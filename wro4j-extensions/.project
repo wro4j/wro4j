@@ -1,0 +1,16 @@
+<projectDescription>
+  <name>wro4j-extensions</name>
+  <comment/>
+  <projects>
+    <project>wro4j-core</project>
+    <project>wro4j-test-utils</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

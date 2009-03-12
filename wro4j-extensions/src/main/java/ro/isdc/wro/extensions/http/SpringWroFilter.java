@@ -1,0 +1,74 @@
+/*
+ * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ */
+package ro.isdc.wro.extensions.http;
+
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.manager.WroManagerFactory;
+
+/**
+ * SpringWroFilter.<br>
+ * A WroFilter capable to get a {@link WroManagerFactory} instance from spring
+ * context. The filter must have initParam called <code>targetBeanName</code>
+ * whose value will be looked up in the spring application context.
+ * 
+ * @author Alexandru.Objelean / ISDC! Romania
+ * @version $Revision: $
+ * @date $Date: $
+ * @created Created on Dec 5, 2008
+ */
+public final class SpringWroFilter extends WroFilter {
+  /**
+   * Init param for target bean name - used to retrieve factory instance from
+   * spring application context.
+   */
+  private static final String PARAM_TARGET_BEAN_NAME = "targetBeanName";
+
+  /**
+   * Default target bean name.
+   */
+  private static final String DEFAULT_TARGET_BEAN_NAME = "wro4j.wroManagerFactory";
+
+  /**
+   * {@link WroManagerFactory} instance from spring application context..
+   */
+  private WroManagerFactory factory;
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void doInit(final FilterConfig filterConfig)
+      throws ServletException {
+    String targetBeanName = filterConfig
+        .getInitParameter(PARAM_TARGET_BEAN_NAME);
+    // apply default targetBeanName
+    targetBeanName = StringUtils.isEmpty(targetBeanName) ? DEFAULT_TARGET_BEAN_NAME
+        : targetBeanName;
+    final WebApplicationContext ctx = WebApplicationContextUtils
+        .getWebApplicationContext(filterConfig.getServletContext());
+    factory = (WroManagerFactory) ctx.getBean(targetBeanName,
+        WroManagerFactory.class);
+    if (factory == null) {
+      throw new WroRuntimeException("Could not locate: "
+          + WroManagerFactory.class.getName()
+          + " instance in applicationContext with bean name: " + targetBeanName);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroManagerFactory getWroManagerFactory() {
+    return factory;
+  }
+}

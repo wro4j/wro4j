@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
+
+  <group name="all">
+    <group-ref>uniform</group-ref>
+    <group-ref>JSGroup</group-ref>
+  </group>
+
+  <group name="uniform">
+    <!--css>file:c:/temp/fileFromDisk.css</css-->
+    <css>/static/css/webapp.css</css>
+    <css>classpath:ro/isdc/wro/resources/classpath.css</css>
+    <css>classpath:com/resources/css/classpath.css</css>
+  </group>
+
+  <group name="dwr">
+    <js>/dwr/engine.js</js>
+    <js>/dwr/interface/DWRFacade.js</js>
+  </group>
+
+  <group name="JSGroup">
+    <js>/static/js/css-browser-selector.js</js>
+    <js>/static/js/jquery.js</js>
+    <js>/static/js/jquery.blockUI.js</js>
+    <js>/static/js/jquery.selectboxes.js</js>
+    <js>/static/js/DOMWindow.js</js>
+    <js>/static/js/calendar_stripped.js</js>
+    <js>/static/js/base.js</js>
+    <js>/static/js/validator-src.js</js>
+    <js>/static/js/error-handlers-src.js</js>
+    <js>/static/js/stringify.js</js>
+    <js>/dwr/engine.js</js>
+    <js>/dwr/interface/DWRFacade.js</js>
+  </group>
+
+  <group name="jquery">
+    <js>/static/js/jquery.js</js>
+    <js>/static/js/jquery.livequery.js</js>
+    <js>/static/js/jquery-validate.js</js>
+    <js>/static/js/jquery-ui-all.js</js>
+  </group>
+
+</groups>

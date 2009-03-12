@@ -1,0 +1,18 @@
+<classpath>
+  <classpathentry kind="src" path="src/main/java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
+  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.4/commons-io-1.4.jar" sourcepath="M2_REPO/commons-io/commons-io/1.4/commons-io-1.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/easymock/easymock/2.3/easymock-2.3.jar" sourcepath="M2_REPO/org/easymock/easymock/2.3/easymock-2.3-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl104-over-slf4j/1.5.0/jcl104-over-slf4j-1.5.0.jar" sourcepath="M2_REPO/org/slf4j/jcl104-over-slf4j/1.5.0/jcl104-over-slf4j-1.5.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.3.1/junit-4.3.1.jar" sourcepath="M2_REPO/junit/junit/4.3.1/junit-4.3.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar" sourcepath="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.0/slf4j-api-1.5.0.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.5.0/slf4j-api-1.5.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.5.0/slf4j-log4j12-1.5.0.jar" sourcepath="M2_REPO/org/slf4j/slf4j-log4j12/1.5.0/slf4j-log4j12-1.5.0-sources.jar"/>
+  <classpathentry kind="src" path="/wro4j-test-utils"/>
+</classpath>

@@ -1,0 +1,70 @@
+/*
+ * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ */
+package ro.isdc.wro.resource.impl;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import ro.isdc.wro.resource.UriLocator;
+import ro.isdc.wro.util.StringUtils;
+
+/**
+ * Implementation of the {@link UriLocator} that is able to read a resource from
+ * a classpath.
+ * 
+ * @author alexandru.objelean / ISDC! Romania
+ * @version $Revision: $
+ * @date $Date: $
+ * @created Created on Nov 6, 2008
+ */
+public final class ClasspathUriLocator implements UriLocator {
+  /**
+   * Logger for this class.
+   */
+  private static final Log log = LogFactory.getLog(ClasspathUriLocator.class);
+
+  /**
+   * Prefix of the resource uri used to check if the resource can be read by
+   * this {@link UriLocator} implementation.
+   */
+  public static final String PREFIX = "classpath:";
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean accept(final String url) {
+    return url.startsWith(PREFIX);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public InputStream locate(final String uri) throws IOException {
+    if (uri == null) {
+      throw new IllegalArgumentException("URI cannot be NULL!");
+    }
+    log.debug("Reading uri: " + uri);
+    // replace prefix & clean path by removing '..' characters if exists and
+    // normalizing the location to use.
+    final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, ""));
+    try {
+      final ClassLoader classLoader = Thread.currentThread()
+          .getContextClassLoader();
+      final InputStream is = classLoader.getResourceAsStream(location);
+      if (is == null) {
+        throw new NullPointerException();
+      }
+      final URL url = classLoader.getResource(location);
+      return url.openStream();
+      // return is;
+    } catch (final NullPointerException e) {
+      throw new IOException("Couldn't get InputStream from this resource: "
+          + uri);
+    }
+  }
+}

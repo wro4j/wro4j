@@ -1,0 +1,307 @@
+/*
+ * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ */
+package ro.isdc.wro.processor.impl;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.UriLocator;
+import ro.isdc.wro.util.WroUtil;
+
+/**
+ * CssUrlRewritingProcessor.<br>
+ * The algorithm requires two types of {@link UriLocator} objects, one for
+ * resolving url resources & one for classpathresources. Both need to be
+ * injected using IoC when creating the instance of
+ * {@link CssUrlRewritingProcessor} class.
+ * <p>
+ * Rewrites background images url of the provided css content. This
+ * implementation takes care of most common cases such as those described
+ * bellow:
+ * <p>
+ * <table border="1" cellpadding="5"><thead>
+ * <tr>
+ * <th>Css resource URI</th>
+ * <th>Image URL</th>
+ * <th>Computed Image URL</th>
+ * </tr>
+ * </thead> <tbody>
+ * <tr>
+ * <td>ANY</td>
+ * <td>[URL]/1.jpg</td>
+ * <td>[URL]/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td rowspan="4">/1.css</td>
+ * <td>/a/1.jpg</td>
+ * <td>/a/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>/1.jpg</td>
+ * <td>/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>1.jpg</td>
+ * <td>../1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>../1.jpg</td>
+ * <td>../../1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td rowspan="4">[X]/1.css <br/><br/> where [X] is URL or a classpath
+ * resource<br/> where [WRO-PREFIX] is a servletContext prefix <br/>which will
+ * map WRO filter to the result url. </td>
+ * <td>/a/1.jpg</td>
+ * <td>[WRO-PREFIX]?id=[X]/a/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>/1.jpg</td>
+ * <td>[WRO-PREFIX]?id=[X]/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>1.jpg</td>
+ * <td>[WRO-PREFIX]?id=[X]/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>../1.jpg</td>
+ * <td>[WRO-PREFIX]?id=[X]/../1.jpg</td>
+ * </tr>
+ * </tbody> </table>
+ * 
+ * @author alexandru.objelean / ISDC! Romania
+ * @version $Revision: $
+ * @date $Date: $
+ * @created Created on Nov 19, 2008
+ */
+public class CssUrlRewritingProcessor implements ResourcePreProcessor {
+  /**
+   * Logger for this class.
+   */
+  private static final Log log = LogFactory
+      .getLog(CssUrlRewritingProcessor.class);
+
+  /**
+   * Resources mapping path. If request uri contains this, the filter will
+   * dispatch it to the original resource.
+   */
+  // public static final String PATH_RESOURCES = "wro/resources";
+  public static final String PATH_RESOURCES = "wroResources";
+
+  /**
+   * The name of resource id parameter.
+   */
+  public static final String PARAM_RESOURCE_ID = "id";
+
+  /**
+   * Src Url pattern.
+   */
+  private static final String PATTERN_PATH = "url\\s*\\(((?:.|\\s)*?)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+
+  /**
+   * Compiled pattern.
+   */
+  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH,
+      Pattern.CASE_INSENSITIVE);
+
+  /**
+   * Prefix of the classpath resource.
+   */
+  private static final String PREFIX_CLASSPATH = "classpath:";
+
+  /**
+   * Prefix of the classpath resource.
+   */
+  private static final String PREFIX_DOT = ":";
+
+  /**
+   * Prefix of the servletContext resource.
+   */
+  private static final String PREFIX_SLASH = "/";
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final String cssUri, final Reader reader,
+      final Writer writer) throws IOException {
+    log.debug("<process>");
+    log.debug("\t<cssUri>" + cssUri + "</cssUri>");
+    final String css = IOUtils.toString(reader);
+    final String result = parseCss(css, cssUri);
+    writer.write(result);
+    writer.close();
+    log.debug("</process>");
+  }
+
+  /**
+   * Perform actual css parsing logic.
+   * 
+   * @param cssContent
+   *          to parse.
+   * @param cssUri
+   *          Uri of the css to parse.
+   * @return parsed css.
+   */
+  private String parseCss(final String cssContent, final String cssUri) {
+    final Matcher m = PATTERN.matcher(cssContent);
+    final StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+      final String oldMatch = m.group();
+      final String urlGroup = m.group(1) != null ? m.group(1) : m.group(2);
+      if (urlGroup == null) {
+        throw new IllegalStateException("Could not extract urlGroup from: "
+            + oldMatch);
+      }
+      final String newReplacement = oldMatch.replace(urlGroup, replaceImageUrl(
+          urlGroup, cssUri));
+      m.appendReplacement(sb, newReplacement);
+    }
+    m.appendTail(sb);
+    return sb.toString();
+  }
+
+  /**
+   * Replace provided url with the new url if needed.
+   * 
+   * @param imageUrl
+   *          to replace.
+   * @param cssUri
+   *          Uri of the parsed css.
+   * @return replaced url.
+   */
+  private String replaceImageUrl(final String imageUrl, final String cssUri) {
+    if (isReplaceNeeded(imageUrl)) {
+      if (isServletContextResource(cssUri)) {
+        if (isServletContextResource(imageUrl)) {
+          return imageUrl;
+        }
+        return computeNewImageLocation(".." + cssUri, imageUrl);
+      }
+      if (isUrlResource(cssUri) || isClassPathResource(cssUri)) {
+        return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
+      } else {
+        throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl
+            + ", contained at location: " + cssUri);
+      }
+    }
+    return imageUrl;
+  }
+
+  /**
+   * Concatenates cssUri and imageUrl after few changes are applied to both
+   * input parameters.
+   * 
+   * @param cssUri
+   *          the URI of css resource.
+   * @param imageUrl
+   *          the URL of image referred in css.
+   * @return processed new location of image url.
+   */
+  private String computeNewImageLocation(final String cssUri,
+      final String imageUrl) {
+    final String cleanImageUrl = cleanImageUrl(imageUrl);
+    // for the following input: /a/b/c/1.css => /a/b/c/
+    int idxLastSeparator = cssUri.lastIndexOf(PREFIX_SLASH);
+    if (idxLastSeparator == -1) {
+      if (isClassPathResource(cssUri)) {
+        // try with ':' character for classpathResource case
+        idxLastSeparator = cssUri.lastIndexOf(PREFIX_DOT);
+      }
+      if (idxLastSeparator < 0) {
+        throw new IllegalStateException("Invalid cssUri: " + cssUri
+            + ". Should contain at least one '/' character!");
+      }
+    }
+    final String cssUriFolder = cssUri.substring(0, idxLastSeparator + 1);
+    // remove '/' from imageUrl if it starts with one.
+    final String processedImageUrl = cleanImageUrl.startsWith(PREFIX_SLASH) ? cleanImageUrl
+        .substring(1)
+        : cleanImageUrl;
+    return cssUriFolder + processedImageUrl;
+  }
+
+  /**
+   * Cleans the image url by triming result and removing \' or \" characters if
+   * such exists.
+   * 
+   * @param imageUrl
+   *          to clean.
+   * @return cleaned image URL.
+   */
+  private String cleanImageUrl(final String imageUrl) {
+    final String result = imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
+    return result.toString();
+  }
+
+  /**
+   * Check if a uri is a classpath resource.
+   * 
+   * @param uri
+   *          to check.
+   * @return true if the uri is a classpath resource.
+   */
+  private boolean isClassPathResource(final String uri) {
+    return uri.trim().startsWith(PREFIX_CLASSPATH);
+  }
+
+  /**
+   * Check if a uri is a URL resource.
+   * 
+   * @param uri
+   *          to check.
+   * @return true if the uri is a URL resource.
+   */
+  private boolean isUrlResource(final String uri) {
+    try {
+      new URL(uri);
+    } catch (final MalformedURLException e) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Check if a uri is a servletContext resource.
+   * 
+   * @param uri
+   *          to check.
+   * @return true if the uri is a servletContext resource.
+   */
+  private boolean isServletContextResource(final String uri) {
+    return uri.trim().startsWith(PREFIX_SLASH);
+  }
+
+  /**
+   * Check if url must be replaced or not.
+   * 
+   * @param url
+   *          to check.
+   * @return true if url needs to be replaced or remain unchanged.
+   */
+  private boolean isReplaceNeeded(final String url) {
+    // The replacement is not needed if the url of the image is absolute (can be
+    // resolved by urlResourceLocator).
+    return !isUrlResource(url);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected String getUrlPrefix() {
+    final String urlPrefix = WroUtil.getRequestUriPath() + PATH_RESOURCES + "?"
+        + PARAM_RESOURCE_ID + "=";
+    return urlPrefix;
+  }
+}
