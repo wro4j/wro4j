@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,6 +34,7 @@ import org.xml.sax.SAXException;
 
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
 import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.http.ContextHolder;
 import ro.isdc.wro.manager.WroSettings;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
@@ -41,9 +45,9 @@ import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
- * Model factory implementation. Creates a WroModel object, based on an xml.
- * This xml contains the description of all groups.
- * 
+ * Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the
+ * description of all groups.
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -91,33 +95,42 @@ public class XmlModelFactory implements WroModelFactory {
   private static final String ATTR_GROUP_NAME = "name";
 
   /**
+   * Browsers attribute used in xml.
+   */
+  private static final String ATTR_BROWSERS = "browsers";
+
+  /**
+   * Browsers attribute used in xml.
+   */
+  private static final String ATTR_NEGATED = "negated";
+
+  /**
    * UriLocatorFactory. Used to create a resource based on its type.
    */
   private UriLocatorFactory uriLocatorFactory;
 
   /**
-   * Map between the group name and corresponding element. Hold the map<GroupName,
-   * Element> of all group nodes to access any element.
+   * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group
+   * nodes to access any element.
    */
   final Map<String, Element> allGroupElements = new HashMap<String, Element>();
 
   /**
-   * List of groups which are currently processing and are partially parsed.
-   * This list is useful in order to catch infinite recurse group reference.
+   * List of groups which are currently processing and are partially parsed. This list is useful in order to
+   * catch infinite recurse group reference.
    */
   final List<String> processingGroups = new ArrayList<String>();
 
   /**
-   * Reference to cached model instance. Using volatile keyword fix the problem
-   * with double-checked locking in JDK 1.5.
+   * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking
+   * in JDK 1.5.
    */
   private volatile WroModel model;
 
   /**
    * {@inheritDoc}
    */
-  public synchronized WroModel getInstance(
-      final UriLocatorFactory uriLocatorFactory) {
+  public synchronized WroModel getInstance(final UriLocatorFactory uriLocatorFactory) {
     log.debug("<getInstance>");
     try {
       if (uriLocatorFactory == null) {
@@ -144,20 +157,18 @@ public class XmlModelFactory implements WroModelFactory {
 
   /**
    * Build model from scratch after xml is parsed.
-   * 
+   *
    * @return new instance of model.
    */
   private WroModel newModel() {
     // TODO return a single instance based on some configuration?
     Document document = null;
     try {
-      final DocumentBuilderFactory factory = DocumentBuilderFactory
-          .newInstance();
+      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
       // factory.setSchema(getSchema());
       // factory.setValidating(true);
-      document = factory.newDocumentBuilder()
-          .parse(getConfigResourceAsStream());
+      document = factory.newDocumentBuilder().parse(getConfigResourceAsStream());
       IOUtils.copy(getConfigResourceAsStream(), System.out);
       validate(document);
       document.getDocumentElement().normalize();
@@ -185,17 +196,15 @@ public class XmlModelFactory implements WroModelFactory {
         .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
     // load a WXS schema, represented by a Schema instance
-    final Source schemaFile = new StreamSource(
-        getResourceAsStream(XML_SCHEMA_FILE));
+    final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
     IOUtils.copy(getResourceAsStream(XML_SCHEMA_FILE), System.out);
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
   }
 
   /**
-   * Override this method, in order to provide different xml definition file
-   * name.
-   * 
+   * Override this method, in order to provide different xml definition file name.
+   *
    * @return name of the xml file containing group & resource definition.
    */
   protected InputStream getConfigResourceAsStream() {
@@ -216,9 +225,8 @@ public class XmlModelFactory implements WroModelFactory {
 
   /**
    * Parse the document and creates the model.
-   * 
-   * @param document
-   *          to parse.
+   *
+   * @param document to parse.
    * @return {@link WroModel} object.
    */
   private WroModel createModel() {
@@ -232,23 +240,19 @@ public class XmlModelFactory implements WroModelFactory {
   }
 
   /**
-   * Recursive method. Add the parsed element group to the group collection. If
-   * the group contains group-ref element, parse recursively this group.
-   * 
-   * @param element
-   *          Group Element to parse.
-   * @param groups
-   *          list of parsed groups where the parsed group is added..
+   * Recursive method. Add the parsed element group to the group collection. If the group contains group-ref
+   * element, parse recursively this group.
+   *
+   * @param element Group Element to parse.
+   * @param groups list of parsed groups where the parsed group is added..
    * @return list of resources associated with this resource
    */
-  private List<Resource> parseGroup(final Element element,
-      final List<Group> groups) {
+  private List<Resource> parseGroup(final Element element, final List<Group> groups) {
     log.debug("<parseGroup>");
     final String name = element.getAttribute(ATTR_GROUP_NAME);
     if (processingGroups.contains(name)) {
-      throw new RecursiveGroupDefinitionException(
-          "Infinite Recursion detected for the group: " + name
-              + ". Recursion path: " + processingGroups);
+      throw new RecursiveGroupDefinitionException("Infinite Recursion detected for the group: " + name
+          + ". Recursion path: " + processingGroups);
     }
     processingGroups.add(name);
     log.debug("\tgroupName=" + name);
@@ -280,17 +284,14 @@ public class XmlModelFactory implements WroModelFactory {
   }
 
   /**
-   * Check if the group with name <code>name</code> was already parsed and
-   * returns Group object with it's resources initialized.
-   * 
-   * @param name
-   *          the group to check.
-   * @param groups
-   *          list of parsed groups.
+   * Check if the group with name <code>name</code> was already parsed and returns Group object with it's
+   * resources initialized.
+   *
+   * @param name the group to check.
+   * @param groups list of parsed groups.
    * @return parsed Group by it's name.
    */
-  private static Group getGroupByName(final String name,
-      final List<Group> groups) {
+  private static Group getGroupByName(final String name, final List<Group> groups) {
     for (final Group group : groups) {
       if (name.equals(group.getName())) {
         return group;
@@ -304,16 +305,14 @@ public class XmlModelFactory implements WroModelFactory {
   }
 
   /**
-   * Creates a resource from a given resourceElement. It can be css, js. If
-   * resource tag name is group-ref, the method will start a recursive
-   * computation.
-   * 
+   * Creates a resource from a given resourceElement. It can be css, js. If resource tag name is group-ref,
+   * the method will start a recursive computation.
+   *
    * @param resourceElement
-   * @param resources
-   *          list of parsed resources where the parsed resource is added.
+   * @param resources list of parsed resources where the parsed resource is added.
    */
-  private void parseResource(final Element resourceElement,
-      final List<Resource> resources, final List<Group> groups) {
+  private void parseResource(final Element resourceElement, final List<Resource> resources,
+      final List<Group> groups) {
     log.debug("<parseResource>");
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
@@ -337,27 +336,117 @@ public class XmlModelFactory implements WroModelFactory {
     if (type != null) {
       final UriLocator uriLocator = this.uriLocatorFactory.getInstance(uri);
       final Resource resource = new Resource(uri, type, uriLocator);
-      resources.add(resource);
+
+      if (checkResourceFilter(resourceElement)) {
+        resources.add(resource);
+      }
     }
     log.debug("</parseResource>");
+  }
+
+  /**
+   * Check the attributes of the current resource element against the request properties.
+   *
+   * @param resourceElement current resource.
+   * @return true is this resource is valid.
+   */
+  private boolean checkResourceFilter(final Element resourceElement) {
+    String browsersAttr = resourceElement.getAttribute(ATTR_BROWSERS);
+    String browserProp = getBrowser(ContextHolder.REQUEST_HOLDER.get().getHeader("User-Agent"));
+    if (browsersAttr != null && !browsersAttr.equals("") && browserProp != null) {
+      boolean negated = false;
+
+      String negatedAttr = resourceElement.getAttribute(ATTR_NEGATED);
+      if (negatedAttr != null && negatedAttr.equals("true")) {
+        negated = true;
+      }
+
+      String[] browsers = browsersAttr.split(",");
+      String[] uaTokens = browserProp.split("\\s");
+      boolean found = false;
+      for (String t : uaTokens) {
+        for (String b : browsers) {
+          if (t.startsWith(b)) {
+            return !negated; // found ^ negated
+          }
+        }
+      }
+      return negated; // found ^ negated
+    }
+
+    return true;
+  }
+
+  /**
+   * Retrieve the brwser name, user agent, etc as string.
+   *
+   * @param userAgentheader
+   * @return
+   */
+  private String getBrowser(String userAgentheader) {
+    String ua = userAgentheader.toLowerCase();
+    Pattern iePattern = Pattern.compile("msie\\s(\\d\\.\\d)");
+    Pattern opExPattern = Pattern.compile("opera|webtv");
+    Matcher opExMatcher = opExPattern.matcher(ua);
+    Matcher ieMatcher = iePattern.matcher(ua);
+
+    if (!opExMatcher.find() && ieMatcher.find()) {
+      return "ie" + ieMatcher.group(1);
+    }
+
+    StringBuffer buffer = new StringBuffer();
+    Pattern ffPattern = Pattern.compile("firefox/(\\d+)");
+    Matcher ffMatcher = ffPattern.matcher(ua);
+    if (ffMatcher.find()) {
+      buffer.append("ff" + ffMatcher.group(1)).append(" ");
+    }
+    Pattern opPattern = Pattern.compile("opera/(\\d+)");
+    Matcher opMatcher = opPattern.matcher(ua);
+    if (opMatcher.find()) {
+      buffer.append("opera" + opMatcher.group(1)).append(" ");
+    }
+    Pattern kqPattern = Pattern.compile("konqueror");
+    Matcher kqMatcher = kqPattern.matcher(ua);
+    if (kqMatcher.find()) {
+      buffer.append("konqueror").append(" ");
+    }
+    Pattern chPattern = Pattern.compile("chrome");
+    Matcher chMatcher = chPattern.matcher(ua);
+    if (chMatcher.find()) {
+      buffer.append("chrome").append(" ").append(" ");
+    }
+    Pattern wkPattern = Pattern.compile("applewebkit/");
+    Matcher wkMatcher = wkPattern.matcher(ua);
+    if (wkMatcher.find()) {
+      buffer.append("webkit").append(" ");
+    }
+    Pattern mozPattern = Pattern.compile("mozilla/");
+    Matcher mozMatcher = wkPattern.matcher(ua);
+    if (mozMatcher.find()) {
+      buffer.append("mozilla").append(" ");
+    }
+    Pattern geckoPattern = Pattern.compile("gecko/");
+    Matcher geckoMatcher = geckoPattern.matcher(ua);
+    if (geckoMatcher.find()) {
+      buffer.append("gecko").append(" ");
+    }
+
+    return buffer.toString();
   }
 
   /**
    * @return InputStream of the local resource from classpath.
    */
   private static InputStream getResourceAsStream(final String fileName) {
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(
-        fileName);
+    return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
   }
 
   /**
    * Checks if xml structure is valid.
-   * 
-   * @param document
-   *          xml document to validate.
+   *
+   * @param document xml document to validate.
    */
-  private void validate(final Document document) throws IOException,
-      SAXException {
+  private void validate(final Document document) throws IOException, SAXException {
     IOUtils.copy(getResourceAsStream(XML_SCHEMA_FILE), System.out);
     final Schema schema = getSchema();
     // create a Validator instance, which can be used to validate an instance

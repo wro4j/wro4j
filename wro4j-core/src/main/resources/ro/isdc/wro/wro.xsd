@@ -2,23 +2,53 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www.isdc.ro/wro" xmlns="http://www.isdc.ro/wro"
 	elementFormDefault="qualified">
-
 	<xsd:element name="groups" type="Groups" />
-
 	<xsd:complexType name="Groups">
 		<xsd:sequence>
 			<xsd:element name="group" type="Group" minOccurs="1"
 				maxOccurs="unbounded" />
 		</xsd:sequence>
 	</xsd:complexType>
-
+	<xsd:attributeGroup name="wroelemgroup">
+		<xsd:attribute name="browsers" type="xsd:string" />
+		<xsd:attribute name="negated">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:pattern value="true|false" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:attributeGroup>
 	<xsd:complexType name="Group">
 		<xsd:choice maxOccurs="unbounded" minOccurs="1">
-			<xsd:element name="css" type="xsd:string" />
-			<xsd:element name="js" type="xsd:string" />
-			<xsd:element name="group-ref" type="xsd:IDREF" />
+			<xsd:element name="css">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="wroelemgroup" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="js">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="wroelemgroup" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="group-ref">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:IDREF">
+							<xsd:attributeGroup ref="wroelemgroup" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:ID" use="required" />
 	</xsd:complexType>
-
 </xsd:schema>
