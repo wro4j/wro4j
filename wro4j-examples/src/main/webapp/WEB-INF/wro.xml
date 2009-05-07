@@ -11,6 +11,9 @@
   <group name="uniform">
     <!--css>file:c:/temp/fileFromDisk.css</css-->
     <css>/static/css/webapp.css</css>
+    <css browsers="ie,opera10">/static/css/css1.css</css>
+    <css browsers="chrome">/static/css/css2.css</css>
+    <css browsers="ff">/static/css/css3.css</css>
     <css>classpath:ro/isdc/wro/resources/classpath.css</css>
     <css>classpath:com/resources/css/classpath.css</css>
   </group>
@@ -21,7 +24,7 @@
   </group>
 
   <group name="JSGroup">
-    <js>/static/js/css-browser-selector.js</js>
+    <js browsers="ie,gecko">/static/js/css-browser-selector.js</js>
     <js>/static/js/jquery.js</js>
     <js>/static/js/jquery.blockUI.js</js>
     <js>/static/js/jquery.selectboxes.js</js>
