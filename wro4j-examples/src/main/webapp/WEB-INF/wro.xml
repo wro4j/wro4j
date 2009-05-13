@@ -13,7 +13,7 @@
     <css>/static/css/webapp.css</css>
     <css browsers="ie,opera10">/static/css/css1.css</css>
     <css browsers="chrome">/static/css/css2.css</css>
-    <css browsers="ff">/static/css/css3.css</css>
+    <css browsers="ff">/static/css/css${number}.css</css>
     <css>classpath:ro/isdc/wro/resources/classpath.css</css>
     <css>classpath:com/resources/css/classpath.css</css>
   </group>
