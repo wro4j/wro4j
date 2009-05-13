@@ -3,16 +3,20 @@
  */
 package ro.isdc.wro.model.impl;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -122,10 +126,15 @@ public class XmlModelFactory implements WroModelFactory {
   final List<String> processingGroups = new ArrayList<String>();
 
   /**
-   * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking
-   * in JDK 1.5.
+   * Reference to cached model configuration. Using volatile keyword fix the problem with double-checked
+   * locking in JDK 1.5.
    */
-  private volatile WroModel model;
+  private volatile String configString;
+
+  /**
+   * Dynamic parameters regexp pattern
+   */
+  private static Pattern paramPattern = Pattern.compile("\\$\\{(.+?)\\}");
 
   /**
    * {@inheritDoc}
@@ -137,19 +146,8 @@ public class XmlModelFactory implements WroModelFactory {
         throw new IllegalArgumentException("uriLocatorFactory cannot be NULL!");
       }
       this.uriLocatorFactory = uriLocatorFactory;
-      // when in DEVELOPMENT mode, create fresh new instance for each request.
-      if (WroSettings.getConfiguration().isDevelopment()) {
-        return newModel();
-      }
-      // use double-check locking
-      if (this.model == null) {
-        synchronized (this) {
-          if (this.model == null) {
-            this.model = newModel();
-          }
-        }
-      }
-      return this.model;
+
+      return constructModel();
     } finally {
       log.debug("</getInstance>");
     }
@@ -160,7 +158,7 @@ public class XmlModelFactory implements WroModelFactory {
    *
    * @return new instance of model.
    */
-  private WroModel newModel() {
+  private WroModel constructModel() {
     // TODO return a single instance based on some configuration?
     Document document = null;
     try {
@@ -168,8 +166,14 @@ public class XmlModelFactory implements WroModelFactory {
       factory.setNamespaceAware(true);
       // factory.setSchema(getSchema());
       // factory.setValidating(true);
-      document = factory.newDocumentBuilder().parse(getConfigResourceAsStream());
-      IOUtils.copy(getConfigResourceAsStream(), System.out);
+
+      // cache the config content for DEPLOYMENT mode
+      InputStream configStream = getCachedConfigStream();
+
+      // replace the expressions with the values
+      document = factory.newDocumentBuilder().parse(replaceExpressions(configStream));
+
+      // IOUtils.copy(configStream, System.out);
       validate(document);
       document.getDocumentElement().normalize();
     } catch (final IOException e) {
@@ -184,6 +188,105 @@ public class XmlModelFactory implements WroModelFactory {
     final WroModel model = createModel();
     log.debug("</getInstance>");
     return model;
+  }
+
+  /**
+   * Get the configuration content as a stream based on a input stream from a configuration file or a cached
+   * version string.
+   *
+   * @return the cached version InputStrream for the configuration.
+   */
+  private InputStream getCachedConfigStream() {
+    if (WroSettings.getConfiguration().isDeployment()) {
+      if (this.configString == null) {
+        synchronized (this) {
+          if (this.configString == null) {
+            InputStream configStream = getConfigResourceAsStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(configStream));
+            StringBuilder sb = new StringBuilder();
+
+            String line = null;
+            try {
+              while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+              }
+            } catch (IOException e) {
+              e.printStackTrace();
+            } finally {
+              try {
+                configStream.close();
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            }
+            this.configString = sb.toString();
+          }
+        }
+      }
+    } else {
+      return getConfigResourceAsStream();
+    }
+
+    return new ByteArrayInputStream(this.configString.getBytes());
+  }
+
+  /**
+   * Try to replace the config expressions with suitable values.
+   *
+   * @param configStream
+   * @return
+   * @throws IOException
+   */
+  private InputStream replaceExpressions(InputStream configStream) throws IOException {
+    BufferedReader in = new BufferedReader(new InputStreamReader(configStream));
+
+    StringBuilder builder = new StringBuilder();
+    String line = null;
+    Matcher matcher = null;
+
+    // process the config line by line
+    while ((line = in.readLine()) != null) {
+      // process line
+      matcher = paramPattern.matcher(line);
+      // look up all the parameters in the line
+      while (matcher.find()) {
+        String parameter = matcher.group(1);
+        // replace the param place holder with the value
+        line = matcher.replaceFirst(acquireParamValue(parameter));
+        // check for next parameter
+        matcher = paramPattern.matcher(line);
+      }
+
+      builder.append(line);
+      builder.append("\n");
+    }
+    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(builder.toString().getBytes());
+    return byteArrayInputStream;
+  }
+
+  /**
+   * Get the config parameters from request or session.
+   *
+   * @param parameter
+   * @return
+   */
+  private String acquireParamValue(String parameter) {
+    HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
+
+    // attempt to get the parameter from the request first
+    String paramValue = request.getParameter(parameter);
+
+    if (paramValue == null) {
+      // not a request param, now attempt to get it from session
+      paramValue = (String) request.getSession().getAttribute(parameter);
+    }
+
+    // as last resort will set the value as the parameter name
+    if (paramValue == null) {
+      paramValue = parameter;
+    }
+
+    return paramValue;
   }
 
   /**
