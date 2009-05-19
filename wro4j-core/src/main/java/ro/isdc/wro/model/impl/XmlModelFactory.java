@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,10 +167,10 @@ public class XmlModelFactory implements WroModelFactory {
       // factory.setValidating(true);
 
       // cache the config content for DEPLOYMENT mode
-      InputStream configStream = getCachedConfigStream();
+      checkConfig();
 
       // replace the expressions with the values
-      document = factory.newDocumentBuilder().parse(replaceExpressions(configStream));
+      document = factory.newDocumentBuilder().parse(getExpressionsConfigAsStream());
 
       // IOUtils.copy(configStream, System.out);
       validate(document);
@@ -196,38 +195,32 @@ public class XmlModelFactory implements WroModelFactory {
    *
    * @return the cached version InputStrream for the configuration.
    */
-  private InputStream getCachedConfigStream() {
-    if (WroSettings.getConfiguration().isDeployment()) {
-      if (this.configString == null) {
-        synchronized (this) {
-          if (this.configString == null) {
-            InputStream configStream = getConfigResourceAsStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(configStream));
-            StringBuilder sb = new StringBuilder();
+  private void checkConfig() {
+    if (WroSettings.getConfiguration().isDevelopment() || this.configString == null) {
+      synchronized (this) {
+        if (WroSettings.getConfiguration().isDevelopment() || this.configString == null) {
+          InputStream configStream = getConfigResourceAsStream();
+          BufferedReader reader = new BufferedReader(new InputStreamReader(configStream));
+          StringBuilder sb = new StringBuilder();
 
-            String line = null;
+          String line = null;
+          try {
+            while ((line = reader.readLine()) != null) {
+              sb.append(line + "\n");
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          } finally {
             try {
-              while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-              }
+              configStream.close();
             } catch (IOException e) {
               e.printStackTrace();
-            } finally {
-              try {
-                configStream.close();
-              } catch (IOException e) {
-                e.printStackTrace();
-              }
             }
-            this.configString = sb.toString();
           }
+          this.configString = sb.toString();
         }
       }
-    } else {
-      return getConfigResourceAsStream();
     }
-
-    return new ByteArrayInputStream(this.configString.getBytes());
   }
 
   /**
@@ -237,31 +230,24 @@ public class XmlModelFactory implements WroModelFactory {
    * @return
    * @throws IOException
    */
-  private InputStream replaceExpressions(InputStream configStream) throws IOException {
-    BufferedReader in = new BufferedReader(new InputStreamReader(configStream));
-
-    StringBuilder builder = new StringBuilder();
-    String line = null;
+  private InputStream getExpressionsConfigAsStream() throws IOException {
+    StringBuilder builder = new StringBuilder(this.configString);
     Matcher matcher = null;
 
-    // process the config line by line
-    while ((line = in.readLine()) != null) {
-      // process line
-      matcher = paramPattern.matcher(line);
-      // look up all the parameters in the line
-      while (matcher.find()) {
-        String parameter = matcher.group(1);
-        // replace the param place holder with the value
-        line = matcher.replaceFirst(acquireParamValue(parameter));
-        // check for next parameter
-        matcher = paramPattern.matcher(line);
-      }
+    // process config
+    matcher = paramPattern.matcher(builder.toString());
 
-      builder.append(line);
-      builder.append("\n");
+    // look up all the parameters
+    while (matcher.find()) {
+      String parameter = matcher.group(1);
+
+      // replace the param place holder with the value
+      String replaced = matcher.replaceFirst(acquireParamValue(parameter));
+      builder.replace(0, builder.length() - 1, replaced);
+      matcher = paramPattern.matcher(builder.toString());
     }
-    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(builder.toString().getBytes());
-    return byteArrayInputStream;
+
+    return new ByteArrayInputStream(builder.toString().getBytes());
   }
 
   /**
@@ -466,7 +452,6 @@ public class XmlModelFactory implements WroModelFactory {
 
       String[] browsers = browsersAttr.split(",");
       String[] uaTokens = browserProp.split("\\s");
-      boolean found = false;
       for (String t : uaTokens) {
         for (String b : browsers) {
           if (t.startsWith(b)) {
@@ -524,7 +509,7 @@ public class XmlModelFactory implements WroModelFactory {
       buffer.append("webkit").append(" ");
     }
     Pattern mozPattern = Pattern.compile("mozilla/");
-    Matcher mozMatcher = wkPattern.matcher(ua);
+    Matcher mozMatcher = mozPattern.matcher(ua);
     if (mozMatcher.find()) {
       buffer.append("mozilla").append(" ");
     }
