@@ -191,17 +191,17 @@
     <repository>
       <id>releases</id>
       <name>Internal Releases</name>
-      <url>http://mavenproxy/nexus/content/repositories/m2-inHouse/</url>
+      <url>https://wro4j.googlecode.com/svn/trunk/maven2</url>
     </repository>
     <snapshotRepository>
       <id>snapshots</id>
       <name>Internal Snapshots</name>
-      <url>http://mavenproxy/nexus/content/repositories/m2-inHouse-snapshots</url>
+      <url>https://wro4j.googlecode.com/svn/trunk/maven2</url>
     </snapshotRepository>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:https://linuxsvn/svn/wro</connection>
-    <developerConnection>scm:svn:https://linuxsvn/svn/wro</developerConnection>
-    <url>scm:svn:https://linuxsvn/svn/wro</url>
+    <connection>scm:svn:https://wro4j.googlecode.com/svn/trunk/</connection>
+    <developerConnection>scm:svn:https://wro4j.googlecode.com/svn/trunk/</developerConnection>
+    <url>scm:svn:https://wro4j.googlecode.com/svn/trunk/</url>
   </scm>
 </project>
