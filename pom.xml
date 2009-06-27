@@ -186,17 +186,24 @@
         </configuration>
       </plugin>
     </plugins>
+	<extensions>  
+ 	    <extension>  
+		   <groupId>org.apache.maven.wagon</groupId>  
+		   <artifactId>wagon-webdav</artifactId>  
+		   <version>1.0-beta-2</version>  
+		</extension>  
+   </extensions> 
   </build>
   <distributionManagement>
     <repository>
-      <id>releases</id>
+      <id>wro4j-releases</id>
       <name>Internal Releases</name>
-      <url>https://wro4j.googlecode.com/svn/trunk/maven2</url>
+      <url>dav:https://wro4j.googlecode.com/svn/trunk/maven/repository</url>
     </repository>
     <snapshotRepository>
-      <id>snapshots</id>
+      <id>wro4j-snapshots</id>
       <name>Internal Snapshots</name>
-      <url>https://wro4j.googlecode.com/svn/trunk/maven2</url>
+      <url>dav:https://wro4j.googlecode.com/svn/trunk/maven/repository-snapshot</url>
     </snapshotRepository>
   </distributionManagement>
   <scm>
