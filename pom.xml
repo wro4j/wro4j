@@ -198,12 +198,12 @@
     <repository>
       <id>wro4j-releases</id>
       <name>Internal Releases</name>
-      <url>dav:https://wro4j.googlecode.com/svn/trunk/maven/repository</url>
+      <url>dav:https://wro4j.googlecode.com/svn/maven/repository</url>
     </repository>
     <snapshotRepository>
       <id>wro4j-snapshots</id>
       <name>Internal Snapshots</name>
-      <url>dav:https://wro4j.googlecode.com/svn/trunk/maven/repository-snapshot</url>
+      <url>dav:https://wro4j.googlecode.com/svn/maven/repository-snapshot</url>
     </snapshotRepository>
   </distributionManagement>
   <scm>
