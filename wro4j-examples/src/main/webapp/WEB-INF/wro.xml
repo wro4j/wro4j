@@ -6,17 +6,22 @@
   <group name="all">
     <group-ref>uniform</group-ref>
     <group-ref>JSGroup</group-ref>
+		<group-ref>otherGroup</group-ref>
   </group>
 
   <group name="uniform">
     <!--css>file:c:/temp/fileFromDisk.css</css-->
     <css>/static/css/webapp.css</css>
-    <css browsers="ie,opera10">/static/css/css1.css</css>
-    <css browsers="chrome">/static/css/css2.css</css>
-    <css browsers="ff">/static/css/css${number}.css</css>
+    <css>/static/css/css1.css</css>
+    <css>/static/css/css2.css</css>
+    <css>/static/css/css${number}.css</css>
     <css>classpath:ro/isdc/wro/resources/classpath.css</css>
     <css>classpath:com/resources/css/classpath.css</css>
   </group>
+	
+	<group name="otherGroup">
+		<css>/static/css/variablesSupport.css</css>
+	</group>
 
   <group name="dwr">
     <js>/dwr/engine.js</js>
@@ -24,7 +29,7 @@
   </group>
 
   <group name="JSGroup">
-    <js browsers="ie,gecko">/static/js/css-browser-selector.js</js>
+    <js>/static/js/css-browser-selector.js</js>
     <js>/static/js/jquery.js</js>
     <js>/static/js/jquery.blockUI.js</js>
     <js>/static/js/jquery.selectboxes.js</js>

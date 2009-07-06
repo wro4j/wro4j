@@ -18,6 +18,7 @@ import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.impl.ContentStripperResourceProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
+import ro.isdc.wro.processor.impl.CssVariablesPreprocessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.UriProcessorImpl;
 import ro.isdc.wro.resource.UriLocator;
@@ -87,6 +88,7 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
     final GroupsProcessorImpl groupProcessor = new GroupsProcessorImpl();
     final List<ResourcePreProcessor> cssPreProcessors = new ArrayList<ResourcePreProcessor>();
     cssPreProcessors.add(new CssUrlRewritingProcessor());
+    cssPreProcessors.add(new CssVariablesPreprocessor());
     groupProcessor.setCssPreProcessors(cssPreProcessors);
     final List<ResourcePostProcessor> postProcessors = new ArrayList<ResourcePostProcessor>();
     postProcessors.add(new ContentStripperResourceProcessor());

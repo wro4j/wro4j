@@ -50,7 +50,7 @@ public class CssVariablesPreprocessor
    *   mainBackground: yellow;
    * </code>
    */
-  private static final String REGEX_VARIABLES_BODY = "(\\w+)\\s*:\\s*(.+?);";//"(\\w+)\\s*:\\s*([^;]*)";//"(\\w+)\\s*:\\s*(.+)(?:;)";;
+  private static final String REGEX_VARIABLES_BODY = "([^:\\s]*)\\s*:\\s*(.+?);";//"(\\w+)\\s*:\\s*(.+?);";//"(\\w+)\\s*:\\s*([^;]*)";//"(\\w+)\\s*:\\s*(.+)(?:;)";;
   /**
    * Pattern used to parse variables body & to extract mapping between variable & its value. For instance:<br/>
    * <code>
@@ -85,6 +85,7 @@ public class CssVariablesPreprocessor
     final Matcher m = PATTERN_VARIABLES_BODY.matcher(variablesBody);
     log.debug("parsing variables body");
     while (m.find()) {
+    	log.debug("found:" + m.group());
       map.put(m.group(1), m.group(2));
     }
     return map;
