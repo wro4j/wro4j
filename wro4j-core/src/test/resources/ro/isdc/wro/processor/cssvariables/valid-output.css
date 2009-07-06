@@ -1,8 +1,9 @@
-@variables {
-  mainColor: #fe8d12;
-  mainBackground: white;
-}
 body {
   color: #fe8d12;
   background: white;
+}
+div#panelId {
+  border: solid red 1px;
+  font: Arial;
+	margin: var(INVALID_VARIABLE);
 }

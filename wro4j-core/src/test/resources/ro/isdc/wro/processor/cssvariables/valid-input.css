@@ -2,7 +2,18 @@
   mainColor: #fe8d12;
   mainBackground: white;
 }
+
+@variables {
+  var1: solid red 1px;
+  var2 : Arial;
+}
+
 body {
   color: var(mainColor);
   background: var(mainBackground);
+}
+div#panelId {
+	border: var(var1);
+	font: var(var2);
+	margin: var(INVALID_VARIABLE);
 }
