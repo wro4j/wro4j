@@ -11,10 +11,8 @@ import ro.isdc.wro.manager.impl.StandAloneWroManagerFactory;
 
 /**
  * TestWroManager.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
  * @created Created on Nov 3, 2008
  */
 public class TestWroManager {

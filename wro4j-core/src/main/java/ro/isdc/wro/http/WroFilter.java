@@ -25,10 +25,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.manager.WroSettings;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.WroProcessResult;
+import ro.isdc.wro.manager.WroSettings;
 import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.Configuration;
@@ -36,7 +36,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * WroFilter.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -103,7 +103,7 @@ public class WroFilter implements Filter {
 
   /**
    * Custom filter initialization - can be used for extended classes.
-   * 
+   *
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config) throws ServletException {}
@@ -172,7 +172,7 @@ public class WroFilter implements Filter {
       res.setContentType(result.getContentType());
       final InputStream is = result.getInputStream();
       OutputStream os = response.getOutputStream();
-      if (gzipResources && acceptsEncoding(request, "gzip")) {
+      if (shouldGzip()) {
         os = getGzipedOutputStream(response);
       }
       // append result to response stream
@@ -183,9 +183,19 @@ public class WroFilter implements Filter {
   }
 
   /**
+   * Decision method for gziping resources.
+   * @return true if requested resources should be gziped.
+   */
+  private boolean shouldGzip() {
+    final HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
+    //final String toGzipAsString = request.getParameter("gzip");
+    return acceptsEncoding(request, "gzip") && gzipResources;
+  }
+
+  /**
    * Add gzip header to response and wrap the response {@link OutputStream} with
    * {@link GZIPOutputStream}
-   * 
+   *
    * @param response
    *          {@link HttpServletResponse} object.
    * @return wrapped gziped OutputStream.
@@ -203,7 +213,7 @@ public class WroFilter implements Filter {
   /**
    * Factory method for {@link WroManagerFactory}. Override this method, in
    * order to change the way filter use factory.
-   * 
+   *
    * @return {@link WroManagerFactory} object.
    */
   protected WroManagerFactory getWroManagerFactory() {

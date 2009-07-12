@@ -13,7 +13,7 @@ import ro.isdc.wro.http.ContextHolder;
 
 /**
  * Utility class.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -28,7 +28,7 @@ public final class WroUtil {
 
   /**
    * Retrieve pathInfo from a given location.
-   * 
+   *
    * @param location
    *          where to search contextPath.
    * @return pathInfo value.
@@ -79,7 +79,7 @@ public final class WroUtil {
 
   /**
    * Retrieve servletPath from a given location.
-   * 
+   *
    * @param location
    *          where to search the servletPath.
    * @return ServletPath string value.
@@ -91,19 +91,16 @@ public final class WroUtil {
   /**
    * Adds the gzip HTTP header to the response. This is need when a gzipped body
    * is returned so that browsers can properly decompress it. <p/>
-   * 
+   *
    * @param response
    *          the response which will have a header added to it. I.e this method
    *          changes its parameter
-   * @throws ResponseHeadersNotModifiableException
-   *           Either the response is committed or we were called using the
-   *           include method from a
-   *           {@link javax.servlet.RequestDispatcher#include(javax.servlet.ServletRequest, javax.servlet.ServletResponse)}
-   *           method and the set set header is ignored.
+   * @throws WroRuntimeException
+   *           if response doesnt contains Content-Encoding header.
    */
   public static void addGzipHeader(final HttpServletResponse response) {
     response.setHeader("Content-Encoding", "gzip");
-    boolean containsEncoding = response.containsHeader("Content-Encoding");
+    final boolean containsEncoding = response.containsHeader("Content-Encoding");
     if (!containsEncoding) {
       throw new WroRuntimeException("Failure when attempting to set "
           + "Content-Encoding: gzip");
