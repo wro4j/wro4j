@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <packaging>pom</packaging>
   <name>Web Resource Optimizer Parent</name>
   <modules>
@@ -122,7 +122,12 @@
         <version>4.3.1</version>
         <scope>test</scope>
       </dependency>
-    </dependencies>
+	  <dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-all</artifactId>
+		<version>1.8.0-rc2</version>
+	  </dependency>
+	</dependencies>
   </dependencyManagement>
   <dependencies>
     <dependency>
@@ -220,8 +225,8 @@
     </snapshotRepository>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:https://wro4j.googlecode.com/svn/trunk/</connection>
-    <developerConnection>scm:svn:https://wro4j.googlecode.com/svn/trunk/</developerConnection>
-    <url>scm:svn:https://wro4j.googlecode.com/svn/trunk/</url>
+    <connection>scm:svn:https://wro4j.googlecode.com/svn/tags/wro4j-parent-1.0.1</connection>
+    <developerConnection>scm:svn:https://wro4j.googlecode.com/svn/tags/wro4j-parent-1.0.1</developerConnection>
+    <url>scm:svn:https://wro4j.googlecode.com/svn/tags/wro4j-parent-1.0.1</url>
   </scm>
 </project>
