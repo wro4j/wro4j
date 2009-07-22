@@ -148,9 +148,12 @@ public class WroFilter implements Filter {
     ContextHolder.REQUEST_HOLDER.set(request);
     ContextHolder.RESPONSE_HOLDER.set(response);
     ContextHolder.SERVLET_CONTEXT_HOLDER.set(servletContext);
-
     final String requestURI = request.getRequestURI();
     final WroManager manager = wroManagerFactory.getInstance();
+
+    //set response headers
+    response.setHeader("Cache-Control", "max-age=3600");
+
     // probably would be better to test with startsWith(servletContext +
     // resources)
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
@@ -169,10 +172,11 @@ public class WroFilter implements Filter {
     } else {
       // process the uri using manager
       final WroProcessResult result = manager.process(requestURI);
-      res.setContentType(result.getContentType());
+      response.setContentType(result.getContentType());
       final InputStream is = result.getInputStream();
+
       OutputStream os = response.getOutputStream();
-      if (shouldGzip()) {
+      if (isGzipEnabled()) {
         os = getGzipedOutputStream(response);
       }
       // append result to response stream
@@ -186,7 +190,7 @@ public class WroFilter implements Filter {
    * Decision method for gziping resources.
    * @return true if requested resources should be gziped.
    */
-  private boolean shouldGzip() {
+  private boolean isGzipEnabled() {
     final HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
     //final String toGzipAsString = request.getParameter("gzip");
     return acceptsEncoding(request, "gzip") && gzipResources;

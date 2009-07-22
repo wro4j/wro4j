@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.XMLConstants; 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
@@ -43,7 +43,7 @@ import ro.isdc.wro.resource.UriLocatorFactory;
 /**
  * Model factory implementation. Creates a WroModel object, based on an xml.
  * This xml contains the description of all groups.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -144,7 +144,7 @@ public class XmlModelFactory implements WroModelFactory {
 
   /**
    * Build model from scratch after xml is parsed.
-   * 
+   *
    * @return new instance of model.
    */
   private WroModel newModel() {
@@ -158,7 +158,6 @@ public class XmlModelFactory implements WroModelFactory {
       // factory.setValidating(true);
       document = factory.newDocumentBuilder()
           .parse(getConfigResourceAsStream());
-      IOUtils.copy(getConfigResourceAsStream(), System.out);
       validate(document);
       document.getDocumentElement().normalize();
     } catch (final IOException e) {
@@ -187,7 +186,6 @@ public class XmlModelFactory implements WroModelFactory {
     // load a WXS schema, represented by a Schema instance
     final Source schemaFile = new StreamSource(
         getResourceAsStream(XML_SCHEMA_FILE));
-    IOUtils.copy(getResourceAsStream(XML_SCHEMA_FILE), System.out);
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
   }
@@ -195,7 +193,7 @@ public class XmlModelFactory implements WroModelFactory {
   /**
    * Override this method, in order to provide different xml definition file
    * name.
-   * 
+   *
    * @return name of the xml file containing group & resource definition.
    */
   protected InputStream getConfigResourceAsStream() {
@@ -216,7 +214,7 @@ public class XmlModelFactory implements WroModelFactory {
 
   /**
    * Parse the document and creates the model.
-   * 
+   *
    * @param document
    *          to parse.
    * @return {@link WroModel} object.
@@ -234,7 +232,7 @@ public class XmlModelFactory implements WroModelFactory {
   /**
    * Recursive method. Add the parsed element group to the group collection. If
    * the group contains group-ref element, parse recursively this group.
-   * 
+   *
    * @param element
    *          Group Element to parse.
    * @param groups
@@ -282,7 +280,7 @@ public class XmlModelFactory implements WroModelFactory {
   /**
    * Check if the group with name <code>name</code> was already parsed and
    * returns Group object with it's resources initialized.
-   * 
+   *
    * @param name
    *          the group to check.
    * @param groups
@@ -299,15 +297,11 @@ public class XmlModelFactory implements WroModelFactory {
     return null;
   }
 
-  public static void main(final String[] args) throws IOException {
-    IOUtils.copy(getResourceAsStream(XML_SCHEMA_FILE), System.out);
-  }
-
   /**
    * Creates a resource from a given resourceElement. It can be css, js. If
    * resource tag name is group-ref, the method will start a recursive
    * computation.
-   * 
+   *
    * @param resourceElement
    * @param resources
    *          list of parsed resources where the parsed resource is added.
@@ -352,7 +346,7 @@ public class XmlModelFactory implements WroModelFactory {
 
   /**
    * Checks if xml structure is valid.
-   * 
+   *
    * @param document
    *          xml document to validate.
    */

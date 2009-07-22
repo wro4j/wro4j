@@ -16,7 +16,7 @@ import ro.isdc.wro.resource.UriLocator;
 /**
  * UriLocator capable to read the resources from some URL. Usually, this
  * uriLocator will be the last in the chain of uriLocators.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -52,19 +52,5 @@ public final class UrlUriLocator implements UriLocator {
     log.debug("Reading uri: " + uri);
     final URL url = new URL(uri);
     return url.openStream();
-  }
-
-  public static void main(final String[] args) throws Exception {
-    final URL aurl = new URL("classpath:c");
-    System.out.println(aurl.getProtocol());
-    // System.setProperty("http.proxyHost", "proxy");
-    // System.setProperty("http.proxyPort", "8080");
-    // final URL url = new URL("http://www.gsp.ro");
-    // final StringWriter writer = new StringWriter();
-    // System.out.println("Open connection...");
-    // IOUtils.copy(url.openStream(), writer);
-    // System.out.println(writer.getBuffer().toString());
-    // writer.close();
-    // System.out.println("Done!");
   }
 }
