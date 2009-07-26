@@ -4,12 +4,7 @@
 package ro.isdc.wro.manager;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
@@ -17,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.ContextHolder;
+import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
@@ -39,11 +34,6 @@ public final class WroManager {
    * Logger for this class.
    */
   private static final Log log = LogFactory.getLog(WroManager.class);
-
-  /**
-   * Dynamic parameters regexp pattern
-   */
-  private static Pattern paramPattern = Pattern.compile("\\$\\{(.+?)\\}");
 
   /**
    * ResourcesModel factory.
@@ -98,7 +88,7 @@ public final class WroManager {
     final List<Group> groups = model.getGroupsByNames(groupNames);
 
     String processedResult = null;
-    if (WroSettings.getConfiguration().isDeployment()) {
+    if (!Context.get().isDevelopmentMode()) {
       // Cache based on uri
       processedResult = cacheStrategy.get(uri);
       if (processedResult == null) {
@@ -113,68 +103,13 @@ public final class WroManager {
     final WroProcessResult result = new WroProcessResult();
     result.setContentType(getContentType(type));
 
-    // replace expressions before writing to stream
-    String exprReplaced = replaceExpressions(processedResult);
-
-    result.setInputStream(new ByteArrayInputStream(exprReplaced.getBytes()));
+    result.setInputStream(new ByteArrayInputStream(processedResult.getBytes()));
 
     stopWatch.stop();
     log.info("WroManage process time: " + stopWatch.toString());
 
     log.debug("</process>");
     return result;
-  }
-
-  /**
-   * Try to replace the params expressions with suitable values.
-   *
-   * @param configStream
-   * @return
-   * @throws IOException
-   */
-  private String replaceExpressions(String resource) {
-    StringBuilder builder = new StringBuilder(resource);
-    Matcher matcher = null;
-
-    // process config
-    matcher = paramPattern.matcher(builder.toString());
-
-    // look up all the parameters
-    while (matcher.find()) {
-      String parameter = matcher.group(1);
-
-      // replace the param place holder with the value
-      String replaced = matcher.replaceFirst(acquireParamValue(parameter));
-      builder.replace(0, builder.length() - 1, replaced);
-      matcher = paramPattern.matcher(builder.toString());
-    }
-
-    return builder.toString();
-  }
-
-  /**
-   * Get the parameters from request or session.
-   *
-   * @param parameter
-   * @return
-   */
-  private String acquireParamValue(String parameter) {
-    HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
-
-    // attempt to get the parameter from the request first
-    String paramValue = request.getParameter(parameter);
-
-    if (paramValue == null) {
-      // not a request param, now attempt to get it from session
-      paramValue = (String) request.getSession().getAttribute(parameter);
-    }
-
-    // as last resort will set the value as the parameter name
-    if (paramValue == null) {
-      paramValue = parameter;
-    }
-
-    return paramValue;
   }
 
   /**

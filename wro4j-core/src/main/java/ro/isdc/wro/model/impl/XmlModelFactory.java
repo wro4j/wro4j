@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.manager.WroSettings;
+import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
@@ -125,7 +125,7 @@ public class XmlModelFactory implements WroModelFactory {
       }
       this.uriLocatorFactory = uriLocatorFactory;
       // when in DEVELOPMENT mode, create fresh new instance for each request.
-      if (WroSettings.getConfiguration().isDevelopment()) {
+      if (Context.get().isDevelopmentMode()) {
         return newModel();
       }
       // use double-check locking

@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.ContextHolder;
+import ro.isdc.wro.http.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -36,7 +36,7 @@ import ro.isdc.wro.util.WroUtil;
  * context and if the resource does not exist, will try to use
  * requestDispatcher. This kind of resources will be accepted if their prefix is
  * <code>/</code>.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -75,13 +75,12 @@ public final class ServletContextUriLocator implements UriLocator {
       throw new IllegalArgumentException("URI cannot be NULL!");
     }
     log.debug("uri resource: " + uri);
-    final ServletContext servletContext = ContextHolder.SERVLET_CONTEXT_HOLDER
-        .get();
+    final ServletContext servletContext = Context.get().getServletContext();
     // first attempt
     InputStream inputStream = servletContext.getResourceAsStream(uri);
     if (inputStream == null) {
-      final HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
-      final HttpServletResponse response = ContextHolder.RESPONSE_HOLDER.get();
+      final HttpServletRequest request = Context.get().getRequest();
+      final HttpServletResponse response = Context.get().getResponse();
       inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
     }
     if (inputStream == null) {

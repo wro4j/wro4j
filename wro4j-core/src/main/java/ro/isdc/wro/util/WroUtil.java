@@ -5,11 +5,10 @@ package ro.isdc.wro.util;
 
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.ContextHolder;
+import ro.isdc.wro.http.Context;
 
 /**
  * Utility class.
@@ -44,35 +43,11 @@ public final class WroUtil {
   }
 
   /**
-   * @return contextPath associated with the request from the current thread.
-   */
-  public static String getContextPath() {
-    final HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
-    if (request == null) {
-      throw new IllegalStateException(
-          "Could not locate Context Path from LocalThread!");
-    }
-    return request.getContextPath();
-  }
-
-  /**
-   * @return requestUri associated with the request from the current thread.
-   */
-  public static String getRequestUri() {
-    final HttpServletRequest request = ContextHolder.REQUEST_HOLDER.get();
-    if (request == null) {
-      throw new IllegalStateException(
-          "Could not locate Context Path from LocalThread!");
-    }
-    return request.getRequestURI();
-  }
-
-  /**
    * @return the request uri path - the part until the last / character. For
    *         instance if request uri is: /app/wro/all.css => /app/wro/
    */
   public static String getRequestUriPath() {
-    final String requestUri = getRequestUri();
+    final String requestUri = Context.get().getRequest().getRequestURI();
     final int idxLastSeparator = requestUri.lastIndexOf('/');
     return requestUri.substring(0, idxLastSeparator + 1);
   }

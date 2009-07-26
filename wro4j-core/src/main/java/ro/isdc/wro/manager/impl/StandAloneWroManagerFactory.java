@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.WroSettings;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.UriProcessorImpl;
@@ -19,7 +18,7 @@ import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 /**
  * This factory will create a WroManager which is able to run itself outside of
  * a webContainer.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -68,7 +67,7 @@ public class StandAloneWroManagerFactory implements WroManagerFactory {
   /**
    * Factory method for {@link UriLocatorFactory}. Create a factory and
    * initialize the uriLocators to be used.
-   * 
+   *
    * @return UriLocatorFactory implementation.
    */
   protected UriLocatorFactory newUriLocatorFactory() {

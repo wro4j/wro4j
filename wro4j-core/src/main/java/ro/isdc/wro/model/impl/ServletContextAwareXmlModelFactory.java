@@ -5,13 +5,13 @@ package ro.isdc.wro.model.impl;
 
 import java.io.InputStream;
 
-import ro.isdc.wro.http.ContextHolder;
+import ro.isdc.wro.http.Context;
 
 /**
  * ServletContext aware Model factory implementation. This factory will run
  * properly only when is used inside a web application. The configuration xml
  * file will be read from the following location: <code>WEB-INF/wro.xml</code>
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -23,7 +23,7 @@ public final class ServletContextAwareXmlModelFactory extends XmlModelFactory {
    */
   @Override
   protected InputStream getConfigResourceAsStream() {
-    return ContextHolder.SERVLET_CONTEXT_HOLDER.get().getResourceAsStream(
+    return Context.get().getServletContext().getResourceAsStream(
         "/WEB-INF/" + XML_CONFIG_FILE);
   }
 }
