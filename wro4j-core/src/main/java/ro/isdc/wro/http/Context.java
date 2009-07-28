@@ -121,7 +121,7 @@ public class Context {
   /**
    * @return true if debug parameter is present (this means that DEBUG or DEVELOPMENT mode is used).
    */
-  public final boolean isDevelopmentMode() {
+  public boolean isDevelopmentMode() {
     //TODO read initParam from filter config?
     final String debugParam = getRequest().getParameter("debug");
     if (debugParam != null) {

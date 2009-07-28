@@ -5,19 +5,19 @@ package ro.isdc.wro.model;
 
 import java.io.InputStream;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
+import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
 import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 
 /**
  * TestProcessor.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -29,7 +29,7 @@ public class TestXmlModelFactory {
   @Before
   public void init() {}
 
-  @Test
+  @Test(expected=RecursiveGroupDefinitionException.class)
   public void recursiveGroupThrowsException() {
     factory = new XmlModelFactory() {
       @Override
@@ -37,19 +37,17 @@ public class TestXmlModelFactory {
         return Thread.currentThread().getContextClassLoader()
             .getResourceAsStream("recursive.xml");
       }
-    };
-    try {
-      final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
-      // add classpathUriLocator, because we will test against a resource in the
-      // classpath
-      uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
-      final WroModel model = factory.getInstance(uriLocatorFactory);
-      Assert.fail("Should have thrown "
-          + RecursiveGroupDefinitionException.class);
-    } catch (final RecursiveGroupDefinitionException e) {
-
-    }
-  }
+		};
+		final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
+		// add classpathUriLocator, because we will test against a resource in
+		// the
+		// classpath
+		uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+		final Context context = Mockito.mock(Context.class);
+		Mockito.when(context.isDevelopmentMode()).thenReturn(true);
+		Context.set(context);
+		factory.getInstance(uriLocatorFactory);
+	}
 
   @Test
   public void processResourceType() {

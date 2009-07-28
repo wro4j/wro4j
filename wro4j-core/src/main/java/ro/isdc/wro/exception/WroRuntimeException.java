@@ -32,7 +32,6 @@ public class WroRuntimeException extends RuntimeException {
   public WroRuntimeException() {
     super();
     log.error("Error occured");
-    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -42,7 +41,6 @@ public class WroRuntimeException extends RuntimeException {
   public WroRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
     log.error(message, cause);
-    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -51,7 +49,6 @@ public class WroRuntimeException extends RuntimeException {
   public WroRuntimeException(final String message) {
     super(message);
     log.error(message);
-    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -60,6 +57,5 @@ public class WroRuntimeException extends RuntimeException {
   public WroRuntimeException(final Throwable cause) {
     super(cause);
     log.error(cause);
-    // TODO Auto-generated constructor stub
   }
 }

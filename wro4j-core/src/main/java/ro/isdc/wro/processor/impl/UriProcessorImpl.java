@@ -42,7 +42,7 @@ public final class UriProcessorImpl implements UriProcessor {
       groupNames.add(groupName);
     } catch (final IndexOutOfBoundsException e) {
       throw new WroRuntimeException("Invalid uri: '" + uri + "'", e);
-    }
+    }    
     return groupNames;
   }
 
