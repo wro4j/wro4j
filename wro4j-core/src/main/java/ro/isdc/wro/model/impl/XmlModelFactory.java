@@ -20,7 +20,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -339,7 +338,7 @@ public class XmlModelFactory implements WroModelFactory {
   /**
    * @return InputStream of the local resource from classpath.
    */
-  private static InputStream getResourceAsStream(final String fileName) {
+  protected static InputStream getResourceAsStream(final String fileName) {
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(
         fileName);
   }
@@ -352,7 +351,6 @@ public class XmlModelFactory implements WroModelFactory {
    */
   private void validate(final Document document) throws IOException,
       SAXException {
-    IOUtils.copy(getResourceAsStream(XML_SCHEMA_FILE), System.out);
     final Schema schema = getSchema();
     // create a Validator instance, which can be used to validate an instance
     // document

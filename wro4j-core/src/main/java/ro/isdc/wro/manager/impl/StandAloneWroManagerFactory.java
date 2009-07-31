@@ -38,7 +38,7 @@ public class StandAloneWroManagerFactory implements WroManagerFactory {
 
   /**
    * Creates default instance of factory, by initializing manager dependencies
-   * with default values (processors). {@inheritDoc}
+   * with default values (processors).
    */
   public final synchronized WroManager getInstance() {
     if (this.manager == null) {
@@ -53,14 +53,12 @@ public class StandAloneWroManagerFactory implements WroManagerFactory {
    * @return {@link WroManager}
    */
   private WroManager newManager() {
-    log.debug("<newManager>");
     final WroManager manager = new WroManager();
     manager.setUriProcessor(new UriProcessorImpl());
     manager.setModelFactory(new XmlModelFactory());
     manager.setGroupsProcessor(new GroupsProcessorImpl());
     manager.setUriLocatorFactory(newUriLocatorFactory());
     manager.setCacheStrategy(new MapCacheStrategy<String, String>());
-    log.debug("</newManager>");
     return manager;
   }
 
