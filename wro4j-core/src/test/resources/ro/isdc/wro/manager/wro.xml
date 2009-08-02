@@ -4,12 +4,16 @@
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
 
-  <group name="all">
-    <group-ref>yui</group-ref>
-    <group-ref>uniform</group-ref>
+  <group name="g1">
+    <group-ref>g2</group-ref>
+    <group-ref>g3</group-ref>
   </group>
 
-  <group name="blueprint">
-    <css>classpath:com/goldlock/web/ref/widget/blueprint/src/reset.css</css>
+  <group name="g2">
+    <css>classpath:1.css</css>
+  </group>
+  
+  <group name="g3">
+    <css>classpath:2.css</css>
   </group>
 </groups>

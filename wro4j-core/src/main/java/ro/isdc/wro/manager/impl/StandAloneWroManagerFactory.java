@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.manager.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -12,8 +15,12 @@ import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.UriProcessorImpl;
+import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
+import ro.isdc.wro.resource.impl.ClasspathUriLocator;
+import ro.isdc.wro.resource.impl.ServletContextUriLocator;
 import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
+import ro.isdc.wro.resource.impl.UrlUriLocator;
 
 /**
  * This factory will create a WroManager which is able to run itself outside of
@@ -70,6 +77,15 @@ public class StandAloneWroManagerFactory implements WroManagerFactory {
    */
   protected UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+
+    final List<UriLocator> resourceLocators = new ArrayList<UriLocator>();
+    // populate the list. The order is important.
+    resourceLocators.add(new ServletContextUriLocator());
+    resourceLocators.add(new ClasspathUriLocator());
+    resourceLocators.add(new UrlUriLocator());
+
+    factory.setUriLocators(resourceLocators);
     return factory;
+
   }
 }

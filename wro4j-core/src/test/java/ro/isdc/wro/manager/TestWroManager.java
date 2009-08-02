@@ -40,7 +40,7 @@ public class TestWroManager {
 
 
     final String uri = "/app/g1.css";
-//    final WroProcessResult result = manager.process(uri);
+    final WroProcessResult result = manager.process(uri);
 //		final Writer writer = new StringWriter();
 //		IOUtils.copy(result.getInputStream(), writer);
 //		System.out.println("Processing result: " + writer.toString());

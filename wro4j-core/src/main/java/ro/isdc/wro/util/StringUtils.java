@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * StringUtils Utility class. This class conatins Utility methods for
  * manipulating strings. Inspired from commons & spring.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -55,7 +55,7 @@ public final class StringUtils {
    * <p>
    * The result is convenient for path comparison. For other uses, notice that
    * Windows separators ("\") are replaced by simple slashes.
-   * 
+   *
    * @param path
    *          the original path
    * @return the normalized path
@@ -114,7 +114,7 @@ public final class StringUtils {
 
   /**
    * Replace all occurrences of a substring within a string with another string.
-   * 
+   *
    * @param inString
    *          String to examine
    * @param oldPattern
@@ -148,7 +148,7 @@ public final class StringUtils {
   /**
    * Convenience method to return a Collection as a delimited (e.g. CSV) String.
    * E.g. useful for <code>toString()</code> implementations.
-   * 
+   *
    * @param coll
    *          the Collection to display
    * @param delim
@@ -163,7 +163,7 @@ public final class StringUtils {
   /**
    * Convenience method to return a Collection as a delimited (e.g. CSV) String.
    * E.g. useful for <code>toString()</code> implementations.
-   * 
+   *
    * @param coll
    *          the Collection to display
    * @param delim
@@ -174,7 +174,7 @@ public final class StringUtils {
    *          the String to end each element with
    * @return the delimited String
    */
-  public static String collectionToDelimitedString(final Collection coll,
+  private static String collectionToDelimitedString(final Collection coll,
       final String delim, final String prefix, final String suffix) {
     if (coll == null || coll.isEmpty()) {
       return "";
@@ -196,7 +196,7 @@ public final class StringUtils {
    * A single delimiter can consists of more than one character: It will still
    * be considered as single delimiter string, rather than as bunch of potential
    * delimiter characters - in contrast to <code>tokenizeToStringArray</code>.
-   * 
+   *
    * @param str
    *          the input String
    * @param delimiter
@@ -205,7 +205,7 @@ public final class StringUtils {
    * @return an array of the tokens in the list
    * @see #tokenizeToStringArray
    */
-  public static String[] delimitedListToStringArray(final String str,
+  private static String[] delimitedListToStringArray(final String str,
       final String delimiter) {
     return delimitedListToStringArray(str, delimiter, null);
   }
@@ -216,7 +216,7 @@ public final class StringUtils {
    * A single delimiter can consists of more than one character: It will still
    * be considered as single delimiter string, rather than as bunch of potential
    * delimiter characters - in contrast to <code>tokenizeToStringArray</code>.
-   * 
+   *
    * @param str
    *          the input String
    * @param delimiter
@@ -229,7 +229,7 @@ public final class StringUtils {
    * @return an array of the tokens in the list
    * @see #tokenizeToStringArray
    */
-  public static String[] delimitedListToStringArray(final String str,
+  private static String[] delimitedListToStringArray(final String str,
       final String delimiter, final String charsToDelete) {
     if (str == null) {
       return new String[0];
@@ -260,22 +260,22 @@ public final class StringUtils {
   /**
    * Copy the given Collection into a String array. The Collection must contain
    * String elements only.
-   * 
+   *
    * @param collection
    *          the Collection to copy
    * @return the String array (<code>null</code> if the passed-in Collection
    *         was <code>null</code>)
    */
-  public static String[] toStringArray(final Collection collection) {
+  private static String[] toStringArray(final Collection<?> collection) {
     if (collection == null) {
       return null;
     }
-    return (String[]) collection.toArray(new String[collection.size()]);
+    return collection.toArray(new String[collection.size()]);
   }
 
   /**
    * Delete any character in a given String.
-   * 
+   *
    * @param inString
    *          the original String
    * @param charsToDelete
@@ -283,7 +283,7 @@ public final class StringUtils {
    *          and new lines.
    * @return the resulting String
    */
-  public static String deleteAny(final String inString,
+  private static String deleteAny(final String inString,
       final String charsToDelete) {
     if (!hasLength(inString) || !hasLength(charsToDelete)) {
       return inString;
@@ -303,20 +303,20 @@ public final class StringUtils {
    * length 0. Note: Will return <code>true</code> for a CharSequence that
    * purely consists of whitespace.
    * <p>
-   * 
+   *
    * <pre>
    * StringUtils.hasLength(null) = false
    * StringUtils.hasLength(&quot;&quot;) = false
    * StringUtils.hasLength(&quot; &quot;) = true
    * StringUtils.hasLength(&quot;Hello&quot;) = true
    * </pre>
-   * 
+   *
    * @param str
    *          the CharSequence to check (may be <code>null</code>)
    * @return <code>true</code> if the CharSequence is not null and has length
    * @see #hasText(String)
    */
-  public static boolean hasLength(final CharSequence str) {
+  private static boolean hasLength(final CharSequence str) {
     return (str != null && str.length() > 0);
   }
 
@@ -324,20 +324,20 @@ public final class StringUtils {
    * Check that the given String is neither <code>null</code> nor of length 0.
    * Note: Will return <code>true</code> for a String that purely consists of
    * whitespace.
-   * 
+   *
    * @param str
    *          the String to check (may be <code>null</code>)
    * @return <code>true</code> if the String is not null and has length
    * @see #hasLength(CharSequence)
    */
-  public static boolean hasLength(final String str) {
+  private static boolean hasLength(final String str) {
     return hasLength((CharSequence) str);
   }
 
   /**
    * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
    * "myfile.txt".
-   * 
+   *
    * @param path
    *          the file path (may be <code>null</code>)
    * @return the extracted filename, or <code>null</code> if none
@@ -353,7 +353,7 @@ public final class StringUtils {
   /**
    * Extract the filename extension from the given path, e.g.
    * "mypath/myfile.txt" -> "txt".
-   * 
+   *
    * @param path
    *          the file path (may be <code>null</code>)
    * @return the extracted filename extension, or <code>null</code> if none
@@ -367,15 +367,16 @@ public final class StringUtils {
   }
 
   /**
+   * TODO: remove
    * Strip the filename extension from the given path, e.g. "mypath/myfile.txt" ->
    * "mypath/myfile".
-   * 
+   *
    * @param path
    *          the file path (may be <code>null</code>)
    * @return the path with stripped filename extension, or <code>null</code>
    *         if none
    */
-  public static String stripFilenameExtension(final String path) {
+  private static String stripFilenameExtension(final String path) {
     if (path == null) {
       return null;
     }
@@ -384,16 +385,17 @@ public final class StringUtils {
   }
 
   /**
+   * TODO: remove
    * Apply the given relative path to the given path, assuming standard Java
    * folder separation (i.e. "/" separators);
-   * 
+   *
    * @param path
    *          the path to start from (usually a full file path)
    * @param relativePath
    *          the relative path to apply (relative to the full file path above)
    * @return the full file path that results from applying the relative path
    */
-  public static String applyRelativePath(final String path,
+  private static String applyRelativePath(final String path,
       final String relativePath) {
     final int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
     if (separatorIndex != -1) {
