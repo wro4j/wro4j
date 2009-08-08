@@ -3,15 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>${releaseVersion}</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Web Resource Optimizer Parent</name>
 
-  <properties>
-    <spring.dependency.version>2.5.6</spring.dependency.version>
-	<releaseVersion>1.0.2-SNAPSHOT</releaseVersion>
-  </properties>
-  
   <modules>
     <module>wro4j-core</module>
     <module>wro4j-extensions</module>
@@ -109,7 +104,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
-        <version>${spring.dependency.version}</version>
+        <version>2.5.6</version>
       </dependency>
       <!-- For test -->
       <dependency>
