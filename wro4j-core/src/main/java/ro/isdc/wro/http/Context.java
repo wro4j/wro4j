@@ -143,15 +143,14 @@ public class Context {
    */
   public final boolean isGzipEnabled() {
     boolean gzipResources = true;
-    final HttpServletRequest request = Context.get().getRequest();
-    final String toGzipAsString = request.getParameter("gzip");
+    final String toGzipAsString = getRequest().getParameter("gzip");
     if (toGzipAsString != null) {
       gzipResources = Boolean.valueOf(toGzipAsString);
     } else {
       final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
       gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     }
-    return acceptsEncoding(request, "gzip") && gzipResources;
+    return acceptsEncoding(getRequest(), "gzip") && gzipResources;
   }
 
   /**
