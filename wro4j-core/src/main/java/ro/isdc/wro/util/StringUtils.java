@@ -365,48 +365,4 @@ public final class StringUtils {
     final int sepIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
     return (sepIndex != -1 ? path.substring(sepIndex + 1) : null);
   }
-
-  /**
-   * TODO: remove
-   * Strip the filename extension from the given path, e.g. "mypath/myfile.txt" ->
-   * "mypath/myfile".
-   *
-   * @param path
-   *          the file path (may be <code>null</code>)
-   * @return the path with stripped filename extension, or <code>null</code>
-   *         if none
-   */
-  private static String stripFilenameExtension(final String path) {
-    if (path == null) {
-      return null;
-    }
-    final int sepIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
-    return (sepIndex != -1 ? path.substring(0, sepIndex) : path);
-  }
-
-  /**
-   * TODO: remove
-   * Apply the given relative path to the given path, assuming standard Java
-   * folder separation (i.e. "/" separators);
-   *
-   * @param path
-   *          the path to start from (usually a full file path)
-   * @param relativePath
-   *          the relative path to apply (relative to the full file path above)
-   * @return the full file path that results from applying the relative path
-   */
-  private static String applyRelativePath(final String path,
-      final String relativePath) {
-    final int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
-    if (separatorIndex != -1) {
-      String newPath = path.substring(0, separatorIndex);
-      if (!relativePath.startsWith(FOLDER_SEPARATOR)) {
-        newPath += FOLDER_SEPARATOR;
-      }
-      return newPath + relativePath;
-    } else {
-      return relativePath;
-    }
-  }
-
 }

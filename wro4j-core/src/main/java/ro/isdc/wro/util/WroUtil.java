@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
 
@@ -33,6 +35,9 @@ public final class WroUtil {
    * @return pathInfo value.
    */
   public static String getPathInfoFromLocation(final String location) {
+    if (StringUtils.isEmpty(location)) {
+      throw new IllegalArgumentException("Location cannot be empty string!");
+    }
     final String noSlash = location.substring(1);
     final int nextSlash = noSlash.indexOf('/');
     if (nextSlash == -1) {
