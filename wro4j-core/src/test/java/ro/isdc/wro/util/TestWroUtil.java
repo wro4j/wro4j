@@ -28,7 +28,7 @@ public class TestWroUtil {
   }
 
   @Test
-  public void first() {
+  public void computeServletPathFromLocation() {
     final String result = WroUtil.getServletPathFromLocation("/a/b/c/d");
     Assert.assertEquals("/a", result);
   }
