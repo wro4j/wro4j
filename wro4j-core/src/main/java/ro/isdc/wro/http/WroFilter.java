@@ -162,12 +162,8 @@ public class WroFilter implements Filter {
             .loadClass(appFactoryClassName);
         // Instantiate the factory
         return (WroManagerFactory) factoryClass.newInstance();
-      } catch (final ClassNotFoundException e) {
-        throw new RuntimeException("", e);
-      } catch (final InstantiationException e) {
-        throw new RuntimeException("", e);
-      } catch (final IllegalAccessException e) {
-        throw new RuntimeException("", e);
+      } catch (final Exception e) {
+        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
   }
