@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.http;
 
-import java.util.Enumeration;
-
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.util.Configuration;
+import ro.isdc.wro.util.WroUtil;
 
 /**
  * Holds the properties related to a request cycle.
@@ -30,10 +29,13 @@ public class Context {
   private static final String PARAM_CONFIGURATION = "configuration";
 
   /**
-   * Gzip resources param option.
+   * Gzip resources configuration option.
    */
   private static final String PARAM_GZIP_RESOURCES = "gzipResources";
-
+  /**
+   * Gzip resources request parameter name.
+   */
+  public static final String PARAM_GZIP = "gzip";
   /**
    * Request.
    */
@@ -137,46 +139,20 @@ public class Context {
   }
 
   /**
-   * Decision method for gziping resources.
+   * The resource will be gzipped if the gzip request param is present and is true. Otherwise, the resource will be
+   * gzipped if the filter is configured with gzip turned on.
    *
    * @return true if requested resources should be gziped.
    */
   public final boolean isGzipEnabled() {
     boolean gzipResources = true;
-    final String toGzipAsString = getRequest().getParameter("gzip");
+    final String toGzipAsString = getRequest().getParameter(PARAM_GZIP);
     if (toGzipAsString != null) {
       gzipResources = Boolean.valueOf(toGzipAsString);
     } else {
       final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
       gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     }
-    return acceptsEncoding(getRequest(), "gzip") && gzipResources;
+    return gzipResources && WroUtil.headerContains(getRequest(), "Accept-Encoding", "gzip");
   }
-
-  /**
-   * TODO: move to WroUtil?
-   * Checks if request accepts the named encoding.
-   */
-  private boolean acceptsEncoding(final HttpServletRequest request,
-      final String name) {
-    final boolean accepts = headerContains(request, "Accept-Encoding", name);
-    return accepts;
-  }
-
-  /**
-   * TODO: move to WroUtil?
-   * Checks if request contains the header value.
-   */
-  private boolean headerContains(final HttpServletRequest request,
-      final String header, final String value) {
-    final Enumeration<String> accepted = request.getHeaders(header);
-    while (accepted.hasMoreElements()) {
-      final String headerValue = accepted.nextElement();
-      if (headerValue.indexOf(value) != -1) {
-        return true;
-      }
-    }
-    return false;
-  }
-
 }

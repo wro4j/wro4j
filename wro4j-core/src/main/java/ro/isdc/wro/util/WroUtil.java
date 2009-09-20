@@ -3,8 +3,10 @@
  */
 package ro.isdc.wro.util;
 
+import java.util.Enumeration;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
@@ -85,5 +87,23 @@ public final class WroUtil {
       throw new WroRuntimeException("Failure when attempting to set "
           + "Content-Encoding: gzip");
     }
+  }
+
+  /**
+   * Checks if request contains the header value with a given value.
+   * @param request to check
+   * @param header name of the header to check
+   * @param value of the header to check
+   */
+  public static boolean headerContains(final HttpServletRequest request,
+      final String header, final String value) {
+    final Enumeration<String> accepted = request.getHeaders(header);
+    while (accepted.hasMoreElements()) {
+      final String headerValue = accepted.nextElement();
+      if (headerValue.indexOf(value) != -1) {
+        return true;
+      }
+    }
+    return false;
   }
 }
