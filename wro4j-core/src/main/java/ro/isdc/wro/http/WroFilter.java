@@ -6,6 +6,7 @@ package ro.isdc.wro.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.Filter;
@@ -42,6 +43,13 @@ public class WroFilter implements Filter {
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(WroFilter.class);
+  private static final String CACHE_CONTROL_HEADER = "Cache-Control";
+  private static final String CACHE_CONTROL_VALUE = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
+  private static final String LAST_MODIFIED_HEADER = "Last-Modified";
+  private static final String LAST_MODIFIED_VALUE = "Sun, 06 Nov 2005 12:00:00 GMT";
+  private static final String ETAG_HEADER = "ETag";
+  private static final String ETAG_VALUE = "2740050219";
+  private static final String EXPIRES_HEADER = "Expires";
 
   /**
    * The name of the context parameter that specifies wroManager factory class
@@ -87,6 +95,12 @@ public class WroFilter implements Filter {
     final String requestURI = request.getRequestURI();
     final WroManager manager = wroManagerFactory.getInstance();
 
+    if (null != request.getHeader("If-Modified-Since")) {
+      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      log.debug("Returning 'not modified' header. ");
+      return;
+    }
+
     setResponseHeaders(response);
     InputStream is = null;
     OutputStream os = null;
@@ -122,15 +136,13 @@ public class WroFilter implements Filter {
    * @param response
    */
   private void setResponseHeaders(final HttpServletResponse response) {
-    //set response headers
-    final int CACHE_DURATION_IN_SECOND = 60 * 60 * 24 * 2; // 2 days
-    final long   CACHE_DURATION_IN_MS = CACHE_DURATION_IN_SECOND  * 1000;
-    final long now = System.currentTimeMillis();
-    //res being the HttpServletResponse of the request
-    response.addHeader("Cache-Control", "max-age=" + CACHE_DURATION_IN_SECOND);
-    //response.addHeader("Cache-Control", "must-revalidate");//optional
-    //response.setDateHeader("Last-Modified", now);
-    response.setDateHeader("Expires", now + CACHE_DURATION_IN_MS);
+    // Force resource caching as best as possible
+    response.setHeader(CACHE_CONTROL_HEADER, CACHE_CONTROL_VALUE);
+    response.setHeader(LAST_MODIFIED_HEADER, LAST_MODIFIED_VALUE);
+    response.setHeader(ETAG_HEADER, ETAG_VALUE);
+    final Calendar cal = Calendar.getInstance();
+    cal.roll(Calendar.YEAR, 10);
+    response.setDateHeader(EXPIRES_HEADER, cal.getTimeInMillis());
   }
 
   /**
