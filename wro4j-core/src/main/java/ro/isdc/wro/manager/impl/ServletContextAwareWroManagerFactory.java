@@ -6,8 +6,8 @@ package ro.isdc.wro.manager.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.manager.WroManager;
@@ -31,7 +31,7 @@ import ro.isdc.wro.resource.impl.UrlUriLocator;
 /**
  * A WroManagerFactory implementation aware of running inside a web application
  * and capable to access a ServletContext reference.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -41,8 +41,7 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory
-      .getLog(ServletContextAwareWroManagerFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(ServletContextAwareWroManagerFactory.class);
 
   /**
    * Manager instance. Using volatile keyword fix the problem with
@@ -99,7 +98,7 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
   /**
    * Factory method for {@link UriLocatorFactory}. Create a factory and
    * initialize the uriLocators to be used.
-   * 
+   *
    * @return UriLocatorFactory implementation.
    */
   protected UriLocatorFactory newUriLocatorFactory() {

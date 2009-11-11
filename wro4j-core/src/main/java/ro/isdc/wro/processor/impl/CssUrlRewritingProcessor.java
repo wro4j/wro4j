@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePreProcessor;
@@ -80,7 +80,7 @@ import ro.isdc.wro.util.WroUtil;
  * <td>[WRO-PREFIX]?id=[X]/../1.jpg</td>
  * </tr>
  * </tbody> </table>
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -90,8 +90,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory
-      .getLog(CssUrlRewritingProcessor.class);
+  private static final Logger log = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
 
   /**
    * Resources mapping path. If request uri contains this, the filter will
@@ -147,7 +146,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Perform actual css parsing logic.
-   * 
+   *
    * @param cssContent
    *          to parse.
    * @param cssUri
@@ -174,7 +173,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Replace provided url with the new url if needed.
-   * 
+   *
    * @param imageUrl
    *          to replace.
    * @param cssUri
@@ -202,7 +201,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Concatenates cssUri and imageUrl after few changes are applied to both
    * input parameters.
-   * 
+   *
    * @param cssUri
    *          the URI of css resource.
    * @param imageUrl
@@ -235,7 +234,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Cleans the image url by triming result and removing \' or \" characters if
    * such exists.
-   * 
+   *
    * @param imageUrl
    *          to clean.
    * @return cleaned image URL.
@@ -247,7 +246,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Check if a uri is a classpath resource.
-   * 
+   *
    * @param uri
    *          to check.
    * @return true if the uri is a classpath resource.
@@ -258,7 +257,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Check if a uri is a URL resource.
-   * 
+   *
    * @param uri
    *          to check.
    * @return true if the uri is a URL resource.
@@ -274,7 +273,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Check if a uri is a servletContext resource.
-   * 
+   *
    * @param uri
    *          to check.
    * @return true if the uri is a servletContext resource.
@@ -285,7 +284,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Check if url must be replaced or not.
-   * 
+   *
    * @param url
    *          to check.
    * @return true if url needs to be replaced or remain unchanged.

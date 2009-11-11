@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
@@ -46,8 +46,7 @@ public final class ServletContextUriLocator implements UriLocator {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory
-      .getLog(ServletContextUriLocator.class);
+  private static final Logger log = LoggerFactory.getLogger(ServletContextUriLocator.class);
 
   /**
    * Prefix for url resources.
@@ -150,12 +149,12 @@ public final class ServletContextUriLocator implements UriLocator {
          * to be sure that dispatched servlet will write to the pipe.
          * PrintWrapper of wrapped response.
          */
-        private PrintWriter pw = new PrintWriter(pos);
+        private final PrintWriter pw = new PrintWriter(pos);
 
         /**
          * Servlet output stream of wrapped response.
          */
-        private ServletOutputStream sos = new DelegatingServletOutputStream(pos);
+        private final ServletOutputStream sos = new DelegatingServletOutputStream(pos);
 
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
@@ -202,7 +201,6 @@ public final class ServletContextUriLocator implements UriLocator {
     public InputStream getInputStream(final HttpServletRequest request,
         final HttpServletResponse response, final String location)
         throws IOException {
-      log.debug("</getInputStream>");
       // where to write the bytes of the stream
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
       // Wrap request
@@ -226,12 +224,12 @@ public final class ServletContextUriLocator implements UriLocator {
          * to be sure that dispatched servlet will write to the pipe.
          * PrintWrapper of wrapped response.
          */
-        private PrintWriter pw = new PrintWriter(os);
+        private final PrintWriter pw = new PrintWriter(os);
 
         /**
          * Servlet output stream of wrapped response.
          */
-        private ServletOutputStream sos = new DelegatingServletOutputStream(os);
+        private final ServletOutputStream sos = new DelegatingServletOutputStream(os);
 
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
@@ -256,7 +254,6 @@ public final class ServletContextUriLocator implements UriLocator {
         throw new WroRuntimeException("Error while dispatching the request: "
             + e.getMessage());
       }
-      log.debug("</getInputStream>");
       return new ByteArrayInputStream(os.toByteArray());
     }
   }

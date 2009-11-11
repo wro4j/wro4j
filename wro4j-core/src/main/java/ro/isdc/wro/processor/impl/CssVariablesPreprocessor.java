@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.processor.ResourcePreProcessor;
 
@@ -32,7 +32,7 @@ public class CssVariablesPreprocessor
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(CssVariablesPreprocessor.class);
+  private static final Logger log = LoggerFactory.getLogger(CssVariablesPreprocessor.class);
   /**
    * Pattern used to find variables definition. For instance:<br/>
    * <code>
@@ -94,7 +94,7 @@ public class CssVariablesPreprocessor
 
 	/**
 	 * Parse css, find all defined variables & replace them.
-	 * 
+	 *
 	 * @param css to parse.
 	 */
   private String parseCss(final String css) {
@@ -111,7 +111,7 @@ public class CssVariablesPreprocessor
       m.appendReplacement(sb, "");
     }
     m.appendTail(sb);
-    
+
     final String result = replaceVariables(sb.toString(), map);
 		log.debug("replaced variables: " + result);
 		return result;
@@ -142,10 +142,10 @@ public class CssVariablesPreprocessor
     while (m.find()) {
       final String oldMatch = m.group();
       final String variableName = m.group(1);
-      String variableValue = variables.get(variableName);
+      final String variableValue = variables.get(variableName);
 			if (variableValue != null) {
 				final String newReplacement = oldMatch.replace(oldMatch, variableValue);
-				m.appendReplacement(sb, newReplacement.trim());				
+				m.appendReplacement(sb, newReplacement.trim());
 			} else {
 				log.warn("No variable with name " + variableName + " was found!");
 			}

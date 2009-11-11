@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.resource.UriLocator;
 
@@ -26,7 +26,7 @@ public final class UrlUriLocator implements UriLocator {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(UrlUriLocator.class);
+  private static final Logger log = LoggerFactory.getLogger(UrlUriLocator.class);
 
   /**
    * {@inheritDoc}

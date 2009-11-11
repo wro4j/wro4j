@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
@@ -41,7 +41,7 @@ public class WroFilter implements Filter {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(WroFilter.class);
+  private static final Logger log = LoggerFactory.getLogger(WroFilter.class);
 
   /**
    * The name of the context parameter that specifies wroManager factory class
@@ -87,41 +87,50 @@ public class WroFilter implements Filter {
     final String requestURI = request.getRequestURI();
     final WroManager manager = wroManagerFactory.getInstance();
 
-    //set response headers
-    response.setHeader("Cache-Control", "max-age=3600");
-
-    // probably would be better to test with startsWith(servletContext +
-    // resources)
+    setResponseHeaders(response);
+    InputStream is = null;
+    OutputStream os = null;
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
       final String resourceId = request
           .getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-      final InputStream is = manager.getUriLocatorFactory().getInstance(
+      is = manager.getUriLocatorFactory().getInstance(
           resourceId).locate(resourceId);
       if (is == null) {
         throw new WroRuntimeException("Could not Locate resource: "
             + resourceId);
       }
-      final OutputStream os = response.getOutputStream();
-      IOUtils.copy(is, os);
-      is.close();
-      os.close();
+      os = response.getOutputStream();
     } else {
       // process the uri using manager
       final WroProcessResult result = manager.process(requestURI);
       response.setContentType(result.getContentType());
-      final InputStream is = result.getInputStream();
-
-      OutputStream os = response.getOutputStream();
+      is = result.getInputStream();
+      os = response.getOutputStream();
       if (Context.get().isGzipEnabled()) {
         os = getGzipedOutputStream(response);
       }
       // append result to response stream
-      IOUtils.copy(is, os);
-      is.close();
-      os.close();
     }
+    IOUtils.copy(is, os);
+    is.close();
+    os.close();
     //remove context from the current thread local.
     Context.unset();
+  }
+
+  /**
+   * @param response
+   */
+  private void setResponseHeaders(final HttpServletResponse response) {
+    //set response headers
+    final int CACHE_DURATION_IN_SECOND = 60 * 60 * 24 * 2; // 2 days
+    final long   CACHE_DURATION_IN_MS = CACHE_DURATION_IN_SECOND  * 1000;
+    final long now = System.currentTimeMillis();
+    //res being the HttpServletResponse of the request
+    response.addHeader("Cache-Control", "max-age=" + CACHE_DURATION_IN_SECOND);
+    //response.addHeader("Cache-Control", "must-revalidate");//optional
+    //response.setDateHeader("Last-Modified", now);
+    response.setDateHeader("Expires", now + CACHE_DURATION_IN_MS);
   }
 
   /**

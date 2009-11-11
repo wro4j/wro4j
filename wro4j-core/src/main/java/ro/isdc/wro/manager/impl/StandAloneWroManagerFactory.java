@@ -6,9 +6,6 @@ package ro.isdc.wro.manager.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -32,12 +29,6 @@ import ro.isdc.wro.resource.impl.UrlUriLocator;
  * @created Created on Nov 3, 2008
  */
 public class StandAloneWroManagerFactory implements WroManagerFactory {
-  /**
-   * Logger for this class.
-   */
-  private static final Log log = LogFactory
-      .getLog(StandAloneWroManagerFactory.class);
-
   /**
    * Manager instance.
    */

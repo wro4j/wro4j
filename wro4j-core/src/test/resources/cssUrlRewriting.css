@@ -9,6 +9,7 @@
 	background: url(../../img.gif) no-repeat right;
 	BACKGROUND-IMAGE: url(../img1.gif);
 	background-image: url(../img.gif);
+  background: url(../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
 .class2 {
 	background-IMAGE: URL(/img.gif);

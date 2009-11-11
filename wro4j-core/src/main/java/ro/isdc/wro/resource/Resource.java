@@ -11,15 +11,15 @@ import java.io.Reader;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 
 /**
  * Encapsulates information about a resource. Resource instance is an immutable
  * thread-safe object.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -29,7 +29,7 @@ public final class Resource {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(Resource.class);
+  private static final Logger log = LoggerFactory.getLogger(Resource.class);
 
   /**
    * The type of resource.
@@ -48,7 +48,7 @@ public final class Resource {
 
   /**
    * Constructor.
-   * 
+   *
    * @param uri
    *          of the resource.
    * @param type
@@ -75,7 +75,7 @@ public final class Resource {
   /**
    * Perform a cleaning of the uri by trimming it and removing last '/'
    * character if exists.
-   * 
+   *
    * @param uri
    *          to clean.
    * @return cleaned uri.
@@ -91,7 +91,7 @@ public final class Resource {
 
   /**
    * TODO cache reader instance?
-   * 
+   *
    * @return the reader of this resource. The reader cannot be NULL.
    * @throws IOException
    *           if the resource is unavailable.

@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * AbstractWroTest.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -24,7 +24,7 @@ public class WroTestUtils {
   /**
    * Compare contents of two resources (files) by performing some sort of
    * processing on input resource.
-   * 
+   *
    * @param inputResourceUri
    *          uri of the resource to process.
    * @param expectedContentResourceUri
@@ -47,7 +47,7 @@ public class WroTestUtils {
 
   /**
    * Replace tabs with spaces.
-   * 
+   *
    * @param input
    *          from where to remove tabs.
    * @return cleaned string.

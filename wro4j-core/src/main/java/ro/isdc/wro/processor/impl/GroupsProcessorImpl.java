@@ -9,12 +9,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.model.Group;
@@ -26,7 +25,7 @@ import ro.isdc.wro.resource.ResourceType;
 /**
  * Default group processor which perform preProcessing, merge and postProcessing
  * on groups resources.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -36,7 +35,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(GroupsProcessorImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(GroupsProcessorImpl.class);
 
   /**
    * {@inheritDoc} While processing the resources, if any exception occurs - it
@@ -70,7 +69,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
 
   /**
    * Apply preProcess and merge the resource collection into the writer.
-   * 
+   *
    * @param resources
    *          what are the resources to merge.
    * @param writer
@@ -109,7 +108,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
 
   /**
    * Apply resourcePreProcessors.
-   * 
+   *
    * @param resourceUri
    *          uri of the resource. This property is used by preProcessor.
    * @param processors
@@ -144,7 +143,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
 
   /**
    * Apply resourcePostProcessors.
-   * 
+   *
    * @param processors
    *          a list of processor to apply on the content from the supplied
    *          writer.
@@ -190,8 +189,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
     // retain only resources of needed type
     final List<Resource> filteredResources = new ArrayList<Resource>();
-    for (final Iterator<Resource> it = allResources.iterator(); it.hasNext();) {
-      final Resource resource = it.next();
+    for (final Resource resource : allResources) {
       if (type == resource.getType()) {
         filteredResources.add(resource);
       }

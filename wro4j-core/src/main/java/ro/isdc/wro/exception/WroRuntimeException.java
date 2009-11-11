@@ -3,13 +3,13 @@
  */
 package ro.isdc.wro.exception;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base Wro Runtime exception. All exceptions will extend this runtime
  * exception.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -24,7 +24,7 @@ public class WroRuntimeException extends RuntimeException {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(WroRuntimeException.class);
+  private static final Logger log = LoggerFactory.getLogger(WroRuntimeException.class);
 
   /**
    * Default constructor.
@@ -56,6 +56,6 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final Throwable cause) {
     super(cause);
-    log.error(cause);
+    log.error(cause.getMessage(), cause);
   }
 }

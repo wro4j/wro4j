@@ -8,26 +8,18 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.WroFilter;
 
 /**
  * The resource model encapsulates the information about all existing groups.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
  * @created Created on Oct 30, 2008
  */
 public final class WroModel {
-  /**
-   * Logger for this class.
-   */
-  private static final Log log = LogFactory.getLog(WroFilter.class);
-
   /**
    * List of groups.
    */

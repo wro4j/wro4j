@@ -9,6 +9,7 @@
   background: url([WRO-PREFIX]?id=classpath:../../img.gif) no-repeat right;
 	BACKGROUND-IMAGE: url([WRO-PREFIX]?id=classpath:../img1.gif);
   background-image: url([WRO-PREFIX]?id=classpath:../img.gif);
+  background: url([WRO-PREFIX]?id=classpath:../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
 .class2 {
   background-IMAGE: URL([WRO-PREFIX]?id=classpath:img.gif);

@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.util.StringUtils;
@@ -16,7 +16,7 @@ import ro.isdc.wro.util.StringUtils;
 /**
  * Implementation of the {@link UriLocator} that is able to read a resource from
  * a classpath.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -26,7 +26,7 @@ public final class ClasspathUriLocator implements UriLocator {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(ClasspathUriLocator.class);
+  private static final Logger log = LoggerFactory.getLogger(ClasspathUriLocator.class);
 
   /**
    * Prefix of the resource uri used to check if the resource can be read by

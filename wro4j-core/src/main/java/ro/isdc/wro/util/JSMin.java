@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,12 +17,13 @@ import java.io.PushbackInputStream;
  * conditions as the jsmin.c on which it is based.
  * <p>
  * http://www.crockford.com/javascript/jsmin.html
- * 
+ *
  * @author Alexandru.Objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
  * @created Created on Dec 5, 2008
  */
+@SuppressWarnings("serial")
 public class JSMin {
   private static final int EOF = -1;
 
@@ -257,25 +256,6 @@ public class JSMin {
   }
 
   class UnterminatedRegExpLiteralException extends Exception {
-  }
-
-  public static void main(final String arg[]) {
-    try {
-      final JSMin jsmin = new JSMin(new FileInputStream(arg[0]), System.out);
-      jsmin.jsmin();
-    } catch (final FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (final ArrayIndexOutOfBoundsException e) {
-      e.printStackTrace();
-    } catch (final IOException e) {
-      e.printStackTrace();
-    } catch (final UnterminatedRegExpLiteralException e) {
-      e.printStackTrace();
-    } catch (final UnterminatedCommentException e) {
-      e.printStackTrace();
-    } catch (final UnterminatedStringLiteralException e) {
-      e.printStackTrace();
-    }
   }
 
 }

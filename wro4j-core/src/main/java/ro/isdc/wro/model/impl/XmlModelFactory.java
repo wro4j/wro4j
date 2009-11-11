@@ -20,8 +20,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,7 +52,7 @@ public class XmlModelFactory implements WroModelFactory {
   /**
    * Logger for this class.
    */
-  private static final Log log = LogFactory.getLog(XmlModelFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(XmlModelFactory.class);
 
   /**
    * Default xml to parse.
