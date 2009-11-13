@@ -32,13 +32,24 @@ public final class UrlUriLocator implements UriLocator {
    * {@inheritDoc}
    */
   public boolean accept(final String uri) {
-    // if creation of URL object doesn't throw an exception, the uri can be
-    // accepted.
-    try {
-      new URL(uri);
-    } catch (final MalformedURLException e) {
-      return false;
-    }
+    return isValid(uri);
+  }
+
+
+	/**
+	 * Check if a uri is a URL resource.
+	 *
+	 * @param uri to check.
+	 * @return true if the uri is a URL resource.
+	 */
+	public static boolean isValid(final String uri) {
+		// if creation of URL object doesn't throw an exception, the uri can be
+		// accepted.
+		try {
+			new URL(uri);
+		} catch (final MalformedURLException e) {
+			return false;
+		}
     return true;
   }
 

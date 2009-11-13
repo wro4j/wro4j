@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
+import ro.isdc.wro.http.HttpHeader;
 
 /**
  * Utility class.
@@ -81,8 +82,8 @@ public final class WroUtil {
    *           if response doesnt contains Content-Encoding header.
    */
   public static void addGzipHeader(final HttpServletResponse response) {
-    response.setHeader("Content-Encoding", "gzip");
-    final boolean containsEncoding = response.containsHeader("Content-Encoding");
+    response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
+    final boolean containsEncoding = response.containsHeader(HttpHeader.CONTENT_ENCODING.toString());
     if (!containsEncoding) {
       throw new WroRuntimeException("Failure when attempting to set "
           + "Content-Encoding: gzip");

@@ -6,8 +6,6 @@ package ro.isdc.wro.processor.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.UriLocator;
+import ro.isdc.wro.resource.impl.ClasspathUriLocator;
+import ro.isdc.wro.resource.impl.ServletContextUriLocator;
+import ro.isdc.wro.resource.impl.UrlUriLocator;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -117,18 +118,11 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Prefix of the classpath resource.
+   * TODO deprecate
+   * @deprecated
    */
-  private static final String PREFIX_CLASSPATH = "classpath:";
-
-  /**
-   * Prefix of the classpath resource.
-   */
-  private static final String PREFIX_DOT = ":";
-
-  /**
-   * Prefix of the servletContext resource.
-   */
-  private static final String PREFIX_SLASH = "/";
+  @Deprecated
+	private static final String PREFIX_DOT = ":";
 
   /**
    * {@inheritDoc}
@@ -182,13 +176,13 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    */
   private String replaceImageUrl(final String imageUrl, final String cssUri) {
     if (isReplaceNeeded(imageUrl)) {
-      if (isServletContextResource(cssUri)) {
-        if (isServletContextResource(imageUrl)) {
+      if (ServletContextUriLocator.isValid(cssUri)) {
+        if (ServletContextUriLocator.isValid(imageUrl)) {
           return imageUrl;
         }
         return computeNewImageLocation(".." + cssUri, imageUrl);
       }
-      if (isUrlResource(cssUri) || isClassPathResource(cssUri)) {
+      if (UrlUriLocator.isValid(cssUri) || ClasspathUriLocator.isValid(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       } else {
         throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl
@@ -211,11 +205,13 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   private String computeNewImageLocation(final String cssUri,
       final String imageUrl) {
     final String cleanImageUrl = cleanImageUrl(imageUrl);
+    //TODO move to ServletContextUriLocator as a helper method?
     // for the following input: /a/b/c/1.css => /a/b/c/
-    int idxLastSeparator = cssUri.lastIndexOf(PREFIX_SLASH);
+    int idxLastSeparator = cssUri.lastIndexOf(ServletContextUriLocator.PREFIX);
     if (idxLastSeparator == -1) {
-      if (isClassPathResource(cssUri)) {
+      if (ClasspathUriLocator.isValid(cssUri)) {
         // try with ':' character for classpathResource case
+      	//TODO use ClasspathUriLocator.PATH instead?
         idxLastSeparator = cssUri.lastIndexOf(PREFIX_DOT);
       }
       if (idxLastSeparator < 0) {
@@ -225,7 +221,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
     }
     final String cssUriFolder = cssUri.substring(0, idxLastSeparator + 1);
     // remove '/' from imageUrl if it starts with one.
-    final String processedImageUrl = cleanImageUrl.startsWith(PREFIX_SLASH) ? cleanImageUrl
+    final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX) ? cleanImageUrl
         .substring(1)
         : cleanImageUrl;
     return cssUriFolder + processedImageUrl;
@@ -245,44 +241,6 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   }
 
   /**
-   * Check if a uri is a classpath resource.
-   *
-   * @param uri
-   *          to check.
-   * @return true if the uri is a classpath resource.
-   */
-  private boolean isClassPathResource(final String uri) {
-    return uri.trim().startsWith(PREFIX_CLASSPATH);
-  }
-
-  /**
-   * Check if a uri is a URL resource.
-   *
-   * @param uri
-   *          to check.
-   * @return true if the uri is a URL resource.
-   */
-  private boolean isUrlResource(final String uri) {
-    try {
-      new URL(uri);
-    } catch (final MalformedURLException e) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Check if a uri is a servletContext resource.
-   *
-   * @param uri
-   *          to check.
-   * @return true if the uri is a servletContext resource.
-   */
-  private boolean isServletContextResource(final String uri) {
-    return uri.trim().startsWith(PREFIX_SLASH);
-  }
-
-  /**
    * Check if url must be replaced or not.
    *
    * @param url
@@ -292,7 +250,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   private boolean isReplaceNeeded(final String url) {
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator).
-    return !isUrlResource(url);
+    return !UrlUriLocator.isValid(url);
   }
 
   /**

@@ -51,7 +51,7 @@ public final class ServletContextUriLocator implements UriLocator {
   /**
    * Prefix for url resources.
    */
-  private static final String PREFIX = "/";
+  public static final String PREFIX = "/";
 
   /**
    * Locator of dynamic resources. There can be different strategies. We will
@@ -63,7 +63,18 @@ public final class ServletContextUriLocator implements UriLocator {
    * {@inheritDoc}
    */
   public boolean accept(final String uri) {
-    return uri.startsWith(PREFIX);
+    return isValid(uri);
+  }
+
+  /**
+   * Check if a uri is a servletContext resource.
+   *
+   * @param uri
+   *          to check.
+   * @return true if the uri is a servletContext resource.
+   */
+  public static boolean isValid(final String uri) {
+    return uri.trim().startsWith(ServletContextUriLocator.PREFIX);
   }
 
   /**

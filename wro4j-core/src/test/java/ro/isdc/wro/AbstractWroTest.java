@@ -22,7 +22,7 @@ import ro.isdc.wro.test.util.WroTestUtils;
 
 /**
  * AbstractWroTest.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -34,10 +34,11 @@ public abstract class AbstractWroTest {
    */
   private UriLocatorFactoryImpl uriLocatorFactory;
 
-  @Before
+
   /**
    * Create UriLocatorfactory and set uriLocators to be used for tests.
    */
+  @Before
   public void initUriLocatorFactory() {
     uriLocatorFactory = new UriLocatorFactoryImpl();
     final List<UriLocator> resourceLocators = new ArrayList<UriLocator>();
@@ -51,7 +52,7 @@ public abstract class AbstractWroTest {
   /**
    * Compare contents of two resources (files) by performing some sort of
    * processing on input resource.
-   * 
+   *
    * @param inputResourceUri
    *          uri of the resource to process.
    * @param expectedContentResourceUri

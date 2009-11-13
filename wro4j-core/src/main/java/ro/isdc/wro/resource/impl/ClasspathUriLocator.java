@@ -38,7 +38,18 @@ public final class ClasspathUriLocator implements UriLocator {
    * {@inheritDoc}
    */
   public boolean accept(final String url) {
-    return url.startsWith(PREFIX);
+    return isValid(url);
+  }
+
+  /**
+   * Check if a uri is a classpath resource.
+   *
+   * @param uri
+   *          to check.
+   * @return true if the uri is a classpath resource.
+   */
+  public static boolean isValid(final String uri) {
+    return uri.trim().startsWith(PREFIX);
   }
 
   /**

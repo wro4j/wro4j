@@ -6,6 +6,10 @@ package ro.isdc.wro.manager;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.FilterConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -23,9 +27,10 @@ import ro.isdc.wro.model.impl.XmlModelFactory;
 public class TestWroManager {
 	@Before
 	public void setUp() {
-		final Context context = Mockito.mock(Context.class);
-		Mockito.when(context.isDevelopmentMode()).thenReturn(true);
-		Context.set(context);
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
+    Context.set(new Context(request, response, filterConfig));
 	}
   @Test
   public void first() throws IOException {

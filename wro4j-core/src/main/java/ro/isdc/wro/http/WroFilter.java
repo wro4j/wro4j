@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.Filter;
@@ -31,7 +33,7 @@ import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 /**
- * WroFilter.java.
+ * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the way it is configured, it builds
  *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
@@ -43,13 +45,6 @@ public class WroFilter implements Filter {
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(WroFilter.class);
-  private static final String CACHE_CONTROL_HEADER = "Cache-Control";
-  private static final String CACHE_CONTROL_VALUE = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
-  private static final String LAST_MODIFIED_HEADER = "Last-Modified";
-  private static final String LAST_MODIFIED_VALUE = "Sun, 06 Nov 2005 12:00:00 GMT";
-  private static final String ETAG_HEADER = "ETag";
-  private static final String ETAG_VALUE = "2740050219";
-  private static final String EXPIRES_HEADER = "Expires";
 
   /**
    * The name of the context parameter that specifies wroManager factory class
@@ -64,17 +59,36 @@ public class WroFilter implements Filter {
    * WroManagerFactory. The brain of the optimizer.
    */
   private WroManagerFactory wroManagerFactory;
-
+  /**
+   * Cache control header values
+   */
+  private String etagValue;
+  private long lastModifiedValue;
+  private String cacheControlValue;
+  private long expiresValue;
   /**
    * {@inheritDoc}
    */
   public final void init(final FilterConfig config) throws ServletException {
     this.filterConfig = config;
     this.wroManagerFactory = getWroManagerFactory();
+    initHeaderValues();
     doInit(config);
   }
 
   /**
+	 * Initialize header values used for server-side resource caching.
+	 */
+	private void initHeaderValues() {
+		etagValue = UUID.randomUUID().toString();
+		lastModifiedValue = new Date().getTime();
+		cacheControlValue = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
+    final Calendar cal = Calendar.getInstance();
+    cal.roll(Calendar.YEAR, 10);
+    expiresValue = cal.getTimeInMillis();
+	}
+
+	/**
    * Custom filter initialization - can be used for extended classes.
    *
    * @see Filter#init(FilterConfig).
@@ -95,7 +109,9 @@ public class WroFilter implements Filter {
     final String requestURI = request.getRequestURI();
     final WroManager manager = wroManagerFactory.getInstance();
 
-    if (null != request.getHeader("If-Modified-Since")) {
+//  if (null != request.getHeader(HttpHeader.IF_MODIFIED_SINCE.toString())) {
+    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+    if (ifNoneMatch != null && ifNoneMatch.equals(etagValue)) {
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       log.debug("Returning 'not modified' header. ");
       return;
@@ -132,17 +148,18 @@ public class WroFilter implements Filter {
     Context.unset();
   }
 
-  /**
-   * @param response
-   */
-  private void setResponseHeaders(final HttpServletResponse response) {
+	/**
+	 * Method responsible for setting response headers, used mostly for cache control. Override this method if you want to
+	 * change the way headers are set.
+	 *
+	 * @param response {@link HttpServletResponse} object.
+	 */
+  protected void setResponseHeaders(final HttpServletResponse response) {
     // Force resource caching as best as possible
-    response.setHeader(CACHE_CONTROL_HEADER, CACHE_CONTROL_VALUE);
-    response.setHeader(LAST_MODIFIED_HEADER, LAST_MODIFIED_VALUE);
-    response.setHeader(ETAG_HEADER, ETAG_VALUE);
-    final Calendar cal = Calendar.getInstance();
-    cal.roll(Calendar.YEAR, 10);
-    response.setDateHeader(EXPIRES_HEADER, cal.getTimeInMillis());
+    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
+    response.setHeader(HttpHeader.ETAG.toString(), etagValue);
+    response.setDateHeader(HttpHeader.LAST_MODIFIED.toString(), lastModifiedValue);
+    response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
   }
 
   /**
