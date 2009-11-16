@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -53,15 +52,15 @@ public class TestContext {
 	  Context.unset();
 	}
 
-	@Test
-	public void testGzipParamIsEnabled() {
-	  Mockito.when(Context.get().getRequest().getParameter(Context.PARAM_GZIP)).thenReturn("true");
-		Assert.assertTrue(Context.get().isGzipEnabled());
-	}
-
-	@Test
-  public void testGzipParamIsNotEnabled() {
-    Mockito.when(Context.get().getRequest().getParameter(Context.PARAM_GZIP)).thenReturn("false");
-    Assert.assertFalse(Context.get().isGzipEnabled());
-  }
+//	@Test
+//	public void testGzipParamIsEnabled() {
+//	  Mockito.when(Context.get().getRequest().getParameter(Context.PARAM_GZIP)).thenReturn("true");
+//		Assert.assertTrue(Context.get().isGzipEnabled());
+//	}
+//
+//	@Test
+//  public void testGzipParamIsNotEnabled() {
+//    Mockito.when(Context.get().getRequest().getParameter(Context.PARAM_GZIP)).thenReturn("false");
+//    Assert.assertFalse(Context.get().isGzipEnabled());
+//  }
 }

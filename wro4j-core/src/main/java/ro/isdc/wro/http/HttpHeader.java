@@ -10,11 +10,12 @@ package ro.isdc.wro.http;
  * @author Alex Objelean
  */
 public enum HttpHeader {
-	CACHE_CONTROL("Cache-Control"), LAST_MODIFIED("Last-Modified"), ETAG("ETag"), EXPIRES("Expires"), IF_MODIFIED_SINCE(
-		"If-Modified-Since"), IF_NONE_MATCH("If-None-Match"), CONTENT_ENCODING("Content-Encoding");
-	/**
-	 * HTTP header as string.
-	 */
+  CACHE_CONTROL("Cache-Control"), LAST_MODIFIED("Last-Modified"), ETAG("ETag"), EXPIRES("Expires"), IF_MODIFIED_SINCE(
+    "If-Modified-Since"), IF_NONE_MATCH("If-None-Match"), CONTENT_ENCODING("Content-Encoding"), ACCEPT_ENCODING(
+    "Accept-Encoding");
+  /**
+   * HTTP header as string.
+   */
 	private String name;
 
 	/**

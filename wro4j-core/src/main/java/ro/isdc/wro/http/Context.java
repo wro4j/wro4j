@@ -32,10 +32,15 @@ public class Context {
    * Gzip resources configuration option.
    */
   private static final String PARAM_GZIP_RESOURCES = "gzipResources";
-  /**
-   * Gzip resources request parameter name.
-   */
-  public static final String PARAM_GZIP = "gzip";
+///**
+//* DEBUG resources request parameter name.
+//*/
+//public static final String PARAM_DEBUG = "debug";
+
+  //  /**
+//   * Gzip resources request parameter name.
+//   */
+//  public static final String PARAM_GZIP = "gzip";
   /**
    * Request.
    */
@@ -125,10 +130,10 @@ public class Context {
    */
   public boolean isDevelopmentMode() {
     //TODO read initParam from filter config?
-    final String debugParam = getRequest().getParameter("debug");
-    if (debugParam != null) {
-      return Boolean.parseBoolean(debugParam);
-    }
+//    final String debugParam = getRequest().getParameter(PARAM_DEBUG);
+//    if (debugParam != null) {
+//      return Boolean.valueOf(debugParam);
+//    }
     //TODO deprecate config using filter config?
     final String configParam = this.filterConfig.getInitParameter(PARAM_CONFIGURATION);
     //TODO get rid of Configuration enum & simplify this logic
@@ -146,13 +151,15 @@ public class Context {
    */
   public final boolean isGzipEnabled() {
     boolean gzipResources = true;
-    final String toGzipAsString = getRequest().getParameter(PARAM_GZIP);
-    if (toGzipAsString != null) {
-      gzipResources = Boolean.valueOf(toGzipAsString);
-    } else {
-      final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
-      gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
-    }
-    return gzipResources && WroUtil.headerContains(getRequest(), "Accept-Encoding", "gzip");
+//    final String toGzipAsString = getRequest().getParameter(PARAM_GZIP);
+//    if (toGzipAsString != null) {
+//      gzipResources = Boolean.valueOf(toGzipAsString);
+//    } else {
+//      final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
+//      gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
+//    }
+    final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
+    gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
+    return gzipResources && WroUtil.headerContains(getRequest(), HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
   }
 }
