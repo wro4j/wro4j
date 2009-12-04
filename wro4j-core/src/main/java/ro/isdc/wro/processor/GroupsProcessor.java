@@ -10,7 +10,7 @@ import ro.isdc.wro.resource.ResourceType;
 
 /**
  * Performs the processing of a group of resources by type.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -19,7 +19,7 @@ import ro.isdc.wro.resource.ResourceType;
 public interface GroupsProcessor {
   /**
    * Process a list of groups by type.
-   * 
+   *
    * @param groups
    *          to process.
    * @param type
@@ -30,7 +30,7 @@ public interface GroupsProcessor {
 
   /**
    * Provide a list of preProcessors to apply on css content.
-   * 
+   *
    * @param processors
    *          a list of {@link ResourcePreProcessor} processors.
    */
@@ -38,7 +38,7 @@ public interface GroupsProcessor {
 
   /**
    * Provide a list of preProcessors to apply on js content.
-   * 
+   *
    * @param processors
    *          a list of {@link ResourcePreProcessor} processors.
    */
@@ -46,7 +46,7 @@ public interface GroupsProcessor {
 
   /**
    * Provide a list of preProcessors to apply on any type of content.
-   * 
+   *
    * @param processors
    *          a list of {@link ResourcePreProcessor} processors.
    */
@@ -54,7 +54,7 @@ public interface GroupsProcessor {
 
   /**
    * Provide a list of postProcessors to apply on css content.
-   * 
+   *
    * @param processors
    *          a list of {@link ResourcePostProcessor} processors.
    */
@@ -62,7 +62,7 @@ public interface GroupsProcessor {
 
   /**
    * Provide a list of postProcessors to apply on js content.
-   * 
+   *
    * @param processors
    *          a list of {@link ResourcePostProcessor} processors.
    */
@@ -70,10 +70,51 @@ public interface GroupsProcessor {
 
   /**
    * Provide a list of postProcessors to apply on any type of content.
-   * 
+   *
    * @param processors
    *          a list of {@link ResourcePostProcessor} processors.
    */
   void setAnyResourcePostProcessors(final List<ResourcePostProcessor> processors);
 
+  /**
+   * Add a single css preProcessor to the chain of preProcessors.
+   *
+   * @param processor {@link ResourcePostProcessor} to add.
+   */
+  void addCssPreProcessor(final ResourcePreProcessor processor);
+
+  /**
+   * Add a single css preProcessor to the chain of postProcessors.
+   *
+   * @param processor {@link ResourcePostProcessor} to add.
+   */
+  void addCssPostProcessor(final ResourcePostProcessor processor);
+
+  /**
+	 * Add a single js preProcessor to the chain of preProcessors.
+	 *
+	 * @param processor {@link ResourcePostProcessor} to add.
+	 */
+	void addJsPreProcessor(final ResourcePreProcessor processor);
+
+	/**
+	 * Add a single js postProcessor to the chain of preProcessors.
+	 *
+	 * @param processor {@link ResourcePostProcessor} to add.
+	 */
+	void addJsPostProcessor(final ResourcePostProcessor processor);
+
+	/**
+	 * Add a single preProcessor to the chain of preProcessors.
+	 *
+	 * @param processor {@link ResourcePostProcessor} to add.
+	 */
+	void addAnyPreProcessor(final ResourcePreProcessor processor);
+
+	/**
+	 * Add a single postProcessor to the chain of preProcessors.
+	 *
+	 * @param processor {@link ResourcePostProcessor} to add.
+	 */
+	void addAnyPostProcessor(final ResourcePostProcessor processor);
 }

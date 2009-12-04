@@ -12,7 +12,7 @@ import ro.isdc.wro.processor.ResourcePreProcessor;
 
 /**
  * AbstractGroupsProcessor.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -23,34 +23,34 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   /**
    * a list of css pre processors.
    */
-  private List<ResourcePreProcessor> cssPreProcessors = new ArrayList<ResourcePreProcessor>();
+  private final List<ResourcePreProcessor> cssPreProcessors = new ArrayList<ResourcePreProcessor>();
 
   /**
    * a list of js pre processors.
    */
-  private List<ResourcePreProcessor> jsPreProcessors = new ArrayList<ResourcePreProcessor>();
+  private final List<ResourcePreProcessor> jsPreProcessors = new ArrayList<ResourcePreProcessor>();
 
   /**
    * a list of pre processors for all resources, will be applied on both (css &
    * js).
    */
-  private List<ResourcePreProcessor> anyResourcePreProcessors = new ArrayList<ResourcePreProcessor>();
+  private final List<ResourcePreProcessor> anyResourcePreProcessors = new ArrayList<ResourcePreProcessor>();
 
   /**
    * a list of css post processors.
    */
-  private List<ResourcePostProcessor> cssPostProcessors = new ArrayList<ResourcePostProcessor>();
+  private final List<ResourcePostProcessor> cssPostProcessors = new ArrayList<ResourcePostProcessor>();
 
   /**
    * a list of js post processors.
    */
-  private List<ResourcePostProcessor> jsPostProcessors = new ArrayList<ResourcePostProcessor>();
+  private final List<ResourcePostProcessor> jsPostProcessors = new ArrayList<ResourcePostProcessor>();
 
   /**
    * a list of post processors for all resources, will be applied on both (css &
    * js).
    */
-  private List<ResourcePostProcessor> anyResourcePostProcessors = new ArrayList<ResourcePostProcessor>();
+  private final List<ResourcePostProcessor> anyResourcePostProcessors = new ArrayList<ResourcePostProcessor>();
 
   /**
    * @param processors
@@ -58,7 +58,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public final void setCssPostProcessors(
       final List<ResourcePostProcessor> processors) {
-    this.cssPostProcessors = processors;
+    this.cssPostProcessors.addAll(processors);
   }
 
   /**
@@ -67,7 +67,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public final void setCssPreProcessors(
       final List<ResourcePreProcessor> cssPreProcessors) {
-    this.cssPreProcessors = cssPreProcessors;
+    this.cssPreProcessors.addAll(cssPreProcessors);
   }
 
   /**
@@ -76,7 +76,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public final void setJsPreProcessors(
       final List<ResourcePreProcessor> jsPreProcessors) {
-    this.jsPreProcessors = jsPreProcessors;
+    this.jsPreProcessors.addAll(jsPreProcessors);
   }
 
   /**
@@ -85,7 +85,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public final void setAnyResourcePreProcessors(
       final List<ResourcePreProcessor> anyResourcePreProcessors) {
-    this.anyResourcePreProcessors = anyResourcePreProcessors;
+    this.anyResourcePreProcessors.addAll(anyResourcePreProcessors);
   }
 
   /**
@@ -94,7 +94,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public final void setJsPostProcessors(
       final List<ResourcePostProcessor> jsPostProcessors) {
-    this.jsPostProcessors = jsPostProcessors;
+    this.jsPostProcessors.addAll(jsPostProcessors);
   }
 
   /**
@@ -103,7 +103,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public final void setAnyResourcePostProcessors(
       final List<ResourcePostProcessor> anyResourcePostProcessors) {
-    this.anyResourcePostProcessors = anyResourcePostProcessors;
+    this.anyResourcePostProcessors.addAll(anyResourcePostProcessors);
   }
 
   /**
@@ -147,4 +147,46 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   protected final List<ResourcePostProcessor> getAnyResourcePostProcessors() {
     return anyResourcePostProcessors;
   }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addAnyPostProcessor(final ResourcePostProcessor processor) {
+		anyResourcePostProcessors.add(processor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addAnyPreProcessor(final ResourcePreProcessor processor) {
+		anyResourcePreProcessors.add(processor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addCssPostProcessor(final ResourcePostProcessor processor) {
+		cssPostProcessors.add(processor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addCssPreProcessor(final ResourcePreProcessor processor) {
+		cssPreProcessors.add(processor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addJsPostProcessor(final ResourcePostProcessor processor) {
+		jsPostProcessors.add(processor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addJsPreProcessor(final ResourcePreProcessor processor) {
+		jsPreProcessors.add(processor);
+	}
 }
