@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ro.isdc.wro4j</groupId>
+	<artifactId>wro4j-maven-plugin</artifactId>
+	<packaging>jar</packaging>
+	<name>Web Resource Optimizer Maven Plugin</name>
+
+	<parent>
+		<groupId>ro.isdc.wro4j</groupId>
+		<artifactId>wro4j-parent</artifactId>
+		<version>1.1.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wro4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>  
+  

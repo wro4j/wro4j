@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.4/commons-io-1.4.jar" sourcepath="M2_REPO/commons-io/commons-io/1.4/commons-io-1.4-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/jde/software/maven-repository/repository/commons-lang/commons-lang/2.4/commons-lang-2.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/4.7/junit-4.7.jar" sourcepath="M2_REPO/junit/junit/4.7/junit-4.7-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-plugin-api/2.1.0/maven-plugin-api-2.1.0.jar" sourcepath="M2_REPO/org/apache/maven/maven-plugin-api/2.1.0/maven-plugin-api-2.1.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.5.8/slf4j-log4j12-1.5.8.jar" sourcepath="M2_REPO/org/slf4j/slf4j-log4j12/1.5.8/slf4j-log4j12-1.5.8-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/ro/isdc/wro4j/wro4j-core/1.1.1-SNAPSHOT/wro4j-core-1.1.1-SNAPSHOT.jar" sourcepath="M2_REPO/ro/isdc/wro4j/wro4j-core/1.1.1-SNAPSHOT/wro4j-core-1.1.1-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
