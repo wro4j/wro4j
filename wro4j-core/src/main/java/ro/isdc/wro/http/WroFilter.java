@@ -66,6 +66,7 @@ public class WroFilter implements Filter {
   private long lastModifiedValue;
   private String cacheControlValue;
   private long expiresValue;
+
   /**
    * {@inheritDoc}
    */
@@ -133,7 +134,7 @@ public class WroFilter implements Filter {
     } else {
       // process the uri using manager
       final WroProcessResult result = manager.process(requestURI);
-      response.setContentType(result.getContentType());
+      response.setContentType(result.getResourceType().getContentType());
       is = result.getInputStream();
       os = response.getOutputStream();
       if (Context.get().isGzipEnabled()) {

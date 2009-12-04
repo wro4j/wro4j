@@ -5,9 +5,11 @@ package ro.isdc.wro.manager;
 
 import java.io.InputStream;
 
+import ro.isdc.wro.resource.ResourceType;
+
 /**
  * WroProcessResult. Contains the result of the manager processing.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -17,7 +19,7 @@ public final class WroProcessResult {
   /**
    * The content type of the stream content.
    */
-  private String contentType;
+  private ResourceType resourceType;
 
   /**
    * The stream content. Can be merged js, css & or image stream from some
@@ -26,18 +28,17 @@ public final class WroProcessResult {
   private InputStream inputStream;
 
   /**
-   * @return the contentType
+   * @return the resourceType
    */
-  public final String getContentType() {
-    return contentType;
+  public ResourceType getResourceType() {
+    return this.resourceType;
   }
 
   /**
-   * @param contentType
-   *          the contentType to set
+   * @param resourceType the resourceType to set
    */
-  public final void setContentType(final String contentType) {
-    this.contentType = contentType;
+  public void setResourceType(final ResourceType resourceType) {
+    this.resourceType = resourceType;
   }
 
   /**

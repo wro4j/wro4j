@@ -32,10 +32,7 @@ import ro.isdc.wro.resource.ResourceType;
  * @created Created on Nov 3, 2008
  */
 public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(GroupsProcessorImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessorImpl.class);
 
   /**
    * {@inheritDoc} While processing the resources, if any exception occurs - it
@@ -78,11 +75,10 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    */
   private String preProcessAndMerge(final List<Resource> resources)
       throws IOException {
-    log.debug("<preProcessAndMerge>");
-
+    LOG.debug("<preProcessAndMerge>");
     final StringBuffer result = new StringBuffer();
     for (final Resource resource : resources) {
-      log.debug("\tmerging: " + resource);
+      LOG.debug("\tmerging: " + resource);
       String preProcessedContent = null;
       // get original content
       final Reader reader = resource.getReader();
@@ -102,7 +98,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
           getAnyResourcePreProcessors(), preProcessedContent);
       result.append(preProcessedContent);
     }
-    log.debug("</preProcessAndMerge>");
+    LOG.debug("</preProcessAndMerge>");
     return result.toString();
   }
 
@@ -133,7 +129,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     Reader input = new StringReader(content);
     Writer output = null;
     for (final ResourcePreProcessor processor : processors) {
-      log.debug("<apply> " + processor);
+      LOG.debug("<apply> " + processor);
       output = new StringWriter();
       processor.process(resourceUri, input, output);
       input = new StringReader(output.toString());
@@ -166,7 +162,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     Reader input = new StringReader(content.toString());
     Writer output = null;
     for (final ResourcePostProcessor processor : processors) {
-      log.debug("<apply> " + processor);
+      LOG.debug("<apply> " + processor);
       output = new StringWriter();
       processor.process(input, output);
       input = new StringReader(output.toString());

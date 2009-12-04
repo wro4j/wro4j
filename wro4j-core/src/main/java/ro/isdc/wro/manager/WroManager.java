@@ -100,9 +100,8 @@ public final class WroManager {
     } else {
       processedResult = groupsProcessor.process(groups, type);
     }
-
     final WroProcessResult result = new WroProcessResult();
-    result.setContentType(getContentType(type));
+    result.setResourceType(type);
 
     result.setInputStream(new ByteArrayInputStream(processedResult.getBytes()));
 
@@ -111,20 +110,6 @@ public final class WroManager {
 
     log.debug("</process>");
     return result;
-  }
-
-  /**
-   * @param type {@link ResourceType} object.
-   * @return content type depending on resourceType.
-   */
-  private String getContentType(final ResourceType type) {
-    String contentType = null;
-    if (ResourceType.CSS == type) {
-      contentType = "text/css";
-    } else if (ResourceType.JS == type) {
-      contentType = "text/javascript";
-    }
-    return contentType;
   }
 
   /**
