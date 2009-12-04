@@ -11,7 +11,6 @@
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-parent</artifactId>
     <version>1.1.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <dependencies>
