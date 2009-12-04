@@ -1,0 +1,16 @@
+body {
+  color: #fe8d12;
+  background: white;
+}
+div#panelId {
+  border: solid red 1px;
+  font: Arial;
+  margin: var(INVALID_VARIABLE);
+  background: yellow;
+}
+form {
+  background: #de5500;  
+}
+ul li {
+  background: url(../img/applications.png) no-repeat left top;
+}
