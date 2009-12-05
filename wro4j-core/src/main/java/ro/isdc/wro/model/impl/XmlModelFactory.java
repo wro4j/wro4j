@@ -194,8 +194,9 @@ public class XmlModelFactory implements WroModelFactory {
    * name.
    *
    * @return name of the xml file containing group & resource definition.
+   * @throws IOException if the stream couldn't be read.
    */
-  protected InputStream getConfigResourceAsStream() {
+  protected InputStream getConfigResourceAsStream() throws IOException {
     return getResourceAsStream(XML_CONFIG_FILE);
   }
 

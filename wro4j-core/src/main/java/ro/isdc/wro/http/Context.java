@@ -58,6 +58,16 @@ public class Context {
    */
   private final FilterConfig filterConfig;
   /**
+   * A context useful for running in non web context (standAlone applications).
+   */
+  public static class StandAloneContext extends Context {
+    @Override
+    public boolean isDevelopmentMode() {
+      return true;
+    }
+  }
+
+  /**
    * @return {@link Context} associated with CURRENT request cycle.
    */
   public static Context get() {
@@ -85,6 +95,16 @@ public class Context {
    */
   public static void unset() {
     CURRENT.set(null);
+  }
+
+  /**
+   * Private constructor. Used to build {@link StandAloneContext}.
+   */
+  private Context() {
+    this.request = null;
+    this.response = null;
+    this.servletContext = null;
+    this.filterConfig = null;
   }
 
   /**

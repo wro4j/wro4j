@@ -14,12 +14,11 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.ResourcePostProcessor;
-import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.impl.ContentStripperResourceProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesPreprocessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
+import ro.isdc.wro.processor.impl.JSMinProcessor;
 import ro.isdc.wro.processor.impl.UriProcessorImpl;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
@@ -38,10 +37,7 @@ import ro.isdc.wro.resource.impl.UrlUriLocator;
  * @created Created on Nov 3, 2008
  */
 public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(ServletContextAwareWroManagerFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServletContextAwareWroManagerFactory.class);
 
   /**
    * Manager instance. Using volatile keyword fix the problem with
@@ -69,14 +65,12 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
    * @return {@link WroManager}
    */
   private WroManager newManager() {
-    log.debug("<newManager>");
     final WroManager manager = new WroManager();
     manager.setUriProcessor(new UriProcessorImpl());
     manager.setModelFactory(new ServletContextAwareXmlModelFactory());
     manager.setGroupsProcessor(newGroupsProcessor());
     manager.setUriLocatorFactory(newUriLocatorFactory());
     manager.setCacheStrategy(new MapCacheStrategy<String, String>());
-    log.debug("</newManager>");
     return manager;
   }
 
@@ -84,14 +78,11 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
    * @return {@link GroupsProcessor} configured processor.
    */
   protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessorImpl groupProcessor = new GroupsProcessorImpl();
-    final List<ResourcePreProcessor> cssPreProcessors = new ArrayList<ResourcePreProcessor>();
-    cssPreProcessors.add(new CssUrlRewritingProcessor());
-    cssPreProcessors.add(new CssVariablesPreprocessor());
-    groupProcessor.setCssPreProcessors(cssPreProcessors);
-    final List<ResourcePostProcessor> postProcessors = new ArrayList<ResourcePostProcessor>();
-    postProcessors.add(new ContentStripperResourceProcessor());
-    groupProcessor.setAnyResourcePostProcessors(postProcessors);
+    final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
+    groupProcessor.addCssPreProcessor(new CssUrlRewritingProcessor());
+    groupProcessor.addCssPreProcessor(new CssVariablesPreprocessor());
+    groupProcessor.addJsPostProcessor(new JSMinProcessor());
+    groupProcessor.addAnyPostProcessor(new ContentStripperResourceProcessor());
     return groupProcessor;
   }
 

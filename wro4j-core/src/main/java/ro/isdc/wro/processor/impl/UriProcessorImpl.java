@@ -15,7 +15,7 @@ import ro.isdc.wro.resource.ResourceType;
  * <p>
  * Perform processing of the uri and extracts group & resources related
  * informations: a list of groups, resource type and name.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -41,8 +41,8 @@ public final class UriProcessorImpl implements UriProcessor {
           .length());
       groupNames.add(groupName);
     } catch (final IndexOutOfBoundsException e) {
-      throw new WroRuntimeException("Invalid uri: '" + uri + "'", e);
-    }    
+      throw new WroRuntimeException("Invalid group name in the uri: '" + uri + "'");
+    }
     return groupNames;
   }
 

@@ -41,15 +41,11 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Oct 31, 2008
  */
 public class WroFilter implements Filter {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(WroFilter.class);
-
+  private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
   /**
    * The name of the context parameter that specifies wroManager factory class
    */
-  public static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
+  private static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
    * Filter config.
    */
@@ -114,7 +110,7 @@ public class WroFilter implements Filter {
     final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
     if (ifNoneMatch != null && ifNoneMatch.equals(etagValue)) {
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      log.debug("Returning 'not modified' header. ");
+      LOG.debug("Returning 'not modified' header. ");
       return;
     }
 
@@ -177,7 +173,7 @@ public class WroFilter implements Filter {
     WroUtil.addGzipHeader(response);
     // Create a gzip stream
     final OutputStream os = new GZIPOutputStream(response.getOutputStream());
-    log.debug("Gziping outputStream response");
+    LOG.debug("Gziping outputStream response");
     return os;
   }
 
