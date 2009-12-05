@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-maven-plugin</artifactId>
-	<packaging>jar</packaging>
+	<packaging>maven-plugin</packaging>
 	<name>Web Resource Optimizer Maven Plugin</name>
 
 	<parent>
@@ -19,6 +19,11 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wro4j-core</artifactId>
 		</dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
@@ -28,6 +33,5 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-
 </project>  
   

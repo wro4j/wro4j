@@ -7,19 +7,19 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test class for {@link WroMojo}
+ * Test class for {@link Wro4jMojo}
  *
  * @author Alex Objelean
  */
 public class TestWroMojo {
-  private WroMojo mojo;
+  private Wro4jMojo mojo;
   @Before
   public void setUp() {
-    mojo = new WroMojo();
+    mojo = new Wro4jMojo();
   }
 
   @Test
   public void first() throws Exception {
-    //mojo.execute();
+//    mojo.execute();
   }
 }
