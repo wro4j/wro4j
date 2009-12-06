@@ -15,7 +15,7 @@ import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
@@ -35,5 +35,19 @@ public class TestYUICssCompressorProcessor extends AbstractWroTest {
             processor.process(reader, writer);
           }
         });
+  }
+
+
+  @Test
+  public void testAbsoluteBackgroundUrl()
+    throws IOException {
+    //Output should be the same as input.
+    final String resourcePath = "classpath:ro/isdc/wro/processor/absoluteBackgroundUrl.css";
+    compareProcessedResourceContents(resourcePath, resourcePath, new ResourceProcessor() {
+        public void process(final Reader reader, final Writer writer)
+            throws IOException {
+          processor.process(reader, writer);
+        }
+      });
   }
 }

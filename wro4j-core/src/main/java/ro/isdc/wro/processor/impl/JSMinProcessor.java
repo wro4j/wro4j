@@ -21,7 +21,7 @@ import ro.isdc.wro.util.JSMin;
  * JSMinProcessor.
  * <p>
  * Use JSMin utility for js compression.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $

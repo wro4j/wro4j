@@ -16,7 +16,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>ro.isdc.wro4j</groupId>
 			<artifactId>wro4j-core</artifactId>
 		</dependency>
     <dependency>

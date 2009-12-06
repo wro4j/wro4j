@@ -14,7 +14,6 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.impl.ContentStripperResourceProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesPreprocessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
@@ -82,7 +81,7 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
     groupProcessor.addCssPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addCssPreProcessor(new CssVariablesPreprocessor());
     groupProcessor.addJsPostProcessor(new JSMinProcessor());
-    groupProcessor.addAnyPostProcessor(new ContentStripperResourceProcessor());
+//    groupProcessor.addAnyPostProcessor(new ContentStripperResourceProcessor());
     return groupProcessor;
   }
 

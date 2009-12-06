@@ -14,9 +14,10 @@ import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ResourceContentStripper;
 
 /**
+ * TODO: deprecate & use other proven solutions.
  * Removes comments and whitespaces from resource content. This processor can be
  * used as both: preProcessor & postProcessor.
- * 
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $
