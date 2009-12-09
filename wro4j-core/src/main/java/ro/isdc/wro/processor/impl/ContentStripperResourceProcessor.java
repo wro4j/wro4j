@@ -23,6 +23,7 @@ import ro.isdc.wro.util.ResourceContentStripper;
  * @date $Date: $
  * @created Created on Nov 13, 2008
  */
+@Deprecated
 public final class ContentStripperResourceProcessor implements
     ResourcePreProcessor, ResourcePostProcessor {
   /**

@@ -16,8 +16,8 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * SingleLineCommentStripperProcessor can be both: preProcessor & postProcessor.
- * Remove Multi line comments from processed resource.
- * 
+ * Remove single line comments from processed resource. This processor exist only for the sake of proof of concept.
+ *
  * @author alexandru.objelean / ISDC! Romania
  * @version $Revision: $
  * @date $Date: $

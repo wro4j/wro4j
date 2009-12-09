@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008 ISDC! Romania. All rights reserved.
  */
-package ro.isdc.wro.util;
+package ro.isdc.wro.processor.algorithm;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -81,7 +81,7 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
     groupProcessor.addCssPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addCssPreProcessor(new CssVariablesPreprocessor());
     groupProcessor.addJsPostProcessor(new JSMinProcessor());
-//    groupProcessor.addAnyPostProcessor(new ContentStripperResourceProcessor());
+//    groupProcessor.addCssPostProcessor(new AndryCssCompressorProcessor());
     return groupProcessor;
   }
 

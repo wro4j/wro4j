@@ -15,7 +15,7 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
-import ro.isdc.wro.util.JSMin;
+import ro.isdc.wro.processor.algorithm.JSMin;
 
 /**
  * JSMinProcessor.
