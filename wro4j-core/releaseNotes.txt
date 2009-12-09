@@ -1,0 +1,5 @@
+# Versions 1.1.1 
+- Update GroupsProcessor - create add[Js/Css][Pre/Post/*]Processor method
+- Do not use ContentStripperResourceProcessor (buggy, considers http:// a comment which is stripped)
+- Integrate AndryCssCompressor 
+- CssImportPreProcessor 
