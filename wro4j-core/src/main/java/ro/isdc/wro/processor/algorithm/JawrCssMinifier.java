@@ -170,12 +170,12 @@ public class JawrCssMinifier {
    * @param replacement
    * @return
    */
-  public static String adaptReplacementToMatcher(String replacement) {
+  public static String adaptReplacementToMatcher(final String replacement) {
     // Double the backslashes, so they are left as they are after replacement.
-    replacement = replacement.replaceAll("\\\\", "\\\\\\\\");
+    String result = replacement.replaceAll("\\\\", "\\\\\\\\");
     // Add backslashes after dollar signs
-    replacement = replacement.replaceAll("\\$", "\\\\\\$");
-    return replacement;
+    result = result.replaceAll("\\$", "\\\\\\$");
+    return result;
   }
 
 }
