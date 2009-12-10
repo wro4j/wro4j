@@ -18,6 +18,7 @@ import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesPreprocessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.JSMinProcessor;
+import ro.isdc.wro.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.processor.impl.UriProcessorImpl;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
@@ -81,6 +82,7 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
     groupProcessor.addCssPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addCssPreProcessor(new CssVariablesPreprocessor());
     groupProcessor.addJsPostProcessor(new JSMinProcessor());
+    groupProcessor.addCssPostProcessor(new JawrCssMinifierProcessor());
 //    groupProcessor.addCssPostProcessor(new AndryCssCompressorProcessor());
     return groupProcessor;
   }
