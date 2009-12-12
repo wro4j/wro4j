@@ -14,9 +14,8 @@
     <css>/static/css/webapp.css</css>
     <css>/static/css/css1.css</css>
     <css>/static/css/css2.css</css>
-    <css>/static/css/css${number}.css</css>
+    <css>/static/css/NOTEXIST.css</css>
     <css>classpath:ro/isdc/wro/resources/classpath.css</css>
-    <css>classpath:com/resources/css/classpath.css</css>
   </group>
 	
 	<group name="otherGroup">
