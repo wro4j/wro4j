@@ -42,7 +42,7 @@ public class TestYUICssCompressorProcessor extends AbstractWroTest {
   public void testAbsoluteBackgroundUrl()
     throws IOException {
     //Output should be the same as input.
-    final String resourcePath = "classpath:ro/isdc/wro/processor/absoluteBackgroundUrl.css";
+    final String resourcePath = "classpath:ro/isdc/wro/extensions/processor/absoluteBackgroundUrl.css";
     compareProcessedResourceContents(resourcePath, resourcePath, new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
             throws IOException {
