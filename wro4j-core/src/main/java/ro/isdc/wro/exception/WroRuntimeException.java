@@ -24,14 +24,14 @@ public class WroRuntimeException extends RuntimeException {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(WroRuntimeException.class);
+  private static final Logger LOG = LoggerFactory.getLogger(WroRuntimeException.class);
 
   /**
    * Default constructor.
    */
   public WroRuntimeException() {
     super();
-    log.error("Error occured");
+    LOG.error("Error occured");
   }
 
   /**
@@ -40,7 +40,7 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
-    log.error(message, cause);
+    LOG.error(message, cause);
   }
 
   /**
@@ -48,7 +48,7 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message) {
     super(message);
-    log.error(message);
+    LOG.error(message);
   }
 
   /**
@@ -56,6 +56,6 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final Throwable cause) {
     super(cause);
-    log.error(cause.getMessage(), cause);
+    LOG.error(cause.getMessage(), cause);
   }
 }

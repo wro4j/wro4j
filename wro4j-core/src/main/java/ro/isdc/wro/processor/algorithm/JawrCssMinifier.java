@@ -97,7 +97,7 @@ public class JawrCssMinifier {
     String compressed = commentsPattern.matcher(data.toString()).replaceAll("");
 
     // Temporarily replace the strings with a placeholder
-    final List strings = new ArrayList();
+    final List<String> strings = new ArrayList<String>();
     final Matcher stringMatcher = quotedContentPattern.matcher(compressed);
     compressed = new MatcherProcessorCallback() {
       @Override
@@ -153,9 +153,9 @@ public class JawrCssMinifier {
     compressed = new MatcherProcessorCallback() {
       @Override
       String matchCallback(final Matcher matcher) {
-        return it.next();
-        // final String replacement = it.next();
-        // return adaptReplacementToMatcher(replacement);
+//        return it.next();
+         final String replacement = it.next();
+         return adaptReplacementToMatcher(replacement);
       }
     }.processWithMatcher(restoreMatcher);
     return new StringBuffer(compressed);

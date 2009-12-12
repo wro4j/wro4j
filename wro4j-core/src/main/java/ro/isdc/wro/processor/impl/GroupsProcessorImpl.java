@@ -75,10 +75,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    */
   private String preProcessAndMerge(final List<Resource> resources)
       throws IOException {
-    LOG.debug("<preProcessAndMerge>");
     final StringBuffer result = new StringBuffer();
     for (final Resource resource : resources) {
-      LOG.debug("\tmerging: " + resource);
+      LOG.debug("\tmerging resource: " + resource);
       String preProcessedContent = null;
       // get original content
       final Reader reader = resource.getReader();
@@ -98,7 +97,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
           getAnyResourcePreProcessors(), preProcessedContent);
       result.append(preProcessedContent);
     }
-    LOG.debug("</preProcessAndMerge>");
     return result.toString();
   }
 
@@ -129,7 +127,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     Reader input = new StringReader(content);
     Writer output = null;
     for (final ResourcePreProcessor processor : processors) {
-      LOG.debug("<apply> " + processor);
+      LOG.debug("applyinig processor:  " + processor);
       output = new StringWriter();
       processor.process(resourceUri, input, output);
       input = new StringReader(output.toString());

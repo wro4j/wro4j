@@ -106,11 +106,9 @@ public class WroFilter implements Filter {
     final String requestURI = request.getRequestURI();
     final WroManager manager = wroManagerFactory.getInstance();
 
-//  if (null != request.getHeader(HttpHeader.IF_MODIFIED_SINCE.toString())) {
     final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
     if (ifNoneMatch != null && ifNoneMatch.equals(etagValue)) {
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      LOG.debug("Returning 'not modified' header. ");
       return;
     }
 
