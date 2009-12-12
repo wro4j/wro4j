@@ -1,5 +1,9 @@
 # Versions 1.1.1 
 - Update GroupsProcessor - create add[Js/Css][Pre/Post/*]Processor method
-- Do not use ContentStripperResourceProcessor (buggy, considers http:// a comment which is stripped)
-- Integrate AndryCssCompressor 
-- CssImportPreProcessor 
+- ContentStripperResourceProcessor is not used anymore (buggy, considers http:// a comment which is stripped)
+- JawrCssMinifier is used instead, also added AndryCssCompressor algorithm (not used by default because Jawr is preferred).
+- Fix ServletContextUriLocator issue when dispatching the request to runtime generated resources
+
+TODO
+- CssImportPreProcessor
+- be able to configure expires header using init-param (@see http://ehcache.org/documentation/web_caching.html) 
