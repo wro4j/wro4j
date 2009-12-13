@@ -34,7 +34,7 @@ public final class WroManager {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(WroManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
 
   /**
    * ResourcesModel factory.
@@ -75,7 +75,6 @@ public final class WroManager {
    * @return
    */
   public WroProcessResult process(final String uri) {
-    log.debug("<process>");
     validate();
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -102,13 +101,10 @@ public final class WroManager {
     }
     final WroProcessResult result = new WroProcessResult();
     result.setResourceType(type);
-
     result.setInputStream(new ByteArrayInputStream(processedResult.getBytes()));
 
     stopWatch.stop();
-    log.info("WroManage process time: " + stopWatch.toString());
-
-    log.debug("</process>");
+    LOG.info("WroManager process time: " + stopWatch.toString());
     return result;
   }
 

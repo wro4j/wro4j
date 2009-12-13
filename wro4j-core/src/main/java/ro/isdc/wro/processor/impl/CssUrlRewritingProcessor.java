@@ -253,8 +253,11 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
     return !UrlUriLocator.isValid(url);
   }
 
+
   /**
-   * {@inheritDoc}
+   * This method has protected modifier in order to be accessed by unit test class.
+   *
+   * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
     final String urlPrefix = WroUtil.getRequestUriPath() + PATH_RESOURCES + "?"

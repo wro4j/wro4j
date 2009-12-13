@@ -32,7 +32,7 @@ public class CssVariablesPreprocessor
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(CssVariablesPreprocessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CssVariablesPreprocessor.class);
   /**
    * Pattern used to find variables definition. For instance:<br/>
    * <code>
@@ -83,38 +83,12 @@ public class CssVariablesPreprocessor
   private Map<String, String> extractVariables(final String variablesBody) {
     final Map<String, String> map = new HashMap<String, String>();
     final Matcher m = PATTERN_VARIABLES_BODY.matcher(variablesBody);
-    log.debug("parsing variables body");
+    LOG.debug("parsing variables body");
     while (m.find()) {
-    	log.debug("found:" + m.group());
+    	LOG.debug("found:" + m.group());
       map.put(m.group(1), m.group(2));
     }
     return map;
-  }
-
-
-	/**
-	 * Parse css, find all defined variables & replace them.
-	 *
-	 * @param css to parse.
-	 */
-  private String parseCss(final String css) {
-  	//map containing variables & their values
-  	final Map<String, String> map = new HashMap<String, String>();
-    final StringBuffer sb = new StringBuffer();
-    final Matcher m = PATTERN_VARIABLES_DEFINITION.matcher(css);
-    while (m.find()) {
-      final String variablesBody = m.group(1);
-      log.debug("variables body: " + variablesBody);
-      //extract variables
-      map.putAll(extractVariables(variablesBody));
-      //remove variables definition
-      m.appendReplacement(sb, "");
-    }
-    m.appendTail(sb);
-
-    final String result = replaceVariables(sb.toString(), map);
-		log.debug("replaced variables: " + result);
-		return result;
   }
 
   /**
@@ -128,6 +102,30 @@ public class CssVariablesPreprocessor
     writer.close();
   }
 
+  /**
+   * Parse css, find all defined variables & replace them.
+   *
+   * @param css to parse.
+   */
+  private String parseCss(final String css) {
+    //map containing variables & their values
+    final Map<String, String> map = new HashMap<String, String>();
+    final StringBuffer sb = new StringBuffer();
+    final Matcher m = PATTERN_VARIABLES_DEFINITION.matcher(css);
+    while (m.find()) {
+      final String variablesBody = m.group(1);
+      LOG.debug("variables body: " + variablesBody);
+      //extract variables
+      map.putAll(extractVariables(variablesBody));
+      //remove variables definition
+      m.appendReplacement(sb, "");
+    }
+    m.appendTail(sb);
+
+    final String result = replaceVariables(sb.toString(), map);
+    LOG.debug("replaced variables: " + result);
+    return result;
+  }
 
   /**
    * Replace variables from css with provided variables map.
@@ -147,7 +145,7 @@ public class CssVariablesPreprocessor
 				final String newReplacement = oldMatch.replace(oldMatch, variableValue);
 				m.appendReplacement(sb, newReplacement.trim());
 			} else {
-				log.warn("No variable with name " + variableName + " was found!");
+				LOG.warn("No variable with name " + variableName + " was found!");
 			}
     }
     m.appendTail(sb);
