@@ -157,9 +157,7 @@ public class Context {
     //TODO deprecate config using filter config?
     final String configParam = this.filterConfig.getInitParameter(PARAM_CONFIGURATION);
     //TODO get rid of Configuration enum & simplify this logic
-    final Configuration config = configParam == null
-      ? Configuration.DEVELOPMENT
-      : Configuration.valueOf(configParam.toUpperCase());
+    final Configuration config = Configuration.of(configParam);
     return config.isDevelopment();
   }
 

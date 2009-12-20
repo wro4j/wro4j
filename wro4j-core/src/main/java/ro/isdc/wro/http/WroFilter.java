@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.http;
 
@@ -35,9 +35,7 @@ import ro.isdc.wro.util.WroUtil;
 /**
  * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the way it is configured, it builds
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author alexandru.objelean
  * @created Created on Oct 31, 2008
  */
 public class WroFilter implements Filter {
@@ -103,18 +101,20 @@ public class WroFilter implements Filter {
 
     // add request, response & servletContext to thread local
     Context.set(new Context(request, response, filterConfig));
-    final String requestURI = request.getRequestURI();
     final WroManager manager = wroManagerFactory.getInstance();
 
-    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-    if (ifNoneMatch != null && ifNoneMatch.equals(etagValue)) {
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      return;
+    if (!Context.get().isDevelopmentMode()) {
+      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+      if (etagValue.equals(ifNoneMatch)) {
+        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        return;
+      }
     }
 
     setResponseHeaders(response);
     InputStream is = null;
     OutputStream os = null;
+    final String requestURI = request.getRequestURI();
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
       final String resourceId = request
           .getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
@@ -143,18 +143,21 @@ public class WroFilter implements Filter {
     Context.unset();
   }
 
-	/**
-	 * Method responsible for setting response headers, used mostly for cache control. Override this method if you want to
-	 * change the way headers are set.
-	 *
-	 * @param response {@link HttpServletResponse} object.
-	 */
+
+  /**
+   * Method responsible for setting response headers, used mostly for cache control. Override this method if you want to
+   * change the way headers are set.<br>Default implementation will set
+   *
+   * @param response {@link HttpServletResponse} object.
+   */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    // Force resource caching as best as possible
-    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
-    response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-    response.setDateHeader(HttpHeader.LAST_MODIFIED.toString(), lastModifiedValue);
-    response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
+    if (!Context.get().isDevelopmentMode()) {
+      // Force resource caching as best as possible
+      response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
+      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
+      response.setDateHeader(HttpHeader.LAST_MODIFIED.toString(), lastModifiedValue);
+      response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
+    }
   }
 
   /**

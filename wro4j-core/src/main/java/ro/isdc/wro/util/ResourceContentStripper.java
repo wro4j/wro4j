@@ -3,14 +3,12 @@
  */
 package ro.isdc.wro.util;
 
+
 /**
  * Strips comments and whitespace from javascript/css resource content. Inspired
  * from wicket.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
- * @created Created on Nov 13, 2008
+ *
+ * @author alexandru.objelean
  */
 public final class ResourceContentStripper {
   /*
@@ -37,13 +35,18 @@ public final class ResourceContentStripper {
   /** Inside a regular expression */
   private final static int REG_EXP = 7;
 
-  private static int getPrevCount(final String s, int fromIndex, final char c) {
+  private static int getPrevCount(final String s, int fromIndex, final char c)
+  {
     int count = 0;
     --fromIndex;
-    while (fromIndex >= 0) {
-      if (s.charAt(fromIndex--) == c) {
+    while (fromIndex >= 0)
+    {
+      if (s.charAt(fromIndex--) == c)
+      {
         ++count;
-      } else {
+      }
+      else
+      {
         break;
       }
     }
@@ -52,114 +55,153 @@ public final class ResourceContentStripper {
 
   /**
    * Removes javascript comments and whitespace from specified string.
-   * 
+   *
    * @param original
-   *          Source string
+   *            Source string
    * @return String with removed comments and whitespace
    */
-  public static String stripCommentsAndWhitespace(final String original) {
+  public static String stripCommentsAndWhitespace(final String original)
+  {
     // let's be optimistic
     final StringBuffer result = new StringBuffer(original.length() / 2);
     int state = REGULAR_TEXT;
+    boolean wasNewLineInWhitespace = false;
 
-    for (int i = 0; i < original.length(); ++i) {
+    for (int i = 0; i < original.length(); ++i)
+    {
       char c = original.charAt(i);
-      final char next = (i < original.length() - 1) ? original.charAt(i + 1)
-          : 0;
+      final char next = (i < original.length() - 1) ? original.charAt(i + 1) : 0;
       final char prev = (i > 0) ? original.charAt(i - 1) : 0;
 
-      if (state == WHITE_SPACE) {
-        if (Character.isWhitespace(next) == false) {
+      if (state == WHITE_SPACE)
+      {
+        // WICKET 2060
+        if (c == '\n' && !wasNewLineInWhitespace)
+        {
+          result.append("\n");
+          wasNewLineInWhitespace = true;
+        }
+        if (Character.isWhitespace(next) == false)
+        {
           state = REGULAR_TEXT;
         }
         continue;
       }
 
-      if (state == REGULAR_TEXT) {
-        if (c == '/' && next == '/' && prev != '\\') {
+      if (state == REGULAR_TEXT)
+      {
+        if (c == '/' && next == '/' && prev != '\\')
+        {
           state = LINE_COMMENT;
           continue;
-        } else if (c == '/' && next == '*') {
+        }
+        else if (c == '/' && next == '*')
+        {
           state = MULTILINE_COMMENT;
           ++i;
           continue;
-        } else if (c == '/') {
-          // This might be a divide operator, or it might be a regular
-          // expression.
-          // Work out if it's a regular expression by finding the previous
-          // non-whitespace
+        }
+        else if (c == '/')
+        {
+          // This might be a divide operator, or it might be a regular expression.
+          // Work out if it's a regular expression by finding the previous non-whitespace
           // char, which
-          // will be either '=' or '('. If it's not, it's just a divide
-          // operator.
+          // will be either '=' or '('. If it's not, it's just a divide operator.
           int idx = result.length() - 1;
-          while (idx > 0) {
+          while (idx > 0)
+          {
             final char tmp = result.charAt(idx);
-            if (Character.isWhitespace(tmp)) {
+            if (Character.isWhitespace(tmp))
+            {
               idx--;
               continue;
             }
-            if (tmp == '=' || tmp == '(' || tmp == '{' || tmp == ':'
-                || tmp == ',' || tmp == '[') {
+            if (tmp == '=' || tmp == '(' || tmp == '{' || tmp == ':' || tmp == ',' ||
+              tmp == '[' || tmp == ';')
+            {
               state = REG_EXP;
               break;
             }
             break;
           }
-        } else if (Character.isWhitespace(c) && Character.isWhitespace(next)) {
+        }
+        else if (Character.isWhitespace(c) && Character.isWhitespace(next))
+        {
+          // WICKET-2060
+          if (c == '\n' || next == '\n')
+          {
+            c = '\n';
+            wasNewLineInWhitespace = true;
+          }
+          else
+          {
+            c = ' ';
+            wasNewLineInWhitespace = false;
+          }
           // ignore all whitespace characters after this one
           state = WHITE_SPACE;
-          c = '\n';
-        } else if (c == '\'') {
+        }
+        else if (c == '\'')
+        {
           state = STRING_SINGLE_QUOTE;
-        } else if (c == '"') {
+        }
+        else if (c == '"')
+        {
           state = STRING_DOUBLE_QUOTES;
         }
         result.append(c);
         continue;
       }
 
-      if (state == LINE_COMMENT) {
-        if (c == '\n' || c == '\r') {
+      if (state == LINE_COMMENT)
+      {
+        if (c == '\n' || c == '\r')
+        {
           state = REGULAR_TEXT;
           continue;
         }
       }
 
-      if (state == MULTILINE_COMMENT) {
-        if (c == '*' && next == '/') {
+      if (state == MULTILINE_COMMENT)
+      {
+        if (c == '*' && next == '/')
+        {
           state = REGULAR_TEXT;
           ++i;
           continue;
         }
       }
 
-      if (state == STRING_SINGLE_QUOTE) {
-        // to leave a string expression we need even (or zero) number of
-        // backslashes
+      if (state == STRING_SINGLE_QUOTE)
+      {
+        // to leave a string expression we need even (or zero) number of backslashes
         final int count = getPrevCount(original, i, '\\');
-        if (c == '\'' && count % 2 == 0) {
+        if (c == '\'' && count % 2 == 0)
+        {
           state = REGULAR_TEXT;
         }
         result.append(c);
         continue;
       }
 
-      if (state == STRING_DOUBLE_QUOTES) {
-        // to leave a string expression we need even (or zero) number of
-        // backslashes
+      if (state == STRING_DOUBLE_QUOTES)
+      {
+        // to leave a string expression we need even (or zero) number of backslashes
         final int count = getPrevCount(original, i, '\\');
-        if (c == '"' && count % 2 == 0) {
+        if (c == '"' && count % 2 == 0)
+        {
           state = REGULAR_TEXT;
         }
         result.append(c);
         continue;
       }
 
-      if (state == REG_EXP) {
-        // to leave regular expression we need even (or zero) number of
-        // backslashes
+      if (state == REG_EXP)
+      {
+        // to leave regular expression we need even (or zero) number of backslashes
         final int count = getPrevCount(original, i, '\\');
-        if (c == '/' && count % 2 == 0) {
+        if (c == '/' && count % 2 == 0)
+        {
           state = REGULAR_TEXT;
         }
         result.append(c);
