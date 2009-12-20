@@ -26,10 +26,14 @@
     <js>/dwr/engine.js</js>
     <js>/dwr/interface/DWRFacade.js</js>
   </group>
+  
+  <group name="chineseEncoding">
+    <js>http://search.trade2cn.com/js/list.js</js>
+    <js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js>
+  </group>
 
   <group name="JSGroup">
     <js>/static/js/css-browser-selector.js</js>
-    <js>/static/js/jquery.js</js>
     <js>/static/js/jquery.blockUI.js</js>
     <js>/static/js/jquery.selectboxes.js</js>
     <js>/static/js/DOMWindow.js</js>
