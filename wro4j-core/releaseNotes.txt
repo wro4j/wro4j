@@ -5,5 +5,15 @@
 - Fix ServletContextUriLocator issue when dispatching the request to runtime generated resources
 
 TODO
+- Create Debug mode GroupProcessor (without any processors)
 - CssImportPreProcessor
-- be able to configure expires header using init-param (@see http://ehcache.org/documentation/web_caching.html) 
+- be able to configure expires header using init-param (@see http://ehcache.org/documentation/web_caching.html)
+- CssCompressor for the following case:
+div#page-wrapper div.page-bottom3 {
+background: transparent url(../css/../img/theme/main-br.png) no-repeat scroll
+100% 100%;
+height: 16px;
+margin-bottom: 10px;
+}
+
+ 
