@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 wro4j. All rights reserved.
+/*
+ * Copyright (c) 2009.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -15,24 +15,25 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 
 
 /**
- * Preprocessor of css resources, responsible for replacing variables. (@see
+ * Processor of css resources, responsible for replacing variables. (@see
  * http://disruptive-innovations.com/zoo/cssvariables/). This is a pre processor, because it makes sense to apply
  * variables only on the same css. <br/>
- * TODO: check if it makes sense to make it post processor instead.
+ * This processor is implemented as both: preprocessor & postprocessor.
  *
  * @author alexandru.objelean
  * @created Created on Jul 05, 2009
  */
-public class CssVariablesPreprocessor
-  implements ResourcePreProcessor {
+public class CssVariablesProcessor
+  implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * Logger for this class.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(CssVariablesPreprocessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CssVariablesProcessor.class);
   /**
    * Pattern used to find variables definition. For instance:<br/>
    * <code>
@@ -86,7 +87,12 @@ public class CssVariablesPreprocessor
     LOG.debug("parsing variables body");
     while (m.find()) {
     	LOG.debug("found:" + m.group());
-      map.put(m.group(1), m.group(2));
+      final String key = m.group(1);
+      final String value = m.group(2);
+    	if (map.containsKey(key)) {
+        LOG.warn("A duplicate variable name found with name: " + key + " and value: " + value + ".");
+      }
+      map.put(key, value);
     }
     return map;
   }
@@ -95,6 +101,14 @@ public class CssVariablesPreprocessor
    * {@inheritDoc}
    */
   public void process(final String resourceUri, final Reader reader, final Writer writer)
+    throws IOException {
+    process(reader, writer);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
     final String css = IOUtils.toString(reader);
     final String result = parseCss(css);
@@ -151,5 +165,4 @@ public class CssVariablesPreprocessor
     m.appendTail(sb);
     return sb.toString();
   }
-
 }

@@ -14,10 +14,8 @@ import ro.isdc.wro.resource.UriLocatorFactory;
  * Default implementation of UriLocator. Holds a list of uri locators. The
  * uriLocator will be created based on the first uriLocator from the supplied
  * list which will accept the url.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Nov 4, 2008
  */
 public final class UriLocatorFactoryImpl implements UriLocatorFactory {
@@ -40,10 +38,7 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
   }
 
   /**
-   * Add a single resource to the list of supported resource locators.
-   * 
-   * @param uriLocator
-   *          {@link UriLocator} object to add.
+   * {@inheritDoc}
    */
   public final void addUriLocator(final UriLocator uriLocator) {
     if (uriLocator == null) {

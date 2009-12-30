@@ -97,7 +97,6 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    * Resources mapping path. If request uri contains this, the filter will
    * dispatch it to the original resource.
    */
-  // public static final String PATH_RESOURCES = "wro/resources";
   public static final String PATH_RESOURCES = "wroResources";
 
   /**

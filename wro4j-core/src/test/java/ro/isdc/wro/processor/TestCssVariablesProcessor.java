@@ -10,7 +10,7 @@ import java.io.Writer;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.processor.impl.CssVariablesPreprocessor;
+import ro.isdc.wro.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**
@@ -21,8 +21,8 @@ import ro.isdc.wro.test.util.ResourceProcessor;
  * @date $Date: $
  * @created Created on Jul 05, 2009
  */
-public class TestCssVariablesPreProcessor extends AbstractWroTest {
-  private final ResourcePreProcessor processor = new CssVariablesPreprocessor();
+public class TestCssVariablesProcessor extends AbstractWroTest {
+  private final ResourcePreProcessor processor = new CssVariablesProcessor();
 
   @Test
   public void testValid() throws IOException {

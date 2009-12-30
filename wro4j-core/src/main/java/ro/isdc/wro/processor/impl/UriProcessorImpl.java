@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2009.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -11,14 +11,10 @@ import ro.isdc.wro.processor.UriProcessor;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
- * UriProcessorImpl.
- * <p>
  * Perform processing of the uri and extracts group & resources related
  * informations: a list of groups, resource type and name.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public final class UriProcessorImpl implements UriProcessor {
