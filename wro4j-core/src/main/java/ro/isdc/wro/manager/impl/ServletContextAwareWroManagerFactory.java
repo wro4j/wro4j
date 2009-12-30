@@ -22,7 +22,7 @@ import ro.isdc.wro.resource.impl.UrlUriLocator;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory {
+public final class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
    */

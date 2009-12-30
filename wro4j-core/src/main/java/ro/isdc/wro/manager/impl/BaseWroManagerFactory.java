@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.manager.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -25,8 +22,6 @@ import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory implements WroManagerFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
-
   /**
    * Manager instance. Using volatile keyword fix the problem with
    * double-checked locking in JDK 1.5.
