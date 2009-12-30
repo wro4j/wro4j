@@ -46,7 +46,11 @@ public final class UrlUriLocator implements UriLocator {
 		// if creation of URL object doesn't throw an exception, the uri can be
 		// accepted.
 		try {
-			new URL(uri);
+			final URL url = new URL(uri);
+			//Do not accept file protocol for security reasons.
+			if ("file".equals(url.getProtocol())) {
+			  return false;
+			}
 		} catch (final MalformedURLException e) {
 			return false;
 		}
@@ -62,6 +66,7 @@ public final class UrlUriLocator implements UriLocator {
     }
     log.debug("Reading uri: " + uri);
     final URL url = new URL(uri);
+    log.debug(url.getProtocol());
     return url.openStream();
   }
 }

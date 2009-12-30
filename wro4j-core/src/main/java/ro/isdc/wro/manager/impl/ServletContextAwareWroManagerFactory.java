@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.manager.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +17,6 @@ import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.JSMinProcessor;
 import ro.isdc.wro.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.processor.impl.UriProcessorImpl;
-import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
 import ro.isdc.wro.resource.impl.ServletContextUriLocator;
@@ -95,14 +91,9 @@ public class ServletContextAwareWroManagerFactory implements WroManagerFactory {
    */
   protected UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
-
-    final List<UriLocator> resourceLocators = new ArrayList<UriLocator>();
-    // populate the list. The order is important.
-    resourceLocators.add(new ServletContextUriLocator());
-    resourceLocators.add(new ClasspathUriLocator());
-    resourceLocators.add(new UrlUriLocator());
-
-    factory.setUriLocators(resourceLocators);
+    factory.addUriLocator(new ServletContextUriLocator());
+    factory.addUriLocator(new ClasspathUriLocator());
+    factory.addUriLocator(new UrlUriLocator());
     return factory;
   }
 }
