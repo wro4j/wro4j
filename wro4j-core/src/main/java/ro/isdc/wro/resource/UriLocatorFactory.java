@@ -22,12 +22,4 @@ public interface UriLocatorFactory {
    *           returned.
    */
   UriLocator getInstance(final String uri);
-
-  /**
-   * Add a single resource to the list of supported resource locators.
-   *
-   * @param uriLocator
-   *          {@link UriLocator} object to add.
-   */
-  void addUriLocator(final UriLocator uriLocator);
 }

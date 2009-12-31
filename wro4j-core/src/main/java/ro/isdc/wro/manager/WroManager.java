@@ -74,6 +74,7 @@ public final class WroManager {
    * @param uri
    * @return
    */
+  //TODO pass request instead of uri
   public WroProcessResult process(final String uri) {
     validate();
     final StopWatch stopWatch = new StopWatch();

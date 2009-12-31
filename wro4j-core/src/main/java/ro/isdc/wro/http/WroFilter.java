@@ -32,13 +32,16 @@ import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
- * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the way it is configured, it builds
+ * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the
+ * way it is configured, it builds
  *
  * @author alexandru.objelean
  * @created Created on Oct 31, 2008
  */
-public class WroFilter implements Filter {
+public class WroFilter
+  implements Filter {
   private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
   /**
    * The name of the context parameter that specifies wroManager factory class
@@ -61,43 +64,48 @@ public class WroFilter implements Filter {
   private String cacheControlValue;
   private long expiresValue;
 
+
   /**
    * {@inheritDoc}
    */
-  public final void init(final FilterConfig config) throws ServletException {
+  public final void init(final FilterConfig config)
+    throws ServletException {
     this.filterConfig = config;
     this.wroManagerFactory = getWroManagerFactory();
     initHeaderValues();
     doInit(config);
   }
 
+
   /**
-	 * Initialize header values used for server-side resource caching.
-	 */
-	private void initHeaderValues() {
-		etagValue = UUID.randomUUID().toString();
-		lastModifiedValue = new Date().getTime();
-		cacheControlValue = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
+   * Initialize header values used for server-side resource caching.
+   */
+  private void initHeaderValues() {
+    etagValue = UUID.randomUUID().toString();
+    lastModifiedValue = new Date().getTime();
+    cacheControlValue = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
     expiresValue = cal.getTimeInMillis();
-	}
+  }
 
-	/**
+
+  /**
    * Custom filter initialization - can be used for extended classes.
    *
    * @see Filter#init(FilterConfig).
    */
-  protected void doInit(final FilterConfig config) throws ServletException {}
+  protected void doInit(final FilterConfig config)
+    throws ServletException {}
+
 
   /**
    * {@inheritDoc}
    */
-  public final void doFilter(final ServletRequest req,
-      final ServletResponse res, final FilterChain chain) throws IOException,
-      ServletException {
-    final HttpServletRequest request = (HttpServletRequest) req;
-    final HttpServletResponse response = (HttpServletResponse) res;
+  public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
+    throws IOException, ServletException {
+    final HttpServletRequest request = (HttpServletRequest)req;
+    final HttpServletResponse response = (HttpServletResponse)res;
 
     // add request, response & servletContext to thread local
     Context.set(new Context(request, response, filterConfig));
@@ -115,14 +123,14 @@ public class WroFilter implements Filter {
     InputStream is = null;
     OutputStream os = null;
     final String requestURI = request.getRequestURI();
+
+    //TODO ask CssUrlRewritingProcessor if we have rights to read
+
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
-      final String resourceId = request
-          .getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-      is = manager.getUriLocatorFactory().getInstance(
-          resourceId).locate(resourceId);
+      final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
+      is = manager.getUriLocatorFactory().getInstance(resourceId).locate(resourceId);
       if (is == null) {
-        throw new WroRuntimeException("Could not Locate resource: "
-            + resourceId);
+        throw new WroRuntimeException("Could not Locate resource: " + resourceId);
       }
       os = response.getOutputStream();
     } else {
@@ -139,14 +147,15 @@ public class WroFilter implements Filter {
     IOUtils.copy(is, os);
     is.close();
     os.close();
-    //remove context from the current thread local.
+    // remove context from the current thread local.
     Context.unset();
   }
 
 
   /**
    * Method responsible for setting response headers, used mostly for cache control. Override this method if you want to
-   * change the way headers are set.<br>Default implementation will set
+   * change the way headers are set.<br>
+   * Default implementation will set
    *
    * @param response {@link HttpServletResponse} object.
    */
@@ -160,16 +169,15 @@ public class WroFilter implements Filter {
     }
   }
 
+
   /**
-   * Add gzip header to response and wrap the response {@link OutputStream} with
-   * {@link GZIPOutputStream}
+   * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}
    *
-   * @param response
-   *          {@link HttpServletResponse} object.
+   * @param response {@link HttpServletResponse} object.
    * @return wrapped gziped OutputStream.
    */
   private OutputStream getGzipedOutputStream(final HttpServletResponse response)
-      throws IOException {
+    throws IOException {
     // gzip response
     WroUtil.addGzipHeader(response);
     // Create a gzip stream
@@ -178,15 +186,14 @@ public class WroFilter implements Filter {
     return os;
   }
 
+
   /**
-   * Factory method for {@link WroManagerFactory}. Override this method, in
-   * order to change the way filter use factory.
+   * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.
    *
    * @return {@link WroManagerFactory} object.
    */
   protected WroManagerFactory getWroManagerFactory() {
-    final String appFactoryClassName = filterConfig
-        .getInitParameter(PARAM_MANAGER_FACTORY);
+    final String appFactoryClassName = filterConfig.getInitParameter(PARAM_MANAGER_FACTORY);
     if (appFactoryClassName == null) {
       // If no context param was specified we return the default factory
       return new ServletContextAwareWroManagerFactory();
@@ -194,20 +201,19 @@ public class WroFilter implements Filter {
       // Try to find the specified factory class
       Class<?> factoryClass;
       try {
-        factoryClass = Thread.currentThread().getContextClassLoader()
-            .loadClass(appFactoryClassName);
+        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(appFactoryClassName);
         // Instantiate the factory
-        return (WroManagerFactory) factoryClass.newInstance();
+        return (WroManagerFactory)factoryClass.newInstance();
       } catch (final Exception e) {
         throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
   }
 
+
   /**
    * {@inheritDoc}
    */
-  public void destroy() {
-  }
+  public void destroy() {}
 
 }

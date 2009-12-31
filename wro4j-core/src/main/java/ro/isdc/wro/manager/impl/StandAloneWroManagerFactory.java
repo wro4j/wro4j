@@ -58,7 +58,7 @@ public final class StandAloneWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
-    final UriLocatorFactory factory = new UriLocatorFactoryImpl();
+    final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
     // The order is important.
     factory.addUriLocator(new ServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());

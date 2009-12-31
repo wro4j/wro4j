@@ -6,6 +6,8 @@ package ro.isdc.wro.processor.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,7 +93,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
 
   /**
    * Resources mapping path. If request uri contains this, the filter will
@@ -122,19 +124,23 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    */
   @Deprecated
 	private static final String PREFIX_DOT = ":";
-
+  /**
+   * A list of allowed url's.
+   */
+  private List<String> allowedUrls = new ArrayList<String>();
   /**
    * {@inheritDoc}
    */
   public void process(final String cssUri, final Reader reader,
       final Writer writer) throws IOException {
-    log.debug("<process>");
-    log.debug("\t<cssUri>" + cssUri + "</cssUri>");
+    LOG.debug("<process>");
+    LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
+    allowedUrls.clear();
     final String css = IOUtils.toString(reader);
     final String result = parseCss(css, cssUri);
     writer.write(result);
     writer.close();
-    log.debug("</process>");
+    LOG.debug("</process>");
   }
 
   /**
@@ -158,6 +164,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
       }
       final String newReplacement = oldMatch.replace(urlGroup, replaceImageUrl(
           urlGroup, cssUri));
+      allowedUrls.add(newReplacement);
       m.appendReplacement(sb, newReplacement);
     }
     m.appendTail(sb);

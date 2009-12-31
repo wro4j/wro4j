@@ -38,7 +38,10 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
   }
 
   /**
-   * {@inheritDoc}
+   * Add a single resource to the list of supported resource locators.
+   *
+   * @param uriLocator
+   *          {@link UriLocator} object to add.
    */
   public final void addUriLocator(final UriLocator uriLocator) {
     if (uriLocator == null) {

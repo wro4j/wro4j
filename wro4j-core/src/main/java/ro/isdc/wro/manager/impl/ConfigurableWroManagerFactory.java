@@ -68,7 +68,7 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
-    final UriLocatorFactory factory = new UriLocatorFactoryImpl();
+    final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
     final List<UriLocator> locators = getLocators();
     for (final UriLocator uriLocator : locators) {
       factory.addUriLocator(uriLocator);
