@@ -6,8 +6,8 @@ package ro.isdc.wro.processor.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,7 +127,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * A list of allowed url's.
    */
-  private List<String> allowedUrls = new ArrayList<String>();
+  private Set<String> allowedUrls = new HashSet<String>();
   /**
    * {@inheritDoc}
    */
@@ -135,11 +135,11 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
       final Writer writer) throws IOException {
     LOG.debug("<process>");
     LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
-    allowedUrls.clear();
     final String css = IOUtils.toString(reader);
     final String result = parseCss(css, cssUri);
     writer.write(result);
     writer.close();
+    LOG.debug("allowed urls: " + allowedUrls);
     LOG.debug("</process>");
   }
 
@@ -162,9 +162,10 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
         throw new IllegalStateException("Could not extract urlGroup from: "
             + oldMatch);
       }
-      final String newReplacement = oldMatch.replace(urlGroup, replaceImageUrl(
-          urlGroup, cssUri));
-      allowedUrls.add(newReplacement);
+      final String replacedUrl = replaceImageUrl(urlGroup, cssUri);
+      final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
+      //update allowedUrls list
+      allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
       m.appendReplacement(sb, newReplacement);
     }
     m.appendTail(sb);
@@ -266,8 +267,6 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
-    final String urlPrefix = WroUtil.getRequestUriPath() + PATH_RESOURCES + "?"
-        + PARAM_RESOURCE_ID + "=";
-    return urlPrefix;
+    return WroUtil.getRequestUriPath() + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
   }
 }

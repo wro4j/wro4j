@@ -86,6 +86,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
 
       // preProcessing
       final String resourceUri = resource.getUri();
+      //TODO check if init call for all preprocessors is needed
       if (ResourceType.CSS == resource.getType()) {
         preProcessedContent = applyPreProcessors(resourceUri,
             getCssPreProcessors(), originalContent);
