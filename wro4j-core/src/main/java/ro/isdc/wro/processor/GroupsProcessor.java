@@ -117,4 +117,14 @@ public interface GroupsProcessor {
 	 * @param processor {@link ResourcePostProcessor} to add.
 	 */
 	void addAnyPostProcessor(final ResourcePostProcessor processor);
+
+
+  /**
+   * Search for the first available preprocessor of given type.
+   *
+   * @param processorClass to search in list of available preprocessors.
+   * @return {@link ResourcePreProcessor} instance if any found, or null if such processor doesn't exist.
+   */
+	<T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass);
+
 }

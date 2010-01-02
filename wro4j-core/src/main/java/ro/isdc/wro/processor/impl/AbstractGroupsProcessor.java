@@ -4,7 +4,9 @@
 package ro.isdc.wro.processor.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
@@ -51,6 +53,25 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    * js).
    */
   private final List<ResourcePostProcessor> anyResourcePostProcessors = new ArrayList<ResourcePostProcessor>();
+
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass) {
+    T found = null;
+    final Set<ResourcePreProcessor> allPreProcessors = new HashSet<ResourcePreProcessor>();
+    allPreProcessors.addAll(cssPreProcessors);
+    allPreProcessors.addAll(jsPreProcessors);
+    allPreProcessors.addAll(anyResourcePreProcessors);
+    for (final ResourcePreProcessor processor : allPreProcessors) {
+      if (processorClass.isInstance(processor)) {
+        found = (T) processor;
+        return found;
+      }
+    }
+    return null;
+  }
 
   /**
    * @param processors

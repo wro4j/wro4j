@@ -5,7 +5,11 @@ package ro.isdc.wro.manager;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -19,7 +23,9 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.UriProcessor;
+import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
@@ -110,6 +116,27 @@ public final class WroManager {
   }
 
   /**
+   * TODO move to process method
+   * Resolve the stream for a request.
+   * @param request {@link HttpServletRequest} object.
+   * @return {@link InputStream} not null object if the resource is valid and can be accessed
+   * @throws WroRuntimeException if no stream could be resolved.
+   */
+  public InputStream getStreamForRequest(final HttpServletRequest request) throws IOException {
+    final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
+    final UriLocator uriLocator = getUriLocatorFactory().getInstance(resourceId);
+    final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
+    if (processor != null && !processor.isUriAllowed(resourceId)) {
+      throw new WroRuntimeException("Unauthorized resource request detected!");
+    }
+    final InputStream is = uriLocator.locate(resourceId);
+    if (is == null) {
+      throw new WroRuntimeException("Could not Locate resource: " + resourceId);
+    }
+    return is;
+  }
+
+  /**
    * Check if all dependencies are set.
    */
   private void validate() {
@@ -175,4 +202,5 @@ public final class WroManager {
   public final UriLocatorFactory getUriLocatorFactory() {
     return uriLocatorFactory;
   }
+
 }

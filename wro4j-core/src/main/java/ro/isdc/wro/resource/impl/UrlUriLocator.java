@@ -46,11 +46,7 @@ public final class UrlUriLocator implements UriLocator {
 		// if creation of URL object doesn't throw an exception, the uri can be
 		// accepted.
 		try {
-			final URL url = new URL(uri);
-			//Do not accept file protocol for security reasons.
-			if ("file".equals(url.getProtocol())) {
-			  return false;
-			}
+			new URL(uri);
 		} catch (final MalformedURLException e) {
 			return false;
 		}

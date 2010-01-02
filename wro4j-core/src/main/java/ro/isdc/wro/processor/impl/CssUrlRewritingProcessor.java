@@ -125,7 +125,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   @Deprecated
 	private static final String PREFIX_DOT = ":";
   /**
-   * A list of allowed url's.
+   * A set of allowed url's.
    */
   private Set<String> allowedUrls = new HashSet<String>();
   /**
@@ -260,6 +260,13 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
     return !UrlUriLocator.isValid(url);
   }
 
+  /**
+   * @param uri to check if is allowed.
+   * @return true if passed argument is contained in allowed list.
+   */
+  public final boolean isUriAllowed(final String uri) {
+    return allowedUrls.contains(uri);
+  }
 
   /**
    * This method has protected modifier in order to be accessed by unit test class.

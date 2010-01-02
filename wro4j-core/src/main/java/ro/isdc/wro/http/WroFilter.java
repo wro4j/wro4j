@@ -124,14 +124,9 @@ public class WroFilter
     OutputStream os = null;
     final String requestURI = request.getRequestURI();
 
-    //TODO ask CssUrlRewritingProcessor if we have rights to read
-
+    //TODO move this logic to manager & update its signature
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
-      final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-      is = manager.getUriLocatorFactory().getInstance(resourceId).locate(resourceId);
-      if (is == null) {
-        throw new WroRuntimeException("Could not Locate resource: " + resourceId);
-      }
+      is = manager.getStreamForRequest(request);
       os = response.getOutputStream();
     } else {
       // process the uri using manager
