@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -9,7 +9,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -26,9 +28,7 @@ import ro.isdc.wro.resource.ResourceType;
  * Default group processor which perform preProcessing, merge and postProcessing
  * on groups resources.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
@@ -76,7 +76,14 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
   private String preProcessAndMerge(final List<Resource> resources)
       throws IOException {
     final StringBuffer result = new StringBuffer();
-    for (final Resource resource : resources) {
+    //using ListIterator because the collection can be changed during processing
+    //be sure we use a list which supports add & remove operation on iterator while iterating
+    final List<Resource> resourceList = new LinkedList<Resource>(resources);
+    final ListIterator<Resource> iterator = resourceList.listIterator();
+    //start with first
+    iterator.next();
+    for (int i = 0; i < resourceList.size(); i++) {
+      final Resource resource = resourceList.get(i);
       LOG.debug("\tmerging resource: " + resource);
       String preProcessedContent = null;
       // get original content
@@ -85,27 +92,54 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       reader.close();
 
       // preProcessing
-      final String resourceUri = resource.getUri();
-      //TODO check if init call for all preprocessors is needed
       if (ResourceType.CSS == resource.getType()) {
-        preProcessedContent = applyPreProcessors(resourceUri,
+        preProcessedContent = applyPreProcessors(resource,
             getCssPreProcessors(), originalContent);
       } else {
-        preProcessedContent = applyPreProcessors(resourceUri,
+        preProcessedContent = applyPreProcessors(resource,
             getJsPreProcessors(), originalContent);
       }
-      preProcessedContent = applyPreProcessors(resourceUri,
+      preProcessedContent = applyPreProcessors(resource,
           getAnyResourcePreProcessors(), preProcessedContent);
       result.append(preProcessedContent);
     }
     return result.toString();
   }
 
+//  private static void test() {
+//    final List<String> list = new ArrayList<String>();
+//    list.add("A");
+//    list.add("B");
+//    list.add("C");
+//    list.add("D");
+//
+//    final ListIterator<String> iter = list.listIterator();
+//    //iter.next();
+//    for (int i = 0; i < list.size(); i++) {
+//      process(list.get(i), iter);
+//      if (iter.hasNext()) {
+//        iter.next();
+//      }
+//    }
+//    System.out.println("list is: " + list);
+//  }
+//
+//  private static void process(final Object o, final ListIterator iterator) {
+//    if (RandomUtils.nextInt(100) < 20) {
+//      //iterator.remove();
+//      iterator.add("a");
+//      iterator.add("b");
+//      iterator.add("c");
+//    } else {
+//      System.out.println(o);
+//    }
+//  }
+
   /**
    * Apply resourcePreProcessors.
    *
-   * @param resourceUri
-   *          uri of the resource. This property is used by preProcessor.
+   * @param resource
+   *          {@link Resource} to pre process.
    * @param processors
    *          a list of processor to apply on the content from the supplied
    *          writer.
@@ -113,12 +147,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    *          The content to preProcess as String.
    * @return the processed content as String.
    */
-  private String applyPreProcessors(final String resourceUri,
+  private String applyPreProcessors(final Resource resource,
       final List<ResourcePreProcessor> processors, final String content)
       throws IOException {
-    if (processors == null) {
-      throw new NullPointerException("Processors list cannot be null!");
-    }
     if (content == null) {
       throw new NullPointerException("content cannot be null!");
     }
@@ -130,7 +161,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     for (final ResourcePreProcessor processor : processors) {
       LOG.debug("applyinig processor:  " + processor);
       output = new StringWriter();
-      processor.process(resourceUri, input, output);
+      processor.process(resource, input, output);
       input = new StringReader(output.toString());
     }
     return output.toString();

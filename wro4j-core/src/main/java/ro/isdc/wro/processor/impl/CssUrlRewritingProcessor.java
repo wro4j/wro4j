@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
 import ro.isdc.wro.resource.impl.ServletContextUriLocator;
@@ -84,9 +85,7 @@ import ro.isdc.wro.util.WroUtil;
  * </tr>
  * </tbody> </table>
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 19, 2008
  */
 public class CssUrlRewritingProcessor implements ResourcePreProcessor {
@@ -131,9 +130,10 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * {@inheritDoc}
    */
-  public void process(final String cssUri, final Reader reader,
+  public void process(final Resource resource, final Reader reader,
       final Writer writer) throws IOException {
     LOG.debug("<process>");
+    final String cssUri = resource.getUri();
     LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
     final String css = IOUtils.toString(reader);
     final String result = parseCss(css, cssUri);

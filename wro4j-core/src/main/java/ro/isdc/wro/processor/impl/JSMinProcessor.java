@@ -16,6 +16,7 @@ import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.algorithm.JSMin;
+import ro.isdc.wro.resource.Resource;
 
 /**
  * JSMinProcessor.
@@ -54,7 +55,7 @@ public class JSMinProcessor implements ResourcePreProcessor,
   /**
    * {@inheritDoc}
    */
-  public void process(final String resourceUri, final Reader reader,
+  public void process(final Resource resource, final Reader reader,
       final Writer writer) throws IOException {
     // resource Uri doesn't matter.
     process(reader, writer);

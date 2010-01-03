@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.Resource;
 
 
 /**
@@ -100,7 +101,7 @@ public class CssVariablesProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final String resourceUri, final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     process(reader, writer);
   }

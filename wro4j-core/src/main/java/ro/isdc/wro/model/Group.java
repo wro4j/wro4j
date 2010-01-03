@@ -13,10 +13,8 @@ import ro.isdc.wro.resource.Resource;
 
 /**
  * A group is an entity which gather a list of resources.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
 public final class Group {
@@ -58,6 +56,9 @@ public final class Group {
    */
   public final void setResources(final List<Resource> resources) {
     this.resources = resources;
+    for (final Resource resource : resources) {
+      resource.setGroup(this);
+    }
   }
 
   /**
@@ -65,8 +66,7 @@ public final class Group {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append(
-        "name", this.name).append("resources", this.resources).toString();
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).toString();
   }
 
 }

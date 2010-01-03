@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.algorithm.AndryCssCompressor;
+import ro.isdc.wro.resource.Resource;
 
 
 /**
@@ -26,7 +27,7 @@ public class AndryCssCompressorProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final String resourceUri, final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     process(reader, writer);
   }

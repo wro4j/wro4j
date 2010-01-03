@@ -12,15 +12,14 @@ import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.util.WroUtil;
 
 /**
  * SingleLineCommentStripperProcessor can be both: preProcessor & postProcessor.
  * Remove single line comments from processed resource. This processor exist only for the sake of proof of concept.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public class SingleLineCommentStripperProcessor implements
@@ -46,7 +45,7 @@ public class SingleLineCommentStripperProcessor implements
   /**
    * {@inheritDoc}
    */
-  public void process(final String resourceUri, final Reader reader,
+  public void process(final Resource resource, final Reader reader,
       final Writer writer) throws IOException {
     // resource Uri doesn't matter.
     process(reader, writer);

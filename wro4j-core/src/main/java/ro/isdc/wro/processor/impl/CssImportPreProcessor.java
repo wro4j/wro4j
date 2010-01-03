@@ -6,8 +6,7 @@ package ro.isdc.wro.processor.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.Resource;
 
 
 /**
@@ -39,22 +39,23 @@ public class CssImportPreProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final String resourceUri, final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String css = IOUtils.toString(reader);
-    final String result = parseCss(css);
+    final String result = parseCss(resource, css);
     writer.write(result);
     writer.close();
   }
 
   /**
-   * Parse css, find all defined variables & replace them.
+   * Parse css, find all import statements.
    *
+   * @param resource {@link Resource} where the parsed css resides.
    * @param css to parse.
    */
-  private String parseCss(final String css) {
-    //map containing variables & their values
-    final Map<String, String> map = new HashMap<String, String>();
+  private String parseCss(final Resource resource, final String css) {
+    final Stack<Resource> stack = new Stack<Resource>();
+
     final StringBuffer sb = new StringBuffer();
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
@@ -64,8 +65,10 @@ public class CssImportPreProcessor
       //extract variables
       //map.putAll(extractVariables(variablesBody));
       //remove variables definition
-
-      m.appendReplacement(sb, "1");
+      m.appendReplacement(sb, "");
+      m.appendTail(sb);
+      System.out.println(sb.toString());
+      break;
     }
     m.appendTail(sb);
 

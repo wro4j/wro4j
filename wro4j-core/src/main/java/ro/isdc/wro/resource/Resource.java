@@ -15,17 +15,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.model.Group;
 
 /**
  * Encapsulates information about a resource. Resource instance is an immutable
- * thread-safe object.
+ * thread-safe object. This class is not final because we need to mock it in unit tests.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class Resource {
+public class Resource {
   /**
    * Logger for this class.
    */
@@ -45,6 +44,11 @@ public final class Resource {
    * UriLocator.
    */
   private final UriLocator uriLocator;
+
+  /**
+   * The reference to the group where this resource resides.
+   */
+  private Group group;
 
   /**
    * Constructor.
@@ -119,10 +123,26 @@ public final class Resource {
   }
 
   /**
-   * @return the uri
+   * @return the uri associated with this resource.
    */
-  public final String getUri() {
+  public String getUri() {
     return uri;
+  }
+
+  /**
+   * @return the group
+   */
+  public Group getGroup() {
+    return this.group;
+  }
+
+  /**
+   * Do NOT call this explicitly, it is used only to build groups.
+   *
+   * @param group the group to set
+   */
+  public void setGroup(final Group group) {
+    this.group = group;
   }
 
   /**
@@ -130,8 +150,6 @@ public final class Resource {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append(
-        "uriLocator", this.uriLocator.getClass()).append("type", this.type)
-        .append("uri", this.uri).toString();
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).toString();
   }
 }

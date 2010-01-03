@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.impl;
 
@@ -44,9 +44,7 @@ import ro.isdc.wro.resource.UriLocatorFactory;
  * Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the description of all
  * groups.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory

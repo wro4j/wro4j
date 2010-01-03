@@ -7,21 +7,21 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import ro.isdc.wro.resource.Resource;
+
 /**
  * ResourcePreProcessor. A processor which will be applied to the resource
  * before merging.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Nov 19, 2008
  */
 public interface ResourcePreProcessor {
   /**
    * Process a content supplied by a reader and perform some sort of processing.
-   * 
-   * @param resourceUri
-   *          Uri of the original resource as it found in the model.
+   *
+   * @param resource
+   *          the original resource as it found in the model.
    * @param reader
    *          {@link Reader} used to read original resource content.
    * @param writer
@@ -29,6 +29,6 @@ public interface ResourcePreProcessor {
    * @throws IOException
    *           when IO exception occurs.
    */
-  public void process(final String resourceUri, final Reader reader,
+  public void process(final Resource resource, final Reader reader,
       final Writer writer) throws IOException;
 }
