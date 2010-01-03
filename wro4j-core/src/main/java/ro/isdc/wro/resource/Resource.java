@@ -107,7 +107,7 @@ public class Resource {
     log.debug("getReader for " + this.getUri());
     final InputStream is = uriLocator.locate(this.getUri());
     // wrap reader with bufferedReader for top efficiency
-    final Reader reader = new BufferedReader(new InputStreamReader(is));
+    final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     if (reader == null) {
       throw new WroRuntimeException(
           "Exception while retrieving InputStream from uri: " + getUri());
@@ -116,9 +116,17 @@ public class Resource {
   }
 
   /**
+   * Inserts a {@link Resource} immediately before this resource in the list of the current group.
+   * @param resource to prepend.
+   */
+  public final void insertBefore(final Resource resource) {
+    getGroup().insertResourceBefore(resource, this);
+  }
+
+  /**
    * @return the type
    */
-  public final ResourceType getType() {
+  public ResourceType getType() {
     return type;
   }
 

@@ -9,12 +9,15 @@
 - do not set expire headers in Development mode 
 
 # Version 1.1.3
+- use allowedResource to filter only authorized resource requests & bring back file protocol from UrlUriLocator (not an issue anymore)
 - use CssVariablesProcessor as a postProcessor
+- change PreProcessor signature (use Resource instead of resourceUri)
 
 TODO
+- integrate maven licence & test explorer plugins 
+- CssImportPreProcessor
 - Create WroManagerFactory capable of being configured using init-params
 - Create Debug mode GroupProcessor (without any processors)
-- CssImportPreProcessor
 - be able to configure expires header using init-param (@see http://ehcache.org/documentation/web_caching.html)
 - CssCompressor for the following case:
 div#page-wrapper div.page-bottom3 {

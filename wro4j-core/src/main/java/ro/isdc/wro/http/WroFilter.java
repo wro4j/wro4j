@@ -37,7 +37,7 @@ import ro.isdc.wro.util.WroUtil;
  * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the
  * way it is configured, it builds
  *
- * @author alexandru.objelean
+ * @author Alex Objelean
  * @created Created on Oct 31, 2008
  */
 public class WroFilter

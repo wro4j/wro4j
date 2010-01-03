@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor;
 
@@ -9,9 +9,10 @@ import java.io.Writer;
 
 import ro.isdc.wro.resource.Resource;
 
+
 /**
- * ResourcePreProcessor. A processor which will be applied to the resource
- * before merging.
+ * ResourcePreProcessor. A processor which will be applied to the resource before merging. TODO: maybe it would be a
+ * good idea to have List<ResourceType> support() method used to identify the type of resources this should apply on?
  *
  * @author Alex Objelean
  * @created Created on Nov 19, 2008

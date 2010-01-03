@@ -25,8 +25,8 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   @Test
   public void testValid() throws IOException {
     compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/processor/cssImports/valid-input.css",
-        "classpath:ro/isdc/wro/processor/cssImports/valid-output.css",
+        "classpath:ro/isdc/wro/processor/cssImports/test1-input.css",
+        "classpath:ro/isdc/wro/processor/cssImports/test1-output.css",
         new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {

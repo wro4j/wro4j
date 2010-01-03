@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
 import ro.isdc.wro.processor.GroupsProcessor;
+import ro.isdc.wro.processor.ResourcePostProcessor;
+import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.resource.UriLocator;
@@ -32,36 +34,66 @@ import ro.isdc.wro.resource.impl.UrlUriLocator;
  * @author Alex Objelean
  * @created Created on Dec 31, 2009
  */
-public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
+public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   /**
    * Name of init param used to specify uri locators.
    */
   private static final String PARAM_URI_LOCATORS = "uriLocators";
-  private static Map<String, Class<?>> PROCESSORS_MAP = new HashMap<String, Class<?>>();
-  static {
-    PROCESSORS_MAP.put("cssUrlRewriting", CssUrlRewritingProcessor.class);
-    PROCESSORS_MAP.put("cssVariables", CssUrlRewritingProcessor.class);
-    PROCESSORS_MAP.put("cssMinJawr", CssUrlRewritingProcessor.class);
-    PROCESSORS_MAP.put("jsMin", CssUrlRewritingProcessor.class);
+  private Map<String, Class<?>> processors = new HashMap<String, Class<?>>();
+  private Map<String, Class<? extends ResourcePreProcessor>> cssPreProcessors = new HashMap<String, Class<? extends ResourcePreProcessor>>();
+  private Map<String, Class<? extends ResourcePreProcessor>> jsPreProcessors = new HashMap<String, Class<? extends ResourcePreProcessor>>();
+  private Map<String, Class<? extends ResourcePreProcessor>> anyPreProcessors = new HashMap<String, Class<? extends ResourcePreProcessor>>();
+  private Map<String, Class<? extends ResourcePostProcessor>> cssPostProcessors = new HashMap<String, Class<? extends ResourcePostProcessor>>();
+  private Map<String, Class<? extends ResourcePostProcessor>> jsPostProcessors = new HashMap<String, Class<? extends ResourcePostProcessor>>();
+  private Map<String, Class<? extends ResourcePostProcessor>> anyPostProcessors = new HashMap<String, Class<? extends ResourcePostProcessor>>();
+
+  private Map<String, Class<? extends UriLocator>> locators = new HashMap<String, Class<? extends UriLocator>>();
+
+  public ConfigurableWroManagerFactory() {
+    initProcessors();
+    initLocators();
   }
-  private static Map<String, Class<? extends UriLocator>> URI_LOCATOR_MAP = new HashMap<String, Class<? extends UriLocator>>();
-  static {
-    URI_LOCATOR_MAP.put("servletContext", ServletContextUriLocator.class);
-    URI_LOCATOR_MAP.put("classpath", ClasspathUriLocator.class);
-    URI_LOCATOR_MAP.put("url", UrlUriLocator.class);
+
+  /**
+   * Init locators with default values.
+   */
+  private void initLocators() {
+    locators.put("servletContext", ServletContextUriLocator.class);
+    locators.put("classpath", ClasspathUriLocator.class);
+    locators.put("url", UrlUriLocator.class);
+    contributeLocators(locators);
+  }
+
+  /**
+   * Init processors with default values.
+   */
+  private void initProcessors() {
+    processors.put("cssUrlRewriting", CssUrlRewritingProcessor.class);
+    processors.put("cssVariables", CssUrlRewritingProcessor.class);
+    processors.put("cssMinJawr", CssUrlRewritingProcessor.class);
+    processors.put("jsMin", CssUrlRewritingProcessor.class);
+    contributeProcessors(processors);
+  }
+
+  /**
+   * Allow subclasses to contribute with it's own locators.
+   * @param map containing locator mappings.
+   */
+  protected void contributeLocators(final Map<String, Class<? extends UriLocator>> map) {
   }
 
 
   /**
-   * {@inheritDoc}
+   * Allow subclasses to contribute with it's own processors.
+   * <p>
+   * It is implementor responsibility to add a processor type (instance of {@link ResourcePreProcessor} or
+   * {@link ResourcePostProcessor}).
+   *
+   * @param map containing processor mappings.
    */
-  @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    return groupProcessor;
+  protected void contributeProcessors(final Map<String, Class<?>> map) {
   }
-
 
   /**
    * {@inheritDoc}
@@ -76,6 +108,15 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return factory;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected GroupsProcessor newGroupsProcessor() {
+    final GroupsProcessorImpl groupProcessor = new GroupsProcessorImpl();
+//    groupProcessor.setCssPreProcessors(cssPreProcessors)
+    return groupProcessor;
+  }
 
   /**
    * @return a list of configured uriLocators.
@@ -85,7 +126,7 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
     final String[] locatorsArray = uriLocators.split(",");
     for (final String locatorAsString : locatorsArray) {
-      final Class<? extends UriLocator> locator = URI_LOCATOR_MAP.get(locatorAsString);
+      final Class<? extends UriLocator> locator = locators.get(locatorAsString);
       if (locator == null) {
         throw new WroRuntimeException("Invalid locator name: " + locatorAsString);
       }
