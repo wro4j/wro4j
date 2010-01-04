@@ -23,10 +23,10 @@ public class YUIServletContextAwareWroManagerFactory extends ServletContextAware
   @Override
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.addCssPreProcessor(new CssUrlRewritingProcessor());
-    groupProcessor.addCssPreProcessor(new CssVariablesProcessor());
-    groupProcessor.addCssPostProcessor(new YUICssCompressorProcessor());
-    groupProcessor.addJsPostProcessor(new YUIJsCompressorProcessor());
+    groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+    groupProcessor.addPreProcessor(new CssVariablesProcessor());
+    groupProcessor.addPostProcessor(new YUICssCompressorProcessor());
+    groupProcessor.addPostProcessor(new YUIJsCompressorProcessor());
     return groupProcessor;
   }
 }
