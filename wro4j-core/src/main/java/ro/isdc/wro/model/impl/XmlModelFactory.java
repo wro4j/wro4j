@@ -36,8 +36,6 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
-import ro.isdc.wro.resource.UriLocator;
-import ro.isdc.wro.resource.UriLocatorFactory;
 
 
 /**
@@ -90,11 +88,6 @@ public class XmlModelFactory
   private static final String ATTR_GROUP_NAME = "name";
 
   /**
-   * UriLocatorFactory. Used to create a resource based on its type.
-   */
-  private UriLocatorFactory uriLocatorFactory;
-
-  /**
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
    * any element.
    */
@@ -115,11 +108,7 @@ public class XmlModelFactory
   /**
    * {@inheritDoc}
    */
-  public synchronized WroModel getInstance(final UriLocatorFactory uriLocatorFactory) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalArgumentException("uriLocatorFactory cannot be NULL!");
-    }
-    this.uriLocatorFactory = uriLocatorFactory;
+  public synchronized WroModel getInstance() {
     // when in DEVELOPMENT mode, create fresh new instance for each request.
     if (Context.get().isDevelopmentMode()) {
       return newModel();
@@ -313,8 +302,7 @@ public class XmlModelFactory
     }
     LOG.debug("\ttype=" + type);
     if (type != null) {
-      final UriLocator uriLocator = this.uriLocatorFactory.getInstance(uri);
-      final Resource resource = new Resource(uri, type, uriLocator);
+      final Resource resource = new Resource(uri, type);
       resources.add(resource);
     }
   }

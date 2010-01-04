@@ -21,8 +21,8 @@ import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
+import ro.isdc.wro.processor.GroupsExtractor;
 import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.UriProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocator;
@@ -31,9 +31,7 @@ import ro.isdc.wro.resource.UriLocatorFactory;
 /**
  * WroManager. Contains all the factories used by optimizer in order to perform the logic.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
 public final class WroManager {
@@ -50,7 +48,7 @@ public final class WroManager {
   /**
    * UriProcessor.
    */
-  private UriProcessor uriProcessor;
+  private GroupsExtractor uriProcessor;
 
   /**
    * UriLocatorFactory.
@@ -77,8 +75,8 @@ public final class WroManager {
    * Perform processing of the uri and depending on it will return {@link WroProcessResult} object containing
    * the input stream of the requested resource and it's content type.
    *
-   * @param uri
-   * @return
+   * @param uri to process.
+   * @return {@link WroProcessResult} object.
    */
   //TODO pass request instead of uri
   public WroProcessResult process(final String uri) {
@@ -91,7 +89,7 @@ public final class WroManager {
     final ResourceType type = uriProcessor.getResourceType(uri);
 
     // create model & find groups
-    final WroModel model = modelFactory.getInstance(uriLocatorFactory);
+    final WroModel model = modelFactory.getInstance();
     final List<Group> groups = model.getGroupsByNames(groupNames);
 
     String processedResult = null;
@@ -164,7 +162,7 @@ public final class WroManager {
   /**
    * @param uriProcessor the uriProcessor to set
    */
-  public final void setUriProcessor(final UriProcessor uriProcessor) {
+  public final void setUriProcessor(final GroupsExtractor uriProcessor) {
     this.uriProcessor = uriProcessor;
   }
 
@@ -187,6 +185,7 @@ public final class WroManager {
    */
   public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
     this.uriLocatorFactory = uriLocatorFactory;
+    groupsProcessor.setUriLocatorFactory(getUriLocatorFactory());
   }
 
   /**

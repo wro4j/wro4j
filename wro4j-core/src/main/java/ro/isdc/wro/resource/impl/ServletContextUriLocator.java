@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.resource.impl;
 
@@ -33,9 +33,7 @@ import ro.isdc.wro.util.WroUtil;
  * physic resource under the servlet context and if the resource does not exist, will try to use requestDispatcher. This
  * kind of resources will be accepted if their prefix is <code>/</code>.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 10, 2008
  */
 public final class ServletContextUriLocator

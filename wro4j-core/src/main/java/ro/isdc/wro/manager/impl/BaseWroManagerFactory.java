@@ -9,9 +9,9 @@ import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModelFactory;
 import ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.UriProcessor;
+import ro.isdc.wro.processor.GroupsExtractor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
-import ro.isdc.wro.processor.impl.UriProcessorImpl;
+import ro.isdc.wro.processor.impl.SingleGroupExtractor;
 import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 
@@ -72,10 +72,10 @@ public class BaseWroManagerFactory implements WroManagerFactory {
   }
 
   /**
-   * @return {@link UriProcessor} implementation.
+   * @return {@link GroupsExtractor} implementation.
    */
-  protected UriProcessorImpl newUriProcessor() {
-    return new UriProcessorImpl();
+  protected SingleGroupExtractor newUriProcessor() {
+    return new SingleGroupExtractor();
   }
 
   /**

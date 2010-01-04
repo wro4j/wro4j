@@ -11,6 +11,8 @@ import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.processor.impl.CssImportPreProcessor;
+import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**
@@ -24,13 +26,13 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
 
   @Test
   public void testValid() throws IOException {
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/processor/cssImports/test1-input.css",
-        "classpath:ro/isdc/wro/processor/cssImports/test1-output.css",
-        new ResourceProcessor() {
+    final String URI = "classpath:ro/isdc/wro/processor/cssImports/test1-input.css";
+    final Resource resource = new Resource(URI, ResourceType.CSS);
+    compareProcessedResourceContents(URI, "classpath:ro/isdc/wro/processor/cssImports/test1-output.css",
+      new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {
-            processor.process(null, reader, writer);
+            processor.process(resource, reader, writer);
           }
         });
   }

@@ -12,7 +12,10 @@
 - use allowedResource to filter only authorized resource requests & bring back file protocol from UrlUriLocator (not an issue anymore)
 - use CssVariablesProcessor as a postProcessor
 - change PreProcessor signature (use Resource instead of resourceUri)
-
+- api breaks: 
+  -- rename UriProcessor to GroupExtractor
+  -- remove getReader from Resource & change constructor
+  -- add setUriLocator to GroupsProcessor
 TODO
 - integrate maven licence & test explorer plugins 
 - CssImportPreProcessor

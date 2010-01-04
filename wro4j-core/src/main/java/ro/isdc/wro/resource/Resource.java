@@ -3,18 +3,11 @@
  */
 package ro.isdc.wro.resource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.model.Group;
 
 /**
@@ -41,11 +34,6 @@ public class Resource {
   private final String uri;
 
   /**
-   * UriLocator.
-   */
-  private final UriLocator uriLocator;
-
-  /**
    * The reference to the group where this resource resides.
    */
   private Group group;
@@ -57,23 +45,16 @@ public class Resource {
    *          of the resource.
    * @param type
    *          of the resource.
-   * @param uriLocator
-   *          {@link UriLocator} object.
    */
-  public Resource(final String uri, final ResourceType type,
-      final UriLocator uriLocator) {
+  public Resource(final String uri, final ResourceType type) {
     if (uri == null) {
       throw new IllegalArgumentException("URI cannot be null!");
     }
     if (type == null) {
       throw new IllegalArgumentException("ResourceType cannot be null!");
     }
-    if (uriLocator == null) {
-      throw new IllegalArgumentException("UriLocator cannot be null!");
-    }
     this.uri = cleanUri(uri);
     this.type = type;
-    this.uriLocator = uriLocator;
   }
 
   /**
@@ -91,28 +72,6 @@ public class Resource {
       result = result.substring(0, endIndex);
     }
     return result;
-  }
-
-  /**
-   * TODO cache reader instance?
-   *
-   * @return the reader of this resource. The reader cannot be NULL.
-   * @throws IOException
-   *           if the resource is unavailable.
-   * @throws WroRuntimeException
-   *           if Reader is null.
-   */
-  public Reader getReader() throws IOException {
-    // TODO add charset to constructor to avoid encoding issues
-    log.debug("getReader for " + this.getUri());
-    final InputStream is = uriLocator.locate(this.getUri());
-    // wrap reader with bufferedReader for top efficiency
-    final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-    if (reader == null) {
-      throw new WroRuntimeException(
-          "Exception while retrieving InputStream from uri: " + getUri());
-    }
-    return reader;
   }
 
   /**

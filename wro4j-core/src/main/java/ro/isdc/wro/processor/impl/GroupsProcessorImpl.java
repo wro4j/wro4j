@@ -3,7 +3,10 @@
  */
 package ro.isdc.wro.processor.impl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -23,6 +26,7 @@ import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.resource.UriLocator;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing
@@ -87,7 +91,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       LOG.debug("\tmerging resource: " + resource);
       String preProcessedContent = null;
       // get original content
-      final Reader reader = resource.getReader();
+      final Reader reader = getResourceReader(resource);
       final String originalContent = IOUtils.toString(reader);
       reader.close();
 
@@ -104,6 +108,25 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       result.append(preProcessedContent);
     }
     return result.toString();
+  }
+
+  /**
+   * @param resource {@link Resource} for which a Reader should be returned.
+   * @return {@link Reader} for the resource.
+   * @throws IOException if there was a problem retrieving a reader.
+   * @throws WroRuntimeException if {@link Reader} is null.
+   */
+  private Reader getResourceReader(final Resource resource)
+    throws IOException {
+    final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+    final InputStream is = locator.locate(resource.getUri());
+    // wrap reader with bufferedReader for top efficiency
+    final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+    if (reader == null) {
+      throw new WroRuntimeException(
+          "Exception while retrieving InputStream from uri: " + resource.getUri());
+    }
+    return reader;
   }
 
 //  private static void test() {

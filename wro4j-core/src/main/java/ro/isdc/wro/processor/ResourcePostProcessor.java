@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor;
 
@@ -9,10 +9,8 @@ import java.io.Writer;
 
 /**
  * A processor which is applied after the merge. Examples are: JSCompressor.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Oct 31, 2008
  */
 public interface ResourcePostProcessor {
@@ -20,7 +18,7 @@ public interface ResourcePostProcessor {
    * Perform actual resource processing. The content to be processed is read
    * from source Reader and is written to destination Writer. It is the client
    * responsibility to close both: Reader and writer.
-   * 
+   *
    * @param reader
    *          source stream.
    * @param writer

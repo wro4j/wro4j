@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model;
 
@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
-import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
@@ -19,9 +18,7 @@ import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 /**
  * TestProcessor.java.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class TestXmlModelFactory {
@@ -46,7 +43,7 @@ public class TestXmlModelFactory {
 		final Context context = Mockito.mock(Context.class);
 		Mockito.when(context.isDevelopmentMode()).thenReturn(true);
 		Context.set(context);
-		factory.getInstance(uriLocatorFactory);
+		factory.getInstance();
 	}
 
 //  @Test
@@ -56,17 +53,18 @@ public class TestXmlModelFactory {
 //   System.out.println(model);
 //  }
 
-  @Test(expected = WroRuntimeException.class)
-  public void cannotProcessResourceWithoutUriLocators() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected InputStream getConfigResourceAsStream() {
-        return Thread.currentThread()
-          .getContextClassLoader()
-          .getResourceAsStream("wro1.xml");
-      }
-    };
-    //the uriLocator factory doesn have any locators set...
-    factory.getInstance(new UriLocatorFactoryImpl());
-  }
+  //This test doesn't make sense after the refactoring
+//  @Test(expected = WroRuntimeException.class)
+//  public void cannotProcessResourceWithoutUriLocators() {
+//    factory = new XmlModelFactory() {
+//      @Override
+//      protected InputStream getConfigResourceAsStream() {
+//        return Thread.currentThread()
+//          .getContextClassLoader()
+//          .getResourceAsStream("wro1.xml");
+//      }
+//    };
+//    //the uriLocator factory doesn't have any locators set...
+//    factory.getInstance();
+//  }
 }

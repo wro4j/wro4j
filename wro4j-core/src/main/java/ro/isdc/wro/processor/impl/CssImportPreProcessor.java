@@ -41,7 +41,7 @@ public class CssImportPreProcessor
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    final String result = parseCss(resource);
+    final String result = parseCss(resource, reader);
     writer.write(result);
     writer.close();
   }
@@ -51,8 +51,8 @@ public class CssImportPreProcessor
    *
    * @param resource {@link Resource} where the parsed css resides.
    */
-  private String parseCss(final Resource resource) throws IOException {
-    final String css = IOUtils.toString(resource.getReader());
+  private String parseCss(final Resource resource, final Reader reader) throws IOException {
+    final String css = IOUtils.toString(reader);
     final Stack<Resource> stack = new Stack<Resource>();
     final StringBuffer sb = new StringBuffer();
     final Matcher m = PATTERN.matcher(css);

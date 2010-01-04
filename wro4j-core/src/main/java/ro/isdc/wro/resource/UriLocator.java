@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.resource;
 
@@ -7,20 +7,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Describes a primary access mechanism of a uri.<br>
+ * Describes a way to locate the stream associated with some uri.<br>
  * Defines a contract for classes which are able to read a uri, by returning the
  * corresponding InputStream.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
 public interface UriLocator {
   /**
    * Locates the uri by retrieving the InputStream. The client is responsible
    * for closing the InputStream.
-   * 
+   *
    * @param uri
    *          uri to read.
    * @return InputStream for the provided uri.
@@ -31,7 +29,7 @@ public interface UriLocator {
 
   /**
    * Check if this uri can be located by concrete implementation.
-   * 
+   *
    * @param uri
    *          to read.
    * @return true if UriLocator is able to return an InputStream of this uri.

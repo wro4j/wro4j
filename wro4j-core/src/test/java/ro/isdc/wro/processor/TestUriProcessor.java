@@ -10,7 +10,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.processor.impl.UriProcessorImpl;
+import ro.isdc.wro.processor.impl.SingleGroupExtractor;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
@@ -22,11 +22,11 @@ import ro.isdc.wro.resource.ResourceType;
  * @created Created on Nov 3, 2008
  */
 public class TestUriProcessor {
-  private UriProcessor uriProcessor;
+  private GroupsExtractor uriProcessor;
 
   @Before
   public void init() {
-    uriProcessor = new UriProcessorImpl();
+    uriProcessor = new SingleGroupExtractor();
   }
 
   @Test

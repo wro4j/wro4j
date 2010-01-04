@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -11,14 +11,17 @@ import java.util.Set;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
  * AbstractGroupsProcessor.java.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 26, 2008
+ */
+/**
+ * @author Admin
+ *
  */
 public abstract class AbstractGroupsProcessor implements GroupsProcessor {
 
@@ -55,6 +58,11 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   private final List<ResourcePostProcessor> anyResourcePostProcessors = new ArrayList<ResourcePostProcessor>();
 
   /**
+   * Used to get stream of the resources.
+   */
+  private UriLocatorFactory uriLocatorFactory;
+
+  /**
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
@@ -71,6 +79,20 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       }
     }
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+    this.uriLocatorFactory = uriLocatorFactory;
+  }
+
+  /**
+   * @return the uriLocatorFactory
+   */
+  public final UriLocatorFactory getUriLocatorFactory() {
+    return this.uriLocatorFactory;
   }
 
   /**

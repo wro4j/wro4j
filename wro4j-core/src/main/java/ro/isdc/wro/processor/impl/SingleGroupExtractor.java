@@ -7,18 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.processor.UriProcessor;
+import ro.isdc.wro.processor.GroupsExtractor;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
- * Perform processing of the uri and extracts group & resources related
- * informations: a list of groups, resource type and name.
+ * Default implementation which is capable of extracting a single group from one request uri.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class UriProcessorImpl implements UriProcessor {
-
+public final class SingleGroupExtractor implements GroupsExtractor {
   /**
    * {@inheritDoc}
    */
@@ -26,7 +24,6 @@ public final class UriProcessorImpl implements UriProcessor {
     if (uri == null) {
       throw new IllegalArgumentException("Uri cannot be null!");
     }
-
     final List<String> groupNames = new ArrayList<String>();
     try {
       // find last dot & get extension (js & css)

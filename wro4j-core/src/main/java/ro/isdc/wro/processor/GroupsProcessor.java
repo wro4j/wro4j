@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor;
 
@@ -7,13 +7,12 @@ import java.util.List;
 
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
  * Performs the processing of a group of resources by type.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
 public interface GroupsProcessor {
@@ -27,6 +26,11 @@ public interface GroupsProcessor {
    * @return processed content as string.
    */
   String process(final List<Group> groups, final ResourceType type);
+
+  /**
+   * @param uriLocatorFactory {@link UriLocatorFactory} to set.
+   */
+  void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory);
 
   /**
    * Provide a list of preProcessors to apply on css content.
@@ -117,7 +121,6 @@ public interface GroupsProcessor {
 	 * @param processor {@link ResourcePostProcessor} to add.
 	 */
 	void addAnyPostProcessor(final ResourcePostProcessor processor);
-
 
   /**
    * Search for the first available preprocessor of given type.
