@@ -4,6 +4,7 @@
 package ro.isdc.wro.processor.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -104,7 +105,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   /**
    * {@inheritDoc}
    */
-  public void setResourcePreProcessors(final List<ResourcePreProcessor> processors) {
+  public void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors) {
     preProcessors.clear();
     preProcessors.addAll(processors);
   }
@@ -112,7 +113,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   /**
    * {@inheritDoc}
    */
-  public void setResourcePostProcessors(final List<ResourcePostProcessor> processors) {
+  public void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors) {
     postProcessors.clear();
     postProcessors.addAll(processors);
   }

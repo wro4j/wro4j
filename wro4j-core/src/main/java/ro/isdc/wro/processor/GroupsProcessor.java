@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.processor;
 
+import java.util.Collection;
 import java.util.List;
 
 import ro.isdc.wro.model.Group;
@@ -38,7 +39,7 @@ public interface GroupsProcessor {
    * @param processors
    *          a list of {@link ResourcePreProcessor} processors.
    */
-  void setResourcePreProcessors(final List<ResourcePreProcessor> processors);
+  void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors);
 
   /**
    * Provide a list of postProcessors to apply on any type of content.
@@ -46,7 +47,7 @@ public interface GroupsProcessor {
    * @param processors
    *          a list of {@link ResourcePostProcessor} processors.
    */
-  void setResourcePostProcessors(final List<ResourcePostProcessor> processors);
+  void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors);
 
   /**
    * Add a single css preProcessor to the chain of postProcessors.

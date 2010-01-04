@@ -17,7 +17,10 @@ import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
+import ro.isdc.wro.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
+import ro.isdc.wro.processor.impl.JSMinProcessor;
+import ro.isdc.wro.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
@@ -40,15 +43,9 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Name of init param used to specify uri locators.
    */
   private static final String PARAM_URI_LOCATORS = "uriLocators";
-  private Map<String, Class<?>> processors = new HashMap<String, Class<?>>();
-  private Map<String, Class<? extends ResourcePreProcessor>> cssPreProcessors = new HashMap<String, Class<? extends ResourcePreProcessor>>();
-  private Map<String, Class<? extends ResourcePreProcessor>> jsPreProcessors = new HashMap<String, Class<? extends ResourcePreProcessor>>();
-  private Map<String, Class<? extends ResourcePreProcessor>> anyPreProcessors = new HashMap<String, Class<? extends ResourcePreProcessor>>();
-  private Map<String, Class<? extends ResourcePostProcessor>> cssPostProcessors = new HashMap<String, Class<? extends ResourcePostProcessor>>();
-  private Map<String, Class<? extends ResourcePostProcessor>> jsPostProcessors = new HashMap<String, Class<? extends ResourcePostProcessor>>();
-  private Map<String, Class<? extends ResourcePostProcessor>> anyPostProcessors = new HashMap<String, Class<? extends ResourcePostProcessor>>();
-
-  private Map<String, Class<? extends UriLocator>> locators = new HashMap<String, Class<? extends UriLocator>>();
+  private Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
+  private Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
+  private Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
 
   public ConfigurableWroManagerFactory() {
     initProcessors();
@@ -59,9 +56,9 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Init locators with default values.
    */
   private void initLocators() {
-    locators.put("servletContext", ServletContextUriLocator.class);
-    locators.put("classpath", ClasspathUriLocator.class);
-    locators.put("url", UrlUriLocator.class);
+    locators.put("servletContext", new ServletContextUriLocator());
+    locators.put("classpath", new ClasspathUriLocator());
+    locators.put("url", new UrlUriLocator());
     contributeLocators(locators);
   }
 
@@ -69,30 +66,40 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Init processors with default values.
    */
   private void initProcessors() {
-    processors.put("cssUrlRewriting", CssUrlRewritingProcessor.class);
-    processors.put("cssVariables", CssUrlRewritingProcessor.class);
-    processors.put("cssMinJawr", CssUrlRewritingProcessor.class);
-    processors.put("jsMin", CssUrlRewritingProcessor.class);
-    contributeProcessors(processors);
+    preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
+    postProcessors.put("cssVariables", new CssVariablesProcessor());
+    postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
+    postProcessors.put("jsMin", new JSMinProcessor());
+    contributePreProcessors(preProcessors);
+    contributePostProcessors(postProcessors);
+
   }
 
   /**
    * Allow subclasses to contribute with it's own locators.
    * @param map containing locator mappings.
    */
-  protected void contributeLocators(final Map<String, Class<? extends UriLocator>> map) {
+  protected void contributeLocators(final Map<String, UriLocator> map) {
   }
 
+  /**
+   * Allow subclasses to contribute with it's own pre processors.
+   * <p>
+   * It is implementor responsibility to add a {@link ResourcePreProcessor} instance.
+   *
+   * @param map containing processor mappings.
+   */
+  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
+  }
 
   /**
    * Allow subclasses to contribute with it's own processors.
    * <p>
-   * It is implementor responsibility to add a processor type (instance of {@link ResourcePreProcessor} or
-   * {@link ResourcePostProcessor}).
+   * It is implementor responsibility to add a {@link ResourcePostProcessor} instance.
    *
    * @param map containing processor mappings.
    */
-  protected void contributeProcessors(final Map<String, Class<?>> map) {
+  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
   }
 
   /**
@@ -114,7 +121,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   @Override
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessorImpl groupProcessor = new GroupsProcessorImpl();
-//    groupProcessor.setCssPreProcessors(cssPreProcessors)
+    groupProcessor.setResourcePreProcessors(preProcessors.values());
+    groupProcessor.setResourcePostProcessors(postProcessors.values());
     return groupProcessor;
   }
 
@@ -126,13 +134,13 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
     final String[] locatorsArray = uriLocators.split(",");
     for (final String locatorAsString : locatorsArray) {
-      final Class<? extends UriLocator> locator = locators.get(locatorAsString);
+      final UriLocator locator = locators.get(locatorAsString);
       if (locator == null) {
         throw new WroRuntimeException("Invalid locator name: " + locatorAsString);
       }
       try {
         LOG.debug("Found locator for name: " + locatorAsString + " : " + locator);
-        list.add(locator.newInstance());
+        list.add(locator);
       } catch (final Exception e) {
         throw new WroRuntimeException("Cannot instantiate locator of type: " + locator, e);
       }
