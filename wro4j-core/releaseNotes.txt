@@ -17,6 +17,7 @@
   -- remove getReader from Resource & change constructor
   -- add setUriLocator to GroupsProcessor
 TODO
+- create ResourceProcessor interface with ResourceType[] support() method & get rid of all css/js/any pre/post processors
 - integrate maven licence & test explorer plugins 
 - CssImportPreProcessor
 - Create WroManagerFactory capable of being configured using init-params
