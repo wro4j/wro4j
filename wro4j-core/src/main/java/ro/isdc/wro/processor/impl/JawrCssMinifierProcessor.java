@@ -9,10 +9,12 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
+import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.algorithm.JawrCssMinifier;
 import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.resource.ResourceType;
 
 
 /**
@@ -20,6 +22,7 @@ import ro.isdc.wro.resource.Resource;
  *
  * @author Alex Objelean
  */
+@SupportedResourceType(type=ResourceType.CSS)
 public class JawrCssMinifierProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   /**

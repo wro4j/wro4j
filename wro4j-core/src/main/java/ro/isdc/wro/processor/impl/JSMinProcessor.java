@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -12,22 +12,23 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
+import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.processor.algorithm.JSMin;
 import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.resource.ResourceType;
 
 /**
  * JSMinProcessor.
  * <p>
  * Use JSMin utility for js compression.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
+@SupportedResourceType(type=ResourceType.JS)
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
   /**

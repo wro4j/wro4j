@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.manager;
 
@@ -21,7 +21,7 @@ import ro.isdc.wro.model.impl.XmlModelFactory;
 /**
  * TestWroManager.java.
  *
- * @author alexandru.objelean / ISDC! Romania
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class TestWroManager {

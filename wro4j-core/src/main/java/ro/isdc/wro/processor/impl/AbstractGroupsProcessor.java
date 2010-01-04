@@ -8,55 +8,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
- * AbstractGroupsProcessor.java.
+ * Implements basic methods. Specialized classes should inherit this class instead of interface.
  *
  * @author Alex Objelean
  * @created Created on Nov 26, 2008
  */
-/**
- * @author Admin
- *
- */
 public abstract class AbstractGroupsProcessor implements GroupsProcessor {
-
   /**
-   * a list of css pre processors.
+   * a list of pre processors.
    */
-  private final List<ResourcePreProcessor> cssPreProcessors = new ArrayList<ResourcePreProcessor>();
-
+  private final List<ResourcePreProcessor> preProcessors = new ArrayList<ResourcePreProcessor>();
   /**
-   * a list of js pre processors.
+   * a list of post processors.
    */
-  private final List<ResourcePreProcessor> jsPreProcessors = new ArrayList<ResourcePreProcessor>();
-
-  /**
-   * a list of pre processors for all resources, will be applied on both (css &
-   * js).
-   */
-  private final List<ResourcePreProcessor> anyResourcePreProcessors = new ArrayList<ResourcePreProcessor>();
-
-  /**
-   * a list of css post processors.
-   */
-  private final List<ResourcePostProcessor> cssPostProcessors = new ArrayList<ResourcePostProcessor>();
-
-  /**
-   * a list of js post processors.
-   */
-  private final List<ResourcePostProcessor> jsPostProcessors = new ArrayList<ResourcePostProcessor>();
-
-  /**
-   * a list of post processors for all resources, will be applied on both (css &
-   * js).
-   */
-  private final List<ResourcePostProcessor> anyResourcePostProcessors = new ArrayList<ResourcePostProcessor>();
-
+  private final List<ResourcePostProcessor> postProcessors = new ArrayList<ResourcePostProcessor>();
   /**
    * Used to get stream of the resources.
    */
@@ -69,9 +42,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   public <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass) {
     T found = null;
     final Set<ResourcePreProcessor> allPreProcessors = new HashSet<ResourcePreProcessor>();
-    allPreProcessors.addAll(cssPreProcessors);
-    allPreProcessors.addAll(jsPreProcessors);
-    allPreProcessors.addAll(anyResourcePreProcessors);
+    allPreProcessors.addAll(preProcessors);
     for (final ResourcePreProcessor processor : allPreProcessors) {
       if (processorClass.isInstance(processor)) {
         found = (T) processor;
@@ -96,140 +67,67 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   }
 
   /**
-   * @param processors
-   *          a list of css post processors.
+   * @param type of resource for which you want to apply preProcessors or null if it doesn't matter (any resource).
+   * @return a list of {@link ResourcePreProcessor} by provided type.
    */
-  public final void setCssPostProcessors(
-      final List<ResourcePostProcessor> processors) {
-    this.cssPostProcessors.addAll(processors);
+  protected final List<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
+    return getProcessorsByType(type, preProcessors);
   }
 
   /**
-   * @param cssPreProcessors
-   *          the cssPreProcessors to set
+   * @param type of resource for which you want to apply postProcessors or null if it doesn't matter (any resource).
+   * @return a list of {@link ResourcePostProcessor} by provided type.
    */
-  public final void setCssPreProcessors(
-      final List<ResourcePreProcessor> cssPreProcessors) {
-    this.cssPreProcessors.addAll(cssPreProcessors);
+  protected final List<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
+    return getProcessorsByType(type, postProcessors);
   }
 
   /**
-   * @param jsPreProcessors
-   *          the jsPreProcessors to set
+   * @param <T> processor type. Can be {@link ResourcePreProcessor} or {@link ResourcePostProcessor}.
+   * @param type {@link ResourceType} to apply for searching on available processors.
+   * @param availableProcessors a list where to perform the search.
+   * @return a list of found processors which satisfy the search criteria.
    */
-  public final void setJsPreProcessors(
-      final List<ResourcePreProcessor> jsPreProcessors) {
-    this.jsPreProcessors.addAll(jsPreProcessors);
+  private <T> List<T> getProcessorsByType(final ResourceType type, final List<T> availableProcessors) {
+    final List<T> found = new ArrayList<T>();
+    for (final T processor : availableProcessors) {
+      final SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
+      final boolean isAnyTypeSatisfied = type == null && supportedType == null;
+      final boolean isTypeSatisfied = type != null && supportedType != null && type == supportedType.type();
+      if (isAnyTypeSatisfied || isTypeSatisfied) {
+        found.add(processor);
+      }
+    }
+    return found;
   }
 
   /**
-   * @param anyResourcePreProcessors
-   *          the anyResourcePreProcessors to set
+   * {@inheritDoc}
    */
-  public final void setAnyResourcePreProcessors(
-      final List<ResourcePreProcessor> anyResourcePreProcessors) {
-    this.anyResourcePreProcessors.addAll(anyResourcePreProcessors);
+  public void setResourcePreProcessors(final List<ResourcePreProcessor> processors) {
+    preProcessors.clear();
+    preProcessors.addAll(processors);
   }
 
   /**
-   * @param jsPostProcessors
-   *          the jsPostProcessors to set
+   * {@inheritDoc}
    */
-  public final void setJsPostProcessors(
-      final List<ResourcePostProcessor> jsPostProcessors) {
-    this.jsPostProcessors.addAll(jsPostProcessors);
-  }
-
-  /**
-   * @param anyResourcePostProcessors
-   *          the anyResourcePostProcessors to set
-   */
-  public final void setAnyResourcePostProcessors(
-      final List<ResourcePostProcessor> anyResourcePostProcessors) {
-    this.anyResourcePostProcessors.addAll(anyResourcePostProcessors);
-  }
-
-  /**
-   * @return the cssPreProcessors
-   */
-  protected final List<ResourcePreProcessor> getCssPreProcessors() {
-    return cssPreProcessors;
-  }
-
-  /**
-   * @return the jsPreProcessors
-   */
-  protected final List<ResourcePreProcessor> getJsPreProcessors() {
-    return jsPreProcessors;
-  }
-
-  /**
-   * @return the anyResourcePreProcessors
-   */
-  protected final List<ResourcePreProcessor> getAnyResourcePreProcessors() {
-    return anyResourcePreProcessors;
-  }
-
-  /**
-   * @return the cssPostProcessors
-   */
-  protected final List<ResourcePostProcessor> getCssPostProcessors() {
-    return cssPostProcessors;
-  }
-
-  /**
-   * @return the jsPostProcessors
-   */
-  protected final List<ResourcePostProcessor> getJsPostProcessors() {
-    return jsPostProcessors;
-  }
-
-  /**
-   * @return the anyResourcePostProcessors
-   */
-  protected final List<ResourcePostProcessor> getAnyResourcePostProcessors() {
-    return anyResourcePostProcessors;
+  public void setResourcePostProcessors(final List<ResourcePostProcessor> processors) {
+    postProcessors.clear();
+    postProcessors.addAll(processors);
   }
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public void addAnyPostProcessor(final ResourcePostProcessor processor) {
-		anyResourcePostProcessors.add(processor);
-	}
+   * Add a {@link ResourcePreProcessor}.
+   */
+  public void addPreProcessor(final ResourcePreProcessor processor) {
+    preProcessors.add(processor);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addAnyPreProcessor(final ResourcePreProcessor processor) {
-		anyResourcePreProcessors.add(processor);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addCssPostProcessor(final ResourcePostProcessor processor) {
-		cssPostProcessors.add(processor);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addCssPreProcessor(final ResourcePreProcessor processor) {
-		cssPreProcessors.add(processor);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addJsPostProcessor(final ResourcePostProcessor processor) {
-		jsPostProcessors.add(processor);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void addJsPreProcessor(final ResourcePreProcessor processor) {
-		jsPreProcessors.add(processor);
-	}
+  /**
+   * Add a {@link ResourcePostProcessor}.
+   */
+  public void addPostProcessor(final ResourcePostProcessor processor) {
+    postProcessors.add(processor);
+  }
 }

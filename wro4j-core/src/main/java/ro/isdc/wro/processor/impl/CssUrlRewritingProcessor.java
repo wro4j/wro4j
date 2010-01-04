@@ -15,9 +15,11 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
 import ro.isdc.wro.resource.impl.ServletContextUriLocator;
@@ -88,6 +90,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 19, 2008
  */
+@SupportedResourceType(type=ResourceType.CSS)
 public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Logger for this class.

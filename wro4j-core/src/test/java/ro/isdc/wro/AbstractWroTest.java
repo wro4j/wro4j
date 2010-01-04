@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro;
 
@@ -24,8 +24,6 @@ import ro.isdc.wro.test.util.WroTestUtils;
  * AbstractWroTest.java.
  *
  * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
  * @created Created on Nov 28, 2008
  */
 public abstract class AbstractWroTest {

@@ -14,8 +14,10 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.resource.ResourceType;
 
 
 /**
@@ -23,6 +25,7 @@ import ro.isdc.wro.resource.Resource;
  *
  * @author Alex Objelean
  */
+@SupportedResourceType(type=ResourceType.CSS)
 public class CssImportPreProcessor
   implements ResourcePreProcessor {
   /**

@@ -49,23 +49,16 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     if (type == null) {
       throw new NullPointerException("ResourceType cannot be null!");
     }
-    String result = null;
     final List<Resource> filteredResources = getFilteredResources(groups, type);
     try {
       // Merge
-      result = preProcessAndMerge(filteredResources);
-
+      String result = preProcessAndMerge(filteredResources);
       // postProcessing
-      if (ResourceType.CSS == type) {
-        result = applyPostProcessors(getCssPostProcessors(), result);
-      } else {
-        result = applyPostProcessors(getJsPostProcessors(), result);
-      }
-      result = applyPostProcessors(this.getAnyResourcePostProcessors(), result);
+      result = applyPostProcessors(type, result);
+      return result;
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources", e);
     }
-    return result;
   }
 
   /**
@@ -94,17 +87,8 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       final Reader reader = getResourceReader(resource);
       final String originalContent = IOUtils.toString(reader);
       reader.close();
-
       // preProcessing
-      if (ResourceType.CSS == resource.getType()) {
-        preProcessedContent = applyPreProcessors(resource,
-            getCssPreProcessors(), originalContent);
-      } else {
-        preProcessedContent = applyPreProcessors(resource,
-            getJsPreProcessors(), originalContent);
-      }
-      preProcessedContent = applyPreProcessors(resource,
-          getAnyResourcePreProcessors(), preProcessedContent);
+      preProcessedContent = applyPreProcessors(resource, originalContent);
       result.append(preProcessedContent);
     }
     return result.toString();
@@ -129,35 +113,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     return reader;
   }
 
-//  private static void test() {
-//    final List<String> list = new ArrayList<String>();
-//    list.add("A");
-//    list.add("B");
-//    list.add("C");
-//    list.add("D");
-//
-//    final ListIterator<String> iter = list.listIterator();
-//    //iter.next();
-//    for (int i = 0; i < list.size(); i++) {
-//      process(list.get(i), iter);
-//      if (iter.hasNext()) {
-//        iter.next();
-//      }
-//    }
-//    System.out.println("list is: " + list);
-//  }
-//
-//  private static void process(final Object o, final ListIterator iterator) {
-//    if (RandomUtils.nextInt(100) < 20) {
-//      //iterator.remove();
-//      iterator.add("a");
-//      iterator.add("b");
-//      iterator.add("c");
-//    } else {
-//      System.out.println(o);
-//    }
-//  }
-
   /**
    * Apply resourcePreProcessors.
    *
@@ -170,34 +125,58 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    *          The content to preProcess as String.
    * @return the processed content as String.
    */
-  private String applyPreProcessors(final Resource resource,
-      final List<ResourcePreProcessor> processors, final String content)
+  private String applyPreProcessors(final Resource resource, final String content)
       throws IOException {
     if (content == null) {
       throw new NullPointerException("content cannot be null!");
     }
-    if (processors.isEmpty()) {
-      return content;
+    final List<ResourcePreProcessor> typeProcessors = getPreProcessorsByType(resource.getType());
+    Writer output = applyPreProcessors(typeProcessors, resource, content);
+    final List<ResourcePreProcessor> anyProcessors = getPreProcessorsByType(null);
+    output = applyPreProcessors(anyProcessors, resource, output.toString());
+    return output.toString();
+  }
+
+  //TODO use generified version
+  private String applyPostProcessors(final ResourceType resourceType, final String content)
+    throws IOException {
+    if (content == null) {
+      throw new NullPointerException("content cannot be null!");
     }
-    Reader input = new StringReader(content);
-    Writer output = null;
-    for (final ResourcePreProcessor processor : processors) {
-      LOG.debug("applyinig processor:  " + processor);
-      output = new StringWriter();
-      processor.process(resource, input, output);
-      input = new StringReader(output.toString());
-    }
+    final List<ResourcePostProcessor> typeProcessors = getPostProcessorsByType(resourceType);
+    String output = applyPostProcessors(typeProcessors, content);
+    final List<ResourcePostProcessor> anyProcessors = getPostProcessorsByType(null);
+    output = applyPostProcessors(anyProcessors, output.toString());
     return output.toString();
   }
 
   /**
+   * @param resource
+   * @param content
+   * @return
+   * @throws IOException
+   */
+  private Writer applyPreProcessors(final List<ResourcePreProcessor> processors, final Resource resource, final String content)
+    throws IOException {
+    Reader input = new StringReader(content);
+    Writer output = new StringWriter();
+    output.write(content);
+    for (final ResourcePreProcessor processor : processors) {
+      output = new StringWriter();
+      processor.process(resource, input, output);
+      input = new StringReader(output.toString());
+    }
+    return output;
+  }
+
+
+  /**
+   * TODO use generics & combine this & above methods
+   * <p>
    * Apply resourcePostProcessors.
    *
-   * @param processors
-   *          a list of processor to apply on the content from the supplied
-   *          writer.
-   * @param content
-   *          to process with all postProcessors.
+   * @param processors a list of processor to apply on the content from the supplied writer.
+   * @param content to process with all postProcessors.
    * @return Writer the processed content is written to this writer.
    */
   private String applyPostProcessors(
@@ -245,4 +224,36 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
     return filteredResources;
   }
+
+
+//private static void test() {
+//  final List<String> list = new ArrayList<String>();
+//  list.add("A");
+//  list.add("B");
+//  list.add("C");
+//  list.add("D");
+//
+//  final ListIterator<String> iter = list.listIterator();
+//  //iter.next();
+//  for (int i = 0; i < list.size(); i++) {
+//    process(list.get(i), iter);
+//    if (iter.hasNext()) {
+//      iter.next();
+//    }
+//  }
+//  System.out.println("list is: " + list);
+//}
+//
+//private static void process(final Object o, final ListIterator iterator) {
+//  if (RandomUtils.nextInt(100) < 20) {
+//    //iterator.remove();
+//    iterator.add("a");
+//    iterator.add("b");
+//    iterator.add("c");
+//  } else {
+//    System.out.println(o);
+//  }
+//}
+
+
 }

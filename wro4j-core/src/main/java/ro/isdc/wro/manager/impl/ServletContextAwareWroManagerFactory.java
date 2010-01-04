@@ -29,10 +29,10 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
   @Override
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.addCssPreProcessor(new CssUrlRewritingProcessor());
-    groupProcessor.addCssPostProcessor(new CssVariablesProcessor());
-    groupProcessor.addJsPostProcessor(new JSMinProcessor());
-    groupProcessor.addCssPostProcessor(new JawrCssMinifierProcessor());
+    groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+    groupProcessor.addPostProcessor(new CssVariablesProcessor());
+    groupProcessor.addPostProcessor(new JSMinProcessor());
+    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
     return groupProcessor;
   }
 

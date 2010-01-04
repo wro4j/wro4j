@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.resource;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.Group;
 
@@ -18,11 +16,6 @@ import ro.isdc.wro.model.Group;
  * @created Created on Oct 30, 2008
  */
 public class Resource {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(Resource.class);
-
   /**
    * The type of resource.
    */
@@ -117,6 +110,6 @@ public class Resource {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).toString();
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("type", type).append("uri", uri).toString();
   }
 }

@@ -47,9 +47,9 @@ public class StandAloneWroManagerFactory extends BaseWroManagerFactory {
   @Override
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.addCssPostProcessor(new CssVariablesProcessor());
-    groupProcessor.addJsPostProcessor(new JSMinProcessor());
-    groupProcessor.addCssPostProcessor(new JawrCssMinifierProcessor());
+    groupProcessor.addPostProcessor(new CssVariablesProcessor());
+    groupProcessor.addPostProcessor(new JSMinProcessor());
+    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
     return groupProcessor;
   }
 
