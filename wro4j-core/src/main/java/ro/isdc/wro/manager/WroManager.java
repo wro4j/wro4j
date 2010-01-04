@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.manager;
 
@@ -46,9 +46,9 @@ public final class WroManager {
   private WroModelFactory modelFactory;
 
   /**
-   * UriProcessor.
+   * GroupExtractor.
    */
-  private GroupsExtractor uriProcessor;
+  private GroupsExtractor groupsExtractor;
 
   /**
    * UriLocatorFactory.
@@ -85,8 +85,8 @@ public final class WroManager {
     stopWatch.start();
 
     // find names & type
-    final List<String> groupNames = uriProcessor.getGroupNames(uri);
-    final ResourceType type = uriProcessor.getResourceType(uri);
+    final List<String> groupNames = groupsExtractor.getGroupNames(uri);
+    final ResourceType type = groupsExtractor.getResourceType(uri);
 
     // create model & find groups
     final WroModel model = modelFactory.getInstance();
@@ -139,7 +139,7 @@ public final class WroManager {
    */
   private void validate() {
     try {
-      if (this.uriProcessor == null) {
+      if (this.groupsExtractor == null) {
         throw new IllegalStateException("UriProcessor was not set!");
       }
       if (this.modelFactory == null) {
@@ -162,8 +162,8 @@ public final class WroManager {
   /**
    * @param uriProcessor the uriProcessor to set
    */
-  public final void setUriProcessor(final GroupsExtractor uriProcessor) {
-    this.uriProcessor = uriProcessor;
+  public final void setGroupsExtractor(final GroupsExtractor uriProcessor) {
+    this.groupsExtractor = uriProcessor;
   }
 
   /**
@@ -185,7 +185,6 @@ public final class WroManager {
    */
   public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
     this.uriLocatorFactory = uriLocatorFactory;
-    groupsProcessor.setUriLocatorFactory(getUriLocatorFactory());
   }
 
   /**

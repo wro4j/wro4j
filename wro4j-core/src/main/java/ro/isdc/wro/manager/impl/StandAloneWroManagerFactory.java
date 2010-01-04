@@ -24,7 +24,7 @@ import ro.isdc.wro.resource.impl.UrlUriLocator;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class StandAloneWroManagerFactory extends BaseWroManagerFactory {
+public class StandAloneWroManagerFactory extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
    */
