@@ -28,6 +28,11 @@ public class TestSingleGroupExtractor {
     groupsExtractor = new SingleGroupExtractor();
   }
 
+  @Test(expected=IllegalArgumentException.class)
+  public void cannotExtractResourceTypeUsingNullUri() {
+    groupsExtractor.getResourceType(null);
+  }
+
   @Test(expected=WroRuntimeException.class)
   public void cannotExtractInvalidResourceType() {
     String uri = "/test.js";

@@ -1,5 +1,5 @@
-/**
- *
+/*
+ * Copyright (c) 2010. All rights reserved.
  */
 package ro.isdc.wro.http;
 
@@ -191,8 +191,4 @@ public class Context {
   public String toString() {
   	return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
-
-  public static void main(final String[] args) {
-		System.out.println("".split(",").length);
-	}
 }

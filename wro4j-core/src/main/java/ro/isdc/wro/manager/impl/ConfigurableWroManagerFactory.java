@@ -4,12 +4,12 @@
 package ro.isdc.wro.manager.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +45,31 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Name of init param used to specify uri locators.
    */
   public static final String PARAM_URI_LOCATORS = "uriLocators";
+  /**
+   * Name of init param used to specify pre processors.
+   */
+  public static final String PARAM_PRE_PROCESSORS = "preProcessors";
+  /**
+   * Name of init param used to specify post processors.
+   */
+  public static final String PARAM_POST_PROCESSORS = "postProcessors";
+
+  /**
+   * Delimit tokens containing a list of locators, preProcessors & postProcessors.
+   */
+  private static final String TOKEN_DELIMITER = ",";
   private final Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
   private final Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
   private final Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
 
+  /**
+   * Initialize processors & locators with a default list.
+   */
   public ConfigurableWroManagerFactory() {
     initProcessors();
     initLocators();
   }
+
 
   /**
    * Init locators with default values.
@@ -63,6 +80,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     locators.put("url", new UrlUriLocator());
     contributeLocators(locators);
   }
+
 
   /**
    * Init processors with default values.
@@ -77,12 +95,14 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
 
   }
 
+
   /**
    * Allow subclasses to contribute with it's own locators.
+   *
    * @param map containing locator mappings.
    */
-  protected void contributeLocators(final Map<String, UriLocator> map) {
-  }
+  protected void contributeLocators(final Map<String, UriLocator> map) {}
+
 
   /**
    * Allow subclasses to contribute with it's own pre processors.
@@ -91,8 +111,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
-  }
+  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {}
+
 
   /**
    * Allow subclasses to contribute with it's own processors.
@@ -101,8 +121,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
-  }
+  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
+
 
   /**
    * {@inheritDoc}
@@ -117,6 +137,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return factory;
   }
 
+
   /**
    * {@inheritDoc}
    */
@@ -128,43 +149,74 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return groupProcessor;
   }
 
+
   /**
    * This method has friendly modifier in order to be able to test it.
+   *
    * @return a list of configured uriLocators.
    */
   List<UriLocator> getLocators() {
-    final List<UriLocator> list = new ArrayList<UriLocator>();
-    final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
-    LOG.debug("filterConfig: " + Context.get().getFilterConfig());
-    LOG.debug("uriLocators: " + uriLocators);
-    if (uriLocators == null) {
-    	final String message = "No '" + PARAM_URI_LOCATORS + "' initParam was set";
-    	throw new WroRuntimeException(message);
+    return getListOfItems(PARAM_URI_LOCATORS, locators);
+  }
+
+  /**
+   * @return a list of configured preProcessors.
+   */
+  List<ResourcePreProcessor> getPreProcessors() {
+    return getListOfItems(PARAM_PRE_PROCESSORS, preProcessors);
+  }
+
+  /**
+   * @return a list of configured preProcessors.
+   */
+  List<ResourcePostProcessor> getPostProcessors() {
+    return getListOfItems(PARAM_POST_PROCESSORS, postProcessors);
+  }
+
+
+  /**
+   * @param initParamName name of init-param which identify what kind of items a required.
+   * @param map mapping between items and its implementations.
+   * @return a list of instances.
+   */
+  private <T>List<T> getListOfItems(final String initParamName, final Map<String, T> map) {
+    final List<T> list = new ArrayList<T>();
+    final String paramValue = Context.get().getFilterConfig().getInitParameter(initParamName);
+    LOG.debug("paramValue: " + paramValue);
+    final List<String> itemsList = getItemsList(paramValue);
+    if (itemsList.isEmpty()) {
+      final String message = "No '" + initParamName + "' initParam was set";
+      throw new WroRuntimeException(message);
     }
-    final List<String> locatorsArray = Arrays.asList(uriLocators.split(","));
-    //remove empty strings
-//    for (final String string : locatorsArray) {
-//			if (StringUtils.isEmpty(string)) {
-//				locatorsArray.remove(string);
-//			}
-//		}
-    LOG.debug("locatorsArray: " + ArrayUtils.toString(locatorsArray));
-    LOG.debug("locatorsArray.length " + locatorsArray.size());
-    if (locatorsArray.size() == 0) {
-    	LOG.warn(PARAM_URI_LOCATORS + "  initParam is empty. Did you forgot to add some fields?");
-    }
-    for (final String locatorAsString : locatorsArray) {
-      final UriLocator locator = locators.get(locatorAsString);
-      if (locator == null) {
-        throw new WroRuntimeException("Invalid locator name: " + locatorAsString);
+    for (final String itemAsString : itemsList) {
+      final T item = map.get(itemAsString);
+      if (item == null) {
+        LOG.info("Available " + initParamName + " are: " + map.keySet());
+        throw new WroRuntimeException("Invalid " + initParamName + " name: " + itemAsString);
       }
-      try {
-        LOG.debug("Found locator for name: " + locatorAsString + " : " + locator);
-        list.add(locator);
-      } catch (final Exception e) {
-        throw new WroRuntimeException("Cannot instantiate locator of type: " + locator, e);
-      }
+      LOG.debug("Found " + initParamName + " for name: " + itemAsString + " : " + item);
+      list.add(item);
     }
     return list;
+  }
+
+
+  /**
+   * @param input string representation of tokens separated by ',' character.
+   * @return a list of non empty strings.
+   */
+  private List<String> getItemsList(final String input) {
+    final List<String> locatorsList = new ArrayList<String>();
+    if (input != null) {
+      // use StringTokenizer instead of split because it skips empty (but not trimmed) strings
+      final StringTokenizer st = new StringTokenizer(input, TOKEN_DELIMITER);
+      while (st.hasMoreTokens()) {
+        final String token = st.nextToken().trim();
+        if (!StringUtils.isEmpty(token)) {
+          locatorsList.add(token);
+        }
+      }
+    }
+    return locatorsList;
   }
 }
