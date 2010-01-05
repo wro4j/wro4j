@@ -90,12 +90,13 @@ public final class Group {
     }
   }
 
+
   /**
-   * @see java.lang.Object#toString()
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).toString();
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("name", getName()).append("resources", getResources()).toString();
   }
 
 }

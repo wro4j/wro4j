@@ -11,7 +11,7 @@ import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
- * Performs the processing of a group of resources by type.
+ * Performs the processing of a group based on resourceType.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
@@ -70,5 +70,4 @@ public interface GroupsProcessor {
    * @return {@link ResourcePreProcessor} instance if any found, or null if such processor doesn't exist.
    */
 	<T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass);
-
 }

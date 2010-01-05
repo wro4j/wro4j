@@ -60,9 +60,6 @@ public final class WroModel {
    *           exception if group is not found.
    */
   private Group getGroupByName(final String name) {
-    if (name == null) {
-      throw new IllegalArgumentException("Name cannot be null!");
-    }
     for (final Group group : groups) {
       if (name.equals(group.getName())) {
         return group;

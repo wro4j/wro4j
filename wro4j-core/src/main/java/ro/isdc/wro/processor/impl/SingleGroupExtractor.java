@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.processor.GroupsExtractor;
+import ro.isdc.wro.processor.GroupExtractor;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
@@ -16,7 +16,7 @@ import ro.isdc.wro.resource.ResourceType;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class SingleGroupExtractor implements GroupsExtractor {
+public final class SingleGroupExtractor implements GroupExtractor {
   /**
    * {@inheritDoc}
    */
