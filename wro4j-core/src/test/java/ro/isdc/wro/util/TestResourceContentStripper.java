@@ -5,6 +5,8 @@ package ro.isdc.wro.util;
 
 import org.junit.Test;
 
+import ro.isdc.wro.processor.algorithm.ResourceContentStripper;
+
 /**
  * Test class for {@link ResourceContentStripper} class.
  * @author Alex Objelean

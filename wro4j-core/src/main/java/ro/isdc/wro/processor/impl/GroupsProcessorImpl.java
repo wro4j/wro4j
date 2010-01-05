@@ -158,9 +158,13 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    */
   private Writer applyPreProcessors(final List<ResourcePreProcessor> processors, final Resource resource, final String content)
     throws IOException {
+  	if (processors.isEmpty()) {
+      final Writer output = new StringWriter();
+      output.write(content);
+  		return output;
+  	}
     Reader input = new StringReader(content);
-    Writer output = new StringWriter();
-    output.write(content);
+    Writer output = null;
     for (final ResourcePreProcessor processor : processors) {
       output = new StringWriter();
       processor.process(resource, input, output);
@@ -182,12 +186,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
   private String applyPostProcessors(
       final List<ResourcePostProcessor> processors, final String content)
       throws IOException {
-    if (processors == null) {
-      throw new NullPointerException("Processors list cannot be null!");
-    }
-    if (content == null) {
-      throw new NullPointerException("Writer cannot be null!");
-    }
     if (processors.isEmpty()) {
       return content;
     }

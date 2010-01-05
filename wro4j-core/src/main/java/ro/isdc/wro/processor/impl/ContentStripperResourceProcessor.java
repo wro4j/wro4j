@@ -11,8 +11,8 @@ import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.processor.algorithm.ResourceContentStripper;
 import ro.isdc.wro.resource.Resource;
-import ro.isdc.wro.util.ResourceContentStripper;
 
 /**
  * TODO: deprecate & use other proven solutions.

@@ -66,12 +66,6 @@ public final class WroManager {
   private CacheStrategy<String, String> cacheStrategy;
 
   /**
-   * Default constructor.
-   */
-  public WroManager() {
-  }
-
-  /**
    * Perform processing of the uri and depending on it will return {@link WroProcessResult} object containing
    * the input stream of the requested resource and it's content type.
    *
