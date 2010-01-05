@@ -71,7 +71,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    * @param type of resource for which you want to apply preProcessors or null if it doesn't matter (any resource).
    * @return a list of {@link ResourcePreProcessor} by provided type.
    */
-  protected final List<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
+  public final List<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
     return getProcessorsByType(type, preProcessors);
   }
 
@@ -79,7 +79,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    * @param type of resource for which you want to apply postProcessors or null if it doesn't matter (any resource).
    * @return a list of {@link ResourcePostProcessor} by provided type.
    */
-  protected final List<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
+  public final List<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
     return getProcessorsByType(type, postProcessors);
   }
 
@@ -107,7 +107,9 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors) {
     preProcessors.clear();
-    preProcessors.addAll(processors);
+		if (processors != null) {
+			preProcessors.addAll(processors);
+		}
   }
 
   /**
@@ -115,7 +117,9 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   public void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors) {
     postProcessors.clear();
-    postProcessors.addAll(processors);
+		if (processors != null) {
+			postProcessors.addAll(processors);
+		}
   }
 
 	/**

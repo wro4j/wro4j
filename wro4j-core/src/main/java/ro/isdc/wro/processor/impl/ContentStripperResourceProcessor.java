@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.processor.impl;
 
@@ -19,9 +19,7 @@ import ro.isdc.wro.resource.Resource;
  * Removes comments and whitespaces from resource content. This processor can be
  * used as both: preProcessor & postProcessor.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
 @Deprecated

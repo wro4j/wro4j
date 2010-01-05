@@ -47,7 +47,13 @@ public class BaseWroManagerFactory implements WroManagerFactory {
 
 
   /**
-   * Life-cycle method. Allow subclasses to initialize context before the manager is instantiated.
+   * Life-cycle method. Allow subclasses to initialize context before the manager is instantiated.<br>
+   * Usually, you will do here something like this:
+   * <code>
+   * Context myContext = ...
+   * Context.set(myContext);
+   * </code>
+   * in order to be able to set a context associated with current request cycle.
    */
   protected void onBeforeCreate() {}
 

@@ -12,7 +12,9 @@ import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.processor.ResourcePostProcessor;
+import ro.isdc.wro.resource.ResourceType;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
@@ -20,9 +22,10 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 /**
  * YUICssCompressorProcessor. Use YUI css compression utility for processing a css resource.
  *
- * @author Alexandru.Objelean / ISDC! Romania
+ * @author Alex Objelean
  * @created Created on Dec 4, 2008
  */
+@SupportedResourceType(type=ResourceType.JS)
 public class YUIJsCompressorProcessor
   implements ResourcePostProcessor {
   /**

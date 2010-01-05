@@ -47,9 +47,8 @@ public class JSMinProcessor implements ResourcePreProcessor,
       os.close();
     } catch (final IOException e) {
       throw e;
-    } catch (final Exception e) {
-      throw new WroRuntimeException("Exception wile processing js using JSMin",
-          e);
+		} catch (final Exception e) {
+			throw new WroRuntimeException("Exception wile processing js using JSMin", e);
     }
   }
 

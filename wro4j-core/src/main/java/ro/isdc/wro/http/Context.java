@@ -8,6 +8,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.util.Configuration;
 import ro.isdc.wro.util.WroUtil;
@@ -180,4 +183,16 @@ public class Context {
     gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     return gzipResources && WroUtil.headerContains(getRequest(), HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+  	return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
+  public static void main(final String[] args) {
+		System.out.println("".split(",").length);
+	}
 }

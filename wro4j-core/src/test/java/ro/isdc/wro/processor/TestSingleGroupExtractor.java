@@ -15,13 +15,13 @@ import ro.isdc.wro.processor.impl.SingleGroupExtractor;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
- * TestGroupExtractor.
+ * TestGroupsExtractor.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class TestGroupExtractor {
-  private GroupsExtractor groupsExtractor;
+public class TestSingleGroupExtractor {
+  private SingleGroupExtractor groupsExtractor;
 
   @Before
   public void init() {

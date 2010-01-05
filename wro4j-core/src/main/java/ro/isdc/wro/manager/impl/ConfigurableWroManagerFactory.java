@@ -4,10 +4,12 @@
 package ro.isdc.wro.manager.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +44,10 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * Name of init param used to specify uri locators.
    */
-  private static final String PARAM_URI_LOCATORS = "uriLocators";
-  private Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
-  private Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
-  private Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
+  public static final String PARAM_URI_LOCATORS = "uriLocators";
+  private final Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
+  private final Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
+  private final Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
 
   public ConfigurableWroManagerFactory() {
     initProcessors();
@@ -127,12 +129,30 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   }
 
   /**
+   * This method has friendly modifier in order to be able to test it.
    * @return a list of configured uriLocators.
    */
-  private List<UriLocator> getLocators() {
+  List<UriLocator> getLocators() {
     final List<UriLocator> list = new ArrayList<UriLocator>();
     final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
-    final String[] locatorsArray = uriLocators.split(",");
+    LOG.debug("filterConfig: " + Context.get().getFilterConfig());
+    LOG.debug("uriLocators: " + uriLocators);
+    if (uriLocators == null) {
+    	final String message = "No '" + PARAM_URI_LOCATORS + "' initParam was set";
+    	throw new WroRuntimeException(message);
+    }
+    final List<String> locatorsArray = Arrays.asList(uriLocators.split(","));
+    //remove empty strings
+//    for (final String string : locatorsArray) {
+//			if (StringUtils.isEmpty(string)) {
+//				locatorsArray.remove(string);
+//			}
+//		}
+    LOG.debug("locatorsArray: " + ArrayUtils.toString(locatorsArray));
+    LOG.debug("locatorsArray.length " + locatorsArray.size());
+    if (locatorsArray.size() == 0) {
+    	LOG.warn(PARAM_URI_LOCATORS + "  initParam is empty. Did you forgot to add some fields?");
+    }
     for (final String locatorAsString : locatorsArray) {
       final UriLocator locator = locators.get(locatorAsString);
       if (locator == null) {
