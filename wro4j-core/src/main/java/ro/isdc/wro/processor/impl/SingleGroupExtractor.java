@@ -60,7 +60,7 @@ public final class SingleGroupExtractor implements GroupsExtractor {
     } catch (final IllegalArgumentException e) {
       // invalid exception
       // TODO Auto-generated method stub
-      throw new WroRuntimeException("Invalid uri: '" + uri + "'", e);
+      throw new WroRuntimeException("Invalid uri: '" + uri + "'");
     }
     return type;
   }
