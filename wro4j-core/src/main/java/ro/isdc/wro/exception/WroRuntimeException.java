@@ -40,12 +40,4 @@ public class WroRuntimeException extends RuntimeException {
     super(message);
     LOG.error(message);
   }
-
-  /**
-   * @param cause
-   */
-  public WroRuntimeException(final Throwable cause) {
-    super(cause);
-    LOG.error(cause.getMessage(), cause);
-  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.util;
 
@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
  * Configuration. There are two types: development used for debugging (no
  * caching) & deployment used in production (with caching).
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 18, 2008
  */
 public enum Configuration {
@@ -46,9 +44,5 @@ public enum Configuration {
       LOG.warn("Invalid configuration value: " + value + ". Using by default " + config.name());
     }
     return config;
-  }
-
-  public static void main(final String[] args) {
-    System.out.println(of(null));
   }
 }

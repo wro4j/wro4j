@@ -15,15 +15,13 @@ import ro.isdc.wro.processor.algorithm.ResourceContentStripper;
 import ro.isdc.wro.resource.Resource;
 
 /**
- * TODO: deprecate & use other proven solutions.
  * Removes comments and whitespaces from resource content. This processor can be
  * used as both: preProcessor & postProcessor.
  *
  * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
-@Deprecated
-public final class ContentStripperResourceProcessor implements
+public final class ResourceContentStripperProcessor implements
     ResourcePreProcessor, ResourcePostProcessor {
   /**
    * {@inheritDoc}

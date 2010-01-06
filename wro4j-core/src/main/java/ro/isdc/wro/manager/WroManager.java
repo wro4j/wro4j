@@ -147,30 +147,27 @@ public final class WroManager {
     return is;
   }
 
-  /**
-   * Check if all dependencies are set.
-   */
-  private void validate() {
-    try {
-      if (this.requestUriParser == null) {
-        throw new IllegalStateException("UriProcessor was not set!");
-      }
-      if (this.modelFactory == null) {
-        throw new IllegalStateException("ModelFactory was not set!");
-      }
-      if (this.groupsProcessor == null) {
-        throw new IllegalStateException("GroupProcessor was not set!");
-      }
-      if (this.uriLocatorFactory == null) {
-        throw new IllegalStateException("uriLocatorFactory was not set!");
-      }
-      if (this.cacheStrategy == null) {
-        throw new IllegalStateException("cacheStrategy was not set!");
-      }
-    } catch (final Exception e) {
-      throw new WroRuntimeException(e);
-    }
-  }
+
+	/**
+	 * Check if all dependencies are set.
+	 */
+	private void validate() {
+		if (this.requestUriParser == null) {
+			throw new WroRuntimeException("UriProcessor was not set!");
+		}
+		if (this.modelFactory == null) {
+			throw new WroRuntimeException("ModelFactory was not set!");
+		}
+		if (this.groupsProcessor == null) {
+			throw new WroRuntimeException("GroupProcessor was not set!");
+		}
+		if (this.uriLocatorFactory == null) {
+			throw new WroRuntimeException("uriLocatorFactory was not set!");
+		}
+		if (this.cacheStrategy == null) {
+			throw new WroRuntimeException("cacheStrategy was not set!");
+		}
+	}
 
   /**
    * @param requestUriParser the uriProcessor to set
