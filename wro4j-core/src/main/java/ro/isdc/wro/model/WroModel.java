@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.exception.InvalidGroupNameException;
 
 /**
  * The resource model encapsulates the information about all existing groups.
@@ -65,7 +65,7 @@ public final class WroModel {
         return group;
       }
     }
-    throw new WroRuntimeException("There is no such group: " + name);
+    throw new InvalidGroupNameException("There is no such group: '" + name + "'");
   }
 
   /**

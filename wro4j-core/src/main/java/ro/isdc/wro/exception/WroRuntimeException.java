@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.exception;
 
@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
  * Base Wro Runtime exception. All exceptions will extend this runtime
  * exception.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class WroRuntimeException extends RuntimeException {
@@ -25,14 +23,6 @@ public class WroRuntimeException extends RuntimeException {
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(WroRuntimeException.class);
-
-  /**
-   * Default constructor.
-   */
-  public WroRuntimeException() {
-    super();
-    LOG.error("Error occured");
-  }
 
   /**
    * @param message

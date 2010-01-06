@@ -4,6 +4,7 @@
 package ro.isdc.wro.test.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -52,8 +53,30 @@ public class WroTestUtils {
    *          from where to remove tabs.
    * @return cleaned string.
    */
-  private static final String replaceTabsWithSpaces(final String input) {
+  private static String replaceTabsWithSpaces(final String input) {
     // replace tabs with spaces
     return input.replaceAll("\\t", "  ");
+  }
+
+
+	/**
+	 * A convenient way to get {@link InputStream} of some resource relative to a java class.
+	 * Usage:
+	 * <code>
+	 *   getClassRelativeResource(MyClass.class, "someFile.properties");
+	 * </code>
+	 * or
+	 * <code>
+	 * 	 getClassRelativeResource(MyClass.class, "subfolder/someFile.properties");
+	 * </code>
+	 *
+	 * @param clazz relative to which the resource stream will be returned.
+	 * @param relativePath path relative to the clazz. This one should not start with a '/'.
+	 * @return {@link InputStream} for search resource.
+	 */
+  public static InputStream getClassRelativeResource(final Class<?> clazz, final String relativePath) {
+    final String packageName = clazz.getPackage().getName().replace('.', '/');
+  	final String finalPath = packageName + "/" + relativePath;
+  	return Thread.currentThread().getContextClassLoader().getResourceAsStream(finalPath);
   }
 }

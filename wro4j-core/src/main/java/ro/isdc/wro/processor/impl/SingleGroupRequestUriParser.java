@@ -39,7 +39,7 @@ public final class SingleGroupRequestUriParser implements RequestUriParser {
           .length());
       groupNames.add(groupName);
     } catch (final IndexOutOfBoundsException e) {
-      LOG.warn("No group defined in uri: " + uri);
+      LOG.warn("No group defined in uri: '" + uri + "'");
       return Collections.EMPTY_LIST;
     }
     return groupNames;

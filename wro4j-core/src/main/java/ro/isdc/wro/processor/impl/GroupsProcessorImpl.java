@@ -78,7 +78,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     final List<Resource> resourceList = new LinkedList<Resource>(resources);
     final ListIterator<Resource> iterator = resourceList.listIterator();
     //start with first
-    iterator.next();
+    if (iterator.hasNext()) {
+      iterator.next();
+    }
     for (int i = 0; i < resourceList.size(); i++) {
       final Resource resource = resourceList.get(i);
       LOG.debug("\tmerging resource: " + resource);

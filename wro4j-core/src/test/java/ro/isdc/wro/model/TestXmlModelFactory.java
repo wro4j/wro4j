@@ -12,11 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
-import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.impl.XmlModelFactory;
-import ro.isdc.wro.resource.impl.ClasspathUriLocator;
-import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 
 /**
  * TestProcessor.java.
@@ -44,19 +41,15 @@ public class TestXmlModelFactory {
             .getResourceAsStream("recursive.xml");
       }
 		};
-		final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
-		// add classpathUriLocator, because we will test against a resource in
-		// the classpath
-		uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
 		factory.getInstance();
 	}
-
-
-  @Test(expected = WroRuntimeException.class)
-  public void processResourceType() {
-    factory = new XmlModelFactory();
-    factory.getInstance();
-  }
+//
+//
+//  @Test
+//  public void processResourceType() {
+//    factory = new XmlModelFactory();
+//    factory.getInstance();
+//  }
 
   //TODO use two concurrent calls
   @Test

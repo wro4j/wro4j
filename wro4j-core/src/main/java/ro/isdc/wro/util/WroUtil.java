@@ -96,15 +96,18 @@ public final class WroUtil {
    * @param header name of the header to check
    * @param value of the header to check
    */
+  @SuppressWarnings("unchecked")
   public static boolean headerContains(final HttpServletRequest request,
       final String header, final String value) {
     final Enumeration<String> accepted = request.getHeaders(header);
-    while (accepted.hasMoreElements()) {
-      final String headerValue = accepted.nextElement();
-      if (headerValue.indexOf(value) != -1) {
-        return true;
-      }
-    }
+		if (accepted != null) {
+			while (accepted.hasMoreElements()) {
+				final String headerValue = accepted.nextElement();
+				if (headerValue.indexOf(value) != -1) {
+					return true;
+				}
+			}
+		}
     return false;
   }
 }

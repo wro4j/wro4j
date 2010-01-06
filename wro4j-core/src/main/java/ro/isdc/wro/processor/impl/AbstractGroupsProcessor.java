@@ -26,11 +26,11 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   /**
    * a list of pre processors.
    */
-  private final List<ResourcePreProcessor> preProcessors = new ArrayList<ResourcePreProcessor>();
+  private final Set<ResourcePreProcessor> preProcessors = new HashSet<ResourcePreProcessor>();
   /**
    * a list of post processors.
    */
-  private final List<ResourcePostProcessor> postProcessors = new ArrayList<ResourcePostProcessor>();
+  private final Set<ResourcePostProcessor> postProcessors = new HashSet<ResourcePostProcessor>();
   /**
    * Used to get stream of the resources.
    */
@@ -89,7 +89,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    * @param availableProcessors a list where to perform the search.
    * @return a list of found processors which satisfy the search criteria.
    */
-  private <T> List<T> getProcessorsByType(final ResourceType type, final List<T> availableProcessors) {
+  private <T> List<T> getProcessorsByType(final ResourceType type, final Set<T> availableProcessors) {
     final List<T> found = new ArrayList<T>();
     for (final T processor : availableProcessors) {
       final SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);

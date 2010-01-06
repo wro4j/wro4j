@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.exception.UnauthorizedRequestException;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
@@ -133,10 +134,11 @@ public final class WroManager {
    */
   private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
+    LOG.debug("locating stream for resourceId: " + resourceId);
     final UriLocator uriLocator = getUriLocatorFactory().getInstance(resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
     if (processor != null && !processor.isUriAllowed(resourceId)) {
-      throw new WroRuntimeException("Unauthorized resource request detected!");
+      throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
     final InputStream is = uriLocator.locate(resourceId);
     if (is == null) {

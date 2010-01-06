@@ -151,7 +151,6 @@ public class XmlModelFactory
     initGroupMap(document);
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
     final WroModel model = createModel();
-    LOG.debug("</getInstance>");
     return model;
   }
 
@@ -285,8 +284,8 @@ public class XmlModelFactory
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
-    LOG.debug("\ttagName=" + tagName);
-    LOG.debug("\turi=" + uri);
+    //LOG.debug("\ttagName=" + tagName);
+    //LOG.debug("\turi=" + uri);
     if (TAG_JS.equals(tagName)) {
       type = ResourceType.JS;
     } else if (TAG_CSS.equals(tagName)) {
@@ -294,13 +293,13 @@ public class XmlModelFactory
     } else if (TAG_GROUP_REF.equals(tagName)) {
       // uri in this case is the group name
       final Element groupElement = allGroupElements.get(uri);
-      LOG.debug("\tparse groupRef: " + uri + ": " + groupElement);
+      //LOG.debug("\tparse groupRef: " + uri + ": " + groupElement);
       resources.addAll(parseGroup(groupElement, groups));
     } else {
       // should not ever happen due to validation of xml.
       throw new WroRuntimeException("Usupported resource type: " + tagName);
     }
-    LOG.debug("\ttype=" + type);
+    //LOG.debug("\ttype=" + type);
     if (type != null) {
       resources.add(Resource.create(uri, type));
     }
