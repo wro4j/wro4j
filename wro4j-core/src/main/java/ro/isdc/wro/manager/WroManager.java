@@ -69,39 +69,46 @@ public final class WroManager {
    * Perform processing of the uri and depending on it will return {@link WroProcessResult} object containing
    * the input stream of the requested resource and it's content type.
    *
-   * @param uri to process.
+   * @param request {@link HttpServletRequest} to process.
    * @return {@link WroProcessResult} object.
+   * @throws IOException.
    */
-  //TODO pass request instead of uri
-  public WroProcessResult process(final String uri) {
-    validate();
+  public WroProcessResult process(final HttpServletRequest request) throws IOException {
+    final String requestURI = request.getRequestURI();
     final StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-
-    // find names & type
-    final List<String> groupNames = groupExtractor.getGroupNames(uri);
-    final ResourceType type = groupExtractor.getResourceType(uri);
-
-    // create model & find groups
-    final WroModel model = modelFactory.getInstance();
-    final List<Group> groups = model.getGroupsByNames(groupNames);
-
-    String processedResult = null;
-    if (!Context.get().isDevelopmentMode()) {
-      // Cache based on uri
-      processedResult = cacheStrategy.get(uri);
-      if (processedResult == null) {
-        // process groups & put update cache
-        processedResult = groupsProcessor.process(groups, type);
-        cacheStrategy.put(uri, processedResult);
-      }
+    InputStream is = null;
+    final ResourceType type = groupExtractor.getResourceType(requestURI);
+    if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
+      is = getStreamForRequest(request);
     } else {
-      processedResult = groupsProcessor.process(groups, type);
+      validate();
+      stopWatch.start();
+      // find names & type
+      final List<String> groupNames = groupExtractor.getGroupNames(requestURI);
+      if (groupNames.isEmpty()) {
+        throw new WroRuntimeException("No groups found for request: " + requestURI);
+      }
+      // create model & find groups
+      final WroModel model = modelFactory.getInstance();
+      final List<Group> groups = model.getGroupsByNames(groupNames);
+
+      String processedResult = null;
+      if (!Context.get().isDevelopmentMode()) {
+        // Cache based on uri
+        processedResult = cacheStrategy.get(requestURI);
+        if (processedResult == null) {
+          // process groups & put update cache
+          processedResult = groupsProcessor.process(groups, type);
+          cacheStrategy.put(requestURI, processedResult);
+        }
+      } else {
+        processedResult = groupsProcessor.process(groups, type);
+      }
+      is = new ByteArrayInputStream(processedResult.getBytes());
     }
     final WroProcessResult result = new WroProcessResult();
     result.setResourceType(type);
-    result.setInputStream(new ByteArrayInputStream(processedResult.getBytes()));
-
+    result.setInputStream(is);
     stopWatch.stop();
     LOG.info("WroManager process time: " + stopWatch.toString());
     return result;
@@ -114,7 +121,7 @@ public final class WroManager {
    * @return {@link InputStream} not null object if the resource is valid and can be accessed
    * @throws WroRuntimeException if no stream could be resolved.
    */
-  public InputStream getStreamForRequest(final HttpServletRequest request) throws IOException {
+  private InputStream getStreamForRequest(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     final UriLocator uriLocator = getUriLocatorFactory().getInstance(resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);

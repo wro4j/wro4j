@@ -4,9 +4,12 @@
 package ro.isdc.wro.processor.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import ro.isdc.wro.exception.WroRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.processor.GroupExtractor;
 import ro.isdc.wro.resource.ResourceType;
 
@@ -17,9 +20,11 @@ import ro.isdc.wro.resource.ResourceType;
  * @created Created on Nov 3, 2008
  */
 public final class SingleGroupExtractor implements GroupExtractor {
+  private static final Logger LOG = LoggerFactory.getLogger(SingleGroupExtractor.class);
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   public List<String> getGroupNames(final String uri) {
     if (uri == null) {
       throw new IllegalArgumentException("Uri cannot be null!");
@@ -34,7 +39,8 @@ public final class SingleGroupExtractor implements GroupExtractor {
           .length());
       groupNames.add(groupName);
     } catch (final IndexOutOfBoundsException e) {
-      throw new WroRuntimeException("Invalid group name in the uri: '" + uri + "'");
+      LOG.warn("No group defined in uri: " + uri);
+      return Collections.EMPTY_LIST;
     }
     return groupNames;
   }
@@ -58,9 +64,7 @@ public final class SingleGroupExtractor implements GroupExtractor {
     try {
       type = ResourceType.valueOf(extension.toUpperCase());
     } catch (final IllegalArgumentException e) {
-      // invalid exception
-      // TODO Auto-generated method stub
-      throw new WroRuntimeException("Invalid uri: '" + uri + "'");
+      LOG.debug("Cannot identify resourceType for uri: " + uri);
     }
     return type;
   }

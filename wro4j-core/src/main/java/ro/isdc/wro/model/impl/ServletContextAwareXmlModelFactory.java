@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.impl;
 
@@ -12,9 +12,7 @@ import ro.isdc.wro.http.Context;
  * properly only when is used inside a web application. The configuration xml
  * file will be read from the following location: <code>WEB-INF/wro.xml</code>
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public final class ServletContextAwareXmlModelFactory extends XmlModelFactory {

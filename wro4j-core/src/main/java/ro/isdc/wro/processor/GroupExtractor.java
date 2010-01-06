@@ -21,14 +21,14 @@ public interface GroupExtractor {
    *
    * @param uri
    *          to check.
-   * @return a list of found group names.
+   * @return a list of found group names. If no groups are found, an empty list will be returned.
    */
   List<String> getGroupNames(final String uri);
 
   /**
    * @param uri
    *          to check.
-   * @return requested ResourceType from uri.
+   * @return requested ResourceType from uri if exists or null otherwise.
    */
   ResourceType getResourceType(final String uri);
 }

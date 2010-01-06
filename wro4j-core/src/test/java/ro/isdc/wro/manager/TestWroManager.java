@@ -43,9 +43,9 @@ public class TestWroManager {
     	}
     });
 
-
-    final String uri = "/app/g1.css";
-    final WroProcessResult result = manager.process(uri);
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
+    final WroProcessResult result = manager.process(request);
 //		final Writer writer = new StringWriter();
 //		IOUtils.copy(result.getInputStream(), writer);
 //		System.out.println("Processing result: " + writer.toString());

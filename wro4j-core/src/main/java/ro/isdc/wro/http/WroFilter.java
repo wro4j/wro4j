@@ -29,7 +29,6 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.WroProcessResult;
 import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
-import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -122,22 +121,18 @@ public class WroFilter
     setResponseHeaders(response);
     InputStream is = null;
     OutputStream os = null;
-    final String requestURI = request.getRequestURI();
 
-    //TODO move this logic to manager & update its signature
-    if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
-      is = manager.getStreamForRequest(request);
-      os = response.getOutputStream();
-    } else {
-      // process the uri using manager
-      final WroProcessResult result = manager.process(requestURI);
+    // process the uri using manager
+    final WroProcessResult result = manager.process(request);
+    if (result.getResourceType() != null) {
       response.setContentType(result.getResourceType().getContentType());
-      is = result.getInputStream();
+    }
+    is = result.getInputStream();
+    // append result to response stream
+    if (Context.get().isGzipEnabled()) {
+      os = getGzipedOutputStream(response);
+    } else {
       os = response.getOutputStream();
-      if (Context.get().isGzipEnabled()) {
-        os = getGzipedOutputStream(response);
-      }
-      // append result to response stream
     }
     IOUtils.copy(is, os);
     is.close();
@@ -163,7 +158,6 @@ public class WroFilter
       response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
     }
   }
-
 
   /**
    * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}

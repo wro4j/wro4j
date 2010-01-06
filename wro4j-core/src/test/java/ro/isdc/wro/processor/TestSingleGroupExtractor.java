@@ -10,7 +10,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.impl.SingleGroupExtractor;
 import ro.isdc.wro.resource.ResourceType;
 
@@ -33,8 +32,13 @@ public class TestSingleGroupExtractor {
     groupsExtractor.getResourceType(null);
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotExtractInvalidResourceType() {
+  @Test(expected=IllegalArgumentException.class)
+  public void cannotExtractGroupNamesUsingNullUri() {
+    groupsExtractor.getGroupNames(null);
+  }
+
+  @Test
+  public void testExtractInvalidResourceType() {
     String uri = "/test.js";
     ResourceType type = groupsExtractor.getResourceType(uri);
     Assert.assertEquals(ResourceType.JS, type);
@@ -44,11 +48,11 @@ public class TestSingleGroupExtractor {
     Assert.assertEquals(ResourceType.CSS, type);
 
     uri = "/test.txt";
-    groupsExtractor.getResourceType(uri);
+    Assert.assertNull(groupsExtractor.getResourceType(uri));
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotExtractInvalidGroupName() {
+  @Test
+  public void testExtractNoGroupName() {
     String uri = "/app/test.js";
     List<String> groupNames = groupsExtractor.getGroupNames(uri);
     Assert.assertEquals(1, groupNames.size());
@@ -60,6 +64,6 @@ public class TestSingleGroupExtractor {
     Assert.assertEquals("test.group", groupNames.get(0));
 
     uri = "/123/";
-    groupsExtractor.getGroupNames(uri);
+    Assert.assertEquals(0, groupsExtractor.getGroupNames(uri).size());
   }
 }
