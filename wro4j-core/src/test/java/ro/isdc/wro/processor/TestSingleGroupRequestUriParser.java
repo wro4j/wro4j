@@ -10,7 +10,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.processor.impl.SingleGroupExtractor;
+import ro.isdc.wro.processor.impl.SingleGroupRequestUriParser;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
@@ -19,51 +19,51 @@ import ro.isdc.wro.resource.ResourceType;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class TestSingleGroupExtractor {
-  private SingleGroupExtractor groupsExtractor;
+public class TestSingleGroupRequestUriParser {
+  private SingleGroupRequestUriParser requestUriParser;
 
   @Before
   public void init() {
-    groupsExtractor = new SingleGroupExtractor();
+    requestUriParser = new SingleGroupRequestUriParser();
   }
 
   @Test(expected=IllegalArgumentException.class)
   public void cannotExtractResourceTypeUsingNullUri() {
-    groupsExtractor.getResourceType(null);
+    requestUriParser.getResourceType(null);
   }
 
   @Test(expected=IllegalArgumentException.class)
   public void cannotExtractGroupNamesUsingNullUri() {
-    groupsExtractor.getGroupNames(null);
+    requestUriParser.getGroupNames(null);
   }
 
   @Test
   public void testExtractInvalidResourceType() {
     String uri = "/test.js";
-    ResourceType type = groupsExtractor.getResourceType(uri);
+    ResourceType type = requestUriParser.getResourceType(uri);
     Assert.assertEquals(ResourceType.JS, type);
 
     uri = "/test.css";
-    type = groupsExtractor.getResourceType(uri);
+    type = requestUriParser.getResourceType(uri);
     Assert.assertEquals(ResourceType.CSS, type);
 
     uri = "/test.txt";
-    Assert.assertNull(groupsExtractor.getResourceType(uri));
+    Assert.assertNull(requestUriParser.getResourceType(uri));
   }
 
   @Test
   public void testExtractNoGroupName() {
     String uri = "/app/test.js";
-    List<String> groupNames = groupsExtractor.getGroupNames(uri);
+    List<String> groupNames = requestUriParser.getGroupNames(uri);
     Assert.assertEquals(1, groupNames.size());
     Assert.assertEquals("test", groupNames.get(0));
 
     uri = "/app/test.group.js";
-    groupNames = groupsExtractor.getGroupNames(uri);
+    groupNames = requestUriParser.getGroupNames(uri);
     Assert.assertEquals(1, groupNames.size());
     Assert.assertEquals("test.group", groupNames.get(0));
 
     uri = "/123/";
-    Assert.assertEquals(0, groupsExtractor.getGroupNames(uri).size());
+    Assert.assertEquals(0, requestUriParser.getGroupNames(uri).size());
   }
 }

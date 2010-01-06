@@ -10,7 +10,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.processor.GroupExtractor;
+import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
@@ -19,8 +19,8 @@ import ro.isdc.wro.resource.ResourceType;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class SingleGroupExtractor implements GroupExtractor {
-  private static final Logger LOG = LoggerFactory.getLogger(SingleGroupExtractor.class);
+public final class SingleGroupRequestUriParser implements RequestUriParser {
+  private static final Logger LOG = LoggerFactory.getLogger(SingleGroupRequestUriParser.class);
   /**
    * {@inheritDoc}
    */

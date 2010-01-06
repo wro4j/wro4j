@@ -21,7 +21,7 @@ import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
-import ro.isdc.wro.processor.GroupExtractor;
+import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.resource.ResourceType;
@@ -48,7 +48,7 @@ public final class WroManager {
   /**
    * GroupExtractor.
    */
-  private GroupExtractor groupExtractor;
+  private RequestUriParser requestUriParser;
 
   /**
    * UriLocatorFactory.
@@ -77,14 +77,14 @@ public final class WroManager {
     final String requestURI = request.getRequestURI();
     final StopWatch stopWatch = new StopWatch();
     InputStream is = null;
-    final ResourceType type = groupExtractor.getResourceType(requestURI);
+    final ResourceType type = requestUriParser.getResourceType(requestURI);
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
       is = getStreamForRequest(request);
     } else {
       validate();
       stopWatch.start();
       // find names & type
-      final List<String> groupNames = groupExtractor.getGroupNames(requestURI);
+      final List<String> groupNames = requestUriParser.getGroupNames(requestURI);
       if (groupNames.isEmpty()) {
         throw new WroRuntimeException("No groups found for request: " + requestURI);
       }
@@ -140,7 +140,7 @@ public final class WroManager {
    */
   private void validate() {
     try {
-      if (this.groupExtractor == null) {
+      if (this.requestUriParser == null) {
         throw new IllegalStateException("UriProcessor was not set!");
       }
       if (this.modelFactory == null) {
@@ -161,10 +161,10 @@ public final class WroManager {
   }
 
   /**
-   * @param uriProcessor the uriProcessor to set
+   * @param requestUriParser the uriProcessor to set
    */
-  public final void setGroupExtractor(final GroupExtractor uriProcessor) {
-    this.groupExtractor = uriProcessor;
+  public final void setRequestUriParser(final RequestUriParser requestUriParser) {
+    this.requestUriParser = requestUriParser;
   }
 
   /**

@@ -15,7 +15,7 @@ import ro.isdc.wro.resource.ResourceType;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public interface GroupExtractor {
+public interface RequestUriParser {
   /**
    * Retrieves a list of group names from supplied uri.
    *
