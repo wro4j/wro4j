@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.manager;
 
@@ -11,8 +11,6 @@ import ro.isdc.wro.resource.ResourceType;
  * WroProcessResult. Contains the result of the manager processing.
  *
  * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
  * @created Created on Nov 14, 2008
  */
 public final class WroProcessResult {

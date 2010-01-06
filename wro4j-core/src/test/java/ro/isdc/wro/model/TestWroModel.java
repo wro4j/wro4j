@@ -43,7 +43,7 @@ public class TestWroModel {
     //create a copy of original list
     final List<Resource> originalResourceList = new ArrayList<Resource>(group.getResources());
     Assert.assertFalse(originalResourceList.isEmpty());
-    final Resource resourceToInsert = new Resource("http://www.site.com/site.css", ResourceType.CSS);
+    final Resource resourceToInsert = Resource.create("http://www.site.com/site.css", ResourceType.CSS);
     group.insertResourceBefore(resourceToInsert, originalResourceList.get(0));
     Assert.assertEquals(originalResourceList.size() + 1, group.getResources().size());
     Assert.assertEquals(resourceToInsert, group.getResources().get(0));

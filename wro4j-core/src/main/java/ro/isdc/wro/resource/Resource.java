@@ -8,9 +8,9 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 import ro.isdc.wro.model.Group;
 
+
 /**
- * Encapsulates information about a resource. Resource instance is an immutable
- * thread-safe object. This class is not final because we need to mock it in unit tests.
+ * Encapsulates information about a resource. This class is not final because we need to mock it in unit tests.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
@@ -39,7 +39,7 @@ public class Resource {
    * @param type
    *          of the resource.
    */
-  public Resource(final String uri, final ResourceType type) {
+  private Resource(final String uri, final ResourceType type) {
     if (uri == null) {
       throw new IllegalArgumentException("URI cannot be null!");
     }
@@ -48,6 +48,17 @@ public class Resource {
     }
     this.uri = cleanUri(uri);
     this.type = type;
+  }
+
+
+	/**
+	 * Factory method for Resource creation. A factory method is preferred instead of public constructor, in order to
+	 * avoid possibilities for clients to extend Resource class.
+	 *
+	 * @return an instance of {@link Resource} object.
+	 */
+  public static Resource create(final String uri, final ResourceType type) {
+  	return new Resource(uri, type);
   }
 
   /**

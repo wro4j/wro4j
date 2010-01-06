@@ -27,7 +27,7 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   @Test
   public void testValid() throws IOException {
     final String URI = "classpath:ro/isdc/wro/processor/cssImports/test1-input.css";
-    final Resource resource = new Resource(URI, ResourceType.CSS);
+    final Resource resource = Resource.create(URI, ResourceType.CSS);
     compareProcessedResourceContents(URI, "classpath:ro/isdc/wro/processor/cssImports/test1-output.css",
       new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)

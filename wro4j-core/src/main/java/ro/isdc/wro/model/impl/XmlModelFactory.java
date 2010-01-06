@@ -144,7 +144,7 @@ public class XmlModelFactory
     } catch (final IOException e) {
       throw new WroRuntimeException("Cannot find XML to parse", e);
     } catch (final SAXException e) {
-      throw new WroRuntimeException("Parsing error", e);
+      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage());
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
@@ -302,8 +302,7 @@ public class XmlModelFactory
     }
     LOG.debug("\ttype=" + type);
     if (type != null) {
-      final Resource resource = new Resource(uri, type);
-      resources.add(resource);
+      resources.add(Resource.create(uri, type));
     }
   }
 

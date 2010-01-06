@@ -71,7 +71,8 @@ public class Wro4jMojo extends AbstractMojo {
     LOG.debug("executing the mojo");
     LOG.debug("wro file: " + wroFile);
     try {
-      getFactory().getInstance().process("test.js");
+    	//TODO create a Request object
+      //getFactory().getInstance().process("test.js");
     } catch(final WroRuntimeException e) {
       throw new MojoExecutionException(e.getMessage(), e);
     }

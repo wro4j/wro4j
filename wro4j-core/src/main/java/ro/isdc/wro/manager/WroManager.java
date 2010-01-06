@@ -21,8 +21,8 @@ import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
-import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.GroupsProcessor;
+import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocator;
@@ -75,53 +75,63 @@ public final class WroManager {
    */
   public WroProcessResult process(final HttpServletRequest request) throws IOException {
     final String requestURI = request.getRequestURI();
-    final StopWatch stopWatch = new StopWatch();
     InputStream is = null;
     final ResourceType type = requestUriParser.getResourceType(requestURI);
     if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
-      is = getStreamForRequest(request);
+      is = locateInputeStream(request);
     } else {
-      validate();
-      stopWatch.start();
-      // find names & type
-      final List<String> groupNames = requestUriParser.getGroupNames(requestURI);
-      if (groupNames.isEmpty()) {
-        throw new WroRuntimeException("No groups found for request: " + requestURI);
-      }
-      // create model & find groups
-      final WroModel model = modelFactory.getInstance();
-      final List<Group> groups = model.getGroupsByNames(groupNames);
-
-      String processedResult = null;
-      if (!Context.get().isDevelopmentMode()) {
-        // Cache based on uri
-        processedResult = cacheStrategy.get(requestURI);
-        if (processedResult == null) {
-          // process groups & put update cache
-          processedResult = groupsProcessor.process(groups, type);
-          cacheStrategy.put(requestURI, processedResult);
-        }
-      } else {
-        processedResult = groupsProcessor.process(groups, type);
-      }
-      is = new ByteArrayInputStream(processedResult.getBytes());
+      is = buildGroupsInputStream(requestURI, type);
     }
     final WroProcessResult result = new WroProcessResult();
     result.setResourceType(type);
     result.setInputStream(is);
-    stopWatch.stop();
-    LOG.info("WroManager process time: " + stopWatch.toString());
     return result;
   }
 
   /**
-   * TODO move to process method
+   * @param requestURI uri of the request which encodes information about groups.
+   * @param type
+   * @return {@link InputStream} for groups found in requestURI.
+   */
+	private InputStream buildGroupsInputStream(final String requestURI, final ResourceType type) {
+		InputStream is = null;
+		final StopWatch stopWatch = new StopWatch();
+		validate();
+		stopWatch.start();
+		// find names & type
+		final List<String> groupNames = requestUriParser.getGroupNames(requestURI);
+		if (groupNames.isEmpty()) {
+		  throw new WroRuntimeException("No groups found for request: " + requestURI);
+		}
+		// create model & find groups
+		final WroModel model = modelFactory.getInstance();
+		final List<Group> groups = model.getGroupsByNames(groupNames);
+
+		String processedResult = null;
+		if (!Context.get().isDevelopmentMode()) {
+		  // Cache based on uri
+		  processedResult = cacheStrategy.get(requestURI);
+		  if (processedResult == null) {
+		    // process groups & put update cache
+		    processedResult = groupsProcessor.process(groups, type);
+		    cacheStrategy.put(requestURI, processedResult);
+		  }
+		} else {
+		  processedResult = groupsProcessor.process(groups, type);
+		}
+		is = new ByteArrayInputStream(processedResult.getBytes());
+		stopWatch.stop();
+		LOG.debug("WroManager process time: " + stopWatch.toString());
+		return is;
+	}
+
+  /**
    * Resolve the stream for a request.
    * @param request {@link HttpServletRequest} object.
    * @return {@link InputStream} not null object if the resource is valid and can be accessed
    * @throws WroRuntimeException if no stream could be resolved.
    */
-  private InputStream getStreamForRequest(final HttpServletRequest request) throws IOException {
+  private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     final UriLocator uriLocator = getUriLocatorFactory().getInstance(resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
