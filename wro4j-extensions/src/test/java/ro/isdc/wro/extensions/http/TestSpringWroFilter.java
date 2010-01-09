@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.extensions.http;
 
@@ -11,10 +11,8 @@ import ro.isdc.wro.manager.WroManagerFactory;
 
 /**
  * TestSpringWroFilter.java.
- * 
- * @author Alexandru.Objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Dec 5, 2008
  */
 public class TestSpringWroFilter {
