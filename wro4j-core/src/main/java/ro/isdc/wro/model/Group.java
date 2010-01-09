@@ -67,6 +67,10 @@ public final class Group {
 
 
   /**
+   * FOR INTERNAL USE ONLY!
+   * <p>
+   * It is very unlikely that you should use this method. Use {@link Resource#prepend(Resource)} instead.
+   * <p>
    * Allow change of the resource list. Useful when the model is changed due to content of some resource (like
    * CssImportPreProcessor).
    * <p>

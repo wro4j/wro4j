@@ -63,21 +63,24 @@ public class CssImportPreProcessor
       final String variablesBody = m.group(1);
       LOG.debug("import statement: " + m.group(0));
       LOG.debug("import url: " + variablesBody);
-      //extract variables
-      //map.putAll(extractVariables(variablesBody));
-      //remove variables definition
-      m.appendReplacement(sb, "");
-      m.appendTail(sb);
       stack.push(resource);
-      System.out.println(sb.toString());
-      break;
+      m.appendReplacement(sb, "");
     }
     m.appendTail(sb);
-
-    //final String result = replaceVariables(sb.toString(), map);
-    //LOG.debug("replaced variables: " + result);
-//    return result;
+    processResource(resource, stack);
+    System.out.println(sb.toString());
+    System.out.println(stack);
     return sb.toString();
+  }
+
+  /**
+   * @param resource
+   * @param stack
+   */
+  private void processResource(final Resource resource, final Stack<Resource> stack) {
+    while(stack.isEmpty()) {
+      final Resource item = stack.pop();
+    }
   }
 
 }

@@ -17,6 +17,7 @@ import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.test.util.WroTestUtils;
 
 /**
  * Test class for WroModel..
@@ -43,9 +44,19 @@ public class TestWroModel {
     //create a copy of original list
     final List<Resource> originalResourceList = new ArrayList<Resource>(group.getResources());
     Assert.assertFalse(originalResourceList.isEmpty());
-    final Resource resourceToInsert = Resource.create("http://www.site.com/site.css", ResourceType.CSS);
-    group.insertResourceBefore(resourceToInsert, originalResourceList.get(0));
+    Resource resourceToInsert = Resource.create("http://www.site.com/site1.css", ResourceType.CSS);
+
+    group.insertResourceBefore(resourceToInsert, group.getResources().get(0));
+    resourceToInsert.setGroup(group);
+
     Assert.assertEquals(originalResourceList.size() + 1, group.getResources().size());
+    Assert.assertEquals(resourceToInsert, group.getResources().get(0));
+
+    resourceToInsert = Resource.create("http://www.site.com/site2.css", ResourceType.CSS);
+    resourceToInsert.setGroup(group);
+    group.getResources().get(0).prepend(resourceToInsert);
+
+    Assert.assertEquals(originalResourceList.size() + 2, group.getResources().size());
     Assert.assertEquals(resourceToInsert, group.getResources().get(0));
   }
 
@@ -56,9 +67,7 @@ public class TestWroModel {
     final WroModelFactory factory = new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() {
-        return Thread.currentThread()
-          .getContextClassLoader()
-          .getResourceAsStream("wro1.xml");
+        return WroTestUtils.getClassRelativeResource(TestWroModel.class, "wro.xml");
       }
     };
     //the uriLocator factory doesn't have any locators set...

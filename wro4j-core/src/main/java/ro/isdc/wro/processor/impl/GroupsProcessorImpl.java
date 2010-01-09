@@ -109,6 +109,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     // wrap reader with bufferedReader for top efficiency
     final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     if (reader == null) {
+      //TODO skip invalid resource, instead of throwing exception
       throw new WroRuntimeException(
           "Exception while retrieving InputStream from uri: " + resource.getUri());
     }
