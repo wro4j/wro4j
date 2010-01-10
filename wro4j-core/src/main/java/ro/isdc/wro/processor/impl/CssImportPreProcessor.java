@@ -40,7 +40,7 @@ public class CssImportPreProcessor
    * Contains a {@link UriLocatorFactory} reference injected externally.
    */
   @Inject
-  public UriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory uriLocatorFactory;
   /** The url pattern */
   private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*"
     + "[\"']?([^\"']*)[\"']?" // any sequence of characters, except an unescaped ')'

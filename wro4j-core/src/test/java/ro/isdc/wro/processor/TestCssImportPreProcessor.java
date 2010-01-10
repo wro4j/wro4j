@@ -32,11 +32,10 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
 
   @Test
   public void testValid() throws IOException {
-    //this is necessary to initialize processors using GroupsProcessor instrumentation
-    buildGroupsProcessor();
+    //this is necessary use GroupsProcessor instrumentation on added processor
+    addToGroupsProcessor(processor);
     final String URI = "classpath:ro/isdc/wro/processor/cssImports/test1-input.css";
     final Resource resource = Resource.create(URI, ResourceType.CSS);
-    System.out.println("processor.uriLocatorFactory: " + processor.uriLocatorFactory);
     System.out.println("comparing resources");
     compareProcessedResourceContents(URI, "classpath:ro/isdc/wro/processor/cssImports/test1-output.css",
       new ResourceProcessor() {
@@ -50,11 +49,10 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   /**
    * Builds a {@link GroupsProcessor} object with all dependencies set.
    */
-  private GroupsProcessor buildGroupsProcessor() {
+  private void addToGroupsProcessor(final ResourcePreProcessor processor) {
     final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
     groupsProcessor.setUriLocatorFactory(getUriLocatorFactory());
     groupsProcessor.addPreProcessor(processor);
-    return groupsProcessor;
   }
 
   /**
