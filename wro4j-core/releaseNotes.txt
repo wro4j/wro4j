@@ -16,13 +16,14 @@
   -- rename UriProcessor to GroupExtractor
   -- remove getReader from Resource & change constructor
   -- add setUriLocator to GroupsProcessor
-- create SupportedResourceType annotation & get rid of all css/js/any pre/post processors
+- create SupportedResourceType annotation & simplify css/js/any pre/post processors
+- Create WroManagerFactory capable of being configured using init-params
+- Create @Inject annotation for processor implementation instrumentation performed by GroupsProcessor implementation
 
 TODO
 - update unit tests.
 - integrate maven licence & test explorer plugins 
 - CssImportPreProcessor
-- Create WroManagerFactory capable of being configured using init-params
 - Create Debug mode GroupProcessor (without any processors)
 - be able to configure expires header using init-param (@see http://ehcache.org/documentation/web_caching.html)
 - CssCompressor for the following case:
