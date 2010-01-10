@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.processor;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,14 +13,19 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import ro.isdc.wro.annot.Inject;
+import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.impl.CssMinProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.JSMinProcessor;
 import ro.isdc.wro.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.processor.impl.SingleLineCommentStripperProcessor;
+import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
  * TestGroupsProcessor.
@@ -85,4 +93,71 @@ public class TestGroupsProcessor {
   	Assert.assertEquals(0, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
   	Assert.assertEquals(0, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
   }
+
+  @Test
+  public void injectAnnotationOnPreProcessorField() {
+    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    groupsProcessor.addPreProcessor(new ResourcePreProcessor() {
+      @Inject
+      private UriLocatorFactory factory;
+      public void process(final Resource resources, final Reader reader, final Writer writer)
+        throws IOException {
+        Assert.assertEquals(uriLocatorFactory, factory);
+      }
+    });
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void cannotUseInjectOnInvalidFieldOfPreProcessor() {
+    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    groupsProcessor.addPreProcessor(new ResourcePreProcessor() {
+      @Inject
+      private Object someObject;
+      public void process(final Resource resources, final Reader reader, final Writer writer)
+        throws IOException {
+      }
+    });
+  }
+  @Test
+  public void injectAnnotationOnPostProcessorField() {
+    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    groupsProcessor.addPostProcessor(new ResourcePostProcessor() {
+      @Inject
+      private UriLocatorFactory factory;
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        Assert.assertEquals(uriLocatorFactory, factory);
+      }
+    });
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void cannotUseInjectOnInvalidFieldOfPostProcessor() {
+    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    groupsProcessor.addPostProcessor(new ResourcePostProcessor() {
+      @Inject
+      private Object someObject;
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+      }
+    });
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void cannotAddProcessorBeforeSettingUriLocatorFactory() {
+    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    groupsProcessor.addPostProcessor(new ResourcePostProcessor() {
+      @Inject
+      private Object someObject;
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+      }
+    });
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+  }
+
 }

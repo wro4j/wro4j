@@ -32,4 +32,10 @@ public class TestWroUtil {
     final String result = WroUtil.getServletPathFromLocation("/a/b/c/d");
     Assert.assertEquals("/a", result);
   }
+
+  @Test
+  public void testGetFolderForUri() {
+    Assert.assertEquals("a/b/c/", WroUtil.getFolderOfUri("a/b/c/d"));
+    Assert.assertEquals("", WroUtil.getFolderOfUri("a.css"));
+  }
 }
