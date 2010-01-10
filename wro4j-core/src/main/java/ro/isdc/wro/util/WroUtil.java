@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.util;
 
@@ -18,9 +18,7 @@ import ro.isdc.wro.http.HttpHeader;
 /**
  * Utility class.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
@@ -55,9 +53,16 @@ public final class WroUtil {
    *         instance if request uri is: /app/wro/all.css => /app/wro/
    */
   public static String getRequestUriPath() {
-    final String requestUri = Context.get().getRequest().getRequestURI();
-    final int idxLastSeparator = requestUri.lastIndexOf('/');
-    return requestUri.substring(0, idxLastSeparator + 1);
+    return getFolderOfUri(Context.get().getRequest().getRequestURI());
+  }
+
+  /**
+   * @return folder path for some uri - the part until the last / character. For
+   *         instance if request uri is: /app/wro/all.css => /app/wro/
+   */
+  public static String getFolderOfUri(final String uri) {
+    final int idxLastSeparator = uri.lastIndexOf('/');
+    return uri.substring(0, idxLastSeparator + 1);
   }
 
   /**

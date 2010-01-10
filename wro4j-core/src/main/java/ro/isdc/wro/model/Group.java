@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.resource.Resource;
@@ -21,7 +19,6 @@ import ro.isdc.wro.resource.Resource;
  * @created Created on Oct 30, 2008
  */
 public final class Group {
-  private static final Logger LOG = LoggerFactory.getLogger(Group.class);
   /**
    * Group name.
    */
@@ -94,6 +91,18 @@ public final class Group {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    //Because name is unique, we can consider two groups are equals if their name is the same
+    if (obj instanceof Group) {
+      final Group group = (Group) obj;
+      return getName().equals(group.getName());
+    }
+    return false;
+  }
 
   /**
    * {@inheritDoc}

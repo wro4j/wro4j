@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.resource.impl;
 
@@ -17,9 +17,7 @@ import ro.isdc.wro.util.StringUtils;
  * Implementation of the {@link UriLocator} that is able to read a resource from
  * a classpath.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 6, 2008
  */
 public final class ClasspathUriLocator implements UriLocator {

@@ -6,7 +6,7 @@ package ro.isdc.wro.processor.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Stack;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,10 +14,14 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.annot.Inject;
 import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.resource.UriLocator;
+import ro.isdc.wro.resource.UriLocatorFactory;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -32,7 +36,11 @@ public class CssImportPreProcessor
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
-
+  /**
+   * Contains a {@link UriLocatorFactory} reference injected externally.
+   */
+  @Inject
+  public UriLocatorFactory uriLocatorFactory;
   /** The url pattern */
   private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*"
     + "[\"']?([^\"']*)[\"']?" // any sequence of characters, except an unescaped ')'
@@ -56,31 +64,37 @@ public class CssImportPreProcessor
    */
   private String parseCss(final Resource resource, final Reader reader) throws IOException {
     final String css = IOUtils.toString(reader);
-    final Stack<Resource> stack = new Stack<Resource>();
     final StringBuffer sb = new StringBuffer();
+    final LinkedList<String> importsList = new LinkedList<String>();
+    final LinkedList<Resource> resourcesList = new LinkedList<Resource>();
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
-      final String variablesBody = m.group(1);
+      final String importUrl = m.group(1);
+      final String absoluteImportUrl = computeAbsoluteUrl(resource, importUrl);
+      final UriLocator uriLocator = uriLocatorFactory.getInstance(absoluteImportUrl);
+      LOG.debug("content of located import resource: " + IOUtils.toString(uriLocator.locate(absoluteImportUrl)));
+      importsList.add(absoluteImportUrl);
+      resourcesList.add(Resource.create(absoluteImportUrl, ResourceType.CSS));
       LOG.debug("import statement: " + m.group(0));
-      LOG.debug("import url: " + variablesBody);
-      stack.push(resource);
+      LOG.debug("import url: " + importUrl);
       m.appendReplacement(sb, "");
     }
     m.appendTail(sb);
-    processResource(resource, stack);
     System.out.println(sb.toString());
-    System.out.println(stack);
+    System.out.println(importsList);
+    System.out.println(resourcesList);
     return sb.toString();
   }
 
   /**
-   * @param resource
-   * @param stack
+   * Computes absolute url of the imported resource.
+   * @param relativeResource {@link Resource} where the import statement is found.
+   * @param importUrl found import url.
+   * @return absolute url of the resource to import.
    */
-  private void processResource(final Resource resource, final Stack<Resource> stack) {
-    while(stack.isEmpty()) {
-      final Resource item = stack.pop();
-    }
+  private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
+    final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
+    final String absoluteImportUrl = folder + importUrl;
+    return absoluteImportUrl;
   }
-
 }

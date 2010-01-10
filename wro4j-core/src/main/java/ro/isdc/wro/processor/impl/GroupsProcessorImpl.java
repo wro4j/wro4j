@@ -12,6 +12,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -133,9 +134,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     if (content == null) {
       throw new NullPointerException("content cannot be null!");
     }
-    final List<ResourcePreProcessor> typeProcessors = getPreProcessorsByType(resource.getType());
+    final Collection<ResourcePreProcessor> typeProcessors = getPreProcessorsByType(resource.getType());
     Writer output = applyPreProcessors(typeProcessors, resource, content);
-    final List<ResourcePreProcessor> anyProcessors = getPreProcessorsByType(null);
+    final Collection<ResourcePreProcessor> anyProcessors = getPreProcessorsByType(null);
     output = applyPreProcessors(anyProcessors, resource, output.toString());
     return output.toString();
   }
@@ -146,9 +147,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     if (content == null) {
       throw new NullPointerException("content cannot be null!");
     }
-    final List<ResourcePostProcessor> typeProcessors = getPostProcessorsByType(resourceType);
+    final Collection<ResourcePostProcessor> typeProcessors = getPostProcessorsByType(resourceType);
     String output = applyPostProcessors(typeProcessors, content);
-    final List<ResourcePostProcessor> anyProcessors = getPostProcessorsByType(null);
+    final Collection<ResourcePostProcessor> anyProcessors = getPostProcessorsByType(null);
     output = applyPostProcessors(anyProcessors, output.toString());
     return output.toString();
   }
@@ -159,7 +160,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    * @return
    * @throws IOException
    */
-  private Writer applyPreProcessors(final List<ResourcePreProcessor> processors, final Resource resource, final String content)
+  private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource, final String content)
     throws IOException {
   	if (processors.isEmpty()) {
       final Writer output = new StringWriter();
@@ -182,12 +183,12 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    * <p>
    * Apply resourcePostProcessors.
    *
-   * @param processors a list of processor to apply on the content from the supplied writer.
+   * @param processors a collection of processors to apply on the content from the supplied writer.
    * @param content to process with all postProcessors.
    * @return Writer the processed content is written to this writer.
    */
   private String applyPostProcessors(
-      final List<ResourcePostProcessor> processors, final String content)
+      final Collection<ResourcePostProcessor> processors, final String content)
       throws IOException {
     if (processors.isEmpty()) {
       return content;

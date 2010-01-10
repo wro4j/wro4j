@@ -119,6 +119,18 @@ public class Resource {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof Resource) {
+      final Resource resource = (Resource) obj;
+      return getUri().equals(resource.getUri()) && getType().equals(resource.getType());
+    }
+    return false;
+  }
+
+  /**
    * @see java.lang.Object#toString()
    */
   @Override
