@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.LinkedList;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,27 +64,52 @@ public class CssImportPreProcessor
    * @param resource {@link Resource} where the parsed css resides.
    */
   private String parseCss(final Resource resource, final Reader reader) throws IOException {
-    final String css = IOUtils.toString(reader);
-    final StringBuffer sb = new StringBuffer();
-    final LinkedList<String> importsList = new LinkedList<String>();
+    final Stack<Resource> stack = new Stack<Resource>();
+    //final LinkedList<String> importsList = new LinkedList<String>();
     final LinkedList<Resource> resourcesList = new LinkedList<Resource>();
+    final String result = parseImports(resource, reader, stack, resourcesList);
+    System.out.println(result);
+    System.out.println(resourcesList);
+    return result;
+  }
+
+  /**
+   * @param resource
+   * @param reader
+   * @param stack
+   * @param resourcesList
+   * @return
+   * @throws IOException
+   */
+  private String parseImports(final Resource resource, final Reader reader,
+    final Stack<Resource> stack, final LinkedList<Resource> resourcesList)
+    throws IOException {
+    final StringBuffer sb = new StringBuffer();
+    //Check if @Scanner#findWithinHorizon can be used instead
+    final String css = IOUtils.toString(reader);
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final String importUrl = m.group(1);
+      LOG.debug("iterate importUrl: " + importUrl);
       final String absoluteImportUrl = computeAbsoluteUrl(resource, importUrl);
       final UriLocator uriLocator = uriLocatorFactory.getInstance(absoluteImportUrl);
-      LOG.debug("content of located import resource: " + IOUtils.toString(uriLocator.locate(absoluteImportUrl)));
-      importsList.add(absoluteImportUrl);
-      resourcesList.add(Resource.create(absoluteImportUrl, ResourceType.CSS));
-      LOG.debug("import statement: " + m.group(0));
-      LOG.debug("import url: " + importUrl);
+      //LOG.debug("content of located import resource: " + IOUtils.toString(uriLocator.locate(absoluteImportUrl)));
+      //importsList.add(absoluteImportUrl);
+      final Resource importResource = Resource.create(absoluteImportUrl, ResourceType.CSS);
+      stack.push(importResource);
+      LOG.debug("<parseImports>");
+      LOG.debug("\tresource: " + resource);
+      //Pass correct Reader instead of reader of original resource.
+      parseImports(importResource, reader, stack, resourcesList);
+      LOG.debug("</parseImports>");
+      resourcesList.add(stack.pop());
+      //LOG.debug("import statement: " + m.group(0));
+      //LOG.debug("import url: " + importUrl);
       m.appendReplacement(sb, "");
     }
     m.appendTail(sb);
-    System.out.println(sb.toString());
-    System.out.println(importsList);
-    System.out.println(resourcesList);
-    return sb.toString();
+    final String result = sb.toString();
+    return result;
   }
 
   /**
