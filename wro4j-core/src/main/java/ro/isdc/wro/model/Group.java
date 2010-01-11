@@ -56,7 +56,8 @@ public final class Group {
    *          the resources to set
    */
   public final void setResources(final List<Resource> resources) {
-    this.resources = resources;
+    //Use ArrayList to be sure that the list supports all necessary operations.
+    this.resources = new ArrayList<Resource>(resources);
     for (final Resource resource : resources) {
       resource.setGroup(this);
     }
