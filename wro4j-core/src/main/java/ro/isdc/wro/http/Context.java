@@ -158,7 +158,8 @@ public class Context {
 //      return Boolean.valueOf(debugParam);
 //    }
     //TODO deprecate config using filter config?
-    final String configParam = this.filterConfig.getInitParameter(PARAM_CONFIGURATION);
+    String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
+    configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
     //TODO get rid of Configuration enum & simplify this logic
     final Configuration config = Configuration.of(configParam);
     return config.isDevelopment();

@@ -6,9 +6,6 @@ package ro.isdc.wro.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.resource.Resource;
 
@@ -110,7 +107,7 @@ public final class Group {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("name", getName()).append("resources", getResources()).toString();
+    return getName();
   }
 
 }

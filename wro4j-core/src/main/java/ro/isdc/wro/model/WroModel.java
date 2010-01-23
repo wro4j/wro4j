@@ -65,7 +65,7 @@ public final class WroModel {
         return group;
       }
     }
-    throw new InvalidGroupNameException("There is no such group: '" + name + "'");
+    throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + groups);
   }
 
   /**
