@@ -15,7 +15,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.http.Context;
-import ro.isdc.wro.manager.impl.StandAloneWroManagerFactory;
+import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 
 /**
@@ -32,9 +33,10 @@ public class TestWroManager {
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     Context.set(new Context(request, response, filterConfig));
 	}
+
   @Test
   public void first() throws IOException {
-    final WroManagerFactory factory = new StandAloneWroManagerFactory();
+    final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
     final WroManager manager = factory.getInstance();
     manager.setModelFactory(new XmlModelFactory() {
     	@Override
@@ -43,11 +45,10 @@ public class TestWroManager {
     	}
     });
 
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    final WroProcessResult result = manager.process(request);
-//		final Writer writer = new StringWriter();
-//		IOUtils.copy(result.getInputStream(), writer);
-//		System.out.println("Processing result: " + writer.toString());
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(System.out));
+    manager.process(request, response);
   }
 }

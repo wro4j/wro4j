@@ -7,10 +7,14 @@ package ro.isdc.wro.manager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +32,7 @@ import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
+import ro.isdc.wro.util.WroUtil;
 
 /**
  * WroManager. Contains all the factories used by optimizer in order to perform the logic.
@@ -67,14 +72,12 @@ public final class WroManager {
   private CacheStrategy<String, String> cacheStrategy;
 
   /**
-   * Perform processing of the uri and depending on it will return {@link WroProcessResult} object containing
-   * the input stream of the requested resource and it's content type.
+   * Perform processing of the uri.
    *
    * @param request {@link HttpServletRequest} to process.
-   * @return {@link WroProcessResult} object.
    * @throws IOException.
    */
-  public WroProcessResult process(final HttpServletRequest request) throws IOException {
+  public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     final String requestURI = request.getRequestURI();
     InputStream is = null;
     final ResourceType type = requestUriParser.getResourceType(requestURI);
@@ -83,10 +86,37 @@ public final class WroManager {
     } else {
       is = buildGroupsInputStream(requestURI, type);
     }
-    final WroProcessResult result = new WroProcessResult();
-    result.setResourceType(type);
-    result.setInputStream(is);
-    return result;
+
+    if (type != null) {
+      response.setContentType(type.getContentType());
+    }
+    OutputStream os = null;
+    // append result to response stream
+    if (Context.get().isGzipEnabled()) {
+      os = getGzipedOutputStream(response);
+    } else {
+      os = response.getOutputStream();
+    }
+    IOUtils.copy(is, os);
+    is.close();
+    os.close();
+  }
+
+
+  /**
+   * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}
+   *
+   * @param response {@link HttpServletResponse} object.
+   * @return wrapped gziped OutputStream.
+   */
+  private OutputStream getGzipedOutputStream(final HttpServletResponse response)
+    throws IOException {
+    // gzip response
+    WroUtil.addGzipHeader(response);
+    // Create a gzip stream
+    final OutputStream os = new GZIPOutputStream(response.getOutputStream());
+    LOG.debug("Gziping outputStream response");
+    return os;
   }
 
   /**

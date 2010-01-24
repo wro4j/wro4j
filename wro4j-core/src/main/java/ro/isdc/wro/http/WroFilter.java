@@ -4,12 +4,9 @@
 package ro.isdc.wro.http;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
-import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -20,16 +17,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.WroProcessResult;
 import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -117,26 +111,9 @@ public class WroFilter
         return;
       }
     }
-
     setResponseHeaders(response);
-    InputStream is = null;
-    OutputStream os = null;
-
     // process the uri using manager
-    final WroProcessResult result = manager.process(request);
-    if (result.getResourceType() != null) {
-      response.setContentType(result.getResourceType().getContentType());
-    }
-    is = result.getInputStream();
-    // append result to response stream
-    if (Context.get().isGzipEnabled()) {
-      os = getGzipedOutputStream(response);
-    } else {
-      os = response.getOutputStream();
-    }
-    IOUtils.copy(is, os);
-    is.close();
-    os.close();
+    manager.process(request, response);
     // remove context from the current thread local.
     Context.unset();
   }
@@ -158,23 +135,6 @@ public class WroFilter
       response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
     }
   }
-
-  /**
-   * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}
-   *
-   * @param response {@link HttpServletResponse} object.
-   * @return wrapped gziped OutputStream.
-   */
-  private OutputStream getGzipedOutputStream(final HttpServletResponse response)
-    throws IOException {
-    // gzip response
-    WroUtil.addGzipHeader(response);
-    // Create a gzip stream
-    final OutputStream os = new GZIPOutputStream(response.getOutputStream());
-    LOG.debug("Gziping outputStream response");
-    return os;
-  }
-
 
   /**
    * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.
