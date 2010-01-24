@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.processor;
 
-import java.util.List;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -34,7 +32,7 @@ public class TestSingleGroupRequestUriParser {
 
   @Test(expected=IllegalArgumentException.class)
   public void cannotExtractGroupNamesUsingNullUri() {
-    requestUriParser.getGroupNames(null);
+    requestUriParser.getGroupName(null);
   }
 
   @Test
@@ -54,16 +52,14 @@ public class TestSingleGroupRequestUriParser {
   @Test
   public void testExtractNoGroupName() {
     String uri = "/app/test.js";
-    List<String> groupNames = requestUriParser.getGroupNames(uri);
-    Assert.assertEquals(1, groupNames.size());
-    Assert.assertEquals("test", groupNames.get(0));
+    String groupName = requestUriParser.getGroupName(uri);
+    Assert.assertEquals("test", groupName);
 
     uri = "/app/test.group.js";
-    groupNames = requestUriParser.getGroupNames(uri);
-    Assert.assertEquals(1, groupNames.size());
-    Assert.assertEquals("test.group", groupNames.get(0));
+    groupName = requestUriParser.getGroupName(uri);
+    Assert.assertEquals("test.group", groupName);
 
     uri = "/123/";
-    Assert.assertEquals(0, requestUriParser.getGroupNames(uri).size());
+    Assert.assertEquals(null, requestUriParser.getGroupName(uri));
   }
 }

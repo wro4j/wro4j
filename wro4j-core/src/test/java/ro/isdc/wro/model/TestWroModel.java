@@ -40,7 +40,7 @@ public class TestWroModel {
     model = buildValidModel();
     Assert.assertFalse(model.getGroups().isEmpty());
     //get first group.
-    final Group group = model.getGroups().get(0);
+    final Group group = model.getGroups().iterator().next();
     //create a copy of original list
     final List<Resource> originalResourceList = new ArrayList<Resource>(group.getResources());
     Assert.assertFalse(originalResourceList.isEmpty());

@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -34,13 +35,13 @@ import ro.isdc.wro.test.util.WroTestUtils;
  * @created Created on Jul 13, 2009
  */
 public class TestWroFilter {
-	private static final String URL_REWRITING_PREFIX = "/[WRO-PREFIX]" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID
-		+ "?=";
 	private WroFilter filter;
 	@Before
 	public void initFilter() throws Exception {
 		filter = new WroFilter();
 		final FilterConfig config = Mockito.mock(FilterConfig.class);
+		final ServletContext servletContext = Mockito.mock(ServletContext.class);
+		Mockito.when(config.getServletContext()).thenReturn(servletContext);
 		filter.init(config);
 	}
 
@@ -67,13 +68,18 @@ public class TestWroFilter {
 	}
 
   @Test(expected=WroRuntimeException.class)
-  public void cannotProcessInvalidUri() throws Exception {
+  public void cannotProcessConfigResourceStream() throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final FilterChain chain = Mockito.mock(FilterChain.class);
 
     Mockito.when(request.getRequestURI()).thenReturn("");
     filter.doFilter(request, response, chain);
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void cannotProcessInvalidUri() throws Exception {
+    requestGroupByUri("");
   }
 
   @Test
