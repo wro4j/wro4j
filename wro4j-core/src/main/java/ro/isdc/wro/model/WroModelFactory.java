@@ -18,4 +18,9 @@ public interface WroModelFactory {
    * @return an instance of {@link WroModel}.
    */
   WroModel getInstance();
+
+  /**
+   * Called to indicate that the factory is being taken out of service.
+   */
+  void destroy();
 }

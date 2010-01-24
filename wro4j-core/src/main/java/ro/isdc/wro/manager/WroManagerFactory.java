@@ -4,7 +4,7 @@
 package ro.isdc.wro.manager;
 
 /**
- * WROManagerFactory.java.
+ * Factory used to create {@link WroManager} objects.
  *
  * @author Alex Objelean
  * @created Created on Oct 31, 2008
@@ -13,7 +13,12 @@ public interface WroManagerFactory {
   /**
    * Creates a instance of {@link WroManager} object.
    *
-   * @return Configured WROManager.
+   * @return Configured {@link WroManager}.
    */
   public WroManager getInstance();
+
+  /**
+   * Called by filter indicating that it is being taken out of service.
+   */
+  public void destroy();
 }

@@ -43,7 +43,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    * {@inheritDoc} While processing the resources, if any exception occurs - it
    * is wrapped in a RuntimeException.
    */
-  public String process(final List<Group> groups, final ResourceType type) {
+  public String process(final Collection<Group> groups, final ResourceType type) {
     if (groups == null) {
       throw new NullPointerException("List of groups cannot be null!");
     }
@@ -211,7 +211,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    *          of resources to collect.
    * @return a list of resources of provided type.
    */
-  private List<Resource> getFilteredResources(final List<Group> groups,
+  private List<Resource> getFilteredResources(final Collection<Group> groups,
       final ResourceType type) {
     final List<Resource> allResources = new ArrayList<Resource>();
     for (final Group group : groups) {
@@ -226,36 +226,4 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
     return filteredResources;
   }
-
-
-//private static void test() {
-//  final List<String> list = new ArrayList<String>();
-//  list.add("A");
-//  list.add("B");
-//  list.add("C");
-//  list.add("D");
-//
-//  final ListIterator<String> iter = list.listIterator();
-//  //iter.next();
-//  for (int i = 0; i < list.size(); i++) {
-//    process(list.get(i), iter);
-//    if (iter.hasNext()) {
-//      iter.next();
-//    }
-//  }
-//  System.out.println("list is: " + list);
-//}
-//
-//private static void process(final Object o, final ListIterator iterator) {
-//  if (RandomUtils.nextInt(100) < 20) {
-//    //iterator.remove();
-//    iterator.add("a");
-//    iterator.add("b");
-//    iterator.add("c");
-//  } else {
-//    System.out.println(o);
-//  }
-//}
-
-
 }

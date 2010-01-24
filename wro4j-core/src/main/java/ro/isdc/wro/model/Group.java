@@ -8,6 +8,7 @@ import java.util.List;
 
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.resource.ResourceType;
 
 /**
  * A group is an entity which gather a list of resources.
@@ -46,6 +47,25 @@ public final class Group {
    */
   public final List<Resource> getResources() {
     return resources;
+  }
+
+
+  /**
+   * Check if the group has at least one resource of some type.
+   *
+   * @param resourceType type of the searched resource.
+   * @return true if at least one resource of some type exists.
+   */
+  public final boolean hasResourcesOfType(final ResourceType resourceType) {
+    if (resourceType == null) {
+      throw new IllegalArgumentException("ResourceType cannot be null!");
+    }
+    for (final Resource resource : getResources()) {
+      if (resourceType.equals(resource.getType())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

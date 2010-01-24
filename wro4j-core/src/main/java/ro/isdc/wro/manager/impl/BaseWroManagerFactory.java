@@ -3,13 +3,15 @@
  */
 package ro.isdc.wro.manager.impl;
 
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModelFactory;
 import ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory;
-import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.GroupsProcessor;
+import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.SingleGroupRequestUriParser;
 import ro.isdc.wro.resource.UriLocatorFactory;
@@ -78,10 +80,10 @@ public class BaseWroManagerFactory implements WroManagerFactory {
   }
 
   /**
-   * @return
+   * @return {@link CacheStrategy} instance.
    */
-  private MapCacheStrategy<String, String> newCacheStrategy() {
-    return new MapCacheStrategy<String, String>();
+  private CacheStrategy<CacheEntry, String> newCacheStrategy() {
+    return new MapCacheStrategy<CacheEntry, String>();
   }
 
   /**
@@ -115,4 +117,10 @@ public class BaseWroManagerFactory implements WroManagerFactory {
     return new UriLocatorFactoryImpl();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void destroy() {
+    manager.getModelFactory().destroy();
+  }
 }

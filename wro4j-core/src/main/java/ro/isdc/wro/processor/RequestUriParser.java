@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.processor;
 
-import java.util.List;
-
 import ro.isdc.wro.resource.ResourceType;
 
 
@@ -17,13 +15,13 @@ import ro.isdc.wro.resource.ResourceType;
  */
 public interface RequestUriParser {
   /**
-   * Retrieves a list of group names from supplied uri.
+   * Retrieves a set of group names from supplied uri.
    *
    * @param uri
    *          to check.
-   * @return a list of found group names. If no groups are found, an empty list will be returned.
+   * @return found group name. If no group is found, null is returned.
    */
-  List<String> getGroupNames(final String uri);
+  String getGroupName(final String uri);
 
   /**
    * @param uri

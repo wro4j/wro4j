@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.exception;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,6 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message) {
     super(message);
-    LOG.error(message);
+    LOG.error(message + Arrays.toString(this.getStackTrace()), this.getStackTrace());
   }
 }

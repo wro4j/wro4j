@@ -8,7 +8,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +25,7 @@ import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.exception.UnauthorizedRequestException;
 import ro.isdc.wro.exception.WroRuntimeException;
@@ -67,9 +74,14 @@ public final class WroManager {
   private GroupsProcessor groupsProcessor;
 
   /**
-   * A cacheStrategy used for caching processed results. Key: uri, Value: processed result.
+   * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
-  private CacheStrategy<String, String> cacheStrategy;
+  private CacheStrategy<CacheEntry, String> cacheStrategy;
+
+  /**
+   * Scheduled executors service, used to update the output result.
+   */
+  private ScheduledExecutorService executorService;
 
   /**
    * Perform processing of the uri.
@@ -78,17 +90,16 @@ public final class WroManager {
    * @throws IOException.
    */
   public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    final String requestURI = request.getRequestURI();
     InputStream is = null;
-    final ResourceType type = requestUriParser.getResourceType(requestURI);
-    if (requestURI.contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
+    // create model
+    final WroModel model = modelFactory.getInstance();
+    //Use @Inject annotation to access model inside RequestProcessors
+    //TODO: move to corresponding RequestProcessor
+    LOG.debug("processing: " + request.getRequestURI());
+    if (request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
       is = locateInputeStream(request);
     } else {
-      is = buildGroupsInputStream(requestURI, type);
-    }
-
-    if (type != null) {
-      response.setContentType(type.getContentType());
+      is = buildGroupsInputStream(model, request, response);
     }
     OutputStream os = null;
     // append result to response stream
@@ -101,7 +112,6 @@ public final class WroManager {
     is.close();
     os.close();
   }
-
 
   /**
    * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}
@@ -124,40 +134,81 @@ public final class WroManager {
    * @param type
    * @return {@link InputStream} for groups found in requestURI.
    */
-	private InputStream buildGroupsInputStream(final String requestURI, final ResourceType type) {
-		InputStream is = null;
+	private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request, final HttpServletResponse response) {
+	  final String requestURI = request.getRequestURI();
+    InputStream is = null;
+    final ResourceType type = requestUriParser.getResourceType(requestURI);
+
 		final StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
 		validate();
-		stopWatch.start();
 		// find names & type
-		final List<String> groupNames = requestUriParser.getGroupNames(requestURI);
-		if (groupNames.isEmpty()) {
+		final String groupName = requestUriParser.getGroupName(requestURI);
+		if (groupName == null) {
 		  throw new WroRuntimeException("No groups found for request: " + requestURI);
 		}
-		// create model & find groups
-		final WroModel model = modelFactory.getInstance();
-		final List<Group> groups = model.getGroupsByNames(groupNames);
+		initExecutorService(model);
 
-		String processedResult = null;
-		if (!Context.get().isDevelopmentMode()) {
-		  // Cache based on uri
-		  processedResult = cacheStrategy.get(requestURI);
-		  if (processedResult == null) {
-		    // process groups & put update cache
-		    processedResult = groupsProcessor.process(groups, type);
-		    cacheStrategy.put(requestURI, processedResult);
-		  }
-		} else {
-		  processedResult = groupsProcessor.process(groups, type);
-		}
-		is = new ByteArrayInputStream(processedResult.getBytes());
+		// find processed result for a group
+    final Group group = model.getGroupByName(groupName);
+    final List<Group> groupAsList = new ArrayList<Group>();
+    groupAsList.add(group);
+		String result = null;
+	  final CacheEntry cacheEntry = new CacheEntry(groupName, type);
+	  // Cache based on uri
+	  result = cacheStrategy.get(cacheEntry);
+	  if (result == null) {
+	    // process groups & put update cache
+	    result = groupsProcessor.process(groupAsList, type);
+	    cacheStrategy.put(cacheEntry, result);
+	  }
+	  is = new ByteArrayInputStream(result.getBytes());
 		stopWatch.stop();
 		LOG.debug("WroManager process time: " + stopWatch.toString());
+    if (type != null) {
+      response.setContentType(type.getContentType());
+    }
 		return is;
 	}
 
   /**
+   * @param model
+   */
+  private void initExecutorService(final WroModel model) {
+    if (executorService == null) {
+      executorService = Executors.newSingleThreadScheduledExecutor();
+      LOG.debug("executorService.isShutdown() " + executorService.isShutdown());
+      LOG.debug("executorService.isTerminated() " + executorService.isTerminated());
+      //TODO make timing configurable depending on some configuration
+      final long period = Context.get().isDevelopmentMode() ? 3 : 10;//60 * 60 * 3;
+      //Run a scheduled task which updates the model
+      executorService.scheduleAtFixedRate(new Runnable() {
+        public void run() {
+          LOG.info("reloading cache with period: " + period);
+          // process groups & put update cache
+          final Collection<Group> groups = model.getGroups();
+          LOG.info("processing groups for cache: " + groups);
+          //update cache for all resources
+          for (final Group group : groups) {
+            for (final ResourceType resourceType : ResourceType.values()) {
+              if (group.hasResourcesOfType(resourceType)) {
+                final Collection<Group> singleGroupCollection = new HashSet<Group>();
+                singleGroupCollection.add(group);
+                final String result = groupsProcessor.process(singleGroupCollection, resourceType);
+                cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
+              }
+            }
+            LOG.info("Cache udpated for group: " + group);
+          }
+        }
+      }, 0, period, TimeUnit.SECONDS);
+		}
+  }
+
+
+  /**
    * Resolve the stream for a request.
+   *
    * @param request {@link HttpServletRequest} object.
    * @return {@link InputStream} not null object if the resource is valid and can be accessed
    * @throws WroRuntimeException if no stream could be resolved.
@@ -230,7 +281,7 @@ public final class WroManager {
   /**
    * @param cacheStrategy the cache to set
    */
-  public final void setCacheStrategy(final CacheStrategy<String, String> cacheStrategy) {
+  public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
     this.cacheStrategy = cacheStrategy;
   }
 
@@ -241,4 +292,19 @@ public final class WroManager {
     return uriLocatorFactory;
   }
 
+  /**
+   * @return the modelFactory
+   */
+  public WroModelFactory getModelFactory() {
+    return this.modelFactory;
+  }
+
+  /**
+   * Called when {@link WroManager} is being taken out of service.
+   */
+  public void destroy() {
+    LOG.debug("WroManager destroyed");
+    cacheStrategy.destroy();
+    executorService.shutdownNow();
+  }
 }

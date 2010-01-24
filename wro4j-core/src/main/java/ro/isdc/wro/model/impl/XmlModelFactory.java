@@ -6,9 +6,15 @@ package ro.isdc.wro.model.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -97,33 +103,52 @@ public class XmlModelFactory
    * List of groups which are currently processing and are partially parsed. This list is useful in order to catch
    * infinite recurse group reference.
    */
-  final List<String> processingGroups = new ArrayList<String>();
+  final Collection<String> processingGroups = new HashSet<String>();
 
   /**
    * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
    */
   private volatile WroModel model;
 
+  /**
+   * Scheduled executors service, used to refresh the WroModel.
+   */
+  private ScheduledExecutorService executorService;
 
   /**
    * {@inheritDoc}
    */
   public synchronized WroModel getInstance() {
-    // when in DEVELOPMENT mode, create fresh new instance for each request.
-    if (Context.get().isDevelopmentMode()) {
-      return newModel();
-    }
+    initExecutor();
     // use double-check locking
-    if (this.model == null) {
+    if (model == null) {
       synchronized (this) {
-        if (this.model == null) {
-          this.model = newModel();
+        if (model == null) {
+          model = newModel();
         }
       }
     }
-    return this.model;
+    return model;
   }
 
+
+  /**
+   * Initialize executor service & start the thread responsible for updating the model. Updates the model each minute in
+   * DEVELOPMENT mode and each half an hour in DEPLOYMENT mode.
+   */
+  private void initExecutor() {
+    if (executorService == null) {
+      executorService = Executors.newSingleThreadScheduledExecutor();
+      //TODO make timing configurable depending on some configuration
+      final long period = Context.get().isDevelopmentMode() ? 1 : 30;
+      //Run a scheduled task which updates the model
+      executorService.scheduleAtFixedRate(new Runnable() {
+        public void run() {
+          model = newModel();
+        }
+      }, 0, period, TimeUnit.MINUTES);
+    }
+  }
 
   /**
    * Build model from scratch after xml is parsed.
@@ -138,7 +163,11 @@ public class XmlModelFactory
       factory.setNamespaceAware(true);
       // factory.setSchema(getSchema());
       // factory.setValidating(true);
-      document = factory.newDocumentBuilder().parse(getConfigResourceAsStream());
+      final InputStream configResource = getConfigResourceAsStream();
+      if (configResource == null) {
+        throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
+      }
+      document = factory.newDocumentBuilder().parse(configResource);
       validate(document);
       document.getDocumentElement().normalize();
     } catch (final IOException e) {
@@ -203,7 +232,7 @@ public class XmlModelFactory
    */
   private WroModel createModel() {
     final WroModel model = new WroModel();
-    final List<Group> groups = new ArrayList<Group>();
+    final Set<Group> groups = new HashSet<Group>();
     for (final Element element : allGroupElements.values()) {
       parseGroup(element, groups);
     }
@@ -220,7 +249,7 @@ public class XmlModelFactory
    * @param groups list of parsed groups where the parsed group is added..
    * @return list of resources associated with this resource
    */
-  private List<Resource> parseGroup(final Element element, final List<Group> groups) {
+  private Collection<Resource> parseGroup(final Element element, final Collection<Group> groups) {
     final String name = element.getAttribute(ATTR_GROUP_NAME);
     if (processingGroups.contains(name)) {
       throw new RecursiveGroupDefinitionException("Infinite Recursion detected for the group: " + name
@@ -263,7 +292,7 @@ public class XmlModelFactory
    * @param groups list of parsed groups.
    * @return parsed Group by it's name.
    */
-  private static Group getGroupByName(final String name, final List<Group> groups) {
+  private static Group getGroupByName(final String name, final Collection<Group> groups) {
     for (final Group group : groups) {
       if (name.equals(group.getName())) {
         return group;
@@ -272,7 +301,6 @@ public class XmlModelFactory
     return null;
   }
 
-
   /**
    * Creates a resource from a given resourceElement. It can be css, js. If resource tag name is group-ref, the method
    * will start a recursive computation.
@@ -280,7 +308,7 @@ public class XmlModelFactory
    * @param resourceElement
    * @param resources list of parsed resources where the parsed resource is added.
    */
-  private void parseResource(final Element resourceElement, final List<Resource> resources, final List<Group> groups) {
+  private void parseResource(final Element resourceElement, final Collection<Resource> resources, final Collection<Group> groups) {
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
@@ -327,5 +355,13 @@ public class XmlModelFactory
     final Validator validator = schema.newValidator();
     // validate the DOM tree
     validator.validate(new DOMSource(document));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void destroy() {
+    //kill running threads
+    executorService.shutdownNow();
   }
 }

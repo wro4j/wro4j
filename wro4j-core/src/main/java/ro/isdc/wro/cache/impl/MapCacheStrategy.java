@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.cache.impl;
 
@@ -10,17 +10,15 @@ import ro.isdc.wro.cache.CacheStrategy;
 
 /**
  * Default CacheStrategy implementation using a hashMap to store values.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Nov 18, 2008
  */
 public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
   /**
    * Map containing cached items.
    */
-  private final Map<K, V> map;
+  private Map<K, V> map;
 
   /**
    * Default constructor. Initialize the map.
@@ -44,5 +42,13 @@ public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
    */
   public synchronized void put(final K key, final V value) {
     map.put(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void destroy() {
+    map.clear();
+    map = null;
   }
 }

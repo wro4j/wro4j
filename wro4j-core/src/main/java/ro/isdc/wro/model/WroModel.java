@@ -3,8 +3,9 @@
  */
 package ro.isdc.wro.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -21,12 +22,12 @@ public final class WroModel {
   /**
    * List of groups.
    */
-  private List<Group> groups = new ArrayList<Group>();
+  private Set<Group> groups = new HashSet<Group>();
 
   /**
    * @return the groups
    */
-  public final List<Group> getGroups() {
+  public final Set<Group> getGroups() {
     return groups;
   }
 
@@ -34,15 +35,15 @@ public final class WroModel {
    * @param groups
    *          the groups to set
    */
-  public final void setGroups(final List<Group> groups) {
+  public final void setGroups(final Set<Group> groups) {
     this.groups = groups;
   }
 
   /**
    * @param groupNames
    */
-  public List<Group> getGroupsByNames(final List<String> names) {
-    final List<Group> groups = new ArrayList<Group>();
+  public Set<Group> getGroupsByNames(final Collection<String> names) {
+    final Set<Group> groups = new HashSet<Group>();
     for (final String name : names) {
       final Group group = getGroupByName(name);
       if (group != null) {
@@ -59,7 +60,7 @@ public final class WroModel {
    * @throws runtime
    *           exception if group is not found.
    */
-  private Group getGroupByName(final String name) {
+  public Group getGroupByName(final String name) {
     for (final Group group : groups) {
       if (name.equals(group.getName())) {
         return group;

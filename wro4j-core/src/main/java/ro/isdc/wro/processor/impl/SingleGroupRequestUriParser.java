@@ -3,10 +3,6 @@
  */
 package ro.isdc.wro.processor.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,25 +20,22 @@ public final class SingleGroupRequestUriParser implements RequestUriParser {
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
-  public List<String> getGroupNames(final String uri) {
+  public String getGroupName(final String uri) {
     if (uri == null) {
       throw new IllegalArgumentException("Uri cannot be null!");
     }
-    final List<String> groupNames = new ArrayList<String>();
+    String groupName = null;
     try {
       // find last dot & get extension (js & css)
       final int lastDot = uri.lastIndexOf('.');
       final String beforeDot = uri.substring(0, lastDot);
       final int lastSlash = beforeDot.lastIndexOf('/');
-      final String groupName = beforeDot.substring(lastSlash + 1, beforeDot
+      groupName = beforeDot.substring(lastSlash + 1, beforeDot
           .length());
-      groupNames.add(groupName);
     } catch (final IndexOutOfBoundsException e) {
       LOG.warn("No group defined in uri: '" + uri + "'");
-      return Collections.EMPTY_LIST;
     }
-    return groupNames;
+    return groupName;
   }
 
   /**

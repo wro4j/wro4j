@@ -163,6 +163,8 @@ public class WroFilter
   /**
    * {@inheritDoc}
    */
-  public void destroy() {}
+  public void destroy() {
+    wroManagerFactory.destroy();
+  }
 
 }

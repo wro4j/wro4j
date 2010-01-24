@@ -4,7 +4,6 @@
 package ro.isdc.wro.processor;
 
 import java.util.Collection;
-import java.util.List;
 
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.resource.ResourceType;
@@ -18,7 +17,7 @@ import ro.isdc.wro.resource.UriLocatorFactory;
  */
 public interface GroupsProcessor {
   /**
-   * Process a list of groups by type.
+   * Process a collection of groups by type.
    *
    * @param groups
    *          to process.
@@ -26,7 +25,7 @@ public interface GroupsProcessor {
    *          to process.
    * @return processed content as string.
    */
-  String process(final List<Group> groups, final ResourceType type);
+  String process(final Collection<Group> groups, final ResourceType type);
 
   /**
    * @param uriLocatorFactory {@link UriLocatorFactory} to set.
