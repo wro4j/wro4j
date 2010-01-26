@@ -113,7 +113,7 @@ public class XmlModelFactory
   /**
    * Scheduled executors service, used to refresh the WroModel.
    */
-  private ScheduledExecutorService executorService;
+  private ScheduledExecutorService scheduler;
 
   /**
    * {@inheritDoc}
@@ -137,12 +137,12 @@ public class XmlModelFactory
    * DEVELOPMENT mode and each half an hour in DEPLOYMENT mode.
    */
   private void initExecutor() {
-    if (executorService == null) {
-      executorService = Executors.newSingleThreadScheduledExecutor();
+    if (scheduler == null) {
+      scheduler = Executors.newSingleThreadScheduledExecutor();
       //TODO make timing configurable depending on some configuration
       final long period = Context.get().isDevelopmentMode() ? 5 : 5;
       //Run a scheduled task which updates the model
-      executorService.scheduleAtFixedRate(new Runnable() {
+      scheduler.scheduleAtFixedRate(new Runnable() {
         public void run() {
 					try {
 						model = newModel();
@@ -367,6 +367,6 @@ public class XmlModelFactory
    */
   public void destroy() {
     //kill running threads
-    executorService.shutdownNow();
+    scheduler.shutdownNow();
   }
 }

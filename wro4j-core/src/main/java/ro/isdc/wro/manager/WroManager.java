@@ -81,7 +81,7 @@ public final class WroManager {
   /**
    * Scheduled executors service, used to update the output result.
    */
-  private ScheduledExecutorService executorService;
+  private ScheduledExecutorService scheduler;
 
   /**
    * Perform processing of the uri.
@@ -175,32 +175,33 @@ public final class WroManager {
    * @param model
    */
   private void initExecutorService(final WroModel model) {
-    if (executorService == null) {
-      executorService = Executors.newSingleThreadScheduledExecutor();
+    if (scheduler == null) {
+      scheduler = Executors.newSingleThreadScheduledExecutor();
       //TODO make timing configurable depending on some configuration
       final long period = Context.get().isDevelopmentMode() ? 3 : 3;//60 * 60 * 3;
-      //Run a scheduled task which updates the model
-      executorService.scheduleAtFixedRate(new Runnable() {
-        public void run() {
-        	try {
-          LOG.info("reloading cache with period: " + period);
-          // process groups & put update cache
-          final Collection<Group> groups = model.getGroups();
-          LOG.info("processing groups for cache: " + groups);
-          //update cache for all resources
-          for (final Group group : groups) {
-            for (final ResourceType resourceType : ResourceType.values()) {
-              if (group.hasResourcesOfType(resourceType)) {
-                final Collection<Group> singleGroupCollection = new HashSet<Group>();
-                singleGroupCollection.add(group);
-                final String result = groupsProcessor.process(singleGroupCollection, resourceType);
-                cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
-              }
-            }
-          }
-          } catch (final Exception e) {
-          	LOG.error("Exception occured: ", e);
-          }
+			// Run a scheduled task which updates the model
+			scheduler.scheduleAtFixedRate(new Runnable() {
+				public void run() {
+					try {
+						LOG.info("reloading cache with period: " + period);
+						// process groups & put update cache
+						final Collection<Group> groups = model.getGroups();
+						LOG.info("processing groups for cache: " + groups);
+						// update cache for all resources
+						for (final Group group : groups) {
+							for (final ResourceType resourceType : ResourceType.values()) {
+								if (group.hasResourcesOfType(resourceType)) {
+									final Collection<Group> groupAsList = new HashSet<Group>();
+									groupAsList.add(group);
+									final String result = groupsProcessor.process(groupAsList, resourceType);
+									cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
+								}
+							}
+						}
+					} catch (final Exception e) {
+						//Catch all exception in order to avoid situation when scheduler runs out of threads.
+						LOG.error("Exception occured: ", e);
+					}
         }
       }, 0, period, TimeUnit.SECONDS);
 		}
@@ -306,6 +307,6 @@ public final class WroManager {
   public void destroy() {
     LOG.debug("WroManager destroyed");
     cacheStrategy.destroy();
-    executorService.shutdownNow();
+    scheduler.shutdownNow();
   }
 }
