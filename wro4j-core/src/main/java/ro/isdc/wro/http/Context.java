@@ -3,6 +3,10 @@
  */
 package ro.isdc.wro.http;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +27,7 @@ public class Context {
   /**
    * Thread local holding CURRENT context.
    */
-  private static final ThreadLocal<Context> CURRENT = new ThreadLocal<Context>();
+  private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
 
   /**
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
@@ -48,6 +52,10 @@ public class Context {
    * Request.
    */
   private final HttpServletRequest request;
+  /**
+   * The uri of the request. This is used because the inherited thread local doesn't preserve
+   */
+  private final String requestURI;
   /**
    * Response.
    */
@@ -81,6 +89,23 @@ public class Context {
     return context;
   }
 
+  public static void main(final String[] args) throws Exception {
+		final ThreadLocal<Integer> t = new InheritableThreadLocal<Integer>();
+		t.set(10);
+		System.out.println("main: " + t.get());
+		final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+		executorService.scheduleWithFixedDelay(new Runnable() {
+			public void run() {
+				System.out.println("executorThread: " + t.get());
+			}
+		}, 0, 1, TimeUnit.SECONDS);
+		System.out.println("main, setting to null: " + t.get());
+		t.set(null);
+		System.out.println("main: " + t.get());
+		Thread.sleep(10000);
+		//executorService.shutdownNow();
+	}
+
   /**
    * Associate a context with the CURRENT request cycle.
    *
@@ -108,6 +133,7 @@ public class Context {
     this.response = null;
     this.servletContext = null;
     this.filterConfig = null;
+    this.requestURI = null;
   }
 
   /**
@@ -115,6 +141,7 @@ public class Context {
    */
   public Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
     this.request = request;
+    this.requestURI = request.getRequestURI();
     this.response = response;
     this.servletContext = filterConfig.getServletContext();
     this.filterConfig = filterConfig;
@@ -126,6 +153,13 @@ public class Context {
   public HttpServletRequest getRequest() {
     return this.request;
   }
+
+  /**
+	 * @return the requestURI
+	 */
+	public String getRequestURI() {
+		return requestURI;
+	}
 
   /**
    * @return the response

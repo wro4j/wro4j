@@ -6,6 +6,7 @@ package ro.isdc.wro.processor.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.http.Context;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
@@ -121,15 +123,15 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
 
   /**
    * Prefix of the classpath resource.
-   * TODO deprecate
    * @deprecated
    */
   @Deprecated
 	private static final String PREFIX_DOT = ":";
   /**
+   * This
    * A set of allowed url's.
    */
-  private Set<String> allowedUrls = new HashSet<String>();
+  private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
   /**
    * {@inheritDoc}
    */
@@ -220,21 +222,23 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
     int idxLastSeparator = cssUri.lastIndexOf(ServletContextUriLocator.PREFIX);
     if (idxLastSeparator == -1) {
       if (ClasspathUriLocator.isValid(cssUri)) {
-        // try with ':' character for classpathResource case
-      	//TODO use ClasspathUriLocator.PATH instead?
-        idxLastSeparator = cssUri.lastIndexOf(PREFIX_DOT);
+        idxLastSeparator = cssUri.lastIndexOf(ClasspathUriLocator.PREFIX);
+        //find the index of ':' character used by classpath prefix
+        if (idxLastSeparator >= 0) {
+        	idxLastSeparator += ClasspathUriLocator.PREFIX.length() - 1;
+        }
       }
       if (idxLastSeparator < 0) {
         throw new IllegalStateException("Invalid cssUri: " + cssUri
             + ". Should contain at least one '/' character!");
       }
-    }
-    final String cssUriFolder = cssUri.substring(0, idxLastSeparator + 1);
-    // remove '/' from imageUrl if it starts with one.
-    final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX) ? cleanImageUrl
-        .substring(1)
-        : cleanImageUrl;
-    return cssUriFolder + processedImageUrl;
+		}
+		final String cssUriFolder = cssUri.substring(0, idxLastSeparator + 1);
+		// remove '/' from imageUrl if it starts with one.
+		final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX)
+			? cleanImageUrl.substring(1)
+			: cleanImageUrl;
+		return cssUriFolder + processedImageUrl;
   }
 
   /**
@@ -277,6 +281,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
-    return WroUtil.getRequestUriPath() + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
+  	final String requestURI = Context.get().getRequestURI();
+  	return WroUtil.getFolderOfUri(requestURI)  + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
   }
 }

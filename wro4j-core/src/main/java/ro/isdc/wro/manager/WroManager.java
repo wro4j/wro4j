@@ -177,13 +177,12 @@ public final class WroManager {
   private void initExecutorService(final WroModel model) {
     if (executorService == null) {
       executorService = Executors.newSingleThreadScheduledExecutor();
-      LOG.debug("executorService.isShutdown() " + executorService.isShutdown());
-      LOG.debug("executorService.isTerminated() " + executorService.isTerminated());
       //TODO make timing configurable depending on some configuration
-      final long period = Context.get().isDevelopmentMode() ? 3 : 10;//60 * 60 * 3;
+      final long period = Context.get().isDevelopmentMode() ? 3 : 3;//60 * 60 * 3;
       //Run a scheduled task which updates the model
       executorService.scheduleAtFixedRate(new Runnable() {
         public void run() {
+        	try {
           LOG.info("reloading cache with period: " + period);
           // process groups & put update cache
           final Collection<Group> groups = model.getGroups();
@@ -198,7 +197,9 @@ public final class WroManager {
                 cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
               }
             }
-            LOG.info("Cache udpated for group: " + group);
+          }
+          } catch (final Exception e) {
+          	LOG.error("Exception occured: ", e);
           }
         }
       }, 0, period, TimeUnit.SECONDS);

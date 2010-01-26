@@ -118,12 +118,13 @@ public class CssImportPreProcessor
     return result;
   }
 
-  /**
-   * Computes absolute url of the imported resource.
-   * @param relativeResource {@link Resource} where the import statement is found.
-   * @param importUrl found import url.
-   * @return absolute url of the resource to import.
-   */
+	/**
+	 * Computes absolute url of the imported resource.
+	 *
+	 * @param relativeResource {@link Resource} where the import statement is found.
+	 * @param importUrl found import url.
+	 * @return absolute url of the resource to import.
+	 */
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
     final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
     final String absoluteImportUrl = folder + importUrl;

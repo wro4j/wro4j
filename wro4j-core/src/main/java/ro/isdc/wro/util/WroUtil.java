@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.Context;
 import ro.isdc.wro.http.HttpHeader;
 
 /**
@@ -49,18 +48,13 @@ public final class WroUtil {
   }
 
   /**
-   * @return the request uri path - the part until the last / character. For
-   *         instance if request uri is: /app/wro/all.css => /app/wro/
-   */
-  public static String getRequestUriPath() {
-    return getFolderOfUri(Context.get().getRequest().getRequestURI());
-  }
-
-  /**
    * @return folder path for some uri - the part until the last / character. For
    *         instance if request uri is: /app/wro/all.css => /app/wro/
    */
   public static String getFolderOfUri(final String uri) {
+  	if (uri == null) {
+  		throw new IllegalArgumentException("uri cannot be null!");
+  	}
     final int idxLastSeparator = uri.lastIndexOf('/');
     return uri.substring(0, idxLastSeparator + 1);
   }

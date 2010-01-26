@@ -140,13 +140,18 @@ public class XmlModelFactory
     if (executorService == null) {
       executorService = Executors.newSingleThreadScheduledExecutor();
       //TODO make timing configurable depending on some configuration
-      final long period = Context.get().isDevelopmentMode() ? 1 : 30;
+      final long period = Context.get().isDevelopmentMode() ? 5 : 5;
       //Run a scheduled task which updates the model
       executorService.scheduleAtFixedRate(new Runnable() {
         public void run() {
-          model = newModel();
+					try {
+						model = newModel();
+						LOG.info("WroModel updated!");
+					} catch (final Exception e) {
+        		LOG.error("Exception occured", e);
+        	}
         }
-      }, 0, period, TimeUnit.MINUTES);
+      }, 0, period, TimeUnit.SECONDS);
     }
   }
 
@@ -230,7 +235,7 @@ public class XmlModelFactory
    * @param document to parse.
    * @return {@link WroModel} object.
    */
-  private WroModel createModel() {
+  private synchronized WroModel createModel() {
     final WroModel model = new WroModel();
     final Set<Group> groups = new HashSet<Group>();
     for (final Element element : allGroupElements.values()) {
