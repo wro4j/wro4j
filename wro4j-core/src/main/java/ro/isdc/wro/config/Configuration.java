@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.util;
+package ro.isdc.wro.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
