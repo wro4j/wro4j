@@ -15,8 +15,8 @@ import ro.isdc.wro.resource.ResourceType;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class SingleGroupRequestUriParser implements RequestUriParser {
-  private static final Logger LOG = LoggerFactory.getLogger(SingleGroupRequestUriParser.class);
+public final class DefaultRequestUriParser implements RequestUriParser {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultRequestUriParser.class);
   /**
    * {@inheritDoc}
    */

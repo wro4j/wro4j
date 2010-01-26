@@ -13,7 +13,7 @@ import ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
-import ro.isdc.wro.processor.impl.SingleGroupRequestUriParser;
+import ro.isdc.wro.processor.impl.DefaultRequestUriParser;
 import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 
@@ -90,7 +90,7 @@ public class BaseWroManagerFactory implements WroManagerFactory {
    * @return {@link RequestUriParser} implementation.
    */
   protected RequestUriParser newRequestUriParser() {
-    return new SingleGroupRequestUriParser();
+    return new DefaultRequestUriParser();
   }
 
   /**

@@ -3,10 +3,6 @@
  */
 package ro.isdc.wro.http;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +21,8 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class Context {
   /**
-   * Thread local holding CURRENT context.
+   * Thread local holding CURRENT context. This instance is of {@link InheritableThreadLocal} type because threads
+   * created by this thread should be able to access the {@link Context}.
    */
   private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
 
@@ -39,15 +36,6 @@ public class Context {
    * Gzip resources configuration option.
    */
   private static final String PARAM_GZIP_RESOURCES = "gzipResources";
-///**
-//* DEBUG resources request parameter name.
-//*/
-//public static final String PARAM_DEBUG = "debug";
-
-  //  /**
-//   * Gzip resources request parameter name.
-//   */
-//  public static final String PARAM_GZIP = "gzip";
   /**
    * Request.
    */
@@ -68,6 +56,7 @@ public class Context {
    * FilterConfig.
    */
   private final FilterConfig filterConfig;
+
   /**
    * A context useful for running in non web context (standAlone applications).
    */
@@ -88,23 +77,6 @@ public class Context {
     }
     return context;
   }
-
-  public static void main(final String[] args) throws Exception {
-		final ThreadLocal<Integer> t = new InheritableThreadLocal<Integer>();
-		t.set(10);
-		System.out.println("main: " + t.get());
-		final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-		executorService.scheduleWithFixedDelay(new Runnable() {
-			public void run() {
-				System.out.println("executorThread: " + t.get());
-			}
-		}, 0, 1, TimeUnit.SECONDS);
-		System.out.println("main, setting to null: " + t.get());
-		t.set(null);
-		System.out.println("main: " + t.get());
-		Thread.sleep(10000);
-		//executorService.shutdownNow();
-	}
 
   /**
    * Associate a context with the CURRENT request cycle.
@@ -186,12 +158,6 @@ public class Context {
    * @return true if debug parameter is present (this means that DEBUG or DEVELOPMENT mode is used).
    */
   public boolean isDevelopmentMode() {
-    //TODO read initParam from filter config?
-//    final String debugParam = getRequest().getParameter(PARAM_DEBUG);
-//    if (debugParam != null) {
-//      return Boolean.valueOf(debugParam);
-//    }
-    //TODO deprecate config using filter config?
     String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
     configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
     //TODO get rid of Configuration enum & simplify this logic
@@ -207,13 +173,6 @@ public class Context {
    */
   public final boolean isGzipEnabled() {
     boolean gzipResources = true;
-//    final String toGzipAsString = getRequest().getParameter(PARAM_GZIP);
-//    if (toGzipAsString != null) {
-//      gzipResources = Boolean.valueOf(toGzipAsString);
-//    } else {
-//      final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
-//      gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
-//    }
     final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     return gzipResources && WroUtil.headerContains(getRequest(), HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
