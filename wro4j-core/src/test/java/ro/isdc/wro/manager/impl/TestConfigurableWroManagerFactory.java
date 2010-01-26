@@ -13,8 +13,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.Context;
 
 /**
  * TestConfigurableWroManagerFactory.

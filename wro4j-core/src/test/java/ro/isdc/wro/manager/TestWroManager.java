@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.http.Context;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.impl.XmlModelFactory;
