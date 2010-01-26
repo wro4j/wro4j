@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.util.WroUtil;

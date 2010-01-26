@@ -34,9 +34,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
@@ -119,7 +119,7 @@ public class XmlModelFactory
    * {@inheritDoc}
    */
   public synchronized WroModel getInstance() {
-    initExecutor();
+    initScheduler();
     // use double-check locking
     if (model == null) {
       synchronized (this) {
@@ -133,26 +133,36 @@ public class XmlModelFactory
 
 
   /**
-   * Initialize executor service & start the thread responsible for updating the model. Updates the model each minute in
-   * DEVELOPMENT mode and each half an hour in DEPLOYMENT mode.
+   * Initialize executor service & start the thread responsible for updating the model.
    */
-  private void initExecutor() {
+  private void initScheduler() {
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
-      //TODO make timing configurable depending on some configuration
-      final long period = Context.get().isDevelopmentMode() ? 5 : 5;
-      //Run a scheduled task which updates the model
-      scheduler.scheduleAtFixedRate(new Runnable() {
-        public void run() {
-					try {
-						model = newModel();
-						LOG.info("WroModel updated!");
-					} catch (final Exception e) {
-        		LOG.error("Exception occured", e);
-        	}
-        }
-      }, 0, period, TimeUnit.SECONDS);
     }
+    //Shutdown if any are running, just to be sure we are starting fresh new task
+    scheduler.shutdown();
+    final long period = Context.get().getApplicationConfig().getModelUpdatePeriod();
+    if (period > 0) {
+      // Run a scheduled task which updates the model
+      scheduler.scheduleAtFixedRate(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
+    }
+  }
+
+
+  /**
+   * @return {@link Runnable} implementation which reloads the model when scheduled.
+   */
+  private Runnable getSchedulerRunnable() {
+    return new Runnable() {
+      public void run() {
+    		try {
+    			model = newModel();
+    			LOG.info("WroModel updated!");
+    		} catch (final Exception e) {
+      		LOG.error("Exception occured", e);
+      	}
+      }
+    };
   }
 
   /**

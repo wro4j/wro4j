@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.UnauthorizedRequestException;
 import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.Context;
 import ro.isdc.wro.model.Group;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelFactory;
@@ -147,7 +147,7 @@ public final class WroManager {
 		if (groupName == null) {
 		  throw new WroRuntimeException("No groups found for request: " + requestURI);
 		}
-		initExecutorService(model);
+		initScheduler(model);
 
 		// find processed result for a group
     final Group group = model.getGroupByName(groupName);
@@ -174,37 +174,46 @@ public final class WroManager {
   /**
    * @param model
    */
-  private void initExecutorService(final WroModel model) {
+  private void initScheduler(final WroModel model) {
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
-      //TODO make timing configurable depending on some configuration
-      final long period = Context.get().isDevelopmentMode() ? 3 : 3;//60 * 60 * 3;
-			// Run a scheduled task which updates the model
-			scheduler.scheduleAtFixedRate(new Runnable() {
-				public void run() {
-					try {
-						LOG.info("reloading cache with period: " + period);
-						// process groups & put update cache
-						final Collection<Group> groups = model.getGroups();
-						LOG.info("processing groups for cache: " + groups);
-						// update cache for all resources
-						for (final Group group : groups) {
-							for (final ResourceType resourceType : ResourceType.values()) {
-								if (group.hasResourcesOfType(resourceType)) {
-									final Collection<Group> groupAsList = new HashSet<Group>();
-									groupAsList.add(group);
-									final String result = groupsProcessor.process(groupAsList, resourceType);
-									cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
-								}
-							}
-						}
-					} catch (final Exception e) {
-						//Catch all exception in order to avoid situation when scheduler runs out of threads.
-						LOG.error("Exception occured: ", e);
-					}
-        }
-      }, 0, period, TimeUnit.SECONDS);
 		}
+    //Shutdown if any are running, just to be sure we are starting fresh new task
+    scheduler.shutdown();
+    final long period = Context.get().getApplicationConfig().getCacheUpdatePeriod();
+    if (period > 0) {
+      // Run a scheduled task which updates the model
+      scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
+    }
+  }
+
+  /**
+   * @param model
+   * @return
+   */
+  private Runnable getSchedulerRunnable(final WroModel model) {
+    return new Runnable() {
+    	public void run() {
+    		try {
+    			// process groups & put update cache
+    			final Collection<Group> groups = model.getGroups();
+    			// update cache for all resources
+    			for (final Group group : groups) {
+    				for (final ResourceType resourceType : ResourceType.values()) {
+    					if (group.hasResourcesOfType(resourceType)) {
+    						final Collection<Group> groupAsList = new HashSet<Group>();
+    						groupAsList.add(group);
+    						final String result = groupsProcessor.process(groupAsList, resourceType);
+    						cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
+    					}
+    				}
+    			}
+    		} catch (final Exception e) {
+    			//Catch all exception in order to avoid situation when scheduler runs out of threads.
+    			LOG.error("Exception occured: ", e);
+    		}
+      }
+    };
   }
 
 

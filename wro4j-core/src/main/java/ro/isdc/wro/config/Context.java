@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010. All rights reserved.
  */
-package ro.isdc.wro.http;
+package ro.isdc.wro.config;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -11,12 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import ro.isdc.wro.config.Configuration;
 import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.util.WroUtil;
+
 
 /**
  * Holds the properties related to a request cycle.
+ *
  * @author Alex Objelean
  */
 public class Context {
@@ -56,6 +58,10 @@ public class Context {
    * FilterConfig.
    */
   private final FilterConfig filterConfig;
+  /**
+   * Application Config.
+   */
+  private ApplicationConfig applicationConfig;
 
   /**
    * A context useful for running in non web context (standAlone applications).
@@ -119,6 +125,8 @@ public class Context {
     this.filterConfig = filterConfig;
   }
 
+
+
   /**
    * @return the request
    */
@@ -152,6 +160,20 @@ public class Context {
    */
   public FilterConfig getFilterConfig() {
     return this.filterConfig;
+  }
+
+  /**
+   * @return the applicationConfig
+   */
+  public ApplicationConfig getApplicationConfig() {
+    return this.applicationConfig;
+  }
+
+  /**
+   * @param applicationConfig the applicationConfig to set
+   */
+  public void setApplicationConfig(final ApplicationConfig applicationConfig) {
+    this.applicationConfig = applicationConfig;
   }
 
   /**

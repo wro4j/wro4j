@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.manager.impl;
 
-import ro.isdc.wro.http.Context;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModelFactory;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;

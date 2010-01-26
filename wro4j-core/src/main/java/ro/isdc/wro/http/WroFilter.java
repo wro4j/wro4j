@@ -4,10 +4,13 @@
 package ro.isdc.wro.http;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -20,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.ApplicationConfig;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -35,6 +40,9 @@ import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
  */
 public class WroFilter
   implements Filter {
+  /**
+   * Logger.
+   */
   private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
   /**
    * The name of the context parameter that specifies wroManager factory class
@@ -57,6 +65,8 @@ public class WroFilter
   private String cacheControlValue;
   private long expiresValue;
 
+  private ApplicationConfig applicationConfig;
+
 
   /**
    * {@inheritDoc}
@@ -66,7 +76,24 @@ public class WroFilter
     this.filterConfig = config;
     this.wroManagerFactory = getWroManagerFactory();
     initHeaderValues();
+    initJMX();
     doInit(config);
+  }
+
+
+  /**
+   * Expose MBean to tell JMX infrastructure about our MBean.
+   */
+  private void initJMX()
+    throws ServletException {
+    try {
+      applicationConfig = new ApplicationConfig();
+      final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+      final ObjectName name = new ObjectName(ApplicationConfig.getObjectName());
+      mbs.registerMBean(applicationConfig, name);
+    } catch (final Exception e) {
+      LOG.error("Exception occured while registering MBean", e);
+    }
   }
 
 
@@ -101,7 +128,9 @@ public class WroFilter
     final HttpServletResponse response = (HttpServletResponse)res;
 
     // add request, response & servletContext to thread local
-    Context.set(new Context(request, response, filterConfig));
+    final Context context = new Context(request, response, filterConfig);
+    context.setApplicationConfig(applicationConfig);
+    Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 
     if (!Context.get().isDevelopmentMode()) {
@@ -135,6 +164,7 @@ public class WroFilter
       response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
     }
   }
+
 
   /**
    * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.

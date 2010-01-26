@@ -5,7 +5,7 @@ package ro.isdc.wro.model.impl;
 
 import java.io.InputStream;
 
-import ro.isdc.wro.http.Context;
+import ro.isdc.wro.config.Context;
 
 /**
  * ServletContext aware Model factory implementation. This factory will run
