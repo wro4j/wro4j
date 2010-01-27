@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ApplicationConfig;
+import ro.isdc.wro.config.ApplicationSettings;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
@@ -65,7 +65,7 @@ public class WroFilter
   private String cacheControlValue;
   private long expiresValue;
 
-  private ApplicationConfig applicationConfig;
+  private ApplicationSettings applicationConfig;
 
 
   /**
@@ -87,9 +87,9 @@ public class WroFilter
   private void initJMX()
     throws ServletException {
     try {
-      applicationConfig = new ApplicationConfig();
+      applicationConfig = new ApplicationSettings();
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      final ObjectName name = new ObjectName(ApplicationConfig.getObjectName());
+      final ObjectName name = new ObjectName(ApplicationSettings.getObjectName());
       mbs.registerMBean(applicationConfig, name);
     } catch (final Exception e) {
       LOG.error("Exception occured while registering MBean", e);
@@ -129,7 +129,7 @@ public class WroFilter
 
     // add request, response & servletContext to thread local
     final Context context = new Context(request, response, filterConfig);
-    context.setApplicationConfig(applicationConfig);
+    context.setApplicationSettings(applicationConfig);
     Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 

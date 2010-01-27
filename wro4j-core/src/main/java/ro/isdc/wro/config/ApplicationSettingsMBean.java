@@ -8,7 +8,7 @@ package ro.isdc.wro.config;
 
  * @author Alex Objelean
  */
-public interface ApplicationConfigMBean {
+public interface ApplicationSettingsMBean {
   long getModelUpdatePeriod();
   void setModelUpdatePeriod(final long period);
   long getCacheUpdatePeriod();

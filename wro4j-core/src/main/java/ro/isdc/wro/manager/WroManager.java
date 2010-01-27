@@ -180,7 +180,7 @@ public final class WroManager {
 		}
     //Shutdown if any are running, just to be sure we are starting fresh new task
     scheduler.shutdown();
-    final long period = Context.get().getApplicationConfig().getCacheUpdatePeriod();
+    final long period = Context.get().getApplicationSettings().getCacheUpdatePeriod();
     if (period > 0) {
       // Run a scheduled task which updates the model
       scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
