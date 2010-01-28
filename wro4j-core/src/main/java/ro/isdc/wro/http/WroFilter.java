@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.http;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
@@ -24,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ApplicationSettings;
+import ro.isdc.wro.config.ApplicationSettingsChangeListener;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
@@ -65,7 +68,7 @@ public class WroFilter
   private String cacheControlValue;
   private long expiresValue;
 
-  private ApplicationSettings applicationConfig;
+  private ApplicationSettings applicationSettings;
 
 
   /**
@@ -87,17 +90,38 @@ public class WroFilter
   private void initJMX()
     throws ServletException {
     try {
-      applicationConfig = new ApplicationSettings();
+      applicationSettings = newApplicationSettings();
+      applicationSettings.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent evt) {
+					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
+						((ApplicationSettingsChangeListener)wroManagerFactory).onCachePeriodChanged();
+					}
+				}
+			});
+      applicationSettings.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
+				public void propertyChange(final PropertyChangeEvent evt) {
+					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
+						((ApplicationSettingsChangeListener)wroManagerFactory).onModelPeriodChanged();
+					}
+				}
+			});
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       final ObjectName name = new ObjectName(ApplicationSettings.getObjectName());
-      mbs.registerMBean(applicationConfig, name);
+      mbs.registerMBean(applicationSettings, name);
     } catch (final Exception e) {
       LOG.error("Exception occured while registering MBean", e);
     }
   }
 
-
   /**
+	 * @return {@link ApplicationSettings} configured object with default values set.
+	 */
+	private ApplicationSettings newApplicationSettings() {
+		return new ApplicationSettings();
+	}
+
+
+	/**
    * Initialize header values used for server-side resource caching.
    */
   private void initHeaderValues() {
@@ -129,7 +153,7 @@ public class WroFilter
 
     // add request, response & servletContext to thread local
     final Context context = new Context(request, response, filterConfig);
-    context.setApplicationSettings(applicationConfig);
+    context.setApplicationSettings(applicationSettings);
     Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 

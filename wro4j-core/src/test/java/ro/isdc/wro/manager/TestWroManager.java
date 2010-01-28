@@ -50,5 +50,6 @@ public class TestWroManager {
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(System.out));
     manager.process(request, response);
+    //manager.destroy();
   }
 }

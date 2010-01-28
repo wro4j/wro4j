@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.config.ApplicationSettingsChangeListener;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.UnauthorizedRequestException;
 import ro.isdc.wro.exception.WroRuntimeException;
@@ -47,7 +48,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class WroManager {
+public final class WroManager implements ApplicationSettingsChangeListener {
   /**
    * Logger for this class.
    */
@@ -240,6 +241,31 @@ public final class WroManager {
   }
 
 
+  /**
+   * {@inheritDoc}
+   */
+  public void onCachePeriodChanged() {
+  	initScheduler(modelFactory.getInstance());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onModelPeriodChanged() {
+  	if (modelFactory instanceof ApplicationSettingsChangeListener) {
+  		((ApplicationSettingsChangeListener)modelFactory).onModelPeriodChanged();
+  	}
+  }
+
+  /**
+   * Called when {@link WroManager} is being taken out of service.
+   */
+  public void destroy() {
+    LOG.debug("WroManager destroyed");
+    cacheStrategy.destroy();
+    scheduler.shutdownNow();
+  }
+
 	/**
 	 * Check if all dependencies are set.
 	 */
@@ -308,14 +334,5 @@ public final class WroManager {
    */
   public WroModelFactory getModelFactory() {
     return this.modelFactory;
-  }
-
-  /**
-   * Called when {@link WroManager} is being taken out of service.
-   */
-  public void destroy() {
-    LOG.debug("WroManager destroyed");
-    cacheStrategy.destroy();
-    scheduler.shutdownNow();
   }
 }

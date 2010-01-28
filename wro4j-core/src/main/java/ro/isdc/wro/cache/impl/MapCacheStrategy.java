@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.cache.impl;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import ro.isdc.wro.cache.CacheStrategy;
 
@@ -24,7 +24,7 @@ public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
    * Default constructor. Initialize the map.
    */
   public MapCacheStrategy() {
-    map = new HashMap<K, V>();
+    map = new WeakHashMap<K, V>();
   }
 
   /**

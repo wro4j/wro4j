@@ -34,6 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import ro.isdc.wro.config.ApplicationSettingsChangeListener;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
 import ro.isdc.wro.exception.WroRuntimeException;
@@ -52,7 +53,7 @@ import ro.isdc.wro.resource.ResourceType;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory {
+  implements WroModelFactory, ApplicationSettingsChangeListener {
   /**
    * Logger for this class.
    */
@@ -141,7 +142,6 @@ public class XmlModelFactory
     }
     //Shutdown if any are running, just to be sure we are starting fresh new task
     scheduler.shutdown();
-    System.out.println("ApplicationConfig: " + Context.get().getApplicationSettings());
     final long period = Context.get().getApplicationSettings().getModelUpdatePeriod();
     if (period > 0) {
       // Run a scheduled task which updates the model
@@ -371,6 +371,20 @@ public class XmlModelFactory
     final Validator validator = schema.newValidator();
     // validate the DOM tree
     validator.validate(new DOMSource(document));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onCachePeriodChanged() {
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onModelPeriodChanged() {
+  	//force scheduler to reload
+  	initScheduler();
   }
 
   /**

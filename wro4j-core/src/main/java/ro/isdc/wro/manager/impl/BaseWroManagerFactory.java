@@ -6,14 +6,15 @@ package ro.isdc.wro.manager.impl;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
+import ro.isdc.wro.config.ApplicationSettingsChangeListener;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModelFactory;
 import ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.RequestUriParser;
-import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.DefaultRequestUriParser;
+import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 
@@ -23,7 +24,7 @@ import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public class BaseWroManagerFactory implements WroManagerFactory {
+public class BaseWroManagerFactory implements WroManagerFactory, ApplicationSettingsChangeListener {
   /**
    * Manager instance. Using volatile keyword fix the problem with
    * double-checked locking in JDK 1.5.
@@ -77,6 +78,20 @@ public class BaseWroManagerFactory implements WroManagerFactory {
 
     manager.setCacheStrategy(newCacheStrategy());
     return manager;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onCachePeriodChanged() {
+  	manager.onCachePeriodChanged();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onModelPeriodChanged() {
+  	manager.onModelPeriodChanged();
   }
 
   /**
