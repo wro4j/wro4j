@@ -8,10 +8,10 @@
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-  <bean name="wro4j.wroManagerFactory" class="ro.isdc.wro.manager.impl.WroManagerFactoryImpl">
+  <bean name="wro4j.wroManagerFactory" class="ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory">
     <property name="wroManager">
       <bean class="ro.isdc.wro.manager.WroManager">
-        <property name="requestUriParser"><bean class="ro.isdc.wro.processor.impl.SingleGroupRequestUriParser"/></property>
+        <property name="requestUriParser"><bean class="ro.isdc.wro.processor.impl.DefaultRequestUriParser"/></property>
         <property name="modelFactory"><bean class="ro.isdc.wro.model.impl.ServletContextAwareXmlModelFactory"/></property>
         <property name="uriLocatorFactory">
           <bean class="ro.isdc.wro.resource.impl.UriLocatorFactoryImpl">
