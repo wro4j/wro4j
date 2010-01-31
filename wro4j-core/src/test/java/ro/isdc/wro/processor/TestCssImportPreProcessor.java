@@ -58,7 +58,7 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test2-input.css", "classpath:ro/isdc/wro/processor/cssImports/test2-output.css", arr);
   }
 
-  @Test
+  //@Test
   public void testRecursive() throws IOException {
     final String[] arr = new String[] {
       "classpath:ro/isdc/wro/processor/cssImports/test2-input.css"
