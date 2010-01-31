@@ -250,8 +250,8 @@
     </repository>  
   </repositories>
   <scm>
-    <connection>scm:git:git@github.com:alexo/wro4j.git</connection>
-    <url>scm:git:git://github.com/alexo/wro4j.git</url>
+    <!--<url>scm:git:git@github.com:alexo/wro4j.git</url>-->
+    <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
     <developerConnection>scm:git:git@github.com:alexo/wro4j.git</developerConnection>    
   </scm>
   <!--
