@@ -185,17 +185,6 @@
 			</plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.scm</groupId>
-            <artifactId>maven-scm-provider-gitexe</artifactId>
-            <version>1.1-db-1</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-scm-plugin</artifactId>
         <dependencies>
           <dependency>
@@ -250,9 +239,12 @@
     </repository>  
   </repositories>
   <scm>
-    <!--<url>scm:git:git@github.com:alexo/wro4j.git</url>-->
-    <connection>scm:git:git://github.com/alexo/wro4j.git/</connection>
+    <!--<url>scm:git:git@github.com:alexo/wro4j.git</url>
     <developerConnection>scm:git:git://github.com/alexo/wro4j.git/</developerConnection>    
+    -->
+    <connection>http://github.com/alexo/wro4j.git</connection>
+    <developerConnection>http://github.com/alexo/wro4j.git</developerConnection>    
+    <url>http://github.com/alexo/wro4j.git</url>
   </scm>
   <!--
 		<scm>
