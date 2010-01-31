@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
-	<version>1.1.3</version>
+	<version>1.1.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Web Resource Optimizer Parent</name>
 
@@ -242,8 +242,8 @@
     <!--<url>scm:git:git@github.com:alexo/wro4j.git</url>
     <developerConnection>scm:git:git://github.com/alexo/wro4j.git/</developerConnection>    
     -->
-    <connection>http://github.com/alexo/wro4j.git</connection>
-    <developerConnection>http://github.com/alexo/wro4j.git</developerConnection>    
+    <connection>scm:git:git@github.com:alexo/wro4j.git</connection>
+    <developerConnection>scm:git:git@github.com:alexo/wro4j.git</developerConnection>    
     <url>http://github.com/alexo/wro4j.git</url>
   </scm>
   <!--
