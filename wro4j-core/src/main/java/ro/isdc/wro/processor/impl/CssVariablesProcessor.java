@@ -132,7 +132,7 @@ public class CssVariablesProcessor
     final Matcher m = PATTERN_VARIABLES_DEFINITION.matcher(css);
     while (m.find()) {
       final String variablesBody = m.group(1);
-      LOG.debug("variables body: " + variablesBody);
+      //LOG.debug("variables body: " + variablesBody);
       //extract variables
       map.putAll(extractVariables(variablesBody));
       //remove variables definition
@@ -141,7 +141,7 @@ public class CssVariablesProcessor
     m.appendTail(sb);
 
     final String result = replaceVariables(sb.toString(), map);
-    LOG.debug("replaced variables: " + result);
+    //LOG.debug("replaced variables: " + result);
     return result;
   }
 

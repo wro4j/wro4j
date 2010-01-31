@@ -24,7 +24,7 @@ public final class UrlUriLocator implements UriLocator {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(UrlUriLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
 
   /**
    * {@inheritDoc}
@@ -58,9 +58,8 @@ public final class UrlUriLocator implements UriLocator {
     if (uri == null) {
       throw new IllegalArgumentException("uri cannot be NULL!");
     }
-    log.debug("Reading uri: " + uri);
+    LOG.debug("Reading uri: " + uri);
     final URL url = new URL(uri);
-    log.debug(url.getProtocol());
     return url.openStream();
   }
 }

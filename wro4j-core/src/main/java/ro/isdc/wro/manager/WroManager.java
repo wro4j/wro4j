@@ -165,7 +165,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
 	  }
 	  is = new ByteArrayInputStream(result.getBytes());
 		stopWatch.stop();
-		LOG.debug("WroManager process time: " + stopWatch.toString());
+		LOG.info("WroManager process time: " + stopWatch.toString());
     if (type != null) {
       response.setContentType(type.getContentType());
     }
@@ -178,10 +178,17 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
-		}
+      restartScheduler(model);
+    }
+  }
+
+  /**
+   * @param model
+   */
+  private void restartScheduler(final WroModel model) {
     //Shutdown if any are running, just to be sure we are starting fresh new task
-    scheduler.shutdown();
     final long period = Context.get().getApplicationSettings().getCacheUpdatePeriod();
+    LOG.debug("runing thread with period of " + period);
     if (period > 0) {
       // Run a scheduled task which updates the model
       scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
@@ -196,6 +203,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     return new Runnable() {
     	public void run() {
     		try {
+    		  LOG.debug("reloading cache");
     			// process groups & put update cache
     			final Collection<Group> groups = model.getGroups();
     			// update cache for all resources
@@ -245,7 +253,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-  	initScheduler(modelFactory.getInstance());
+    restartScheduler(modelFactory.getInstance());
   }
 
   /**

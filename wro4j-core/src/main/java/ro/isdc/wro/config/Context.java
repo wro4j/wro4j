@@ -186,7 +186,7 @@ public class Context {
     configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
     //TODO get rid of Configuration enum & simplify this logic
     final Configuration config = Configuration.of(configParam);
-    return config.isDevelopment();
+    return false && config.isDevelopment();
   }
 
   /**

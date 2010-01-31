@@ -23,7 +23,7 @@ import ro.isdc.wro.test.util.WroTestUtils;
 /**
  * AbstractWroTest.java.
  *
- * @author alexandru.objelean / ISDC! Romania
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public abstract class AbstractWroTest {

@@ -140,8 +140,6 @@ public class XmlModelFactory
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
     }
-    //Shutdown if any are running, just to be sure we are starting fresh new task
-    scheduler.shutdown();
     final long period = Context.get().getApplicationSettings().getModelUpdatePeriod();
     if (period > 0) {
       // Run a scheduled task which updates the model

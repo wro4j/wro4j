@@ -22,7 +22,7 @@ public final class ApplicationSettings extends NotificationBroadcasterSupport
 	/**
 	 * By default period values are 0, that means that the associated scheduler never runs.
 	 */
-  private long cacheUpdatePeriod;
+  private long cacheUpdatePeriod = 90;
   private long modelUpdatePeriod;
   /**
    * Gzip enable flag.
