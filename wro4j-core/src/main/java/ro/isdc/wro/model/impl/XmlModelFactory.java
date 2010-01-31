@@ -34,8 +34,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import ro.isdc.wro.config.ApplicationContext;
 import ro.isdc.wro.config.ApplicationSettingsChangeListener;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.model.Group;
@@ -140,7 +140,7 @@ public class XmlModelFactory
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
     }
-    final long period = Context.get().getApplicationSettings().getModelUpdatePeriod();
+    final long period = ApplicationContext.get().getApplicationSettings().getModelUpdatePeriod();
     if (period > 0) {
       // Run a scheduled task which updates the model
       scheduler.scheduleAtFixedRate(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);

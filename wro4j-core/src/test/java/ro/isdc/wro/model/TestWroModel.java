@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.ApplicationSettings;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.impl.XmlModelFactory;
 import ro.isdc.wro.resource.Resource;
@@ -33,7 +32,6 @@ public class TestWroModel {
   public void init() {
     final Context context = Mockito.mock(Context.class);
     Mockito.when(context.isDevelopmentMode()).thenReturn(true);
-    Mockito.when(context.getApplicationSettings()).thenReturn(new ApplicationSettings());
     Context.set(context);
   }
 

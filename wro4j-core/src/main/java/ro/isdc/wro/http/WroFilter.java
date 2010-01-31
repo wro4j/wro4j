@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.ApplicationContext;
 import ro.isdc.wro.config.ApplicationSettings;
 import ro.isdc.wro.config.ApplicationSettingsChangeListener;
 import ro.isdc.wro.config.Context;
@@ -91,6 +92,7 @@ public class WroFilter
     throws ServletException {
     try {
       applicationSettings = newApplicationSettings();
+      ApplicationContext.get().setSettings(applicationSettings);
       applicationSettings.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
 					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
@@ -153,7 +155,6 @@ public class WroFilter
 
     // add request, response & servletContext to thread local
     final Context context = new Context(request, response, filterConfig);
-    context.setApplicationSettings(applicationSettings);
     Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 

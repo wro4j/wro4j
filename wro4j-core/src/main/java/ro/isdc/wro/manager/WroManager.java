@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.config.ApplicationContext;
 import ro.isdc.wro.config.ApplicationSettingsChangeListener;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.UnauthorizedRequestException;
@@ -187,7 +188,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    */
   private void restartScheduler(final WroModel model) {
     //Shutdown if any are running, just to be sure we are starting fresh new task
-    final long period = Context.get().getApplicationSettings().getCacheUpdatePeriod();
+    final long period = ApplicationContext.get().getApplicationSettings().getCacheUpdatePeriod();
     LOG.debug("runing thread with period of " + period);
     if (period > 0) {
       // Run a scheduled task which updates the model

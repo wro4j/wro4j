@@ -10,17 +10,28 @@ package ro.isdc.wro.config;
  * @author Alex Objelean
  */
 public class ApplicationContext {
-	private static ThreadLocal<ApplicationContext> CURRENT = new ThreadLocal<ApplicationContext>();
 	/**
 	 * Settings associated with current context.
 	 */
 	private ApplicationSettings settings;
+  /**
+   * Singleton instance.
+   */
+  private static ApplicationContext INSTANCE;
 
+
+  /**
+   * Cannot instantiate this class. It is singleton.
+   */
+	private ApplicationContext() {
+	  //set default settings.
+	  settings = new ApplicationSettings();
+	}
 
 	/**
 	 * @return the settings
 	 */
-	public ApplicationSettings getSettings() {
+	public ApplicationSettings getApplicationSettings() {
 		return settings;
 	}
 
@@ -33,11 +44,10 @@ public class ApplicationContext {
 	}
 
 	public static ApplicationContext get() {
-		final ApplicationContext instance = CURRENT.get();
-		if (instance == null) {
-
+		if (INSTANCE == null) {
+		  INSTANCE = new ApplicationContext();
 		}
-		return instance;
+		return INSTANCE;
 	}
 
 }
