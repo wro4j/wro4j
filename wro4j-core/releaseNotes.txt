@@ -1,5 +1,3 @@
-branch: test
-
 # Versions 1.1.1 
 - Update GroupsProcessor - create add[Js/Css][Pre/Post/*]Processor method
 - ContentStripperResourceProcessor is not used anymore (buggy, considers http:// a comment which is stripped)
