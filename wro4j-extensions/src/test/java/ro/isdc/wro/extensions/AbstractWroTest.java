@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.extensions;
 
@@ -24,9 +24,7 @@ import ro.isdc.wro.test.util.WroTestUtils;
  * AbstractWroTest.java. TODO this class is a copy from core tests. Find a way
  * to reuse it.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public abstract class AbstractWroTest {
