@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ApplicationSettings;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.impl.XmlModelFactory;
@@ -30,7 +29,6 @@ public class TestXmlModelFactory {
   public void init() {
     final Context context = Mockito.mock(Context.class);
     Mockito.when(context.isDevelopmentMode()).thenReturn(true);
-    Mockito.when(context.getApplicationSettings()).thenReturn(new ApplicationSettings());
     Context.set(context);
   }
 

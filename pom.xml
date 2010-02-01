@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
@@ -135,6 +134,15 @@
 				</excludes>
 			</resource>
 		</resources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.0-beta-9</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>  
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -146,7 +154,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
+				<version>2.6</version>
+        <configuration>
 					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
@@ -174,12 +183,24 @@
 					</archive>
 				</configuration>
 			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>1.1-db-1</version>
+          </dependency>
+        </dependencies>
+      </plugin>      
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<configuration>
-					<tagBase>https://wro4j.googlecode.com/svn/tags</tagBase>
+					<!--<tagBase>git@github.com:alexo/wro4j.git</tagBase>-->
 					<autoVersionSubmodules>true</autoVersionSubmodules>
+          <preparationGoals>clean verify install</preparationGoals>
 				</configuration>
 				<version>2.0-beta-9</version>
 			</plugin>
@@ -190,7 +211,14 @@
 				<artifactId>wagon-webdav</artifactId>
 				<version>1.0-beta-2</version>
 			</extension>
-		</extensions>
+      <!--
+      <extension>
+        <groupId>org.jvnet.wagon-svn</groupId>
+        <artifactId>wagon-svn</artifactId>
+        <version>1.8</version>
+      </extension>
+      -->
+    </extensions>
 	</build>
 	<distributionManagement>
 		<repository>
@@ -204,7 +232,21 @@
 			<url>dav:https://wro4j.googlecode.com/svn/maven/repository-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<!--
+  <repositories>
+    <repository>
+      <id>don-asf-repository</id>
+      <url>http://people.apache.org/~mrdon/repository/</url>
+    </repository>  
+  </repositories>
+  <scm>
+    <!--<url>scm:git:git@github.com:alexo/wro4j.git</url>
+    <developerConnection>scm:git:git://github.com/alexo/wro4j.git/</developerConnection>    
+    -->
+    <connection>scm:git:git@github.com:alexo/wro4j.git</connection>
+    <developerConnection>scm:git:git@github.com:alexo/wro4j.git</developerConnection>    
+    <url>http://github.com/alexo/wro4j.git</url>
+  </scm>
+  <!--
 		<scm>
 		<connection>scm:svn:https://wro4j.googlecode.com/svn/tags/wro4j-parent-1.0.1</connection>
 		<developerConnection>scm:svn:https://wro4j.googlecode.com/svn/tags/wro4j-parent-1.0.1</developerConnection>

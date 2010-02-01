@@ -58,10 +58,6 @@ public class Context {
    * FilterConfig.
    */
   private final FilterConfig filterConfig;
-  /**
-   * Application Settings.
-   */
-  private ApplicationSettings applicationSettings;
 
   /**
    * A context useful for running in non web context (standAlone applications).
@@ -112,7 +108,6 @@ public class Context {
     this.servletContext = null;
     this.filterConfig = null;
     this.requestURI = null;
-    this.applicationSettings = new ApplicationSettings();
   }
 
   /**
@@ -124,10 +119,7 @@ public class Context {
     this.response = response;
     this.servletContext = filterConfig.getServletContext();
     this.filterConfig = filterConfig;
-    this.applicationSettings = new ApplicationSettings();
   }
-
-
 
   /**
    * @return the request
@@ -162,20 +154,6 @@ public class Context {
    */
   public FilterConfig getFilterConfig() {
     return this.filterConfig;
-  }
-
-  /**
-   * @return the applicationConfig
-   */
-  public ApplicationSettings getApplicationSettings() {
-    return this.applicationSettings;
-  }
-
-  /**
-   * @param applicationConfig the applicationConfig to set
-   */
-  public void setApplicationSettings(final ApplicationSettings applicationConfig) {
-    this.applicationSettings = applicationConfig;
   }
 
   /**
