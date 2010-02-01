@@ -43,11 +43,13 @@ public class ApplicationContext {
 		this.settings = settings;
 	}
 
+	/**
+	 * @return an instance of {@link ApplicationContext} singleton object.
+	 */
 	public static ApplicationContext get() {
 		if (INSTANCE == null) {
 		  INSTANCE = new ApplicationContext();
 		}
 		return INSTANCE;
 	}
-
 }

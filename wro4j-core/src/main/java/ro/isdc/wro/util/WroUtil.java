@@ -90,6 +90,14 @@ public final class WroUtil {
   }
 
   /**
+   * @param request {@link HttpServletRequest} object.
+   * @return true if this request support gzip encoding.
+   */
+  public static boolean isGzipSupported(final HttpServletRequest request) {
+    return headerContains(request, HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
+  }
+
+  /**
    * Checks if request contains the header value with a given value.
    * @param request to check
    * @param header name of the header to check

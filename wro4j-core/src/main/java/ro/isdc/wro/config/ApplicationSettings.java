@@ -8,8 +8,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.NotificationBroadcasterSupport;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
@@ -17,17 +15,21 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * Defines MBean which manage configuration.
  * @author Alex Objelean
  */
-public final class ApplicationSettings extends NotificationBroadcasterSupport
+public final class ApplicationSettings
   implements ApplicationSettingsMBean {
 	/**
 	 * By default period values are 0, that means that the associated scheduler never runs.
 	 */
-  private long cacheUpdatePeriod = 90;
+  private long cacheUpdatePeriod;
   private long modelUpdatePeriod;
   /**
    * Gzip enable flag.
    */
   private boolean gzipEnabled = true;
+  /**
+   * If true, we are running in DEVELOPMENT mode.
+   */
+  private boolean debug;
   /**
    * Listeners for the change of cache & model period properties.
    */
@@ -154,6 +156,20 @@ public final class ApplicationSettings extends NotificationBroadcasterSupport
 	public void registerCacheUpdatePeriodChangeListener(final PropertyChangeListener listener) {
 		cacheUpdatePeriodListeners.add(listener);
 	}
+
+  /**
+   * @return the debug
+   */
+  public boolean isDebug() {
+    return this.debug;
+  }
+
+  /**
+   * @param debug the debug to set
+   */
+  public void setDebug(final boolean debug) {
+    this.debug = debug;
+  }
 
   /**
    * {@inheritDoc}

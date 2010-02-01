@@ -105,7 +105,8 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     }
     OutputStream os = null;
     // append result to response stream
-    if (Context.get().isGzipEnabled()) {
+    if (ApplicationContext.get().getApplicationSettings().isGzipEnabled()
+      && WroUtil.isGzipSupported(Context.get().getRequest())) {
       os = getGzipedOutputStream(response);
     } else {
       os = response.getOutputStream();
@@ -157,9 +158,11 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     groupAsList.add(group);
 		String result = null;
 	  final CacheEntry cacheEntry = new CacheEntry(groupName, type);
+	  LOG.info("Searching cache entry: " + cacheEntry);
 	  // Cache based on uri
 	  result = cacheStrategy.get(cacheEntry);
 	  if (result == null) {
+	    LOG.info("Cache is empty. Perform processing");
 	    // process groups & put update cache
 	    result = groupsProcessor.process(groupAsList, type);
 	    cacheStrategy.put(cacheEntry, result);
@@ -179,22 +182,15 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
-      restartScheduler(model);
+      final long period = ApplicationContext.get().getApplicationSettings().getCacheUpdatePeriod();
+      LOG.info("runing thread with period of " + period);
+      if (period > 0) {
+        // Run a scheduled task which updates the model
+        scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
+      }
     }
   }
 
-  /**
-   * @param model
-   */
-  private void restartScheduler(final WroModel model) {
-    //Shutdown if any are running, just to be sure we are starting fresh new task
-    final long period = ApplicationContext.get().getApplicationSettings().getCacheUpdatePeriod();
-    LOG.debug("runing thread with period of " + period);
-    if (period > 0) {
-      // Run a scheduled task which updates the model
-      scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
-    }
-  }
 
   /**
    * @param model
@@ -204,7 +200,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     return new Runnable() {
     	public void run() {
     		try {
-    		  LOG.debug("reloading cache");
+    		  LOG.info("reloading cache");
     			// process groups & put update cache
     			final Collection<Group> groups = model.getGroups();
     			// update cache for all resources
@@ -254,7 +250,12 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-    restartScheduler(modelFactory.getInstance());
+    LOG.info("onCachePeriodChanged");
+    scheduler = null;
+    //flush the cache by destroying it.
+    cacheStrategy.clear();
+    //scheduler.submit(getSchedulerRunnable(modelFactory.getInstance()));
+//    restartScheduler(modelFactory.getInstance(), 100);
   }
 
   /**

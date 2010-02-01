@@ -28,7 +28,6 @@ public class TestXmlModelFactory {
   @Before
   public void init() {
     final Context context = Mockito.mock(Context.class);
-    Mockito.when(context.isDevelopmentMode()).thenReturn(true);
     Context.set(context);
   }
 

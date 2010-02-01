@@ -53,6 +53,16 @@ public class WroFilter
    */
   private static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
+   * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
+   * is used.
+   */
+  private static final String PARAM_CONFIGURATION = "configuration";
+
+  /**
+   * Gzip resources configuration option.
+   */
+  private static final String PARAM_GZIP_RESOURCES = "gzipResources";
+  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -115,11 +125,28 @@ public class WroFilter
     }
   }
 
+
   /**
-	 * @return {@link ApplicationSettings} configured object with default values set.
-	 */
+   * TODO allow configuration using some sort of property file?...
+   *
+   * @return {@link ApplicationSettings} configured object with default values set.
+   */
 	private ApplicationSettings newApplicationSettings() {
-		return new ApplicationSettings();
+		final ApplicationSettings settings = new ApplicationSettings();
+
+    final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
+    final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
+    settings.setGzipEnabled(gzipResources);
+
+    boolean debug = true;
+    final String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
+    if (configParam != null) {
+      if ("DEPLOYMENT".equalsIgnoreCase(configParam)) {
+        debug = false;
+      }
+    }
+    settings.setDebug(debug);
+    return settings;
 	}
 
 
@@ -158,7 +185,7 @@ public class WroFilter
     Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 
-    if (!Context.get().isDevelopmentMode()) {
+    if (!ApplicationContext.get().getApplicationSettings().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       if (etagValue.equals(ifNoneMatch)) {
         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -181,7 +208,7 @@ public class WroFilter
    * @param response {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    if (!Context.get().isDevelopmentMode()) {
+    if (!ApplicationContext.get().getApplicationSettings().isDebug()) {
       // Force resource caching as best as possible
       response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
