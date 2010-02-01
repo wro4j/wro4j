@@ -8,7 +8,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.impl.StandAloneWroManagerFactory;
+import ro.isdc.wro.model.WroModelFactory;
+import ro.isdc.wro.model.impl.XmlModelFactory;
 
 
 /**
