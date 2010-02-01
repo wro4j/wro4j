@@ -12,9 +12,9 @@
 		<module>wro4j-extensions</module>
 		<module>wro4j-test-utils</module>
 		<module>wro4j-examples</module>
-    <!--
+    <!---->
 		<module>wro4j-maven-plugin</module>
-	  -->
+	  
   </modules>
 
 	<dependencyManagement>
@@ -29,13 +29,18 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>wro4j-extensions</artifactId>
 				<version>${project.version}</version>
-			</dependency>
+			</dependency>    
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>wro4j-test-utils</artifactId>
 				<version>${project.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>wro4j-maven-plugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>      
 			<!-- Other Dependencies -->
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -232,12 +237,14 @@
 			<url>dav:https://wro4j.googlecode.com/svn/maven/repository-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
+  <!--
   <repositories>
     <repository>
       <id>don-asf-repository</id>
       <url>http://people.apache.org/~mrdon/repository/</url>
     </repository>  
   </repositories>
+  -->
   <scm>
     <!--<url>scm:git:git@github.com:alexo/wro4j.git</url>
     <developerConnection>scm:git:git://github.com/alexo/wro4j.git/</developerConnection>    
