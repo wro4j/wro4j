@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +67,7 @@ public class CssImportPreProcessor
    */
   private String parseCss(final Resource resource, final Reader reader) throws IOException {
     final Stack<Resource> stack = new Stack<Resource>();
-    final LinkedList<Resource> resourcesList = new LinkedList<Resource>();
+    final List<Resource> resourcesList = new LinkedList<Resource>();
     final String result = parseImports(resource, reader, stack, resourcesList);
     //prepend entire list of resources
     for (final Resource importedResource : resourcesList) {
@@ -80,7 +81,7 @@ public class CssImportPreProcessor
    * TODO update javadoc
    */
   private String parseImports(final Resource resource, final Reader reader,
-    final Stack<Resource> stack, final LinkedList<Resource> resourcesList)
+    final Stack<Resource> stack, final List<Resource> resourcesList)
     throws IOException {
     //check recursivity
     //TODO find a correct way for handling recursivity
@@ -97,13 +98,18 @@ public class CssImportPreProcessor
       final String absoluteImportUrl = computeAbsoluteUrl(resource, importUrl);
       final UriLocator uriLocator = uriLocatorFactory.getInstance(absoluteImportUrl);
       final Resource importResource = Resource.create(absoluteImportUrl, ResourceType.CSS);
-      stack.push(importResource);
-      try {
-        final Reader importReader = new InputStreamReader(uriLocator.locate(importResource.getUri()));
-        parseImports(importResource, importReader, stack, resourcesList);
-        resourcesList.add(stack.pop());
-      } catch (final IOException e) {
-        LOG.warn("Invalid imported resource: " + importResource + " located in: " + resource);
+      if (resource.equals(importResource)) {
+        LOG.warn("Recursivity detected for resource: " + resource);
+      } else {
+        stack.push(importResource);
+
+        try {
+          final Reader importReader = new InputStreamReader(uriLocator.locate(importResource.getUri()));
+          parseImports(importResource, importReader, stack, resourcesList);
+          resourcesList.add(stack.pop());
+        } catch (final IOException e) {
+          LOG.warn("Invalid imported resource: " + importResource + " located in: " + resource);
+        }
       }
       m.appendReplacement(sb, "");
     }

@@ -58,14 +58,28 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test2-input.css", "classpath:ro/isdc/wro/processor/cssImports/test2-output.css", arr);
   }
 
+  /**
+   * Checks a situation when the css contains an import to itself.
+   * @throws IOException
+   */
   @Test
   public void testRecursive() throws IOException {
     final String[] arr = new String[] {
-      "classpath:ro/isdc/wro/processor/cssImports/test2-input.css"
+      "classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css"
     };
     genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css", "classpath:ro/isdc/wro/processor/cssImports/testRecursive-output.css", arr);
   }
 
+  /**
+   * Level 2 recursivity test. When a referred css contain an import to original css.
+   */
+  @Test
+  public void testRecursive1() throws IOException {
+    final String[] arr = new String[] {
+      "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css"
+    };
+    genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css", "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-output.css", arr);
+  }
 
   /**
    * @param inputUri the uri of the input css to process.
