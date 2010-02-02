@@ -78,12 +78,6 @@ public class CssImportPreProcessor
 
   /**
    * TODO update javadoc
-   * @param resource
-   * @param reader
-   * @param stack
-   * @param resourcesList
-   * @return
-   * @throws IOException
    */
   private String parseImports(final Resource resource, final Reader reader,
     final Stack<Resource> stack, final LinkedList<Resource> resourcesList)

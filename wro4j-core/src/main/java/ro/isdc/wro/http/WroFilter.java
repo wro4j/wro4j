@@ -146,6 +146,12 @@ public class WroFilter
       }
     }
     settings.setDebug(debug);
+    if (debug) {
+      //Every minute
+      settings.setCacheUpdatePeriod(60);
+      //Every ten minutes
+      settings.setModelUpdatePeriod(600);
+    }
     return settings;
 	}
 

@@ -48,6 +48,18 @@ public interface ApplicationSettingsMBean {
 	 */
 	void setGzipEnabled(final boolean enable);
 
+	/**
+	 * @return the state of debug flag.
+	 */
+	boolean isDebug();
+
+
+  /**
+   * Set the debug mode.
+   *
+   * @param debug if true, the wro4j will run in DEVELOPMENT MODE.
+   */
+	void setDebug(final boolean debug);
 
 	/**
 	 * Force reload of the cache.
