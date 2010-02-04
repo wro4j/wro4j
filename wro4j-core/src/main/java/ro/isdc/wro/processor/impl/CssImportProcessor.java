@@ -38,12 +38,12 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 @SupportedResourceType(type=ResourceType.CSS)
-public class CssImportPreProcessor
+public class CssImportProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * Logger for this class.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CssImportProcessor.class);
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.
    */

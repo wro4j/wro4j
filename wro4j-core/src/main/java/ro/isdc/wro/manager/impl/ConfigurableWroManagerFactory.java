@@ -18,6 +18,7 @@ import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.processor.impl.CssImportProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
@@ -87,6 +88,10 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private void initProcessors() {
     preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
+
+    final CssImportProcessor cssImportProcessor = new CssImportProcessor();
+    preProcessors.put("cssImport", cssImportProcessor);
+    postProcessors.put("cssImport", cssImportProcessor);
     postProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
     postProcessors.put("jsMin", new JSMinProcessor());

@@ -4,10 +4,12 @@
 package ro.isdc.wro.manager.impl;
 
 import ro.isdc.wro.processor.GroupsProcessor;
+import ro.isdc.wro.processor.impl.CssImportProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.JSMinProcessor;
+import ro.isdc.wro.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.resource.impl.ClasspathUriLocator;
 import ro.isdc.wro.resource.impl.ServletContextUriLocator;
@@ -31,7 +33,12 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPostProcessor(new JSMinProcessor());
-    //groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+
+    final CssImportProcessor cssImportProcessor = new CssImportProcessor();
+    groupProcessor.addPreProcessor(cssImportProcessor);
+    groupProcessor.addPostProcessor(cssImportProcessor);
+
     return groupProcessor;
   }
 

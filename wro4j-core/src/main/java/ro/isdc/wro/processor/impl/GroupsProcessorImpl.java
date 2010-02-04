@@ -45,10 +45,10 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    */
   public String process(final Collection<Group> groups, final ResourceType type) {
     if (groups == null) {
-      throw new NullPointerException("List of groups cannot be null!");
+      throw new IllegalArgumentException("List of groups cannot be null!");
     }
     if (type == null) {
-      throw new NullPointerException("ResourceType cannot be null!");
+      throw new IllegalArgumentException("ResourceType cannot be null!");
     }
     final List<Resource> filteredResources = getFilteredResources(groups, type);
     try {
