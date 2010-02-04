@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,9 +68,8 @@ public class CssImportPreProcessor
    * @param resource {@link Resource} where the parsed css resides.
    */
   private String parseCss(final Resource resource, final Reader reader) throws IOException {
-    final Stack<Resource> stack = new Stack<Resource>();
     final List<Resource> resourcesList = new LinkedList<Resource>();
-    final String result = parseImports(resource, reader, stack, resourcesList);
+    final String result = parseImports(resource, reader, new Stack<Resource>(), resourcesList);
     //prepend entire list of resources
     for (final Resource importedResource : resourcesList) {
       resource.prepend(importedResource);
@@ -76,6 +77,7 @@ public class CssImportPreProcessor
     LOG.debug("" + resourcesList);
     return result;
   }
+
 
   /**
    * TODO update javadoc
@@ -86,7 +88,75 @@ public class CssImportPreProcessor
     //check recursivity
     //TODO find a correct way for handling recursivity
     if (resourcesList.contains(resource)) {
-      LOG.warn("Recursivity detected for resource: " + resource);
+      LOG.warn("!!!RECURSIVITY : " + resource);
+      if (resourcesList.contains(resource)) {
+        LOG.warn("IN LIST");
+      } else {
+        LOG.warn("IN STACK");
+      }
+      return null;
+    }
+    final Set<Resource> importedResources = getImportedResources(resource, reader);
+    final StringBuffer sb = new StringBuffer();
+    for (final Resource imported : importedResources) {
+      if (resource.equals(imported)) {
+        LOG.warn("Recursivity detected for resource: " + resource);
+      } else {
+        stack.push(imported);
+        try {
+          final Reader importReader = getReaderForResource(imported);
+          parseImports(imported, importReader, stack, resourcesList);
+          final Resource processedImport = stack.pop();
+          resourcesList.add(processedImport);
+        } catch (final IOException e) {
+          LOG.warn("Invalid imported resource: " + imported + " located in: " + resource);
+        }
+      }
+    }
+    //LOG.debug("Appending stream: " + IOUtils.toString(getReaderForResource(resource)) + " for resource: " + resource);
+    sb.append(IOUtils.toString(getReaderForResource(resource)));
+    return sb.toString();
+  }
+
+  //we use this because a reader cannot be used twice for reading
+  private Reader getReaderForResource(final Resource imported)
+    throws IOException {
+    final UriLocator uriLocator = uriLocatorFactory.getInstance(imported.getUri());
+    final Reader importReader = new InputStreamReader(uriLocator.locate(imported.getUri()));
+    return importReader;
+  }
+
+  private Set<Resource> getImportedResources(final Resource resource, final Reader reader) throws IOException {
+    final Set<Resource> importSet = new HashSet<Resource>();
+    //Check if @Scanner#findWithinHorizon can be used instead
+    final String css = IOUtils.toString(reader);
+    final Matcher m = PATTERN.matcher(css);
+    while (m.find()) {
+      final Resource importedResource = buildImportedResource(resource, m);
+      //add and check if already exist
+      final boolean alreadyExist = !importSet.add(importedResource);
+      if (alreadyExist) {
+        LOG.warn("Duplicate imported resource: " + importedResource);
+      }
+    }
+    return importSet;
+  }
+
+  /**
+   * TODO update javadoc
+   */
+  private String parseImports1(final Resource resource, final Reader reader,
+    final Stack<Resource> stack, final List<Resource> resourcesList)
+    throws IOException {
+    //check recursivity
+    //TODO find a correct way for handling recursivity
+    if (stack.contains(resource)) {
+      LOG.warn("!!!RECURSIVITY : " + resource);
+      if (resourcesList.contains(resource)) {
+        LOG.warn("IN LIST");
+      } else {
+        LOG.warn("IN STACK");
+      }
       return null;
     }
     final StringBuffer sb = new StringBuffer();
@@ -98,6 +168,7 @@ public class CssImportPreProcessor
       final String absoluteImportUrl = computeAbsoluteUrl(resource, importUrl);
       final UriLocator uriLocator = uriLocatorFactory.getInstance(absoluteImportUrl);
       final Resource importResource = Resource.create(absoluteImportUrl, ResourceType.CSS);
+      LOG.debug("@IMPORT " + importResource);
       if (resource.equals(importResource)) {
         LOG.warn("Recursivity detected for resource: " + resource);
       } else {
@@ -118,6 +189,12 @@ public class CssImportPreProcessor
     return result;
   }
 
+  private Resource buildImportedResource(final Resource resource, final Matcher m) {
+    final String importUrl = m.group(1);
+    final String absoluteImportUrl = computeAbsoluteUrl(resource, importUrl);
+    final Resource importResource = Resource.create(absoluteImportUrl, ResourceType.CSS);
+    return importResource;
+  }
 	/**
 	 * Computes absolute url of the imported resource.
 	 *
@@ -127,7 +204,8 @@ public class CssImportPreProcessor
 	 */
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
     final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
-    final String absoluteImportUrl = folder + importUrl;
+    //normalize it
+    final String absoluteImportUrl = WroUtil.normalizePath(folder + importUrl);
     return absoluteImportUrl;
   }
 }
