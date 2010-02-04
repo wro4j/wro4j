@@ -4,7 +4,6 @@
 package ro.isdc.wro.resource;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 
 import ro.isdc.wro.model.Group;
 
@@ -135,6 +134,6 @@ public class Resource {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("type", type).append("uri", uri).toString();
+    return new ToStringBuilder(this).append("uri", uri).toString();
   }
 }

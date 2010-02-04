@@ -40,7 +40,6 @@ import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocator;
-import ro.isdc.wro.resource.UriLocatorFactory;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -68,7 +67,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   /**
    * UriLocatorFactory.
    */
-  private UriLocatorFactory uriLocatorFactory;
+//  private UriLocatorFactory uriLocatorFactory;
 
   /**
    * Groups processor.
@@ -233,7 +232,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
-    final UriLocator uriLocator = getUriLocatorFactory().getInstance(resourceId);
+    final UriLocator uriLocator = groupsProcessor.getUriLocatorFactory().getInstance(resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
@@ -289,9 +288,9 @@ public final class WroManager implements ApplicationSettingsChangeListener {
 		if (this.groupsProcessor == null) {
 			throw new WroRuntimeException("GroupProcessor was not set!");
 		}
-		if (this.uriLocatorFactory == null) {
-			throw new WroRuntimeException("uriLocatorFactory was not set!");
-		}
+//		if (this.uriLocatorFactory == null) {
+//			throw new WroRuntimeException("uriLocatorFactory was not set!");
+//		}
 		if (this.cacheStrategy == null) {
 			throw new WroRuntimeException("cacheStrategy was not set!");
 		}
@@ -318,12 +317,12 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     this.modelFactory = modelFactory;
   }
 
-  /**
-   * @param uriLocatorFactory the resourceLocatorFactory to set
-   */
-  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
-  }
+//  /**
+//   * @param uriLocatorFactory the resourceLocatorFactory to set
+//   */
+//  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+//    this.uriLocatorFactory = uriLocatorFactory;
+//  }
 
   /**
    * @param cacheStrategy the cache to set
@@ -331,13 +330,13 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
     this.cacheStrategy = cacheStrategy;
   }
-
-  /**
-   * @return the uriLocatorFactory
-   */
-  public final UriLocatorFactory getUriLocatorFactory() {
-    return uriLocatorFactory;
-  }
+//
+//  /**
+//   * @return the uriLocatorFactory
+//   */
+//  public final UriLocatorFactory getUriLocatorFactory() {
+//    return uriLocatorFactory;
+//  }
 
   /**
    * @return the modelFactory

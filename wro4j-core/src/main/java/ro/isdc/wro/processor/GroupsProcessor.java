@@ -33,6 +33,11 @@ public interface GroupsProcessor {
   void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory);
 
   /**
+   * @return {@link UriLocatorFactory} for this GroupsProcessor.
+   */
+  UriLocatorFactory getUriLocatorFactory();
+
+  /**
    * Provide a list of preProcessors to apply on any type of content.
    *
    * @param processors

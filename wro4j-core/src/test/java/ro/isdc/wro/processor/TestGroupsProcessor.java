@@ -120,6 +120,12 @@ public class TestGroupsProcessor {
       }
     });
   }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void cannotAcceptNullArguments() {
+    groupsProcessor.process(null, null);
+  }
+
   @Test
   public void injectAnnotationOnPostProcessorField() {
     final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
