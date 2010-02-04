@@ -168,6 +168,17 @@ public final class ApplicationSettings
    * @param debug the debug to set
    */
   public void setDebug(final boolean debug) {
+    if (debug) {
+      //Every minute
+      setCacheUpdatePeriod(60);
+      //Every ten minutes
+      setModelUpdatePeriod(600);
+    } else {
+      setCacheUpdatePeriod(0);
+      setModelUpdatePeriod(0);
+    }
+    reloadCache();
+    reloadModel();
     this.debug = debug;
   }
 

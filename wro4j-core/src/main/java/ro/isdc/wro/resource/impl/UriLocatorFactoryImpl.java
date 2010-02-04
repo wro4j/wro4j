@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.resource.impl;
 

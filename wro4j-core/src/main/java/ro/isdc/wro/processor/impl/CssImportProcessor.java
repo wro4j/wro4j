@@ -92,6 +92,11 @@ public class CssImportProcessor
     resourcesList.remove(resource);
     // prepend entire list of resources
     for (final Resource importedResource : resourcesList) {
+      // we should skip this because there is no other way to be sure that the processor prepended already these
+      // resources.
+      if (resource.getGroup().getResources().contains(importedResource)) {
+        break;
+      }
       resource.prepend(importedResource);
     }
     LOG.debug("" + resourcesList);
@@ -104,8 +109,6 @@ public class CssImportProcessor
    */
   private String parseImports(final Resource resource, final String resourceContent, final Stack<Resource> stack, final List<Resource> resourcesList)
     throws IOException {
-    // check recursivity
-    // TODO find a correct way for handling recursivity
     if (resourcesList.contains(resource) || stack.contains(resource)) {
       LOG.warn("RECURSIVITY detected for resource: " + resource);
       return null;
@@ -135,7 +138,9 @@ public class CssImportProcessor
     return sb.toString();
   }
 
-
+  /**
+   * @return the content of the resource as string.
+   */
   private String getResourceContent(final Resource resource)
     throws IOException {
     final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());

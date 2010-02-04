@@ -57,7 +57,10 @@ public class WroFilter
    * is used.
    */
   private static final String PARAM_CONFIGURATION = "configuration";
-
+  /**
+   * Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is assumed.
+   */
+  private static final String PARAM_DEPLOYMENT = "DEPLOYMENT";
   /**
    * Gzip resources configuration option.
    */
@@ -141,17 +144,11 @@ public class WroFilter
     boolean debug = true;
     final String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
     if (configParam != null) {
-      if ("DEPLOYMENT".equalsIgnoreCase(configParam)) {
+      if (PARAM_DEPLOYMENT.equalsIgnoreCase(configParam)) {
         debug = false;
       }
     }
     settings.setDebug(debug);
-    if (debug) {
-      //Every minute
-      settings.setCacheUpdatePeriod(60);
-      //Every ten minutes
-      settings.setModelUpdatePeriod(600);
-    }
     return settings;
 	}
 

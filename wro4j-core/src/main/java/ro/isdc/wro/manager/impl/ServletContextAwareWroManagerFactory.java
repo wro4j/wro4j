@@ -30,6 +30,7 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
   @Override
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
+    groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPostProcessor(new JSMinProcessor());
@@ -43,7 +44,7 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
   }
 
   /**
-   * {@inheritDoc}
+   * Creates a new {@link UriLocatorFactory} implementation.
    */
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {

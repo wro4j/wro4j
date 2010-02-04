@@ -66,15 +66,11 @@ public class BaseWroManagerFactory implements WroManagerFactory, ApplicationSett
   private WroManager newManager() {
     final WroManager manager = new WroManager();
 
-    final UriLocatorFactory uriLocatorFactory = newUriLocatorFactory();
-    manager.setUriLocatorFactory(uriLocatorFactory);
-
     manager.setRequestUriParser(newRequestUriParser());
     manager.setModelFactory(newModelFactory());
 
     final GroupsProcessor groupsProcessor = newGroupsProcessor();
     manager.setGroupsProcessor(groupsProcessor);
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
 
     manager.setCacheStrategy(newCacheStrategy());
     return manager;
