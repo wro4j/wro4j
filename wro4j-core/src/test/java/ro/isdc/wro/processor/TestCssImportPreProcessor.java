@@ -46,7 +46,7 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
       "classpath:ro/isdc/wro/processor/cssImports/css/import3.css",
       "classpath:ro/isdc/wro/processor/cssImports/test1-input.css"
     };
-    genericTest("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", "classpath:ro/isdc/wro/processor/cssImports/test1-output.css", arr);
+    genericTest("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", "classpath:ro/isdc/wro/processor/cssImports/test1-input.css", arr);
   }
 
   @Test
@@ -55,7 +55,7 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
       "classpath:ro/isdc/wro/processor/cssImports/css/import2.css",
       "classpath:ro/isdc/wro/processor/cssImports/test2-input.css"
     };
-    genericTest("classpath:ro/isdc/wro/processor/cssImports/test2-input.css", "classpath:ro/isdc/wro/processor/cssImports/test2-output.css", arr);
+    genericTest("classpath:ro/isdc/wro/processor/cssImports/test2-input.css", "classpath:ro/isdc/wro/processor/cssImports/test2-input.css", arr);
   }
 
   /**
@@ -67,7 +67,7 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     final String[] arr = new String[] {
       "classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css"
     };
-    genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css", "classpath:ro/isdc/wro/processor/cssImports/testRecursive-output.css", arr);
+    genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css", "classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css", arr);
   }
 
   /**
@@ -76,9 +76,10 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   @Test
   public void testRecursive1() throws IOException {
     final String[] arr = new String[] {
+      "classpath:ro/isdc/wro/processor/cssImports/css/recursive1.css",
       "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css"
     };
-    genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css", "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-output.css", arr);
+    genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css", "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css", arr);
   }
 
   /**
@@ -104,7 +105,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     for (final Resource r : resultResources) {
       actualUriList.add(r.getUri());
     }
-    //System.out.println(actualUriList);
     Assert.assertEquals(Arrays.asList(groupResourceUris), actualUriList);
   }
 
