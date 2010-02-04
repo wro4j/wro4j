@@ -26,6 +26,7 @@ import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
+import ro.isdc.wro.util.StringUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -182,7 +183,7 @@ public class CssImportPreProcessor
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
     final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
     //normalize it
-    final String absoluteImportUrl = WroUtil.normalizePath(folder + importUrl);
+    final String absoluteImportUrl = StringUtils.normalizePath(folder + importUrl);
     return absoluteImportUrl;
   }
 }

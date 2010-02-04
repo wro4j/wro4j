@@ -3,10 +3,7 @@
  */
 package ro.isdc.wro.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -109,8 +106,8 @@ public final class WroUtil {
    * @param value of the header to check
    */
   @SuppressWarnings("unchecked")
-  public static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
-    final Enumeration<String> accepted = request.getHeaders(header);
+  private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
+   final Enumeration<String> accepted = request.getHeaders(header);
     if (accepted != null) {
       while (accepted.hasMoreElements()) {
         final String headerValue = accepted.nextElement();
@@ -120,71 +117,5 @@ public final class WroUtil {
       }
     }
     return false;
-  }
-
-  /**
-   * Normalize the path by removing occurrences of "..".
-   *
-   * @param path to normalize.
-   * @return path string with double dots removed
-   */
-  public static String normalizePath(final String path) {
-    final List<String> newcomponents = new ArrayList<String>(Arrays.asList(path.split("/")));
-    for (int i = 0; i < newcomponents.size(); i++) {
-      if (i < newcomponents.size() - 1) {
-        // Verify for a ".." component at next iteration
-        if ((newcomponents.get(i)).length() > 0 && newcomponents.get(i + 1).equals("..")) {
-          newcomponents.remove(i);
-          newcomponents.remove(i);
-          i = i - 2;
-          if (i < -1) {
-            i = -1;
-          }
-        }
-      }
-    }
-    final String newpath = join("/", newcomponents.toArray(new String[0]));
-    if (path.endsWith("/")) {
-      return newpath + "/";
-    }
-    return newpath;
-  }
-
-
-  /**
-   * Joins string fragments using the specified separator
-   *
-   * @param separator
-   * @param fragments
-   * @return combined fragments
-   */
-  static String join(final String separator, final String... fragments) {
-    if (fragments.length < 1) {
-      // no elements
-      return "";
-    } else if (fragments.length < 2) {
-      // single element
-      return fragments[0];
-    } else {
-      // two or more elements
-      final StringBuffer buff = new StringBuffer(128);
-      if (fragments[0] != null) {
-        buff.append(fragments[0]);
-      }
-      for (int i = 1; i < fragments.length; i++) {
-        if ((fragments[i - 1] != null) || (fragments[i] != null)) {
-          final boolean lhsClosed = fragments[i - 1].endsWith(separator);
-          final boolean rhsClosed = fragments[i].startsWith(separator);
-          if (lhsClosed && rhsClosed) {
-            buff.append(fragments[i].substring(1));
-          } else if (!lhsClosed && !rhsClosed) {
-            buff.append(separator).append(fragments[i]);
-          } else {
-            buff.append(fragments[i]);
-          }
-        }
-      }
-      return buff.toString();
-    }
   }
 }
