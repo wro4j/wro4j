@@ -88,9 +88,9 @@ public class CssImportProcessor
    *
    * @param resource {@link Resource} where the parsed css resides.
    */
-  private String parseCss(final Resource resource, final Reader reader) throws IOException {
+  private void parseCss(final Resource resource, final Reader reader) throws IOException {
     final List<Resource> resourcesList = new ArrayList<Resource>();
-    final String result = parseImports(resource, getResourceContent(resource), new Stack<Resource>(), resourcesList);
+    parseImports(resource, new Stack<Resource>(), resourcesList);
     //remove currently processing resource
     resourcesList.remove(resource);
     // prepend entire list of resources
@@ -103,18 +103,17 @@ public class CssImportProcessor
       resource.prepend(importedResource);
     }
     LOG.debug("" + resourcesList);
-    return result;
   }
 
 
   /**
    * TODO update javadoc
    */
-  private String parseImports(final Resource resource, final String resourceContent, final Stack<Resource> stack, final List<Resource> resourcesList)
+  private void parseImports(final Resource resource, final Stack<Resource> stack, final List<Resource> resourcesList)
     throws IOException {
     if (resourcesList.contains(resource) || stack.contains(resource)) {
       LOG.warn("RECURSIVITY detected for resource: " + resource);
-      return null;
+      return;
     }
     LOG.debug("PUSH: " + resource);
     stack.push(resource);
@@ -126,7 +125,7 @@ public class CssImportProcessor
         if (resource.equals(imported)) {
           LOG.warn("Recursivity detected for resource: " + resource);
         } else {
-          parseImports(imported, getResourceContent(resource), stack, resourcesList);
+          parseImports(imported, stack, resourcesList);
         }
       } catch (final IOException e) {
         // remove invalid uri
@@ -137,8 +136,6 @@ public class CssImportProcessor
     final Resource r = stack.pop();
     LOG.debug("POP: " + r);
     resourcesList.add(r);
-    sb.append(resourceContent);
-    return sb.toString();
   }
 
   /**

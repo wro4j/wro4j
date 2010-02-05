@@ -94,6 +94,8 @@ public final class Group {
    * @param resourceToInsert new {@link Resource} to be inserted in the list.
    * @param resource before which the new {@link Resource} will be inserted.
    */
+  //do not allow model change once it was created
+  @Deprecated
   public final void insertResourceBefore(final Resource resourceToInsert, final Resource resource) {
     if (resourceToInsert == null) {
       throw new IllegalArgumentException("newResource cannot be NULL");

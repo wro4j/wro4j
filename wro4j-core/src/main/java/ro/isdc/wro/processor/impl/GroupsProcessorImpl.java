@@ -85,12 +85,8 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     //TODO find a way to process also resources which were added during iteration.
     for (final Resource resource : resourceList) {
       LOG.debug("\tmerging resource: " + resource);
-      // get original content
-      final Reader reader = getResourceReader(resource);
-      final String originalContent = IOUtils.toString(reader);
-      reader.close();
       // preProcessing
-      final String preProcessedContent = applyPreProcessors(resource, originalContent);
+      final String preProcessedContent = applyPreProcessors(resource);
       result.append(preProcessedContent);
     }
     return result.toString();
@@ -121,22 +117,17 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    *
    * @param resource
    *          {@link Resource} to pre process.
-   * @param processors
-   *          a list of processor to apply on the content from the supplied
-   *          writer.
-   * @param content
-   *          The content to preProcess as String.
    * @return the processed content as String.
    */
-  private String applyPreProcessors(final Resource resource, final String content)
+  private String applyPreProcessors(final Resource resource)
       throws IOException {
-    if (content == null) {
-      throw new NullPointerException("content cannot be null!");
+    if (resource == null) {
+      throw new NullPointerException("resource cannot be null!");
     }
     final Collection<ResourcePreProcessor> typeProcessors = getPreProcessorsByType(resource.getType());
-    Writer output = applyPreProcessors(typeProcessors, resource, content);
+    Writer output = applyPreProcessors(typeProcessors, resource);
     final Collection<ResourcePreProcessor> anyProcessors = getPreProcessorsByType(null);
-    output = applyPreProcessors(anyProcessors, resource, output.toString());
+    output = applyPreProcessors(anyProcessors, resource);
     return output.toString();
   }
 
@@ -153,8 +144,16 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     return output.toString();
   }
 
-  private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource, final String content)
+  /**
+   * Apply a list of preprocessors on a resource.
+   */
+  private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
     throws IOException {
+    // get original content
+    final Reader reader = getResourceReader(resource);
+    final String content = IOUtils.toString(reader);
+    reader.close();
+
   	if (processors.isEmpty()) {
       final Writer output = new StringWriter();
       output.write(content);

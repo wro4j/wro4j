@@ -97,7 +97,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     postProcessors.put("jsMin", new JSMinProcessor());
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);
-
   }
 
 
@@ -132,8 +131,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
    */
-  @Override
-  protected UriLocatorFactory newUriLocatorFactory() {
+  private UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
     final List<UriLocator> locators = getLocators();
     for (final UriLocator uriLocator : locators) {
@@ -148,10 +146,11 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessorImpl groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.setResourcePreProcessors(preProcessors.values());
-    groupProcessor.setResourcePostProcessors(postProcessors.values());
-    return groupProcessor;
+    final GroupsProcessorImpl groupsProcessor = new GroupsProcessorImpl();
+    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
+    groupsProcessor.setResourcePreProcessors(preProcessors.values());
+    groupsProcessor.setResourcePostProcessors(postProcessors.values());
+    return groupsProcessor;
   }
 
 

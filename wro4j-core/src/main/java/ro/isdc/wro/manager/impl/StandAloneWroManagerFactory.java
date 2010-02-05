@@ -46,18 +46,18 @@ public class StandAloneWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupProcessor.addPostProcessor(new JSMinProcessor());
-    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-    return groupProcessor;
+    final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
+    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
+    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+    groupsProcessor.addPostProcessor(new JSMinProcessor());
+    groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+    return groupsProcessor;
   }
 
   /**
    * {@inheritDoc}
    */
-  @Override
-  protected UriLocatorFactory newUriLocatorFactory() {
+  private UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
     // The order is important.
     factory.addUriLocator(new ServletContextUriLocator());

@@ -46,8 +46,7 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
   /**
    * Creates a new {@link UriLocatorFactory} implementation.
    */
-  @Override
-  protected UriLocatorFactory newUriLocatorFactory() {
+  private UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
     factory.addUriLocator(new ServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());

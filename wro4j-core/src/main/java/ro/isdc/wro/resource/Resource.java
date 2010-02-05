@@ -83,6 +83,7 @@ public class Resource {
    *
    * @param resource to prepend.
    */
+  @Deprecated
   public final void prepend(final Resource resource) {
     getGroup().insertResourceBefore(resource, this);
   }

@@ -15,8 +15,6 @@ import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.RequestUriParser;
 import ro.isdc.wro.processor.impl.DefaultRequestUriParser;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
-import ro.isdc.wro.resource.UriLocatorFactory;
-import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
 
 /**
  * A simple implementation of {@link WroManagerFactory} which doesn't define any processors or uriLocators.
@@ -116,16 +114,6 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    */
   protected GroupsProcessor newGroupsProcessor() {
     return new GroupsProcessorImpl();
-  }
-
-  /**
-   * Factory method for {@link UriLocatorFactory}. Create a factory and
-   * initialize the uriLocators to be used.
-   *
-   * @return UriLocatorFactory implementation.
-   */
-  protected UriLocatorFactory newUriLocatorFactory() {
-    return new UriLocatorFactoryImpl();
   }
 
   /**
