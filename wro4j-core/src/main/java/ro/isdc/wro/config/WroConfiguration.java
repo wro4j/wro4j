@@ -15,8 +15,8 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * Defines MBean which manage configuration.
  * @author Alex Objelean
  */
-public final class ApplicationSettings
-  implements ApplicationSettingsMBean {
+public final class WroConfiguration
+  implements WroConfigurationMBean {
 	/**
 	 * By default period values are 0, that means that the associated scheduler never runs.
 	 */
@@ -40,7 +40,7 @@ public final class ApplicationSettings
    * @return the name of the object used to register the MBean.
    */
   public static String getObjectName() {
-    return ApplicationSettings.class.getPackage().getName() + ".jmx:type=" + ApplicationSettings.class.getSimpleName();
+    return WroConfiguration.class.getPackage().getName() + ".jmx:type=" + WroConfiguration.class.getSimpleName();
   }
 
   /**

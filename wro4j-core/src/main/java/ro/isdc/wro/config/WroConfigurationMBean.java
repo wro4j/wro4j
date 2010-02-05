@@ -8,7 +8,7 @@ package ro.isdc.wro.config;
  *
  * @author Alex Objelean
  */
-public interface ApplicationSettingsMBean {
+public interface WroConfigurationMBean {
 	/**
 	 * @return period in seconds when the wro model (by default read from wro.xml) is updated.
 	 */

@@ -6,7 +6,7 @@ package ro.isdc.wro.manager.impl;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
-import ro.isdc.wro.config.ApplicationSettingsChangeListener;
+import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModelFactory;
@@ -24,7 +24,7 @@ import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public class BaseWroManagerFactory implements WroManagerFactory, ApplicationSettingsChangeListener {
+public class BaseWroManagerFactory implements WroManagerFactory, WroConfigurationChangeListener {
   /**
    * Manager instance. Using volatile keyword fix the problem with
    * double-checked locking in JDK 1.5.

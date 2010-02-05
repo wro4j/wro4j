@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.config.ApplicationContext;
-import ro.isdc.wro.config.ApplicationSettingsChangeListener;
+import ro.isdc.wro.config.ConfigurationContext;
+import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.UnauthorizedRequestException;
 import ro.isdc.wro.exception.WroRuntimeException;
@@ -48,7 +48,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class WroManager implements ApplicationSettingsChangeListener {
+public final class WroManager implements WroConfigurationChangeListener {
   /**
    * Logger for this class.
    */
@@ -104,7 +104,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     }
     OutputStream os = null;
     // append result to response stream
-    if (ApplicationContext.get().getApplicationSettings().isGzipEnabled()
+    if (ConfigurationContext.get().getApplicationSettings().isGzipEnabled()
       && WroUtil.isGzipSupported(Context.get().getRequest())) {
       os = getGzipedOutputStream(response);
     } else {
@@ -181,7 +181,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
       scheduler = Executors.newSingleThreadScheduledExecutor();
-      final long period = ApplicationContext.get().getApplicationSettings().getCacheUpdatePeriod();
+      final long period = ConfigurationContext.get().getApplicationSettings().getCacheUpdatePeriod();
       LOG.info("runing thread with period of " + period);
       if (period > 0) {
         // Run a scheduled task which updates the model
@@ -261,8 +261,8 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-  	if (modelFactory instanceof ApplicationSettingsChangeListener) {
-  		((ApplicationSettingsChangeListener)modelFactory).onModelPeriodChanged();
+  	if (modelFactory instanceof WroConfigurationChangeListener) {
+  		((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
   	}
   }
 
