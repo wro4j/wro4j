@@ -82,16 +82,15 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     if (iterator.hasNext()) {
       iterator.next();
     }
-    for (int i = 0; i < resourceList.size(); i++) {
-      final Resource resource = resourceList.get(i);
+    //TODO find a way to process also resources which were added during iteration.
+    for (final Resource resource : resourceList) {
       LOG.debug("\tmerging resource: " + resource);
-      String preProcessedContent = null;
       // get original content
       final Reader reader = getResourceReader(resource);
       final String originalContent = IOUtils.toString(reader);
       reader.close();
       // preProcessing
-      preProcessedContent = applyPreProcessors(resource, originalContent);
+      final String preProcessedContent = applyPreProcessors(resource, originalContent);
       result.append(preProcessedContent);
     }
     return result.toString();
@@ -154,12 +153,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     return output.toString();
   }
 
-  /**
-   * @param resource
-   * @param content
-   * @return
-   * @throws IOException
-   */
   private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource, final String content)
     throws IOException {
   	if (processors.isEmpty()) {

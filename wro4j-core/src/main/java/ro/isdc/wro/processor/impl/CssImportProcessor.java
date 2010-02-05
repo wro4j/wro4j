@@ -60,8 +60,11 @@ public class CssImportProcessor
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    final String result = parseCss(resource, reader);
-    writer.write(result);
+    LOG.debug("PROCESS: " + resource);
+    //TODO check if write is needed...
+    parseCss(resource, reader);
+    IOUtils.copy(reader, writer);
+//    writer.write(result);
     writer.close();
   }
 
@@ -187,7 +190,7 @@ public class CssImportProcessor
 	 */
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
     final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
-    //normalize it
+    //remove '../' & normalize the path.
     final String absoluteImportUrl = StringUtils.normalizePath(folder + importUrl);
     return absoluteImportUrl;
   }

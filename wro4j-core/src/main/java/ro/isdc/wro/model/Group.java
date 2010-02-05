@@ -11,7 +11,7 @@ import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
 
 /**
- * A group is an entity which gather a list of resources.
+ * A group is an entity holding a list of resources.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008

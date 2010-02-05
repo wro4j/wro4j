@@ -162,7 +162,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
 	  result = cacheStrategy.get(cacheEntry);
 	  if (result == null) {
 	    LOG.info("Cache is empty. Perform processing");
-	    // process groups & put update cache
+	    // process groups & put result in the cache
 	    result = groupsProcessor.process(groupAsList, type);
 	    cacheStrategy.put(cacheEntry, result);
 	  }
