@@ -18,6 +18,7 @@ import ro.isdc.wro.resource.Resource;
  * @created Created on Nov 19, 2008
  */
 public interface ResourcePreProcessor {
+  //TODO add a closure responsible for applying preprocessor on new resources instead of modifying the model.
   /**
    * Process a content supplied by a reader and perform some sort of processing.
    *
