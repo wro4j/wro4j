@@ -3,6 +3,11 @@
  */
 package ro.isdc.wro.processor.impl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +23,9 @@ import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.resource.UriLocator;
 import ro.isdc.wro.resource.UriLocatorFactory;
 
 /**
@@ -106,21 +113,36 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       final Field[] fields = processor.getClass().getDeclaredFields();
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
-          if (field.getType().equals(UriLocatorFactory.class)) {
-            //accept even private modifiers
-            field.setAccessible(true);
-            if (uriLocatorFactory == null) {
-              throw new WroRuntimeException("No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
-            }
-            field.set(processor, uriLocatorFactory);
-            LOG.debug("Successfully injected field: " + field.getName());
-          } else {
-            throw new WroRuntimeException("@Inject can be applied only on fiels of " + UriLocatorFactory.class.getName() + " type");
-          }
+          acceptAnnotation(processor, field);
         }
       }
     } catch (final Exception e) {
       throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
+    }
+  }
+
+
+  /**
+   * Analyze the field containing {@link Inject} annotation and set its value to appropriate value.
+   *
+   * @param processor an instance of processor which is the holder of the field.
+   * @param field {@link Field} object containing {@link Inject} annotation.
+   * @throws IllegalAccessException
+   */
+  private void acceptAnnotation(final Object processor, final Field field)
+    throws IllegalAccessException {
+    if (field.getType().equals(UriLocatorFactory.class)) {
+      //accept even private modifiers
+      field.setAccessible(true);
+      if (uriLocatorFactory == null) {
+        throw new WroRuntimeException("No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
+      }
+      field.set(processor, uriLocatorFactory);
+      LOG.debug("Successfully injected field: " + field.getName());
+    } else if (field.getType().equals(PreProcessorExecutor.class)) {
+      //TODO implement
+    } else {
+      throw new WroRuntimeException("@Inject can be applied only on fiels of " + UriLocatorFactory.class.getName() + " type");
     }
   }
 
@@ -208,4 +230,24 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   public void addPostProcessor(final ResourcePostProcessor processor) {
     postProcessors.add(processor);
   }
+
+  /**
+   * @param resource {@link Resource} for which a Reader should be returned.
+   * @return {@link Reader} for the resource.
+   * @throws IOException if there was a problem retrieving a reader.
+   * @throws WroRuntimeException if {@link Reader} is null.
+   */
+  protected final Reader getResourceReader(final Resource resource)
+    throws IOException {
+      final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+      final InputStream is = locator.locate(resource.getUri());
+      // wrap reader with bufferedReader for top efficiency
+      final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      if (reader == null) {
+        //TODO skip invalid resource, instead of throwing exception
+        throw new WroRuntimeException(
+            "Exception while retrieving InputStream from uri: " + resource.getUri());
+      }
+      return reader;
+    }
 }

@@ -18,6 +18,7 @@ import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
+import ro.isdc.wro.processor.impl.AbstractGroupsProcessor;
 import ro.isdc.wro.processor.impl.CssImportProcessor;
 import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesProcessor;
@@ -146,7 +147,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessorImpl groupsProcessor = new GroupsProcessorImpl();
+    final AbstractGroupsProcessor groupsProcessor = new GroupsProcessorImpl();
     groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
     groupsProcessor.setResourcePreProcessors(preProcessors.values());
     groupsProcessor.setResourcePostProcessors(postProcessors.values());

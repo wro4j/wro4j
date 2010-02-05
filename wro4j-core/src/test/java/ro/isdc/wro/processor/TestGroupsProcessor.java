@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.annot.Inject;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.model.Group;
+import ro.isdc.wro.processor.impl.AbstractGroupsProcessor;
 import ro.isdc.wro.processor.impl.CssImportProcessor;
 import ro.isdc.wro.processor.impl.CssMinProcessor;
 import ro.isdc.wro.processor.impl.CssVariablesProcessor;
@@ -40,7 +41,7 @@ import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
  * @created Created on Jan 5, 2010
  */
 public class TestGroupsProcessor {
-  private GroupsProcessorImpl groupsProcessor;
+  private AbstractGroupsProcessor groupsProcessor;
 
   @Before
   public void init() {

@@ -56,19 +56,6 @@ public class CssImportProcessor
     Pattern.CASE_INSENSITIVE); // works with 'URL('
 
   /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    LOG.debug("PROCESS: " + resource);
-    //TODO check if write is needed...
-    parseCss(resource, reader);
-    IOUtils.copy(reader, writer);
-//    writer.write(result);
-    writer.close();
-  }
-
-  /**
    * Remove all @import occurences.
    */
   public void process(final Reader reader, final Writer writer)
@@ -84,48 +71,73 @@ public class CssImportProcessor
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
+    LOG.debug("PROCESS: " + resource);
+    final String result = parseCss(resource, reader);
+    writer.write(result);
+    writer.close();
+  }
+
+  /**
    * Parse css, find all import statements.
    *
    * @param resource {@link Resource} where the parsed css resides.
    */
-  private void parseCss(final Resource resource, final Reader reader) throws IOException {
-    final List<Resource> resourcesList = new ArrayList<Resource>();
-    parseImports(resource, new Stack<Resource>(), resourcesList);
+  private String parseCss(final Resource resource, final Reader reader) throws IOException {
+    final StringBuffer sb = new StringBuffer();
+    final Collection<Resource> importsCollector = new ArrayList<Resource>();
+    parseImports(resource, importsCollector);
     //remove currently processing resource
-    resourcesList.remove(resource);
+    importsCollector.remove(resource);
     // prepend entire list of resources
-    for (final Resource importedResource : resourcesList) {
+    for (final Resource imported : importsCollector) {
+      //TODO fix this & it shouldn't be needed.
       // we should skip this because there is no other way to be sure that the processor prepended already these
       // resources.
-      if (resource.getGroup().getResources().contains(importedResource)) {
+      if (resource.getGroup().getResources().contains(imported)) {
         break;
       }
-      resource.prepend(importedResource);
+      resource.prepend(imported);
     }
-    LOG.debug("" + resourcesList);
+    if (!importsCollector.isEmpty()) {
+      LOG.debug("Imported resources found : " + importsCollector.size());
+    }
+
+    sb.append(getResourceContent(resource));
+    LOG.debug("" + importsCollector);
+    return sb.toString();
   }
 
+  /**
+   * TODO: update javadoc
+   */
+  private void parseImports(final Resource resource, final Collection<Resource> resources)
+    throws IOException {
+    parseImports(resource, new Stack<Resource>(), resources);
+  }
 
   /**
    * TODO update javadoc
    */
-  private void parseImports(final Resource resource, final Stack<Resource> stack, final List<Resource> resourcesList)
+  private void parseImports(final Resource resource, final Stack<Resource> stack, final Collection<Resource> resources)
     throws IOException {
-    if (resourcesList.contains(resource) || stack.contains(resource)) {
+    if (resources.contains(resource) || stack.contains(resource)) {
       LOG.warn("RECURSIVITY detected for resource: " + resource);
       return;
     }
     LOG.debug("PUSH: " + resource);
     stack.push(resource);
-    final Collection<Resource> importedResources = getImportedResources(resource);
-    LOG.debug("IMPORT LIST: " + importedResources);
-    final StringBuffer sb = new StringBuffer();
-    for (final Resource imported : importedResources) {
+    final Collection<Resource> imports = getImportedResources(resource);
+    LOG.debug("IMPORT LIST: " + imports);
+    for (final Resource imported : imports) {
       try {
         if (resource.equals(imported)) {
           LOG.warn("Recursivity detected for resource: " + resource);
         } else {
-          parseImports(imported, stack, resourcesList);
+          parseImports(imported, stack, resources);
         }
       } catch (final IOException e) {
         // remove invalid uri
@@ -135,7 +147,7 @@ public class CssImportProcessor
     }
     final Resource r = stack.pop();
     LOG.debug("POP: " + r);
-    resourcesList.add(r);
+    resources.add(r);
   }
 
   /**
@@ -173,8 +185,8 @@ public class CssImportProcessor
    * Build a {@link Resource} object from a found importedResource inside a given resource.
    */
   private Resource buildImportedResource(final Resource resource, final String importUrl) {
-    final String absoluteImportUrl = computeAbsoluteUrl(resource, importUrl);
-    final Resource importResource = Resource.create(absoluteImportUrl, ResourceType.CSS);
+    final String absoluteUrl = computeAbsoluteUrl(resource, importUrl);
+    final Resource importResource = Resource.create(absoluteUrl, ResourceType.CSS);
     return importResource;
   }
 

@@ -3,10 +3,7 @@
  */
 package ro.isdc.wro.processor.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -27,7 +24,6 @@ import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
-import ro.isdc.wro.resource.UriLocator;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing
@@ -38,6 +34,54 @@ import ro.isdc.wro.resource.UriLocator;
  */
 public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessorImpl.class);
+
+  private static class DefaultPreProcessorExecutor implements PreProcessorExecutor {
+    AbstractGroupsProcessor groupsProcessor;
+    public DefaultPreProcessorExecutor(final AbstractGroupsProcessor groupsProcessor) {
+      this.groupsProcessor = groupsProcessor;
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public String execute(final Resource resource) throws IOException {
+      if (resource == null) {
+        throw new IllegalArgumentException("Resource cannot be null!");
+      }
+      final Collection<ResourcePreProcessor> typeProcessors = groupsProcessor.getPreProcessorsByType(resource.getType());
+      Writer output = applyPreProcessors(typeProcessors, resource);
+      final Collection<ResourcePreProcessor> anyProcessors = groupsProcessor.getPreProcessorsByType(null);
+      output = applyPreProcessors(anyProcessors, resource);
+      return output.toString();
+    }
+
+
+    /**
+     * Apply a list of preprocessors on a resource.
+     */
+    private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
+      throws IOException {
+      // get original content
+      final Reader reader = groupsProcessor.getResourceReader(resource);
+      final String content = IOUtils.toString(reader);
+      reader.close();
+
+      if (processors.isEmpty()) {
+        final Writer output = new StringWriter();
+        output.write(content);
+        return output;
+      }
+      Reader input = new StringReader(content);
+      Writer output = null;
+      for (final ResourcePreProcessor processor : processors) {
+        output = new StringWriter();
+        processor.process(resource, input, output);
+        input = new StringReader(output.toString());
+      }
+      return output;
+    }
+  }
+
+  private PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
 
   /**
    * {@inheritDoc} While processing the resources, if any exception occurs - it
@@ -82,60 +126,18 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     if (iterator.hasNext()) {
       iterator.next();
     }
-    //TODO find a way to process also resources which were added during iteration.
     for (final Resource resource : resourceList) {
       LOG.debug("\tmerging resource: " + resource);
-      // preProcessing
-      final String preProcessedContent = applyPreProcessors(resource);
-      result.append(preProcessedContent);
+      result.append(preProcessorExecutor.execute(resource));
     }
     return result.toString();
-  }
-
-  /**
-   * @param resource {@link Resource} for which a Reader should be returned.
-   * @return {@link Reader} for the resource.
-   * @throws IOException if there was a problem retrieving a reader.
-   * @throws WroRuntimeException if {@link Reader} is null.
-   */
-  private Reader getResourceReader(final Resource resource)
-    throws IOException {
-    final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
-    final InputStream is = locator.locate(resource.getUri());
-    // wrap reader with bufferedReader for top efficiency
-    final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-    if (reader == null) {
-      //TODO skip invalid resource, instead of throwing exception
-      throw new WroRuntimeException(
-          "Exception while retrieving InputStream from uri: " + resource.getUri());
-    }
-    return reader;
-  }
-
-  /**
-   * Apply resourcePreProcessors.
-   *
-   * @param resource
-   *          {@link Resource} to pre process.
-   * @return the processed content as String.
-   */
-  private String applyPreProcessors(final Resource resource)
-      throws IOException {
-    if (resource == null) {
-      throw new NullPointerException("resource cannot be null!");
-    }
-    final Collection<ResourcePreProcessor> typeProcessors = getPreProcessorsByType(resource.getType());
-    Writer output = applyPreProcessors(typeProcessors, resource);
-    final Collection<ResourcePreProcessor> anyProcessors = getPreProcessorsByType(null);
-    output = applyPreProcessors(anyProcessors, resource);
-    return output.toString();
   }
 
   //TODO use generified version
   private String applyPostProcessors(final ResourceType resourceType, final String content)
     throws IOException {
     if (content == null) {
-      throw new NullPointerException("content cannot be null!");
+      throw new IllegalArgumentException("content cannot be null!");
     }
     final Collection<ResourcePostProcessor> typeProcessors = getPostProcessorsByType(resourceType);
     String output = applyPostProcessors(typeProcessors, content);
@@ -143,32 +145,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     output = applyPostProcessors(anyProcessors, output.toString());
     return output.toString();
   }
-
-  /**
-   * Apply a list of preprocessors on a resource.
-   */
-  private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
-    throws IOException {
-    // get original content
-    final Reader reader = getResourceReader(resource);
-    final String content = IOUtils.toString(reader);
-    reader.close();
-
-  	if (processors.isEmpty()) {
-      final Writer output = new StringWriter();
-      output.write(content);
-  		return output;
-  	}
-    Reader input = new StringReader(content);
-    Writer output = null;
-    for (final ResourcePreProcessor processor : processors) {
-      output = new StringWriter();
-      processor.process(resource, input, output);
-      input = new StringReader(output.toString());
-    }
-    return output;
-  }
-
 
   /**
    * TODO use generics & combine this & above methods
@@ -179,9 +155,8 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    * @param content to process with all postProcessors.
    * @return Writer the processed content is written to this writer.
    */
-  private String applyPostProcessors(
-      final Collection<ResourcePostProcessor> processors, final String content)
-      throws IOException {
+  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
+    throws IOException {
     if (processors.isEmpty()) {
       return content;
     }
