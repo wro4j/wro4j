@@ -40,6 +40,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     public DefaultPreProcessorExecutor(final AbstractGroupsProcessor groupsProcessor) {
       this.groupsProcessor = groupsProcessor;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -47,10 +48,10 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       if (resource == null) {
         throw new IllegalArgumentException("Resource cannot be null!");
       }
-      final Collection<ResourcePreProcessor> typeProcessors = groupsProcessor.getPreProcessorsByType(resource.getType());
-      Writer output = applyPreProcessors(typeProcessors, resource);
-      final Collection<ResourcePreProcessor> anyProcessors = groupsProcessor.getPreProcessorsByType(null);
-      output = applyPreProcessors(anyProcessors, resource);
+      //TODO Concatenate collections and call applyPreProcessors only once
+      final Collection<ResourcePreProcessor> processors = groupsProcessor.getPreProcessorsByType(resource.getType());
+      processors.addAll(groupsProcessor.getPreProcessorsByType(null));
+      final Writer output = applyPreProcessors(processors, resource);
       return output.toString();
     }
 
@@ -60,6 +61,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
      */
     private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
       throws IOException {
+      LOG.info("applyPreProcessors: " + resource + " : " + processors);
       // get original content
       final Reader reader = groupsProcessor.getResourceReader(resource);
       final String content = IOUtils.toString(reader);
@@ -74,8 +76,10 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       Writer output = null;
       for (final ResourcePreProcessor processor : processors) {
         output = new StringWriter();
+        LOG.debug("using Processor: " + processor);
         processor.process(resource, input, output);
         input = new StringReader(output.toString());
+        LOG.debug("output: " + output);
       }
       return output;
     }

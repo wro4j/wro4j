@@ -75,7 +75,6 @@ public class CssImportProcessor
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    LOG.debug("PROCESS: " + resource);
     final String result = parseCss(resource, reader);
     writer.write(result);
     writer.close();
@@ -100,13 +99,14 @@ public class CssImportProcessor
       if (resource.getGroup().getResources().contains(imported)) {
         break;
       }
+      //sb.append(b)
       resource.prepend(imported);
     }
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : " + importsCollector.size());
     }
 
-    sb.append(getResourceContent(resource));
+    sb.append(IOUtils.toString(reader));
     LOG.debug("" + importsCollector);
     return sb.toString();
   }

@@ -138,9 +138,9 @@ public class XmlModelFactory
    */
   private void initScheduler() {
     if (scheduler == null) {
-      scheduler = Executors.newSingleThreadScheduledExecutor();
       final long period = ConfigurationContext.get().getApplicationSettings().getModelUpdatePeriod();
       if (period > 0) {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
         // Run a scheduled task which updates the model
         scheduler.scheduleAtFixedRate(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
       }
@@ -381,7 +381,11 @@ public class XmlModelFactory
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-  	//force scheduler to reload
+  	if (scheduler != null) {
+  	  scheduler.shutdown();
+  	  scheduler = null;
+  	}
+    //force scheduler to reload
   	model = null;
   }
 
@@ -390,6 +394,8 @@ public class XmlModelFactory
    */
   public void destroy() {
     //kill running threads
-    scheduler.shutdownNow();
+    if (scheduler != null) {
+      scheduler.shutdownNow();
+    }
   }
 }

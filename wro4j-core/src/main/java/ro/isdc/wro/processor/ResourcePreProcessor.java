@@ -20,16 +20,14 @@ import ro.isdc.wro.resource.Resource;
 public interface ResourcePreProcessor {
   //TODO add a closure responsible for applying preprocessor on new resources instead of modifying the model.
   /**
-   * Process a content supplied by a reader and perform some sort of processing.
+   * Process a content supplied by a reader and perform some sort of processing. It is important to know that you should
+   * use reader for processing instead of trying to access the resource original content using {@link Resource}, because
+   * this way you can ignore the other preProcessors from the chain.
    *
-   * @param resource
-   *          the original resource as it found in the model.
-   * @param reader
-   *          {@link Reader} used to read original resource content.
-   * @param writer
-   *          {@link Writer} where used to write processed results.
-   * @throws IOException
-   *           when IO exception occurs.
+   * @param resource the original resource as it found in the model.
+   * @param reader {@link Reader} used to read processed resource content.
+   * @param writer {@link Writer} where used to write processed results.
+   * @throws IOException when IO exception occurs.
    */
   public void process(final Resource resource, final Reader reader,
       final Writer writer) throws IOException;

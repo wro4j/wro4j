@@ -120,15 +120,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    */
   private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH,
       Pattern.CASE_INSENSITIVE);
-
   /**
-   * Prefix of the classpath resource.
-   * @deprecated
-   */
-  @Deprecated
-	private static final String PREFIX_DOT = ":";
-  /**
-   * This
    * A set of allowed url's.
    */
   private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
@@ -168,8 +160,10 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
             + oldMatch);
       }
       final String replacedUrl = replaceImageUrl(urlGroup, cssUri);
+      LOG.debug("replacedImageUrl: " + replacedUrl);
       final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
       //update allowedUrls list
+      //TODO no need to hold absolute url's inside
       allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
       m.appendReplacement(sb, newReplacement);
     }
@@ -187,6 +181,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    * @return replaced url.
    */
   private String replaceImageUrl(final String imageUrl, final String cssUri) {
+    LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
     if (isReplaceNeeded(imageUrl)) {
       if (ServletContextUriLocator.isValid(cssUri)) {
         if (ServletContextUriLocator.isValid(imageUrl)) {
