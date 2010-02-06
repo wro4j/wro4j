@@ -62,11 +62,16 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
       throws IOException {
       // get original content
-      final Reader reader = groupsProcessor.getResourceReader(resource);
-      final String content = IOUtils.toString(reader);
-      reader.close();
-
-      if (processors.isEmpty()) {
+      Reader reader = null;
+      String content = "";
+      try {
+        reader = groupsProcessor.getResourceReader(resource);
+        content = IOUtils.toString(reader);
+        reader.close();
+      } catch (final IOException e) {
+        LOG.warn("Invalid resource found" + resource);
+      }
+      if (processors.isEmpty() || reader == null) {
         final Writer output = new StringWriter();
         output.write(content);
         return output;

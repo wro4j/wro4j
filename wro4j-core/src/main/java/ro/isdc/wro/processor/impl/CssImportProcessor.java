@@ -10,7 +10,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,75 +82,27 @@ public class CssImportProcessor
     writer.close();
   }
 
-  /**
-   * Parse css, find all import statements.
-   *
-   * @param resource {@link Resource} where the parsed css resides.
-   */
   private String parseCss(final Resource resource, final Reader reader) throws IOException {
     final StringBuffer sb = new StringBuffer();
-    final Collection<Resource> importsCollector = new ArrayList<Resource>();
-    parseImports(resource, importsCollector);
-    //remove currently processing resource
-    importsCollector.remove(resource);
-    // prepend entire list of resources
+    //TODO find a way to identify a deep recursivity.
+    final List<Resource> processed = new ArrayList<Resource>();
+    final Collection<Resource> importsCollector = getImportedResources(resource);
+    if (importsCollector.contains(resource)) {
+      LOG.warn("Recursive import detected: " + resource);
+      importsCollector.remove(resource);
+    }
     for (final Resource imported : importsCollector) {
-      //TODO fix this & it shouldn't be needed.
-      // we should skip this because there is no other way to be sure that the processor prepended already these
-      // resources.
-//      if (resource.getGroup().getResources().contains(imported)) {
-//        break;
-//      }
       sb.append(preProcessorExecutor.execute(imported));
       //resource.prepend(imported);
     }
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : " + importsCollector.size());
     }
-
     sb.append(IOUtils.toString(reader));
     LOG.debug("" + importsCollector);
     return sb.toString();
   }
 
-  /**
-   * TODO: update javadoc
-   */
-  private void parseImports(final Resource resource, final Collection<Resource> resources)
-    throws IOException {
-    parseImports(resource, new Stack<Resource>(), resources);
-  }
-
-  /**
-   * TODO update javadoc
-   */
-  private void parseImports(final Resource resource, final Stack<Resource> stack, final Collection<Resource> resources)
-    throws IOException {
-    if (resources.contains(resource) || stack.contains(resource)) {
-      LOG.warn("RECURSIVITY detected for resource: " + resource);
-      return;
-    }
-    LOG.debug("PUSH: " + resource);
-    stack.push(resource);
-    final Collection<Resource> imports = getImportedResources(resource);
-    LOG.debug("IMPORT LIST: " + imports);
-    for (final Resource imported : imports) {
-      try {
-        if (resource.equals(imported)) {
-          LOG.warn("Recursivity detected for resource: " + resource);
-        } else {
-          parseImports(imported, stack, resources);
-        }
-      } catch (final IOException e) {
-        // remove invalid uri
-        stack.pop();
-        LOG.warn("Invalid imported resource: " + imported + " located in: " + resource);
-      }
-    }
-    final Resource r = stack.pop();
-    LOG.debug("POP: " + r);
-    resources.add(r);
-  }
 
   /**
    * @return the content of the resource as string.

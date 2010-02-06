@@ -27,6 +27,7 @@ import ro.isdc.wro.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
 import ro.isdc.wro.processor.impl.JSMinProcessor;
 import ro.isdc.wro.processor.impl.MultiLineCommentStripperProcessor;
+import ro.isdc.wro.processor.impl.PreProcessorExecutor;
 import ro.isdc.wro.processor.impl.SingleLineCommentStripperProcessor;
 import ro.isdc.wro.resource.Resource;
 import ro.isdc.wro.resource.ResourceType;
@@ -108,9 +109,12 @@ public class TestGroupsProcessor {
     groupsProcessor.addPreProcessor(new ResourcePreProcessor() {
       @Inject
       private UriLocatorFactory factory;
+      @Inject
+      private PreProcessorExecutor preProcessorExecutor;
       public void process(final Resource resources, final Reader reader, final Writer writer)
         throws IOException {
         Assert.assertEquals(uriLocatorFactory, factory);
+        Assert.assertNotNull(preProcessorExecutor);
       }
     });
   }
