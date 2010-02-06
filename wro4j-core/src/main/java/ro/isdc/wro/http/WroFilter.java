@@ -26,9 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ConfigurationContext;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfiguration;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.exception.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -108,6 +108,8 @@ public class WroFilter
       ConfigurationContext.get().setConfig(applicationSettings);
       applicationSettings.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
+				  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
+				  initHeaderValues();
 					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
 						((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
 					}

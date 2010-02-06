@@ -49,6 +49,9 @@ public class CssImportProcessor
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
+  @Inject
+  private PreProcessorExecutor preProcessorExecutor;
+
   /** The url pattern */
   private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*"
     + "[\"']?([^\"']*)[\"']?" // any sequence of characters, except an unescaped ')'
@@ -96,11 +99,11 @@ public class CssImportProcessor
       //TODO fix this & it shouldn't be needed.
       // we should skip this because there is no other way to be sure that the processor prepended already these
       // resources.
-      if (resource.getGroup().getResources().contains(imported)) {
-        break;
-      }
-      //sb.append(b)
-      resource.prepend(imported);
+//      if (resource.getGroup().getResources().contains(imported)) {
+//        break;
+//      }
+      sb.append(preProcessorExecutor.execute(imported));
+      //resource.prepend(imported);
     }
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : " + importsCollector.size());

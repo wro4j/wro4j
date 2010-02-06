@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +61,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
      */
     private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
       throws IOException {
-      LOG.info("applyPreProcessors: " + resource + " : " + processors);
       // get original content
       final Reader reader = groupsProcessor.getResourceReader(resource);
       final String content = IOUtils.toString(reader);
@@ -76,16 +75,29 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       Writer output = null;
       for (final ResourcePreProcessor processor : processors) {
         output = new StringWriter();
-        LOG.debug("using Processor: " + processor);
         processor.process(resource, input, output);
         input = new StringReader(output.toString());
-        LOG.debug("output: " + output);
       }
       return output;
     }
   }
 
   private PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean acceptAnnotatedField(final Object processor, final Field field)
+    throws IllegalAccessException {
+    boolean accept = super.acceptAnnotatedField(processor, field);
+    if (field.getType().equals(PreProcessorExecutor.class)) {
+      field.set(processor, preProcessorExecutor);
+      LOG.debug("Successfully injected field: " + field.getName());
+      accept = true;
+    }
+    return accept;
+  }
 
   /**
    * {@inheritDoc} While processing the resources, if any exception occurs - it
@@ -173,28 +185,5 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       input = new StringReader(output.toString());
     }
     return output.toString();
-  }
-
-  /**
-   * @param groups
-   *          list of groups where to search resources to filter.
-   * @param type
-   *          of resources to collect.
-   * @return a list of resources of provided type.
-   */
-  private List<Resource> getFilteredResources(final Collection<Group> groups,
-      final ResourceType type) {
-    final List<Resource> allResources = new ArrayList<Resource>();
-    for (final Group group : groups) {
-      allResources.addAll(group.getResources());
-    }
-    // retain only resources of needed type
-    final List<Resource> filteredResources = new ArrayList<Resource>();
-    for (final Resource resource : allResources) {
-      if (type == resource.getType()) {
-        filteredResources.add(resource);
-      }
-    }
-    return filteredResources;
   }
 }

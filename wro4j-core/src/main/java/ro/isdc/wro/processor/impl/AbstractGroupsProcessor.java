@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.annot.Inject;
 import ro.isdc.wro.annot.SupportedResourceType;
 import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.model.Group;
 import ro.isdc.wro.processor.GroupsProcessor;
 import ro.isdc.wro.processor.ResourcePostProcessor;
 import ro.isdc.wro.processor.ResourcePreProcessor;
@@ -113,7 +115,9 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       final Field[] fields = processor.getClass().getDeclaredFields();
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
-          acceptAnnotation(processor, field);
+          if (!acceptAnnotatedField(processor, field)) {
+            throw new WroRuntimeException("@Inject can be applied only on fiels of " + UriLocatorFactory.class.getName() + " type");
+          }
         }
       }
     } catch (final Exception e) {
@@ -123,27 +127,27 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
 
 
   /**
-   * Analyze the field containing {@link Inject} annotation and set its value to appropriate value.
+   * Analyze the field containing {@link Inject} annotation and set its value to appropriate value. Override this method
+   * if you want to inject something else but uriLocatorFactory.
    *
    * @param processor an instance of processor which is the holder of the field.
    * @param field {@link Field} object containing {@link Inject} annotation.
+   * @return true if field was injected with some not null value.
    * @throws IllegalAccessException
    */
-  private void acceptAnnotation(final Object processor, final Field field)
+  protected boolean acceptAnnotatedField(final Object processor, final Field field)
     throws IllegalAccessException {
+    field.setAccessible(true);
     if (field.getType().equals(UriLocatorFactory.class)) {
       //accept even private modifiers
-      field.setAccessible(true);
       if (uriLocatorFactory == null) {
         throw new WroRuntimeException("No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
       }
       field.set(processor, uriLocatorFactory);
       LOG.debug("Successfully injected field: " + field.getName());
-    } else if (field.getType().equals(PreProcessorExecutor.class)) {
-      //TODO implement
-    } else {
-      throw new WroRuntimeException("@Inject can be applied only on fiels of " + UriLocatorFactory.class.getName() + " type");
+      return true;
     }
+    return false;
   }
 
 
@@ -250,4 +254,26 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       }
       return reader;
     }
+
+  /**
+   * @param groups
+   *          list of groups where to search resources to filter.
+   * @param type
+   *          of resources to collect.
+   * @return a list of resources of provided type.
+   */
+  protected final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
+    final List<Resource> allResources = new ArrayList<Resource>();
+    for (final Group group : groups) {
+      allResources.addAll(group.getResources());
+    }
+    // retain only resources of needed type
+    final List<Resource> filteredResources = new ArrayList<Resource>();
+    for (final Resource resource : allResources) {
+      if (type == resource.getType()) {
+        filteredResources.add(resource);
+      }
+    }
+    return filteredResources;
+  }
 }
