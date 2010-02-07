@@ -40,6 +40,22 @@ public class TestCssImportProcessor extends AbstractWroTest {
       "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
   }
 
+  @Test
+  public void testPreProcessorWithBackgrounds()
+    throws IOException {
+//    final Resource resource = createResource(inputUri);
+//    updateGroupsProcessorDependencies(processor);
+//    compareProcessedResourceContents(inputUri, outputUri, new ResourceProcessor() {
+//      public void process(final Reader reader, final Writer writer)
+//        throws IOException {
+//        processor.process(resource, reader, writer);
+//      }
+//    });
+    //TODO find a way to simulate servletContext resources read from classpath
+    genericTest("classpath:ro/isdc/wro/processor/cssImports/testWithBackgrounds-input.css",
+      "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
+  }
+
 
   @Test
   public void testPreProcessorWithoutRecursion2()
@@ -106,9 +122,9 @@ public class TestCssImportProcessor extends AbstractWroTest {
   /**
    * Create a resource and add associate it with a group.
    */
-  private Resource createResource(final String URI) {
+  private Resource createResource(final String uri) {
     final Group group = new Group();
-    final Resource resource = Resource.create(URI, ResourceType.CSS);
+    final Resource resource = Resource.create(uri, ResourceType.CSS);
     resource.setGroup(group);
     group.setResources(Arrays.asList(new Resource[] { resource }));
     return resource;
@@ -116,7 +132,7 @@ public class TestCssImportProcessor extends AbstractWroTest {
 
 
   /**
-   * Builds a {@link GroupsProcessor} object with all dependencies set.
+   * This method will allow the fields containing @Inject annotations to be assigned.
    */
   private void updateGroupsProcessorDependencies(final ResourcePreProcessor processor) {
     final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();

@@ -29,16 +29,17 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
    */
   @Override
   protected GroupsProcessor newGroupsProcessor() {
+    final CssImportProcessor cssImportProcessor = new CssImportProcessor();
+
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
     groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+    groupProcessor.addPreProcessor(cssImportProcessor);
+
+    groupProcessor.addPostProcessor(cssImportProcessor);
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPostProcessor(new JSMinProcessor());
     groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-
-    final CssImportProcessor cssImportProcessor = new CssImportProcessor();
-    groupProcessor.addPreProcessor(cssImportProcessor);
-    groupProcessor.addPostProcessor(cssImportProcessor);
 
     return groupProcessor;
   }
