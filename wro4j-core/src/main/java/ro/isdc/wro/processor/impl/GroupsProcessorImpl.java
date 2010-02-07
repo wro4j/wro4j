@@ -10,9 +10,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -48,7 +46,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       if (resource == null) {
         throw new IllegalArgumentException("Resource cannot be null!");
       }
-      //TODO Concatenate collections and call applyPreProcessors only once
+      //merge preProcessorsBy type and anyPreProcessors
       final Collection<ResourcePreProcessor> processors = groupsProcessor.getPreProcessorsByType(resource.getType());
       processors.addAll(groupsProcessor.getPreProcessorsByType(null));
       final Writer output = applyPreProcessors(processors, resource);
@@ -139,15 +137,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
   private String preProcessAndMerge(final List<Resource> resources)
       throws IOException {
     final StringBuffer result = new StringBuffer();
-    //using ListIterator because the collection can be changed during processing
-    //be sure we use a list which supports add & remove operation on iterator while iterating
-    final List<Resource> resourceList = new LinkedList<Resource>(resources);
-    final ListIterator<Resource> iterator = resourceList.listIterator();
-    //start with first
-    if (iterator.hasNext()) {
-      iterator.next();
-    }
-    for (final Resource resource : resourceList) {
+    for (final Resource resource : resources) {
       LOG.debug("\tmerging resource: " + resource);
       result.append(preProcessorExecutor.execute(resource));
     }

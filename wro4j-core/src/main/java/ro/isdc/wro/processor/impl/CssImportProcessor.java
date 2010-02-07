@@ -50,6 +50,10 @@ public class CssImportProcessor
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
+  /**
+   * List of processed resources, useful for detecting deep recurivity.
+   */
+  private final List<Resource> processed = new ArrayList<Resource>();
 
   /** The url pattern */
   private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*"
@@ -72,25 +76,35 @@ public class CssImportProcessor
     writer.write(sb.toString());
   }
 
+
+
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public synchronized void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String result = parseCss(resource, reader);
     writer.write(result);
     writer.close();
+    processed.clear();
   }
 
+  /**
+   *
+   * @param resource {@link Resource} to process.
+   * @param reader Reader for processed resource.
+   * @return css content with all imports processed.
+   * @throws IOException
+   */
   private String parseCss(final Resource resource, final Reader reader) throws IOException {
+    if (processed.contains(resource)) {
+      LOG.warn("Recursive import detected: " + resource);
+      return "";
+    }
+    processed.add(resource);
     final StringBuffer sb = new StringBuffer();
     //TODO find a way to identify a deep recursivity.
-    final List<Resource> processed = new ArrayList<Resource>();
     final Collection<Resource> importsCollector = getImportedResources(resource);
-    if (importsCollector.contains(resource)) {
-      LOG.warn("Recursive import detected: " + resource);
-      importsCollector.remove(resource);
-    }
     for (final Resource imported : importsCollector) {
       sb.append(preProcessorExecutor.execute(imported));
       //resource.prepend(imported);

@@ -1,3 +1,23 @@
+div.import1a {
+  color: red;
+}
+div.import1b {
+  color: red;
+}
+@import url("import1a.css");
+@import url("css1/import1b.css");
+div.import1 {
+  color: red;
+}
+div.import2 {
+  color: red;
+}
+div.import3 {
+  color: red;
+}
+@import url('css/import1.css');
+@import url('css/import2.css');
+@import url('css/import3.css');
 ul li {
   list-style: none;
 }

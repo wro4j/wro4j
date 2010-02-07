@@ -6,11 +6,7 @@ package ro.isdc.wro.processor;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -40,24 +36,16 @@ public class TestCssImportProcessor extends AbstractWroTest {
   @Test
   public void testPreProcessorWithoutRecursion1()
     throws IOException {
-    final String[] arr = new String[] { "classpath:ro/isdc/wro/processor/cssImports/css/import1a.css",
-        "classpath:ro/isdc/wro/processor/cssImports/css/css1/import1b.css",
-        "classpath:ro/isdc/wro/processor/cssImports/css/import1.css",
-        "classpath:ro/isdc/wro/processor/cssImports/css/import2.css",
-        "classpath:ro/isdc/wro/processor/cssImports/css/import3.css",
-        "classpath:ro/isdc/wro/processor/cssImports/test1-input.css" };
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test1-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/test1-input.css", arr);
+      "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
   }
 
 
   @Test
   public void testPreProcessorWithoutRecursion2()
     throws IOException {
-    final String[] arr = new String[] { "classpath:ro/isdc/wro/processor/cssImports/css/import2.css",
-        "classpath:ro/isdc/wro/processor/cssImports/test2-input.css" };
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test2-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/test2-input.css", arr);
+      "classpath:ro/isdc/wro/processor/cssImports/test2-output.css");
   }
 
 
@@ -69,9 +57,8 @@ public class TestCssImportProcessor extends AbstractWroTest {
   @Test
   public void testPreProcessorWithImmediateRecursivity()
     throws IOException {
-    final String[] arr = new String[] { "classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css" };
     genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css", arr);
+      "classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css");
   }
 
 
@@ -81,15 +68,13 @@ public class TestCssImportProcessor extends AbstractWroTest {
   @Test
   public void testPreProcessorWithDeepRecursivity()
     throws IOException {
-    final String[] arr = new String[] { "classpath:ro/isdc/wro/processor/cssImports/css/recursive1.css",
-        "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css" };
     genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css", arr);
+      "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-output.css");
   }
 
   @Test
   public void testPostProcessor() throws IOException {
-    compareProcessedResourceContents("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", "classpath:ro/isdc/wro/processor/cssImports/test1-output.css", new ResourceProcessor() {
+    compareProcessedResourceContents("classpath:ro/isdc/wro/processor/cssImports/testPostProcessor-input.css", "classpath:ro/isdc/wro/processor/cssImports/testPostProcessor-output.css", new ResourceProcessor() {
       public void process(final Reader reader, final Writer writer)
         throws IOException {
         processor.process(reader, writer);
@@ -104,10 +89,10 @@ public class TestCssImportProcessor extends AbstractWroTest {
    * @param groupResourceUris an array of expected uri's contained inside the Group after processing.
    * @throws IOException
    */
-  private void genericTest(final String inputUri, final String outputUri, final String[] groupResourceUris)
+  private void genericTest(final String inputUri, final String outputUri)
     throws IOException {
     // this is necessary use GroupsProcessor instrumentation on added processor
-    addToGroupsProcessor(processor);
+    updateGroupsProcessorDependencies(processor);
     final Resource resource = createResource(inputUri);
     compareProcessedResourceContents(inputUri, outputUri, new ResourceProcessor() {
       public void process(final Reader reader, final Writer writer)
@@ -115,12 +100,6 @@ public class TestCssImportProcessor extends AbstractWroTest {
         processor.process(resource, reader, writer);
       }
     });
-    final List<Resource> resultResources = resource.getGroup().getResources();
-    final List<String> actualUriList = new ArrayList<String>();
-    for (final Resource r : resultResources) {
-      actualUriList.add(r.getUri());
-    }
-    Assert.assertEquals(Arrays.asList(groupResourceUris), actualUriList);
   }
 
 
@@ -139,7 +118,7 @@ public class TestCssImportProcessor extends AbstractWroTest {
   /**
    * Builds a {@link GroupsProcessor} object with all dependencies set.
    */
-  private void addToGroupsProcessor(final ResourcePreProcessor processor) {
+  private void updateGroupsProcessorDependencies(final ResourcePreProcessor processor) {
     final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
     groupsProcessor.setUriLocatorFactory(getUriLocatorFactory());
     groupsProcessor.addPreProcessor(processor);
