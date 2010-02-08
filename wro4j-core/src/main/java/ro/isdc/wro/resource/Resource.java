@@ -77,17 +77,6 @@ public class Resource {
     return result;
   }
 
-
-  /**
-   * Inserts a {@link Resource} immediately before this resource in the list of the current group.
-   *
-   * @param resource to prepend.
-   */
-  @Deprecated
-  public final void prepend(final Resource resource) {
-    getGroup().insertResourceBefore(resource, this);
-  }
-
   /**
    * @return the type
    */

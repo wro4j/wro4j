@@ -173,11 +173,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     Reader input = new StringReader(content.toString());
     Writer output = null;
     for (final ResourcePostProcessor processor : processors) {
-      LOG.debug("apply Post processor: " + processor);
       output = new StringWriter();
       processor.process(input, output);
       input = new StringReader(output.toString());
-      LOG.debug("postProcess result" + output);
     }
     return output.toString();
   }

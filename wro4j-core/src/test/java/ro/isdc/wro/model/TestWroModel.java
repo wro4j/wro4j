@@ -4,8 +4,6 @@
 package ro.isdc.wro.model;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -14,9 +12,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.exception.InvalidGroupNameException;
 import ro.isdc.wro.model.impl.XmlModelFactory;
-import ro.isdc.wro.resource.Resource;
-import ro.isdc.wro.resource.ResourceType;
 import ro.isdc.wro.test.util.WroTestUtils;
 
 /**
@@ -35,32 +32,23 @@ public class TestWroModel {
   }
 
   @Test
-  public void testInsertResourceBeforeIsOk() {
+  public void testGetExistingGroup() {
     model = buildValidModel();
     Assert.assertFalse(model.getGroups().isEmpty());
-    //get first group.
-    final Group group = model.getGroups().iterator().next();
+    final Group group = model.getGroupByName("g1");
     //create a copy of original list
-    final List<Resource> originalResourceList = new ArrayList<Resource>(group.getResources());
-    Assert.assertFalse(originalResourceList.isEmpty());
-    Resource resourceToInsert = Resource.create("http://www.site.com/site1.css", ResourceType.CSS);
+    Assert.assertEquals(1, group.getResources().size());
+  }
 
-    group.insertResourceBefore(resourceToInsert, group.getResources().get(0));
-    resourceToInsert.setGroup(group);
-
-    Assert.assertEquals(originalResourceList.size() + 1, group.getResources().size());
-    Assert.assertEquals(resourceToInsert, group.getResources().get(0));
-
-    resourceToInsert = Resource.create("http://www.site.com/site2.css", ResourceType.CSS);
-    resourceToInsert.setGroup(group);
-    group.getResources().get(0).prepend(resourceToInsert);
-
-    Assert.assertEquals(originalResourceList.size() + 2, group.getResources().size());
-    Assert.assertEquals(resourceToInsert, group.getResources().get(0));
+  @Test(expected=InvalidGroupNameException.class)
+  public void testGetInvalidGroup() {
+    model = buildValidModel();
+    Assert.assertFalse(model.getGroups().isEmpty());
+    model.getGroupByName("INVALID_GROUP");
   }
 
   /**
-   * @return a valid {@link WroModel} prepopulated with some valid resources.
+   * @return a valid {@link WroModel} pre populated with some valid resources.
    */
   private WroModel buildValidModel() {
     final WroModelFactory factory = new XmlModelFactory() {
