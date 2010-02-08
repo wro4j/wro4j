@@ -76,11 +76,9 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       }
       Reader input = new StringReader(content);
       Writer output = null;
-      LOG.debug("ApplyPreprocessors on: " + resource);
       for (final ResourcePreProcessor processor : processors) {
         output = new StringWriter();
         processor.process(resource, input, output);
-        LOG.debug("preprocess result: " + output.toString());
         input = new StringReader(output.toString());
       }
       return output;
