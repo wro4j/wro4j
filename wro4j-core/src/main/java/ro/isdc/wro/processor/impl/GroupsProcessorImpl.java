@@ -87,7 +87,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
   }
 
-  private PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
+  private final PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
 
   /**
    * {@inheritDoc}
@@ -152,11 +152,10 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     if (content == null) {
       throw new IllegalArgumentException("content cannot be null!");
     }
-    final Collection<ResourcePostProcessor> typeProcessors = getPostProcessorsByType(resourceType);
-    String output = applyPostProcessors(typeProcessors, content);
-    final Collection<ResourcePostProcessor> anyProcessors = getPostProcessorsByType(null);
-    output = applyPostProcessors(anyProcessors, output.toString());
-    return output.toString();
+    final Collection<ResourcePostProcessor> processors = getPostProcessorsByType(resourceType);
+    processors.addAll(getPostProcessorsByType(null));
+    final String output = applyPostProcessors(processors, content);
+    return output;
   }
 
   /**
@@ -180,6 +179,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       output = new StringWriter();
       processor.process(input, output);
       input = new StringReader(output.toString());
+      LOG.debug("postProcess result" + output);
     }
     return output.toString();
   }

@@ -40,22 +40,6 @@ public class TestCssImportProcessor extends AbstractWroTest {
       "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
   }
 
-  @Test
-  public void testPreProcessorWithBackgrounds()
-    throws IOException {
-//    final Resource resource = createResource(inputUri);
-//    updateGroupsProcessorDependencies(processor);
-//    compareProcessedResourceContents(inputUri, outputUri, new ResourceProcessor() {
-//      public void process(final Reader reader, final Writer writer)
-//        throws IOException {
-//        processor.process(resource, reader, writer);
-//      }
-//    });
-    //TODO find a way to simulate servletContext resources read from classpath
-    genericTest("classpath:ro/isdc/wro/processor/cssImports/testWithBackgrounds-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
-  }
-
 
   @Test
   public void testPreProcessorWithoutRecursion2()
@@ -91,6 +75,17 @@ public class TestCssImportProcessor extends AbstractWroTest {
   @Test
   public void testPostProcessor() throws IOException {
     compareProcessedResourceContents("classpath:ro/isdc/wro/processor/cssImports/testPostProcessor-input.css", "classpath:ro/isdc/wro/processor/cssImports/testPostProcessor-output.css", new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    });
+  }
+
+
+  @Test
+  public void testPreProcessorWithBackgrounds() throws IOException {
+    compareProcessedResourceContents("classpath:ro/isdc/wro/processor/cssImports/testPostProcessorWithBackgrounds-input.css", "classpath:ro/isdc/wro/processor/cssImports/testPostProcessorWithBackgrounds-output.css", new ResourceProcessor() {
       public void process(final Reader reader, final Writer writer)
         throws IOException {
         processor.process(reader, writer);
