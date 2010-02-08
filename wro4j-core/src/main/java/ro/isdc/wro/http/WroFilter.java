@@ -25,14 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ApplicationContext;
-import ro.isdc.wro.config.ApplicationSettings;
-import ro.isdc.wro.config.ApplicationSettingsChangeListener;
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 
 
 /**
@@ -82,7 +82,7 @@ public class WroFilter
   private String cacheControlValue;
   private long expiresValue;
 
-  private ApplicationSettings applicationSettings;
+  private WroConfiguration applicationSettings;
 
 
   /**
@@ -105,23 +105,25 @@ public class WroFilter
     throws ServletException {
     try {
       applicationSettings = newApplicationSettings();
-      ApplicationContext.get().setSettings(applicationSettings);
+      ConfigurationContext.get().setConfig(applicationSettings);
       applicationSettings.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
-					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
-						((ApplicationSettingsChangeListener)wroManagerFactory).onCachePeriodChanged();
+				  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
+				  initHeaderValues();
+					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+						((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
 					}
 				}
 			});
       applicationSettings.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
-					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
-						((ApplicationSettingsChangeListener)wroManagerFactory).onModelPeriodChanged();
+					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+						((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
 					}
 				}
 			});
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      final ObjectName name = new ObjectName(ApplicationSettings.getObjectName());
+      final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
       mbs.registerMBean(applicationSettings, name);
     } catch (final Exception e) {
       LOG.error("Exception occured while registering MBean", e);
@@ -132,10 +134,10 @@ public class WroFilter
   /**
    * TODO allow configuration using some sort of property file?...
    *
-   * @return {@link ApplicationSettings} configured object with default values set.
+   * @return {@link WroConfiguration} configured object with default values set.
    */
-	private ApplicationSettings newApplicationSettings() {
-		final ApplicationSettings settings = new ApplicationSettings();
+	private WroConfiguration newApplicationSettings() {
+		final WroConfiguration settings = new WroConfiguration();
 
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
@@ -188,7 +190,7 @@ public class WroFilter
     Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 
-    if (!ApplicationContext.get().getApplicationSettings().isDebug()) {
+    if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       if (etagValue.equals(ifNoneMatch)) {
         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -211,7 +213,7 @@ public class WroFilter
    * @param response {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    if (!ApplicationContext.get().getApplicationSettings().isDebug()) {
+    if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
       // Force resource caching as best as possible
       response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);

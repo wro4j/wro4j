@@ -10,7 +10,7 @@ import java.io.Writer;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.processor.impl.MultiLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**

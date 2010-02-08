@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.manager.WroManagerFactory;
 

@@ -6,7 +6,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.model.resource.ResourceType;
 
 /**
  * Used as an entry for the cache.

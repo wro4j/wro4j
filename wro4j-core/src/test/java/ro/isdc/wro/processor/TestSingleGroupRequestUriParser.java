@@ -8,8 +8,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.processor.impl.DefaultRequestUriParser;
-import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.model.group.DefaultGroupExtractor;
+import ro.isdc.wro.model.resource.ResourceType;
 
 /**
  * TestGroupsExtractor.
@@ -18,11 +18,11 @@ import ro.isdc.wro.resource.ResourceType;
  * @created Created on Nov 3, 2008
  */
 public class TestSingleGroupRequestUriParser {
-  private DefaultRequestUriParser requestUriParser;
+  private DefaultGroupExtractor requestUriParser;
 
   @Before
   public void init() {
-    requestUriParser = new DefaultRequestUriParser();
+    requestUriParser = new DefaultGroupExtractor();
   }
 
   @Test(expected=IllegalArgumentException.class)

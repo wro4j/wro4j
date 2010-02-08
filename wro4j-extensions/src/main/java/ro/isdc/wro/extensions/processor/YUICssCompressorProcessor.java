@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import ro.isdc.wro.annot.SupportedResourceType;
-import ro.isdc.wro.processor.ResourcePostProcessor;
-import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 

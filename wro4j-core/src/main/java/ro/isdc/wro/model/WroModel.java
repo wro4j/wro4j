@@ -10,7 +10,8 @@ import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import ro.isdc.wro.exception.InvalidGroupNameException;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.InvalidGroupNameException;
 
 /**
  * The resource model encapsulates the information about all existing groups.

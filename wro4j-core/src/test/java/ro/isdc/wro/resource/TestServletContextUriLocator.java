@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.resource.impl.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 
 /**
  * Test for {@link ServletContextUriLocator} class.

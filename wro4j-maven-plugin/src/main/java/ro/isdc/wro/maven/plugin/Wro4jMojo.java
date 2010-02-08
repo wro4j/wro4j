@@ -14,11 +14,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.impl.StandAloneWroManagerFactory;
-import ro.isdc.wro.model.WroModelFactory;
-import ro.isdc.wro.model.impl.XmlModelFactory;
+import ro.isdc.wro.manager.factory.StandAloneWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 
 
 /**

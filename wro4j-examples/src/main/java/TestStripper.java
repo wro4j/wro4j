@@ -5,7 +5,7 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
-import ro.isdc.wro.processor.algorithm.ResourceContentStripper;
+import ro.isdc.wro.model.resource.processor.algorithm.ResourceContentStripper;
 
 /*
  * Copyright (c) 2008 ISDC! Romania. All rights reserved.

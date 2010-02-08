@@ -5,11 +5,11 @@ package ro.isdc.wro.extensions.manager;
 
 import ro.isdc.wro.extensions.processor.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.YUIJsCompressorProcessor;
-import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
-import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
+import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
+import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 
 /**
  * A factory which use YUI specific GroupProcessors

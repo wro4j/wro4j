@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -15,17 +17,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.annot.Inject;
-import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.processor.impl.CssMinProcessor;
-import ro.isdc.wro.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
-import ro.isdc.wro.processor.impl.JSMinProcessor;
-import ro.isdc.wro.processor.impl.MultiLineCommentStripperProcessor;
-import ro.isdc.wro.processor.impl.SingleLineCommentStripperProcessor;
-import ro.isdc.wro.resource.Resource;
-import ro.isdc.wro.resource.ResourceType;
-import ro.isdc.wro.resource.UriLocatorFactory;
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.AbstractGroupsProcessor;
+import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.processor.PreProcessorExecutor;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
 
 /**
  * TestGroupsProcessor.
@@ -34,7 +44,7 @@ import ro.isdc.wro.resource.UriLocatorFactory;
  * @created Created on Jan 5, 2010
  */
 public class TestGroupsProcessor {
-  private GroupsProcessorImpl groupsProcessor;
+  private AbstractGroupsProcessor groupsProcessor;
 
   @Before
   public void init() {
@@ -101,9 +111,12 @@ public class TestGroupsProcessor {
     groupsProcessor.addPreProcessor(new ResourcePreProcessor() {
       @Inject
       private UriLocatorFactory factory;
+      @Inject
+      private PreProcessorExecutor preProcessorExecutor;
       public void process(final Resource resources, final Reader reader, final Writer writer)
         throws IOException {
         Assert.assertEquals(uriLocatorFactory, factory);
+        Assert.assertNotNull(preProcessorExecutor);
       }
     });
   }
@@ -164,6 +177,21 @@ public class TestGroupsProcessor {
       }
     });
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+  }
+
+  @Test
+  public void testGroupWithCssImportProcessor() throws Exception {
+    final Group group = new Group();
+    group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
+    final List<Group> groups = Arrays.asList(group);
+    final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
+    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
+    final ResourcePreProcessor preProcessor = Mockito.mock(ResourcePreProcessor.class);
+    groupsProcessor.addPreProcessor(preProcessor);
+    groupsProcessor.process(groups, ResourceType.CSS);
+    Mockito.verify(preProcessor, Mockito.times(6)).process(Mockito.any(Resource.class), Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
 
 }
