@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
 
 

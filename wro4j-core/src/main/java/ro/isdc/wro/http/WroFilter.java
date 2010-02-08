@@ -25,14 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfiguration;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 
 
 /**

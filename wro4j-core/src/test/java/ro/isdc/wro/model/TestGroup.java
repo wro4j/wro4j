@@ -10,8 +10,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.resource.Resource;
-import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 
 /**
  * Test class for {@link Group}.

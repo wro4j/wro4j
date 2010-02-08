@@ -25,21 +25,21 @@ import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.exception.UnauthorizedRequestException;
-import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.model.Group;
+import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.WroModelFactory;
-import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.RequestUriParser;
-import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.resource.ResourceType;
-import ro.isdc.wro.resource.UriLocator;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -62,7 +62,7 @@ public final class WroManager implements WroConfigurationChangeListener {
   /**
    * GroupExtractor.
    */
-  private RequestUriParser requestUriParser;
+  private GroupExtractor requestUriParser;
 
   /**
    * Groups processor.
@@ -297,7 +297,7 @@ public final class WroManager implements WroConfigurationChangeListener {
   /**
    * @param requestUriParser the uriProcessor to set
    */
-  public final void setRequestUriParser(final RequestUriParser requestUriParser) {
+  public final void setRequestUriParser(final GroupExtractor requestUriParser) {
     this.requestUriParser = requestUriParser;
   }
 

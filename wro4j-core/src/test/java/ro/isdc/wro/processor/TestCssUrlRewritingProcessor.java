@@ -12,8 +12,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.resource.Resource;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 

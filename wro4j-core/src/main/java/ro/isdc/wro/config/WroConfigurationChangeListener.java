@@ -4,6 +4,8 @@
  */
 package ro.isdc.wro.config;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
+
 /**
  * Listener which is notified about the change of some properties of {@link WroConfiguration} object.
  *

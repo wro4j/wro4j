@@ -11,7 +11,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.resource.impl.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
 
 /**
  * Tests if C works properly.

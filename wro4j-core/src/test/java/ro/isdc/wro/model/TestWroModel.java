@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.exception.InvalidGroupNameException;
-import ro.isdc.wro.model.impl.XmlModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.test.util.WroTestUtils;
 
 /**

@@ -12,11 +12,11 @@ import java.util.List;
 
 import org.junit.Before;
 
-import ro.isdc.wro.resource.UriLocator;
-import ro.isdc.wro.resource.impl.ClasspathUriLocator;
-import ro.isdc.wro.resource.impl.ServletContextUriLocator;
-import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
-import ro.isdc.wro.resource.impl.UrlUriLocator;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.test.util.ResourceProcessor;
 import ro.isdc.wro.test.util.WroTestUtils;
 

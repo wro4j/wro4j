@@ -4,6 +4,8 @@
  */
 package ro.isdc.wro.config;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
+
 /**
  * Holds configuration instance. Accessing this object is safe even outside of a request cycle.
  *

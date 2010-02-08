@@ -17,23 +17,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.annot.Inject;
-import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.model.Group;
-import ro.isdc.wro.processor.impl.AbstractGroupsProcessor;
-import ro.isdc.wro.processor.impl.CssImportProcessor;
-import ro.isdc.wro.processor.impl.CssMinProcessor;
-import ro.isdc.wro.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.processor.impl.GroupsProcessorImpl;
-import ro.isdc.wro.processor.impl.JSMinProcessor;
-import ro.isdc.wro.processor.impl.MultiLineCommentStripperProcessor;
-import ro.isdc.wro.processor.impl.PreProcessorExecutor;
-import ro.isdc.wro.processor.impl.SingleLineCommentStripperProcessor;
-import ro.isdc.wro.resource.Resource;
-import ro.isdc.wro.resource.ResourceType;
-import ro.isdc.wro.resource.UriLocatorFactory;
-import ro.isdc.wro.resource.impl.ClasspathUriLocator;
-import ro.isdc.wro.resource.impl.UriLocatorFactoryImpl;
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.AbstractGroupsProcessor;
+import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.processor.PreProcessorExecutor;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
 
 /**
  * TestGroupsProcessor.
@@ -185,7 +187,7 @@ public class TestGroupsProcessor {
     final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
     uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
-    groupsProcessor.addPreProcessor(new CssImportProcessor());
+    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
     final ResourcePreProcessor preProcessor = Mockito.mock(ResourcePreProcessor.class);
     groupsProcessor.addPreProcessor(preProcessor);
     groupsProcessor.process(groups, ResourceType.CSS);

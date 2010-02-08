@@ -9,8 +9,9 @@ import java.net.MalformedURLException;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.resource.impl.ClasspathUriLocator;
-import ro.isdc.wro.resource.impl.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
