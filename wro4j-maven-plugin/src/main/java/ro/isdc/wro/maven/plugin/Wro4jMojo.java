@@ -7,14 +7,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mockito.Mockito;
 
-import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.StandAloneWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -22,25 +25,27 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 
 
 /**
- * @goal create
+ * @goal bundle
  * @phase package
  */
 public class Wro4jMojo extends AbstractMojo {
-  private static final Logger LOG = LoggerFactory.getLogger(Wro4jMojo.class);
+//  private static final Logger LOG = LoggerFactory.getLogger(Wro4jMojo.class);
   /**
    * File containing the groups definitions.
    * @parameter
-   * @required
    */
   private File wroFile;
   /**
    * @parameter
    * @optional
    */
-  private List<String> targetGroups;
-  private File cssOut;
-  private File jsOut;
-//   * @parameter expression="${project.build.directory}"
+  private List<String> targetGroups = new ArrayList<String>();
+  /**
+   * The path to the destination directory where the files are stored at the end of the process.
+   *
+   * @parameter default-value="${project.build.directory}/wro"
+   */
+  private String destinationFolder;
   /**
    * Factory which will create the engine for doing the main job.
    */
@@ -68,14 +73,30 @@ public class Wro4jMojo extends AbstractMojo {
    */
   public void execute()
     throws MojoExecutionException {
-    LOG.debug("executing the mojo");
-    LOG.debug("wro file: " + wroFile);
+    getLog().info("Executing the mojo");
+    getLog().debug("executing the mojo");
+    getLog().debug("wro file: " + wroFile);
     try {
     	//TODO create a Request object
-      //getFactory().getInstance().process("test.js");
-    } catch(final WroRuntimeException e) {
+      for (final String group : targetGroups) {
+        processGroup(group);
+      }
+    } catch(final Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
     }
+  }
+
+  /**
+   * @throws IOException
+   */
+  private void processGroup(final String group)
+    throws IOException {
+    getLog().info("processing group: " + group);
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    Mockito.when(request.getRequestURI()).thenReturn(group);
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(System.out));
+    getFactory().getInstance().process(request, response);
   }
 
   /**
@@ -92,4 +113,17 @@ public class Wro4jMojo extends AbstractMojo {
     this.targetGroups = targetGroups;
   }
 
+  /**
+   * @return the destinationFolder
+   */
+  public String getDestinationFolder() {
+    return this.destinationFolder;
+  }
+
+  /**
+   * @param destinationFolder the destinationFolder to set
+   */
+  public void setDestinationFolder(final String destinationFolder) {
+    this.destinationFolder = destinationFolder;
+  }
 }

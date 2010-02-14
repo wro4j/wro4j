@@ -48,7 +48,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class WroManager implements WroConfigurationChangeListener {
+public class WroManager implements WroConfigurationChangeListener {
   /**
    * Logger for this class.
    */
@@ -100,7 +100,7 @@ public final class WroManager implements WroConfigurationChangeListener {
     OutputStream os = null;
     // append result to response stream
     if (ConfigurationContext.get().getApplicationSettings().isGzipEnabled()
-      && WroUtil.isGzipSupported(Context.get().getRequest())) {
+      && isGzipSupported()) {
       os = getGzipedOutputStream(response);
     } else {
       os = response.getOutputStream();
@@ -108,6 +108,13 @@ public final class WroManager implements WroConfigurationChangeListener {
     IOUtils.copy(is, os);
     is.close();
     os.close();
+  }
+
+  /**
+   * @return true if Gzip is Supported
+   */
+  protected boolean isGzipSupported() {
+    return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 
   /**

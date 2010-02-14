@@ -65,6 +65,12 @@ public class WroFilter
    * Gzip resources configuration option.
    */
   private static final String PARAM_GZIP_RESOURCES = "gzipResources";
+
+  // ETag parameter
+  public static final int ETAG_OFF = 0;
+  public static final int ETAG_WEAK = 1;
+  //public static final int ETAG_STRONG = 2;
+
   /**
    * Filter config.
    */

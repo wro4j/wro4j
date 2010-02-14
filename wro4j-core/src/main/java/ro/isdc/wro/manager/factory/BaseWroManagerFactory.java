@@ -40,6 +40,11 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
       synchronized (this) {
         if (this.manager == null) {
           this.manager = newManager();
+          manager.setRequestUriParser(newRequestUriParser());
+          manager.setModelFactory(newModelFactory());
+          final GroupsProcessor groupsProcessor = newGroupsProcessor();
+          manager.setGroupsProcessor(groupsProcessor);
+          manager.setCacheStrategy(newCacheStrategy());
         }
       }
     }
@@ -61,16 +66,8 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
   /**
    * @return {@link WroManager}
    */
-  private WroManager newManager() {
+  protected WroManager newManager() {
     final WroManager manager = new WroManager();
-
-    manager.setRequestUriParser(newRequestUriParser());
-    manager.setModelFactory(newModelFactory());
-
-    final GroupsProcessor groupsProcessor = newGroupsProcessor();
-    manager.setGroupsProcessor(groupsProcessor);
-
-    manager.setCacheStrategy(newCacheStrategy());
     return manager;
   }
 

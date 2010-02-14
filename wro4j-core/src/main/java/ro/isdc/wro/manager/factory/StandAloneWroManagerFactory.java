@@ -4,6 +4,7 @@
 package ro.isdc.wro.manager.factory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
@@ -39,6 +40,22 @@ public class StandAloneWroManagerFactory extends BaseWroManagerFactory {
   @Override
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroManager newManager() {
+    return new WroManager() {
+      /**
+       * Just return false, without checking the request headers.
+       */
+      @Override
+      protected boolean isGzipSupported() {
+        return false;
+      }
+    };
   }
 
   /**
