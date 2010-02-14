@@ -77,9 +77,18 @@ public class StandAloneWroManagerFactory extends BaseWroManagerFactory {
   private UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
     // The order is important.
-    factory.addUriLocator(new ServletContextUriLocator());
+    factory.addUriLocator(newServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());
     return factory;
+  }
+
+
+  /**
+   * @return {@link ServletContextUriLocator} or a derivate locator which will be responsible for locating resources
+   *         starting with '/' character. Ex: /static/resource.js
+   */
+  protected ServletContextUriLocator newServletContextUriLocator() {
+    return new ServletContextUriLocator();
   }
 }

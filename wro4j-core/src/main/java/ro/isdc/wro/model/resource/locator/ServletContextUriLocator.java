@@ -35,7 +35,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 10, 2008
  */
-public final class ServletContextUriLocator
+public class ServletContextUriLocator
   implements UriLocator {
   /**
    * Logger for this class.
@@ -51,8 +51,8 @@ public final class ServletContextUriLocator
    * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
    * to see if performance change.
    */
-  private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();// new
-                                                                                                             // PipedStreamDispatchingStrategy();
+  private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
+  // new PipedStreamDispatchingStrategy();
 
 
   /**

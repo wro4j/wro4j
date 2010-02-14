@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.group;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,18 +25,8 @@ public final class DefaultGroupExtractor implements GroupExtractor {
     if (uri == null) {
       throw new IllegalArgumentException("Uri cannot be null!");
     }
-    String groupName = null;
-    try {
-      // find last dot & get extension (js & css)
-      final int lastDot = uri.lastIndexOf('.');
-      final String beforeDot = uri.substring(0, lastDot);
-      final int lastSlash = beforeDot.lastIndexOf('/');
-      groupName = beforeDot.substring(lastSlash + 1, beforeDot
-          .length());
-    } catch (final IndexOutOfBoundsException e) {
-      LOG.warn("No group defined in uri: '" + uri + "'");
-    }
-    return groupName;
+    final String groupName = FilenameUtils.getBaseName(uri);
+    return StringUtils.isEmpty(groupName) ? null : groupName;
   }
 
   /**
@@ -49,9 +41,7 @@ public final class DefaultGroupExtractor implements GroupExtractor {
     if (uri == null) {
       throw new IllegalArgumentException("Uri cannot be null!");
     }
-    // find last dot & get extension (js & css)
-    final int lastDot = uri.lastIndexOf('.');
-    final String extension = uri.substring(lastDot + 1, uri.length());
+    final String extension = FilenameUtils.getExtension(uri);
     ResourceType type = null;
     try {
       type = ResourceType.valueOf(extension.toUpperCase());

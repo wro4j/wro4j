@@ -41,7 +41,10 @@ public class WroTestUtils {
     final String expected = replaceTabsWithSpaces(expectedWriter.toString()
         .trim());
     final String actual = replaceTabsWithSpaces(resultWriter.toString().trim());
+    System.out.println("Equals: " + expected.equals(actual));
     Assert.assertEquals(expected, actual);
+    expectedReader.close();
+    expectedWriter.close();
   }
 
   /**
