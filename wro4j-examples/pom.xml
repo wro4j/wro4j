@@ -47,7 +47,7 @@
 	          <!-- Use this phase so that maven war includes our bundles -->
 	          <phase>process-resources</phase>
 	          <goals>
-	            <goal>bundle</goal>
+	            <goal>run</goal>
 	          </goals>
 	        </execution>
 	      </executions>
