@@ -14,6 +14,7 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
@@ -65,6 +66,7 @@ public class StandAloneWroManagerFactory extends BaseWroManagerFactory {
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
     groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
+    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupsProcessor.addPostProcessor(new CssVariablesProcessor());
     groupsProcessor.addPostProcessor(new JSMinProcessor());
     groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());

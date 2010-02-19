@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.resource;
+package ro.isdc.wro.model.resource.locator;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

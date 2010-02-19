@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.processor;
+package ro.isdc.wro.model.resource.processor;
 
 import junit.framework.Assert;
 

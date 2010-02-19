@@ -1,7 +1,7 @@
 /**
  *
  */
-package ro.isdc.wro.resource;
+package ro.isdc.wro.model.resource.locator;
 
 import java.io.InputStream;
 

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009. All rights reserved.
  */
-package ro.isdc.wro.processor;
+package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
 import java.io.Reader;

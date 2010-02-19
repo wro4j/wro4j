@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model;
+package ro.isdc.wro.model.group;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,6 +10,7 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
@@ -33,6 +34,8 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
 
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
     groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
+
+    groupProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addPreProcessor(cssImportProcessor);
 

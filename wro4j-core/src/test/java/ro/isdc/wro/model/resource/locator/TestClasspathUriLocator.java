@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008 ISDC! Romania. All rights reserved.
  */
-package ro.isdc.wro.resource;
+package ro.isdc.wro.model.resource.locator;
 
 import java.io.File;
 import java.io.IOException;

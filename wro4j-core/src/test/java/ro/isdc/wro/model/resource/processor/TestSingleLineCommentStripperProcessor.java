@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008 ISDC! Romania. All rights reserved.
  */
-package ro.isdc.wro.processor;
+package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
 import java.io.Reader;
