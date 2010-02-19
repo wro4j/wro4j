@@ -21,7 +21,6 @@ public class CSSMin {
       final StringBuffer sb = new StringBuffer(input.replaceAll("[\t\n\r]", "").replaceAll("  ", " "));
       int k, n;
 
-      // System.out.println("Stripping comments...");
       // Find the start of the comment
       while ((n = sb.indexOf("/*")) != -1) {
         k = sb.indexOf("*/", n + 2);
@@ -30,22 +29,18 @@ public class CSSMin {
         }
         sb.delete(n, k + 2);
       }
-      // System.out.println("Finished stripping comments.");
 
-      // System.out.println("Extracting & parsing selectors...");
       final Vector selectors = new Vector();
       n = 0;
       while ((k = sb.indexOf("}", n)) != -1) {
         try {
           selectors.addElement(new Selector(sb.substring(n, k + 1)));
         } catch (final Exception e) {
-          // System.out.println("  Error parsing selector: skipping...");
+          //skip
         }
         n = k + 1;
       }
-      // System.out.println("Finished extracting & parsing selectors.");
 
-      // System.out.println("Pretty-printing output...");
       final Iterator iterSelectors = selectors.iterator();
       while (iterSelectors.hasNext()) {
         final Selector selector = (Selector)iterSelectors.next();

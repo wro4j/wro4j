@@ -31,7 +31,6 @@ public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
    * {@inheritDoc}
    */
   public V get(final K key) {
-    System.out.println(map.keySet());
     return map.get(key);
   }
 
@@ -49,7 +48,6 @@ public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
    * {@inheritDoc}
    */
   public void clear() {
-    System.out.println("Clear the cache");
     map.clear();
   }
 
