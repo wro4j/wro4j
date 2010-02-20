@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
-	<artifactId>maven-wro4j-plugin</artifactId>
+	<artifactId>wro4j-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
 	<name>Web Resource Optimizer Maven Plugin</name>
 
