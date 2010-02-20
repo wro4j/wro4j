@@ -1,0 +1,14 @@
+@import url('css/testWithBackgrounds.css');
+ul li {
+  list-style: none;
+}
+.center {
+  text-align: center;
+}
+.left {
+  text-align: left;
+	background: url(../image.png);
+}
+.right {
+  text-align: right;
+}

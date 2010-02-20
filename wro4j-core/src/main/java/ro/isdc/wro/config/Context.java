@@ -11,9 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.http.HttpHeader;
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.WroRuntimeException;
 
 
 /**
@@ -27,17 +25,6 @@ public class Context {
    * created by this thread should be able to access the {@link Context}.
    */
   private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
-
-  /**
-   * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
-   * is used.
-   */
-  private static final String PARAM_CONFIGURATION = "configuration";
-
-  /**
-   * Gzip resources configuration option.
-   */
-  private static final String PARAM_GZIP_RESOURCES = "gzipResources";
   /**
    * Request.
    */
@@ -63,10 +50,6 @@ public class Context {
    * A context useful for running in non web context (standAlone applications).
    */
   public static class StandAloneContext extends Context {
-    @Override
-    public boolean isDevelopmentMode() {
-      return true;
-    }
   }
 
   /**
@@ -96,7 +79,7 @@ public class Context {
    * Remove context from the local thread.
    */
   public static void unset() {
-    CURRENT.set(null);
+    CURRENT.remove();
   }
 
   /**
@@ -159,25 +142,13 @@ public class Context {
   /**
    * @return true if debug parameter is present (this means that DEBUG or DEVELOPMENT mode is used).
    */
-  public boolean isDevelopmentMode() {
-    String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
-    configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
-    //TODO get rid of Configuration enum & simplify this logic
-    final Configuration config = Configuration.of(configParam);
-    return false && config.isDevelopment();
-  }
-
-  /**
-   * The resource will be gzipped if the gzip request param is present and is true. Otherwise, the resource will be
-   * gzipped if the filter is configured with gzip turned on.
-   *
-   * @return true if requested resources should be gziped.
-   */
-  public final boolean isGzipEnabled() {
-    boolean gzipResources = true;
-    final String gzipParam = this.filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
-    gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
-    return gzipResources && WroUtil.headerContains(getRequest(), HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
+  public boolean isDevelopmentMode1() {
+//    String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
+//    configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
+//    //TODO get rid of Configuration enum & simplify this logic
+//    final Configuration config = Configuration.of(configParam);
+//    return false && config.isDevelopment();
+    return false;
   }
 
   /**

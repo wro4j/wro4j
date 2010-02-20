@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Betfair.
+ * Copyright (C) 2009.
  * All rights reserved.
  */
 package ro.isdc.wro.http;

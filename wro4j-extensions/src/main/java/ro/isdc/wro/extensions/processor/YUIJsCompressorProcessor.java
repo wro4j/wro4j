@@ -12,9 +12,9 @@ import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.annot.SupportedResourceType;
-import ro.isdc.wro.processor.ResourcePostProcessor;
-import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 

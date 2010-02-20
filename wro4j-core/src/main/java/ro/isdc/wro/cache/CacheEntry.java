@@ -4,8 +4,9 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
-import ro.isdc.wro.resource.ResourceType;
+import ro.isdc.wro.model.resource.ResourceType;
 
 /**
  * Used as an entry for the cache.
@@ -51,4 +52,12 @@ public class CacheEntry implements Serializable {
 	public int hashCode() {
 		return HashCodeBuilder.reflectionHashCode(this);
   }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+	  return ToStringBuilder.reflectionToString(this);
+	}
 }

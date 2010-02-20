@@ -33,6 +33,11 @@ public interface CacheStrategy<K, V> {
   V get(final K key);
 
   /**
+   * Clear all cache contents.
+   */
+  void clear();
+
+  /**
    * Perform the clean up.
    */
   void destroy();

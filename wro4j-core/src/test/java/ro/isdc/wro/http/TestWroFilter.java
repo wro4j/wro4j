@@ -18,14 +18,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.exception.InvalidGroupNameException;
-import ro.isdc.wro.exception.UnauthorizedRequestException;
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
-import ro.isdc.wro.model.WroModelFactory;
-import ro.isdc.wro.model.impl.XmlModelFactory;
-import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
+import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.InvalidGroupNameException;
+import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.test.util.WroTestUtils;
 
 /**

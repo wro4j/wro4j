@@ -25,14 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ApplicationContext;
-import ro.isdc.wro.config.ApplicationSettings;
-import ro.isdc.wro.config.ApplicationSettingsChangeListener;
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.exception.WroRuntimeException;
+import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.impl.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 
 
 /**
@@ -53,6 +53,25 @@ public class WroFilter
    */
   private static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
+   * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
+   * is used.
+   */
+  private static final String PARAM_CONFIGURATION = "configuration";
+  /**
+   * Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is assumed.
+   */
+  private static final String PARAM_DEPLOYMENT = "DEPLOYMENT";
+  /**
+   * Gzip resources configuration option.
+   */
+  private static final String PARAM_GZIP_RESOURCES = "gzipResources";
+
+  // ETag parameter
+  public static final int ETAG_OFF = 0;
+  public static final int ETAG_WEAK = 1;
+  //public static final int ETAG_STRONG = 2;
+
+  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -69,7 +88,7 @@ public class WroFilter
   private String cacheControlValue;
   private long expiresValue;
 
-  private ApplicationSettings applicationSettings;
+  private WroConfiguration applicationSettings;
 
 
   /**
@@ -92,34 +111,53 @@ public class WroFilter
     throws ServletException {
     try {
       applicationSettings = newApplicationSettings();
-      ApplicationContext.get().setSettings(applicationSettings);
+      ConfigurationContext.get().setConfig(applicationSettings);
       applicationSettings.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
-					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
-						((ApplicationSettingsChangeListener)wroManagerFactory).onCachePeriodChanged();
+				  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
+				  initHeaderValues();
+					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+						((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
 					}
 				}
 			});
       applicationSettings.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
-					if (wroManagerFactory instanceof ApplicationSettingsChangeListener) {
-						((ApplicationSettingsChangeListener)wroManagerFactory).onModelPeriodChanged();
+					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+						((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
 					}
 				}
 			});
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      final ObjectName name = new ObjectName(ApplicationSettings.getObjectName());
+      final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
       mbs.registerMBean(applicationSettings, name);
     } catch (final Exception e) {
       LOG.error("Exception occured while registering MBean", e);
     }
   }
 
+
   /**
-	 * @return {@link ApplicationSettings} configured object with default values set.
-	 */
-	private ApplicationSettings newApplicationSettings() {
-		return new ApplicationSettings();
+   * TODO allow configuration using some sort of property file?...
+   *
+   * @return {@link WroConfiguration} configured object with default values set.
+   */
+	private WroConfiguration newApplicationSettings() {
+		final WroConfiguration settings = new WroConfiguration();
+
+    final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
+    final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
+    settings.setGzipEnabled(gzipResources);
+
+    boolean debug = true;
+    final String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
+    if (configParam != null) {
+      if (PARAM_DEPLOYMENT.equalsIgnoreCase(configParam)) {
+        debug = false;
+      }
+    }
+    settings.setDebug(debug);
+    return settings;
 	}
 
 
@@ -158,7 +196,7 @@ public class WroFilter
     Context.set(context);
     final WroManager manager = wroManagerFactory.getInstance();
 
-    if (!Context.get().isDevelopmentMode()) {
+    if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       if (etagValue.equals(ifNoneMatch)) {
         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -181,7 +219,7 @@ public class WroFilter
    * @param response {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    if (!Context.get().isDevelopmentMode()) {
+    if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
       // Force resource caching as best as possible
       response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);

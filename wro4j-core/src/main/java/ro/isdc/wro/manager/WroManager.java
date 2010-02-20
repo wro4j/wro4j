@@ -25,22 +25,21 @@ import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.config.ApplicationContext;
-import ro.isdc.wro.config.ApplicationSettingsChangeListener;
+import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.exception.UnauthorizedRequestException;
-import ro.isdc.wro.exception.WroRuntimeException;
-import ro.isdc.wro.model.Group;
+import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.WroModelFactory;
-import ro.isdc.wro.processor.GroupsProcessor;
-import ro.isdc.wro.processor.RequestUriParser;
-import ro.isdc.wro.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.resource.ResourceType;
-import ro.isdc.wro.resource.UriLocator;
-import ro.isdc.wro.resource.UriLocatorFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -49,7 +48,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class WroManager implements ApplicationSettingsChangeListener {
+public class WroManager implements WroConfigurationChangeListener {
   /**
    * Logger for this class.
    */
@@ -63,12 +62,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   /**
    * GroupExtractor.
    */
-  private RequestUriParser requestUriParser;
-
-  /**
-   * UriLocatorFactory.
-   */
-  private UriLocatorFactory uriLocatorFactory;
+  private GroupExtractor requestUriParser;
 
   /**
    * Groups processor.
@@ -84,7 +78,6 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-
   /**
    * Perform processing of the uri.
    *
@@ -92,6 +85,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    * @throws IOException.
    */
   public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    LOG.info("processing: " + request.getRequestURI());
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
@@ -105,7 +99,8 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     }
     OutputStream os = null;
     // append result to response stream
-    if (Context.get().isGzipEnabled()) {
+    if (ConfigurationContext.get().getApplicationSettings().isGzipEnabled()
+      && isGzipSupported()) {
       os = getGzipedOutputStream(response);
     } else {
       os = response.getOutputStream();
@@ -113,6 +108,13 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     IOUtils.copy(is, os);
     is.close();
     os.close();
+  }
+
+  /**
+   * @return true if Gzip is Supported
+   */
+  protected boolean isGzipSupported() {
+    return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 
   /**
@@ -157,10 +159,12 @@ public final class WroManager implements ApplicationSettingsChangeListener {
     groupAsList.add(group);
 		String result = null;
 	  final CacheEntry cacheEntry = new CacheEntry(groupName, type);
+	  LOG.info("Searching cache entry: " + cacheEntry);
 	  // Cache based on uri
 	  result = cacheStrategy.get(cacheEntry);
 	  if (result == null) {
-	    // process groups & put update cache
+	    LOG.info("Cache is empty. Perform processing");
+	    // process groups & put result in the cache
 	    result = groupsProcessor.process(groupAsList, type);
 	    cacheStrategy.put(cacheEntry, result);
 	  }
@@ -178,33 +182,26 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    */
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
-      scheduler = Executors.newSingleThreadScheduledExecutor();
-      restartScheduler(model);
+      final long period = ConfigurationContext.get().getApplicationSettings().getCacheUpdatePeriod();
+      LOG.info("runing thread with period of " + period);
+      if (period > 0) {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        // Run a scheduled task which updates the model
+        scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
+      }
     }
   }
 
-  /**
-   * @param model
-   */
-  private void restartScheduler(final WroModel model) {
-    //Shutdown if any are running, just to be sure we are starting fresh new task
-    final long period = ApplicationContext.get().getApplicationSettings().getCacheUpdatePeriod();
-    LOG.debug("runing thread with period of " + period);
-    if (period > 0) {
-      // Run a scheduled task which updates the model
-      scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
-    }
-  }
 
   /**
-   * @param model
-   * @return
+   * @param model Model containing
+   * @return a {@link Runnable} which will update the cache content with latest data.
    */
   private Runnable getSchedulerRunnable(final WroModel model) {
     return new Runnable() {
     	public void run() {
     		try {
-    		  LOG.debug("reloading cache");
+    		  LOG.info("reloading cache");
     			// process groups & put update cache
     			final Collection<Group> groups = model.getGroups();
     			// update cache for all resources
@@ -237,7 +234,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
-    final UriLocator uriLocator = getUriLocatorFactory().getInstance(resourceId);
+    final UriLocator uriLocator = groupsProcessor.getUriLocatorFactory().getInstance(resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
@@ -254,15 +251,24 @@ public final class WroManager implements ApplicationSettingsChangeListener {
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-    restartScheduler(modelFactory.getInstance());
+    LOG.info("onCachePeriodChanged");
+    if (scheduler != null) {
+      scheduler.shutdown();
+      scheduler = null;
+    }
+    //flush the cache by destroying it.
+    cacheStrategy.clear();
   }
 
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-  	if (modelFactory instanceof ApplicationSettingsChangeListener) {
-  		((ApplicationSettingsChangeListener)modelFactory).onModelPeriodChanged();
+    LOG.info("onModelPeriodChanged");
+    //update the cache also when model is changed.
+    onCachePeriodChanged();
+  	if (modelFactory instanceof WroConfigurationChangeListener) {
+  		((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
   	}
   }
 
@@ -272,7 +278,9 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   public void destroy() {
     LOG.debug("WroManager destroyed");
     cacheStrategy.destroy();
-    scheduler.shutdownNow();
+    if (scheduler != null) {
+      scheduler.shutdownNow();
+    }
   }
 
 	/**
@@ -288,9 +296,6 @@ public final class WroManager implements ApplicationSettingsChangeListener {
 		if (this.groupsProcessor == null) {
 			throw new WroRuntimeException("GroupProcessor was not set!");
 		}
-		if (this.uriLocatorFactory == null) {
-			throw new WroRuntimeException("uriLocatorFactory was not set!");
-		}
 		if (this.cacheStrategy == null) {
 			throw new WroRuntimeException("cacheStrategy was not set!");
 		}
@@ -299,7 +304,7 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   /**
    * @param requestUriParser the uriProcessor to set
    */
-  public final void setRequestUriParser(final RequestUriParser requestUriParser) {
+  public final void setRequestUriParser(final GroupExtractor requestUriParser) {
     this.requestUriParser = requestUriParser;
   }
 
@@ -318,24 +323,10 @@ public final class WroManager implements ApplicationSettingsChangeListener {
   }
 
   /**
-   * @param uriLocatorFactory the resourceLocatorFactory to set
-   */
-  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
-  }
-
-  /**
    * @param cacheStrategy the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
     this.cacheStrategy = cacheStrategy;
-  }
-
-  /**
-   * @return the uriLocatorFactory
-   */
-  public final UriLocatorFactory getUriLocatorFactory() {
-    return uriLocatorFactory;
   }
 
   /**
