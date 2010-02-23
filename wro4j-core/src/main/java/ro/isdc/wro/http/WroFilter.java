@@ -130,7 +130,9 @@ public class WroFilter
 			});
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
-      mbs.registerMBean(applicationSettings, name);
+      if (!mbs.isRegistered(name)) {
+        mbs.registerMBean(applicationSettings, name);
+      }
     } catch (final Exception e) {
       LOG.error("Exception occured while registering MBean", e);
     }
