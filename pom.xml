@@ -4,9 +4,54 @@
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Web Resource Optimizer Parent</name>
+	<packaging>pom</packaging>	
+  <name>Web Resource Optimizer Parent</name>
+  <inceptionYear>2008</inceptionYear>
+  
+  <description>
+     The purpose of this project is to reduce the number of requests 
+     needed to load a page and the amount of data to transfer to clients, 
+     achieving drastic improvement of loading times. The resources can be benefit 
+     also from minification and compression.
+  </description>
+  
+  <issueManagement>
+    <system>googleCode</system>
+    <url>http://code.google.com/p/wro4j/issues/list</url>
+  </issueManagement>
+  
+  
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
+  <mailingLists>
+    <mailingList>
+      <name>Discussion Group</name>
+      <post>wro4j@googlegroups.com</post>
+      <archive>http://groups.google.com/group/wro4j</archive>
+    </mailingList>
+  </mailingLists>
+
+  <developers>
+    <developer>
+      <id>alex.objelean</id>
+      <name>Alex Objelean</name>
+      <email>alex.objelean@gmail.com</email>
+      <timezone>+2</timezone>
+    </developer>
+    <developer>
+      <id>bogdan.csoregi</id>
+      <name>Bogdan Csoregi</name>
+      <email>bogdan.csoregi@gmail.com</email>
+      <timezone>+2</timezone>
+    </developer>
+  </developers>
+  
 	<modules>
 		<module>wro4j-core</module>
 		<module>wro4j-extensions</module>
@@ -199,9 +244,9 @@
       </plugin>      
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
+        <artifactId>maven-release-plugin</artifactId>
 				<configuration>
-					<tagBase>git://github.com/alexo/wro4j.git</tagBase>
+					<tagBase>http://wro4j.googlecode.com/svn/tags/</tagBase>
 				</configuration>
 				<version>2.0-beta-7</version>
 			</plugin>
