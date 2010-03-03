@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>	
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
+  <url>http://code.google.com/p/wro4j/</url>
   
   <description>
      The purpose of this project is to reduce the number of requests 
@@ -19,8 +20,7 @@
     <system>googleCode</system>
     <url>http://code.google.com/p/wro4j/issues/list</url>
   </issueManagement>
-  
-  
+    
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -275,6 +275,7 @@
   <scm>
     <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
     <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>    
+    <url>http://github.com/alexo/wro4j.git</url>
   </scm>
   
   <profiles>
