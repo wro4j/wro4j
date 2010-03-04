@@ -35,11 +35,10 @@
     <!-- 
 	    <plugin>
 	      <groupId>ro.isdc.wro4j</groupId>
-	      <artifactId>maven-wro4j-plugin</artifactId>
+	      <artifactId>wro4j-maven-plugin</artifactId>
 	      <version>1.2.0-rc2</version>
 	      <executions>
 	        <execution>
-	          <phase>process-resources</phase>
 	          <goals>
 	            <goal>run</goal>
 	          </goals>
@@ -47,11 +46,12 @@
 	      </executions>
 	      <configuration>
 	        <targetGroups>
-	          <param>all</param>
+	          <param>uniform</param>
 	        </targetGroups>
 	      </configuration>
 	    </plugin>  
        -->
 	  </plugins>
-	</build>	
+	</build>
+  <!--  -->	
 </project>

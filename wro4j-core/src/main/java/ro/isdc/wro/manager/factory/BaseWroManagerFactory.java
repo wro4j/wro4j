@@ -30,6 +30,12 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
   protected volatile WroManager manager;
 
   /**
+   * Prevent instantiation. Use factory method.
+   */
+  protected BaseWroManagerFactory() {
+  }
+
+  /**
    * Creates default singleton instance of manager, by initializing manager
    * dependencies with default values (processors). {@inheritDoc}
    */
@@ -117,6 +123,6 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    * {@inheritDoc}
    */
   public void destroy() {
-    manager.getModelFactory().destroy();
+    getInstance().getModelFactory().destroy();
   }
 }

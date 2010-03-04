@@ -36,14 +36,16 @@ import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 public class Wro4jMojo extends AbstractMojo {
   /**
    * File containing the groups definitions.
+   *
    * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml
    */
   private File wroFile;
   /**
-   * File containing the groups definitions.
+   * The folder where web application context resides useful for locating resources relative to servletContext .
+   *
    * @parameter default-value="${basedir}/src/main/webapp/
    */
-  private File servletContextFolder;
+  private File contextFolder;
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
@@ -60,6 +62,9 @@ public class Wro4jMojo extends AbstractMojo {
    */
   private WroManagerFactory wroManagerFactory;
 
+  /**
+   * @return {@link WroManagerFactory} implementation.
+   */
   private WroManagerFactory getFactory() {
     if (wroManagerFactory == null) {
       wroManagerFactory = new StandAloneWroManagerFactory() {
@@ -79,7 +84,7 @@ public class Wro4jMojo extends AbstractMojo {
             public InputStream locate(final String uri)
               throws IOException {
               final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
-              return new FileInputStream(new File(servletContextFolder, uriWithoutPrefix));
+              return new FileInputStream(new File(contextFolder, uriWithoutPrefix));
             }
           };
         }
@@ -124,11 +129,18 @@ public class Wro4jMojo extends AbstractMojo {
     Mockito.when(request.getRequestURI()).thenReturn(group);
     final File destinationFile = new File(destinationFolder, group);
     destinationFile.createNewFile();
-    getLog().debug("Creating output file: " + destinationFile.getAbsolutePath());
     final FileOutputStream fos = new FileOutputStream(destinationFile);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
     getFactory().getInstance().process(request, response);
     fos.close();
+    //delete empty files
+    if (destinationFile.length() == 0) {
+      getLog().info("No content found for group: " + group);
+      destinationFile.delete();
+    } else {
+      getLog().info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes"
+        + ") has been created!");
+    }
   }
 
   /**
@@ -153,9 +165,9 @@ public class Wro4jMojo extends AbstractMojo {
   }
 
   /**
-   * @param servletContextFolder the servletContextFolder to set
+   * @param contextFolder the servletContextFolder to set
    */
-  public void setServletContextFolder(final File servletContextFolder) {
-    this.servletContextFolder = servletContextFolder;
+  public void setContextFolder(final File contextFolder) {
+    this.contextFolder = contextFolder;
   }
 }

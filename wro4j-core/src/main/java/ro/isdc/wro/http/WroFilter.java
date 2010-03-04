@@ -66,11 +66,6 @@ public class WroFilter
    */
   private static final String PARAM_GZIP_RESOURCES = "gzipResources";
 
-  // ETag parameter
-  public static final int ETAG_OFF = 0;
-  public static final int ETAG_WEAK = 1;
-  //public static final int ETAG_STRONG = 2;
-
   /**
    * Filter config.
    */
@@ -123,6 +118,7 @@ public class WroFilter
 			});
       applicationSettings.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
+          initHeaderValues();
 					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
 						((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
 					}
@@ -140,8 +136,6 @@ public class WroFilter
 
 
   /**
-   * TODO allow configuration using some sort of property file?...
-   *
    * @return {@link WroConfiguration} configured object with default values set.
    */
 	private WroConfiguration newApplicationSettings() {
@@ -174,7 +168,6 @@ public class WroFilter
     cal.roll(Calendar.YEAR, 10);
     expiresValue = cal.getTimeInMillis();
   }
-
 
   /**
    * Custom filter initialization - can be used for extended classes.
