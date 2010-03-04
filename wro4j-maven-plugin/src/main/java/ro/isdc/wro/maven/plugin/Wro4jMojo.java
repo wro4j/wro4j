@@ -23,8 +23,13 @@ import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.StandAloneWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
 
 
 /**
@@ -58,6 +63,11 @@ public class Wro4jMojo extends AbstractMojo {
    */
   private List<String> targetGroups = new ArrayList<String>();
   /**
+   * @parameter default-value="true"
+   * @optional
+   */
+  private boolean minimize;
+  /**
    * Factory which will create the engine for doing the main job.
    */
   private WroManagerFactory wroManagerFactory;
@@ -76,6 +86,17 @@ public class Wro4jMojo extends AbstractMojo {
               return new FileInputStream(wroFile);
             }
           };
+        }
+        @Override
+        protected GroupsProcessor newGroupsProcessor() {
+          final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+          groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
+          groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+          if (minimize) {
+            groupsProcessor.addPostProcessor(new JSMinProcessor());
+            groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+          }
+          return groupsProcessor;
         }
         @Override
         protected ServletContextUriLocator newServletContextUriLocator() {
