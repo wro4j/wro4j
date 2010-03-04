@@ -68,7 +68,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
         content = IOUtils.toString(reader);
         reader.close();
       } catch (final IOException e) {
-        LOG.warn("Invalid resource found" + resource);
+        LOG.warn("Invalid resource found: " + resource);
       }
       if (processors.isEmpty() || reader == null) {
         final Writer output = new StringWriter();

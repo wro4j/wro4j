@@ -30,6 +30,8 @@ import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 /**
  * @goal run
  * @phase package
+ *
+ * @author Alex Objelean
  */
 public class Wro4jMojo extends AbstractMojo {
   /**

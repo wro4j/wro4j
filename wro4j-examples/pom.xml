@@ -5,13 +5,12 @@
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-examples</artifactId>
 	<packaging>war</packaging>
-
 	<name>Web Resource Optimizer Examples Project</name>
 
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-		<version>1.2.0</version>
+		<version>1.2.1-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
