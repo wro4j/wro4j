@@ -58,6 +58,16 @@
     </developer>
   </developers>
   
+	<properties>
+    <commons-io.dependency>1.4</commons-io.dependency>
+    <commons-lang.dependency>2.4</commons-lang.dependency>       
+    <slf4j.dependency>1.5.11</slf4j.dependency>    
+		<maven.dependency>2.2.1</maven.dependency>    
+    <mockito.dependency>1.8.2</mockito.dependency>
+    <junit.dependency>4.8.1</junit.dependency>    
+	</properties>
+  
+  
 	<modules>
 		<module>wro4j-core</module>
 		<module>wro4j-extensions</module>
@@ -94,29 +104,38 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>1.4</version>
+				<version>${commons-io.dependency}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
-				<version>2.4</version>
+				<version>${commons-lang.dependency}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.5.11</version>
+				<version>${slf4j.dependency}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.5.11</version>
+				<version>${slf4j.dependency}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-plugin-api</artifactId>
-				<version>2.1.0</version>
+				<version>${maven.dependency}</version>
 			</dependency>
-
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-artifact</artifactId>
+        <version>${maven.dependency}</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${maven.dependency}</version>
+      </dependency>
 			<!-- Provided by container -->
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -144,13 +163,13 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.8.1</version>
+				<version>${junit.dependency}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
-				<version>1.8.2</version>
+				<version>${mockito.dependency}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
