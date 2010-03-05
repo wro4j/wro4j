@@ -187,8 +187,7 @@ public class WroFilter
     final HttpServletResponse response = (HttpServletResponse)res;
 
     // add request, response & servletContext to thread local
-    final Context context = new Context(request, response, filterConfig);
-    Context.set(context);
+    Context.set(Context.webContext(request, response, filterConfig));
     final WroManager manager = wroManagerFactory.getInstance();
 
     if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {

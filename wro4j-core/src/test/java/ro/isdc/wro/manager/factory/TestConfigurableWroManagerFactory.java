@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 
 /**
  * TestConfigurableWroManagerFactory.
@@ -32,7 +31,7 @@ public class TestConfigurableWroManagerFactory {
     	protected void onBeforeCreate() {
     		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     		final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    		Context.set(new Context(request, response, filterConfig));
+    		Context.set(Context.webContext(request, response, filterConfig));
     	}
     };
     //create one instance for test

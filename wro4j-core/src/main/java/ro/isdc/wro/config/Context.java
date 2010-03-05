@@ -47,9 +47,28 @@ public class Context {
   private final FilterConfig filterConfig;
 
   /**
+   * A context useful for running in web context (inside a servlet container).
+   */
+  public static Context webContext(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
+    return new Context(request, response, filterConfig);
+  }
+  
+  /**
    * A context useful for running in non web context (standAlone applications).
    */
-  public static class StandAloneContext extends Context {
+  public static Context standaloneContext() {
+    return new Context();
+  }
+
+
+  /**
+   * Creates a Context which knows only about {@link HttpServletRequest} object.
+   * 
+   * @param request {@link HttpServletRequest} for this context.
+   * @return {@link Context} instance.
+   */
+  public static Context standaloneContext(final HttpServletRequest request) {
+    return new Context(request, null, null);
   }
 
   /**
@@ -96,11 +115,15 @@ public class Context {
   /**
    * Constructor.
    */
-  public Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
+  private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
     this.request = request;
     this.requestURI = request.getRequestURI();
     this.response = response;
-    this.servletContext = filterConfig.getServletContext();
+    if (filterConfig != null) {
+      this.servletContext = filterConfig.getServletContext();
+    } else  {
+      this.servletContext = null;
+    }
     this.filterConfig = filterConfig;
   }
 
@@ -137,18 +160,6 @@ public class Context {
    */
   public FilterConfig getFilterConfig() {
     return this.filterConfig;
-  }
-
-  /**
-   * @return true if debug parameter is present (this means that DEBUG or DEVELOPMENT mode is used).
-   */
-  public boolean isDevelopmentMode1() {
-//    String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
-//    configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
-//    //TODO get rid of Configuration enum & simplify this logic
-//    final Configuration config = Configuration.of(configParam);
-//    return false && config.isDevelopment();
-    return false;
   }
 
   /**

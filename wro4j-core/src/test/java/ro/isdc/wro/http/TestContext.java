@@ -36,7 +36,7 @@ public class TestContext {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    Context.set(new Context(request, response, filterConfig));
+    Context.set(Context.webContext(request, response, filterConfig));
     //simulate that gzip encoding is accepted
     Mockito.when(Context.get().getRequest().getHeaders(Mockito.anyString())).thenReturn(new Enumeration<String>() {
       public boolean hasMoreElements() {

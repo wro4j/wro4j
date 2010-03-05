@@ -31,7 +31,7 @@ public class TestWroManager {
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    Context.set(new Context(request, response, filterConfig));
+    Context.set(Context.webContext(request, response, filterConfig));
 	}
 
   @Test
