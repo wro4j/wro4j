@@ -8,12 +8,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -58,7 +64,7 @@ public class Wro4jMojo extends AbstractMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}/wro/
+   * @parameter default-value="${project.build.directory}/wro/"
    */
   private File destinationFolder;
   /**
@@ -71,8 +77,8 @@ public class Wro4jMojo extends AbstractMojo {
    * @optional
    */
   private boolean minimize;
-  /** 
-   * @parameter default-value="${project}" 
+  /**
+   * @parameter default-value="${project}"
    */
   private MavenProject mavenProject;
 
@@ -133,9 +139,9 @@ public class Wro4jMojo extends AbstractMojo {
     throws MojoExecutionException {
     getLog().info("Executing the mojo");
     getLog().debug("wro file: " + wroFile);
-    
-    //TODO update classloader by adding all runtime dependencies of the running project 
-    
+
+    updateClasspath();
+
     try {
       if (!destinationFolder.exists()) {
         destinationFolder.mkdirs();
@@ -154,6 +160,27 @@ public class Wro4jMojo extends AbstractMojo {
   }
 
   /**
+   * Update the classpath.
+   */
+  private void updateClasspath() {
+    //TODO update classloader by adding all runtime dependencies of the running project
+    getLog().info("mavenProject: " + mavenProject);
+    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
+    final List<URL> urlList = new ArrayList<URL>();
+    try {
+      for (final Artifact artifact : artifacts) {
+        urlList.add(artifact.getFile().toURI().toURL());
+      }
+    } catch (final MalformedURLException e) {
+      getLog().error("Error retreiving URL for artifact", e);
+      throw new RuntimeException(e);
+    }
+    getLog().info("URLs: " + urlList);
+    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
+    Thread.currentThread().setContextClassLoader(cl);
+  }
+
+  /**
    * @return a list containing all groups needs to be processed.
    */
   private List<String> getTargetGroupsAsList() {
@@ -167,18 +194,18 @@ public class Wro4jMojo extends AbstractMojo {
   private void processGroup(final String group)
     throws IOException {
     getLog().info("processing group: " + group);
-    
+
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(request.getRequestURI()).thenReturn(group);
-   
+
     final File destinationFile = new File(destinationFolder, group);
     destinationFile.createNewFile();
     final FileOutputStream fos = new FileOutputStream(destinationFile);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
-    
+
     getManagerFactory(request).getInstance().process(request, response);
-    
+
     fos.close();
     //delete empty files
     if (destinationFile.length() == 0) {
@@ -210,14 +237,14 @@ public class Wro4jMojo extends AbstractMojo {
   public void setContextFolder(final File contextFolder) {
     this.contextFolder = contextFolder;
   }
-  
+
   /**
    * @param targetGroups comma separated group names.
    */
   public void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
   }
-  
+
   /**
    * @param minimize flag for minimization.
    */

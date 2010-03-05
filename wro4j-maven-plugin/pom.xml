@@ -43,7 +43,11 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-    </dependency>    
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+     </dependency>    
     <!-- Add explicitly compile scope, because it is by default test -->
     <dependency>
       <groupId>org.slf4j</groupId>
