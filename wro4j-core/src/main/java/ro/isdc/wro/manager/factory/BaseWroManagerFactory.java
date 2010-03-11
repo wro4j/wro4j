@@ -73,22 +73,21 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    * @return {@link WroManager}
    */
   protected WroManager newManager() {
-    final WroManager manager = new WroManager();
-    return manager;
+    return new WroManager();
   }
 
   /**
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-  	manager.onCachePeriodChanged();
+  	getInstance().onCachePeriodChanged();
   }
 
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-  	manager.onModelPeriodChanged();
+    getInstance().onModelPeriodChanged();
   }
 
   /**

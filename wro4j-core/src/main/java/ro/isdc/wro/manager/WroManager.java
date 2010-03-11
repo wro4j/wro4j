@@ -86,6 +86,7 @@ public class WroManager implements WroConfigurationChangeListener {
    */
   public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     LOG.info("processing: " + request.getRequestURI());
+    validate();
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
@@ -145,7 +146,6 @@ public class WroManager implements WroConfigurationChangeListener {
 
 		final StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-		validate();
 		// find names & type
 		final String groupName = requestUriParser.getGroupName(requestURI);
 		if (groupName == null) {
