@@ -6,7 +6,6 @@ package ro.isdc.wro.model.resource.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 /**
@@ -32,8 +31,7 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
         return uriLocator;
       }
     }
-    throw new WroRuntimeException(
-        "Cannot find a uriLocator for the following uri: " + uri);
+    return null;
   }
 
   /**

@@ -242,17 +242,19 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   protected final Reader getResourceReader(final Resource resource)
     throws IOException {
-      final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+    Reader reader = null;
+    final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+    if (locator != null) {
       final InputStream is = locator.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
-      final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-      if (reader == null) {
-        //TODO skip invalid resource, instead of throwing exception
-        throw new WroRuntimeException(
-            "Exception while retrieving InputStream from uri: " + resource.getUri());
-      }
-      return reader;
+      reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     }
+    if (reader == null) {
+      // TODO skip invalid resource, instead of throwing exception
+      throw new IOException("Exception while retrieving InputStream from uri: " + resource.getUri());
+    }
+    return reader;
+  }
 
   /**
    * @param groups

@@ -62,7 +62,7 @@ public class WroManager implements WroConfigurationChangeListener {
   /**
    * GroupExtractor.
    */
-  private GroupExtractor requestUriParser;
+  private GroupExtractor groupExtractor;
 
   /**
    * Groups processor.
@@ -142,12 +142,12 @@ public class WroManager implements WroConfigurationChangeListener {
 	private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request, final HttpServletResponse response) {
 	  final String requestURI = request.getRequestURI();
     InputStream is = null;
-    final ResourceType type = requestUriParser.getResourceType(requestURI);
+    final ResourceType type = groupExtractor.getResourceType(requestURI);
 
 		final StopWatch stopWatch = new StopWatch();
     stopWatch.start();
 		// find names & type
-		final String groupName = requestUriParser.getGroupName(requestURI);
+		final String groupName = groupExtractor.getGroupName(requestURI);
 		if (groupName == null) {
 		  throw new WroRuntimeException("No groups found for request: " + requestURI);
 		}
@@ -278,6 +278,7 @@ public class WroManager implements WroConfigurationChangeListener {
   public void destroy() {
     LOG.debug("WroManager destroyed");
     cacheStrategy.destroy();
+    modelFactory.destroy();
     if (scheduler != null) {
       scheduler.shutdownNow();
     }
@@ -287,14 +288,14 @@ public class WroManager implements WroConfigurationChangeListener {
 	 * Check if all dependencies are set.
 	 */
 	private void validate() {
-		if (this.requestUriParser == null) {
-			throw new WroRuntimeException("UriProcessor was not set!");
+		if (this.groupExtractor == null) {
+			throw new WroRuntimeException("GroupExtractor was not set!");
 		}
 		if (this.modelFactory == null) {
 			throw new WroRuntimeException("ModelFactory was not set!");
 		}
 		if (this.groupsProcessor == null) {
-			throw new WroRuntimeException("GroupProcessor was not set!");
+			throw new WroRuntimeException("GroupsProcessor was not set!");
 		}
 		if (this.cacheStrategy == null) {
 			throw new WroRuntimeException("cacheStrategy was not set!");
@@ -302,16 +303,22 @@ public class WroManager implements WroConfigurationChangeListener {
 	}
 
   /**
-   * @param requestUriParser the uriProcessor to set
+   * @param groupExtractor the uriProcessor to set
    */
-  public final void setRequestUriParser(final GroupExtractor requestUriParser) {
-    this.requestUriParser = requestUriParser;
+  public final void setGroupExtractor(final GroupExtractor groupExtractor) {
+    if (groupExtractor == null) {
+      throw new IllegalArgumentException("GroupExtractor cannot be null!");
+    }
+    this.groupExtractor = groupExtractor;
   }
 
   /**
    * @param groupsProcessor the groupsProcessor to set
    */
   public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
+    if (groupsProcessor == null) {
+      throw new IllegalArgumentException("GroupsProcessor cannot be null!");
+    }
     this.groupsProcessor = groupsProcessor;
   }
 
@@ -319,6 +326,9 @@ public class WroManager implements WroConfigurationChangeListener {
    * @param modelFactory the modelFactory to set
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
+    if (modelFactory == null) {
+      throw new IllegalArgumentException("WroModelFactory cannot be null!");
+    }
     this.modelFactory = modelFactory;
   }
 
@@ -326,6 +336,9 @@ public class WroManager implements WroConfigurationChangeListener {
    * @param cacheStrategy the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
+    if (cacheStrategy == null) {
+      throw new IllegalArgumentException("cacheStrategy cannot be null!");
+    }
     this.cacheStrategy = cacheStrategy;
   }
 

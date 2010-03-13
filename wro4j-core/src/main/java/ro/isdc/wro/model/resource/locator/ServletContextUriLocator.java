@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -134,7 +135,8 @@ public class ServletContextUriLocator
       final ServletResponse wrappedResponse = getWrappedServletResponse(response, os);
       // use dispatcher
       try {
-        request.getRequestDispatcher(location).include(wrappedRequest, wrappedResponse);
+        final RequestDispatcher dispatcher = Context.get().getRequest().getRequestDispatcher(location);
+        dispatcher.include(wrappedRequest, wrappedResponse);
         LOG.debug("dispatching request to:" + location);
         // force flushing - the content will be written to
         // BytArrayOutputStream. Otherwise exactly 32K of data will be

@@ -18,10 +18,7 @@ public interface UriLocatorFactory {
    *
    * @param uri
    *          location of the resource.
-   * @return not null {@link UriLocator} implementation.
-   * @throws runtime
-   *           exception if a valid instance of resourceLocator cannot be
-   *           returned.
+   * @return {@link UriLocator} implementation if any found or null otherwise.
    */
   UriLocator getInstance(final String uri);
 }

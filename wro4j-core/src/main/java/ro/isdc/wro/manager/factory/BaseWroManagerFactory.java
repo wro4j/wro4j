@@ -46,7 +46,7 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
       synchronized (this) {
         if (this.manager == null) {
           this.manager = newManager();
-          manager.setRequestUriParser(newRequestUriParser());
+          manager.setGroupExtractor(newRequestUriParser());
           manager.setModelFactory(newModelFactory());
           final GroupsProcessor groupsProcessor = newGroupsProcessor();
           manager.setGroupsProcessor(groupsProcessor);
@@ -122,6 +122,6 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    * {@inheritDoc}
    */
   public void destroy() {
-    getInstance().getModelFactory().destroy();
+    getInstance().destroy();
   }
 }
