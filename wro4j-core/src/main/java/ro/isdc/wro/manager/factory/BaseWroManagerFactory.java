@@ -45,12 +45,17 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
     if (this.manager == null) {
       synchronized (this) {
         if (this.manager == null) {
-          this.manager = newManager();
-          manager.setGroupExtractor(newRequestUriParser());
-          manager.setModelFactory(newModelFactory());
+          final GroupExtractor groupExtractor = newGroupExtractor();
+          final WroModelFactory modelFactory = newModelFactory();
           final GroupsProcessor groupsProcessor = newGroupsProcessor();
+          final CacheStrategy<CacheEntry, String> cacheStrategy = newCacheStrategy();
+          // it is important to instantiate dependencies first, otherwise another thread can start working with
+          // uninitialized manager.
+          this.manager = newManager();
+          manager.setGroupExtractor(groupExtractor);
+          manager.setModelFactory(modelFactory);
           manager.setGroupsProcessor(groupsProcessor);
-          manager.setCacheStrategy(newCacheStrategy());
+          manager.setCacheStrategy(cacheStrategy);
         }
       }
     }
@@ -100,7 +105,7 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
   /**
    * @return {@link GroupExtractor} implementation.
    */
-  protected GroupExtractor newRequestUriParser() {
+  protected GroupExtractor newGroupExtractor() {
     return new DefaultGroupExtractor();
   }
 

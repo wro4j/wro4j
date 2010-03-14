@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -53,11 +54,7 @@ public final class WroUtil {
    *         /app/wro/all.css => /app/wro/
    */
   public static String getFolderOfUri(final String uri) {
-    if (uri == null) {
-      throw new IllegalArgumentException("uri cannot be null!");
-    }
-    final int idxLastSeparator = uri.lastIndexOf('/');
-    return uri.substring(0, idxLastSeparator + 1);
+    return FilenameUtils.getFullPath(uri);
   }
 
 

@@ -30,7 +30,7 @@ public class TestConfigurableWroManagerFactory {
     	@Override
     	protected void onBeforeCreate() {
     		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    		final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     		Context.set(Context.webContext(request, response, filterConfig));
     	}
     };

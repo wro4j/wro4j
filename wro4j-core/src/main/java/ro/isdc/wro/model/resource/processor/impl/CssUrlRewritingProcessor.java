@@ -276,7 +276,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
-  	final String requestURI = Context.get().getRequestURI();
+  	final String requestURI = Context.get().getRequest().getRequestURI();
   	return WroUtil.getFolderOfUri(requestURI)  + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
   }
 }

@@ -48,6 +48,11 @@ public class TestContext {
     });
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void cannotSetNulContext() {
+	  Context.set(null);
+	}
+
 	@After
 	public void tearDown() {
 	  Context.unset();

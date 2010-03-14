@@ -6,10 +6,10 @@ package ro.isdc.wro.manager;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -28,10 +28,7 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 public class TestWroManager {
 	@Before
 	public void setUp() {
-		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    Context.set(Context.webContext(request, response, filterConfig));
+	  Context.set(Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS));
 	}
 
   @Test
@@ -44,12 +41,16 @@ public class TestWroManager {
     		return getResourceAsStream(TestWroManager.class.getPackage().getName().replace(".", "/") + "/wro.xml");
     	}
     });
-
-    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(System.out));
     manager.process(request, response);
-    //manager.destroy();
+    manager.destroy();
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 }

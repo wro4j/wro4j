@@ -40,6 +40,17 @@
     <url-pattern>/dwr/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>dynamicResource</servlet-name>
+    <display-name>DWR Servlet</display-name>
+    <servlet-class>ro.isdc.wro.examples.DynamicResourceServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>dynamicResource</servlet-name>
+    <url-pattern>/dynamicResource/*</url-pattern>
+  </servlet-mapping>
+
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>

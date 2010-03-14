@@ -30,7 +30,6 @@ import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 
@@ -185,11 +184,8 @@ public class WroFilter
     throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest)req;
     final HttpServletResponse response = (HttpServletResponse)res;
-
     // add request, response & servletContext to thread local
     Context.set(Context.webContext(request, response, filterConfig));
-    final WroManager manager = wroManagerFactory.getInstance();
-
     if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       if (etagValue.equals(ifNoneMatch)) {
@@ -199,7 +195,7 @@ public class WroFilter
     }
     setResponseHeaders(response);
     // process the uri using manager
-    manager.process(request, response);
+    wroManagerFactory.getInstance().process(request, response);
     // remove context from the current thread local.
     Context.unset();
   }

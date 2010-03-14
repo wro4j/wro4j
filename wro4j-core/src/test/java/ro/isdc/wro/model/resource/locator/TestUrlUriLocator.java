@@ -9,10 +9,6 @@ import java.net.MalformedURLException;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
  *
@@ -39,5 +35,11 @@ public class TestUrlUriLocator {
   public void cannotLocateMalformedUrl()
     throws IOException {
     uriLocator.locate("/someInvalidUri.html");
+  }
+
+  @Test
+  public void testValidUrl()
+    throws IOException {
+    uriLocator.locate("http://www.google.com");
   }
 }
