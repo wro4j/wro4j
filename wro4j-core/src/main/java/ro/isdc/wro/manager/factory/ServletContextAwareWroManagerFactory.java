@@ -40,6 +40,7 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
     groupProcessor.addPreProcessor(cssImportProcessor);
 
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
+
     groupProcessor.addPostProcessor(new JSMinProcessor());
     groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
 

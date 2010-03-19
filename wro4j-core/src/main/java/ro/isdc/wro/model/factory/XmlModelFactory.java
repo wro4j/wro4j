@@ -137,7 +137,7 @@ public class XmlModelFactory
    */
   private void initScheduler() {
     if (scheduler == null) {
-      final long period = ConfigurationContext.get().getApplicationSettings().getModelUpdatePeriod();
+      final long period = ConfigurationContext.get().getConfig().getModelUpdatePeriod();
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Run a scheduled task which updates the model

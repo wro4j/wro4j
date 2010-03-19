@@ -211,7 +211,7 @@ public class WroFilter
     final HttpServletResponse response = (HttpServletResponse)res;
     // add request, response & servletContext to thread local
     Context.set(Context.webContext(request, response, filterConfig));
-    if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
+    if (!ConfigurationContext.get().getConfig().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       if (etagValue.equals(ifNoneMatch)) {
         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -234,7 +234,7 @@ public class WroFilter
    * @param response {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    if (!ConfigurationContext.get().getApplicationSettings().isDebug()) {
+    if (!ConfigurationContext.get().getConfig().isDebug()) {
       // Force resource caching as best as possible
       response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);

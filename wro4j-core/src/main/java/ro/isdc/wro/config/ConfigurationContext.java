@@ -33,16 +33,16 @@ public class ConfigurationContext {
 	/**
 	 * @return the settings
 	 */
-	public WroConfiguration getApplicationSettings() {
+	public WroConfiguration getConfig() {
 		return config;
 	}
 
 
 	/**
-	 * @param settings the settings to set
+	 * @param config the settings to set
 	 */
-	public void setConfig(final WroConfiguration settings) {
-		this.config = settings;
+	public void setConfig(final WroConfiguration config) {
+		this.config = config;
 	}
 
 	/**

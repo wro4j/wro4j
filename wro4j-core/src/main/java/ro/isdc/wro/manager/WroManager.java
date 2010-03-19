@@ -100,7 +100,7 @@ public class WroManager implements WroConfigurationChangeListener {
     }
     OutputStream os = null;
     // append result to response stream
-    if (ConfigurationContext.get().getApplicationSettings().isGzipEnabled()
+    if (ConfigurationContext.get().getConfig().isGzipEnabled()
       && isGzipSupported()) {
       os = getGzipedOutputStream(response);
     } else {
@@ -182,7 +182,7 @@ public class WroManager implements WroConfigurationChangeListener {
    */
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
-      final long period = ConfigurationContext.get().getApplicationSettings().getCacheUpdatePeriod();
+      final long period = ConfigurationContext.get().getConfig().getCacheUpdatePeriod();
       LOG.info("runing thread with period of " + period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
