@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
@@ -41,9 +42,10 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
 
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
 
-    groupProcessor.addPostProcessor(new JSMinProcessor());
-    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-
+    if (ConfigurationContext.get().getConfig().isMinimize()) {
+      groupProcessor.addPostProcessor(new JSMinProcessor());
+      groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+    }
     return groupProcessor;
   }
 
