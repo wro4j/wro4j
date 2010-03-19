@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.servlet.Filter;
@@ -55,16 +56,23 @@ public class WroFilter
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
    * is used.
    */
-  private static final String PARAM_CONFIGURATION = "configuration";
+  static final String PARAM_CONFIGURATION = "configuration";
   /**
    * Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is assumed.
    */
-  private static final String PARAM_DEPLOYMENT = "DEPLOYMENT";
+  static final String PARAM_VALUE_DEPLOYMENT = "DEPLOYMENT";
   /**
    * Gzip resources configuration option.
    */
-  private static final String PARAM_GZIP_RESOURCES = "gzipResources";
-
+  static final String PARAM_GZIP_RESOURCES = "gzipResources";
+  /**
+   * Parameter containing an integer value for specifying how often (in seconds) the cache should be refreshed.
+   */
+  static final String PARAM_CACHE_UPDATE_PERIOD = "cacheUpdatePeriod";
+  /**
+   * Parameter containing an integer value for specifying how often (in seconds) the model should be refreshed.
+   */
+  static final String PARAM_MODEL_UPDATE_PERIOD = "modelUpdatePeriod";
   /**
    * Filter config.
    */
@@ -82,7 +90,7 @@ public class WroFilter
   private String cacheControlValue;
   private long expiresValue;
 
-  private WroConfiguration applicationSettings;
+  private WroConfiguration configuration;
 
 
   /**
@@ -104,9 +112,11 @@ public class WroFilter
   private void initJMX()
     throws ServletException {
     try {
-      applicationSettings = newApplicationSettings();
-      ConfigurationContext.get().setConfig(applicationSettings);
-      applicationSettings.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
+      configuration = newConfiguration();
+      configuration.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
+      configuration.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
+      ConfigurationContext.get().setConfig(configuration);
+      configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
 				  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
 				  initHeaderValues();
@@ -115,7 +125,7 @@ public class WroFilter
 					}
 				}
 			});
-      applicationSettings.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
+      configuration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
 				public void propertyChange(final PropertyChangeEvent evt) {
           initHeaderValues();
 					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
@@ -126,33 +136,48 @@ public class WroFilter
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
       if (!mbs.isRegistered(name)) {
-        mbs.registerMBean(applicationSettings, name);
+        mbs.registerMBean(configuration, name);
       }
-    } catch (final Exception e) {
+    } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
   }
 
 
   /**
+   * Extracts long value from provided init param name configuration.
+   */
+  private long getUpdatePeriodByName(final String paramName) {
+    final String valueAsString = filterConfig.getInitParameter(paramName);
+    if (valueAsString == null) {
+      return 0;
+    }
+    try {
+      return Long.valueOf(valueAsString);
+    } catch (final NumberFormatException e) {
+      throw new WroRuntimeException(paramName + " init-param must be a number, but was: " + valueAsString);
+    }
+  }
+
+  /**
    * @return {@link WroConfiguration} configured object with default values set.
    */
-	private WroConfiguration newApplicationSettings() {
-		final WroConfiguration settings = new WroConfiguration();
+	private WroConfiguration newConfiguration() {
+		final WroConfiguration config = new WroConfiguration();
 
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
-    settings.setGzipEnabled(gzipResources);
+    config.setGzipEnabled(gzipResources);
 
     boolean debug = true;
     final String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
     if (configParam != null) {
-      if (PARAM_DEPLOYMENT.equalsIgnoreCase(configParam)) {
+      if (PARAM_VALUE_DEPLOYMENT.equalsIgnoreCase(configParam)) {
         debug = false;
       }
     }
-    settings.setDebug(debug);
-    return settings;
+    config.setDebug(debug);
+    return config;
 	}
 
 
@@ -240,6 +265,15 @@ public class WroFilter
         throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
+  }
+
+
+  /**
+   * This exists only for testing purposes.
+   * @return the applicationSettings
+   */
+  protected final WroConfiguration getConfiguration() {
+    return this.configuration;
   }
 
 

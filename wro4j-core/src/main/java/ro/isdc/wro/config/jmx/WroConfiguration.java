@@ -19,9 +19,12 @@ import org.apache.commons.lang.builder.ToStringStyle;
 public final class WroConfiguration
   implements WroConfigurationMBean {
 	/**
-	 * By default period values are 0, that means that the associated scheduler never runs.
+	 * How often to run a thread responsible for refreshing the cache.
 	 */
   private long cacheUpdatePeriod;
+  /**
+   * How often to run a thread responsible for refreshing the model.
+   */
   private long modelUpdatePeriod;
   /**
    * Gzip enable flag.
