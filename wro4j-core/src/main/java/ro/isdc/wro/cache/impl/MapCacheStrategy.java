@@ -56,6 +56,5 @@ public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
    */
   public void destroy() {
     clear();
-    map = null;
   }
 }

@@ -92,13 +92,6 @@ public class Resource {
   }
 
   /**
-   * @return the group
-   */
-  public Group getGroup() {
-    return this.group;
-  }
-
-  /**
    * Do NOT call this explicitly, it is used only to build groups.
    *
    * @param group the group to set

@@ -226,7 +226,6 @@ public class WroManager implements WroConfigurationChangeListener {
     };
   }
 
-
   /**
    * Resolve the stream for a request.
    *

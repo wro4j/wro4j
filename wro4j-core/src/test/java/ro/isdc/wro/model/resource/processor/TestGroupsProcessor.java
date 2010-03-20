@@ -31,6 +31,7 @@ import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
 
@@ -174,6 +175,48 @@ public class TestGroupsProcessor {
       }
     });
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+  }
+
+  /**
+   * Check if minimize aware processor is not called when minimization is not wanted.
+   * @throws Exception
+   */
+  @Test
+  public void testMinimizeAwareProcessorIsNotCalled() throws Exception {
+    final ResourcePostProcessor postProcessor = getMinimizeAwareProcessorWithMinimizeSetTo(false);
+    Mockito.verify(postProcessor, Mockito.times(0)).process(Mockito.any(Reader.class), Mockito.any(Writer.class));
+  }
+
+
+  /**
+   * Creates a mocked {@link ResourcePostProcessor} object used to check how many times it was invoked depending on
+   * minimize flag.
+   *
+   * @return {@link ResourcePostProcessor} mock object.
+   */
+  private ResourcePostProcessor getMinimizeAwareProcessorWithMinimizeSetTo(final boolean minimize) {
+    final Group group = new Group();
+    group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
+    final List<Group> groups = Arrays.asList(group);
+
+    final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
+    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+
+    final ResourcePostProcessor postProcessor = Mockito.mock(JawrCssMinifierProcessor.class);
+    groupsProcessor.addPostProcessor(postProcessor);
+    groupsProcessor.process(groups, ResourceType.CSS, minimize);
+    return postProcessor;
+  }
+
+  /**
+   * Check if minimize aware processor is called when minimization is wanted.
+   * @throws Exception
+   */
+  @Test
+  public void testMinimizeAwareProcessorIsCalled() throws Exception {
+    final ResourcePostProcessor postProcessor = getMinimizeAwareProcessorWithMinimizeSetTo(true);
+    Mockito.verify(postProcessor, Mockito.times(1)).process(Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
 
   @Test

@@ -60,7 +60,6 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       return output.toString();
     }
 
-
     /**
      * Apply a list of preprocessors on a resource.
      */
@@ -85,6 +84,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       Writer output = null;
       for (final ResourcePreProcessor processor : processors) {
         output = new StringWriter();
+        LOG.debug("applying preProcessor: " + processor.getClass().getName());
         processor.process(resource, input, output);
         input = new StringReader(output.toString());
       }
@@ -118,7 +118,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
    */
   private static <T> void removeMinimizeAwareProcessors(final Collection<T> processors) {
     final Collection<T> minimizeAwareProcessors = new ArrayList<T>();
-    for (final T processor : minimizeAwareProcessors) {
+    for (final T processor : processors) {
       if (processor.getClass().isAnnotationPresent(Minimize.class)) {
         minimizeAwareProcessors.add(processor);
       }
@@ -208,6 +208,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     Writer output = null;
     for (final ResourcePostProcessor processor : processors) {
       output = new StringWriter();
+      LOG.debug("applying postProcessor: " + processor.getClass().getName());
       processor.process(input, output);
       input = new StringReader(output.toString());
     }

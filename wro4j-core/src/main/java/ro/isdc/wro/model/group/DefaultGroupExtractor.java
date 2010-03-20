@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.model.resource.ResourceType;
 
 /**
@@ -58,6 +59,7 @@ public final class DefaultGroupExtractor implements GroupExtractor {
   }
 
   /**
+   * The minimization is can be switched off only in debug mode.
    * @return false if the request contains parameter {@link DefaultGroupExtractor#PARAM_MINIMIZE} with value false, otherwise returns true.
    */
   public boolean isMinimized(final HttpServletRequest request) {
@@ -65,6 +67,6 @@ public final class DefaultGroupExtractor implements GroupExtractor {
       throw new IllegalArgumentException("Request cannot be NULL!");
     }
     final String minimizeAsString = request.getParameter(PARAM_MINIMIZE);
-    return !"false".equalsIgnoreCase(minimizeAsString);
+    return !(ConfigurationContext.get().getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
   }
 }
