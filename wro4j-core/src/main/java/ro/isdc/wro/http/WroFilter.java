@@ -51,7 +51,7 @@ public class WroFilter
   /**
    * The name of the context parameter that specifies wroManager factory class
    */
-  private static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
+  static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
    * is used.

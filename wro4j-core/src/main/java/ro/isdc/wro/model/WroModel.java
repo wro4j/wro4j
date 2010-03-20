@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,20 +37,6 @@ public final class WroModel {
    */
   public final void setGroups(final Set<Group> groups) {
     this.groups = groups;
-  }
-
-  /**
-   * @param groupNames
-   */
-  public Set<Group> getGroupsByNames(final Collection<String> names) {
-    final Set<Group> groups = new HashSet<Group>();
-    for (final String name : names) {
-      final Group group = getGroupByName(name);
-      if (group != null) {
-        groups.add(group);
-      }
-    }
-    return groups;
   }
 
   /**

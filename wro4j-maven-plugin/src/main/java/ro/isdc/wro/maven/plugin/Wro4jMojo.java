@@ -140,8 +140,7 @@ public class Wro4jMojo extends AbstractMojo {
     getLog().info("Executing the mojo");
     getLog().debug("wro file: " + wroFile);
 
-    updateClasspath();
-
+//    updateClasspath();
     try {
       if (!destinationFolder.exists()) {
         destinationFolder.mkdirs();

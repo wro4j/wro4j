@@ -80,6 +80,20 @@ public class TestWroFilter {
     filter.init(config);
   }
 
+  @Test(expected=WroRuntimeException.class)
+  public void testInvalidAppFactoryClassNameIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn("Invalid value");
+    filter.init(config);
+  }
+
+  @Test
+  public void testValidAppFactoryClassNameIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn(ServletContextAwareWroManagerFactory.class.getName());
+    filter.init(config);
+  }
+
 	/**
 	 * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.
 	 */
@@ -149,7 +163,7 @@ public class TestWroFilter {
 
   //TODO build model before performing the request
   //@Test
-  public void requestUrlRewritternResource() throws Exception {
+  public void requestUrlRewrittenResource() throws Exception {
   	final String resourcePath = "classpath:ro/isdc/wro/http/2.css";
   	final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + "?id=" + resourcePath;
 		requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
@@ -164,6 +178,22 @@ public class TestWroFilter {
 
   private void requestGroupByUri(final String requestUri) throws IOException, ServletException {
   	requestGroupByUri(requestUri, new RequestBuilder(requestUri));
+  }
+
+  @Test
+  public void testDoFilterInDEPLOYMENTMode()
+    throws Exception {
+    initFilterWithValidConfig();
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(request.getRequestURI()).thenReturn("/g2.js");
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
+    Mockito.when(response.getOutputStream()).thenReturn(sos);
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    filter.init(config);
+    filter.doFilter(request, response, chain);
   }
 
   /**
