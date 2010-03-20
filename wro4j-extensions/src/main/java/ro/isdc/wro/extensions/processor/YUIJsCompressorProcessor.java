@@ -12,6 +12,7 @@ import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -25,7 +26,8 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
  * @author Alex Objelean
  * @created Created on Dec 4, 2008
  */
-@SupportedResourceType(type=ResourceType.JS)
+@Minimize
+@SupportedResourceType(ResourceType.JS)
 public class YUIJsCompressorProcessor
   implements ResourcePostProcessor {
   /**

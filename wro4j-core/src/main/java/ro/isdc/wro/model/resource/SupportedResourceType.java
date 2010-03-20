@@ -25,5 +25,5 @@ public @interface SupportedResourceType {
   /**
    * @return supported {@link ResourceType}.
    */
-  ResourceType type();
+  ResourceType value();
 }

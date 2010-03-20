@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.group;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,27 +21,31 @@ import ro.isdc.wro.model.resource.ResourceType;
 public final class DefaultGroupExtractor implements GroupExtractor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultGroupExtractor.class);
   /**
+   * The name of the parameter used to decide if the group must be minimized.
+   */
+  public static final String PARAM_MINIMIZE = "minimize";
+  /**
    * {@inheritDoc}
    */
   public String getGroupName(final String uri) {
     if (uri == null) {
-      throw new IllegalArgumentException("Uri cannot be null!");
+      throw new IllegalArgumentException("Uri cannot be NULL!");
     }
     final String groupName = FilenameUtils.getBaseName(uri);
     return StringUtils.isEmpty(groupName) ? null : groupName;
   }
 
+
   /**
-   * Extracts the resource type, by parsing the uri & finds the extension. If
-   * extension is valid ('css' or 'js'), returns corresponding ResourceType,
-   * otherwise throws exception.
+   * Extracts the resource type, by parsing the uri & finds the extension. If extension is valid ('css' or 'js'),
+   * returns corresponding ResourceType, otherwise throws exception.
    * <p>
-   * Valid examples of uri are: <code>/context/somePath/test.js</code> or
-   * <code>/context/somePath/test.css</code> {@inheritDoc}
+   * Valid examples of uri are: <code>/context/somePath/test.js</code> or <code>/context/somePath/test.css</code>
+   * {@inheritDoc}
    */
   public ResourceType getResourceType(final String uri) {
     if (uri == null) {
-      throw new IllegalArgumentException("Uri cannot be null!");
+      throw new IllegalArgumentException("Uri cannot be NULL!");
     }
     final String extension = FilenameUtils.getExtension(uri);
     ResourceType type = null;
@@ -51,4 +57,14 @@ public final class DefaultGroupExtractor implements GroupExtractor {
     return type;
   }
 
+  /**
+   * @return false if the request contains parameter {@link DefaultGroupExtractor#PARAM_MINIMIZE} with value false, otherwise returns true.
+   */
+  public boolean isMinimized(final HttpServletRequest request) {
+    if (request == null) {
+      throw new IllegalArgumentException("Request cannot be NULL!");
+    }
+    final String minimizeAsString = request.getParameter(PARAM_MINIMIZE);
+    return !"false".equalsIgnoreCase(minimizeAsString);
+  }
 }

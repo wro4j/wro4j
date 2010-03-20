@@ -12,14 +12,24 @@ import ro.isdc.wro.model.resource.ResourceType;
  * Used as an entry for the cache.
  */
 @SuppressWarnings("serial")
-public class CacheEntry implements Serializable {
+public final class CacheEntry implements Serializable {
 	private final ResourceType type;
 	private final String groupName;
+	/**
+	 * Produce minimized version.
+	 */
+	private boolean minimize;
 
-
-	public CacheEntry(final String groupName, final ResourceType type) {
+	/**
+	 *
+	 * @param groupName name of the group.
+	 * @param type resource type (js or css)
+	 * @param minimize true if the result should produce minimized version.
+	 */
+	public CacheEntry(final String groupName, final ResourceType type, final boolean minimize) {
 		this.groupName = groupName;
 		this.type = type;
+		this.minimize = minimize;
 	}
 
 
@@ -39,15 +49,33 @@ public class CacheEntry implements Serializable {
 	}
 
 
-	@Override
+	/**
+   * @return the minimize
+   */
+  public boolean isMinimize() {
+    return this.minimize;
+  }
+
+
+  /**
+   * @param minimize the minimize to set
+   */
+  public void setMinimize(final boolean minimize) {
+    this.minimize = minimize;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
 	public boolean equals(final Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 
-
-	/**
-	 * {@inheritDoc}
-	 */
+  /**
+   * {@inheritDoc}
+   */
 	@Override
 	public int hashCode() {
 		return HashCodeBuilder.reflectionHashCode(this);

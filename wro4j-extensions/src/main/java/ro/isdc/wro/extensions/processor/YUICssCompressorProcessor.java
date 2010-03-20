@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -20,7 +21,8 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
  * @author Alex Objelean
  * @created Created on Dec 4, 2008
  */
-@SupportedResourceType(type=ResourceType.CSS)
+@Minimize
+@SupportedResourceType(ResourceType.CSS)
 public class YUICssCompressorProcessor
   implements ResourcePostProcessor {
   /**

@@ -13,6 +13,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -20,15 +21,16 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.JSMin;
 
+
 /**
- * JSMinProcessor.
- * <p>
- * Use JSMin utility for js compression.
+ * Use JSMin utility for js compression. This processor is annotated with {@link Minimize} because it performs
+ * minimization.
  *
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-@SupportedResourceType(type=ResourceType.JS)
+@Minimize
+@SupportedResourceType(ResourceType.JS)
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
   /**

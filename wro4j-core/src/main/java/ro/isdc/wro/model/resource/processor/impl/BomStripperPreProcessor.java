@@ -26,7 +26,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created Created on Feb 20, 2010
  */
-@SupportedResourceType(type = ResourceType.JS)
+@SupportedResourceType(ResourceType.JS)
 public class BomStripperPreProcessor
   implements ResourcePreProcessor {
   /**

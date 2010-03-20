@@ -35,10 +35,6 @@ public final class WroConfiguration
    */
   private boolean debug;
   /**
-   * Flag used to apply/skip minimization.
-   */
-  private boolean minimize;
-  /**
    * Listeners for the change of cache & model period properties.
    */
   private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>();
@@ -164,20 +160,6 @@ public final class WroConfiguration
 	public void registerCacheUpdatePeriodChangeListener(final PropertyChangeListener listener) {
 		cacheUpdatePeriodListeners.add(listener);
 	}
-
-  /**
-   * @return the minimize
-   */
-  public boolean isMinimize() {
-    return this.minimize;
-  }
-
-  /**
-   * @param minimize the minimize to set
-   */
-  public void setMinimize(final boolean minimize) {
-    this.minimize = minimize;
-  }
 
   /**
    * @return the debug

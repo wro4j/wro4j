@@ -9,6 +9,7 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -18,11 +19,14 @@ import ro.isdc.wro.model.resource.processor.algorithm.JawrCssMinifier;
 
 
 /**
- * A processor implementation using {@link JawrCssMinifier} algorithm. This processor can be used as both: PreProcessor & postProcessor.
+ * A processor implementation using {@link JawrCssMinifier} algorithm. This processor can be used as both: PreProcessor
+ * & postProcessor. <br/>
+ * This processor is annotated with {@link Minimize} because it performs minimization.
  *
  * @author Alex Objelean
  */
-@SupportedResourceType(type=ResourceType.CSS)
+@Minimize
+@SupportedResourceType(ResourceType.CSS)
 public class JawrCssMinifierProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   /**

@@ -9,7 +9,10 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.AndryCssCompressor;
@@ -20,6 +23,8 @@ import ro.isdc.wro.model.resource.processor.algorithm.AndryCssCompressor;
  *
  * @author Alex Objelean
  */
+@Minimize
+@SupportedResourceType(ResourceType.CSS)
 public class AndryCssCompressorProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final int LINEBREAK_AFTER_CHARACTERS = 8000;

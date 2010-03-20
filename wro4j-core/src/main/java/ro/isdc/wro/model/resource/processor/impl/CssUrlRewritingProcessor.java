@@ -92,7 +92,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 19, 2008
  */
-@SupportedResourceType(type=ResourceType.CSS)
+@SupportedResourceType(ResourceType.CSS)
 public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Logger for this class.

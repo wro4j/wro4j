@@ -27,9 +27,6 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.processor.PreProcessorExecutor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
@@ -136,7 +133,7 @@ public class TestGroupsProcessor {
 
   @Test(expected=IllegalArgumentException.class)
   public void cannotAcceptNullArguments() {
-    groupsProcessor.process(null, null);
+    groupsProcessor.process(null, null, true);
   }
 
   @Test
@@ -190,7 +187,7 @@ public class TestGroupsProcessor {
     groupsProcessor.addPreProcessor(new CssImportPreProcessor());
     final ResourcePreProcessor preProcessor = Mockito.mock(ResourcePreProcessor.class);
     groupsProcessor.addPreProcessor(preProcessor);
-    groupsProcessor.process(groups, ResourceType.CSS);
+    groupsProcessor.process(groups, ResourceType.CSS, true);
     Mockito.verify(preProcessor, Mockito.times(6)).process(Mockito.any(Resource.class), Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
 

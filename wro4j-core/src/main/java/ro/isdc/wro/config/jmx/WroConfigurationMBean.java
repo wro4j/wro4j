@@ -9,15 +9,6 @@ package ro.isdc.wro.config.jmx;
  * @author Alex Objelean
  */
 public interface WroConfigurationMBean {
-	/**
-	 * @return true if resources should be minimized.
-	 */
-  boolean isMinimize();
-
-  /**
-   * @param minimize flag for minimization of resources.
-   */
-	void setMinimize(final boolean minimize);
 
   /**
 	 * @return period in seconds when the wro model (by default read from wro.xml) is updated.

@@ -7,6 +7,7 @@ package ro.isdc.wro.config;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
 /**
+ * TODO: check if this class can be removed & use WroConfiguration.get() instead
  * Holds configuration instance. Accessing this object is safe even outside of a request cycle.
  *
  * @author Alex Objelean
@@ -21,9 +22,8 @@ public class ConfigurationContext {
    */
   private static ConfigurationContext INSTANCE;
 
-
   /**
-   * Cannot instantiate this class. It is singleton.
+   * Cannot instantiate this class. It is a singleton.
    */
 	private ConfigurationContext() {
 	  //set default settings.

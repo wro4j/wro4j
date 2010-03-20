@@ -113,26 +113,8 @@ public class WroFilter
     throws ServletException {
     try {
       configuration = newConfiguration();
-      configuration.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
-      configuration.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
       ConfigurationContext.get().setConfig(configuration);
-      configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent evt) {
-				  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
-				  initHeaderValues();
-					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-						((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
-					}
-				}
-			});
-      configuration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
-				public void propertyChange(final PropertyChangeEvent evt) {
-          initHeaderValues();
-					if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-						((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
-					}
-				}
-			});
+      registerChangeListeners();
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
       if (!mbs.isRegistered(name)) {
@@ -141,6 +123,30 @@ public class WroFilter
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
+  }
+
+
+  /**
+   * Register property change listeners.
+   */
+  private void registerChangeListeners() {
+    configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
+    	public void propertyChange(final PropertyChangeEvent evt) {
+    	  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
+    	  initHeaderValues();
+    		if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+    			((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
+    		}
+    	}
+    });
+    configuration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
+    	public void propertyChange(final PropertyChangeEvent evt) {
+        initHeaderValues();
+    		if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+    			((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
+    		}
+    	}
+    });
   }
 
 
@@ -177,6 +183,8 @@ public class WroFilter
       }
     }
     config.setDebug(debug);
+    config.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
+    config.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
     return config;
 	}
 

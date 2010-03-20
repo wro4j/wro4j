@@ -46,7 +46,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   private final Collection<ResourcePostProcessor> postProcessors = decorateCollection(new ArrayList<ResourcePostProcessor>());
   /**
-   * Used to get stream of the resources.
+   * Used to get a stream of the resources.
    */
   private UriLocatorFactory uriLocatorFactory;
 
@@ -192,7 +192,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     for (final T processor : availableProcessors) {
       final SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
       final boolean isAnyTypeSatisfied = type == null && supportedType == null;
-      final boolean isTypeSatisfied = type != null && supportedType != null && type == supportedType.type();
+      final boolean isTypeSatisfied = type != null && supportedType != null && type == supportedType.value();
       if (isAnyTypeSatisfied || isTypeSatisfied) {
         found.add(processor);
       }
@@ -233,6 +233,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
   public void addPostProcessor(final ResourcePostProcessor processor) {
     postProcessors.add(processor);
   }
+
 
   /**
    * @param resource {@link Resource} for which a Reader should be returned.

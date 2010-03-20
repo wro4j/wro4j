@@ -85,13 +85,11 @@ public class WroManager implements WroConfigurationChangeListener {
    * @throws IOException.
    */
   public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    LOG.info("processing: " + request.getRequestURI());
+    LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
-    //Use @Inject annotation to access model inside RequestProcessors
-    //TODO: move to corresponding RequestProcessor
     LOG.debug("processing: " + request.getRequestURI());
     if (request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
       is = locateInputeStream(request);
@@ -140,32 +138,34 @@ public class WroManager implements WroConfigurationChangeListener {
    * @return {@link InputStream} for groups found in requestURI.
    */
 	private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request, final HttpServletResponse response) {
-	  final String requestURI = request.getRequestURI();
-    InputStream is = null;
-    final ResourceType type = groupExtractor.getResourceType(requestURI);
-
-		final StopWatch stopWatch = new StopWatch();
+    final StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-		// find names & type
+
+	  InputStream is = null;
+    // find names & type
+	  final String requestURI = request.getRequestURI();
+	  final ResourceType type = groupExtractor.getResourceType(requestURI);
+
 		final String groupName = groupExtractor.getGroupName(requestURI);
 		if (groupName == null) {
 		  throw new WroRuntimeException("No groups found for request: " + requestURI);
 		}
 		initScheduler(model);
+		final boolean minimize = groupExtractor.isMinimized(request);
 
 		// find processed result for a group
     final Group group = model.getGroupByName(groupName);
     final List<Group> groupAsList = new ArrayList<Group>();
     groupAsList.add(group);
 		String result = null;
-	  final CacheEntry cacheEntry = new CacheEntry(groupName, type);
-	  LOG.info("Searching cache entry: " + cacheEntry);
+	  final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
+	  LOG.debug("Searching cache entry: " + cacheEntry);
 	  // Cache based on uri
 	  result = cacheStrategy.get(cacheEntry);
 	  if (result == null) {
-	    LOG.info("Cache is empty. Perform processing");
+	    LOG.debug("Cache is empty. Perform processing...");
 	    // process groups & put result in the cache
-	    result = groupsProcessor.process(groupAsList, type);
+	    result = groupsProcessor.process(groupAsList, type, minimize);
 	    cacheStrategy.put(cacheEntry, result);
 	  }
 	  is = new ByteArrayInputStream(result.getBytes());
@@ -183,7 +183,7 @@ public class WroManager implements WroConfigurationChangeListener {
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
       final long period = ConfigurationContext.get().getConfig().getCacheUpdatePeriod();
-      LOG.info("runing thread with period of " + period);
+      LOG.debug("runing thread with period of " + period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Run a scheduled task which updates the model
@@ -210,8 +210,11 @@ public class WroManager implements WroConfigurationChangeListener {
     					if (group.hasResourcesOfType(resourceType)) {
     						final Collection<Group> groupAsList = new HashSet<Group>();
     						groupAsList.add(group);
-    						final String result = groupsProcessor.process(groupAsList, resourceType);
-    						cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
+    						final boolean minimize = false;
+                //TODO check if request parameter can be fetched here without errors.
+    						//groupExtractor.isMinimized(Context.get().getRequest())
+    						final String result = groupsProcessor.process(groupAsList, resourceType, minimize);
+    						cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), result);
     					}
     				}
     			}
