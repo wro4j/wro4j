@@ -93,6 +93,10 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
   }
 
+  /**
+   * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
+   * (according to findbugs eclipse plugin).
+   */
   private transient final PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
 
   /**
