@@ -10,16 +10,13 @@ import java.io.Writer;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public class TestJsMinProcessor extends AbstractWroTest {
