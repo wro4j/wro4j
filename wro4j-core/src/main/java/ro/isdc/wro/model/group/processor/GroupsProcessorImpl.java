@@ -33,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 3, 2008
  */
 public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
+  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessorImpl.class);
   /**
    * Default implementation of {@link PreProcessorExecutor}
@@ -92,7 +93,7 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
   }
 
-  private final PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
+  private transient final PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
 
   /**
    * {@inheritDoc}

@@ -54,7 +54,7 @@ public class TestServletContextUriLocator {
     throws Exception {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
     Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
-    final InputStream is = locator.locate("/css/resourcePath.css");
+    locator.locate("/css/resourcePath.css");
   }
 
   @After

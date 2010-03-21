@@ -247,13 +247,13 @@ public class JSMin {
     out.flush();
   }
 
-  class UnterminatedCommentException extends Exception {
+  private static class UnterminatedCommentException extends Exception {
   }
 
-  class UnterminatedStringLiteralException extends Exception {
+  private static class UnterminatedStringLiteralException extends Exception {
   }
 
-  class UnterminatedRegExpLiteralException extends Exception {
+  private static class UnterminatedRegExpLiteralException extends Exception {
   }
 
 }

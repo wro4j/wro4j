@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -21,7 +22,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public interface GroupsProcessor {
+public interface GroupsProcessor extends Serializable {
   /**
    * Process a collection of groups by type.
    *
