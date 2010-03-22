@@ -350,4 +350,11 @@ public class WroManager implements WroConfigurationChangeListener {
   public WroModelFactory getModelFactory() {
     return this.modelFactory;
   }
+
+  /**
+   * @return the groupExtractor
+   */
+  public GroupExtractor getGroupExtractor() {
+    return this.groupExtractor;
+  }
 }

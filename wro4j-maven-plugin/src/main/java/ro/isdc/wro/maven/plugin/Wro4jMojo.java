@@ -8,21 +8,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
@@ -31,6 +24,8 @@ import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.StandaloneWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -40,6 +35,7 @@ import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
 
 
 /**
@@ -69,18 +65,18 @@ public class Wro4jMojo extends AbstractMojo {
   private File destinationFolder;
   /**
    * Comma separated group names.
-   * @parameter expression="${wro4j.targetGroups}"
+   * @parameter expression="${targetGroups}"
    */
   private String targetGroups;
   /**
-   * @parameter default-value="true" expression="${wro4j.minimize}"
+   * @parameter default-value="true" expression="${minimize}"
    * @optional
    */
   private boolean minimize;
-  /**
-   * @parameter default-value="${project}"
-   */
-  private MavenProject mavenProject;
+//  /**
+//   * @parameter default-value="${project}"
+//   */
+//  private MavenProject mavenProject;
 
   /**
    * @param request {@link HttpServletRequest} to process
@@ -91,6 +87,15 @@ public class Wro4jMojo extends AbstractMojo {
       @Override
       protected void onBeforeCreate() {
         Context.set(Context.standaloneContext(request));
+      }
+      @Override
+      protected GroupExtractor newGroupExtractor() {
+        return new GroupExtractorDecorator(super.newGroupExtractor()) {
+          @Override
+          public boolean isMinimized(final HttpServletRequest request) {
+            return minimize;
+          }
+        };
       }
       @Override
       protected WroModelFactory newModelFactory() {
@@ -109,11 +114,10 @@ public class Wro4jMojo extends AbstractMojo {
         groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
         groupsProcessor.addPreProcessor(new CssImportPreProcessor());
         groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+        groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
         groupsProcessor.addPostProcessor(new CssVariablesProcessor());
-        if (minimize) {
-          groupsProcessor.addPostProcessor(new JSMinProcessor());
-          groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-        }
+        groupsProcessor.addPostProcessor(new JSMinProcessor());
+        groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
         return groupsProcessor;
       }
 
@@ -137,8 +141,11 @@ public class Wro4jMojo extends AbstractMojo {
    */
   public void execute()
     throws MojoExecutionException {
-    getLog().info("Executing the mojo");
-    getLog().debug("wro file: " + wroFile);
+    getLog().info("Executing the mojo: ");
+    getLog().info("Wro4j Model path: " + wroFile.getPath());
+    getLog().info("TargetGroups: " + targetGroups);
+    getLog().info("Minimize: " + minimize);
+    getLog().info("Destination folder: " + destinationFolder);
 
 //    updateClasspath();
     try {
@@ -158,26 +165,26 @@ public class Wro4jMojo extends AbstractMojo {
     }
   }
 
-  /**
-   * Update the classpath.
-   */
-  private void updateClasspath() {
-    //TODO update classloader by adding all runtime dependencies of the running project
-    getLog().info("mavenProject: " + mavenProject);
-    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
-    final List<URL> urlList = new ArrayList<URL>();
-    try {
-      for (final Artifact artifact : artifacts) {
-        urlList.add(artifact.getFile().toURI().toURL());
-      }
-    } catch (final MalformedURLException e) {
-      getLog().error("Error retreiving URL for artifact", e);
-      throw new RuntimeException(e);
-    }
-    getLog().info("URLs: " + urlList);
-    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
-    Thread.currentThread().setContextClassLoader(cl);
-  }
+//  /**
+//   * Update the classpath.
+//   */
+//  private void updateClasspath() {
+//    //TODO update classloader by adding all runtime dependencies of the running project
+//    getLog().info("mavenProject: " + mavenProject);
+//    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
+//    final List<URL> urlList = new ArrayList<URL>();
+//    try {
+//      for (final Artifact artifact : artifacts) {
+//        urlList.add(artifact.getFile().toURI().toURL());
+//      }
+//    } catch (final MalformedURLException e) {
+//      getLog().error("Error retreiving URL for artifact", e);
+//      throw new RuntimeException(e);
+//    }
+//    getLog().info("URLs: " + urlList);
+//    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
+//    Thread.currentThread().setContextClassLoader(cl);
+//  }
 
   /**
    * @return a list containing all groups needs to be processed.
