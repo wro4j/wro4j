@@ -115,10 +115,10 @@ public class WroFilter
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
       registerChangeListeners();
-      final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+      final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
       final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
-      if (!mbs.isRegistered(name)) {
-        mbs.registerMBean(configuration, name);
+      if (!mbeanServer.isRegistered(name)) {
+        mbeanServer.registerMBean(configuration, name);
       }
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
@@ -131,7 +131,7 @@ public class WroFilter
    */
   private void registerChangeListeners() {
     configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
-    	public void propertyChange(final PropertyChangeEvent evt) {
+    	public void propertyChange(final PropertyChangeEvent event) {
     	  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
     	  initHeaderValues();
     		if (wroManagerFactory instanceof WroConfigurationChangeListener) {
@@ -140,7 +140,7 @@ public class WroFilter
     	}
     });
     configuration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
-    	public void propertyChange(final PropertyChangeEvent evt) {
+    	public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
     		if (wroManagerFactory instanceof WroConfigurationChangeListener) {
     			((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
@@ -155,6 +155,7 @@ public class WroFilter
    */
   private long getUpdatePeriodByName(final String paramName) {
     final String valueAsString = filterConfig.getInitParameter(paramName);
+    LOG.debug("The value of init-param: " + paramName + " is: " + valueAsString);
     if (valueAsString == null) {
       return 0;
     }
@@ -185,6 +186,7 @@ public class WroFilter
     config.setDebug(debug);
     config.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
     config.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
+    LOG.debug("configuration built: " + config);
     return config;
 	}
 
