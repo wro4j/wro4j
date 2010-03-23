@@ -19,10 +19,8 @@ import ro.isdc.wro.manager.WroManagerFactory;
  * A WroFilter capable to get a {@link WroManagerFactory} instance from spring
  * context. The filter must have initParam called <code>targetBeanName</code>
  * whose value will be looked up in the spring application context.
- * 
- * @author Alexandru.Objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Dec 5, 2008
  */
 public final class SpringWroFilter extends WroFilter {

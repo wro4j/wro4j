@@ -75,9 +75,12 @@ public final class WroUtil {
    * <p/>
    *
    * @param response the response which will have a header added to it. I.e this method changes its parameter
-   * @throws WroRuntimeException if response doesnt contains Content-Encoding header.
+   * @throws WroRuntimeException if response doesn't contains Content-Encoding header.
    */
   public static void addGzipHeader(final HttpServletResponse response) {
+    if (response == null) {
+      throw new IllegalArgumentException("response cannot be null!");
+    }
     response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
     final boolean containsEncoding = response.containsHeader(HttpHeader.CONTENT_ENCODING.toString());
     if (!containsEncoding) {

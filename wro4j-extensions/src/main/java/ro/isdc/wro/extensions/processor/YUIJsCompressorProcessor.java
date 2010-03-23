@@ -33,7 +33,7 @@ public class YUIJsCompressorProcessor
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(YUIJsCompressorProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(YUIJsCompressorProcessor.class);
 
   // options of YUI compressor
   private final int linebreakpos = -1;
@@ -55,9 +55,9 @@ public class YUIJsCompressorProcessor
       public void warning(final String message, final String sourceName, final int line, final String lineSource,
         final int lineOffset) {
         if (line < 0) {
-          log.warn("\n[WARNING] " + message);
+          LOG.warn("\n[WARNING] " + message);
         } else {
-          log.warn("\n[WARNING] " + line + ':' + lineOffset + ':' + message);
+          LOG.warn("\n[WARNING] " + line + ':' + lineOffset + ':' + message);
         }
       }
 
@@ -65,9 +65,9 @@ public class YUIJsCompressorProcessor
       public void error(final String message, final String sourceName, final int line, final String lineSource,
         final int lineOffset) {
         if (line < 0) {
-          log.error("\n[ERROR] " + message);
+          LOG.error("\n[ERROR] " + message);
         } else {
-          log.error("\n[ERROR] " + line + ':' + lineOffset + ':' + message);
+          LOG.error("\n[ERROR] " + line + ':' + lineOffset + ':' + message);
         }
       }
 
