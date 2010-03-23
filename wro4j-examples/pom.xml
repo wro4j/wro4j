@@ -38,7 +38,7 @@
 	</dependencies>
 	<build>
 		<plugins>
-
+<!-- 
 			<plugin>
 				<groupId>ro.isdc.wro4j</groupId>
 				<artifactId>wro4j-maven-plugin</artifactId>
@@ -54,7 +54,7 @@
 					<targetGroups>all</targetGroups>
 				</configuration>
 			</plugin>
-      <!---->
+      -->
 		</plugins>
 	</build>
 	<!--  -->
