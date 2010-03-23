@@ -14,11 +14,14 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -66,6 +69,59 @@ public class TestWroFilter {
   	};
 	}
 
+	/**
+   * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.
+   */
+  @Test(expected=WroRuntimeException.class)
+  public void testFilterInitParamsAreWrong() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("InvalidNumber");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
+    filter.init(config);
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testInvalidAppFactoryClassNameIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn("Invalid value");
+    filter.init(config);
+  }
+
+  @Test
+  public void testValidAppFactoryClassNameIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn(ServletContextAwareWroManagerFactory.class.getName());
+    filter.init(config);
+  }
+
+	/**
+	 * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.
+	 */
+	@Test
+	public void testFilterInitParamsAreSetProperly() throws Exception {
+	  final FilterConfig config = Mockito.mock(FilterConfig.class);
+	  Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_GZIP_RESOURCES)).thenReturn(Boolean.FALSE.toString());
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("10");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
+    filter.init(config);
+    Assert.assertEquals(false, filter.getConfiguration().isDebug());
+    Assert.assertEquals(false, filter.getConfiguration().isGzipEnabled());
+    Assert.assertEquals(10, filter.getConfiguration().getCacheUpdatePeriod());
+    Assert.assertEquals(100, filter.getConfiguration().getModelUpdatePeriod());
+	}
+
+	/**
+   * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.
+   */
+  @Test
+  public void testConfigurationInitParam() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
+    filter.init(config);
+    Assert.assertEquals(true, filter.getConfiguration().isDebug());
+  }
+
   @Test(expected=WroRuntimeException.class)
   public void cannotProcessConfigResourceStream() throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -95,7 +151,7 @@ public class TestWroFilter {
   public void cannotAccessUnauthorizedRequest() throws Exception {
   	final String resourcePath = "/g1.css";
   	final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + resourcePath;
-		requestGroupByUri(requestUri, new FilterBuilder(requestUri) {
+		requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
 			@Override
 			protected HttpServletRequest newRequest() {
 				final HttpServletRequest request = super.newRequest();
@@ -107,10 +163,10 @@ public class TestWroFilter {
 
   //TODO build model before performing the request
   //@Test
-  public void requestUrlRewritternResource() throws Exception {
+  public void requestUrlRewrittenResource() throws Exception {
   	final String resourcePath = "classpath:ro/isdc/wro/http/2.css";
   	final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + "?id=" + resourcePath;
-		requestGroupByUri(requestUri, new FilterBuilder(requestUri) {
+		requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
 			@Override
 			protected HttpServletRequest newRequest() {
 				final HttpServletRequest request = super.newRequest();
@@ -121,7 +177,23 @@ public class TestWroFilter {
   }
 
   private void requestGroupByUri(final String requestUri) throws IOException, ServletException {
-  	requestGroupByUri(requestUri, new FilterBuilder(requestUri));
+  	requestGroupByUri(requestUri, new RequestBuilder(requestUri));
+  }
+
+  @Test
+  public void testDoFilterInDEPLOYMENTMode()
+    throws Exception {
+    initFilterWithValidConfig();
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(request.getRequestURI()).thenReturn("/g2.js");
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
+    Mockito.when(response.getOutputStream()).thenReturn(sos);
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    filter.init(config);
+    filter.doFilter(request, response, chain);
   }
 
   /**
@@ -129,10 +201,10 @@ public class TestWroFilter {
    *
    * @param requestUri
    */
-	private void requestGroupByUri(final String requestUri, final FilterBuilder filterBuilder)
+	private void requestGroupByUri(final String requestUri, final RequestBuilder requestBuilder)
 		throws IOException, ServletException {
 		initFilterWithValidConfig();
-    final HttpServletRequest request = filterBuilder.newRequest();
+    final HttpServletRequest request = requestBuilder.newRequest();
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
     Mockito.when(response.getOutputStream()).thenReturn(sos);
@@ -142,9 +214,9 @@ public class TestWroFilter {
     filter.doFilter(request, response, chain);
 	}
 
-	class FilterBuilder {
+	class RequestBuilder {
 		private final String requestUri;
-		public FilterBuilder(final String requestUri) {
+		public RequestBuilder(final String requestUri) {
 			this.requestUri = requestUri;
 		}
 		protected HttpServletRequest newRequest() {

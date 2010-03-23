@@ -10,19 +10,19 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-		<version>1.2.0</version>
+		<version>1.2.1</version>
 	</parent>
 
 	<dependencies>
-    <dependency>
-      <groupId>ro.isdc.wro4j</groupId>
-      <artifactId>wro4j-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>compile</scope>
-    </dependency>
+		<dependency>
+			<groupId>ro.isdc.wro4j</groupId>
+			<artifactId>wro4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
@@ -32,10 +32,30 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>compile</scope>
-    </dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>compile</scope>
+		</dependency>
+    <!-- 
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+		</dependency>
+     -->
+		<dependency>
+			<groupId>org.apache.maven.shared</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>      
+		</dependency>    
+		<!-- Add explicitly compile scope, because it is by default test -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>  
   

@@ -3,31 +3,35 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.io.Serializable;
 import java.util.Collection;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
+
 /**
- * Performs the processing of a group based on resourceType.
+ * Performs the processing of a group based on resourceType. The implementation should take care of
+ * {@link WroConfiguration#isMinimize()} to skip the processors which perform minimization of resources, otherwise
+ * changing of minimize flag will have no effect.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public interface GroupsProcessor {
+public interface GroupsProcessor extends Serializable {
   /**
    * Process a collection of groups by type.
    *
-   * @param groups
-   *          to process.
-   * @param type
-   *          to process.
+   * @param groups to process.
+   * @param type to process.
+   * @param minimize if true, the result of the processing will be minimized
    * @return processed content as string.
    */
-  String process(final Collection<Group> groups, final ResourceType type);
+  String process(final Collection<Group> groups, final ResourceType type, final boolean minimize);
 
   /**
    * @param uriLocatorFactory {@link UriLocatorFactory} to set.

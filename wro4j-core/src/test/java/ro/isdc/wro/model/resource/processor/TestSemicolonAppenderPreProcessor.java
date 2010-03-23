@@ -10,27 +10,27 @@ import java.io.Writer;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**
- * TestMultiLineCommentStripperPostProcessor.java.
+ * Test for {@link SemicolonAppenderPreProcessor} class.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
+ * @created Created on March 21, 2010
  */
-public class TestJsMinProcessor extends AbstractWroTest {
-  private final ResourcePostProcessor processor = new JSMinProcessor();
+public class TestSemicolonAppenderPreProcessor extends AbstractWroTest {
+  private final ResourcePreProcessor processor = new SemicolonAppenderPreProcessor();
 
   @Test
   public void test() throws IOException {
     compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/processor/jsmin-input.js",
-        "classpath:ro/isdc/wro/processor/jsmin-output.js",
+        "classpath:ro/isdc/wro/processor/jsSemicolonAppender-input.js",
+        "classpath:ro/isdc/wro/processor/jsSemicolonAppender-output.js",
         new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {
-            processor.process(reader, writer);
+            processor.process(null, reader, writer);
           }
         });
   }

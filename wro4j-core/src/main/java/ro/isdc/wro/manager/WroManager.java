@@ -62,7 +62,7 @@ public class WroManager implements WroConfigurationChangeListener {
   /**
    * GroupExtractor.
    */
-  private GroupExtractor requestUriParser;
+  private GroupExtractor groupExtractor;
 
   /**
    * Groups processor.
@@ -85,12 +85,11 @@ public class WroManager implements WroConfigurationChangeListener {
    * @throws IOException.
    */
   public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    LOG.info("processing: " + request.getRequestURI());
+    LOG.debug("processing: " + request.getRequestURI());
+    validate();
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
-    //Use @Inject annotation to access model inside RequestProcessors
-    //TODO: move to corresponding RequestProcessor
     LOG.debug("processing: " + request.getRequestURI());
     if (request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
       is = locateInputeStream(request);
@@ -99,7 +98,7 @@ public class WroManager implements WroConfigurationChangeListener {
     }
     OutputStream os = null;
     // append result to response stream
-    if (ConfigurationContext.get().getApplicationSettings().isGzipEnabled()
+    if (ConfigurationContext.get().getConfig().isGzipEnabled()
       && isGzipSupported()) {
       os = getGzipedOutputStream(response);
     } else {
@@ -139,33 +138,34 @@ public class WroManager implements WroConfigurationChangeListener {
    * @return {@link InputStream} for groups found in requestURI.
    */
 	private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request, final HttpServletResponse response) {
-	  final String requestURI = request.getRequestURI();
-    InputStream is = null;
-    final ResourceType type = requestUriParser.getResourceType(requestURI);
-
-		final StopWatch stopWatch = new StopWatch();
+    final StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-		validate();
-		// find names & type
-		final String groupName = requestUriParser.getGroupName(requestURI);
+
+	  InputStream is = null;
+    // find names & type
+	  final String requestURI = request.getRequestURI();
+	  final ResourceType type = groupExtractor.getResourceType(requestURI);
+
+		final String groupName = groupExtractor.getGroupName(requestURI);
 		if (groupName == null) {
 		  throw new WroRuntimeException("No groups found for request: " + requestURI);
 		}
 		initScheduler(model);
+		final boolean minimize = groupExtractor.isMinimized(request);
 
 		// find processed result for a group
     final Group group = model.getGroupByName(groupName);
     final List<Group> groupAsList = new ArrayList<Group>();
     groupAsList.add(group);
 		String result = null;
-	  final CacheEntry cacheEntry = new CacheEntry(groupName, type);
-	  LOG.info("Searching cache entry: " + cacheEntry);
+	  final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
+	  LOG.debug("Searching cache entry: " + cacheEntry);
 	  // Cache based on uri
 	  result = cacheStrategy.get(cacheEntry);
 	  if (result == null) {
-	    LOG.info("Cache is empty. Perform processing");
+	    LOG.debug("Cache is empty. Perform processing...");
 	    // process groups & put result in the cache
-	    result = groupsProcessor.process(groupAsList, type);
+	    result = groupsProcessor.process(groupAsList, type, minimize);
 	    cacheStrategy.put(cacheEntry, result);
 	  }
 	  is = new ByteArrayInputStream(result.getBytes());
@@ -182,8 +182,8 @@ public class WroManager implements WroConfigurationChangeListener {
    */
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
-      final long period = ConfigurationContext.get().getApplicationSettings().getCacheUpdatePeriod();
-      LOG.info("runing thread with period of " + period);
+      final long period = ConfigurationContext.get().getConfig().getCacheUpdatePeriod();
+      LOG.debug("runing thread with period of " + period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Run a scheduled task which updates the model
@@ -210,8 +210,11 @@ public class WroManager implements WroConfigurationChangeListener {
     					if (group.hasResourcesOfType(resourceType)) {
     						final Collection<Group> groupAsList = new HashSet<Group>();
     						groupAsList.add(group);
-    						final String result = groupsProcessor.process(groupAsList, resourceType);
-    						cacheStrategy.put(new CacheEntry(group.getName(), resourceType), result);
+    						final boolean minimize = false;
+                //TODO check if request parameter can be fetched here without errors.
+    						//groupExtractor.isMinimized(Context.get().getRequest())
+    						final String result = groupsProcessor.process(groupAsList, resourceType, minimize);
+    						cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), result);
     					}
     				}
     			}
@@ -222,7 +225,6 @@ public class WroManager implements WroConfigurationChangeListener {
       }
     };
   }
-
 
   /**
    * Resolve the stream for a request.
@@ -278,6 +280,7 @@ public class WroManager implements WroConfigurationChangeListener {
   public void destroy() {
     LOG.debug("WroManager destroyed");
     cacheStrategy.destroy();
+    modelFactory.destroy();
     if (scheduler != null) {
       scheduler.shutdownNow();
     }
@@ -287,14 +290,14 @@ public class WroManager implements WroConfigurationChangeListener {
 	 * Check if all dependencies are set.
 	 */
 	private void validate() {
-		if (this.requestUriParser == null) {
-			throw new WroRuntimeException("UriProcessor was not set!");
+		if (this.groupExtractor == null) {
+			throw new WroRuntimeException("GroupExtractor was not set!");
 		}
 		if (this.modelFactory == null) {
 			throw new WroRuntimeException("ModelFactory was not set!");
 		}
 		if (this.groupsProcessor == null) {
-			throw new WroRuntimeException("GroupProcessor was not set!");
+			throw new WroRuntimeException("GroupsProcessor was not set!");
 		}
 		if (this.cacheStrategy == null) {
 			throw new WroRuntimeException("cacheStrategy was not set!");
@@ -302,16 +305,22 @@ public class WroManager implements WroConfigurationChangeListener {
 	}
 
   /**
-   * @param requestUriParser the uriProcessor to set
+   * @param groupExtractor the uriProcessor to set
    */
-  public final void setRequestUriParser(final GroupExtractor requestUriParser) {
-    this.requestUriParser = requestUriParser;
+  public final void setGroupExtractor(final GroupExtractor groupExtractor) {
+    if (groupExtractor == null) {
+      throw new IllegalArgumentException("GroupExtractor cannot be null!");
+    }
+    this.groupExtractor = groupExtractor;
   }
 
   /**
    * @param groupsProcessor the groupsProcessor to set
    */
   public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
+    if (groupsProcessor == null) {
+      throw new IllegalArgumentException("GroupsProcessor cannot be null!");
+    }
     this.groupsProcessor = groupsProcessor;
   }
 
@@ -319,6 +328,9 @@ public class WroManager implements WroConfigurationChangeListener {
    * @param modelFactory the modelFactory to set
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
+    if (modelFactory == null) {
+      throw new IllegalArgumentException("WroModelFactory cannot be null!");
+    }
     this.modelFactory = modelFactory;
   }
 
@@ -326,6 +338,9 @@ public class WroManager implements WroConfigurationChangeListener {
    * @param cacheStrategy the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
+    if (cacheStrategy == null) {
+      throw new IllegalArgumentException("cacheStrategy cannot be null!");
+    }
     this.cacheStrategy = cacheStrategy;
   }
 
@@ -334,5 +349,12 @@ public class WroManager implements WroConfigurationChangeListener {
    */
   public WroModelFactory getModelFactory() {
     return this.modelFactory;
+  }
+
+  /**
+   * @return the groupExtractor
+   */
+  public GroupExtractor getGroupExtractor() {
+    return this.groupExtractor;
   }
 }

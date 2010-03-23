@@ -16,6 +16,7 @@ import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
 
 /**
  * A WroManagerFactory implementation aware of running inside a web application
@@ -30,19 +31,17 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
    */
   @Override
   protected GroupsProcessor newGroupsProcessor() {
-    final CssImportPreProcessor cssImportProcessor = new CssImportPreProcessor();
-
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
     groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
 
     groupProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupProcessor.addPreProcessor(cssImportProcessor);
-
+    groupProcessor.addPreProcessor(new CssImportPreProcessor());
+    groupProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
+
     groupProcessor.addPostProcessor(new JSMinProcessor());
     groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-
     return groupProcessor;
   }
 

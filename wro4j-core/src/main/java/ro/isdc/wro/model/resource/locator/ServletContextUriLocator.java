@@ -8,9 +8,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
@@ -128,21 +128,36 @@ public class ServletContextUriLocator
       throws IOException {
       // where to write the bytes of the stream
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
-      // Wrap request
-      final HttpServletRequest wrappedRequest = getWrappedServletRequest(request, location);
-      // Wrap response
-      final ServletResponse wrappedResponse = getWrappedServletResponse(response, os);
-      // use dispatcher
       try {
-        request.getRequestDispatcher(location).include(wrappedRequest, wrappedResponse);
+        final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
+        if (dispatcher == null) {
+          // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
+          // the thread responsible for refreshing resources)
+
+          //Returns the part URL from the protocol name up to the query string and contextPath.
+          final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
+
+          final String absolutePath = servletContextPath + location;
+          final URL url = new URL(absolutePath);
+          return url.openStream();
+        }
+        // Wrap request
+        final HttpServletRequest wrappedRequest = getWrappedServletRequest(request, location);
+        // Wrap response
+        final ServletResponse wrappedResponse = getWrappedServletResponse(response, os);
+        // use dispatcher
+        dispatcher.include(wrappedRequest, wrappedResponse);
         LOG.debug("dispatching request to:" + location);
         // force flushing - the content will be written to
         // BytArrayOutputStream. Otherwise exactly 32K of data will be
         // written.
         wrappedResponse.getWriter().flush();
         os.close();
-      } catch (final ServletException e) {
-        throw new WroRuntimeException("Error while dispatching the request for location " + location, e);
+      } catch (final Exception e) {
+        // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
+        // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
+        // included.
+        throw new IOException("Error while dispatching the request for location " + location);
       }
       if (os.size() == 0) {
         LOG.warn("Wrong or empty resource with location : " + location);
@@ -161,12 +176,10 @@ public class ServletContextUriLocator
           return getContextPath() + location;
         }
 
-
         @Override
         public String getPathInfo() {
           return WroUtil.getPathInfoFromLocation(location);
         }
-
 
         @Override
         public String getServletPath() {

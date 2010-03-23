@@ -92,7 +92,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 19, 2008
  */
-@SupportedResourceType(type=ResourceType.CSS)
+@SupportedResourceType(ResourceType.CSS)
 public class CssUrlRewritingProcessor implements ResourcePreProcessor {
   /**
    * Logger for this class.
@@ -276,7 +276,7 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
    * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
-  	final String requestURI = Context.get().getRequestURI();
+  	final String requestURI = Context.get().getRequest().getRequestURI();
   	return WroUtil.getFolderOfUri(requestURI)  + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
   }
 }

@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
-import java.io.File;
 import java.io.IOException;
 
 import junit.framework.Assert;
@@ -11,15 +10,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-
 /**
  * Tests if C works properly.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class TestClasspathUriLocator {
@@ -50,15 +44,5 @@ public class TestClasspathUriLocator {
     } catch (final IOException e) {
       // TODO: handle exception
     }
-  }
-
-  @Test
-  public void test() {
-
-  }
-
-  public static void main(final String[] args) throws Exception {
-    final File file = new File("/f1/f2/../img/test.jpg");
-    System.out.println(file.getCanonicalPath());
   }
 }

@@ -12,6 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.http.FieldsSavingRequestWrapper;
 
 
 /**
@@ -28,29 +29,48 @@ public class Context {
   /**
    * Request.
    */
-  private final HttpServletRequest request;
-  /**
-   * The uri of the request. This is used because the inherited thread local doesn't preserve
-   */
-  private final String requestURI;
+  private HttpServletRequest request;
   /**
    * Response.
    */
-  private final HttpServletResponse response;
+  private HttpServletResponse response;
   /**
    * ServletContext.
    */
-  private final ServletContext servletContext;
+  private ServletContext servletContext;
   /**
    * FilterConfig.
    */
-  private final FilterConfig filterConfig;
+  private FilterConfig filterConfig;
+
+
+  /**
+   * A context useful for running in web context (inside a servlet container).
+   */
+  public static Context webContext(final HttpServletRequest request, final HttpServletResponse response,
+    final FilterConfig filterConfig) {
+    return new Context(request, response, filterConfig);
+  }
+
 
   /**
    * A context useful for running in non web context (standAlone applications).
    */
-  public static class StandAloneContext extends Context {
+  public static Context standaloneContext() {
+    return new Context();
   }
+
+
+  /**
+   * Creates a Context which knows only about {@link HttpServletRequest} object.
+   *
+   * @param request {@link HttpServletRequest} for this context.
+   * @return {@link Context} instance.
+   */
+  public static Context standaloneContext(final HttpServletRequest request) {
+    return new Context(request, null, null);
+  }
+
 
   /**
    * @return {@link Context} associated with CURRENT request cycle.
@@ -62,6 +82,7 @@ public class Context {
     }
     return context;
   }
+
 
   /**
    * Associate a context with the CURRENT request cycle.
@@ -75,6 +96,7 @@ public class Context {
     CURRENT.set(context);
   }
 
+
   /**
    * Remove context from the local thread.
    */
@@ -82,25 +104,26 @@ public class Context {
     CURRENT.remove();
   }
 
+
   /**
    * Private constructor. Used to build {@link StandAloneContext}.
    */
   private Context() {
-    this.request = null;
-    this.response = null;
-    this.servletContext = null;
-    this.filterConfig = null;
-    this.requestURI = null;
   }
+
 
   /**
    * Constructor.
    */
-  public Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
-    this.request = request;
-    this.requestURI = request.getRequestURI();
+  private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
+    this.request = new FieldsSavingRequestWrapper(request);
+
     this.response = response;
-    this.servletContext = filterConfig.getServletContext();
+    if (filterConfig != null) {
+      this.servletContext = filterConfig.getServletContext();
+    } else {
+      this.servletContext = null;
+    }
     this.filterConfig = filterConfig;
   }
 
@@ -111,12 +134,6 @@ public class Context {
     return this.request;
   }
 
-  /**
-	 * @return the requestURI
-	 */
-	public String getRequestURI() {
-		return requestURI;
-	}
 
   /**
    * @return the response
@@ -125,12 +142,14 @@ public class Context {
     return this.response;
   }
 
+
   /**
    * @return the servletContext
    */
   public ServletContext getServletContext() {
     return this.servletContext;
   }
+
 
   /**
    * @return the filterConfig
@@ -140,22 +159,10 @@ public class Context {
   }
 
   /**
-   * @return true if debug parameter is present (this means that DEBUG or DEVELOPMENT mode is used).
-   */
-  public boolean isDevelopmentMode1() {
-//    String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
-//    configParam = configParam == null ? Configuration.DEVELOPMENT.name() : configParam;
-//    //TODO get rid of Configuration enum & simplify this logic
-//    final Configuration config = Configuration.of(configParam);
-//    return false && config.isDevelopment();
-    return false;
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
   public String toString() {
-  	return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }

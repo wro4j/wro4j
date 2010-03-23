@@ -36,7 +36,7 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  */
-@SupportedResourceType(type=ResourceType.CSS)
+@SupportedResourceType(ResourceType.CSS)
 public class CssImportPreProcessor
   implements ResourcePreProcessor {
   /**
@@ -87,7 +87,9 @@ public class CssImportPreProcessor
     final StringBuffer sb = new StringBuffer();
     final Collection<Resource> importsCollector = getImportedResources(resource);
     for (final Resource imported : importsCollector) {
-      sb.append(preProcessorExecutor.execute(imported));
+      //for now, minimize always
+      //TODO: find a way to get minimize property dynamically.
+      sb.append(preProcessorExecutor.execute(imported, true));
     }
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : " + importsCollector.size());

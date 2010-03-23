@@ -20,8 +20,9 @@ public interface PreProcessorExecutor {
    * Execute all the preProcessors on the given resource.
    *
    * @param resource {@link Resource} to preProcess.
+   * @param minimize whether the minimimize aware preProcessor must be applied.
    * @return the result of preProcessing as string content.
    * @throws IOException if {@link Resource} cannot be found or any other related errors.
    */
-  String execute(Resource resource) throws IOException;
+  String execute(Resource resource, final boolean minimize) throws IOException;
 }

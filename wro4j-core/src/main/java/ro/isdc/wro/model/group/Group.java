@@ -6,6 +6,8 @@ package ro.isdc.wro.model.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -90,6 +92,14 @@ public final class Group {
       return getName().equals(group.getName());
     }
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   /**

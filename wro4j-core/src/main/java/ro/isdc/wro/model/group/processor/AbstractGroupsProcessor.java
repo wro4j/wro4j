@@ -46,7 +46,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   private final Collection<ResourcePostProcessor> postProcessors = decorateCollection(new ArrayList<ResourcePostProcessor>());
   /**
-   * Used to get stream of the resources.
+   * Used to get a stream of the resources.
    */
   private UriLocatorFactory uriLocatorFactory;
 
@@ -192,7 +192,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     for (final T processor : availableProcessors) {
       final SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
       final boolean isAnyTypeSatisfied = type == null && supportedType == null;
-      final boolean isTypeSatisfied = type != null && supportedType != null && type == supportedType.type();
+      final boolean isTypeSatisfied = type != null && supportedType != null && type == supportedType.value();
       if (isAnyTypeSatisfied || isTypeSatisfied) {
         found.add(processor);
       }
@@ -234,6 +234,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     postProcessors.add(processor);
   }
 
+
   /**
    * @param resource {@link Resource} for which a Reader should be returned.
    * @return {@link Reader} for the resource.
@@ -242,17 +243,19 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    */
   protected final Reader getResourceReader(final Resource resource)
     throws IOException {
-      final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+    Reader reader = null;
+    final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+    if (locator != null) {
       final InputStream is = locator.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
-      final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-      if (reader == null) {
-        //TODO skip invalid resource, instead of throwing exception
-        throw new WroRuntimeException(
-            "Exception while retrieving InputStream from uri: " + resource.getUri());
-      }
-      return reader;
+      reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     }
+    if (reader == null) {
+      // TODO skip invalid resource, instead of throwing exception
+      throw new IOException("Exception while retrieving InputStream from uri: " + resource.getUri());
+    }
+    return reader;
+  }
 
   /**
    * @param groups

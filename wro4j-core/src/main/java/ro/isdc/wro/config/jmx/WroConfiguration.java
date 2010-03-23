@@ -19,9 +19,12 @@ import org.apache.commons.lang.builder.ToStringStyle;
 public final class WroConfiguration
   implements WroConfigurationMBean {
 	/**
-	 * By default period values are 0, that means that the associated scheduler never runs.
+	 * How often to run a thread responsible for refreshing the cache.
 	 */
   private long cacheUpdatePeriod;
+  /**
+   * How often to run a thread responsible for refreshing the model.
+   */
   private long modelUpdatePeriod;
   /**
    * Gzip enable flag.
@@ -169,15 +172,6 @@ public final class WroConfiguration
    * @param debug the debug to set
    */
   public void setDebug(final boolean debug) {
-    if (debug) {
-      //Every minute
-      setCacheUpdatePeriod(60);
-      //Every ten minutes
-      setModelUpdatePeriod(600);
-    } else {
-      setCacheUpdatePeriod(0);
-      setModelUpdatePeriod(0);
-    }
     reloadCache();
     reloadModel();
     this.debug = debug;

@@ -9,7 +9,8 @@ package ro.isdc.wro.config.jmx;
  * @author Alex Objelean
  */
 public interface WroConfigurationMBean {
-	/**
+
+  /**
 	 * @return period in seconds when the wro model (by default read from wro.xml) is updated.
 	 */
 	long getModelUpdatePeriod();

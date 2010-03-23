@@ -18,6 +18,14 @@
       <param-name>gzipResources</param-name>
       <param-value>TRUE</param-value>
     </init-param>
+    <init-param>
+      <param-name>cacheUpdatePeriod</param-name>
+      <param-value>20</param-value>
+    </init-param>
+    <init-param>
+      <param-name>modelUpdatePeriod</param-name>
+      <param-value>60</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>WebResourceOptimizer</filter-name>
@@ -38,6 +46,17 @@
   <servlet-mapping>
     <servlet-name>dwr-invoker</servlet-name>
     <url-pattern>/dwr/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>dynamicResource</servlet-name>
+    <display-name>DWR Servlet</display-name>
+    <servlet-class>ro.isdc.wro.examples.DynamicResourceServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>dynamicResource</servlet-name>
+    <url-pattern>/dynamicResource/*</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>

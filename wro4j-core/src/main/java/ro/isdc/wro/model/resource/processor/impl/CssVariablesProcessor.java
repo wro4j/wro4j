@@ -31,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author alexandru.objelean
  * @created Created on Jul 05, 2009
  */
-@SupportedResourceType(type=ResourceType.CSS)
+@SupportedResourceType(ResourceType.CSS)
 public class CssVariablesProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   /**
