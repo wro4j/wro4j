@@ -277,7 +277,6 @@ public class WroFilter
     }
   }
 
-
   /**
    * This exists only for testing purposes.
    * @return the applicationSettings

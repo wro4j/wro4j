@@ -4,10 +4,8 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,33 +16,19 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.StandaloneWroManagerFactory;
-import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.factory.XmlModelFactory;
-import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
 
 
 /**
  * @goal run
- * @phase package
+ * @phase process-resources
  *
  * @author Alex Objelean
  */
-public class Wro4jMojo extends AbstractMojo {
+public class Wro4jMojo
+  extends AbstractMojo {
   /**
    * File containing the groups definitions.
    *
@@ -65,6 +49,7 @@ public class Wro4jMojo extends AbstractMojo {
   private File destinationFolder;
   /**
    * Comma separated group names.
+   *
    * @parameter expression="${targetGroups}"
    */
   private String targetGroups;
@@ -73,68 +58,52 @@ public class Wro4jMojo extends AbstractMojo {
    * @optional
    */
   private boolean minimize;
-//  /**
-//   * @parameter default-value="${project}"
-//   */
-//  private MavenProject mavenProject;
+  /**
+   * @parameter expression="${wroManagerFactory}"
+   * @optional
+   */
+  private String wroManagerFactory;
+
+
+  // /**
+  // * @parameter default-value="${project}"
+  // */
+  // private MavenProject mavenProject;
 
   /**
    * @param request {@link HttpServletRequest} to process
    * @return {@link WroManagerFactory} implementation.
    */
-  private WroManagerFactory getManagerFactory(final HttpServletRequest request) {
-    return new StandaloneWroManagerFactory() {
-      @Override
-      protected void onBeforeCreate() {
-        Context.set(Context.standaloneContext(request));
+  @SuppressWarnings("unchecked")
+  private MavenContextAwareManagerFactory getManagerFactory(final HttpServletRequest request)
+    throws MojoExecutionException {
+    final MavenContextAwareManagerFactory managerFactory;
+    if (wroManagerFactory != null) {
+      try {
+        final Class<? extends MavenContextAwareManagerFactory> wroManagerFactoryClass = (Class<? extends MavenContextAwareManagerFactory>)Thread.currentThread().getContextClassLoader().loadClass(wroManagerFactory);
+        managerFactory = wroManagerFactoryClass.newInstance();
+      } catch (final Exception e) {
+        throw new MojoExecutionException("Invalid wroManagerFactory className: " + wroManagerFactory);
       }
-      @Override
-      protected GroupExtractor newGroupExtractor() {
-        return new GroupExtractorDecorator(super.newGroupExtractor()) {
-          @Override
-          public boolean isMinimized(final HttpServletRequest request) {
-            return minimize;
-          }
-        };
-      }
-      @Override
-      protected WroModelFactory newModelFactory() {
-        return new XmlModelFactory() {
-          @Override
-          protected InputStream getConfigResourceAsStream()
-            throws IOException {
-            return new FileInputStream(wroFile);
-          }
-        };
-      }
-
-      @Override
-      protected GroupsProcessor newGroupsProcessor() {
-        final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
-        groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-        groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-        groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-        groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-        groupsProcessor.addPostProcessor(new CssVariablesProcessor());
-        groupsProcessor.addPostProcessor(new JSMinProcessor());
-        groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-        return groupsProcessor;
-      }
-
-
-      @Override
-      protected ServletContextUriLocator newServletContextUriLocator() {
-        return new ServletContextUriLocator() {
-          @Override
-          public InputStream locate(final String uri)
-            throws IOException {
-            final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
-            return new FileInputStream(new File(contextFolder, uriWithoutPrefix));
-          }
-        };
-      }
-    };
+    } else {
+      managerFactory = new DefaultMavenContextAwareManagerFactory();
+    }
+    //initialize before return.
+    managerFactory.initialize(createRunContext(), request);
+    return managerFactory;
   }
+
+  /**
+   * Creates a {@link RunContext} by setting properties passed after mojo is initialized.
+   */
+  private RunContext createRunContext() {
+    final RunContext runContext = new RunContext();
+    runContext.setContextFolder(contextFolder);
+    runContext.setMinimize(minimize);
+    runContext.setWroFile(wroFile);
+    return runContext;
+  }
+
 
   /**
    * {@inheritDoc}
@@ -147,44 +116,46 @@ public class Wro4jMojo extends AbstractMojo {
     getLog().info("Minimize: " + minimize);
     getLog().info("Destination folder: " + destinationFolder);
 
-//    updateClasspath();
+    // updateClasspath();
     try {
       if (!destinationFolder.exists()) {
         destinationFolder.mkdirs();
       }
       getLog().info("will process the following groups: " + targetGroups);
-    	//TODO create a Request object
+      // TODO create a Request object
       for (final String group : getTargetGroupsAsList()) {
         for (final ResourceType resourceType : ResourceType.values()) {
           final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
           processGroup(groupWithExtension);
         }
       }
-    } catch(final Exception e) {
+    } catch (final Exception e) {
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
     }
   }
 
-//  /**
-//   * Update the classpath.
-//   */
-//  private void updateClasspath() {
-//    //TODO update classloader by adding all runtime dependencies of the running project
-//    getLog().info("mavenProject: " + mavenProject);
-//    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
-//    final List<URL> urlList = new ArrayList<URL>();
-//    try {
-//      for (final Artifact artifact : artifacts) {
-//        urlList.add(artifact.getFile().toURI().toURL());
-//      }
-//    } catch (final MalformedURLException e) {
-//      getLog().error("Error retreiving URL for artifact", e);
-//      throw new RuntimeException(e);
-//    }
-//    getLog().info("URLs: " + urlList);
-//    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
-//    Thread.currentThread().setContextClassLoader(cl);
-//  }
+
+  // /**
+  // * Update the classpath.
+  // */
+  // private void updateClasspath() {
+  // //TODO update classloader by adding all runtime dependencies of the running project
+  // getLog().info("mavenProject: " + mavenProject);
+  // final Collection<Artifact> artifacts = mavenProject.getArtifacts();
+  // final List<URL> urlList = new ArrayList<URL>();
+  // try {
+  // for (final Artifact artifact : artifacts) {
+  // urlList.add(artifact.getFile().toURI().toURL());
+  // }
+  // } catch (final MalformedURLException e) {
+  // getLog().error("Error retreiving URL for artifact", e);
+  // throw new RuntimeException(e);
+  // }
+  // getLog().info("URLs: " + urlList);
+  // final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}),
+  // Thread.currentThread().getContextClassLoader());
+  // Thread.currentThread().setContextClassLoader(cl);
+  // }
 
   /**
    * @return a list containing all groups needs to be processed.
@@ -193,12 +164,14 @@ public class Wro4jMojo extends AbstractMojo {
     return Arrays.asList(targetGroups.split(","));
   }
 
+
   /**
    * Process a single group.
+   *
    * @throws IOException if any IO related exception occurs.
    */
   private void processGroup(final String group)
-    throws IOException {
+    throws IOException, MojoExecutionException {
     getLog().info("processing group: " + group);
 
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -213,7 +186,7 @@ public class Wro4jMojo extends AbstractMojo {
     getManagerFactory(request).getInstance().process(request, response);
 
     fos.close();
-    //delete empty files
+    // delete empty files
     if (destinationFile.length() == 0) {
       getLog().info("No content found for group: " + group);
       destinationFile.delete();
@@ -223,12 +196,14 @@ public class Wro4jMojo extends AbstractMojo {
     }
   }
 
+
   /**
    * @param wroFile the wroFile to set
    */
   public void setWroFile(final File wroFile) {
     this.wroFile = wroFile;
   }
+
 
   /**
    * @param destinationFolder the destinationFolder to set
@@ -237,12 +212,14 @@ public class Wro4jMojo extends AbstractMojo {
     this.destinationFolder = destinationFolder;
   }
 
+
   /**
    * @param contextFolder the servletContextFolder to set
    */
   public void setContextFolder(final File contextFolder) {
     this.contextFolder = contextFolder;
   }
+
 
   /**
    * @param targetGroups comma separated group names.
@@ -251,10 +228,18 @@ public class Wro4jMojo extends AbstractMojo {
     this.targetGroups = targetGroups;
   }
 
+
   /**
    * @param minimize flag for minimization.
    */
   public void setMinimize(final boolean minimize) {
     this.minimize = minimize;
+  }
+
+  /**
+   * @param wroManagerFactory the wroManagerFactory to set
+   */
+  public void setWroManagerFactory(final String wroManagerFactory) {
+    this.wroManagerFactory = wroManagerFactory;
   }
 }
