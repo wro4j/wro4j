@@ -3,7 +3,11 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import java.io.File;
+
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.junit.Test;
 
 
 /**
@@ -12,24 +16,26 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
  * @author Alex Objelean
  */
 public class Wro4jRunTest extends AbstractMojoTestCase {
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void setUp()
+  @Test
+  public void testMojoGoal()
     throws Exception {
-    super.setUp();
+    runMojo("src/test/resources/unit/basic-test/pom.xml");
   }
 
-  public void test() {
-    //no test
+  public void testIncompleteConfigurationMojoGoal()
+    throws Exception {
+    try {
+      runMojo("src/test/resources/unit/basic-test/pom-incompleteConfiguration.xml");
+      fail("should have thrown an exception");
+    } catch (final MojoExecutionException e) {
+      // TODO: handle exception
+    }
   }
-//
-//  public void testMojoGoal()
-//    throws Exception {
-//    final File testPom = new File(getBasedir(), "src/test/resources/unit/basic-test/pom.xml");
-//    final Wro4jMojo mojo = (Wro4jMojo)lookupMojo("run", testPom);
-//    //mojo.execute();
-//    assertNotNull(mojo);
-//  }
+
+  private void runMojo(final String pomPath)
+    throws Exception, MojoExecutionException {
+    final File testPom = new File(getBasedir(), pomPath);
+    final Wro4jMojo mojo = (Wro4jMojo)lookupMojo("run", testPom);
+    mojo.execute();
+  }
 }

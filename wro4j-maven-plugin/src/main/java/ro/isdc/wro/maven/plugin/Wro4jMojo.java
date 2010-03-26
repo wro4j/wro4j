@@ -6,14 +6,21 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
@@ -64,11 +71,11 @@ public class Wro4jMojo
    */
   private String wroManagerFactory;
 
+  /**
+   * @parameter default-value="${project}"
+   */
+  private MavenProject mavenProject;
 
-  // /**
-  // * @parameter default-value="${project}"
-  // */
-  // private MavenProject mavenProject;
 
   /**
    * @param request {@link HttpServletRequest} to process
@@ -88,10 +95,11 @@ public class Wro4jMojo
     } else {
       managerFactory = new DefaultMavenContextAwareManagerFactory();
     }
-    //initialize before return.
+    // initialize before return.
     managerFactory.initialize(createRunContext(), request);
     return managerFactory;
   }
+
 
   /**
    * Creates a {@link RunContext} by setting properties passed after mojo is initialized.
@@ -110,6 +118,8 @@ public class Wro4jMojo
    */
   public void execute()
     throws MojoExecutionException {
+    validate();
+    updateClasspath();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("TargetGroups: " + targetGroups);
@@ -135,27 +145,47 @@ public class Wro4jMojo
   }
 
 
-  // /**
-  // * Update the classpath.
-  // */
-  // private void updateClasspath() {
-  // //TODO update classloader by adding all runtime dependencies of the running project
-  // getLog().info("mavenProject: " + mavenProject);
-  // final Collection<Artifact> artifacts = mavenProject.getArtifacts();
-  // final List<URL> urlList = new ArrayList<URL>();
-  // try {
-  // for (final Artifact artifact : artifacts) {
-  // urlList.add(artifact.getFile().toURI().toURL());
-  // }
-  // } catch (final MalformedURLException e) {
-  // getLog().error("Error retreiving URL for artifact", e);
-  // throw new RuntimeException(e);
-  // }
-  // getLog().info("URLs: " + urlList);
-  // final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}),
-  // Thread.currentThread().getContextClassLoader());
-  // Thread.currentThread().setContextClassLoader(cl);
-  // }
+  /**
+   * Checks if all required fields are configured.
+   */
+  private void validate()
+    throws MojoExecutionException {
+    if (wroFile == null) {
+      throw new MojoExecutionException("wroFile was not set!");
+    }
+    if (destinationFolder == null) {
+      throw new MojoExecutionException("destinationFolder was not set!");
+    }
+    if (targetGroups == null) {
+      throw new MojoExecutionException("targetGroups was not set!");
+    }
+    if (contextFolder == null) {
+      throw new MojoExecutionException("contextFolder was not set!");
+    }
+  }
+
+
+  /**
+   * Update the classpath.
+   */
+  private void updateClasspath() {
+    // TODO update classloader by adding all runtime dependencies of the running project
+    getLog().info("mavenProject: " + mavenProject);
+    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
+    final List<URL> urlList = new ArrayList<URL>();
+    try {
+      for (final Artifact artifact : artifacts) {
+        urlList.add(artifact.getFile().toURI().toURL());
+      }
+    } catch (final MalformedURLException e) {
+      getLog().error("Error retreiving URL for artifact", e);
+      throw new RuntimeException(e);
+    }
+    getLog().info("URLs: " + urlList);
+    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
+    Thread.currentThread().setContextClassLoader(cl);
+  }
+
 
   /**
    * @return a list containing all groups needs to be processed.
@@ -235,6 +265,7 @@ public class Wro4jMojo
   public void setMinimize(final boolean minimize) {
     this.minimize = minimize;
   }
+
 
   /**
    * @param wroManagerFactory the wroManagerFactory to set
