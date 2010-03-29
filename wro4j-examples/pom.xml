@@ -19,12 +19,12 @@
 			<groupId>ro.isdc.wro4j</groupId>
 			<artifactId>wro4j-core</artifactId>
 		</dependency>
-    <!-- 
+    
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 		</dependency>
-		 -->
+		 
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -32,9 +32,10 @@
 		<dependency>
 			<groupId>org.directwebremoting</groupId>
 			<artifactId>dwr</artifactId>
-			<version>2.0.3</version>
+			<version>3.0.M1</version>
 		</dependency>
 	</dependencies>
+  <!-- 
 	<build>
 		<plugins>
 			<plugin>
@@ -52,8 +53,7 @@
 					<targetGroups>all</targetGroups>
 				</configuration>
 			</plugin>
-      <!-- -->
 		</plugins>
 	</build>
-	<!--  -->
+	-->
 </project>
