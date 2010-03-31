@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.UUID;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -195,8 +194,9 @@ public class WroFilter
    * Initialize header values used for server-side resource caching.
    */
   private void initHeaderValues() {
-    etagValue = UUID.randomUUID().toString();
-    lastModifiedValue = new Date().getTime();
+    final Long timestamp = new Date().getTime();
+    etagValue = Long.toHexString(timestamp);
+    lastModifiedValue = timestamp;
     cacheControlValue = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
