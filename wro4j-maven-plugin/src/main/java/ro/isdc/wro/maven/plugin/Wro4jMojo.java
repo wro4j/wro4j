@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
@@ -64,11 +63,11 @@ public class Wro4jMojo
    * @optional
    */
   private String wroManagerFactory;
-
-  /**
-   * @parameter default-value="${project}"
-   */
-  private MavenProject mavenProject;
+//
+//  /**
+//   * @parameter default-value="${project}"
+//   */
+//  private MavenProject mavenProject;
 
 
   /**
