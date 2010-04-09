@@ -121,7 +121,8 @@ public class WroFilter
     try {
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
-      System.out.println("enableJmx" + jmxEnabled);
+      LOG.debug("jmxEnabled: " + jmxEnabled);
+      LOG.debug("wro4j configuration: " + configuration);
       if (jmxEnabled) {
         registerChangeListeners();
         final MBeanServer mbeanServer = getMBeanServer();
@@ -206,7 +207,6 @@ public class WroFilter
     config.setDebug(debug);
     config.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
     config.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
-    LOG.debug("configuration built: " + config);
     return config;
 	}
 
@@ -223,7 +223,6 @@ public class WroFilter
     cal.roll(Calendar.YEAR, 10);
     expiresValue = cal.getTimeInMillis();
     //treat null as true
-    System.out.println("jmxConfig: " + BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)));
     jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
   }
 
