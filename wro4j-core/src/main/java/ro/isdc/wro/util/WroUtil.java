@@ -7,12 +7,10 @@ import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
 
 
@@ -67,27 +65,6 @@ public final class WroUtil {
   public static String getServletPathFromLocation(final String location) {
     return location.replace(getPathInfoFromLocation(location), "");
   }
-
-
-  /**
-   * Adds the gzip HTTP header to the response. This is need when a gzipped body is returned so that browsers can
-   * properly decompress it.
-   * <p/>
-   *
-   * @param response the response which will have a header added to it. I.e this method changes its parameter
-   * @throws WroRuntimeException if response doesn't contains Content-Encoding header.
-   */
-  public static void addGzipHeader(final HttpServletResponse response) {
-    if (response == null) {
-      throw new IllegalArgumentException("response cannot be null!");
-    }
-    response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
-    final boolean containsEncoding = response.containsHeader(HttpHeader.CONTENT_ENCODING.toString());
-    if (!containsEncoding) {
-      throw new WroRuntimeException("Failure when attempting to set " + "Content-Encoding: gzip");
-    }
-  }
-
 
   /**
    * @param request {@link HttpServletRequest} object.

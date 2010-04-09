@@ -84,8 +84,18 @@ public class DefaultMavenContextAwareManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
+  protected final GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+    configureProcessors(groupsProcessor);
+    return groupsProcessor;
+  }
+
+  /**
+   * Configure the pre and post processors. Override this to specify your own processors.
+   *
+   * @param groupsProcessor
+   */
+  protected void configureProcessors(final GroupsProcessor groupsProcessor) {
     groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupsProcessor.addPreProcessor(new CssImportPreProcessor());
     groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
@@ -93,7 +103,6 @@ public class DefaultMavenContextAwareManagerFactory
     groupsProcessor.addPostProcessor(new CssVariablesProcessor());
     groupsProcessor.addPostProcessor(new JSMinProcessor());
     groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-    return groupsProcessor;
   }
 
 

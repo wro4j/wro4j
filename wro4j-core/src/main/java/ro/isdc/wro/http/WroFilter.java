@@ -22,6 +22,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +74,10 @@ public class WroFilter
    */
   static final String PARAM_MODEL_UPDATE_PERIOD = "modelUpdatePeriod";
   /**
+   * Parameter allowing to turn jmx on or off.
+   */
+  static final String PARAM_JMX_ENABLED = "jmxEnabled";
+  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -88,8 +93,11 @@ public class WroFilter
   private long lastModifiedValue;
   private String cacheControlValue;
   private long expiresValue;
-
   private WroConfiguration configuration;
+  /**
+   * Flag for enable/disable jmx. By default this value is true.
+   */
+  private boolean jmxEnabled = true;
 
 
   /**
@@ -100,8 +108,8 @@ public class WroFilter
     this.filterConfig = config;
     this.wroManagerFactory = getWroManagerFactory();
     initHeaderValues();
-    initJMX();
     doInit(config);
+    initJMX();
   }
 
 
@@ -113,15 +121,28 @@ public class WroFilter
     try {
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
-      registerChangeListeners();
-      final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-      final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
-      if (!mbeanServer.isRegistered(name)) {
-        mbeanServer.registerMBean(configuration, name);
+      System.out.println("enableJmx" + jmxEnabled);
+      if (jmxEnabled) {
+        registerChangeListeners();
+        final MBeanServer mbeanServer = getMBeanServer();
+        final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
+        if (!mbeanServer.isRegistered(name)) {
+          mbeanServer.registerMBean(configuration, name);
+        }
       }
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
+  }
+
+
+  /**
+   * Override this method if you want to provide a different MBeanServer.
+   *
+   * @return {@link MBeanServer} to use for JMX.
+   */
+  protected MBeanServer getMBeanServer() {
+    return ManagementFactory.getPlatformMBeanServer();
   }
 
 
@@ -191,7 +212,7 @@ public class WroFilter
 
 
 	/**
-   * Initialize header values used for server-side resource caching.
+   * Initialize header values.
    */
   private void initHeaderValues() {
     final Long timestamp = new Date().getTime();
@@ -201,6 +222,9 @@ public class WroFilter
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
     expiresValue = cal.getTimeInMillis();
+    //treat null as true
+    System.out.println("jmxConfig: " + BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)));
+    jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
   }
 
   /**

@@ -31,6 +31,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -96,20 +97,17 @@ public class WroManager implements WroConfigurationChangeListener {
     } else {
       is = buildGroupsInputStream(model, request, response);
     }
-    OutputStream os = null;
-    // append result to response stream
-    if (ConfigurationContext.get().getConfig().isGzipEnabled()
-      && isGzipSupported()) {
-      os = getGzipedOutputStream(response);
-    } else {
-      os = response.getOutputStream();
-    }
+    //use gziped response if supported
+    final OutputStream os = getGzipedOutputStream(response);
     IOUtils.copy(is, os);
     is.close();
     os.close();
   }
 
+
   /**
+   * Allow subclasses to turnoff gzipping
+   *
    * @return true if Gzip is Supported
    */
   protected boolean isGzipSupported() {
@@ -124,12 +122,14 @@ public class WroManager implements WroConfigurationChangeListener {
    */
   private OutputStream getGzipedOutputStream(final HttpServletResponse response)
     throws IOException {
-    // gzip response
-    WroUtil.addGzipHeader(response);
-    // Create a gzip stream
-    final OutputStream os = new GZIPOutputStream(response.getOutputStream());
+    if (ConfigurationContext.get().getConfig().isGzipEnabled() && isGzipSupported()) {
+      // add gzip header and gzip response
+      response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
+      // Create a gzip stream
+      return new GZIPOutputStream(response.getOutputStream());
+    }
     LOG.debug("Gziping outputStream response");
-    return os;
+    return response.getOutputStream();
   }
 
   /**

@@ -6,18 +6,12 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -119,7 +113,7 @@ public class Wro4jMojo
   public void execute()
     throws MojoExecutionException {
     validate();
-    updateClasspath();
+//    updateClasspath();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("TargetGroups: " + targetGroups);
@@ -164,27 +158,27 @@ public class Wro4jMojo
     }
   }
 
-
-  /**
-   * Update the classpath.
-   */
-  private void updateClasspath() {
-    // TODO update classloader by adding all runtime dependencies of the running project
-    getLog().info("mavenProject: " + mavenProject);
-    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
-    final List<URL> urlList = new ArrayList<URL>();
-    try {
-      for (final Artifact artifact : artifacts) {
-        urlList.add(artifact.getFile().toURI().toURL());
-      }
-    } catch (final MalformedURLException e) {
-      getLog().error("Error retreiving URL for artifact", e);
-      throw new RuntimeException(e);
-    }
-    getLog().info("URLs: " + urlList);
-    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
-    Thread.currentThread().setContextClassLoader(cl);
-  }
+//
+//  /**
+//   * Update the classpath.
+//   */
+//  private void updateClasspath() {
+//    // TODO update classloader by adding all runtime dependencies of the running project
+//    getLog().info("mavenProject: " + mavenProject);
+//    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
+//    final List<URL> urlList = new ArrayList<URL>();
+//    try {
+//      for (final Artifact artifact : artifacts) {
+//        urlList.add(artifact.getFile().toURI().toURL());
+//      }
+//    } catch (final MalformedURLException e) {
+//      getLog().error("Error retreiving URL for artifact", e);
+//      throw new RuntimeException(e);
+//    }
+//    getLog().info("URLs: " + urlList);
+//    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
+//    Thread.currentThread().setContextClassLoader(cl);
+//  }
 
 
   /**

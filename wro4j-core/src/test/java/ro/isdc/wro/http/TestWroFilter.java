@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,6 +39,7 @@ import ro.isdc.wro.test.util.WroTestUtils;
  */
 public class TestWroFilter {
 	private WroFilter filter;
+
 	@Before
 	public void initFilter() throws Exception {
 		filter = new WroFilter();
@@ -45,6 +47,11 @@ public class TestWroFilter {
 		final ServletContext servletContext = Mockito.mock(ServletContext.class);
 		Mockito.when(config.getServletContext()).thenReturn(servletContext);
 		filter.init(config);
+	}
+
+	@After
+	public void tearDown() {
+	  filter.destroy();
 	}
 
   /**
@@ -91,6 +98,14 @@ public class TestWroFilter {
   public void testValidAppFactoryClassNameIsSet() throws Exception {
     final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn(ServletContextAwareWroManagerFactory.class.getName());
+    filter.init(config);
+  }
+
+
+  @Test
+  public void testJmxDisabled() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(filter.PARAM_JMX_ENABLED)).thenReturn("false");
     filter.init(config);
   }
 
