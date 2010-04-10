@@ -4,12 +4,14 @@
 package ro.isdc.wro.util;
 
 import java.util.Enumeration;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.FastDateFormat;
 
 import ro.isdc.wro.http.HttpHeader;
 
@@ -25,6 +27,21 @@ public final class WroUtil {
    * Empty line pattern.
    */
   public static Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  /**
+   * Thread safe date format used to transform milliseconds into date as string to put in response header.
+   */
+  private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("E, dd MMM yyyy HH:mm:ss z", TimeZone.getTimeZone("GMT"));
+
+
+  /**
+   * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
+   *
+   * @param milliseconds to transform
+   * @return string representation of the date.
+   */
+  public static String toDateAsString(final long milliseconds) {
+    return DATE_FORMAT.format(milliseconds);
+  }
 
 
   /**

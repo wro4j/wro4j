@@ -127,6 +127,8 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    * {@inheritDoc}
    */
   public void destroy() {
-    getInstance().destroy();
+    if (manager != null) {
+      manager.destroy();
+    }
   }
 }

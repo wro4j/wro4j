@@ -126,6 +126,20 @@ public class TestWroFilter {
     Assert.assertEquals(100, filter.getConfiguration().getModelUpdatePeriod());
 	}
 
+	@Test
+	public void testValidHeaderParamIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989");
+    filter.init(config);
+	}
+
+	@Test(expected=WroRuntimeException.class)
+  public void testInvalidHeaderParamIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag 998989 expires 1");
+    filter.init(config);
+  }
+
 	/**
    * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.
    */

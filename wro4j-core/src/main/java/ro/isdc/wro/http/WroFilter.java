@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -33,6 +35,7 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -49,12 +52,15 @@ public class WroFilter
    */
   private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
   /**
+   * The parameter used to specify headers to put into the response, used mostly for caching.
+   */
+  static final String PARAM_HEADER = "header";
+  /**
    * The name of the context parameter that specifies wroManager factory class
    */
   static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
-   * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode
-   * is used.
+   * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode is used.
    */
   static final String PARAM_CONFIGURATION = "configuration";
   /**
@@ -86,18 +92,23 @@ public class WroFilter
    * WroManagerFactory. The brain of the optimizer.
    */
   private WroManagerFactory wroManagerFactory;
-  /**
-   * Cache control header values
-   */
-  private String etagValue;
-  private long lastModifiedValue;
-  private String cacheControlValue;
-  private long expiresValue;
   private WroConfiguration configuration;
   /**
    * Flag for enable/disable jmx. By default this value is true.
    */
   private boolean jmxEnabled = true;
+  /**
+   * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
+   * put, in order to avoid duplicate keys. This is done, because according to RFC 2616 Message Headers field names are
+   * case-insensitive.
+   */
+  @SuppressWarnings("serial")
+  private Map<String, String> headersMap = new LinkedHashMap<String, String>() {
+    @Override
+    public String put(final String key, final String value) {
+      return super.put(key.trim().toLowerCase(), value);
+    };
+  };
 
 
   /**
@@ -119,6 +130,9 @@ public class WroFilter
   private void initJMX()
     throws ServletException {
     try {
+      // treat null as true
+      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
+        BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
       LOG.debug("jmxEnabled: " + jmxEnabled);
@@ -152,21 +166,21 @@ public class WroFilter
    */
   private void registerChangeListeners() {
     configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
-    	public void propertyChange(final PropertyChangeEvent event) {
-    	  //reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
-    	  initHeaderValues();
-    		if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-    			((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
-    		}
-    	}
+      public void propertyChange(final PropertyChangeEvent event) {
+        // reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
+        initHeaderValues();
+        if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
+        }
+      }
     });
     configuration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
-    	public void propertyChange(final PropertyChangeEvent event) {
+      public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
-    		if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-    			((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
-    		}
-    	}
+        if (wroManagerFactory instanceof WroConfigurationChangeListener) {
+          ((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
+        }
+      }
     });
   }
 
@@ -176,7 +190,6 @@ public class WroFilter
    */
   private long getUpdatePeriodByName(final String paramName) {
     final String valueAsString = filterConfig.getInitParameter(paramName);
-    LOG.debug("The value of init-param: " + paramName + " is: " + valueAsString);
     if (valueAsString == null) {
       return 0;
     }
@@ -187,11 +200,12 @@ public class WroFilter
     }
   }
 
+
   /**
    * @return {@link WroConfiguration} configured object with default values set.
    */
-	private WroConfiguration newConfiguration() {
-		final WroConfiguration config = new WroConfiguration();
+  private WroConfiguration newConfiguration() {
+    final WroConfiguration config = new WroConfiguration();
 
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
@@ -208,23 +222,57 @@ public class WroFilter
     config.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
     config.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
     return config;
-	}
+  }
 
 
-	/**
+  /**
+   * Parse header value & puts the found values in headersMap field.
+   *
+   * @param header value to parse.
+   */
+  private void parseHeader(final String header) {
+    final String headerName = header.substring(0, header.indexOf(":"));
+    if (!headersMap.containsKey(headerName)) {
+      headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
+    }
+  }
+
+
+  /**
    * Initialize header values.
    */
   private void initHeaderValues() {
+    // put defaults
     final Long timestamp = new Date().getTime();
-    etagValue = Long.toHexString(timestamp);
-    lastModifiedValue = timestamp;
-    cacheControlValue = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
-    expiresValue = cal.getTimeInMillis();
-    //treat null as true
-    jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
+
+    headersMap.put(HttpHeader.CACHE_CONTROL.toString(),
+      "public, max-age=315360000, post-check=315360000, pre-check=315360000");
+    headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
+    headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
+    headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+
+    final String headerParam = filterConfig.getInitParameter(PARAM_HEADER);
+    if (headerParam != null) {
+      try {
+        if (headerParam.contains("|")) {
+          final String[] headers = headerParam.split("[|]");
+          for (final String header : headers) {
+            parseHeader(header);
+          }
+        } else {
+          parseHeader(headerParam);
+        }
+      } catch (final Exception e) {
+        throw new WroRuntimeException("Invalid header init-param value: " + headerParam
+          + ". A correct value should have the following format: "
+          + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: " + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | ETag: 123456789", e);
+      }
+    }
+    LOG.info("Header Values :" + headersMap);
   }
+
 
   /**
    * Custom filter initialization - can be used for extended classes.
@@ -246,7 +294,8 @@ public class WroFilter
     Context.set(Context.webContext(request, response, filterConfig));
     if (!ConfigurationContext.get().getConfig().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-      if (etagValue.equals(ifNoneMatch)) {
+      final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
+      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return;
       }
@@ -260,19 +309,17 @@ public class WroFilter
 
 
   /**
-   * Method responsible for setting response headers, used mostly for cache control. Override this method if you want to
-   * change the way headers are set.<br>
-   * Default implementation will set
+   * Method called for each request and responsible for setting response headers, used mostly for cache control.
+   * Override this method if you want to change the way headers are set.<br>
    *
    * @param response {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
     if (!ConfigurationContext.get().getConfig().isDebug()) {
       // Force resource caching as best as possible
-      response.setHeader(HttpHeader.CACHE_CONTROL.toString(), cacheControlValue);
-      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-      response.setDateHeader(HttpHeader.LAST_MODIFIED.toString(), lastModifiedValue);
-      response.setDateHeader(HttpHeader.EXPIRES.toString(), expiresValue);
+      for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
+        response.setHeader(entry.getKey(), entry.getValue());
+      }
     }
   }
 
@@ -300,8 +347,10 @@ public class WroFilter
     }
   }
 
+
   /**
    * This exists only for testing purposes.
+   *
    * @return the applicationSettings
    */
   protected final WroConfiguration getConfiguration() {
