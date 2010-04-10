@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,6 +39,7 @@ import ro.isdc.wro.test.util.WroTestUtils;
  */
 public class TestWroFilter {
 	private WroFilter filter;
+
 	@Before
 	public void initFilter() throws Exception {
 		filter = new WroFilter();
@@ -45,6 +47,11 @@ public class TestWroFilter {
 		final ServletContext servletContext = Mockito.mock(ServletContext.class);
 		Mockito.when(config.getServletContext()).thenReturn(servletContext);
 		filter.init(config);
+	}
+
+	@After
+	public void tearDown() {
+	  filter.destroy();
 	}
 
   /**
@@ -94,6 +101,14 @@ public class TestWroFilter {
     filter.init(config);
   }
 
+
+  @Test
+  public void testJmxDisabled() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(filter.PARAM_JMX_ENABLED)).thenReturn("false");
+    filter.init(config);
+  }
+
 	/**
 	 * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.
 	 */
@@ -110,6 +125,20 @@ public class TestWroFilter {
     Assert.assertEquals(10, filter.getConfiguration().getCacheUpdatePeriod());
     Assert.assertEquals(100, filter.getConfiguration().getModelUpdatePeriod());
 	}
+
+	@Test
+	public void testValidHeaderParamIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989");
+    filter.init(config);
+	}
+
+	@Test(expected=WroRuntimeException.class)
+  public void testInvalidHeaderParamIsSet() throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag 998989 expires 1");
+    filter.init(config);
+  }
 
 	/**
    * Set filter init params with proper values and check they are the same in {@link WroConfiguration} object.

@@ -35,8 +35,6 @@ import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
 
 
 /**
- * TODO finish implementation & create unit tests.
- * <p>
  * Allow configuring uriLocators & processors to add using initParams of the filter.
  *
  * @author Alex Objelean
