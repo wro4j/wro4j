@@ -170,7 +170,7 @@ public class WroManager implements WroConfigurationChangeListener {
 	  }
 	  is = new ByteArrayInputStream(result.getBytes());
 		stopWatch.stop();
-		LOG.info("WroManager process time: " + stopWatch.toString());
+		LOG.debug("WroManager process time: " + stopWatch.toString());
     if (type != null) {
       response.setContentType(type.getContentType());
     }

@@ -42,7 +42,6 @@ public class TestWroManager {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    //Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(System.out));
     manager.process(request, response);
   }
 
