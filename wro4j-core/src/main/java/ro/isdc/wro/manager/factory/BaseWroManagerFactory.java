@@ -127,6 +127,7 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    * {@inheritDoc}
    */
   public void destroy() {
+    //there is a strange situation when manager actually can be null
     if (manager != null) {
       manager.destroy();
     }
