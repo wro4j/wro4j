@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,26 +61,23 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
     }
 
     /**
+     * TODO optimize
      * Apply a list of preprocessors on a resource.
      */
     private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
       throws IOException {
       // get original content
       Reader reader = null;
-      String content = "";
       try {
         reader = groupsProcessor.getResourceReader(resource);
-        content = IOUtils.toString(reader);
-        reader.close();
       } catch (final IOException e) {
         LOG.warn("Invalid resource found: " + resource);
       }
       if (processors.isEmpty() || reader == null) {
         final Writer output = new StringWriter();
-        output.write(content);
         return output;
       }
-      Reader input = new StringReader(content);
+      Reader input = reader;
       Writer output = null;
       for (final ResourcePreProcessor processor : processors) {
         output = new StringWriter();
