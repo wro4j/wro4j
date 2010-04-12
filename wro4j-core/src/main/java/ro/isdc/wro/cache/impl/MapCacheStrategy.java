@@ -18,7 +18,7 @@ public final class MapCacheStrategy<K, V> implements CacheStrategy<K, V> {
   /**
    * Map containing cached items.
    */
-  private Map<K, V> map;
+  private final Map<K, V> map;
 
   /**
    * Default constructor. Initialize the map.

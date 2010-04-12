@@ -52,7 +52,6 @@ public class ServletContextUriLocator
    * to see if performance change.
    */
   private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
-  // new PipedStreamDispatchingStrategy();
 
 
   /**

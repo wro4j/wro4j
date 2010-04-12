@@ -5,13 +5,23 @@
 
   <group name="all">
     <group-ref>dynamicResource</group-ref>
+    <group-ref>WEBINF-css</group-ref>
+    <!-- 
     <group-ref>uniform</group-ref>
     <group-ref>JSGroup</group-ref>
+     
 		<group-ref>otherGroup</group-ref>
+    -->
 	</group>
-
+  
+  <group name="WEBINF-css">
+    <css>/WEB-INF/css/webapp.css</css>
+    <css>/WEB-INF/css/css1.css</css>
+    <css>/WEB-INF/css/css2.css</css>
+  </group>
+  
+<!-- 
   <group name="uniform">
-    <!--css>file:c:/temp/fileFromDisk.css</css-->
     <css>/static/css/webapp.css</css>
     <css>/static/css/css1.css</css>
     <css>/static/css/css2.css</css>
@@ -22,16 +32,17 @@
 	<group name="otherGroup">
 		<css>/static/css/variablesSupport.css</css>
 	</group>
-
-  <group name="dwr">
-    <js>/dwr/engine.js</js>
-    <js>/dwr/interface/DWRFacade.js</js>
-  </group>
+ -->
   
   <group name="dynamicResource">
     <js>/dynamicResource/test.js</js>
   </group>
   
+  <!-- 
+    <group name="dwr">
+    <js>/dwr/engine.js</js>
+    <js>/dwr/interface/DWRFacade.js</js>
+  </group>
   <group name="chineseEncoding">
     <js>http://search.trade2cn.com/js/list.js</js>
     <js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js>
@@ -57,5 +68,5 @@
     <js>/static/js/jquery-validate.js</js>
     <js>/static/js/jquery-ui-all.js</js>
   </group>
-
+ -->
 </groups>

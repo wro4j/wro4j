@@ -44,7 +44,7 @@ import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 /**
- * WroManager. Contains all the factories used by optimizer in order to perform the logic.
+ * Contains all the factories used by optimizer in order to perform the logic.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
@@ -210,11 +210,14 @@ public class WroManager implements WroConfigurationChangeListener {
     					if (group.hasResourcesOfType(resourceType)) {
     						final Collection<Group> groupAsList = new HashSet<Group>();
     						groupAsList.add(group);
-    						final boolean minimize = false;
+    						//TODO notify the filter about the change - expose a callback
                 //TODO check if request parameter can be fetched here without errors.
     						//groupExtractor.isMinimized(Context.get().getRequest())
-    						final String result = groupsProcessor.process(groupAsList, resourceType, minimize);
-    						cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), result);
+    						final Boolean[] minimizeValues = new Boolean[] {true, false};
+    						for (final boolean minimize : minimizeValues) {
+                  final String result = groupsProcessor.process(groupAsList, resourceType, minimize);
+                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), result);
+                }
     					}
     				}
     			}

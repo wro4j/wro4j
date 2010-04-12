@@ -3,8 +3,8 @@ package ro.isdc.wro.cache;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -70,7 +70,7 @@ public final class CacheEntry implements Serializable {
    */
   @Override
 	public boolean equals(final Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+    return EqualsBuilder.reflectionEquals(this, obj);
 	}
 
   /**
@@ -78,14 +78,18 @@ public final class CacheEntry implements Serializable {
    */
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+	  int hash = 7;
+	  hash = 31 * hash + getGroupName().hashCode();
+	  hash = 31 * hash + getType().hashCode();
+	  hash = 31 * hash + Boolean.valueOf(isMinimize()).hashCode();
+	  return hash;
   }
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-	  return ToStringBuilder.reflectionToString(this);
-	}
+  public String toString() {
+    return new ToStringBuilder("", ToStringStyle.MULTI_LINE_STYLE).append(getGroupName()).append(getType()).append(isMinimize()).toString();
+  }
 }

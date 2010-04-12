@@ -27,6 +27,8 @@ public class DynamicResourceServlet extends HttpServlet {
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
     resp.setContentType("javascript");
-    resp.getWriter().write("alert('" + dateFormat.format(new Date()) + "');");
+    final String result = "document.write('<h1>" + dateFormat.format(new Date()) + "</h1>');";
+    System.out.println("DynamicResourceServlet: " + result);
+    resp.getWriter().write(result);
   }
 }
