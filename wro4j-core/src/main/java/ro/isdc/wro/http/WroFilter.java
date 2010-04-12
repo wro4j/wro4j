@@ -131,6 +131,7 @@ public class WroFilter
     throws ServletException {
     try {
       // treat null as true
+      //TODO do not use BooleanUtils -> create your utility method
       jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
         BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
