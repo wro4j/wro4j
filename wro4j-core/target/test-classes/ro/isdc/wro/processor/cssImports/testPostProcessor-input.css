@@ -1,0 +1,15 @@
+@import url('css/import1.css');
+@import url('css/import2.css');
+@import url('css/import3.css');
+ul li {
+  list-style: none;
+}
+.center {
+  text-align: center;
+}
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}

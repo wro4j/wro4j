@@ -1,0 +1,29 @@
+@variables {
+  mainColor: #fe8d12;
+  mainBackground: white;
+	alt1-background: yellow;
+  alt2-background: #de5500;
+  alt3-background: url(../img/applications.png) no-repeat left top;	
+}
+
+@variables {
+  var1: solid red 1px;
+  var2 : Arial;
+}
+
+body {
+  color: var(mainColor);
+  background: var(mainBackground);
+}
+div#panelId {
+	border: var(var1);
+	font: var(var2);
+	margin: var(INVALID_VARIABLE);
+	background: var(alt1-background);
+}
+form {
+	background: var(alt2-background);	
+}
+ul li {
+	background: var(alt3-background);
+}

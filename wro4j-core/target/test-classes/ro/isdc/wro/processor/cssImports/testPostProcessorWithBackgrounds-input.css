@@ -1,0 +1,9 @@
+div.1 {
+  background: url(../css/a/../image.png);
+}div.3 {
+  background: url(../css/a/b/c/../image.png);
+}@import url(../css/a/b/../a.css);
+@import url(../css/a/b/c/c.css);
+div.2 {
+  background: url(../css/a/b/../image.png);
+}
