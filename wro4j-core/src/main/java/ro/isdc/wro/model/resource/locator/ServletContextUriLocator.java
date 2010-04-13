@@ -46,7 +46,10 @@ public class ServletContextUriLocator
    * Prefix for url resources.
    */
   public static final String PREFIX = "/";
-
+  /**
+   * Constant for WEB-INF folder.
+   */
+  private static final String PROTECTED_PREFIX = "/WEB-INF/";
   /**
    * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
    * to see if performance change.
@@ -72,6 +75,17 @@ public class ServletContextUriLocator
     return uri.trim().startsWith(ServletContextUriLocator.PREFIX);
   }
 
+
+  /**
+   * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
+   * folder).
+   *
+   * @param uri the uri to check.
+   * @return true if the uri is a protected resource.
+   */
+  public static boolean isProtectedResource(final String uri) {
+    return uri.startsWith(PROTECTED_PREFIX);
+  }
 
   /**
    * {@inheritDoc}
@@ -120,9 +134,11 @@ public class ServletContextUriLocator
   private static final class ByteArrayStreamDispatchingStrategy
     implements DynamicStreamLocatorStrategy {
     /**
-     * {@inheritDoc}
+     * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
+     * application behind it. So when it intercepts a requests for portal then it start bombing the the application
+     * behind the portal with multiple threads (web requests) that are combined with threads for wro4.
      */
-    public InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
+    public synchronized InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
       final String location)
       throws IOException {
       // where to write the bytes of the stream

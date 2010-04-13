@@ -69,6 +69,23 @@ import ro.isdc.wro.util.WroUtil;
  * <td>../../1.jpg</td>
  * </tr>
  * <tr>
+ * <td rowspan="4">/WEB-INF/1.css</td>
+ * <td>/a/1.jpg</td>
+ * <td>/a/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>/1.jpg</td>
+ * <td>/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>1.jpg</td>
+ * <td>[WRO-PREFIX]?id=/WEB-INF/1.jpg</td>
+ * </tr>
+ * <tr>
+ * <td>../1.jpg</td>
+ * <td>[WRO-PREFIX]?id=/WEB-INF/../1.jpg</td>
+ * </tr>
+ * <tr>
  * <td rowspan="4">[X]/1.css <br/><br/> where [X] is URL or a classpath
  * resource<br/> where [WRO-PREFIX] is a servletContext prefix <br/>which will
  * map WRO filter to the result url. </td>
@@ -186,6 +203,10 @@ public class CssUrlRewritingProcessor implements ResourcePreProcessor {
       if (ServletContextUriLocator.isValid(cssUri)) {
         if (ServletContextUriLocator.isValid(imageUrl)) {
           return imageUrl;
+        }
+        //Treat WEB-INF special case
+        if (ServletContextUriLocator.isProtectedResource(cssUri)) {
+          return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
         }
         return computeNewImageLocation(".." + cssUri, imageUrl);
       }

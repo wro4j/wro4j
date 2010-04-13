@@ -16,5 +16,4 @@
   background: url(/img.gif) red;
 	background: url(/folder/img.gif) no-repeat right;
 	background: url(http://www.google.com/);
-  background: url(/WEB-INF/js/protected.js);
 }

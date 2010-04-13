@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
@@ -73,8 +72,6 @@ public class TestCssUrlRewritingProcessor extends AbstractWroTest {
 
   /**
    * Test a servletContext css resource.
-   *
-   * @throws IOException
    */
   @Test
   public void processServletContextResourceType()
@@ -88,6 +85,20 @@ public class TestCssUrlRewritingProcessor extends AbstractWroTest {
       });
   }
 
+  /**
+   * Test a resource which is located inside WEB-INF protected folder.
+   */
+  @Test
+  public void processWEBINFServletContextResourceType()
+    throws IOException {
+    compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
+      "classpath:cssUrlRewriting-WEBINFservletContext-outcome.css", new ResourceProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource("/WEB-INF/" + CSS_INPUT_NAME), reader, writer);
+        }
+      });
+  }
 
   /**
    * Test a url css resource.
