@@ -332,11 +332,12 @@ public class WroFilter
   }
 
   /**
-   * Invoked when a {@link WroRuntimeException} is thrown. Allows custom exception handling.
+   * Invoked when a {@link WroRuntimeException} is thrown. Allows custom exception handling. By default the exception is thrown further.
    *
    * @param e {@link WroRuntimeException}.
    */
   protected void onRuntimeException(final WroRuntimeException e) {
+    throw e;
   }
 
 
