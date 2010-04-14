@@ -33,6 +33,7 @@ import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -103,11 +104,14 @@ public class WroFilter
    * case-insensitive.
    */
   @SuppressWarnings("serial")
-  private Map<String, String> headersMap = new LinkedHashMap<String, String>() {
+  private final Map<String, String> headersMap = new LinkedHashMap<String, String>() {
     @Override
     public String put(final String key, final String value) {
       return super.put(key.trim().toLowerCase(), value);
-    };
+    }
+    public String get(final Object key) {
+      return super.get(((String) key).toLowerCase());
+    }
   };
 
 
@@ -117,10 +121,26 @@ public class WroFilter
   public final void init(final FilterConfig config)
     throws ServletException {
     this.filterConfig = config;
-    this.wroManagerFactory = getWroManagerFactory();
+    initWroManagerFactory();
     initHeaderValues();
     doInit(config);
     initJMX();
+  }
+
+
+  /**
+   * Initialize {@link WroManagerFactory}.
+   */
+  private void initWroManagerFactory() {
+    this.wroManagerFactory = getWroManagerFactory();
+    if (wroManagerFactory instanceof CacheChangeCallbackAware) {
+      ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
+        public void propertyChange(final PropertyChangeEvent evt) {
+          //update header values
+          initHeaderValues();
+        }
+      });
+    }
   }
 
 
@@ -225,20 +245,6 @@ public class WroFilter
     return config;
   }
 
-
-  /**
-   * Parse header value & puts the found values in headersMap field.
-   *
-   * @param header value to parse.
-   */
-  private void parseHeader(final String header) {
-    final String headerName = header.substring(0, header.indexOf(":"));
-    if (!headersMap.containsKey(headerName)) {
-      headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
-    }
-  }
-
-
   /**
    * Initialize header values.
    */
@@ -274,6 +280,17 @@ public class WroFilter
     LOG.info("Header Values :" + headersMap);
   }
 
+  /**
+   * Parse header value & puts the found values in headersMap field.
+   *
+   * @param header value to parse.
+   */
+  private void parseHeader(final String header) {
+    final String headerName = header.substring(0, header.indexOf(":"));
+    if (!headersMap.containsKey(headerName)) {
+      headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
+    }
+  }
 
   /**
    * Custom filter initialization - can be used for extended classes.
@@ -296,6 +313,8 @@ public class WroFilter
     if (!ConfigurationContext.get().getConfig().isDebug()) {
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
+      LOG.info("Request ETag: " + ifNoneMatch);
+      LOG.info("Resource ETag: " + etagValue);
       if (etagValue != null && etagValue.equals(ifNoneMatch)) {
         response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return;

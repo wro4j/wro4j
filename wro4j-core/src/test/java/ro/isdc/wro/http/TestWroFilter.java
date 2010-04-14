@@ -133,6 +133,16 @@ public class TestWroFilter {
     filter.init(config);
 	}
 
+
+  @Test
+  public void testValidHeaderParamsAreSet()
+    throws Exception {
+    final FilterConfig config = Mockito.mock(FilterConfig.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989 | Expires: Thu, 15 Apr 2010 20:00:00 GMT");
+    filter.init(config);
+  }
+
+
 	@Test(expected=WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet() throws Exception {
     final FilterConfig config = Mockito.mock(FilterConfig.class);

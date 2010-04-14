@@ -3,10 +3,13 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import java.beans.PropertyChangeListener;
+
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
@@ -22,13 +25,16 @@ import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public class BaseWroManagerFactory implements WroManagerFactory, WroConfigurationChangeListener {
+public class BaseWroManagerFactory implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Manager instance. Using volatile keyword fix the problem with
    * double-checked locking in JDK 1.5.
    */
   protected volatile WroManager manager;
-
+  /**
+   * A callback to be notified about the cache change.
+   */
+  private PropertyChangeListener cacheChangeCallback;
   /**
    * Prevent instantiation. Use factory method.
    */
@@ -56,12 +62,19 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
           manager.setModelFactory(modelFactory);
           manager.setGroupsProcessor(groupsProcessor);
           manager.setCacheStrategy(cacheStrategy);
+          manager.registerCallback(cacheChangeCallback);
         }
       }
     }
     return this.manager;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void registerCallback(final PropertyChangeListener callback) {
+    this.cacheChangeCallback = callback;
+  }
 
   /**
    * Life-cycle method. Allow subclasses to initialize context before the manager is instantiated.<br>

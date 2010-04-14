@@ -4,6 +4,7 @@
 package ro.isdc.wro.manager;
 
 
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +50,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public class WroManager implements WroConfigurationChangeListener {
+public class WroManager implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Logger for this class.
    */
@@ -74,7 +75,10 @@ public class WroManager implements WroConfigurationChangeListener {
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   private CacheStrategy<CacheEntry, String> cacheStrategy;
-
+  /**
+   * A callback to be notified about the cache change.
+   */
+  private PropertyChangeListener cacheChangeCallback;
   /**
    * Scheduled executors service, used to update the output result.
    */
@@ -104,6 +108,12 @@ public class WroManager implements WroConfigurationChangeListener {
     os.close();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void registerCallback(final PropertyChangeListener callback) {
+    this.cacheChangeCallback = callback;
+  }
 
   /**
    * Allow subclasses to turnoff gzipping
@@ -201,6 +211,10 @@ public class WroManager implements WroConfigurationChangeListener {
     return new Runnable() {
     	public void run() {
     		try {
+          if (cacheChangeCallback != null) {
+            // invoke cacheChangeCallback
+            cacheChangeCallback.propertyChange(null);
+          }
     		  LOG.info("reloading cache");
     			// process groups & put update cache
     			final Collection<Group> groups = model.getGroups();

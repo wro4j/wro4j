@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.factory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 
 
@@ -14,10 +15,10 @@ import ro.isdc.wro.model.WroModel;
  */
 public interface WroModelFactory {
   /**
-   * Creates a {@link WroModel} object. The concrete implementation must
-   * synchronize the instantiation of the model.
+   * Creates a {@link WroModel} object. The concrete implementation must synchronize the instantiation of the model.
    *
    * @return an instance of {@link WroModel}.
+   * @throws WroRuntimeException if model cannot be created.
    */
   WroModel getInstance();
 
