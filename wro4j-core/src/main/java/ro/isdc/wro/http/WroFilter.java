@@ -306,9 +306,9 @@ public class WroFilter
    */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
     throws IOException, ServletException {
+    final HttpServletRequest request = (HttpServletRequest)req;
+    final HttpServletResponse response = (HttpServletResponse)res;
     try {
-      final HttpServletRequest request = (HttpServletRequest)req;
-      final HttpServletResponse response = (HttpServletResponse)res;
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
       if (!ConfigurationContext.get().getConfig().isDebug()) {
@@ -326,17 +326,17 @@ public class WroFilter
       wroManagerFactory.getInstance().process(request, response);
       // remove context from the current thread local.
       Context.unset();
-    } catch (final WroRuntimeException e) {
-      onRuntimeException(e);
+    } catch (final RuntimeException e) {
+      onRuntimeException(e, response);
     }
   }
 
   /**
-   * Invoked when a {@link WroRuntimeException} is thrown. Allows custom exception handling. By default the exception is thrown further.
+   * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. By default the exception is thrown further.
    *
-   * @param e {@link WroRuntimeException}.
+   * @param e {@link RuntimeException}.
    */
-  protected void onRuntimeException(final WroRuntimeException e) {
+  protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response) {
     throw e;
   }
 
