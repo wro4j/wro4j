@@ -15,20 +15,20 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 
 /**
- * Test class for {@link LastValidAwareXmlModelFactory}.
+ * Test class for {@link FallbackAwareXmlModelFactory}.
  *
  * @author Alex Objelean
  */
-public class TestLastValidAwareXmlModelFactory {
+public class TestFallbackAwareXmlModelFactory {
   private XmlModelFactory xmlModelFactory;
-  private XmlModelFactory lastValidAwareModelFactory;
+  private XmlModelFactory fallbackAwareModelFactory;
   /**
    * Used to simulate that a resource stream used to build the model is not available.
    */
   private boolean flag = false;
   @Before
   public void setUp() {
-    lastValidAwareModelFactory = new LastValidAwareXmlModelFactory() {
+    fallbackAwareModelFactory = new FallbackAwareXmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()
         throws IOException {
@@ -54,9 +54,9 @@ public class TestLastValidAwareXmlModelFactory {
 
   @Test
   public void testLastValidIsOK() {
-    Assert.assertNotNull(lastValidAwareModelFactory.getInstance());
-    lastValidAwareModelFactory.onModelPeriodChanged();
-    Assert.assertNotNull(lastValidAwareModelFactory.getInstance());
+    Assert.assertNotNull(fallbackAwareModelFactory.getInstance());
+    fallbackAwareModelFactory.onModelPeriodChanged();
+    Assert.assertNotNull(fallbackAwareModelFactory.getInstance());
   }
 
   @Test(expected=WroRuntimeException.class)

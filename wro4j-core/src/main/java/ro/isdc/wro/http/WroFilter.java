@@ -306,25 +306,37 @@ public class WroFilter
    */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
     throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest)req;
-    final HttpServletResponse response = (HttpServletResponse)res;
-    // add request, response & servletContext to thread local
-    Context.set(Context.webContext(request, response, filterConfig));
-    if (!ConfigurationContext.get().getConfig().isDebug()) {
-      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-      final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
-      LOG.info("Request ETag: " + ifNoneMatch);
-      LOG.info("Resource ETag: " + etagValue);
-      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-        return;
+    try {
+      final HttpServletRequest request = (HttpServletRequest)req;
+      final HttpServletResponse response = (HttpServletResponse)res;
+      // add request, response & servletContext to thread local
+      Context.set(Context.webContext(request, response, filterConfig));
+      if (!ConfigurationContext.get().getConfig().isDebug()) {
+        final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+        final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
+        LOG.info("Request ETag: " + ifNoneMatch);
+        LOG.info("Resource ETag: " + etagValue);
+        if (etagValue != null && etagValue.equals(ifNoneMatch)) {
+          response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+          return;
+        }
       }
+      setResponseHeaders(response);
+      // process the uri using manager
+      wroManagerFactory.getInstance().process(request, response);
+      // remove context from the current thread local.
+      Context.unset();
+    } catch (final WroRuntimeException e) {
+      onRuntimeException(e);
     }
-    setResponseHeaders(response);
-    // process the uri using manager
-    wroManagerFactory.getInstance().process(request, response);
-    // remove context from the current thread local.
-    Context.unset();
+  }
+
+  /**
+   * Invoked when a {@link WroRuntimeException} is thrown. Allows custom exception handling.
+   *
+   * @param e {@link WroRuntimeException}.
+   */
+  protected void onRuntimeException(final WroRuntimeException e) {
   }
 
 

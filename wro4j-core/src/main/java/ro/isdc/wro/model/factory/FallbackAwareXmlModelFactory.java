@@ -12,17 +12,17 @@ import ro.isdc.wro.model.WroModel;
 
 /**
  * An {@link XmlModelFactory} that handles the situation when the wro model cannot be loaded at some point
- * (resource cannot be located or the model is invalid). It holds the last good model and reuse it until a new valid
+ * (resource cannot be located or the model is invalid). It holds the last known good model and reuse it until a new valid
  * instance of model is available.
  *
  * @author Alex Objelean
  */
-public class LastValidAwareXmlModelFactory
+public class FallbackAwareXmlModelFactory
   extends XmlModelFactory {
   /**
    * Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(LastValidAwareXmlModelFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FallbackAwareXmlModelFactory.class);
   /**
    * Last valid model instance..
    */
