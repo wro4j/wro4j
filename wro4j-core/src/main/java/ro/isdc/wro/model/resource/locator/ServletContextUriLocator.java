@@ -72,9 +72,8 @@ public class ServletContextUriLocator
    * @return true if the uri is a servletContext resource.
    */
   public static boolean isValid(final String uri) {
-    return uri.trim().startsWith(ServletContextUriLocator.PREFIX);
+    return uri.trim().startsWith(PREFIX);
   }
-
 
   /**
    * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
@@ -84,7 +83,7 @@ public class ServletContextUriLocator
    * @return true if the uri is a protected resource.
    */
   public static boolean isProtectedResource(final String uri) {
-    return uri.startsWith(PROTECTED_PREFIX);
+    return WroUtil.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
   }
 
   /**
@@ -115,7 +114,7 @@ public class ServletContextUriLocator
    * DynamicStreamLocatorStrategy. Defines the way a inputStream is located using different types of streams after
    * dispatching the request to provided location.
    */
-  private interface DynamicStreamLocatorStrategy {
+  private static interface DynamicStreamLocatorStrategy {
     /**
      * @param request {@link HttpServletRequest} object.
      * @param response {@link HttpServletResponse} object.
