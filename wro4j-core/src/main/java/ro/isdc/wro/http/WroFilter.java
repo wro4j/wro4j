@@ -36,6 +36,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -109,8 +110,10 @@ public class WroFilter
     public String put(final String key, final String value) {
       return super.put(key.trim().toLowerCase(), value);
     }
+
+
     public String get(final Object key) {
-      return super.get(((String) key).toLowerCase());
+      return super.get(((String)key).toLowerCase());
     }
   };
 
@@ -136,7 +139,7 @@ public class WroFilter
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
       ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
-          //update header values
+          // update header values
           initHeaderValues();
         }
       });
@@ -151,9 +154,8 @@ public class WroFilter
     throws ServletException {
     try {
       // treat null as true
-      //TODO do not use BooleanUtils -> create your utility method
-      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
-        BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
+      // TODO do not use BooleanUtils -> create your utility method
+      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
       LOG.debug("jmxEnabled: " + jmxEnabled);
@@ -223,9 +225,11 @@ public class WroFilter
 
 
   /**
+   * Override this method if you need a different way to create {@link WroConfiguration} object.
+   *
    * @return {@link WroConfiguration} configured object with default values set.
    */
-  private WroConfiguration newConfiguration() {
+  protected WroConfiguration newConfiguration() {
     final WroConfiguration config = new WroConfiguration();
 
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
@@ -245,6 +249,7 @@ public class WroFilter
     return config;
   }
 
+
   /**
    * Initialize header values.
    */
@@ -254,8 +259,7 @@ public class WroFilter
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
 
-    headersMap.put(HttpHeader.CACHE_CONTROL.toString(),
-      "public, max-age=315360000, post-check=315360000, pre-check=315360000");
+    headersMap.put(HttpHeader.CACHE_CONTROL.toString(), "public, max-age=315360000, post-check=315360000, pre-check=315360000");
     headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
     headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
     headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
@@ -274,11 +278,13 @@ public class WroFilter
       } catch (final Exception e) {
         throw new WroRuntimeException("Invalid header init-param value: " + headerParam
           + ". A correct value should have the following format: "
-          + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: " + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | ETag: 123456789", e);
+          + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
+          + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | ETag: 123456789", e);
       }
     }
     LOG.info("Header Values :" + headersMap);
   }
+
 
   /**
    * Parse header value & puts the found values in headersMap field.
@@ -292,13 +298,15 @@ public class WroFilter
     }
   }
 
+
   /**
    * Custom filter initialization - can be used for extended classes.
    *
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config)
-    throws ServletException {}
+    throws ServletException {
+  }
 
 
   /**
@@ -311,15 +319,11 @@ public class WroFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
-      if (!ConfigurationContext.get().getConfig().isDebug()) {
-        final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-        final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
-        LOG.info("Request ETag: " + ifNoneMatch);
-        LOG.info("Resource ETag: " + etagValue);
-        if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-          response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-          return;
-        }
+      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+      final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
+      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
+        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        return;
       }
       setResponseHeaders(response);
       // process the uri using manager
@@ -331,12 +335,25 @@ public class WroFilter
     }
   }
 
+
   /**
-   * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. By default the exception is thrown further.
+   * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
+   * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
    *
    * @param e {@link RuntimeException}.
    */
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response) {
+    if (!ConfigurationContext.get().getConfig().isDebug()) {
+      if (e instanceof InvalidGroupNameException || e instanceof UnauthorizedRequestException) {
+        try {
+          response.sendError(HttpServletResponse.SC_NOT_FOUND);
+          return;
+        } catch (final IOException ex) {
+          LOG.error("Error while redirecting to: " + HttpServletResponse.SC_NOT_FOUND);
+          throw e;
+        }
+      }
+    }
     throw e;
   }
 
@@ -348,11 +365,9 @@ public class WroFilter
    * @param response {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    if (!ConfigurationContext.get().getConfig().isDebug()) {
-      // Force resource caching as best as possible
-      for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
-        response.setHeader(entry.getKey(), entry.getValue());
-      }
+    // Force resource caching as best as possible
+    for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
+      response.setHeader(entry.getKey(), entry.getValue());
     }
   }
 
@@ -397,5 +412,4 @@ public class WroFilter
   public void destroy() {
     wroManagerFactory.destroy();
   }
-
 }

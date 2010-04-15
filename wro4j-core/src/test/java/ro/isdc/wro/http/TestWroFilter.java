@@ -94,6 +94,72 @@ public class TestWroFilter {
     filter.init(config);
   }
 
+  /**
+   * Test that in DEPLOYMENT mode if {@link InvalidGroupNameException} is thrown, the response redirect to 404.
+   */
+  @Test
+  public void testInvalidGroupNameExceptionThrownInDEPLOYMENTMode() throws Exception {
+    testSpecificExceptionThrownInDEPLOYMENTMode(new InvalidGroupNameException(""));
+  }
+
+  /**
+   * Test that in DEPLOYMENT mode if {@link InvalidGroupNameException} is thrown, the response redirect to 404.
+   */
+  @Test
+  public void testUnauthorizedRequestExceptionThrownInDEPLOYMENTMode() throws Exception {
+    testSpecificExceptionThrownInDEPLOYMENTMode(new UnauthorizedRequestException(""));
+  }
+
+  /**
+   * Test that in DEPLOYMENT mode if specified exception is thrown, the response redirect to 404.
+   */
+  public void testSpecificExceptionThrownInDEPLOYMENTMode(final Throwable e) throws Exception {
+    final WroManagerFactory factory = Mockito.mock(WroManagerFactory.class);
+    Mockito.when(factory.getInstance()).thenThrow(e);
+    filter = createTestFilter(factory, false);
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    filter.init(Mockito.mock(FilterConfig.class));
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
+    //check 404 was called
+    Mockito.verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
+  }
+
+  /**
+   * Test that in development mode, all runtime exception are not catched.
+   */
+  @Test(expected=WroRuntimeException.class)
+  public void testInvalidGroupNameExceptionThrownInDevelopmentMode() throws Exception {
+    final WroManagerFactory factory = Mockito.mock(WroManagerFactory.class);
+    Mockito.when(factory.getInstance()).thenThrow(new InvalidGroupNameException(""));
+    filter = createTestFilter(factory, true);
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    filter.init(Mockito.mock(FilterConfig.class));
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
+  }
+
+  /**
+   * Creates a test filter with configured {@link WroManagerFactory} as a factory and with configuration mode set
+   * to DEVELOPMENT if isDevelopment argument is true.
+   *
+   * @param factory used by the filter.
+   * @param isDevelopment true if configuration mode is in DEVELOPMENT mode.
+   * @return
+   */
+  private WroFilter createTestFilter(final WroManagerFactory factory, final boolean isDevelopment) {
+    return new WroFilter() {
+      @Override
+      protected WroManagerFactory getWroManagerFactory() {
+        return factory;
+      }
+      @Override
+      protected WroConfiguration newConfiguration() {
+        final WroConfiguration config = super.newConfiguration();
+        config.setDebug(isDevelopment);
+        return config;
+      }
+    };
+  }
+
   @Test
   public void testValidAppFactoryClassNameIsSet() throws Exception {
     final FilterConfig config = Mockito.mock(FilterConfig.class);

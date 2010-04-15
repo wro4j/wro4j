@@ -26,6 +26,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -124,7 +125,11 @@ public class XmlModelFactory
     if (model == null) {
       synchronized (this) {
         if (model == null) {
+          final StopWatch stopWatch = new StopWatch();
+          stopWatch.start();
           model = newModel();
+          stopWatch.stop();
+          LOG.debug("WroModel creation time: " + stopWatch.toString());
         }
       }
     }

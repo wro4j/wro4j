@@ -63,7 +63,7 @@
     <commons-lang.dependency>2.4</commons-lang.dependency>       
     <slf4j.dependency>1.5.11</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
-    <mockito.dependency>1.8.3</mockito.dependency>
+    <mockito.dependency>1.8.4</mockito.dependency>
     <junit.dependency>4.8.1</junit.dependency>    
 	</properties>
   
