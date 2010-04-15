@@ -38,5 +38,6 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message) {
     super(message);
+    LOG.error(message);
   }
 }
