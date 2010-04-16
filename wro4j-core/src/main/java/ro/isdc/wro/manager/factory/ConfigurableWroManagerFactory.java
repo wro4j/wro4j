@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.group.processor.AbstractGroupsProcessor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
@@ -40,7 +39,7 @@ import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
  * @author Alex Objelean
  * @created Created on Dec 31, 2009
  */
-public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
+public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   /**
    * Name of init param used to specify uri locators.
@@ -62,7 +61,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private final Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
   private final Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
   private final Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
-
+  private GroupsProcessor groupsProcessor;
   /**
    * Initialize processors & locators with a default list.
    */
@@ -146,10 +145,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected GroupsProcessor newGroupsProcessor() {
-    final AbstractGroupsProcessor groupsProcessor = new GroupsProcessorImpl();
-    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
-    groupsProcessor.setResourcePreProcessors(preProcessors.values());
-    groupsProcessor.setResourcePostProcessors(postProcessors.values());
+    if (groupsProcessor == null) {
+      groupsProcessor = new GroupsProcessorImpl();
+      groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
+      groupsProcessor.setResourcePreProcessors(preProcessors.values());
+      groupsProcessor.setResourcePostProcessors(postProcessors.values());
+    }
     return groupsProcessor;
   }
 
