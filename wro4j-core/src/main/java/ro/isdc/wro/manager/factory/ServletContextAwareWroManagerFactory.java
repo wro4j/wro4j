@@ -34,11 +34,12 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
     groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
 
+    //this one must be before the CssUrlRewritingProcessor
+    groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addPreProcessor(new CssImportPreProcessor());
     groupProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-    groupProcessor.addPostProcessor(new CssVariablesProcessor());
 
     groupProcessor.addPostProcessor(new JSMinProcessor());
     groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());

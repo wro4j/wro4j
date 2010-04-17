@@ -24,11 +24,11 @@
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>10</param-value>
+      <param-value>100</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>120</param-value>
+      <param-value>200</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>
@@ -45,6 +45,10 @@
     <init-param>
       <param-name>postProcessors</param-name>
       <param-value>cssVariables,cssMinJawr,jsMin</param-value>
+    </init-param>
+    <init-param>
+      <param-name>mbeanName</param-name>
+      <param-value>objelean</param-value>
     </init-param>
   </filter>
   <filter-mapping>

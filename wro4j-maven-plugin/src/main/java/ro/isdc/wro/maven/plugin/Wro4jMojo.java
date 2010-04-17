@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 
 
@@ -26,6 +27,10 @@ import ro.isdc.wro.model.resource.ResourceType;
  * @phase process-resources
  *
  * @author Alex Objelean
+ */
+/**
+ * @author Admin
+ *
  */
 public class Wro4jMojo
   extends AbstractMojo {
@@ -59,6 +64,12 @@ public class Wro4jMojo
    */
   private boolean minimize;
   /**
+   * @parameter default-value="true" expression="${ignoreMissingResources}"
+   * @optional
+   */
+  private boolean ignoreMissingResources;
+
+  /**
    * @parameter expression="${wroManagerFactory}"
    * @optional
    */
@@ -86,7 +97,14 @@ public class Wro4jMojo
         throw new MojoExecutionException("Invalid wroManagerFactory className: " + wroManagerFactory);
       }
     } else {
-      managerFactory = new DefaultMavenContextAwareManagerFactory();
+      managerFactory = new DefaultMavenContextAwareManagerFactory() {
+        @Override
+        protected GroupsProcessor newGroupsProcessor() {
+          final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+          groupsProcessor.setIgnoreMissingResources(ignoreMissingResources);
+          return groupsProcessor;
+        }
+      };
     }
     // initialize before return.
     managerFactory.initialize(createRunContext(), request);
@@ -257,6 +275,13 @@ public class Wro4jMojo
    */
   public void setMinimize(final boolean minimize) {
     this.minimize = minimize;
+  }
+
+  /**
+   * @param ignoreMissingResources the ignoreMissingResources to set
+   */
+  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
+    this.ignoreMissingResources = ignoreMissingResources;
   }
 
 

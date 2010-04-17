@@ -29,13 +29,19 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
+
 /**
  * Implements basic methods. Specialized classes should inherit this class instead of interface.
  *
  * @author Alex Objelean
  * @created Created on Nov 26, 2008
  */
-public abstract class AbstractGroupsProcessor implements GroupsProcessor {
+/**
+ * @author Admin
+ *
+ */
+public abstract class AbstractGroupsProcessor
+  implements GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractGroupsProcessor.class);
   /**
    * a list of pre processors.
@@ -49,6 +55,10 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
    * Used to get a stream of the resources.
    */
   private UriLocatorFactory uriLocatorFactory;
+  /**
+   * If true, missing resources are ignored. By default this value is true.
+   */
+  private boolean ignoreMissingResources = true;
 
 
   /**
@@ -63,11 +73,15 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
         processInjectAnnotation(element);
         super.add(index, element);
       };
+
+
       @Override
       public boolean add(final T element) {
         processInjectAnnotation(element);
         return super.add(element);
       };
+
+
       @Override
       public boolean addAll(final Collection<? extends T> c) {
         for (final T element : c) {
@@ -75,6 +89,8 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
         }
         return super.addAll(c);
       }
+
+
       @Override
       public boolean addAll(final int index, final Collection<? extends T> c) {
         for (final T element : c) {
@@ -84,6 +100,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       }
     };
   }
+
 
   /**
    * {@inheritDoc}
@@ -95,7 +112,7 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     allPreProcessors.addAll(preProcessors);
     for (final ResourcePreProcessor processor : allPreProcessors) {
       if (processorClass.isInstance(processor)) {
-        found = (T) processor;
+        found = (T)processor;
         return found;
       }
     }
@@ -115,7 +132,8 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject can be applied only on fiels of " + UriLocatorFactory.class.getName() + " type");
+            throw new WroRuntimeException("@Inject can be applied only on fiels of "
+              + UriLocatorFactory.class.getName() + " type");
           }
         }
       }
@@ -138,9 +156,10 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     throws IllegalAccessException {
     field.setAccessible(true);
     if (field.getType().equals(UriLocatorFactory.class)) {
-      //accept even private modifiers
+      // accept even private modifiers
       if (uriLocatorFactory == null) {
-        throw new WroRuntimeException("No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
+        throw new WroRuntimeException(
+          "No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
       }
       field.set(processor, uriLocatorFactory);
       LOG.debug("Successfully injected field: " + field.getName());
@@ -149,37 +168,6 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     return false;
   }
 
-
-  /**
-   * It is important to setUriLocators before any processors are set. Otherwise, some of them (which depends on
-   * uriLocatorFactory) will not work properly.
-   */
-  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
-  }
-
-  /**
-   * @return the uriLocatorFactory
-   */
-  public final UriLocatorFactory getUriLocatorFactory() {
-    return this.uriLocatorFactory;
-  }
-
-  /**
-   * @param type of resource for which you want to apply preProcessors or null if it doesn't matter (any resource).
-   * @return a list of {@link ResourcePreProcessor} by provided type.
-   */
-  public final Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
-    return getProcessorsByType(type, preProcessors);
-  }
-
-  /**
-   * @param type of resource for which you want to apply postProcessors or null if it doesn't matter (any resource).
-   * @return a list of {@link ResourcePostProcessor} by provided type.
-   */
-  public final Collection<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
-    return getProcessorsByType(type, postProcessors);
-  }
 
   /**
    * @param <T> processor type. Can be {@link ResourcePreProcessor} or {@link ResourcePostProcessor}.
@@ -198,40 +186,6 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
       }
     }
     return found;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors) {
-    preProcessors.clear();
-		if (processors != null) {
-			preProcessors.addAll(processors);
-		}
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors) {
-    postProcessors.clear();
-		if (processors != null) {
-			postProcessors.addAll(processors);
-		}
-  }
-
-	/**
-   * Add a {@link ResourcePreProcessor}.
-   */
-  public void addPreProcessor(final ResourcePreProcessor processor) {
-    preProcessors.add(processor);
-  }
-
-  /**
-   * Add a {@link ResourcePostProcessor}.
-   */
-  public void addPostProcessor(final ResourcePostProcessor processor) {
-    postProcessors.add(processor);
   }
 
 
@@ -257,11 +211,10 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     return reader;
   }
 
+
   /**
-   * @param groups
-   *          list of groups where to search resources to filter.
-   * @param type
-   *          of resources to collect.
+   * @param groups list of groups where to search resources to filter.
+   * @param type of resources to collect.
    * @return a list of resources of provided type.
    */
   protected final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
@@ -278,4 +231,94 @@ public abstract class AbstractGroupsProcessor implements GroupsProcessor {
     }
     return filteredResources;
   }
+
+
+  /**
+   * @return the ignoreMissingResources
+   */
+  public boolean isIgnoreMissingResources() {
+    return this.ignoreMissingResources;
+  }
+
+
+  /**
+   * @param ignoreMissingResources the ignoreMissingResources to set
+   */
+  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
+    this.ignoreMissingResources = ignoreMissingResources;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors) {
+    preProcessors.clear();
+    if (processors != null) {
+      preProcessors.addAll(processors);
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors) {
+    postProcessors.clear();
+    if (processors != null) {
+      postProcessors.addAll(processors);
+    }
+  }
+
+
+  /**
+   * Add a {@link ResourcePreProcessor}.
+   */
+  public void addPreProcessor(final ResourcePreProcessor processor) {
+    preProcessors.add(processor);
+  }
+
+
+  /**
+   * Add a {@link ResourcePostProcessor}.
+   */
+  public void addPostProcessor(final ResourcePostProcessor processor) {
+    postProcessors.add(processor);
+  }
+
+
+  /**
+   * It is important to setUriLocators before any processors are set. Otherwise, some of them (which depends on
+   * uriLocatorFactory) will not work properly.
+   */
+  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+    this.uriLocatorFactory = uriLocatorFactory;
+  }
+
+
+  /**
+   * @return the uriLocatorFactory
+   */
+  public final UriLocatorFactory getUriLocatorFactory() {
+    return this.uriLocatorFactory;
+  }
+
+
+  /**
+   * @param type of resource for which you want to apply preProcessors or null if it doesn't matter (any resource).
+   * @return a list of {@link ResourcePreProcessor} by provided type.
+   */
+  public final Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
+    return getProcessorsByType(type, preProcessors);
+  }
+
+
+  /**
+   * @param type of resource for which you want to apply postProcessors or null if it doesn't matter (any resource).
+   * @return a list of {@link ResourcePostProcessor} by provided type.
+   */
+  public final Collection<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
+    return getProcessorsByType(type, postProcessors);
+  }
+
 }

@@ -270,7 +270,7 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-    LOG.info("onCachePeriodChanged");
+    LOG.info("CacheChange event triggered!");
     if (scheduler != null) {
       scheduler.shutdown();
       scheduler = null;
@@ -283,7 +283,7 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-    LOG.info("onModelPeriodChanged");
+    LOG.info("ModelChange event triggered!");
     //update the cache also when model is changed.
     onCachePeriodChanged();
   	if (modelFactory instanceof WroConfigurationChangeListener) {

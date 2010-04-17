@@ -39,7 +39,7 @@ import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
  * @author Alex Objelean
  * @created Created on Dec 31, 2009
  */
-public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
+public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   /**
    * Name of init param used to specify uri locators.
@@ -61,7 +61,8 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private final Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
   private final Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
   private final Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
-  private GroupsProcessor groupsProcessor;
+
+
   /**
    * Initialize processors & locators with a default list.
    */
@@ -144,13 +145,11 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    if (groupsProcessor == null) {
-      groupsProcessor = new GroupsProcessorImpl();
-      groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
-      groupsProcessor.setResourcePreProcessors(preProcessors.values());
-      groupsProcessor.setResourcePostProcessors(postProcessors.values());
-    }
+  protected final GroupsProcessor newGroupsProcessor() {
+    final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
+    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
+    groupsProcessor.setResourcePreProcessors(preProcessors.values());
+    groupsProcessor.setResourcePostProcessors(postProcessors.values());
     return groupsProcessor;
   }
 
@@ -164,12 +163,14 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return getListOfItems(PARAM_URI_LOCATORS, locators);
   }
 
+
   /**
    * @return a list of configured preProcessors.
    */
   List<ResourcePreProcessor> getPreProcessors() {
     return getListOfItems(PARAM_PRE_PROCESSORS, preProcessors);
   }
+
 
   /**
    * @return a list of configured preProcessors.
@@ -184,7 +185,7 @@ public final class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * @param map mapping between items and its implementations.
    * @return a list of instances.
    */
-  private <T>List<T> getListOfItems(final String initParamName, final Map<String, T> map) {
+  private <T> List<T> getListOfItems(final String initParamName, final Map<String, T> map) {
     final List<T> list = new ArrayList<T>();
     final String paramValue = Context.get().getFilterConfig().getInitParameter(initParamName);
     LOG.debug("paramValue: " + paramValue);

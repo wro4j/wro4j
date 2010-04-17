@@ -39,13 +39,16 @@ import ro.isdc.wro.test.util.WroTestUtils;
  */
 public class TestWroFilter {
 	private WroFilter filter;
-
+	private FilterConfig config;
 	@Before
 	public void initFilter() throws Exception {
 		filter = new WroFilter();
-		final FilterConfig config = Mockito.mock(FilterConfig.class);
+		config = Mockito.mock(FilterConfig.class);
+
 		final ServletContext servletContext = Mockito.mock(ServletContext.class);
 		Mockito.when(config.getServletContext()).thenReturn(servletContext);
+		Mockito.when(servletContext.getContextPath()).thenReturn("/context");
+
 		filter.init(config);
 	}
 
@@ -81,7 +84,6 @@ public class TestWroFilter {
    */
   @Test(expected=WroRuntimeException.class)
   public void testFilterInitParamsAreWrong() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("InvalidNumber");
     Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
     filter.init(config);
@@ -89,7 +91,6 @@ public class TestWroFilter {
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidAppFactoryClassNameIsSet() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn("Invalid value");
     filter.init(config);
   }
@@ -118,7 +119,7 @@ public class TestWroFilter {
     Mockito.when(factory.getInstance()).thenThrow(e);
     filter = createTestFilter(factory, false);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    filter.init(Mockito.mock(FilterConfig.class));
+    filter.init(config);
     filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
     //check 404 was called
     Mockito.verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -133,7 +134,7 @@ public class TestWroFilter {
     Mockito.when(factory.getInstance()).thenThrow(new InvalidGroupNameException(""));
     filter = createTestFilter(factory, true);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    filter.init(Mockito.mock(FilterConfig.class));
+    filter.init(config);
     filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
   }
 
@@ -162,7 +163,6 @@ public class TestWroFilter {
 
   @Test
   public void testValidAppFactoryClassNameIsSet() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn(ServletContextAwareWroManagerFactory.class.getName());
     filter.init(config);
   }
@@ -170,7 +170,6 @@ public class TestWroFilter {
 
   @Test
   public void testJmxDisabled() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(filter.PARAM_JMX_ENABLED)).thenReturn("false");
     filter.init(config);
   }
@@ -180,7 +179,6 @@ public class TestWroFilter {
 	 */
 	@Test
 	public void testFilterInitParamsAreSetProperly() throws Exception {
-	  final FilterConfig config = Mockito.mock(FilterConfig.class);
 	  Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_GZIP_RESOURCES)).thenReturn(Boolean.FALSE.toString());
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("10");
@@ -194,7 +192,6 @@ public class TestWroFilter {
 
 	@Test
 	public void testValidHeaderParamIsSet() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989");
     filter.init(config);
 	}
@@ -203,7 +200,6 @@ public class TestWroFilter {
   @Test
   public void testValidHeaderParamsAreSet()
     throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989 | Expires: Thu, 15 Apr 2010 20:00:00 GMT");
     filter.init(config);
   }
@@ -211,7 +207,6 @@ public class TestWroFilter {
 
 	@Test(expected=WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag 998989 expires 1");
     filter.init(config);
   }
@@ -221,7 +216,6 @@ public class TestWroFilter {
    */
   @Test
   public void testConfigurationInitParam() throws Exception {
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
     filter.init(config);
     Assert.assertEquals(true, filter.getConfiguration().isDebug());
@@ -295,7 +289,6 @@ public class TestWroFilter {
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
     Mockito.when(response.getOutputStream()).thenReturn(sos);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
     filter.doFilter(request, response, chain);
@@ -314,7 +307,6 @@ public class TestWroFilter {
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
     Mockito.when(response.getOutputStream()).thenReturn(sos);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    final FilterConfig config = Mockito.mock(FilterConfig.class);
   	filter.init(config);
     filter.doFilter(request, response, chain);
 	}

@@ -84,7 +84,7 @@ public class DefaultMavenContextAwareManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected final GroupsProcessor newGroupsProcessor() {
+  protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
     configureProcessors(groupsProcessor);
     return groupsProcessor;
