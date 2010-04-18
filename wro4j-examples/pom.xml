@@ -34,12 +34,23 @@
 			<version>3.0.M1</version>
 		</dependency>
 	</dependencies>
-	<!--
-		<build> <plugins> <plugin> <groupId>ro.isdc.wro4j</groupId>
-		<artifactId>wro4j-maven-plugin</artifactId>
-		<version>1.2.2-SNAPSHOT</version> <executions> <execution> <goals>
-		<goal>run</goal> </goals> </execution> </executions> <configuration>
-		<targetGroups>all</targetGroups> </configuration> </plugin> </plugins>
-		</build>
-	-->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>ro.isdc.wro4j</groupId>
+				<artifactId>wro4j-maven-plugin</artifactId>
+				<version>1.2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<targetGroups>all</targetGroups>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

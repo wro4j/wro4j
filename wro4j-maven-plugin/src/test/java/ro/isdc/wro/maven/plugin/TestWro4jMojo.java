@@ -12,8 +12,8 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,6 +92,9 @@ public class TestWro4jMojo {
 
   @After
   public void tearDown() {
-    FileUtils.deleteQuietly(destinationFolder);
+    try {
+      FileUtils.deleteDirectory(destinationFolder);
+    } catch (final Exception e) {
+    }
   }
 }

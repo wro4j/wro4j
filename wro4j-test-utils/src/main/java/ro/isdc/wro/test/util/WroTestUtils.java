@@ -38,8 +38,7 @@ public class WroTestUtils {
     processor.process(resultReader, resultWriter);
     final Writer expectedWriter = new StringWriter();
     IOUtils.copy(expectedReader, expectedWriter);
-    final String expected = replaceTabsWithSpaces(expectedWriter.toString()
-        .trim());
+    final String expected = replaceTabsWithSpaces(expectedWriter.toString().trim());
     final String actual = replaceTabsWithSpaces(resultWriter.toString().trim());
     Assert.assertEquals(expected, actual);
     expectedReader.close();
