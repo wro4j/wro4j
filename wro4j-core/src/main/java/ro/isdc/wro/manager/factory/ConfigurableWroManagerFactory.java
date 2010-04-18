@@ -4,7 +4,7 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -58,9 +58,10 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Delimit tokens containing a list of locators, preProcessors & postProcessors.
    */
   private static final String TOKEN_DELIMITER = ",";
-  private final Map<String, ResourcePreProcessor> preProcessors = new HashMap<String, ResourcePreProcessor>();
-  private final Map<String, ResourcePostProcessor> postProcessors = new HashMap<String, ResourcePostProcessor>();
-  private final Map<String, UriLocator> locators = new HashMap<String, UriLocator>();
+  //Use LinkedHashMap to preserve the addition order
+  private final Map<String, ResourcePreProcessor> preProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
+  private final Map<String, ResourcePostProcessor> postProcessors = new LinkedHashMap<String, ResourcePostProcessor>();
+  private final Map<String, UriLocator> locators = new LinkedHashMap<String, UriLocator>();
 
 
   /**
@@ -70,7 +71,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     initProcessors();
     initLocators();
   }
-
 
   /**
    * Init locators with default values.
@@ -92,6 +92,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     final CssImportPreProcessor cssImportProcessor = new CssImportPreProcessor();
     preProcessors.put("bomStripper", new BomStripperPreProcessor());
     preProcessors.put("cssImport", cssImportProcessor);
+    preProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
     postProcessors.put("jsMin", new JSMinProcessor());
@@ -133,10 +134,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
-    final List<UriLocator> locators = getLocators();
-    for (final UriLocator uriLocator : locators) {
-      factory.addUriLocator(uriLocator);
-    }
+    factory.setUriLocators(getLocators());
     return factory;
   }
 
@@ -148,8 +146,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   protected final GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
     groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
-    groupsProcessor.setResourcePreProcessors(preProcessors.values());
-    groupsProcessor.setResourcePostProcessors(postProcessors.values());
+    groupsProcessor.setResourcePreProcessors(getPreProcessors());
+    groupsProcessor.setResourcePostProcessors(getPostProcessors());
     return groupsProcessor;
   }
 
@@ -181,26 +179,30 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
 
 
   /**
-   * @param initParamName name of init-param which identify what kind of items a required.
+   * Extracts a list of items (processors) from init-param based on existing values inside the map.
+   *
+   * @param initParamName name of init-param that identifies required items.
    * @param map mapping between items and its implementations.
-   * @return a list of instances.
+   * @return a list of items (processors).
    */
   private <T> List<T> getListOfItems(final String initParamName, final Map<String, T> map) {
     final List<T> list = new ArrayList<T>();
     final String paramValue = Context.get().getFilterConfig().getInitParameter(initParamName);
     LOG.debug("paramValue: " + paramValue);
-    final List<String> itemsList = getItemsList(paramValue);
-    if (itemsList.isEmpty()) {
+    final List<String> tokens = getTokens(paramValue);
+    if (tokens.isEmpty()) {
       final String message = "No '" + initParamName + "' initParam was set";
-      throw new WroRuntimeException(message);
+      LOG.warn(message);
+      return list;
+//      throw new WroRuntimeException(message);
     }
-    for (final String itemAsString : itemsList) {
-      final T item = map.get(itemAsString);
+    for (final String token : tokens) {
+      final T item = map.get(token);
       if (item == null) {
         LOG.info("Available " + initParamName + " are: " + map.keySet());
-        throw new WroRuntimeException("Invalid " + initParamName + " name: " + itemAsString);
+        throw new WroRuntimeException("Invalid " + initParamName + " name: " + token);
       }
-      LOG.debug("Found " + initParamName + " for name: " + itemAsString + " : " + item);
+      LOG.debug("Found " + initParamName + " for name: " + token + " : " + item);
       list.add(item);
     }
     return list;
@@ -208,10 +210,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
 
 
   /**
+   * Creates a list of tokens (processors name) based on provided string of comma separated strings.
+   *
    * @param input string representation of tokens separated by ',' character.
    * @return a list of non empty strings.
    */
-  private List<String> getItemsList(final String input) {
+  private List<String> getTokens(final String input) {
     final List<String> locatorsList = new ArrayList<String>();
     if (input != null) {
       // use StringTokenizer instead of split because it skips empty (but not trimmed) strings

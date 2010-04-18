@@ -30,9 +30,9 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * CssImport Processor responsible for handling css @import statement. It is implemented as both: preProcessor &
+ * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both: preProcessor &
  * postProcessor. It is necessary because preProcessor is responsible for updating model with found imported resources,
- * while post processor removes import occurences.
+ * while post processor removes import occurrences.
  *
  * @author Alex Objelean
  */
