@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import java.util.List;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,11 +12,16 @@ import javax.servlet.http.HttpServletResponse;
 import junit.framework.Assert;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 
 /**
  * TestConfigurableWroManagerFactory.
@@ -24,6 +31,7 @@ import ro.isdc.wro.config.Context;
  */
 public class TestConfigurableWroManagerFactory {
   private ConfigurableWroManagerFactory factory;
+  private FilterConfig filterConfig;
 
   public void initFactory(final FilterConfig filterConfig) {
     factory = new ConfigurableWroManagerFactory() {
@@ -38,24 +46,29 @@ public class TestConfigurableWroManagerFactory {
     factory.getInstance();
   }
 
+  @Before
+  public void setUp() {
+    filterConfig = Mockito.mock(FilterConfig.class);
+  }
+
   @After
   public void tearDown() {
   	Context.unset();
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotUseFactoryWithoutUriLocatorsParamSet() {
-  	final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
+  @Test
+  public void testWhenNoUriLocatorsParamSet() {
   	initFactory(filterConfig);
-  	factory.getInstance();
+    factory.getInstance();
+  	Assert.assertTrue(factory.getLocators().isEmpty());
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotUseWithEmptyUriLocators() {
-  	final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
+  @Test
+  public void testWithEmptyUriLocators() {
   	Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("");
   	initFactory(filterConfig);
   	factory.getLocators();
+    Assert.assertTrue(factory.getLocators().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -68,7 +81,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWhenValidLocatorsSet() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     configureValidUriLocators(filterConfig);
     Assert.assertEquals(3, factory.getLocators().size());
   }
@@ -81,13 +93,23 @@ public class TestConfigurableWroManagerFactory {
     initFactory(filterConfig);
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotUseWithEmptyPreProcessors() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
+  @Test
+  public void testProcessorsExecutionOrder() {
+    configureValidUriLocators(filterConfig);
+    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("bomStripper, cssImport, cssVariables");
+    initFactory(filterConfig);
+    final List<ResourcePreProcessor> list = factory.getPreProcessors();
+    Assert.assertEquals(BomStripperPreProcessor.class, list.get(0).getClass());
+    Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
+    Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
+  }
+
+  @Test
+  public void testWithEmptyPreProcessors() {
     configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("");
     initFactory(filterConfig);
-    factory.getPreProcessors();
+    Assert.assertTrue(factory.getPreProcessors().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -101,25 +123,22 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWhenValidPreProcessorsSet() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("cssUrlRewriting");
     initFactory(filterConfig);
     Assert.assertEquals(1, factory.getPreProcessors().size());
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotUseWithEmptyPostProcessors() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
+  @Test
+  public void testWithEmptyPostProcessors() {
     configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("");
     initFactory(filterConfig);
-    factory.getPostProcessors();
+    Assert.assertTrue(factory.getPostProcessors().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInvalidPostProcessorsSet() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("INVALID1,INVALID2");
     initFactory(filterConfig);
@@ -128,7 +147,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWhenValidPostProcessorsSet() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("cssMinJawr, jsMin, cssVariables");
     initFactory(filterConfig);

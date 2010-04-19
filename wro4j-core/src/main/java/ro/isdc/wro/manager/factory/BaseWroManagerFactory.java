@@ -43,7 +43,7 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
 
   /**
    * Creates default singleton instance of manager, by initializing manager
-   * dependencies with default values (processors). {@inheritDoc}
+   * dependencies with default values (processors).
    */
   public final WroManager getInstance() {
     onBeforeCreate();
@@ -98,14 +98,20 @@ public class BaseWroManagerFactory implements WroManagerFactory, WroConfiguratio
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-  	getInstance().onCachePeriodChanged();
+    if (manager != null) {
+      manager.onCachePeriodChanged();
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-    getInstance().onModelPeriodChanged();
+    if (manager != null) {
+      manager.onModelPeriodChanged();
+      //update cache too.
+      manager.onCachePeriodChanged();
+    }
   }
 
   /**

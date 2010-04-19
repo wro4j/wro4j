@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +87,10 @@ public class WroFilter
    */
   static final String PARAM_JMX_ENABLED = "jmxEnabled";
   /**
+   * A preferred name of the MBean object.
+   */
+  static final String PARAM_MBEAN_NAME = "mbeanName";
+  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -112,6 +117,7 @@ public class WroFilter
     }
 
 
+    @Override
     public String get(final Object key) {
       return super.get(((String)key).toLowerCase());
     }
@@ -137,6 +143,7 @@ public class WroFilter
   private void initWroManagerFactory() {
     this.wroManagerFactory = getWroManagerFactory();
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
+      //register cache change callback -> when cache is changed, update headers values.
       ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
           // update header values
@@ -155,7 +162,8 @@ public class WroFilter
     try {
       // treat null as true
       // TODO do not use BooleanUtils -> create your utility method
-      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
+      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
+        BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
       LOG.debug("jmxEnabled: " + jmxEnabled);
@@ -163,7 +171,7 @@ public class WroFilter
       if (jmxEnabled) {
         registerChangeListeners();
         final MBeanServer mbeanServer = getMBeanServer();
-        final ObjectName name = new ObjectName(WroConfiguration.getObjectName());
+        final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
         if (!mbeanServer.isRegistered(name)) {
           mbeanServer.registerMBean(configuration, name);
         }
@@ -171,6 +179,20 @@ public class WroFilter
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
+  }
+
+
+  /**
+   * @return the name of MBean to be used by JMX to configure wro.
+   */
+  private String newMBeanName() {
+    String mbeanName = filterConfig.getInitParameter(PARAM_MBEAN_NAME);
+    if (StringUtils.isEmpty(mbeanName)) {
+      final String contextPath = filterConfig.getServletContext().getContextPath().replaceFirst("/", "");
+      mbeanName = StringUtils.isEmpty(contextPath) ? "ROOT" : contextPath;
+      mbeanName = "wro4j-" + contextPath;
+    }
+    return mbeanName;
   }
 
 
@@ -259,7 +281,8 @@ public class WroFilter
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
 
-    headersMap.put(HttpHeader.CACHE_CONTROL.toString(), "public, max-age=315360000, post-check=315360000, pre-check=315360000");
+    headersMap.put(HttpHeader.CACHE_CONTROL.toString(),
+      "public, max-age=315360000, post-check=315360000, pre-check=315360000");
     headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
     headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
     headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
@@ -305,8 +328,7 @@ public class WroFilter
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config)
-    throws ServletException {
-  }
+    throws ServletException {}
 
 
   /**

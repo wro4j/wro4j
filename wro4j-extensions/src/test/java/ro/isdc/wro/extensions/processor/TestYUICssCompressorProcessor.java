@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.extensions.processor;
 
@@ -16,9 +16,7 @@ import ro.isdc.wro.test.util.ResourceProcessor;
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public class TestYUICssCompressorProcessor extends AbstractWroTest {

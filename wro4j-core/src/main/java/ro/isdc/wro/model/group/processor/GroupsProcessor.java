@@ -22,7 +22,8 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public interface GroupsProcessor extends Serializable {
+public interface GroupsProcessor
+  extends Serializable {
   /**
    * Process a collection of groups by type.
    *
@@ -33,31 +34,34 @@ public interface GroupsProcessor extends Serializable {
    */
   String process(final Collection<Group> groups, final ResourceType type, final boolean minimize);
 
+
   /**
    * @param uriLocatorFactory {@link UriLocatorFactory} to set.
    */
   void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory);
+
 
   /**
    * @return {@link UriLocatorFactory} for this GroupsProcessor.
    */
   UriLocatorFactory getUriLocatorFactory();
 
+
   /**
    * Provide a list of preProcessors to apply on any type of content.
    *
-   * @param processors
-   *          a list of {@link ResourcePreProcessor} processors.
+   * @param processors a list of {@link ResourcePreProcessor} processors.
    */
   void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors);
+
 
   /**
    * Provide a list of postProcessors to apply on any type of content.
    *
-   * @param processors
-   *          a list of {@link ResourcePostProcessor} processors.
+   * @param processors a list of {@link ResourcePostProcessor} processors.
    */
   void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors);
+
 
   /**
    * Add a single css preProcessor to the chain of postProcessors.
@@ -66,12 +70,14 @@ public interface GroupsProcessor extends Serializable {
    */
   void addPostProcessor(final ResourcePostProcessor processor);
 
-	/**
-	 * Add a single preProcessor to the chain of preProcessors.
-	 *
-	 * @param processor {@link ResourcePostProcessor} to add.
-	 */
-	void addPreProcessor(final ResourcePreProcessor processor);
+
+  /**
+   * Add a single preProcessor to the chain of preProcessors.
+   *
+   * @param processor {@link ResourcePostProcessor} to add.
+   */
+  void addPreProcessor(final ResourcePreProcessor processor);
+
 
   /**
    * Search for the first available preprocessor of given type.
@@ -79,5 +85,17 @@ public interface GroupsProcessor extends Serializable {
    * @param processorClass to search in list of available preprocessors.
    * @return {@link ResourcePreProcessor} instance if any found, or null if such processor doesn't exist.
    */
-	<T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass);
+  <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass);
+
+
+  /**
+   * @param ignore flag indicating if missing resources should be ignored.
+   */
+  void setIgnoreMissingResources(boolean ignore);
+
+
+  /**
+   * @return true if missing resources are ignored.
+   */
+  boolean isIgnoreMissingResources();
 }

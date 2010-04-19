@@ -71,7 +71,11 @@ public final class GroupsProcessorImpl extends AbstractGroupsProcessor {
       try {
         reader = groupsProcessor.getResourceReader(resource);
       } catch (final IOException e) {
-        LOG.warn("Invalid resource found: " + resource);
+        if (groupsProcessor.isIgnoreMissingResources()) {
+          LOG.warn("Invalid resource found: " + resource);
+        } else {
+          throw e;
+        }
       }
       if (processors.isEmpty() || reader == null) {
         final Writer output = new StringWriter();
