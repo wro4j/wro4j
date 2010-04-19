@@ -28,10 +28,6 @@ import ro.isdc.wro.model.resource.ResourceType;
  *
  * @author Alex Objelean
  */
-/**
- * @author Admin
- *
- */
 public class Wro4jMojo
   extends AbstractMojo {
   /**
