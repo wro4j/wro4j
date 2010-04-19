@@ -48,7 +48,7 @@ public class CssMinProcessor
       new CSSMin().formatFile(content, writer);
       writer.flush();
     } catch (final Exception e) {
-      throw new IOException(e);
+      throw new IOException("Exception occured while formatting the css");
     }
   }
 }

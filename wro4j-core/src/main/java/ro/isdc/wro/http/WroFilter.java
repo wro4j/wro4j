@@ -189,7 +189,7 @@ public class WroFilter
     String mbeanName = filterConfig.getInitParameter(PARAM_MBEAN_NAME);
     if (StringUtils.isEmpty(mbeanName)) {
       final String contextPath = filterConfig.getServletContext().getContextPath().replaceFirst("/", "");
-      mbeanName = contextPath.isEmpty() ? "ROOT" : contextPath;
+      mbeanName = StringUtils.isEmpty(contextPath) ? "ROOT" : contextPath;
       mbeanName = "wro4j-" + contextPath;
     }
     return mbeanName;
