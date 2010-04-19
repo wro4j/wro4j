@@ -9,11 +9,16 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Css minify barryvan implementation.
  */
 public class CSSMin {
+  private static final Logger LOG = LoggerFactory.getLogger(CSSMin.class);
+
 
   public void formatFile(final String input, final Writer writer)
     throws Exception {
@@ -36,7 +41,7 @@ public class CSSMin {
         try {
           selectors.addElement(new Selector(sb.substring(n, k + 1)));
         } catch (final Exception e) {
-          //skip
+          // skip
         }
         n = k + 1;
       }
@@ -49,7 +54,7 @@ public class CSSMin {
       writer.write("\r\n");
       writer.flush();
     } catch (final Exception e) {
-      System.err.println(e.getMessage());
+      LOG.error(e.getMessage(), e);
     }
 
   }
@@ -57,7 +62,7 @@ public class CSSMin {
 
 
 class Selector {
-
+  private static final Logger LOG = LoggerFactory.getLogger(CSSMin.class);
   private final Property[] properties;
   private final String selector;
 
@@ -115,7 +120,7 @@ class Selector {
       try {
         results[i] = new Property(parts[i]);
       } catch (final Exception e) {
-        System.err.println(e.getMessage());
+        LOG.error(e.getMessage(), e);
         results[i] = null;
       }
     }
@@ -132,7 +137,7 @@ class Selector {
 
 class Property
   implements Comparable {
-
+  private static final Logger LOG = LoggerFactory.getLogger(CSSMin.class);
   protected String property;
   protected Value[] values;
 
@@ -189,7 +194,7 @@ class Property
       try {
         results[i] = new Value(parts[i]);
       } catch (final Exception e) {
-        System.err.println(e.getMessage());
+        LOG.error(e.getMessage(), e);
         results[i] = null;
       }
     }
