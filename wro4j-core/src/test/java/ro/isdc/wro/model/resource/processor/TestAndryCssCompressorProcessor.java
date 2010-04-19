@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
@@ -17,7 +18,8 @@ import ro.isdc.wro.test.util.ResourceProcessor;
  * @author Alex Objelean
  */
 public class TestAndryCssCompressorProcessor extends AbstractWroTest {
-  private AndryCssCompressorProcessor processor = new AndryCssCompressorProcessor();
+  private final AndryCssCompressorProcessor processor = new AndryCssCompressorProcessor();
+  @Ignore
   @Test
   public void test() throws IOException {
     compareProcessedResourceContents(
