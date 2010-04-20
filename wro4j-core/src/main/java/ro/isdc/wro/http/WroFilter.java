@@ -18,6 +18,7 @@ import javax.management.ObjectName;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -54,6 +55,10 @@ public class WroFilter
    * Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
+  /**
+   * The prefix to use for default mbean name.
+   */
+  private static final String MBEAN_PREFIX = "wro4j-";
   /**
    * The parameter used to specify headers to put into the response, used mostly for caching.
    */
@@ -143,7 +148,7 @@ public class WroFilter
   private void initWroManagerFactory() {
     this.wroManagerFactory = getWroManagerFactory();
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
-      //register cache change callback -> when cache is changed, update headers values.
+      // register cache change callback -> when cache is changed, update headers values.
       ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
           // update header values
@@ -162,8 +167,7 @@ public class WroFilter
     try {
       // treat null as true
       // TODO do not use BooleanUtils -> create your utility method
-      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
-        BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
+      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
       LOG.debug("jmxEnabled: " + jmxEnabled);
@@ -188,11 +192,27 @@ public class WroFilter
   private String newMBeanName() {
     String mbeanName = filterConfig.getInitParameter(PARAM_MBEAN_NAME);
     if (StringUtils.isEmpty(mbeanName)) {
-      final String contextPath = filterConfig.getServletContext().getContextPath().replaceFirst("/", "");
+      final String contextPath = getContextPath();
       mbeanName = StringUtils.isEmpty(contextPath) ? "ROOT" : contextPath;
-      mbeanName = "wro4j-" + contextPath;
+      mbeanName = MBEAN_PREFIX + contextPath;
     }
     return mbeanName;
+  }
+
+
+  /**
+   * @return Context path of the application.
+   */
+  private String getContextPath() {
+    String contextPath = null;
+    try {
+      contextPath = (String)ServletContext.class.getMethod("getContextPath", new Class<?>[] {}).invoke(filterConfig.getServletContext(), new Object[] {});
+    } catch (final Exception e) {
+      contextPath = "DEFAULT";
+      LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
+        + contextPath + " contextPath.");
+    }
+    return contextPath;
   }
 
 
@@ -281,8 +301,7 @@ public class WroFilter
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
 
-    headersMap.put(HttpHeader.CACHE_CONTROL.toString(),
-      "public, max-age=315360000, post-check=315360000, pre-check=315360000");
+    headersMap.put(HttpHeader.CACHE_CONTROL.toString(), "public, max-age=315360000, post-check=315360000, pre-check=315360000");
     headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
     headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
     headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
@@ -328,7 +347,8 @@ public class WroFilter
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config)
-    throws ServletException {}
+    throws ServletException {
+  }
 
 
   /**

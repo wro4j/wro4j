@@ -44,11 +44,8 @@ public class TestWroFilter {
 	public void initFilter() throws Exception {
 		filter = new WroFilter();
 		config = Mockito.mock(FilterConfig.class);
-
 		final ServletContext servletContext = Mockito.mock(ServletContext.class);
 		Mockito.when(config.getServletContext()).thenReturn(servletContext);
-		Mockito.when(servletContext.getContextPath()).thenReturn("/context");
-
 		filter.init(config);
 	}
 
