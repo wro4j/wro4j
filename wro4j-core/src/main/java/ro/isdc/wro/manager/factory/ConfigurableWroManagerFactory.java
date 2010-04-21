@@ -31,6 +31,7 @@ import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
 
 
 /**
@@ -88,11 +89,11 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private void initProcessors() {
     preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
-
-    final CssImportPreProcessor cssImportProcessor = new CssImportPreProcessor();
     preProcessors.put("bomStripper", new BomStripperPreProcessor());
-    preProcessors.put("cssImport", cssImportProcessor);
+    preProcessors.put("cssImport", new CssImportPreProcessor());
     preProcessors.put("cssVariables", new CssVariablesProcessor());
+    preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
+
     postProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
     postProcessors.put("jsMin", new JSMinProcessor());

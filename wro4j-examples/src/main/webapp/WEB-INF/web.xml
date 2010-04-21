@@ -32,7 +32,7 @@
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>
-      <param-value>ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory</param-value>
+      <param-value>ro.isdc.wro.examples.ExternalModelConfigurableWroManagerFactory</param-value>
     </init-param>
     <init-param>
       <param-name>uriLocators</param-name>
@@ -40,7 +40,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
