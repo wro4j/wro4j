@@ -21,7 +21,6 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
@@ -107,7 +106,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   private Resource createResource(final String uri) {
     final Group group = new Group();
     final Resource resource = Resource.create(uri, ResourceType.CSS);
-    resource.setGroup(group);
     group.setResources(Arrays.asList(new Resource[] { resource }));
     return resource;
   }

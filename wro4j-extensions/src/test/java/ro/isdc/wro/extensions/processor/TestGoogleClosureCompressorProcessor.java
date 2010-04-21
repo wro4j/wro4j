@@ -19,7 +19,7 @@ import com.google.javascript.jscomp.CompilationLevel;
  * TestGoogleClosureCompressorProcessor.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
+ * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
   @Test

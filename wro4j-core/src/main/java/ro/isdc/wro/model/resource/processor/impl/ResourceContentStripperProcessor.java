@@ -14,29 +14,35 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.ResourceContentStripper;
 
+
 /**
- * Removes comments and whitespaces from resource content. This processor can be
- * used as both: preProcessor & postProcessor.
+ * Removes comments and whitespaces from resource content. This processor can be used as both: preProcessor &
+ * postProcessor.
  *
  * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
-public final class ResourceContentStripperProcessor implements
-    ResourcePreProcessor, ResourcePostProcessor {
+public final class ResourceContentStripperProcessor
+  implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
-      throws IOException {
-    writer.write(ResourceContentStripper.stripCommentsAndWhitespace(IOUtils
-        .toString(reader)));
+    throws IOException {
+    try {
+      writer.write(ResourceContentStripper.stripCommentsAndWhitespace(IOUtils.toString(reader)));
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
+
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader,
-      final Writer writer) throws IOException {
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
     process(reader, writer);
   }
 }

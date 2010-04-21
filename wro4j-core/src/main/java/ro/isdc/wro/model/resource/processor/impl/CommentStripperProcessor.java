@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor.impl;
 
@@ -14,38 +14,40 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
- * CommentStripperProcessor. Removes both type of comments. It uses both: multi
- * line & single line comment strippers.
+ * CommentStripperProcessor. Removes both type of comments. It uses both: multi line & single line comment strippers.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-public class CommentStripperProcessor implements ResourcePreProcessor,
-    ResourcePostProcessor {
+public class CommentStripperProcessor
+  implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader source, final Writer destination)
-      throws IOException {
-    final String content = IOUtils.toString(source);
-    // apply single line comment stripper processor first
-    String result = SingleLineCommentStripperProcessor.PATTERN.matcher(content)
-        .replaceAll("");
-    // apply multi line comment stripper processor after
-    result = MultiLineCommentStripperProcessor.PATTERN.matcher(result)
-        .replaceAll("");
-    result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
-    destination.write(result);
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    try {
+      final String content = IOUtils.toString(reader);
+      // apply single line comment stripper processor first
+      String result = SingleLineCommentStripperProcessor.PATTERN.matcher(content).replaceAll("");
+      // apply multi line comment stripper processor after
+      result = MultiLineCommentStripperProcessor.PATTERN.matcher(result).replaceAll("");
+      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
+      writer.write(result);
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
+
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader,
-      final Writer writer) throws IOException {
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
     // resource Uri doesn't matter.
     process(reader, writer);
   }

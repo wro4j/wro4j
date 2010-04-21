@@ -1,55 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>ro.isdc.wro4j</groupId>
-	<artifactId>wro4j-examples</artifactId>
-	<packaging>war</packaging>
-	<name>Web Resource Optimizer Examples Project</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ro.isdc.wro4j</groupId>
+  <artifactId>wro4j-examples</artifactId>
+  <packaging>war</packaging>
+  <name>Web Resource Optimizer Examples Project</name>
 
-	<parent>
-		<groupId>ro.isdc.wro4j</groupId>
-		<artifactId>wro4j-parent</artifactId>
-		<version>1.2.6-SNAPSHOT</version>
-	</parent>
+  <parent>
+    <groupId>ro.isdc.wro4j</groupId>
+    <artifactId>wro4j-parent</artifactId>
+    <version>1.2.6-SNAPSHOT</version>
+  </parent>
 
-	<dependencies>
-		<!-- Project Dependencies -->
-		<dependency>
-			<groupId>ro.isdc.wro4j</groupId>
-			<artifactId>wro4j-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.directwebremoting</groupId>
-			<artifactId>dwr</artifactId>
-			<version>3.0.M1</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>ro.isdc.wro4j</groupId>
-				<artifactId>wro4j-maven-plugin</artifactId>
-				<version>1.2.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<targetGroups>all</targetGroups>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <dependencies>
+    <!-- Project Dependencies -->
+    <dependency>
+      <groupId>ro.isdc.wro4j</groupId>
+      <artifactId>wro4j-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.directwebremoting</groupId>
+      <artifactId>dwr</artifactId>
+      <version>3.0.M1</version>
+    </dependency>
+    <!-- Required by wro -->
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-maven-plugin</artifactId>
+        <version>1.2.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <targetGroups>all</targetGroups>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

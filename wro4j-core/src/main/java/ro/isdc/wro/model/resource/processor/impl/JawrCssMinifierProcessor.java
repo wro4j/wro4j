@@ -50,6 +50,9 @@ public class JawrCssMinifierProcessor
       writer.flush();
     } catch (final Exception e) {
       throw new IOException("Exception occured while minimizing the css");
+    } finally {
+      reader.close();
+      writer.close();
     }
   }
 }

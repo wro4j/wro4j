@@ -212,7 +212,7 @@ public class WroFilter
       LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
         + contextPath + " contextPath.");
     }
-    return contextPath;
+    return contextPath.replaceFirst("/", "");
   }
 
 

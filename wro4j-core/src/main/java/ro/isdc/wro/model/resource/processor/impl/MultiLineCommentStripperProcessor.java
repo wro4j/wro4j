@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor.impl;
 
@@ -19,9 +19,7 @@ import ro.isdc.wro.util.WroUtil;
  * SingleLineCommentStripperPostProcessor. Remove single line comments from
  * processed resource.
  *
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public class MultiLineCommentStripperProcessor implements ResourcePreProcessor,

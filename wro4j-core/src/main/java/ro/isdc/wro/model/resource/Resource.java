@@ -3,10 +3,7 @@
  */
 package ro.isdc.wro.model.resource;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-
-import ro.isdc.wro.model.group.Group;
 
 
 /**
@@ -25,12 +22,6 @@ public class Resource {
    * Resource identifier.
    */
   private final String uri;
-
-  /**
-   * The reference to the group where this resource resides.
-   */
-  private Group group;
-
   /**
    * Constructor.
    *
@@ -93,15 +84,6 @@ public class Resource {
   }
 
   /**
-   * Do NOT call this explicitly, it is used only to build groups.
-   *
-   * @param group the group to set
-   */
-  public void setGroup(final Group group) {
-    this.group = group;
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -118,7 +100,10 @@ public class Resource {
    */
   @Override
   public int hashCode() {
-    return HashCodeBuilder.reflectionHashCode(this);
+    int hash = 7;
+    hash = 31 * hash + getType().hashCode();
+    hash = 31 * hash + getUri().hashCode();
+    return hash;
   }
 
   /**

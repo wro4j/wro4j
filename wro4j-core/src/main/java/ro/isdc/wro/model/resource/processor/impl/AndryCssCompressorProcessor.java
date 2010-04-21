@@ -19,7 +19,8 @@ import ro.isdc.wro.model.resource.processor.algorithm.AndryCssCompressor;
 
 
 /**
- * A processor implementation using {@link AndryCssCompressor} algorithm. This processor can be used as both: PreProcessor & postProcessor.
+ * A processor implementation using {@link AndryCssCompressor} algorithm. This processor can be used as both:
+ * PreProcessor & postProcessor.
  *
  * @author Alex Objelean
  */
@@ -28,6 +29,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.AndryCssCompressor;
 public class AndryCssCompressorProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final int LINEBREAK_AFTER_CHARACTERS = 8000;
+
 
   /**
    * {@inheritDoc}
@@ -43,9 +45,14 @@ public class AndryCssCompressorProcessor
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
-    final String content = IOUtils.toString(reader);
-    final AndryCssCompressor compressor = new AndryCssCompressor(content);
-    compressor.compress(writer, LINEBREAK_AFTER_CHARACTERS);
-    writer.flush();
+    try {
+      final String content = IOUtils.toString(reader);
+      final AndryCssCompressor compressor = new AndryCssCompressor(content);
+      compressor.compress(writer, LINEBREAK_AFTER_CHARACTERS);
+      writer.flush();
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
 }

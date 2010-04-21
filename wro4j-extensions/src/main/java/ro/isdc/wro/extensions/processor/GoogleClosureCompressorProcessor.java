@@ -36,7 +36,8 @@ public class GoogleClosureCompressorProcessor
   /**
    * {@link CompilationLevel} to use for compression.
    */
-  private CompilationLevel compilationLevel;
+  private final CompilationLevel compilationLevel;
+
 
   /**
    * Uses google closure compiler with default compilation level: {@link CompilationLevel#SIMPLE_OPTIMIZATIONS}
@@ -69,19 +70,23 @@ public class GoogleClosureCompressorProcessor
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
-    final Compiler compiler = new Compiler();
-    final CompilerOptions options = new CompilerOptions();
-    // Advanced mode is used here, but additional options could be set, too.
-    compilationLevel.setOptionsForCompilationLevel(options);
-    final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "function alert(x) {}");
-    final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(IOUtils.toByteArray(reader)));
+    try {
+      final Compiler compiler = new Compiler();
+      final CompilerOptions options = new CompilerOptions();
+      // Advanced mode is used here, but additional options could be set, too.
+      compilationLevel.setOptionsForCompilationLevel(options);
+      final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "function alert(x) {}");
+      final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(IOUtils.toByteArray(reader)));
 
-    final Result result = compiler.compile(extern, input, options);
-    if (result.success) {
-      writer.write(compiler.toSource());
+      final Result result = compiler.compile(extern, input, options);
+      if (result.success) {
+        writer.write(compiler.toSource());
+      } else {
+        LOG.warn("The JS to compress contains errors: " + Arrays.toString(result.errors));
+      }
+    } finally {
+      reader.close();
       writer.close();
-    } else {
-      LOG.warn("The JS to compress contains errors: " + Arrays.toString(result.errors));
     }
   }
 }

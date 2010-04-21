@@ -30,9 +30,9 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both: preProcessor &
- * postProcessor. It is necessary because preProcessor is responsible for updating model with found imported resources,
- * while post processor removes import occurrences.
+ * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
+ * preProcessor & postProcessor. It is necessary because preProcessor is responsible for updating model with found
+ * imported resources, while post processor removes import occurrences.
  *
  * @author Alex Objelean
  */
@@ -56,21 +56,34 @@ public class CssImportPreProcessor
   private final List<Resource> processed = new ArrayList<Resource>();
 
   /** The url pattern */
-  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?"
-    + "[\"']?([^\"']*?)[\"']?" // any sequence of characters, except an unescaped ')'
+  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?" // any
+                                                                                                             // sequence
+                                                                                                             // of
+                                                                                                             // characters,
+                                                                                                             // except
+                                                                                                             // an
+                                                                                                             // unescaped
+                                                                                                             // ')'
     + "\\s*?\\);?", // Any number of whitespaces, then ')'
-    Pattern.CASE_INSENSITIVE); // works with 'URL('
+  Pattern.CASE_INSENSITIVE); // works with 'URL('
+
 
   /**
    * {@inheritDoc}
    */
   public synchronized void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    final String result = parseCss(resource, reader);
-    writer.write(result);
-    writer.close();
-    processed.clear();
+    try {
+      final String result = parseCss(resource, reader);
+      writer.write(result);
+      writer.close();
+      processed.clear();
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
+
 
   /**
    * @param resource {@link Resource} to process.
@@ -78,7 +91,8 @@ public class CssImportPreProcessor
    * @return css content with all imports processed.
    * @throws IOException
    */
-  private String parseCss(final Resource resource, final Reader reader) throws IOException {
+  private String parseCss(final Resource resource, final Reader reader)
+    throws IOException {
     if (processed.contains(resource)) {
       LOG.warn("Recursive import detected: " + resource);
       return "";
@@ -87,8 +101,8 @@ public class CssImportPreProcessor
     final StringBuffer sb = new StringBuffer();
     final Collection<Resource> importsCollector = getImportedResources(resource);
     for (final Resource imported : importsCollector) {
-      //for now, minimize always
-      //TODO: find a way to get minimize property dynamically.
+      // for now, minimize always
+      // TODO: find a way to get minimize property dynamically.
       sb.append(preProcessorExecutor.execute(imported, true));
     }
     if (!importsCollector.isEmpty()) {
@@ -99,6 +113,7 @@ public class CssImportPreProcessor
     return removeImportStatements(sb.toString());
   }
 
+
   /**
    * Removes all @import statements for css.
    */
@@ -106,12 +121,13 @@ public class CssImportPreProcessor
     final Matcher m = PATTERN.matcher(content);
     final StringBuffer sb = new StringBuffer();
     while (m.find()) {
-      //add and check if already exist
+      // add and check if already exist
       m.appendReplacement(sb, "");
     }
     m.appendTail(sb);
     return sb.toString();
   }
+
 
   /**
    * @return the content of the resource as string.
@@ -123,13 +139,15 @@ public class CssImportPreProcessor
     return IOUtils.toString(reader);
   }
 
+
   /**
    * Find a set of imported resources inside a given resource.
    */
-  private Collection<Resource> getImportedResources(final Resource resource) throws IOException {
-    //it should be sorted
+  private Collection<Resource> getImportedResources(final Resource resource)
+    throws IOException {
+    // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    //Check if @Scanner#findWithinHorizon can be used instead
+    // Check if @Scanner#findWithinHorizon can be used instead
     final String css = getResourceContent(resource);
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
@@ -144,6 +162,7 @@ public class CssImportPreProcessor
     return imports;
   }
 
+
   /**
    * Build a {@link Resource} object from a found importedResource inside a given resource.
    */
@@ -153,16 +172,17 @@ public class CssImportPreProcessor
     return importResource;
   }
 
-	/**
-	 * Computes absolute url of the imported resource.
-	 *
-	 * @param relativeResource {@link Resource} where the import statement is found.
-	 * @param importUrl found import url.
-	 * @return absolute url of the resource to import.
-	 */
+
+  /**
+   * Computes absolute url of the imported resource.
+   *
+   * @param relativeResource {@link Resource} where the import statement is found.
+   * @param importUrl found import url.
+   * @return absolute url of the resource to import.
+   */
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
     final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
-    //remove '../' & normalize the path.
+    // remove '../' & normalize the path.
     final String absoluteImportUrl = StringUtils.normalizePath(folder + importUrl);
     return absoluteImportUrl;
   }

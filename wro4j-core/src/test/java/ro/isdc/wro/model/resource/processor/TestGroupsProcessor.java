@@ -187,6 +187,14 @@ public class TestGroupsProcessor {
     Mockito.verify(postProcessor, Mockito.times(0)).process(Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
 
+//  @Test
+//  public void testGroupHashCode() {
+//    final Group group = new Group();
+//    final Resource resource = Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS);
+//    group.setResources(Arrays.asList(resource));
+//    Assert.assertEquals(0, resource.hashCode());
+//    Assert.assertEquals(0, group.hashCode());
+//  }
 
   /**
    * Creates a mocked {@link ResourcePostProcessor} object used to check how many times it was invoked depending on
@@ -208,6 +216,7 @@ public class TestGroupsProcessor {
     groupsProcessor.process(groups, ResourceType.CSS, minimize);
     return postProcessor;
   }
+
 
   /**
    * Check if minimize aware processor is called when minimization is wanted.

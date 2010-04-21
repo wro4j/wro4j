@@ -46,38 +46,37 @@ public class YUIJsCompressorProcessor
 
   boolean verbose = true;
 
+
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
-    final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new ErrorReporter() {
-      public void warning(final String message, final String sourceName, final int line, final String lineSource,
-        final int lineOffset) {
-        if (line < 0) {
-          LOG.warn("\n[WARNING] " + message);
-        } else {
-          LOG.warn("\n[WARNING] " + line + ':' + lineOffset + ':' + message);
+    try {
+      final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new ErrorReporter() {
+        public void warning(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset) {
+          if (line < 0) {
+            LOG.warn("\n[WARNING] " + message);
+          } else {
+            LOG.warn("\n[WARNING] " + line + ':' + lineOffset + ':' + message);
+          }
         }
-      }
-
-
-      public void error(final String message, final String sourceName, final int line, final String lineSource,
-        final int lineOffset) {
-        if (line < 0) {
-          LOG.error("\n[ERROR] " + message);
-        } else {
-          LOG.error("\n[ERROR] " + line + ':' + lineOffset + ':' + message);
+        public void error(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset) {
+          if (line < 0) {
+            LOG.error("\n[ERROR] " + message);
+          } else {
+            LOG.error("\n[ERROR] " + line + ':' + lineOffset + ':' + message);
+          }
         }
-      }
-
-
-      public EvaluatorException runtimeError(final String message, final String sourceName, final int line,
-        final String lineSource, final int lineOffset) {
-        error(message, sourceName, line, lineSource, lineOffset);
-        return new EvaluatorException(message);
-      }
-    });
-    compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
+        public EvaluatorException runtimeError(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset) {
+          error(message, sourceName, line, lineSource, lineOffset);
+          return new EvaluatorException(message);
+        }
+      });
+      compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
 }

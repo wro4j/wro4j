@@ -22,14 +22,19 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  */
 @SupportedResourceType(ResourceType.JS)
-public class SemicolonAppenderPreProcessor implements ResourcePreProcessor {
+public class SemicolonAppenderPreProcessor
+  implements ResourcePreProcessor {
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    IOUtils.copy(reader, writer);
-    writer.write(';');
-    IOUtils.closeQuietly(writer);
+    try {
+      IOUtils.copy(reader, writer);
+      writer.write(';');
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
 }

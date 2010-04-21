@@ -30,12 +30,18 @@ public class YUICssCompressorProcessor
    */
   private static final int linebreakpos = -1;
 
+
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
-    final CssCompressor compressor = new CssCompressor(reader);
-    compressor.compress(writer, linebreakpos);
+    try {
+      final CssCompressor compressor = new CssCompressor(reader);
+      compressor.compress(writer, linebreakpos);
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
 }

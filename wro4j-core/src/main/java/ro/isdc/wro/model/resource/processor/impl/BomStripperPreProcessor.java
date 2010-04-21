@@ -21,6 +21,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Removes BOM (Byte Order Mark) characters from the beginning of js files.
  * <p>
+ *
  * @see http://en.wikipedia.org/wiki/Byte_order_mark.
  *
  * @author Alex Objelean
@@ -32,11 +33,13 @@ public class BomStripperPreProcessor
   /**
    * A stream which removes BOM characters.
    */
-  private static class BomStripperInputStream extends PushbackInputStream {
+  private static class BomStripperInputStream
+    extends PushbackInputStream {
     private static final int[][] BOMS = { { 0x00, 0x00, 0xFE, 0xFF }, { 0xFF, 0xFE, 0x00, 0x00 },
         { 0x2B, 0x2F, 0x76, 0x38 }, { 0x2B, 0x2F, 0x76, 0x39 }, { 0x2B, 0x2F, 0x76, 0x2B }, { 0x2B, 0x2F, 0x76, 0x2F },
         { 0xDD, 0x73, 0x66, 0x73 }, { 0xEF, 0xBB, 0xBF }, { 0x0E, 0xFE, 0xFF }, { 0xFB, 0xEE, 0x28 }, { 0xFE, 0xFF },
         { 0xFF, 0xFE } };
+
 
     /**
      * Removes a BOM characters from chained inputStream.
@@ -58,6 +61,7 @@ public class BomStripperPreProcessor
       }
     }
 
+
     private int testForBOM(final int[] bom, final int[] bytes) {
       for (int index = 0; index < bom.length; index++) {
         if (bom[index] != bytes[index])
@@ -67,13 +71,19 @@ public class BomStripperPreProcessor
     }
   }
 
+
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
-    reader.close();
-    writer.close();
+    try {
+      IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
+      reader.close();
+      writer.close();
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
 }
