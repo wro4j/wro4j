@@ -46,8 +46,19 @@ public class Wro4jMojo
    * The path to the destination directory where the files are stored at the end of the process.
    *
    * @parameter default-value="${project.build.directory}/wro/"
+   * @optional
    */
   private File destinationFolder;
+  /**
+   * @parameter expression=${cssDestinationFolder}
+   * @optional
+   */
+  private File cssDestinationFolder;
+  /**
+   * @parameter expression=${jsDestinationFolder}
+   * @optional
+   */
+  private File jsDestinationFolder;
   /**
    * Comma separated group names.
    *
@@ -135,20 +146,49 @@ public class Wro4jMojo
 
     // updateClasspath();
     try {
-      if (!destinationFolder.exists()) {
-        destinationFolder.mkdirs();
-      }
       getLog().info("will process the following groups: " + targetGroups);
       // TODO create a Request object
       for (final String group : getTargetGroupsAsList()) {
         for (final ResourceType resourceType : ResourceType.values()) {
+          final File destinationFolder = computeDestinationFolder(resourceType);
           final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-          processGroup(groupWithExtension);
+          processGroup(groupWithExtension, destinationFolder);
         }
       }
     } catch (final Exception e) {
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
     }
+  }
+
+
+  /**
+   * Computes the destination folder based on resource type.
+   *
+   * @param resourceType {@link ResourceType} to process.
+   * @return destinationFoder where the result of resourceType will be copied.
+   * @throws MojoExecutionException if computed folder is null.
+   */
+  private File computeDestinationFolder(final ResourceType resourceType) throws MojoExecutionException {
+    File folder = destinationFolder;
+    if (resourceType == ResourceType.JS) {
+      if (jsDestinationFolder != null) {
+        folder = jsDestinationFolder;
+      }
+    }
+    if (resourceType == ResourceType.CSS) {
+      if (cssDestinationFolder != null) {
+        folder = cssDestinationFolder;
+      }
+    }
+    if (folder == null) {
+      throw new MojoExecutionException("Couldn't compute destination folder for resourceType: "
+        + resourceType
+        + ". That means that you didn't define one of the following parameters: destinationFolder, cssDestinationFolder, jsDestinationFolder");
+    }
+    if (!folder.exists()) {
+      folder.mkdirs();
+    }
+    return folder;
   }
 
 
@@ -207,7 +247,7 @@ public class Wro4jMojo
    *
    * @throws IOException if any IO related exception occurs.
    */
-  private void processGroup(final String group)
+  private void processGroup(final String group, final File parentFoder)
     throws IOException, MojoExecutionException {
     getLog().info("processing group: " + group);
 
@@ -215,7 +255,7 @@ public class Wro4jMojo
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(request.getRequestURI()).thenReturn(group);
 
-    final File destinationFile = new File(destinationFolder, group);
+    final File destinationFile = new File(parentFoder, group);
     destinationFile.createNewFile();
     final FileOutputStream fos = new FileOutputStream(destinationFile);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
@@ -247,6 +287,22 @@ public class Wro4jMojo
    */
   public void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
+  }
+
+
+  /**
+   * @param cssDestinationFolder the cssDestinationFolder to set
+   */
+  public void setCssDestinationFolder(final File cssDestinationFolder) {
+    this.cssDestinationFolder = cssDestinationFolder;
+  }
+
+
+  /**
+   * @param jsDestinationFolder the jsDestinationFolder to set
+   */
+  public void setJsDestinationFolder(final File jsDestinationFolder) {
+    this.jsDestinationFolder = jsDestinationFolder;
   }
 
 

@@ -30,6 +30,8 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
  */
 public class TestWro4jMojo {
   private Wro4jMojo mojo;
+  private File cssDestinationFolder;
+  private File jsDestinationFolder;
   private File destinationFolder;
 
 
@@ -44,6 +46,10 @@ public class TestWro4jMojo {
     mojo.setContextFolder(wroFile.getParentFile().getParentFile());
     destinationFolder = new File("wroTemp-" + new Date().getTime());
     destinationFolder.mkdir();
+    cssDestinationFolder = new File("wroTemp-css-" + new Date().getTime());
+    destinationFolder.mkdir();
+    jsDestinationFolder = new File("wroTemp-js-" + new Date().getTime());
+    destinationFolder.mkdir();
     mojo.setDestinationFolder(destinationFolder);
   }
 
@@ -51,6 +57,38 @@ public class TestWro4jMojo {
   @Test
   public void testMojoWithPropertiesSet()
     throws Exception {
+    mojo.execute();
+  }
+
+
+  @Test(expected=MojoExecutionException.class)
+  public void testNoDestinationFolderSet()
+    throws Exception {
+    mojo.setDestinationFolder(null);
+    mojo.execute();
+  }
+
+  @Test(expected=MojoExecutionException.class)
+  public void testOnlyCssDestinationFolderSet()
+    throws Exception {
+    mojo.setCssDestinationFolder(cssDestinationFolder);
+    mojo.setDestinationFolder(null);
+    mojo.execute();
+  }
+
+  @Test(expected=MojoExecutionException.class)
+  public void testOnlyJsDestinationFolderSet()
+    throws Exception {
+    mojo.setJsDestinationFolder(jsDestinationFolder);
+    mojo.setDestinationFolder(null);
+    mojo.execute();
+  }
+
+  @Test
+  public void testJsAndCssDestinationFolderSet()
+    throws Exception {
+    mojo.setJsDestinationFolder(jsDestinationFolder);
+    mojo.setCssDestinationFolder(cssDestinationFolder);
     mojo.execute();
   }
 
@@ -94,6 +132,8 @@ public class TestWro4jMojo {
   public void tearDown() {
     try {
       FileUtils.deleteDirectory(destinationFolder);
+      FileUtils.deleteDirectory(cssDestinationFolder);
+      FileUtils.deleteDirectory(jsDestinationFolder);
     } catch (final Exception e) {
     }
   }
