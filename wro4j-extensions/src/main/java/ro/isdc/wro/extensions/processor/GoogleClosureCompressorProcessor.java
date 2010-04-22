@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -30,6 +31,7 @@ import com.google.javascript.jscomp.Result;
  * @see http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html
  * @author Alex Objelean
  */
+@Minimize
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
   implements ResourcePostProcessor {

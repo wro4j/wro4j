@@ -45,7 +45,7 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.6-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>

@@ -33,29 +33,29 @@ public class Wro4jMojo
   /**
    * File containing the groups definitions.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
    */
   private File wroFile;
   /**
    * The folder where web application context resides useful for locating resources relative to servletContext .
    *
-   * @parameter default-value="${basedir}/src/main/webapp/
+   * @parameter default-value="${basedir}/src/main/webapp/"
    */
   private File contextFolder;
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}/wro/"
+   * @parameter default-value="${project.build.directory}/wro/" expression="${destinationFolder}"
    * @optional
    */
   private File destinationFolder;
   /**
-   * @parameter expression=${cssDestinationFolder}
+   * @parameter expression="${cssDestinationFolder}"
    * @optional
    */
   private File cssDestinationFolder;
   /**
-   * @parameter expression=${jsDestinationFolder}
+   * @parameter expression="${jsDestinationFolder}"
    * @optional
    */
   private File jsDestinationFolder;
@@ -140,9 +140,11 @@ public class Wro4jMojo
 //    updateClasspath();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
-    getLog().info("TargetGroups: " + targetGroups);
-    getLog().info("Minimize: " + minimize);
-    getLog().info("Destination folder: " + destinationFolder);
+    getLog().info("targetGroups: " + targetGroups);
+    getLog().info("minimize: " + minimize);
+    getLog().info("destinationFolder: " + destinationFolder);
+    getLog().info("jsDestinationFolder: " + jsDestinationFolder);
+    getLog().info("cssDestinationFolder: " + cssDestinationFolder);
 
     // updateClasspath();
     try {
@@ -180,6 +182,7 @@ public class Wro4jMojo
         folder = cssDestinationFolder;
       }
     }
+    getLog().info("folder: " + folder);
     if (folder == null) {
       throw new MojoExecutionException("Couldn't compute destination folder for resourceType: "
         + resourceType
