@@ -5,6 +5,8 @@ package ro.isdc.wro.manager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 
@@ -35,6 +38,24 @@ public class TestWroManager {
     manager = factory.getInstance();
 	  Context.set(Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS));
 	}
+
+  @Test
+  public void testNoProcessorWroManagerFactory() throws IOException {
+    final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
+    manager = factory.getInstance();
+    manager.setModelFactory(getValidModelFactory());
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+
+    final OutputStream os = System.out;
+
+    final HttpServletResponse response = Context.get().getResponse();
+    Mockito.when(response.getWriter()).thenReturn(new PrintWriter(os));
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(os));
+    Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
+    manager.process(request, response);
+
+    //WroTestUtils.compareProcessedResourceContents(resultReader, expectedReader, processor)
+  }
 
   @Test
   public void processValidModel() throws IOException {
@@ -56,6 +77,7 @@ public class TestWroManager {
     	}
     };
   }
+
 
 
   /**

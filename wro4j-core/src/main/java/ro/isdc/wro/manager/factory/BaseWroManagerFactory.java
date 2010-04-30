@@ -25,7 +25,7 @@ import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public class BaseWroManagerFactory implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
+public abstract class BaseWroManagerFactory implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Manager instance. Using volatile keyword fix the problem with
    * double-checked locking in JDK 1.5.

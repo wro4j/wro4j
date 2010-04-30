@@ -99,11 +99,6 @@ public class TestConfigurableWroManagerFactory {
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("bomStripper, cssImport, cssVariables");
     initFactory(filterConfig);
     final List<ResourcePreProcessor> list = factory.getPreProcessors();
-//    Collections.sort(list, new Comparator<ResourcePreProcessor>() {
-//      public int compare(final ResourcePreProcessor o1, final ResourcePreProcessor o2) {
-//        return o1.hashCode() - o2.hashCode();
-//      }
-//    });
     Assert.assertEquals(BomStripperPreProcessor.class, list.get(0).getClass());
     Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
     Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
