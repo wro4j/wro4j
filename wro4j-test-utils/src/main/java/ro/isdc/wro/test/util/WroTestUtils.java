@@ -3,12 +3,8 @@
  */
 package ro.isdc.wro.test.util;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -75,6 +71,8 @@ public class WroTestUtils {
         actual).trim());
     Assert.assertEquals(
         expectedAsString, actualAsString);
+    expected.close();
+    actual.close();
   }
 
 
@@ -87,32 +85,7 @@ public class WroTestUtils {
    */
   private static String replaceTabsWithSpaces(final String input) {
     // replace tabs with spaces
-    return input.replaceAll(
-        "\\t", "  ");
-  }
-
-
-  /**
-   * Transform the original outputStream with a wrapped one and returns an {@link InputStream} where the bytes are
-   * written. This is useful when you read the result of content written into some outputStream.
-   *
-   * @param expected
-   *          {@link InputStream} of the expected resource.
-   * @param actual
-   *          the {@link OutputStream} where the actual content is written and is compared against expected content.
-   */
-  public static InputStream convertToInputStream(OutputStream outputStream) throws IOException {
-    Assert.assertNotNull(outputStream);
-    final PipedInputStream is = new PipedInputStream();
-    final PipedOutputStream os = new PipedOutputStream(is);
-    outputStream = new BufferedOutputStream(outputStream) {
-      @Override
-      public synchronized void write(final int b) throws IOException {
-        os.write(b);
-        super.write(b);
-      }
-    };
-    return is;
+    return input.replaceAll("\\t", "  ");
   }
 
 

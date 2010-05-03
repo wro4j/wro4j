@@ -143,8 +143,6 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
   }
 
   /**
-   * @param requestURI uri of the request which encodes information about groups.
-   * @param type
    * @return {@link InputStream} for groups found in requestURI.
    */
 	private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request, final HttpServletResponse response) {
@@ -153,12 +151,10 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
 
 	  InputStream is = null;
     // find names & type
-	  final String requestURI = request.getRequestURI();
-	  final ResourceType type = groupExtractor.getResourceType(requestURI);
-
-		final String groupName = groupExtractor.getGroupName(requestURI);
+	  final ResourceType type = groupExtractor.getResourceType(request);
+		final String groupName = groupExtractor.getGroupName(request);
 		if (groupName == null) {
-		  throw new WroRuntimeException("No groups found for request: " + requestURI);
+		  throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
 		}
 		initScheduler(model);
 		final boolean minimize = groupExtractor.isMinimized(request);

@@ -3,9 +3,10 @@
  */
 package ro.isdc.wro.manager;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,14 +51,14 @@ public class TestWroManager extends AbstractWroTest {
     manager = factory.getInstance();
     manager.setModelFactory(getValidModelFactory());
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final OutputStream os = System.out;
     final HttpServletResponse response = Context.get().getResponse();
 
-    final InputStream actualStream = WroTestUtils.convertToInputStream(os);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(os));
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
     manager.process(request, response);
-    WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"), actualStream);
+    //compare written bytes to output stream with the content from specified css.
+    WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"), new ByteArrayInputStream(out.toByteArray()));
   }
 
 
