@@ -106,13 +106,13 @@ public abstract class AbstractGroupsProcessor
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass) {
+  public final <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass) {
     T found = null;
     final Set<ResourcePreProcessor> allPreProcessors = new HashSet<ResourcePreProcessor>();
     allPreProcessors.addAll(preProcessors);
     for (final ResourcePreProcessor processor : allPreProcessors) {
       if (processorClass.isInstance(processor)) {
-        found = (T)processor;
+        found = (T) processor;
         return found;
       }
     }

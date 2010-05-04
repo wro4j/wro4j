@@ -14,12 +14,12 @@ import ro.isdc.wro.model.resource.ResourceType;
  *
  * @author Alex Objelean
  */
-public class GroupExtractorDecorator
+public final class GroupExtractorDecorator
   implements GroupExtractor {
   /**
    * {@link GroupExtractor} to decorate.
    */
-  private GroupExtractor decorated;
+  private final GroupExtractor decorated;
 
 
   /**

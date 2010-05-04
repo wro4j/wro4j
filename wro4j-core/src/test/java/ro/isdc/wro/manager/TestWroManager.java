@@ -21,6 +21,7 @@ import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.test.util.WroTestUtils;
@@ -47,7 +48,7 @@ public class TestWroManager extends AbstractWroTest {
 
   @Test
   public void testNoProcessorWroManagerFactory() throws IOException {
-    final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
+    final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
     manager = factory.getInstance();
     manager.setModelFactory(getValidModelFactory());
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);

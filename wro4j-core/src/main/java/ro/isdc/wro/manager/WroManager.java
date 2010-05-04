@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager;
 
-
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -44,13 +43,15 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
  * Contains all the factories used by optimizer in order to perform the logic.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public class WroManager implements WroConfigurationChangeListener, CacheChangeCallbackAware {
+public class WroManager
+    implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Logger for this class.
    */
@@ -83,13 +84,17 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
+
+
   /**
    * Perform processing of the uri.
    *
-   * @param request {@link HttpServletRequest} to process.
-   * @throws IOException.
+   * @param request
+   *          {@link HttpServletRequest} to process.
+   * @param response HttpServletResponse where to write the result content.
+   * @throws IOException when any IO related problem occurs.
    */
-  public void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+  public final void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
@@ -101,37 +106,23 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     } else {
       is = buildGroupsInputStream(model, request, response);
     }
-    //use gziped response if supported
+    // use gziped response if supported
     final OutputStream os = getGzipedOutputStream(response);
     IOUtils.copy(is, os);
     is.close();
     os.close();
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void registerCallback(final PropertyChangeListener callback) {
-    this.cacheChangeCallback = callback;
-  }
 
   /**
-   * Allow subclasses to turnoff gzipping
+   * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}.
    *
-   * @return true if Gzip is Supported
-   */
-  protected boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
-  }
-
-  /**
-   * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}
-   *
-   * @param response {@link HttpServletResponse} object.
+   * @param response
+   *          {@link HttpServletResponse} object.
    * @return wrapped gziped OutputStream.
+   * @throws IOException when Gzip operation fails.
    */
-  private OutputStream getGzipedOutputStream(final HttpServletResponse response)
-    throws IOException {
+  private OutputStream getGzipedOutputStream(final HttpServletResponse response) throws IOException {
     if (ConfigurationContext.get().getConfig().isGzipEnabled() && isGzipSupported()) {
       // add gzip header and gzip response
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
@@ -142,49 +133,56 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     return response.getOutputStream();
   }
 
+
   /**
+   * @param model the model used to build stream.
+   * @param request {@link HttpServletRequest} for this request cycle.
+   * @param response {@link HttpServletResponse} used to set content type.
    * @return {@link InputStream} for groups found in requestURI.
    */
-	private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request, final HttpServletResponse response) {
+  private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request,
+      final HttpServletResponse response) {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start();
 
-	  InputStream is = null;
+    InputStream is = null;
     // find names & type
-	  final ResourceType type = groupExtractor.getResourceType(request);
-		final String groupName = groupExtractor.getGroupName(request);
-		if (groupName == null) {
-		  throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
-		}
-		initScheduler(model);
-		final boolean minimize = groupExtractor.isMinimized(request);
+    final ResourceType type = groupExtractor.getResourceType(request);
+    final String groupName = groupExtractor.getGroupName(request);
+    if (groupName == null) {
+      throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
+    }
+    initScheduler(model);
+    final boolean minimize = groupExtractor.isMinimized(request);
 
-		// find processed result for a group
+    // find processed result for a group
     final Group group = model.getGroupByName(groupName);
     final List<Group> groupAsList = new ArrayList<Group>();
     groupAsList.add(group);
-		String result = null;
-	  final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
-	  LOG.debug("Searching cache entry: " + cacheEntry);
-	  // Cache based on uri
-	  result = cacheStrategy.get(cacheEntry);
-	  if (result == null) {
-	    LOG.debug("Cache is empty. Perform processing...");
-	    // process groups & put result in the cache
-	    result = groupsProcessor.process(groupAsList, type, minimize);
-	    cacheStrategy.put(cacheEntry, result);
-	  }
-	  is = new ByteArrayInputStream(result.getBytes());
-		stopWatch.stop();
-		LOG.debug("WroManager process time: " + stopWatch.toString());
+    String result = null;
+    final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
+    LOG.debug("Searching cache entry: " + cacheEntry);
+    // Cache based on uri
+    result = cacheStrategy.get(cacheEntry);
+    if (result == null) {
+      LOG.debug("Cache is empty. Perform processing...");
+      // process groups & put result in the cache
+      result = groupsProcessor.process(groupAsList, type, minimize);
+      cacheStrategy.put(cacheEntry, result);
+    }
+    is = new ByteArrayInputStream(result.getBytes());
+    stopWatch.stop();
+    LOG.debug("WroManager process time: " + stopWatch.toString());
     if (type != null) {
       response.setContentType(type.getContentType());
     }
-		return is;
-	}
+    return is;
+  }
+
 
   /**
    * @param model
+   *          {@link WroModel} object.
    */
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
@@ -200,51 +198,75 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
 
 
   /**
-   * @param model Model containing
+   * @param model
+   *          Model containing
    * @return a {@link Runnable} which will update the cache content with latest data.
    */
   private Runnable getSchedulerRunnable(final WroModel model) {
     return new Runnable() {
-    	public void run() {
-    		try {
+      public void run() {
+        try {
           if (cacheChangeCallback != null) {
             // invoke cacheChangeCallback
             cacheChangeCallback.propertyChange(null);
           }
-    		  LOG.info("reloading cache");
-    			// process groups & put update cache
-    			final Collection<Group> groups = model.getGroups();
-    			// update cache for all resources
-    			for (final Group group : groups) {
-    				for (final ResourceType resourceType : ResourceType.values()) {
-    					if (group.hasResourcesOfType(resourceType)) {
-    						final Collection<Group> groupAsList = new HashSet<Group>();
-    						groupAsList.add(group);
-    						//TODO notify the filter about the change - expose a callback
-                //TODO check if request parameter can be fetched here without errors.
-    						//groupExtractor.isMinimized(Context.get().getRequest())
-    						final Boolean[] minimizeValues = new Boolean[] {true, false};
-    						for (final boolean minimize : minimizeValues) {
+          LOG.info("reloading cache");
+          // process groups & put update cache
+          final Collection<Group> groups = model.getGroups();
+          // update cache for all resources
+          for (final Group group : groups) {
+            for (final ResourceType resourceType : ResourceType.values()) {
+              if (group.hasResourcesOfType(resourceType)) {
+                final Collection<Group> groupAsList = new HashSet<Group>();
+                groupAsList.add(group);
+                // TODO notify the filter about the change - expose a callback
+                // TODO check if request parameter can be fetched here without errors.
+                // groupExtractor.isMinimized(Context.get().getRequest())
+                final Boolean[] minimizeValues = new Boolean[] {
+                    true, false
+                };
+                for (final boolean minimize : minimizeValues) {
                   final String result = groupsProcessor.process(groupAsList, resourceType, minimize);
                   cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), result);
                 }
-    					}
-    				}
-    			}
-    		} catch (final Exception e) {
-    			//Catch all exception in order to avoid situation when scheduler runs out of threads.
-    			LOG.error("Exception occured: ", e);
-    		}
+              }
+            }
+          }
+        } catch (final Exception e) {
+          // Catch all exception in order to avoid situation when scheduler runs out of threads.
+          LOG.error("Exception occured: ", e);
+        }
       }
     };
   }
 
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void registerCallback(final PropertyChangeListener callback) {
+    this.cacheChangeCallback = callback;
+  }
+
+
+  /**
+   * Allow subclasses to turn off gzipping.
+   *
+   * @return true if Gzip is Supported
+   */
+  protected boolean isGzipSupported() {
+    return WroUtil.isGzipSupported(Context.get().getRequest());
+  }
+
+
   /**
    * Resolve the stream for a request.
    *
-   * @param request {@link HttpServletRequest} object.
+   * @param request
+   *          {@link HttpServletRequest} object.
    * @return {@link InputStream} not null object if the resource is valid and can be accessed
-   * @throws WroRuntimeException if no stream could be resolved.
+   * @throws IOException
+   *           if no stream could be resolved.
    */
   private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
@@ -265,32 +287,34 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
   /**
    * {@inheritDoc}
    */
-  public void onCachePeriodChanged() {
+  public final void onCachePeriodChanged() {
     LOG.info("CacheChange event triggered!");
     if (scheduler != null) {
       scheduler.shutdown();
       scheduler = null;
     }
-    //flush the cache by destroying it.
+    // flush the cache by destroying it.
     cacheStrategy.clear();
   }
+
 
   /**
    * {@inheritDoc}
    */
-  public void onModelPeriodChanged() {
+  public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
-    //update the cache also when model is changed.
+    // update the cache also when model is changed.
     onCachePeriodChanged();
-  	if (modelFactory instanceof WroConfigurationChangeListener) {
-  		((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
-  	}
+    if (modelFactory instanceof WroConfigurationChangeListener) {
+      ((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
+    }
   }
+
 
   /**
    * Called when {@link WroManager} is being taken out of service.
    */
-  public void destroy() {
+  public final void destroy() {
     LOG.debug("WroManager destroyed");
     cacheStrategy.destroy();
     modelFactory.destroy();
@@ -299,26 +323,29 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     }
   }
 
-	/**
-	 * Check if all dependencies are set.
-	 */
-	private void validate() {
-		if (this.groupExtractor == null) {
-			throw new WroRuntimeException("GroupExtractor was not set!");
-		}
-		if (this.modelFactory == null) {
-			throw new WroRuntimeException("ModelFactory was not set!");
-		}
-		if (this.groupsProcessor == null) {
-			throw new WroRuntimeException("GroupsProcessor was not set!");
-		}
-		if (this.cacheStrategy == null) {
-			throw new WroRuntimeException("cacheStrategy was not set!");
-		}
-	}
 
   /**
-   * @param groupExtractor the uriProcessor to set
+   * Check if all dependencies are set.
+   */
+  private void validate() {
+    if (this.groupExtractor == null) {
+      throw new WroRuntimeException("GroupExtractor was not set!");
+    }
+    if (this.modelFactory == null) {
+      throw new WroRuntimeException("ModelFactory was not set!");
+    }
+    if (this.groupsProcessor == null) {
+      throw new WroRuntimeException("GroupsProcessor was not set!");
+    }
+    if (this.cacheStrategy == null) {
+      throw new WroRuntimeException("cacheStrategy was not set!");
+    }
+  }
+
+
+  /**
+   * @param groupExtractor
+   *          the uriProcessor to set
    */
   public final void setGroupExtractor(final GroupExtractor groupExtractor) {
     if (groupExtractor == null) {
@@ -327,8 +354,10 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     this.groupExtractor = groupExtractor;
   }
 
+
   /**
-   * @param groupsProcessor the groupsProcessor to set
+   * @param groupsProcessor
+   *          the groupsProcessor to set
    */
   public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
     if (groupsProcessor == null) {
@@ -337,8 +366,10 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     this.groupsProcessor = groupsProcessor;
   }
 
+
   /**
-   * @param modelFactory the modelFactory to set
+   * @param modelFactory
+   *          the modelFactory to set
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
     if (modelFactory == null) {
@@ -347,8 +378,10 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     this.modelFactory = modelFactory;
   }
 
+
   /**
-   * @param cacheStrategy the cache to set
+   * @param cacheStrategy
+   *          the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
     if (cacheStrategy == null) {
@@ -357,17 +390,19 @@ public class WroManager implements WroConfigurationChangeListener, CacheChangeCa
     this.cacheStrategy = cacheStrategy;
   }
 
+
   /**
    * @return the modelFactory
    */
-  public WroModelFactory getModelFactory() {
+  public final WroModelFactory getModelFactory() {
     return this.modelFactory;
   }
+
 
   /**
    * @return the groupExtractor
    */
-  public GroupExtractor getGroupExtractor() {
+  public final GroupExtractor getGroupExtractor() {
     return this.groupExtractor;
   }
 }

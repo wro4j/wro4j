@@ -18,14 +18,17 @@ import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
 
+
 /**
- * A WroManagerFactory implementation aware of running inside a web application
- * and capable to access a ServletContext reference. Use several predefined processors (like jsMin, cssMin, etc) & 3 most used uriLocators (like servletContext, classpath & urlUri)
+ * A WroManagerFactory implementation aware of running inside a web application and capable to access a ServletContext
+ * reference. Use several predefined processors (like jsMin, cssMin, etc) & 3 most used uriLocators (like
+ * servletContext, classpath & urlUri)
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory {
+public class ServletContextAwareWroManagerFactory
+    extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
    */
@@ -34,7 +37,7 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
     final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
     groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
 
-    //this one must be before the CssUrlRewritingProcessor
+    // this one must be before the CssUrlRewritingProcessor
     groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
@@ -46,8 +49,11 @@ public class ServletContextAwareWroManagerFactory extends BaseWroManagerFactory 
     return groupProcessor;
   }
 
+
   /**
    * Creates a new {@link UriLocatorFactory} implementation.
+   *
+   * @return {@link UriLocatorFactory} object.
    */
   private UriLocatorFactory newUriLocatorFactory() {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();

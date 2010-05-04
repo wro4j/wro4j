@@ -76,7 +76,6 @@ public class CssImportPreProcessor
     try {
       final String result = parseCss(resource, reader);
       writer.write(result);
-      writer.close();
       processed.clear();
     } finally {
       reader.close();
