@@ -44,7 +44,7 @@
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,cssMinJawr,jsMin</param-value>
+      <param-value>cssVariables,cssMinJawr,jsMin,googleClosureSimple</param-value>
     </init-param>
   </filter>
   <filter-mapping>

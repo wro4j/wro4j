@@ -5,12 +5,13 @@
 
   <group name="all">
     <group-ref>dynamicResource</group-ref>
-    <group-ref>jquery</group-ref>    
+    <group-ref>jquery</group-ref>
+    <!--     
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>JSGroup</group-ref>
 		<group-ref>otherGroup</group-ref>
-    
+     -->
 	</group>
   
   <group name="WEBINF-css">
