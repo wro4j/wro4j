@@ -16,7 +16,7 @@
     </init-param>
     <init-param>
       <param-name>configuration</param-name>
-      <param-value>DEPLOYMENT</param-value>
+      <param-value>DEVELOPMENT</param-value>
     </init-param>
     <init-param>
       <param-name>gzipResources</param-name>
