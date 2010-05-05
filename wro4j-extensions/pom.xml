@@ -23,7 +23,6 @@
       <groupId>ro.isdc.wro4j</groupId>
       <artifactId>wro4j-test-utils</artifactId>
     </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -44,17 +43,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.google</groupId>
-      <artifactId>closure</artifactId>
-      <version>0.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/src/main/resources/compiler.jar</systemPath>
-    </dependency>
-    <!--
-      <dependency> <groupId>org.dojotoolkit</groupId>
-      <artifactId>custom_rhino</artifactId> </dependency>
-    -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>

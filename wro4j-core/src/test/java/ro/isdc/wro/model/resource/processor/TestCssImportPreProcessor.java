@@ -4,9 +4,12 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
+
+import net.nczonline.web.datauri.DataURIGenerator;
 
 import org.junit.Test;
 
@@ -41,6 +44,10 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
       "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
   }
 
+  @Test
+  public void test() throws Exception {
+    DataURIGenerator.generateDataURI(getInputStream("classpath:1.css"), new OutputStreamWriter(System.out), "test.css", "application/css");
+  }
 
   @Test
   public void testPreProcessorWithoutRecursion2()
