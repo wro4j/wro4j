@@ -9,8 +9,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 
-import net.nczonline.web.datauri.DataURIGenerator;
-
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
@@ -24,6 +22,7 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
@@ -45,8 +44,12 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   }
 
   @Test
-  public void test() throws Exception {
-    DataURIGenerator.generateDataURI(getInputStream("classpath:1.css"), new OutputStreamWriter(System.out), "test.css", "application/css");
+  public void test()
+      throws Exception {
+    final Writer writer = new OutputStreamWriter(System.out);
+    new DataUriGenerator().generateDataURI(getInputStream("classpath:ro/isdc/wro/processor/dataUri/btn_icons.png"),
+        writer, "btn_icons.png");
+    writer.close();
   }
 
   @Test
