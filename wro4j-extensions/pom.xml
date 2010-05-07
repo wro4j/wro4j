@@ -55,5 +55,12 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.google</groupId>
+      <artifactId>closure</artifactId>
+      <version>0.1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/compiler.jar</systemPath>
+    </dependency>
   </dependencies>
 </project>
