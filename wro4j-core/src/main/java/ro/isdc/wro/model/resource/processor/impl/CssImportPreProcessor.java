@@ -56,8 +56,8 @@ public class CssImportPreProcessor
   private final List<Resource> processed = new ArrayList<Resource>();
 
   /** The url pattern */
-  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?" // any
-    // sequence of characters, except an unescaped ')'
+  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?"
+    // any sequence of characters, except an unescaped ')'
     + "\\s*?\\);?", // Any number of whitespaces, then ')'
     Pattern.CASE_INSENSITIVE); // works with 'URL('
 

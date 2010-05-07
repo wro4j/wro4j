@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Default implementation of {@link PreProcessorExecutor}.
  */
-class DefaultPreProcessorExecutor
+public class DefaultPreProcessorExecutor
     implements PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultPreProcessorExecutor.class);
   private final AbstractGroupsProcessor groupsProcessor;
