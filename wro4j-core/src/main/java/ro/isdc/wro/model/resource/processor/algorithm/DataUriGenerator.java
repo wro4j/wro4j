@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Betfair. All rights reserved.
+ * Copyright (C) 2010. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor.algorithm;
 
@@ -86,8 +86,6 @@ public class DataUriGenerator {
    *          Where to output the data URI.
    * @param mimeType
    *          The MIME type to specify in the data URI.
-   * @param charset
-   *          The character set to specify in the data URI.
    * @throws java.io.IOException
    */
   private static void generateDataURI(final byte[] bytes, final Writer out, final String mimeType)

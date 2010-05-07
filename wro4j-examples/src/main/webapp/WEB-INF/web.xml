@@ -24,7 +24,7 @@
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>100</param-value>
+      <param-value>10</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
@@ -44,7 +44,7 @@
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,cssMinJawr,jsMin,googleClosureSimple</param-value>
+      <param-value>cssVariables,cssMinJawr,jsMin</param-value>
     </init-param>
   </filter>
   <filter-mapping>
@@ -70,13 +70,24 @@
 
   <servlet>
     <servlet-name>dynamicResource</servlet-name>
-    <display-name>DWR Servlet</display-name>
+    <display-name>Dynamic Resource Servlet</display-name>
     <servlet-class>ro.isdc.wro.examples.DynamicResourceServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>dynamicResource</servlet-name>
     <url-pattern>/dynamicResource/*</url-pattern>
+  </servlet-mapping>
+
+ <servlet>
+    <servlet-name>externalResource</servlet-name>
+    <display-name>External Resource Servlet</display-name>
+    <servlet-class>ro.isdc.wro.examples.ExternalResourceServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>externalResource</servlet-name>
+    <url-pattern>/external/*</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>

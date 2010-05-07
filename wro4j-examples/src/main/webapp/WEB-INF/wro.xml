@@ -6,7 +6,6 @@
   <group name="all">
     <group-ref>dynamicResource</group-ref>
     <group-ref>jquery</group-ref>
-    
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <!--     
@@ -16,6 +15,7 @@
 	</group>
   
   <group name="WEBINF-css">
+    <js>/external/resource.js</js>  
     <css>/WEB-INF/css/webinf.css</css>
   </group>
   
