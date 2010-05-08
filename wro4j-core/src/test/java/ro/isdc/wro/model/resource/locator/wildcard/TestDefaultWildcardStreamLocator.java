@@ -59,13 +59,13 @@ public class TestDefaultWildcardStreamLocator {
 
   @Test
   public void testWithValidFolder() throws IOException {
-    final File folder = new File(this.getClass().getClassLoader().getSystemResource("").getFile());
+    final File folder = new File(ClassLoader.getSystemResource("").getFile());
     locator.locateStream("/resource/*.css", folder);
   }
 
   @Test(expected=IOException.class)
   public void testWithInvalidFolder() throws IOException {
-    final File folder = new File(this.getClass().getClassLoader().getSystemResource("1.css").getFile());
+    final File folder = new File(ClassLoader.getSystemResource("1.css").getFile());
     locator.locateStream("/resource/*.css", folder);
   }
 }
