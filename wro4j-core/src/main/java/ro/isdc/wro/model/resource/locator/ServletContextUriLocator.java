@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,10 +11,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -45,7 +49,24 @@ public class ServletContextUriLocator
    * to see if performance change.
    */
   private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
+  /**
+   * Wildcard stream locator implementation.
+   */
+  private WildcardStreamLocator wildcardStreamLocator;
 
+  /**
+   * Default constructor.
+   */
+  public ServletContextUriLocator() {
+    wildcardStreamLocator = newWildcardStreamLocator();
+  }
+
+  /**
+   * @return default implementation of {@link WildcardStreamLocator}.
+   */
+  protected WildcardStreamLocator newWildcardStreamLocator() {
+    return new DefaultWildcardStreamLocator();
+  }
 
   /**
    * {@inheritDoc}
@@ -86,6 +107,18 @@ public class ServletContextUriLocator
     }
     LOG.debug("uri resource: " + uri);
     final ServletContext servletContext = Context.get().getServletContext();
+
+    if (wildcardStreamLocator.hasWildcard(uri)) {
+      final String fullPath = FilenameUtils.getFullPath(uri);
+      final String realPath = servletContext.getRealPath(fullPath);
+      if (realPath == null) {
+        final String message = "Could not determine realPath for resource: " + uri;
+        LOG.error(message);
+        throw new IOException(message);
+      }
+      return wildcardStreamLocator.locateStream(uri, new File(realPath));
+    }
+
     // first attempt
     InputStream inputStream = servletContext.getResourceAsStream(uri);
     if (inputStream == null) {

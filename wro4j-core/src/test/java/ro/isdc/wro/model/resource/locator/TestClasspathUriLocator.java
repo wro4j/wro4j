@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.resource.locator;
 
@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests if C works properly.
+ * Tests if {@link ClasspathUriLocator} works properly.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -35,6 +35,32 @@ public class TestClasspathUriLocator {
   public void resourceAvailable() throws IOException {
     uriLocator.locate(createUri("test.css"));
   }
+
+  @Test
+  public void testWildcardInexistentResources() throws IOException {
+    uriLocator.locate(createUri("*.NOTEXIST"));
+  }
+
+  @Test
+  public void testWildcard1Resources() throws IOException {
+    uriLocator.locate(createUri("*.css"));
+  }
+
+  @Test
+  public void testWildcard2Resources() throws IOException {
+    uriLocator.locate(createUri("*.cs?"));
+  }
+
+  @Test
+  public void testWildcard3Resources() throws IOException {
+    uriLocator.locate(createUri("*.???"));
+  }
+
+  @Test
+  public void testRecursiveWildcardResources() throws IOException {
+    uriLocator.locate(createUri("**.css"));
+  }
+
 
   @Test
   public void resourceUnavailable() {

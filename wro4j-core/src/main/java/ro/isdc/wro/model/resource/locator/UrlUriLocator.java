@@ -3,13 +3,18 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 
 
 /**
@@ -24,6 +29,24 @@ public final class UrlUriLocator implements UriLocator {
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
+  /**
+   * Wildcard stream locator implementation.
+   */
+  private WildcardStreamLocator wildcardStreamLocator;
+
+  /**
+   * Default constructor.
+   */
+  public UrlUriLocator() {
+    wildcardStreamLocator = newWildcardStreamLocator();
+  }
+
+  /**
+   * @return default implementation of {@link WildcardStreamLocator}.
+   */
+  protected WildcardStreamLocator newWildcardStreamLocator() {
+    return new DefaultWildcardStreamLocator();
+  }
 
   /**
    * {@inheritDoc}
@@ -40,7 +63,7 @@ public final class UrlUriLocator implements UriLocator {
 	 * @return true if the uri is a URL resource.
 	 */
 	public static boolean isValid(final String uri) {
-		// if creation of URL object doesn't throw an exception, the uri can be
+	  // if creation of URL object doesn't throw an exception, the uri can be
 		// accepted.
 		try {
 			new URL(uri);
@@ -57,6 +80,13 @@ public final class UrlUriLocator implements UriLocator {
     if (uri == null) {
       throw new IllegalArgumentException("uri cannot be NULL!");
     }
+
+    if (wildcardStreamLocator.hasWildcard(uri)) {
+      final String fullPath = FilenameUtils.getFullPath(uri);
+      final URL url = new URL(fullPath);
+      return wildcardStreamLocator.locateStream(uri, new File(url.getFile()));
+    }
+
     LOG.debug("Reading uri: " + uri);
     final URL url = new URL(uri);
     return url.openStream();
