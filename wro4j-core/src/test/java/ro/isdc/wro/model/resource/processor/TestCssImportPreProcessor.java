@@ -4,7 +4,6 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
@@ -22,7 +21,6 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
@@ -41,15 +39,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     throws IOException {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test1-input.css",
       "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
-  }
-
-  @Test
-  public void test()
-      throws Exception {
-    final Writer writer = new OutputStreamWriter(System.out);
-    new DataUriGenerator().generateDataURI(getInputStream("classpath:ro/isdc/wro/processor/dataUri/btn_icons.png"),
-        writer, "btn_icons.png");
-    writer.close();
   }
 
   @Test
