@@ -52,6 +52,7 @@ public class DefaultWildcardStreamLocator
       return o1.getName().compareTo(o2.getName());
     }
   };
+
   /**
    * Comparator used to sort files in alphabetical descending order.
    */
@@ -60,6 +61,7 @@ public class DefaultWildcardStreamLocator
       return o1.getName().compareTo(o2.getName());
     }
   };
+
 
   /**
    * {@inheritDoc}
@@ -126,4 +128,14 @@ public class DefaultWildcardStreamLocator
     final boolean recursive = wildcard.contains(RECURSIVE_WILDCARD);
     return recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE;
   }
+
+  // public static void main(final String[] args)
+  // throws Exception {
+  // final WildcardStreamLocator locator = new DefaultWildcardStreamLocator();
+  // final File folder = new File("C:\\jde\\projects\\github\\jquery\\jquery\\");
+  // final InputStream is = locator.locateStream("*", folder);
+  // IOUtils.copy(is, System.out);
+  // is.close();
+  // }
+
 }

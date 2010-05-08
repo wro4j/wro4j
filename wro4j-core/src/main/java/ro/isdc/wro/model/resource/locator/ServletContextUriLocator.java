@@ -16,21 +16,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
  * UriLocator capable to read the resources relative to servlet context. The resource reader will attempt to locate a
  * physic resource under the servlet context and if the resource does not exist, will try to use requestDispatcher. This
- * kind of resources will be accepted if their prefix is <code>/</code>.
+ * kind of resources will be accepted if their prefix is '/'.
  *
  * @author Alex Objelean
  * @created Created on Nov 10, 2008
  */
 public class ServletContextUriLocator
-  implements UriLocator {
+  extends WildcardUriLocatorSupport {
   /**
    * Logger for this class.
    */
@@ -49,24 +47,6 @@ public class ServletContextUriLocator
    * to see if performance change.
    */
   private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
-  /**
-   * Wildcard stream locator implementation.
-   */
-  private WildcardStreamLocator wildcardStreamLocator;
-
-  /**
-   * Default constructor.
-   */
-  public ServletContextUriLocator() {
-    wildcardStreamLocator = newWildcardStreamLocator();
-  }
-
-  /**
-   * @return default implementation of {@link WildcardStreamLocator}.
-   */
-  protected WildcardStreamLocator newWildcardStreamLocator() {
-    return new DefaultWildcardStreamLocator();
-  }
 
   /**
    * {@inheritDoc}
@@ -108,7 +88,7 @@ public class ServletContextUriLocator
     LOG.debug("uri resource: " + uri);
     final ServletContext servletContext = Context.get().getServletContext();
 
-    if (wildcardStreamLocator.hasWildcard(uri)) {
+    if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final String realPath = servletContext.getRealPath(fullPath);
       if (realPath == null) {
@@ -116,7 +96,7 @@ public class ServletContextUriLocator
         LOG.error(message);
         throw new IOException(message);
       }
-      return wildcardStreamLocator.locateStream(uri, new File(realPath));
+      return getWildcardStreamLocator().locateStream(uri, new File(realPath));
     }
 
     // first attempt

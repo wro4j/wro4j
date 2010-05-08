@@ -160,7 +160,8 @@ public class XmlModelFactory
       public void run() {
     		try {
     			model = newModel();
-    			LOG.info("WroModel updated!");
+    			//find a way to clear the cache
+    			LOG.info("Wro Model (wro.xml) updated!");
     		} catch (final Exception e) {
       		LOG.error("Exception occured", e);
       	}
@@ -179,8 +180,6 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      // factory.setSchema(getSchema());
-      // factory.setValidating(true);
       final InputStream configResource = getConfigResourceAsStream();
       if (configResource == null) {
         throw new WroRuntimeException("Could not locate config resource (wro.xml)!");

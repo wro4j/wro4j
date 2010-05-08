@@ -12,8 +12,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.util.StringUtils;
 
 
@@ -23,37 +21,17 @@ import ro.isdc.wro.util.StringUtils;
  * @author Alex Objelean
  * @created Created on Nov 6, 2008
  */
-public final class ClasspathUriLocator
-  implements UriLocator {
+public class ClasspathUriLocator
+  extends WildcardUriLocatorSupport {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(ClasspathUriLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
 
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
   public static final String PREFIX = "classpath:";
-  /**
-   * Wildcard stream locator implementation.
-   */
-  private WildcardStreamLocator wildcardStreamLocator;
-
-
-  /**
-   * Default constructor.
-   */
-  public ClasspathUriLocator() {
-    wildcardStreamLocator = newWildcardStreamLocator();
-  }
-
-
-  /**
-   * @return default implementation of {@link WildcardStreamLocator}.
-   */
-  protected WildcardStreamLocator newWildcardStreamLocator() {
-    return new DefaultWildcardStreamLocator();
-  }
 
 
   /**
@@ -83,15 +61,20 @@ public final class ClasspathUriLocator
     if (uri == null) {
       throw new IllegalArgumentException("URI cannot be NULL!");
     }
-    log.debug("Reading uri: " + uri);
+    LOG.debug("Reading uri: " + uri);
     // replace prefix & clean path by removing '..' characters if exists and
     // normalizing the location to use.
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, ""));
 
-    if (wildcardStreamLocator.hasWildcard(uri)) {
+    if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = ClassLoader.getSystemResource(fullPath);
-      return wildcardStreamLocator.locateStream(location, new File(url.getFile()));
+      if (url == null) {
+        final String message = "Couldn't get URL for the following path: " + fullPath;
+        LOG.warn(message);
+        throw new IOException(message);
+      }
+      return getWildcardStreamLocator().locateStream(location, new File(url.getFile()));
     }
 
     try {

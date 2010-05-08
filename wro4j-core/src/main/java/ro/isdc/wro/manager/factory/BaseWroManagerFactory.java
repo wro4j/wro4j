@@ -52,6 +52,7 @@ public abstract class BaseWroManagerFactory implements WroManagerFactory, WroCon
       synchronized (this) {
         if (this.manager == null) {
           final GroupExtractor groupExtractor = newGroupExtractor();
+          //TODO pass servletContext to this method - it could be useful to access it when creating model.
           final WroModelFactory modelFactory = newModelFactory();
           final GroupsProcessor groupsProcessor = newGroupsProcessor();
           final CacheStrategy<CacheEntry, String> cacheStrategy = newCacheStrategy();

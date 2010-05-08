@@ -78,4 +78,8 @@ public class TestUrlUriLocator {
     uriLocator.locate(createUri("**.css"));
   }
 
+  @Test(expected=IOException.class)
+  public void testWildcardUsingInvalidResource() throws IOException {
+    uriLocator.locate(createUri("http://www.google.com/*.js"));
+  }
 }

@@ -13,9 +13,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
-
 
 /**
  * UriLocator capable to read the resources from some URL. Usually, this
@@ -24,29 +21,12 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
  * @author Alex Objelean
  * @created Created on Nov 10, 2008
  */
-public final class UrlUriLocator implements UriLocator {
+public class UrlUriLocator extends WildcardUriLocatorSupport {
   /**
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
-  /**
-   * Wildcard stream locator implementation.
-   */
-  private WildcardStreamLocator wildcardStreamLocator;
 
-  /**
-   * Default constructor.
-   */
-  public UrlUriLocator() {
-    wildcardStreamLocator = newWildcardStreamLocator();
-  }
-
-  /**
-   * @return default implementation of {@link WildcardStreamLocator}.
-   */
-  protected WildcardStreamLocator newWildcardStreamLocator() {
-    return new DefaultWildcardStreamLocator();
-  }
 
   /**
    * {@inheritDoc}
@@ -81,10 +61,15 @@ public final class UrlUriLocator implements UriLocator {
       throw new IllegalArgumentException("uri cannot be NULL!");
     }
 
-    if (wildcardStreamLocator.hasWildcard(uri)) {
+    if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
-      return wildcardStreamLocator.locateStream(uri, new File(url.getFile()));
+      if (url == null) {
+        final String message = "Couldn't get URL for the following path: " + fullPath;
+        LOG.warn(message);
+        throw new IOException(message);
+      }
+      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
     }
 
     LOG.debug("Reading uri: " + uri);
