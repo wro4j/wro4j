@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * Generator for Data URIs. Inspired from: http://github.com/nzakas/cssembed.
  *
  * @author Alex Objelean
- * @created 7 May, 2010
+ * @created May 7, 2010
  */
 public class DataUriGenerator {
   /**
@@ -150,7 +150,7 @@ public class DataUriGenerator {
       } else {
         throw new IOException("No MIME type provided and MIME type couldn't be automatically determined.");
       }
-      LOG.warn("[INFO] No MIME type provided, defaulting to '" + mimeType + "'.");
+      LOG.debug("No MIME type provided, defaulting to '" + mimeType + "'.");
     }
     return mimeType;
   }
