@@ -50,7 +50,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Oct 31, 2008
  */
 public class WroFilter
-  implements Filter {
+    implements Filter {
   /**
    * Logger.
    */
@@ -64,7 +64,7 @@ public class WroFilter
    */
   static final String PARAM_HEADER = "header";
   /**
-   * The name of the context parameter that specifies wroManager factory class
+   * The name of the context parameter that specifies wroManager factory class.
    */
   static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
@@ -121,26 +121,23 @@ public class WroFilter
       return super.put(key.trim().toLowerCase(), value);
     }
 
-
     @Override
     public String get(final Object key) {
-      return super.get(((String)key).toLowerCase());
+      return super.get(((String) key).toLowerCase());
     }
   };
-
 
   /**
    * {@inheritDoc}
    */
   public final void init(final FilterConfig config)
-    throws ServletException {
+      throws ServletException {
     this.filterConfig = config;
     initWroManagerFactory();
     initHeaderValues();
     doInit(config);
     initJMX();
   }
-
 
   /**
    * Initialize {@link WroManagerFactory}.
@@ -149,7 +146,7 @@ public class WroFilter
     this.wroManagerFactory = getWroManagerFactory();
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
       // register cache change callback -> when cache is changed, update headers values.
-      ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
+      ((CacheChangeCallbackAware) wroManagerFactory).registerCallback(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
           // update header values
           initHeaderValues();
@@ -158,16 +155,15 @@ public class WroFilter
     }
   }
 
-
   /**
    * Expose MBean to tell JMX infrastructure about our MBean.
    */
-  private void initJMX()
-    throws ServletException {
+  private void initJMX() {
     try {
       // treat null as true
       // TODO do not use BooleanUtils -> create your utility method
-      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
+      jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
+          BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
       LOG.debug("jmxEnabled: " + jmxEnabled);
@@ -185,7 +181,6 @@ public class WroFilter
     }
   }
 
-
   /**
    * @return the name of MBean to be used by JMX to configure wro.
    */
@@ -199,22 +194,21 @@ public class WroFilter
     return mbeanName;
   }
 
-
   /**
    * @return Context path of the application.
    */
   private String getContextPath() {
     String contextPath = null;
     try {
-      contextPath = (String)ServletContext.class.getMethod("getContextPath", new Class<?>[] {}).invoke(filterConfig.getServletContext(), new Object[] {});
+      contextPath = (String) ServletContext.class.getMethod("getContextPath", new Class<?>[] {}).invoke(
+          filterConfig.getServletContext(), new Object[] {});
     } catch (final Exception e) {
       contextPath = "DEFAULT";
       LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
-        + contextPath + " contextPath.");
+          + contextPath + " contextPath.");
     }
     return contextPath.replaceFirst("/", "");
   }
-
 
   /**
    * Override this method if you want to provide a different MBeanServer.
@@ -225,7 +219,6 @@ public class WroFilter
     return ManagementFactory.getPlatformMBeanServer();
   }
 
-
   /**
    * Register property change listeners.
    */
@@ -235,7 +228,7 @@ public class WroFilter
         // reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
+          ((WroConfigurationChangeListener) wroManagerFactory).onCachePeriodChanged();
         }
       }
     });
@@ -243,12 +236,11 @@ public class WroFilter
       public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-          ((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
+          ((WroConfigurationChangeListener) wroManagerFactory).onModelPeriodChanged();
         }
       }
     });
   }
-
 
   /**
    * Extracts long value from provided init param name configuration.
@@ -264,7 +256,6 @@ public class WroFilter
       throw new WroRuntimeException(paramName + " init-param must be a number, but was: " + valueAsString);
     }
   }
-
 
   /**
    * Override this method if you need a different way to create {@link WroConfiguration} object.
@@ -291,7 +282,6 @@ public class WroFilter
     return config;
   }
 
-
   /**
    * Initialize header values.
    */
@@ -301,7 +291,8 @@ public class WroFilter
     final Calendar cal = Calendar.getInstance();
     cal.roll(Calendar.YEAR, 10);
 
-    headersMap.put(HttpHeader.CACHE_CONTROL.toString(), "public, max-age=315360000, post-check=315360000, pre-check=315360000");
+    headersMap.put(HttpHeader.CACHE_CONTROL.toString(),
+        "public, max-age=315360000, post-check=315360000, pre-check=315360000");
     headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
     headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
     headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
@@ -319,19 +310,19 @@ public class WroFilter
         }
       } catch (final Exception e) {
         throw new WroRuntimeException("Invalid header init-param value: " + headerParam
-          + ". A correct value should have the following format: "
-          + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
-          + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | ETag: 123456789", e);
+            + ". A correct value should have the following format: "
+            + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
+            + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | ETag: 123456789", e);
       }
     }
     LOG.info("Header Values :" + headersMap);
   }
 
-
   /**
    * Parse header value & puts the found values in headersMap field.
    *
-   * @param header value to parse.
+   * @param header
+   *          value to parse.
    */
   private void parseHeader(final String header) {
     final String headerName = header.substring(0, header.indexOf(":"));
@@ -340,24 +331,22 @@ public class WroFilter
     }
   }
 
-
   /**
    * Custom filter initialization - can be used for extended classes.
    *
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config)
-    throws ServletException {
+      throws ServletException {
   }
-
 
   /**
    * {@inheritDoc}
    */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
-    throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest)req;
-    final HttpServletResponse response = (HttpServletResponse)res;
+      throws IOException, ServletException {
+    final HttpServletRequest request = (HttpServletRequest) req;
+    final HttpServletResponse response = (HttpServletResponse) res;
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
@@ -377,12 +366,12 @@ public class WroFilter
     }
   }
 
-
   /**
    * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
    * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
    *
-   * @param e {@link RuntimeException}.
+   * @param e
+   *          {@link RuntimeException} thrown during request processing.
    */
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response) {
     if (!ConfigurationContext.get().getConfig().isDebug()) {
@@ -399,12 +388,12 @@ public class WroFilter
     throw e;
   }
 
-
   /**
    * Method called for each request and responsible for setting response headers, used mostly for cache control.
    * Override this method if you want to change the way headers are set.<br>
    *
-   * @param response {@link HttpServletResponse} object.
+   * @param response
+   *          {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
     // Force resource caching as best as possible
@@ -412,7 +401,6 @@ public class WroFilter
       response.setHeader(entry.getKey(), entry.getValue());
     }
   }
-
 
   /**
    * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.
@@ -430,13 +418,12 @@ public class WroFilter
       try {
         factoryClass = Thread.currentThread().getContextClassLoader().loadClass(appFactoryClassName);
         // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
+        return (WroManagerFactory) factoryClass.newInstance();
       } catch (final Exception e) {
         throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
   }
-
 
   /**
    * This exists only for testing purposes.
@@ -446,7 +433,6 @@ public class WroFilter
   protected final WroConfiguration getConfiguration() {
     return this.configuration;
   }
-
 
   /**
    * {@inheritDoc}

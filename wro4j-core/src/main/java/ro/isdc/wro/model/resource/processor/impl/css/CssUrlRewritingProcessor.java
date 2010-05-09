@@ -1,31 +1,21 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.impl.css;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -110,11 +100,10 @@ import ro.isdc.wro.util.WroUtil;
  * </table>
  *
  * @author Alex Objelean
- * @created Created on Nov 19, 2008
+ * @created Nov 19, 2008
  */
-@SupportedResourceType(ResourceType.CSS)
 public class CssUrlRewritingProcessor
-  implements ResourcePreProcessor {
+  extends AbstractCssUrlRewritingProcessor {
   /**
    * Logger for this class.
    */
@@ -129,16 +118,6 @@ public class CssUrlRewritingProcessor
    * The name of resource id parameter.
    */
   public static final String PARAM_RESOURCE_ID = "id";
-
-  /**
-   * Src Url pattern.
-   */
-  private static final String PATTERN_PATH = "url\\s*\\(((?:.|\\s)*?)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
-
-  /**
-   * Compiled pattern.
-   */
-  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
   /**
    * A set of allowed url's.
    */
@@ -148,81 +127,43 @@ public class CssUrlRewritingProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    try {
-      LOG.debug("<process>");
-      final String cssUri = resource.getUri();
-      LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
-      final String css = IOUtils.toString(reader);
-      final String result = parseCss(css, cssUri);
-      writer.write(result);
-      writer.close();
-      LOG.debug("allowed urls: " + allowedUrls);
-      LOG.debug("</process>");
-    } finally {
-      reader.close();
-      writer.close();
-    }
+  @Override
+  protected void onProcessCompleted() {
+    LOG.debug("allowed urls: " + allowedUrls);
   }
-
 
   /**
-   * Perform actual css parsing logic.
-   *
-   * @param cssContent to parse.
-   * @param cssUri Uri of the css to parse.
-   * @return parsed css.
+   * {@inheritDoc}
    */
-  private String parseCss(final String cssContent, final String cssUri) {
-    final Matcher m = PATTERN.matcher(cssContent);
-    final StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      final String oldMatch = m.group();
-      final String urlGroup = m.group(1) != null ? m.group(1) : m.group(2);
-      if (urlGroup == null) {
-        throw new IllegalStateException("Could not extract urlGroup from: " + oldMatch);
-      }
-      final String replacedUrl = replaceImageUrl(urlGroup, cssUri);
-      LOG.debug("replacedImageUrl: " + replacedUrl);
-      final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
-      // update allowedUrls list
-      // TODO no need to hold absolute url's inside
-      allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
-      m.appendReplacement(sb, newReplacement);
-    }
-    m.appendTail(sb);
-    return sb.toString();
+  @Override
+  protected void onUrlReplaced(final String replacedUrl) {
+    allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
   }
-
 
   /**
    * Replace provided url with the new url if needed.
    *
-   * @param imageUrl to replace.
    * @param cssUri Uri of the parsed css.
+   * @param imageUrl to replace.
    * @return replaced url.
    */
-  private String replaceImageUrl(final String imageUrl, final String cssUri) {
+  @Override
+  protected String replaceImageUrl(final String cssUri, final String imageUrl) {
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
-    if (isReplaceNeeded(imageUrl)) {
-      if (ServletContextUriLocator.isValid(cssUri)) {
-        if (ServletContextUriLocator.isValid(imageUrl)) {
-          return imageUrl;
-        }
-        // Treat WEB-INF special case
-        if (ServletContextUriLocator.isProtectedResource(cssUri)) {
-          return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
-        }
-        return computeNewImageLocation(".." + cssUri, imageUrl);
+    if (ServletContextUriLocator.isValid(cssUri)) {
+      if (ServletContextUriLocator.isValid(imageUrl)) {
+        return imageUrl;
       }
-      if (UrlUriLocator.isValid(cssUri) || ClasspathUriLocator.isValid(cssUri)) {
+      // Treat WEB-INF special case
+      if (ServletContextUriLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
-      } else {
-        throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
       }
+      return computeNewImageLocation(".." + cssUri, imageUrl);
     }
-    return imageUrl;
+    if (UrlUriLocator.isValid(cssUri) || ClasspathUriLocator.isValid(cssUri)) {
+      return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
+    }
+    throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
   }
 
 
@@ -256,31 +197,6 @@ public class CssUrlRewritingProcessor
       ? cleanImageUrl.substring(1)
       : cleanImageUrl;
     return cssUriFolder + processedImageUrl;
-  }
-
-
-  /**
-   * Cleans the image url by triming result and removing \' or \" characters if such exists.
-   *
-   * @param imageUrl to clean.
-   * @return cleaned image URL.
-   */
-  private String cleanImageUrl(final String imageUrl) {
-    final String result = imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
-    return result.toString();
-  }
-
-
-  /**
-   * Check if url must be replaced or not.
-   *
-   * @param url to check.
-   * @return true if url needs to be replaced or remain unchanged.
-   */
-  private boolean isReplaceNeeded(final String url) {
-    // The replacement is not needed if the url of the image is absolute (can be
-    // resolved by urlResourceLocator).
-    return !UrlUriLocator.isValid(url);
   }
 
 

@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.resource.processor.impl.AndryCssCompressorProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.AndryCssCompressorProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**

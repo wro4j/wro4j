@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 
@@ -40,7 +40,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test1-input.css",
       "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
   }
-
 
   @Test
   public void testPreProcessorWithoutRecursion2()

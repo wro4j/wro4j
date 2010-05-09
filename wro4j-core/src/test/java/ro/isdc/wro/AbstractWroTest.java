@@ -5,6 +5,7 @@ package ro.isdc.wro;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -75,5 +76,14 @@ public abstract class AbstractWroTest {
     // wrap reader with bufferedReader for top efficiency
     return new BufferedReader(new InputStreamReader(uriLocatorFactory
         .getInstance(uri).locate(uri)));
+  }
+
+  /**
+   * @param expectedContentResourceUri
+   * @return
+   */
+  public InputStream getInputStream(final String uri) throws IOException {
+    // wrap reader with bufferedReader for top efficiency
+    return uriLocatorFactory.getInstance(uri).locate(uri);
   }
 }

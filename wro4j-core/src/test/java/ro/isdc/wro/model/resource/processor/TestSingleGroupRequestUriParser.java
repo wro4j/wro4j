@@ -3,10 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import javax.servlet.http.HttpServletRequest;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -38,28 +41,31 @@ public class TestSingleGroupRequestUriParser {
   @Test
   public void testExtractInvalidResourceType() {
     String uri = "/test.js";
-    ResourceType type = requestUriParser.getResourceType(uri);
+    ResourceType type = requestUriParser.getResourceType(mockRequestForUri(uri));
     Assert.assertEquals(ResourceType.JS, type);
 
     uri = "/test.css";
-    type = requestUriParser.getResourceType(uri);
+    type = requestUriParser.getResourceType(mockRequestForUri(uri));
     Assert.assertEquals(ResourceType.CSS, type);
 
     uri = "/test.txt";
-    Assert.assertNull(requestUriParser.getResourceType(uri));
+    Assert.assertNull(requestUriParser.getResourceType(mockRequestForUri(uri)));
   }
 
   @Test
   public void testExtractNoGroupName() {
-    String uri = "/app/test.js";
-    String groupName = requestUriParser.getGroupName(uri);
+    String groupName = requestUriParser.getGroupName(mockRequestForUri("/app/test.js"));
     Assert.assertEquals("test", groupName);
 
-    uri = "/app/test.group.js";
-    groupName = requestUriParser.getGroupName(uri);
+    groupName = requestUriParser.getGroupName(mockRequestForUri("/app/test.group.js"));
     Assert.assertEquals("test.group", groupName);
 
-    uri = "/123/";
-    Assert.assertEquals(null, requestUriParser.getGroupName(uri));
+    Assert.assertEquals(null, requestUriParser.getGroupName(mockRequestForUri("/123/")));
+  }
+
+  private HttpServletRequest mockRequestForUri(final String uri) {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(uri);
+    return request;
   }
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.impl.js;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

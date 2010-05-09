@@ -28,10 +28,11 @@ public final class DefaultGroupExtractor implements GroupExtractor {
   /**
    * {@inheritDoc}
    */
-  public String getGroupName(final String uri) {
-    if (uri == null) {
+  public String getGroupName(final HttpServletRequest request) {
+    if (request == null) {
       throw new IllegalArgumentException("Uri cannot be NULL!");
     }
+    final String uri = request.getRequestURI();
     final String groupName = FilenameUtils.getBaseName(uri);
     return StringUtils.isEmpty(groupName) ? null : groupName;
   }
@@ -44,10 +45,11 @@ public final class DefaultGroupExtractor implements GroupExtractor {
    * Valid examples of uri are: <code>/context/somePath/test.js</code> or <code>/context/somePath/test.css</code>
    * {@inheritDoc}
    */
-  public ResourceType getResourceType(final String uri) {
-    if (uri == null) {
+  public ResourceType getResourceType(final HttpServletRequest request) {
+    if (request == null) {
       throw new IllegalArgumentException("Uri cannot be NULL!");
     }
+    final String uri = request.getRequestURI();
     final String extension = FilenameUtils.getExtension(uri);
     ResourceType type = null;
     try {

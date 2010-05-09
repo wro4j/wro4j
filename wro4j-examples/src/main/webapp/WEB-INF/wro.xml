@@ -5,18 +5,28 @@
 
   <group name="all">
     <group-ref>dynamicResource</group-ref>
-    <group-ref>jquery</group-ref>    
+    <group-ref>jquery</group-ref>
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
+    <!--     
     <group-ref>JSGroup</group-ref>
 		<group-ref>otherGroup</group-ref>
-    
+     -->
 	</group>
   
   <group name="WEBINF-css">
+    <js>/external/resource.js</js>  
     <css>/WEB-INF/css/webinf.css</css>
   </group>
   
+  <group name="wildcard">
+    <css>/static/**.css</css>
+    <js>/dynamicResource/*.js</js>
+    <js>/static/js/*.js</js>
+    <css>/WEB-INF/css/*.css</css>
+    <css>classpath:ro/isdc/wro/resources/**.cs?</css>
+    
+  </group>
 
   <group name="uniform">
     <css>/static/css/webapp.css</css>

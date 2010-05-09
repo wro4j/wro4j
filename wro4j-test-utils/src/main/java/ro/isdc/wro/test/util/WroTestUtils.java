@@ -12,17 +12,22 @@ import java.io.Writer;
 import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
- * AbstractWroTest.java.
+ * WroTestUtils.
  *
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
 public class WroTestUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
+
+
   /**
-   * Compare contents of two resources (files) by performing some sort of
-   * processing on input resource.
+   * Compare contents of two resources (files) by performing some sort of processing on input resource.
    *
    * @param inputResourceUri
    *          uri of the resource to process.
@@ -31,19 +36,45 @@ public class WroTestUtils {
    * @param processor
    *          a closure used to process somehow the input content.
    */
-  public static void compareProcessedResourceContents(
-      final Reader resultReader, final Reader expectedReader,
+  public static void compareProcessedResourceContents(final Reader resultReader, final Reader expectedReader,
       final ResourceProcessor processor) throws IOException {
     final Writer resultWriter = new StringWriter();
-    processor.process(resultReader, resultWriter);
+    processor.process(
+        resultReader, resultWriter);
     final Writer expectedWriter = new StringWriter();
-    IOUtils.copy(expectedReader, expectedWriter);
+    IOUtils.copy(
+        expectedReader, expectedWriter);
     final String expected = replaceTabsWithSpaces(expectedWriter.toString().trim());
     final String actual = replaceTabsWithSpaces(resultWriter.toString().trim());
-    Assert.assertEquals(expected, actual);
+    Assert.assertEquals(
+        expected, actual);
     expectedReader.close();
     expectedWriter.close();
   }
+
+
+  /**
+   * Compare if content of expected stream is the same as content of the actual stream.
+   *
+   * @param expected
+   *          {@link InputStream} of the expected content.
+   * @param actual
+   *          {@link InputStream} of the actual content.
+   * @return true if content of the expected and actual streams are equal.
+   */
+  public static void compare(final InputStream expected, final InputStream actual) throws IOException {
+    Assert.assertNotNull(expected);
+    Assert.assertNotNull(actual);
+    final String expectedAsString = replaceTabsWithSpaces(IOUtils.toString(
+        expected).trim());
+    final String actualAsString = replaceTabsWithSpaces(IOUtils.toString(
+        actual).trim());
+    Assert.assertEquals(
+        expectedAsString, actualAsString);
+    expected.close();
+    actual.close();
+  }
+
 
   /**
    * Replace tabs with spaces.
@@ -58,24 +89,24 @@ public class WroTestUtils {
   }
 
 
-	/**
-	 * A convenient way to get {@link InputStream} of some resource relative to a java class.
-	 * Usage:
-	 * <code>
+  /**
+   * A convenient way to get {@link InputStream} of some resource relative to a java class. Usage: <code>
 	 *   getClassRelativeResource(MyClass.class, "someFile.properties");
-	 * </code>
-	 * or
-	 * <code>
+	 * </code> or <code>
 	 * 	 getClassRelativeResource(MyClass.class, "subfolder/someFile.properties");
 	 * </code>
-	 *
-	 * @param clazz relative to which the resource stream will be returned.
-	 * @param relativePath path relative to the clazz. This one should not start with a '/'.
-	 * @return {@link InputStream} for search resource.
-	 */
+   *
+   * @param clazz
+   *          relative to which the resource stream will be returned.
+   * @param relativePath
+   *          path relative to the clazz. This one should not start with a '/'.
+   * @return {@link InputStream} for search resource.
+   */
   public static InputStream getClassRelativeResource(final Class<?> clazz, final String relativePath) {
-    final String packageName = clazz.getPackage().getName().replace('.', '/');
-  	final String finalPath = packageName + "/" + relativePath;
-  	return Thread.currentThread().getContextClassLoader().getResourceAsStream(finalPath);
+    final String packageName = clazz.getPackage().getName().replace(
+        '.', '/');
+    final String finalPath = packageName + "/" + relativePath;
+    return Thread.currentThread().getContextClassLoader().getResourceAsStream(
+        finalPath);
   }
 }

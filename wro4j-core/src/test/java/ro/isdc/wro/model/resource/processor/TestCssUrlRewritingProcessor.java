@@ -13,12 +13,12 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 
 /**
- * TestProcessor.java.
+ * Test for CssUrlRewritingProcessor class.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -41,9 +41,23 @@ public class TestCssUrlRewritingProcessor extends AbstractWroTest {
 
 
   /**
+   * When background url contains a dataUri, the rewriting should have no effect.
+   */
+  @Test
+  public void processResourceWithDataUriEncodedValue()
+    throws IOException {
+    final String resourceUri = "classpath:cssUrlRewriting-dataUri.css";
+    compareProcessedResourceContents(resourceUri, resourceUri,
+      new ResourceProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource(resourceUri), reader, writer);
+        }
+      });
+  }
+
+  /**
    * Test a classpath css resource.
-   *
-   * @throws IOException
    */
   @Test
   public void processClasspathResourceType()
@@ -102,8 +116,6 @@ public class TestCssUrlRewritingProcessor extends AbstractWroTest {
 
   /**
    * Test a url css resource.
-   *
-   * @throws IOException
    */
   @Test
   public void processUrlResourceType()

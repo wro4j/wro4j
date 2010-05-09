@@ -19,18 +19,18 @@ public interface GroupExtractor {
   /**
    * Retrieves a set of group names from supplied uri.
    *
-   * @param uri
+   * @param request
    *          to check.
    * @return found group name. If no group is found, null is returned.
    */
-  String getGroupName(final String uri);
+  String getGroupName(final HttpServletRequest request);
 
   /**
-   * @param uri
+   * @param request
    *          to check.
-   * @return requested ResourceType from uri if exists or null otherwise.
+   * @return requested ResourceType.
    */
-  ResourceType getResourceType(final String uri);
+  ResourceType getResourceType(final HttpServletRequest request);
 
   /**
    * @param request {@link HttpServletRequest} object.

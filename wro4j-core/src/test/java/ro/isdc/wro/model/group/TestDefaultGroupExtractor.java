@@ -49,9 +49,9 @@ public class TestDefaultGroupExtractor {
 
   @Test
   public void testValidCssUri() {
-    final String uri = "group1.css";
-    Assert.assertEquals("group1", groupExtractor.getGroupName(uri));
-    Assert.assertEquals(ResourceType.CSS, groupExtractor.getResourceType(uri));
+    final HttpServletRequest request = mockRequestForUri("group1.css");
+    Assert.assertEquals("group1", groupExtractor.getGroupName(request));
+    Assert.assertEquals(ResourceType.CSS, groupExtractor.getResourceType(request));
   }
 
   @Test
@@ -96,16 +96,21 @@ public class TestDefaultGroupExtractor {
 
   @Test
   public void testValidJsUri() {
-    final String uri = "otherGroup.js";
-    Assert.assertEquals("otherGroup", groupExtractor.getGroupName(uri));
-    Assert.assertEquals(ResourceType.JS, groupExtractor.getResourceType(uri));
+    final HttpServletRequest request = mockRequestForUri("otherGroup.js");
+    Assert.assertEquals("otherGroup", groupExtractor.getGroupName(request));
+    Assert.assertEquals(ResourceType.JS, groupExtractor.getResourceType(request));
   }
 
   @Test
   public void testWithInvalidUriType() {
-    final String uri = "all.someInvalidType";
-    Assert.assertEquals("all", groupExtractor.getGroupName(uri));
-    Assert.assertEquals(null, groupExtractor.getResourceType(uri));
+    final HttpServletRequest request = mockRequestForUri("all.someInvalidType");
+    Assert.assertEquals("all", groupExtractor.getGroupName(request));
+    Assert.assertEquals(null, groupExtractor.getResourceType(request));
   }
 
+  private HttpServletRequest mockRequestForUri(final String uri) {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(uri);
+    return request;
+  }
 }

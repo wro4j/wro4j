@@ -11,12 +11,8 @@
       ro.isdc.wro.http.WroFilter
     </filter-class>
     <init-param>
-      <param-name>header</param-name>
-      <param-value>Expires: Thu, 15 Apr 2020 20:00:00 GMT</param-value>
-    </init-param>
-    <init-param>
       <param-name>configuration</param-name>
-      <param-value>DEPLOYMENT</param-value>
+      <param-value>DEVELOPMENT</param-value>
     </init-param>
     <init-param>
       <param-name>gzipResources</param-name>
@@ -24,15 +20,15 @@
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>100</param-value>
-    </init-param>
-    <init-param>
-      <param-name>modelUpdatePeriod</param-name>
       <param-value>200</param-value>
     </init-param>
     <init-param>
+      <param-name>modelUpdatePeriod</param-name>
+      <param-value>20</param-value>
+    </init-param>
+    <init-param>
       <param-name>managerFactoryClassName</param-name>
-      <param-value>ro.isdc.wro.examples.ExternalModelConfigurableWroManagerFactory</param-value>
+      <param-value>ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory</param-value>
     </init-param>
     <init-param>
       <param-name>uriLocators</param-name>
@@ -40,7 +36,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender</param-value>
+      <param-value>cssDataUri,cssUrlRewriting,cssImport,bomStripper,semicolonAppender</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
@@ -70,13 +66,24 @@
 
   <servlet>
     <servlet-name>dynamicResource</servlet-name>
-    <display-name>DWR Servlet</display-name>
+    <display-name>Dynamic Resource Servlet</display-name>
     <servlet-class>ro.isdc.wro.examples.DynamicResourceServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>dynamicResource</servlet-name>
     <url-pattern>/dynamicResource/*</url-pattern>
+  </servlet-mapping>
+
+ <servlet>
+    <servlet-name>externalResource</servlet-name>
+    <display-name>External Resource Servlet</display-name>
+    <servlet-class>ro.isdc.wro.examples.ExternalResourceServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>externalResource</servlet-name>
+    <url-pattern>/external/*</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>

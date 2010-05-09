@@ -10,7 +10,7 @@ import java.io.Writer;
 /**
  * ResourceProcessor.java.
  *
- * @author alexandru.objelean / ISDC! Romania
+ * @author Alex Objelean
  * @created Created on Mar 10, 2009
  */
 public interface ResourceProcessor {

@@ -19,7 +19,7 @@ public class GroupExtractorDecorator
   /**
    * {@link GroupExtractor} to decorate.
    */
-  private GroupExtractor decorated;
+  private final GroupExtractor decorated;
 
 
   /**
@@ -38,16 +38,16 @@ public class GroupExtractorDecorator
   /**
    * {@inheritDoc}
    */
-  public String getGroupName(final String uri) {
-    return decorated.getGroupName(uri);
+  public String getGroupName(final HttpServletRequest request) {
+    return decorated.getGroupName(request);
   }
 
 
   /**
    * {@inheritDoc}
    */
-  public ResourceType getResourceType(final String uri) {
-    return decorated.getResourceType(uri);
+  public ResourceType getResourceType(final HttpServletRequest request) {
+    return decorated.getResourceType(request);
   }
 
 

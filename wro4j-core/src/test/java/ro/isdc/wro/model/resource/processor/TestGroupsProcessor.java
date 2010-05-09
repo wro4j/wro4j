@@ -27,13 +27,13 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**
  * TestGroupsProcessor.

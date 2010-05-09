@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import ro.isdc.wro.config.Context;
@@ -17,12 +18,12 @@ import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 /**
  * {@link WroManagerFactory} instance used by the maven plugin.
@@ -70,7 +71,7 @@ public class DefaultMavenContextAwareManagerFactory
 
 
   @Override
-  protected WroModelFactory newModelFactory() {
+  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()

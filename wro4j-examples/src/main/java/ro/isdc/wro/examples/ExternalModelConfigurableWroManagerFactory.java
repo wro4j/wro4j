@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.ServletContext;
+
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.model.factory.FallbackAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -23,7 +25,7 @@ public class ExternalModelConfigurableWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected WroModelFactory newModelFactory() {
+  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new FallbackAwareXmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()

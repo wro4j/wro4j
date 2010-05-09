@@ -1,0 +1,147 @@
+/*
+ * Copyright (c) 2010. All rights reserved.
+ */
+package ro.isdc.wro.model.resource.processor.impl.css;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
+
+
+/**
+ * A processor responsible for rewriting url's from inside the css resources.
+ *
+ * @author Alex Objelean
+ * @created Created on 9 May, 2010
+ */
+@SupportedResourceType(ResourceType.CSS)
+public abstract class AbstractCssUrlRewritingProcessor
+  implements ResourcePreProcessor {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
+
+  /**
+   * Pattern used to identify the placeholders where the url rewriting will be performed.
+   */
+  private static final String PATTERN_PATH = "url\\s*\\(((?:.*?|\\s*?))\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+  /**
+   * Compiled pattern.
+   */
+  protected static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
+    try {
+      LOG.debug("<process>");
+      final String cssUri = resource.getUri();
+      LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
+      final String css = IOUtils.toString(reader);
+      final String result = parseCss(css, cssUri);
+      writer.write(result);
+      writer.close();
+      onProcessCompleted();
+      LOG.debug("</process>");
+    } finally {
+      reader.close();
+      writer.close();
+    }
+  }
+
+
+  /**
+   * Invoked when the process operation is completed. Useful to invoke some post processing logic or for custom logging.
+   */
+  protected void onProcessCompleted() {
+  }
+
+
+  /**
+   * Perform actual css parsing logic.
+   *
+   * @param cssContent to parse.
+   * @param cssUri Uri of the css to parse.
+   * @return parsed css.
+   */
+  private String parseCss(final String cssContent, final String cssUri) {
+    final Matcher matcher = PATTERN.matcher(cssContent);
+    final StringBuffer sb = new StringBuffer();
+    while (matcher.find()) {
+      final String oldMatch = matcher.group();
+      final String urlGroup = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+      if (urlGroup == null) {
+        throw new IllegalStateException("Could not extract urlGroup from: " + oldMatch);
+      }
+      if (isReplaceNeeded(urlGroup)) {
+        final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
+        LOG.debug("replacedImageUrl: " + replacedUrl);
+        final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
+        onUrlReplaced(replacedUrl);
+        // update allowedUrls list
+        // TODO no need to hold absolute url's inside
+        // allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
+        matcher.appendReplacement(sb, newReplacement);
+      }
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
+  }
+
+
+  /**
+   * Invoked when an url is replaced. Useful if you need to do something will replacements.
+   * @param replacedUrl the newly computed url created as a result of url rewriting.
+   */
+  protected void onUrlReplaced(final String replacedUrl) {}
+
+
+  /**
+   * Replace provided url with the new url if needed.
+   *
+   * @param cssUri Uri of the parsed css.
+   * @param imageUrl to replace.
+   * @return replaced url.
+   */
+  protected abstract String replaceImageUrl(final String cssUri, final String imageUrl);
+
+  /**
+   * Cleans the image url by triming result and removing \' or \" characters if such exists.
+   *
+   * @param imageUrl to clean.
+   * @return cleaned image URL.
+   */
+  protected final String cleanImageUrl(final String imageUrl) {
+    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
+  }
+
+
+  /**
+   * Check if url must be replaced or not.
+   *
+   * @param url to check.
+   * @return true if url needs to be replaced or remain unchanged.
+   */
+  protected final boolean isReplaceNeeded(final String url) {
+    // The replacement is not needed if the url of the image is absolute (can be
+    // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
+    return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
+  }
+}

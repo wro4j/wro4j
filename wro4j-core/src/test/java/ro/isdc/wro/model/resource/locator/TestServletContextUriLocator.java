@@ -3,7 +3,9 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import junit.framework.Assert;
 
@@ -37,6 +39,38 @@ public class TestServletContextUriLocator {
     locator.locate(null);
   }
 
+
+  @Test
+  public void testWildcard1Resources() throws IOException {
+    locator.locate(createUri("/css/*.css"));
+  }
+
+  @Test
+  public void testWildcard2Resources() throws IOException {
+    locator.locate(createUri("/css/*.cs?"));
+  }
+
+  @Test
+  public void testWildcard3Resources() throws IOException {
+    locator.locate(createUri("/css/*.???"));
+  }
+
+  @Test
+  public void testRecursiveWildcardResources() throws IOException {
+    locator.locate(createUri("/css/**.css"));
+  }
+
+  @Test
+  public void testWildcardInexistentResources() throws IOException {
+    locator.locate(createUri("/css/**.NOTEXIST"));
+  }
+
+  private String createUri(final String uri) throws IOException {
+    final URL url = Thread.currentThread().getContextClassLoader().getResource("ro/isdc/wro/model/resource/locator/");
+    Mockito.when(Context.get().getServletContext().getRealPath(Mockito.anyString())).thenReturn(url.getPath());
+    //Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    return uri;
+  }
 
   @Test
   public void testSomeUri()

@@ -36,10 +36,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created Created on Nov 26, 2008
  */
-/**
- * @author Admin
- *
- */
 public abstract class AbstractGroupsProcessor
   implements GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractGroupsProcessor.class);
@@ -106,13 +102,13 @@ public abstract class AbstractGroupsProcessor
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass) {
+  public final <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass) {
     T found = null;
     final Set<ResourcePreProcessor> allPreProcessors = new HashSet<ResourcePreProcessor>();
     allPreProcessors.addAll(preProcessors);
     for (final ResourcePreProcessor processor : allPreProcessors) {
       if (processorClass.isInstance(processor)) {
-        found = (T)processor;
+        found = (T) processor;
         return found;
       }
     }

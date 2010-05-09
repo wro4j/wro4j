@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,21 +51,15 @@ public class CssImportPreProcessor
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
   /**
-   * List of processed resources, useful for detecting deep recurivity.
+   * List of processed resources, useful for detecting deep recursion.
    */
   private final List<Resource> processed = new ArrayList<Resource>();
 
   /** The url pattern */
-  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?" // any
-                                                                                                             // sequence
-                                                                                                             // of
-                                                                                                             // characters,
-                                                                                                             // except
-                                                                                                             // an
-                                                                                                             // unescaped
-                                                                                                             // ')'
+  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?"
+    // any sequence of characters, except an unescaped ')'
     + "\\s*?\\);?", // Any number of whitespaces, then ')'
-  Pattern.CASE_INSENSITIVE); // works with 'URL('
+    Pattern.CASE_INSENSITIVE); // works with 'URL('
 
 
   /**
@@ -76,7 +70,6 @@ public class CssImportPreProcessor
     try {
       final String result = parseCss(resource, reader);
       writer.write(result);
-      writer.close();
       processed.clear();
     } finally {
       reader.close();

@@ -26,17 +26,20 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  public static Pattern EMTPY_LINE_PATTERN = Pattern.compile(
+      "^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
-  private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("E, dd MMM yyyy HH:mm:ss z", TimeZone.getTimeZone("GMT"));
+  private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance(
+      "E, dd MMM yyyy HH:mm:ss z", TimeZone.getTimeZone("GMT"));
 
 
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
    *
-   * @param milliseconds to transform
+   * @param milliseconds
+   *          to transform
    * @return string representation of the date.
    */
   public static String toDateAsString(final long milliseconds) {
@@ -47,7 +50,8 @@ public final class WroUtil {
   /**
    * Retrieve pathInfo from a given location.
    *
-   * @param location where to search contextPath.
+   * @param location
+   *          where to search contextPath.
    * @return pathInfo value.
    */
   public static String getPathInfoFromLocation(final String location) {
@@ -77,7 +81,6 @@ public final class WroUtil {
    * <p>
    * Case insensitive check if a String starts with a specified prefix.
    * </p>
-   *
    * <p>
    * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal. The
    * comparison is case insensitive.
@@ -92,13 +95,16 @@ public final class WroUtil {
    * </pre>
    *
    * @see java.lang.String#startsWith(String)
-   * @param str the String to check, may be null
-   * @param prefix the prefix to find, may be null
+   * @param str
+   *          the String to check, may be null
+   * @param prefix
+   *          the prefix to find, may be null
    * @return <code>true</code> if the String starts with the prefix, case insensitive, or both <code>null</code>
    * @since 2.4
    */
   public static boolean startsWithIgnoreCase(final String str, final String prefix) {
-    return startsWith(str, prefix, true);
+    return startsWith(
+        str, prefix, true);
   }
 
 
@@ -108,9 +114,12 @@ public final class WroUtil {
    * </p>
    *
    * @see java.lang.String#startsWith(String)
-   * @param str the String to check, may be null
-   * @param prefix the prefix to find, may be null
-   * @param ignoreCase inidicates whether the compare should ignore case (case insensitive) or not.
+   * @param str
+   *          the String to check, may be null
+   * @param prefix
+   *          the prefix to find, may be null
+   * @param ignoreCase
+   *          inidicates whether the compare should ignore case (case insensitive) or not.
    * @return <code>true</code> if the String starts with the prefix or both <code>null</code>
    */
   private static boolean startsWith(final String str, final String prefix, final boolean ignoreCase) {
@@ -120,36 +129,44 @@ public final class WroUtil {
     if (prefix.length() > str.length()) {
       return false;
     }
-    return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
+    return str.regionMatches(
+        ignoreCase, 0, prefix, 0, prefix.length());
   }
 
 
   /**
    * Retrieve servletPath from a given location.
    *
-   * @param location where to search the servletPath.
+   * @param location
+   *          where to search the servletPath.
    * @return ServletPath string value.
    */
   public static String getServletPathFromLocation(final String location) {
-    return location.replace(getPathInfoFromLocation(location), "");
+    return location.replace(
+        getPathInfoFromLocation(location), "");
   }
 
 
   /**
-   * @param request {@link HttpServletRequest} object.
+   * @param request
+   *          {@link HttpServletRequest} object.
    * @return true if this request support gzip encoding.
    */
   public static boolean isGzipSupported(final HttpServletRequest request) {
-    return headerContains(request, HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
+    return headerContains(
+        request, HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
   }
 
 
   /**
    * Checks if request contains the header value with a given value.
    *
-   * @param request to check
-   * @param header name of the header to check
-   * @param value of the header to check
+   * @param request
+   *          to check
+   * @param header
+   *          name of the header to check
+   * @param value
+   *          of the header to check
    */
   @SuppressWarnings("unchecked")
   private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {

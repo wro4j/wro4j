@@ -3,13 +3,17 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
 
 /**
@@ -19,11 +23,12 @@ import org.slf4j.LoggerFactory;
  * @author Alex Objelean
  * @created Created on Nov 10, 2008
  */
-public final class UrlUriLocator implements UriLocator {
+public class UrlUriLocator extends WildcardUriLocatorSupport {
   /**
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
+
 
   /**
    * {@inheritDoc}
@@ -40,7 +45,7 @@ public final class UrlUriLocator implements UriLocator {
 	 * @return true if the uri is a URL resource.
 	 */
 	public static boolean isValid(final String uri) {
-		// if creation of URL object doesn't throw an exception, the uri can be
+	  // if creation of URL object doesn't throw an exception, the uri can be
 		// accepted.
 		try {
 			new URL(uri);
@@ -57,6 +62,18 @@ public final class UrlUriLocator implements UriLocator {
     if (uri == null) {
       throw new IllegalArgumentException("uri cannot be NULL!");
     }
+
+    if (getWildcardStreamLocator().hasWildcard(uri)) {
+      final String fullPath = FilenameUtils.getFullPath(uri);
+      final URL url = new URL(fullPath);
+      if (url == null) {
+        final String message = "Couldn't get URL for the following path: " + fullPath;
+        LOG.warn(message);
+        throw new IOException(message);
+      }
+      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+    }
+
     LOG.debug("Reading uri: " + uri);
     final URL url = new URL(uri);
     return url.openStream();
