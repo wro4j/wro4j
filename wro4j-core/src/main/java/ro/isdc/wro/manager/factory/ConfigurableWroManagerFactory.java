@@ -26,13 +26,13 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssEmbedPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 
 /**
@@ -94,7 +94,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     preProcessors.put("cssImport", new CssImportPreProcessor());
     preProcessors.put("cssVariables", new CssVariablesProcessor());
     preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
-    preProcessors.put("cssEmbed", new CssEmbedPreProcessor());
+    preProcessors.put("cssEmbed", new CssDataUriPreProcessor());
 
     postProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());

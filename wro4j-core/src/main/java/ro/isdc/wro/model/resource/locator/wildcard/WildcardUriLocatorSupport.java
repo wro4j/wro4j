@@ -1,10 +1,9 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.locator;
+package ro.isdc.wro.model.resource.locator.wildcard;
 
-import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
 /**

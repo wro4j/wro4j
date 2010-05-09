@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,19 +15,19 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.JawrCssMinifier;
+import ro.isdc.wro.model.resource.processor.algorithm.CSSMin;
 
 
 /**
- * A processor implementation using {@link JawrCssMinifier} algorithm. This processor can be used as both: PreProcessor
- * & postProcessor. <br/>
+ * A processor implementation using {@link CSSMin} algorithm. This processor can be used as both: PreProcessor &
+ * postProcessor.<br/>
  * This processor is annotated with {@link Minimize} because it performs minimization.
  *
  * @author Alex Objelean
  */
 @Minimize
 @SupportedResourceType(ResourceType.CSS)
-public class JawrCssMinifierProcessor
+public class CssMinProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * {@inheritDoc}
@@ -45,11 +45,10 @@ public class JawrCssMinifierProcessor
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
-      final StringBuffer result = new JawrCssMinifier().minifyCSS(new StringBuffer(content));
-      writer.write(result.toString());
+      new CSSMin().formatFile(content, writer);
       writer.flush();
     } catch (final Exception e) {
-      throw new IOException("Exception occured while minimizing the css");
+      throw new IOException("Exception occured while formatting the css");
     } finally {
       reader.close();
       writer.close();

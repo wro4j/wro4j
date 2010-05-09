@@ -11,12 +11,12 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.SemicolonAppenderPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 
 /**
@@ -38,12 +38,12 @@ public class ServletContextAwareWroManagerFactory
     groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
 
     // this one must be before the CssUrlRewritingProcessor
-    groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
     groupProcessor.addPreProcessor(new CssImportPreProcessor());
     groupProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
 
+    groupProcessor.addPostProcessor(new CssVariablesProcessor());
     groupProcessor.addPostProcessor(new JSMinProcessor());
     groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
     return groupProcessor;

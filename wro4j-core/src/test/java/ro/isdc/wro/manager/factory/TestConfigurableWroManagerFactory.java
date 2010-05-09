@@ -20,8 +20,8 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 
 /**
  * TestConfigurableWroManagerFactory.

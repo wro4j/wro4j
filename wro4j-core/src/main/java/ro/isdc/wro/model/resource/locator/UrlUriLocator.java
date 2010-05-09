@@ -13,6 +13,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
+
 
 /**
  * UriLocator capable to read the resources from some URL. Usually, this

@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor.algorithm;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -13,25 +12,59 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Generator for Data URIs. Inspired from: http://github.com/nzakas/cssembed.
  *
  * @author Alex Objelean
+ * @created 7 May, 2010
  */
 public class DataUriGenerator {
+  /**
+   *
+   */
+  private static final String DATA_URI_PREFIX = "data:";
+  /**
+   * Logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(DataUriGenerator.class);
   private final Map<String, String> binaryTypes = new HashMap<String, String>();
   private final Map<String, String> textTypes = new HashMap<String, String>();
-  private final boolean verbose = false;
 
-
+  /**
+   * Default constructor.
+   */
   public DataUriGenerator() {
     initTypes();
   }
 
+  /**
+   * Generate the dataUri as string associated to the passed InputStream with encoding & type based on provided fileName.
+   */
+  public String generateDataURI(final InputStream inputStream, final String fileName)
+    throws IOException {
+    final StringWriter writer = new StringWriter();
+    // actually write
+    generateDataURI(inputStream, writer, fileName);
+    return writer.toString();
+  }
 
-  public void initTypes() {
+  /**
+   * Check if the url is actually a dataUri (base64 encoded value).
+   * @param url to check
+   * @return true if the url is a base64 encoded value.
+   */
+  public static boolean isDataUri(final String url) {
+    return url.startsWith(DATA_URI_PREFIX);
+  }
+
+  /**
+   * Initialize types.
+   */
+  private void initTypes() {
     binaryTypes.put("gif", "image/gif");
     binaryTypes.put("jpg", "image/jpeg");
     binaryTypes.put("png", "image/png");
@@ -46,18 +79,10 @@ public class DataUriGenerator {
     textTypes.put("txt", "text/plain");
   }
 
-
   /**
    * Generates DataURI based on provided InputStream, fileName and mimeType.
-   *
-   * @param inputStream
-   * @param out
-   * @param fileName
-   * @param mimeType
-   * @throws FileNotFoundException
-   * @throws IOException
    */
-  public void generateDataURI(final InputStream inputStream, final Writer out, final String fileName, String mimeType)
+  private void generateDataURI(final InputStream inputStream, final Writer out, final String fileName, String mimeType)
     throws IOException {
     // read the bytes from the file
     final byte[] bytes = IOUtils.toByteArray(inputStream);
@@ -70,32 +95,11 @@ public class DataUriGenerator {
   }
 
   /**
-   * @param inputStream
-   * @param out
-   * @param fileName
-   * @throws IOException
+   * Generates dataUri without specifying the mimeType -  this one being guessed from the fileName.
    */
   private void generateDataURI(final InputStream inputStream, final Writer out, final String fileName)
     throws IOException {
-    // read the bytes from the file
-    final byte[] bytes = IOUtils.toByteArray(inputStream);
-    inputStream.close();
-
-    // verify MIME type and charset
-    final String mimeType = getMimeType(fileName, null);
-    // actually write
-    generateDataURI(bytes, out, mimeType);
-  }
-
-  /**
-   * Generate the dataUri as string associated to the passed InputStream with encoding & type based on provided fileName.
-   */
-  public String generateDataURI(final InputStream inputStream, final String fileName)
-    throws IOException {
-    final StringWriter writer = new StringWriter();
-    // actually write
-    generateDataURI(inputStream, writer, fileName);
-    return writer.getBuffer().toString();
+    generateDataURI(inputStream, out, fileName, null);
   }
 
 
@@ -107,11 +111,11 @@ public class DataUriGenerator {
    * @param mimeType The MIME type to specify in the data URI.
    * @throws java.io.IOException
    */
-  private static void generateDataURI(final byte[] bytes, final Writer out, final String mimeType)
+  private void generateDataURI(final byte[] bytes, final Writer out, final String mimeType)
     throws IOException {
     // create the output
     final StringBuffer buffer = new StringBuffer();
-    buffer.append("data:");
+    buffer.append(DATA_URI_PREFIX);
 
     // add MIME type
     buffer.append(mimeType);
@@ -146,9 +150,7 @@ public class DataUriGenerator {
       } else {
         throw new IOException("No MIME type provided and MIME type couldn't be automatically determined.");
       }
-      if (verbose) {
-        System.err.println("[INFO] No MIME type provided, defaulting to '" + mimeType + "'.");
-      }
+      LOG.warn("[INFO] No MIME type provided, defaulting to '" + mimeType + "'.");
     }
     return mimeType;
   }

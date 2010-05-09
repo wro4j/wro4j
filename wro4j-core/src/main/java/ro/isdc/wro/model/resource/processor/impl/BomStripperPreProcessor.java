@@ -13,20 +13,17 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Removes BOM (Byte Order Mark) characters from the beginning of js files.
+ * Removes BOM (Byte Order Mark) characters from the beginning of merged resource files.
  * <p>
  *
  * @see http://en.wikipedia.org/wiki/Byte_order_mark.
  * @author Alex Objelean
  * @created Created on Feb 20, 2010
  */
-@SupportedResourceType(ResourceType.JS)
 public final class BomStripperPreProcessor
     implements ResourcePreProcessor {
   /**

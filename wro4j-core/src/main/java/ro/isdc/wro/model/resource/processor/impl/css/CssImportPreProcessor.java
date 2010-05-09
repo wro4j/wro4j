@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

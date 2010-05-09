@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,20 +15,22 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.CSSMin;
+import ro.isdc.wro.model.resource.processor.algorithm.AndryCssCompressor;
 
 
 /**
- * A processor implementation using {@link CSSMin} algorithm. This processor can be used as both: PreProcessor &
- * postProcessor.<br/>
- * This processor is annotated with {@link Minimize} because it performs minimization.
+ * A processor implementation using {@link AndryCssCompressor} algorithm. This processor can be used as both:
+ * PreProcessor & postProcessor.
  *
  * @author Alex Objelean
  */
 @Minimize
 @SupportedResourceType(ResourceType.CSS)
-public class CssMinProcessor
+public class AndryCssCompressorProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
+  private static final int LINEBREAK_AFTER_CHARACTERS = 8000;
+
+
   /**
    * {@inheritDoc}
    */
@@ -45,10 +47,9 @@ public class CssMinProcessor
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
-      new CSSMin().formatFile(content, writer);
+      final AndryCssCompressor compressor = new AndryCssCompressor(content);
+      compressor.compress(writer, LINEBREAK_AFTER_CHARACTERS);
       writer.flush();
-    } catch (final Exception e) {
-      throw new IOException("Exception occured while formatting the css");
     } finally {
       reader.close();
       writer.close();
