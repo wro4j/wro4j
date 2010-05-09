@@ -85,6 +85,8 @@ public class CssDataUriPreProcessor
   protected boolean replaceWithDataUri(final String dataUri) throws UnsupportedEncodingException {
     final byte[] bytes = dataUri.getBytes("UTF8");
     final int limit = 32 * 1024;
-    return bytes.length < limit;
+    final boolean exceedLimit = bytes.length >= limit;
+    LOG.debug("dataUri size: " + bytes.length/1024 + "KB, limit exceeded: " + exceedLimit);
+    return !exceedLimit;
   }
 }

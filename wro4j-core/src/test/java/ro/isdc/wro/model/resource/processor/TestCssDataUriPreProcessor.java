@@ -72,7 +72,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   public void processLargeDataUri()
     throws IOException {
     final String resourceUri = "classpath:" + TEST_FOLDER + "cssEmbed-large-input.css";
-    compareProcessedResourceContents(resourceUri, "classpath:" + TEST_FOLDER + "cssEmbed-classpath-outcome.css",
+    compareProcessedResourceContents(resourceUri, resourceUri,
       new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
