@@ -89,15 +89,20 @@ public class ServletContextUriLocator
     LOG.debug("uri resource: " + uri);
     final ServletContext servletContext = Context.get().getServletContext();
 
-    if (getWildcardStreamLocator().hasWildcard(uri)) {
-      final String fullPath = FilenameUtils.getFullPath(uri);
-      final String realPath = servletContext.getRealPath(fullPath);
-      if (realPath == null) {
-        final String message = "Could not determine realPath for resource: " + uri;
-        LOG.error(message);
-        throw new IOException(message);
+    try {
+      if (getWildcardStreamLocator().hasWildcard(uri)) {
+        final String fullPath = FilenameUtils.getFullPath(uri);
+        final String realPath = servletContext.getRealPath(fullPath);
+        if (realPath == null) {
+          final String message = "Could not determine realPath for resource: " + uri;
+          LOG.error(message);
+          throw new IOException(message);
+        }
+        return getWildcardStreamLocator().locateStream(uri, new File(realPath));
       }
-      return getWildcardStreamLocator().locateStream(uri, new File(realPath));
+    } catch (final IOException e) {
+      LOG.warn("Couldn't localize the stream containing wildcard: " + e.getMessage()
+        + ". Trying to locate the stream without the wildcard.");
     }
 
     // first attempt

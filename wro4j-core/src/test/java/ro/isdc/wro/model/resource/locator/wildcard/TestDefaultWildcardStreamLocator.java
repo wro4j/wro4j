@@ -23,28 +23,33 @@ public class TestDefaultWildcardStreamLocator {
   }
 
   @Test
-  public void testNoWildcardPreset1() {
+  public void testNoWildcardPresent1() {
     Assert.assertFalse(locator.hasWildcard("test/resource.css"));
   }
 
   @Test
-  public void testNoWildcardPreset2() {
+  public void testNoWildcardPresent2() {
     Assert.assertFalse(locator.hasWildcard("test/resource[a].css"));
   }
 
   @Test
-  public void testWildcardPreset1() {
+  public void testWildcardPresent1() {
     Assert.assertTrue(locator.hasWildcard("test/*.css"));
   }
 
   @Test
-  public void testWildcardPreset2() {
+  public void testWildcardPresent2() {
     Assert.assertTrue(locator.hasWildcard("test/test.?ss"));
   }
 
   @Test
-  public void testWildcardPreset3() {
+  public void testWildcardPresent3() {
     Assert.assertTrue(locator.hasWildcard("test/**.???"));
+  }
+
+  @Test
+  public void testWildcardPresent4() {
+    Assert.assertFalse(locator.hasWildcard("http://yui.yahooapis.com/combo?2.7.0/build/reset-fonts-grids/reset-fonts-grids.css&2.7.0/build/base/base-min.css&2.7.0/build/assets/skins/sam/skin.css"));
   }
 
   @Test(expected=IOException.class)

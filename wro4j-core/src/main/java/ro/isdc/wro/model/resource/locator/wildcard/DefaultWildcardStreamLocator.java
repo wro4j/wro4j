@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,8 +27,10 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * @author Admin
+ * Default implementation of {@link WildcardStreamLocator}.
  *
+ * @author Alex Objelean
+ * @created May 8, 2010
  */
 public class DefaultWildcardStreamLocator
   implements WildcardStreamLocator {
@@ -38,8 +41,11 @@ public class DefaultWildcardStreamLocator
   /**
    * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?' character, it is considered
    * a wildcard.
+   * <p>
+   * A string is considered to contain wildcard if it doesn't start with http(s) and contains at least one of the
+   * following characters: [?*].
    */
-  private static final String WILDCARD_REGEX = "(.)*[\\*\\?](.)*";
+  private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
   /**
    * Character to distinguish wildcard inside the uri.
    */
@@ -62,6 +68,14 @@ public class DefaultWildcardStreamLocator
     }
   };
 
+
+  public static void main(final String[] args) throws Exception {
+    URL url = new URL("http://www.soundpure.com/test?param=value");
+    System.out.println(url.getProtocol());
+    url = new URL("https://www.soundpure.com/test?param=value");
+    System.out.println(url.getProtocol());
+
+  }
 
   /**
    * {@inheritDoc}

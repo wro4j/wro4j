@@ -42,7 +42,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Compiled pattern.
    */
-  protected static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  protected static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
 
 
   /**
@@ -57,7 +57,6 @@ public abstract class AbstractCssUrlRewritingProcessor
       final String css = IOUtils.toString(reader);
       final String result = parseCss(css, cssUri);
       writer.write(result);
-      writer.close();
       onProcessCompleted();
       LOG.debug("</process>");
     } finally {
@@ -92,7 +91,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       }
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replacedImageUrl: " + replacedUrl);
+        LOG.debug("replaced old Url: [" + urlGroup + "] with: [" + replacedUrl + "].");
         final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
         onUrlReplaced(replacedUrl);
         // update allowedUrls list

@@ -166,8 +166,8 @@ public class WroFilter
           BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
       ConfigurationContext.get().setConfig(configuration);
-      LOG.debug("jmxEnabled: " + jmxEnabled);
-      LOG.debug("wro4j configuration: " + configuration);
+      LOG.info("jmxEnabled: " + jmxEnabled);
+      LOG.info("wro4j configuration: " + configuration);
       if (jmxEnabled) {
         registerChangeListeners();
         final MBeanServer mbeanServer = getMBeanServer();

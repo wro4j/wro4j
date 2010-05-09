@@ -62,19 +62,24 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     if (uri == null) {
       throw new IllegalArgumentException("uri cannot be NULL!");
     }
+    LOG.debug("Reading uri: " + uri);
 
-    if (getWildcardStreamLocator().hasWildcard(uri)) {
-      final String fullPath = FilenameUtils.getFullPath(uri);
-      final URL url = new URL(fullPath);
-      if (url == null) {
-        final String message = "Couldn't get URL for the following path: " + fullPath;
-        LOG.warn(message);
-        throw new IOException(message);
+    try {
+      if (getWildcardStreamLocator().hasWildcard(uri)) {
+        final String fullPath = FilenameUtils.getFullPath(uri);
+        final URL url = new URL(fullPath);
+        if (url == null) {
+          final String message = "Couldn't get URL for the following path: " + fullPath;
+          LOG.warn(message);
+          throw new IOException(message);
+        }
+        return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
       }
-      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+    } catch (final IOException e) {
+      LOG.warn("Couldn't localize the stream containing wildcard: " + e.getMessage()
+        + ". Trying to locate the stream without the wildcard.");
     }
 
-    LOG.debug("Reading uri: " + uri);
     final URL url = new URL(uri);
     return url.openStream();
   }
