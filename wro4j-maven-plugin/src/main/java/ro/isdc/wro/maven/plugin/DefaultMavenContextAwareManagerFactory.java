@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import ro.isdc.wro.config.Context;
@@ -70,7 +71,7 @@ public class DefaultMavenContextAwareManagerFactory
 
 
   @Override
-  protected WroModelFactory newModelFactory() {
+  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()

@@ -5,13 +5,17 @@ package ro.isdc.wro.manager.factory;
 
 import java.beans.PropertyChangeListener;
 
+import javax.servlet.ServletContext;
+
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -53,7 +57,7 @@ public abstract class BaseWroManagerFactory implements WroManagerFactory, WroCon
         if (this.manager == null) {
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
-          final WroModelFactory modelFactory = newModelFactory();
+          final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
           final GroupsProcessor groupsProcessor = newGroupsProcessor();
           final CacheStrategy<CacheEntry, String> cacheStrategy = newCacheStrategy();
           // it is important to instantiate dependencies first, otherwise another thread can start working with
@@ -129,10 +133,12 @@ public abstract class BaseWroManagerFactory implements WroManagerFactory, WroCon
     return new DefaultGroupExtractor();
   }
 
+
   /**
+   * @param servletContext {@link ServletContext} which could be useful for creating dynamic {@link WroModel}.
    * @return {@link WroModelFactory} implementation
    */
-  protected WroModelFactory newModelFactory() {
+  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new ServletContextAwareXmlModelFactory();
   }
 

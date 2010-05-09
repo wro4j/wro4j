@@ -16,8 +16,8 @@ public class TestDataUriGenerator extends AbstractWroTest {
   @Test
   public void test()
     throws Exception {
-    System.out.println(dataUriGenerator.generateDataURI(
-      getInputStream("classpath:ro/isdc/wro/processor/dataUri/btn_icons.png"), "btn_icons.png"));
+    dataUriGenerator.generateDataURI(getInputStream("classpath:ro/isdc/wro/processor/dataUri/btn_icons.png"),
+      "btn_icons.png");
   }
 
 }

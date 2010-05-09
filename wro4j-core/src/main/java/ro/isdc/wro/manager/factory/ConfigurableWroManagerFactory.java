@@ -94,7 +94,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     preProcessors.put("cssImport", new CssImportPreProcessor());
     preProcessors.put("cssVariables", new CssVariablesProcessor());
     preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
-    preProcessors.put("cssEmbed", new CssDataUriPreProcessor());
+    preProcessors.put("cssDataUri", new CssDataUriPreProcessor());
 
     postProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());

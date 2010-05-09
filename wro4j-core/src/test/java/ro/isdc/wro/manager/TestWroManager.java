@@ -40,9 +40,10 @@ public class TestWroManager extends AbstractWroTest {
   @Before
   public void setUp() {
     initConfigWithUpdatePeriodValue(0);
+    final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
+    Context.set(context);
     final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
     manager = factory.getInstance();
-    Context.set(Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS));
   }
 
 
