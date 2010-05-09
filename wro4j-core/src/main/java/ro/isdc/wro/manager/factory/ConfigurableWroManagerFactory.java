@@ -26,6 +26,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CssEmbedPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CssVariablesProcessor;
@@ -93,6 +94,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     preProcessors.put("cssImport", new CssImportPreProcessor());
     preProcessors.put("cssVariables", new CssVariablesProcessor());
     preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
+    preProcessors.put("cssEmbed", new CssEmbedPreProcessor());
 
     postProcessors.put("cssVariables", new CssVariablesProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());

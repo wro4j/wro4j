@@ -133,7 +133,7 @@ public class CssUrlRewritingProcessor
   /**
    * Src Url pattern.
    */
-  private static final String PATTERN_PATH = "url\\s*\\(((?:.|\\s)*?)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+  public static final String PATTERN_PATH = "url\\s*\\(((?:.|\\s)*?)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
 
   /**
    * Compiled pattern.

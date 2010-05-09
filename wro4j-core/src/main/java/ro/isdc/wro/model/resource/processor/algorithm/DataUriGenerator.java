@@ -6,6 +6,7 @@ package ro.isdc.wro.model.resource.processor.algorithm;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +25,11 @@ public class DataUriGenerator {
   private final Map<String, String> textTypes = new HashMap<String, String>();
   private final boolean verbose = false;
 
+
   public DataUriGenerator() {
     initTypes();
   }
+
 
   public void initTypes() {
     binaryTypes.put("gif", "image/gif");
@@ -43,6 +46,7 @@ public class DataUriGenerator {
     textTypes.put("txt", "text/plain");
   }
 
+
   /**
    * Generates DataURI based on provided InputStream, fileName and mimeType.
    *
@@ -54,7 +58,7 @@ public class DataUriGenerator {
    * @throws IOException
    */
   public void generateDataURI(final InputStream inputStream, final Writer out, final String fileName, String mimeType)
-      throws IOException {
+    throws IOException {
     // read the bytes from the file
     final byte[] bytes = IOUtils.toByteArray(inputStream);
     inputStream.close();
@@ -65,8 +69,14 @@ public class DataUriGenerator {
     generateDataURI(bytes, out, mimeType);
   }
 
-  public void generateDataURI(final InputStream inputStream, final Writer out, final String fileName)
-      throws IOException {
+  /**
+   * @param inputStream
+   * @param out
+   * @param fileName
+   * @throws IOException
+   */
+  private void generateDataURI(final InputStream inputStream, final Writer out, final String fileName)
+    throws IOException {
     // read the bytes from the file
     final byte[] bytes = IOUtils.toByteArray(inputStream);
     inputStream.close();
@@ -78,18 +88,27 @@ public class DataUriGenerator {
   }
 
   /**
+   * Generate the dataUri as string associated to the passed InputStream with encoding & type based on provided fileName.
+   */
+  public String generateDataURI(final InputStream inputStream, final String fileName)
+    throws IOException {
+    final StringWriter writer = new StringWriter();
+    // actually write
+    generateDataURI(inputStream, writer, fileName);
+    return writer.getBuffer().toString();
+  }
+
+
+  /**
    * Generates a data URI from a byte array and outputs to the given writer.
    *
-   * @param bytes
-   *          The array of bytes to output to the data URI.
-   * @param out
-   *          Where to output the data URI.
-   * @param mimeType
-   *          The MIME type to specify in the data URI.
+   * @param bytes The array of bytes to output to the data URI.
+   * @param out Where to output the data URI.
+   * @param mimeType The MIME type to specify in the data URI.
    * @throws java.io.IOException
    */
   private static void generateDataURI(final byte[] bytes, final Writer out, final String mimeType)
-      throws IOException {
+    throws IOException {
     // create the output
     final StringBuffer buffer = new StringBuffer();
     buffer.append("data:");
@@ -105,20 +124,18 @@ public class DataUriGenerator {
     out.write(buffer.toString());
   }
 
+
   /**
    * Determines the MIME type to use for the given filename. If a MIME type is passed in, then that is used by default.
    * Otherwise, the filename is inspected to determine the appropriate MIME type.
    *
-   * @param filename
-   *          The filename to check.
-   * @param mimeType
-   *          The provided MIME type or null if nothing was provided.
+   * @param filename The filename to check.
+   * @param mimeType The provided MIME type or null if nothing was provided.
    * @return The MIME type string to use for the filename.
-   * @throws java.io.IOException
-   *           When no MIME type can be determined.
+   * @throws java.io.IOException When no MIME type can be determined.
    */
   private String getMimeType(final String filename, String mimeType)
-      throws IOException {
+    throws IOException {
     if (mimeType == null) {
       final String type = FilenameUtils.getExtension(filename);
       // if it's an image type, don't use a charset
