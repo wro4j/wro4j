@@ -44,13 +44,14 @@ public final class BomStripperPreProcessor
       { 0xFE, 0xFF },
       { 0xFF, 0xFE } };
 
-
     /**
      * Removes a BOM characters from chained inputStream.
      */
     public BomStripperInputStream(final InputStream is) throws IOException {
       super(is, 4);
-      final int[] bytes = { read(), read(), read(), read() };
+      final int[] bytes = {
+        read(), read(), read(), read()
+      };
       int count = 0;
       for (final int[] bom : BOMS) {
         count = testForBOM(bom, bytes);

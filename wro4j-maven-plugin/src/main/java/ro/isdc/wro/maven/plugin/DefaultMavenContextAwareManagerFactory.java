@@ -87,6 +87,7 @@ public class DefaultMavenContextAwareManagerFactory
   @Override
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+    groupsProcessor.setIgnoreMissingResources(runContext.isIgnoreMissingResources());
     configureProcessors(groupsProcessor);
     return groupsProcessor;
   }
