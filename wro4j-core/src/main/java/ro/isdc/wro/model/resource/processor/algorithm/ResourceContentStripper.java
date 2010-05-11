@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor.algorithm;
 
@@ -8,7 +8,7 @@ package ro.isdc.wro.model.resource.processor.algorithm;
  * Strips comments and whitespace from javascript/css resource content. Inspired
  * from wicket.
  *
- * @author alexandru.objelean
+ * @author Alex Objelean
  */
 public final class ResourceContentStripper {
   /*
