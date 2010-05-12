@@ -14,7 +14,7 @@ import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.model.resource.ResourceType;
 
 /**
- * Default implementation which is capable of extracting a single group from one request uri.
+ * Default implementation capable of extracting a single group from the request.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008

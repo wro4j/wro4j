@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 
 
@@ -103,7 +104,14 @@ public class Wro4jMojo
         throw new MojoExecutionException("Invalid wroManagerFactory className: " + wroManagerFactory);
       }
     } else {
-      managerFactory = new DefaultMavenContextAwareManagerFactory();
+      managerFactory = new DefaultMavenContextAwareManagerFactory() {
+        @Override
+        protected GroupsProcessor newGroupsProcessor() {
+          final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+          groupsProcessor.setIgnoreMissingResources(ignoreMissingResources);
+          return groupsProcessor;
+        }
+      };
     }
     // initialize before return.
     managerFactory.initialize(createRunContext(), request);
@@ -119,7 +127,6 @@ public class Wro4jMojo
     runContext.setContextFolder(contextFolder);
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
-    runContext.setIgnoreMissingResources(ignoreMissingResources);
     return runContext;
   }
 
@@ -133,8 +140,8 @@ public class Wro4jMojo
 //    updateClasspath();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
-    getLog().info("minimize: " + minimize);
     getLog().info("targetGroups: " + targetGroups);
+    getLog().info("minimize: " + minimize);
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);

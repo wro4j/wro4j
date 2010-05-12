@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008. All rights reserved.
+ * Copyright (c) 2008 ISDC! Romania. All rights reserved.
  */
 package ro.isdc.wro.http;
 
@@ -10,8 +10,10 @@ import javax.servlet.ServletOutputStream;
 
 /**
  * Delegating implementation of {@link javax.servlet.ServletOutputStream}.
- *
- * @author Alex Objelean
+ * 
+ * @author alexandru.objelean / ISDC! Romania
+ * @version $Revision: $
+ * @date $Date: $
  * @created Created on Nov 14, 2008
  */
 public final class DelegatingServletOutputStream extends ServletOutputStream {
@@ -22,7 +24,7 @@ public final class DelegatingServletOutputStream extends ServletOutputStream {
 
   /**
    * Create a DelegatingServletOutputStream for the given target stream.
-   *
+   * 
    * @param targetStream
    *          the target stream (never <code>null</code>)
    */

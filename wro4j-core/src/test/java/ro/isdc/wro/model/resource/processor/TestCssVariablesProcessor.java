@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008. All rights reserved.
+ * Copyright (c) 2008 ISDC! Romania. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor;
 
@@ -10,13 +10,16 @@ import java.io.Writer;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 /**
  * Test for css variables preprocessor.
  *
- * @author Alex Objelean
+ * @author alexandru.objelean / ISDC! Romania
+ * @version $Revision: $
+ * @date $Date: $
  * @created Created on Jul 05, 2009
  */
 public class TestCssVariablesProcessor extends AbstractWroTest {

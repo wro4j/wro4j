@@ -16,7 +16,7 @@ import ro.isdc.wro.test.util.ResourceProcessor;
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
  *
- * @author Alex Objelean
+ * @author alexandru.objelean / ISDC! Romania
  * @created Created on Nov 28, 2008
  */
 public class TestMultiLineCommentStripperProcessor extends AbstractWroTest {
