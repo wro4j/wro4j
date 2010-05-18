@@ -1,3 +1,6 @@
+.inlineHelp {
+  background:#B3B3B3 url(/img/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
+}
 #webapp {
 	color: green;
 	background-image: url(../img/applications.png);

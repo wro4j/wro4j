@@ -2,8 +2,8 @@
   background: url(../static/img/img.gif);
   filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../static/img/../images/tabs/tabContent.png',sizingMethod='scale');
   background: url(../static/img/folder/img.gif);
-  background: url(../static/img/folder/img.gif);
-  background: url(../static/img/folder/img.gif);
+  background: url('../static/img/folder/img.gif');
+  background: url("../static/img/folder/img.gif");
   background: url(../static/img/folder/folder/img.gif) top left;
   background: url(../static/img/../img.gif) repeat-x;
   background: url(../static/img/../../img.gif) no-repeat right;
@@ -16,4 +16,10 @@
   background: url(/img.gif) red;
   background: url(/folder/img.gif) no-repeat right;
   background: url(http://www.google.com/);
+}
+
+.inlineHelp {
+  background:#B3B3B3 url("/images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
+  background:#B3B3B3 url('/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
+  background:#B3B3B3 url(/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
 }

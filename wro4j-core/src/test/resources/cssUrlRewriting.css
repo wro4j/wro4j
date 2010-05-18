@@ -17,3 +17,9 @@
 	background: url(/folder/img.gif) no-repeat right;
 	background: url(http://www.google.com/);
 }
+
+.inlineHelp {
+  background:#B3B3B3 url("/images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
+  background:#B3B3B3 url('/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
+  background:#B3B3B3 url(/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
+}

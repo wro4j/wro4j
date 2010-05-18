@@ -38,7 +38,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Pattern used to identify the placeholders where the url rewriting will be performed.
    */
-  private static final String PATTERN_PATH = "url\\s*\\(((?:.*?|\\s*?))\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+  private static final String PATTERN_PATH = "url\\s*\\(['\"]?((?:.*?|\\s*?))['\"]?\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
   /**
    * Compiled pattern.
    */
