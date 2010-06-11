@@ -191,7 +191,9 @@ public class WroManager
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Run a scheduled task which updates the model
-        scheduler.scheduleAtFixedRate(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
+        // here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
+        // (thread tries to make up for lost time in some situations)
+        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
       }
     }
   }
