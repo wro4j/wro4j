@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
-        <version>1.2.8</version>
+  <version>1.2.8-SNAPSHOT</version>
 	<packaging>pom</packaging>	
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
@@ -60,10 +60,10 @@
   
 	<properties>
     <commons-io.dependency>1.4</commons-io.dependency>
-    <commons-lang.dependency>2.4</commons-lang.dependency>       
-    <slf4j.dependency>1.5.11</slf4j.dependency>    
+    <commons-lang.dependency>2.5</commons-lang.dependency>       
+    <slf4j.dependency>1.6.0</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
-    <mockito.dependency>1.8.4</mockito.dependency>
+    <mockito.dependency>1.8.5</mockito.dependency>
     <junit.dependency>4.8.1</junit.dependency>    
 	</properties>
   
