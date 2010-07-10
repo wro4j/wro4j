@@ -158,24 +158,25 @@ public class WroManager
     // find names & type
     final ResourceType type = groupExtractor.getResourceType(request);
     final String groupName = groupExtractor.getGroupName(request);
+    final boolean minimize = groupExtractor.isMinimized(request);
     if (groupName == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
     initScheduler(model);
-    final boolean minimize = groupExtractor.isMinimized(request);
 
-    // find processed result for a group
-    final Group group = model.getGroupByName(groupName);
-    final List<Group> groupAsList = new ArrayList<Group>();
-    groupAsList.add(group);
-    ContentHashEntry result = null;
     final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
+
     LOG.debug("Searching cache entry: " + cacheEntry);
     // Cache based on uri
-    result = cacheStrategy.get(cacheEntry);
+    ContentHashEntry result = cacheStrategy.get(cacheEntry);
     if (result == null) {
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
+      // find processed result for a group
+      final List<Group> groupAsList = new ArrayList<Group>();
+      final Group group = model.getGroupByName(groupName);
+      groupAsList.add(group);
+
       final String content = groupsProcessor.process(groupAsList, type, minimize);
       result = getContentHashEntry(content);
       cacheStrategy.put(cacheEntry, result);
@@ -183,11 +184,14 @@ public class WroManager
     if (result.getContent() != null) {
       is = new ByteArrayInputStream(result.getContent().getBytes());
     }
-    stopWatch.stop();
-    LOG.debug("WroManager process time: " + stopWatch.toString());
     if (type != null) {
       response.setContentType(type.getContentType());
     }
+    //set ETag header
+    response.setHeader(HttpHeader.ETAG.toString(), result.getHash());
+
+    stopWatch.stop();
+    LOG.debug("WroManager process time: " + stopWatch.toString());
     return is;
   }
 

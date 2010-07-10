@@ -293,7 +293,7 @@ public class WroFilter
 
     headersMap.put(HttpHeader.CACHE_CONTROL.toString(),
         "public, max-age=315360000, post-check=315360000, pre-check=315360000");
-    headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
+    //headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
     headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
     headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
 
