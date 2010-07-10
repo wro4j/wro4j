@@ -46,5 +46,16 @@ public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
         }
       });
   }
+  @Test
+  public void test1()
+    throws IOException {
+    compareProcessedResourceContents("file:C:/kit/wmp11-windowsxp-x86-enu.exe",
+      "classpath:ro/isdc/wro/extensions/processor/googleClosure-advanced-output.js", new ResourceProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS).process(reader, writer);
+        }
+      });
+  }
 
 }

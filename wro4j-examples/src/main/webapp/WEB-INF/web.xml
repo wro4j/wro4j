@@ -24,7 +24,7 @@
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>20</param-value>
+      <param-value>200</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>

@@ -21,13 +21,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
@@ -41,6 +41,7 @@ import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -75,7 +76,7 @@ public class WroManager
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
-  private CacheStrategy<CacheEntry, String> cacheStrategy;
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
   /**
    * A callback to be notified about the cache change.
    */
@@ -95,13 +96,14 @@ public class WroManager
    * @throws IOException when any IO related problem occurs.
    */
   public final void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    //TODO return true if the request was processed in order to continue filter chain processing
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
     LOG.debug("processing: " + request.getRequestURI());
-    if (request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES)) {
+    if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
     } else {
       is = buildGroupsInputStream(model, request, response);
@@ -111,6 +113,14 @@ public class WroManager
     IOUtils.copy(is, os);
     is.close();
     os.close();
+  }
+
+
+  /**
+   * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
+   */
+  private boolean isProxyResourceRequest(final HttpServletRequest request) {
+    return request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
 
@@ -143,8 +153,7 @@ public class WroManager
   private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request,
       final HttpServletResponse response) {
     final StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-
+    stopWatch.start("buildGroupsStream");
     InputStream is = null;
     // find names & type
     final ResourceType type = groupExtractor.getResourceType(request);
@@ -159,7 +168,7 @@ public class WroManager
     final Group group = model.getGroupByName(groupName);
     final List<Group> groupAsList = new ArrayList<Group>();
     groupAsList.add(group);
-    String result = null;
+    ContentHashEntry result = null;
     final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
     LOG.debug("Searching cache entry: " + cacheEntry);
     // Cache based on uri
@@ -167,16 +176,33 @@ public class WroManager
     if (result == null) {
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
-      result = groupsProcessor.process(groupAsList, type, minimize);
+      final String content = groupsProcessor.process(groupAsList, type, minimize);
+      result = getContentHashEntry(content);
       cacheStrategy.put(cacheEntry, result);
     }
-    is = new ByteArrayInputStream(result.getBytes());
+    if (result.getContent() != null) {
+      is = new ByteArrayInputStream(result.getContent().getBytes());
+    }
     stopWatch.stop();
     LOG.debug("WroManager process time: " + stopWatch.toString());
     if (type != null) {
       response.setContentType(type.getContentType());
     }
     return is;
+  }
+
+
+  /**
+   * Creates a {@link ContentHashEntry} for a given content.
+   */
+  private ContentHashEntry getContentHashEntry(final String content) {
+    String hash = null;
+    if (content != null) {
+      hash = WroUtil.getMD5Hash(content.getBytes());
+    }
+    final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
+    LOG.debug("computed entry: " + entry);
+    return entry;
   }
 
 
@@ -228,8 +254,8 @@ public class WroManager
                     true, false
                 };
                 for (final boolean minimize : minimizeValues) {
-                  final String result = groupsProcessor.process(groupAsList, resourceType, minimize);
-                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), result);
+                  final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
+                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), getContentHashEntry(content));
                 }
               }
             }
@@ -385,7 +411,7 @@ public class WroManager
    * @param cacheStrategy
    *          the cache to set
    */
-  public final void setCacheStrategy(final CacheStrategy<CacheEntry, String> cacheStrategy) {
+  public final void setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     if (cacheStrategy == null) {
       throw new IllegalArgumentException("cacheStrategy cannot be null!");
     }

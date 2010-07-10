@@ -22,6 +22,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -88,13 +89,22 @@ public final class GroupsProcessorImpl
     if (type == null) {
       throw new IllegalArgumentException("ResourceType cannot be null!");
     }
+    final StopWatch stopWatch = new StopWatch();
+    stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
     final List<Resource> filteredResources = getFilteredResources(groups, type);
     try {
+      stopWatch.stop();
+      stopWatch.start("pre process and merge");
       // Merge
       final String result = preProcessAndMerge(filteredResources, minimize);
+      stopWatch.stop();
+      stopWatch.start("post process");
       // postProcessing
-      return applyPostProcessors(type, result, minimize);
+      final String postProcessedResult = applyPostProcessors(type, result, minimize);
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
+      return postProcessedResult;
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources", e);
     }

@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
@@ -59,7 +60,7 @@ public abstract class BaseWroManagerFactory implements WroManagerFactory, WroCon
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
           final GroupsProcessor groupsProcessor = newGroupsProcessor();
-          final CacheStrategy<CacheEntry, String> cacheStrategy = newCacheStrategy();
+          final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           // it is important to instantiate dependencies first, otherwise another thread can start working with
           // uninitialized manager.
           this.manager = newManager();
@@ -122,8 +123,8 @@ public abstract class BaseWroManagerFactory implements WroManagerFactory, WroCon
   /**
    * @return {@link CacheStrategy} instance.
    */
-  private CacheStrategy<CacheEntry, String> newCacheStrategy() {
-    return new MapCacheStrategy<CacheEntry, String>();
+  protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
+    return new MapCacheStrategy<CacheEntry, ContentHashEntry>();
   }
 
   /**
