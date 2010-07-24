@@ -12,6 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.FieldsSavingRequestWrapper;
 
 
@@ -26,6 +27,11 @@ public class Context {
    * created by this thread should be able to access the {@link Context}.
    */
   private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
+  /**
+   * {@link WroConfiguration} is not stored inside a {@link ThreadLocal}, because it must be accessible outside of
+   * request cycle.
+   */
+  private static WroConfiguration CONFIG_INSTANCE = new WroConfiguration();
   /**
    * Request.
    */
@@ -42,6 +48,23 @@ public class Context {
    * FilterConfig.
    */
   private FilterConfig filterConfig;
+
+  /**
+   * @return {@link WroConfiguration} singleton instance.
+   */
+  public static WroConfiguration getConfig() {
+    return CONFIG_INSTANCE;
+  }
+
+
+  /**
+   * DO NOT CALL THIS METHOD UNLESS YOU ARE SURE WHAT YOU ARE DOING.
+   * <p/>
+   * sets the {@link WroConfiguration} singleton instance.
+   */
+  public static void setConfig(final WroConfiguration config) {
+    CONFIG_INSTANCE = config;
+  }
 
 
   /**

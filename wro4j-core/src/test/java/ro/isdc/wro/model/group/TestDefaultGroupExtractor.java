@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.ConfigurationContext;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -28,7 +28,7 @@ public class TestDefaultGroupExtractor {
     //by default configuration is in debug mode
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(true);
-    ConfigurationContext.get().setConfig(config);
+    Context.setConfig(config);
     groupExtractor = new DefaultGroupExtractor();
   }
 
@@ -81,7 +81,7 @@ public class TestDefaultGroupExtractor {
   public void testMinimizedWithFalseParamInDEPLOYMENTMode() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(false);
-    ConfigurationContext.get().setConfig(config);
+    Context.setConfig(config);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getParameter(DefaultGroupExtractor.PARAM_MINIMIZE)).thenReturn("false");
     Assert.assertEquals(true, groupExtractor.isMinimized(request));

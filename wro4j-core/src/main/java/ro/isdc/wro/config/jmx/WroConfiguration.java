@@ -39,7 +39,6 @@ public final class WroConfiguration
    */
   private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>();
   private final List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>();
-
   /**
    * @return the name of the object used to register the MBean.
    */

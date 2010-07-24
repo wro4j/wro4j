@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.ConfigurationContext;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
@@ -142,7 +142,7 @@ public class XmlModelFactory
    */
   private void initScheduler() {
     if (scheduler == null) {
-      final long period = ConfigurationContext.get().getConfig().getModelUpdatePeriod();
+      final long period = Context.getConfig().getModelUpdatePeriod();
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Run a scheduled task which updates the model

@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ConfigurationContext;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 
 /**
@@ -69,6 +69,6 @@ public final class DefaultGroupExtractor implements GroupExtractor {
       throw new IllegalArgumentException("Request cannot be NULL!");
     }
     final String minimizeAsString = request.getParameter(PARAM_MINIMIZE);
-    return !(ConfigurationContext.get().getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
+    return !(Context.getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
   }
 }

@@ -23,6 +23,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -49,8 +50,7 @@ public class TestWroFilter {
     filter = new WroFilter();
     config = Mockito.mock(FilterConfig.class);
     final ServletContext servletContext = Mockito.mock(ServletContext.class);
-    Mockito.when(config.getServletContext())
-      .thenReturn(servletContext);
+    Mockito.when(config.getServletContext()).thenReturn(servletContext);
     filter.init(config);
   }
 
@@ -90,10 +90,8 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testFilterInitParamsAreWrong()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD))
-      .thenReturn("InvalidNumber");
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD))
-      .thenReturn("100");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("InvalidNumber");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
     filter.init(config);
   }
 
@@ -101,8 +99,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidAppFactoryClassNameIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY))
-      .thenReturn("Invalid value");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_MANAGER_FACTORY)).thenReturn("Invalid value");
     filter.init(config);
   }
 
@@ -113,7 +110,7 @@ public class TestWroFilter {
   @Test
   public void testInvalidGroupNameExceptionThrownInDEPLOYMENTMode()
     throws Exception {
-    testSpecificExceptionThrownInDEPLOYMENTMode(new InvalidGroupNameException(""));
+    testChainContinueWhenSpecificExceptionThrown(new InvalidGroupNameException(""));
   }
 
 
@@ -123,52 +120,48 @@ public class TestWroFilter {
   @Test
   public void testUnauthorizedRequestExceptionThrownInDEPLOYMENTMode()
     throws Exception {
-    testSpecificExceptionThrownInDEPLOYMENTMode(new UnauthorizedRequestException(""));
+    testChainContinueWhenSpecificExceptionThrown(new UnauthorizedRequestException(""));
   }
 
 
   /**
    * Test that in DEPLOYMENT mode if specified exception is thrown, the response redirect to 404.
    */
-  public void testSpecificExceptionThrownInDEPLOYMENTMode(final Throwable e)
+  public void testChainContinueWhenSpecificExceptionThrown(final Throwable e)
     throws Exception {
     final WroManagerFactory factory = Mockito.mock(WroManagerFactory.class);
-    Mockito.when(factory.getInstance())
-      .thenThrow(e);
+    Mockito.when(factory.getInstance()).thenThrow(e);
     filter = createTestFilter(factory, false);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     filter.init(config);
-    filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
-    // check 404 was called
-    Mockito.verify(response)
-      .sendError(HttpServletResponse.SC_NOT_FOUND);
+
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), response, chain);
+    verifyChainIsCalled(chain);
   }
 
 
-  /**
-   * Test that in development mode, all runtime exception are not catched.
-   */
-  @Test(expected = WroRuntimeException.class)
-  public void testInvalidGroupNameExceptionThrownInDevelopmentMode()
-    throws Exception {
-    final WroManagerFactory factory = Mockito.mock(WroManagerFactory.class);
-    Mockito.when(factory.getInstance())
-      .thenThrow(new InvalidGroupNameException(""));
-    filter = createTestFilter(factory, true);
-    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    filter.init(config);
-    filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
-  }
+//  /**
+//   * Test that in development mode, all runtime exception are not catched.
+//   */
+//  @Test(expected = WroRuntimeException.class)
+//  public void testInvalidGroupNameExceptionThrownInDevelopmentMode()
+//    throws Exception {
+//    final WroManagerFactory factory = Mockito.mock(WroManagerFactory.class);
+//    Mockito.when(factory.getInstance()).thenThrow(new InvalidGroupNameException(""));
+//    filter = createTestFilter(factory, true);
+//    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+//    filter.init(config);
+//    filter.doFilter(Mockito.mock(HttpServletRequest.class), response, Mockito.mock(FilterChain.class));
+//  }
 
 
   /**
    * Creates a test filter with configured {@link WroManagerFactory} as a factory and with configuration mode set to
    * DEVELOPMENT if isDevelopment argument is true.
    *
-   * @param factory
-   *          used by the filter.
-   * @param isDevelopment
-   *          true if configuration mode is in DEVELOPMENT mode.
+   * @param factory used by the filter.
+   * @param isDevelopment true if configuration mode is in DEVELOPMENT mode.
    * @return
    */
   private WroFilter createTestFilter(final WroManagerFactory factory, final boolean isDevelopment) {
@@ -192,8 +185,8 @@ public class TestWroFilter {
   @Test
   public void testValidAppFactoryClassNameIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY))
-      .thenReturn(ServletContextAwareWroManagerFactory.class.getName());
+    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn(
+      ServletContextAwareWroManagerFactory.class.getName());
     filter.init(config);
   }
 
@@ -201,8 +194,7 @@ public class TestWroFilter {
   @Test
   public void testJmxDisabled()
     throws Exception {
-    Mockito.when(config.getInitParameter(filter.PARAM_JMX_ENABLED))
-      .thenReturn("false");
+    Mockito.when(config.getInitParameter(filter.PARAM_JMX_ENABLED)).thenReturn("false");
     filter.init(config);
   }
 
@@ -213,31 +205,22 @@ public class TestWroFilter {
   @Test
   public void testFilterInitParamsAreSetProperly()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION))
-      .thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_GZIP_RESOURCES))
-      .thenReturn(Boolean.FALSE.toString());
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD))
-      .thenReturn("10");
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD))
-      .thenReturn("100");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_GZIP_RESOURCES)).thenReturn(Boolean.FALSE.toString());
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("10");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
     filter.init(config);
-    Assert.assertEquals(false, filter.getConfiguration()
-      .isDebug());
-    Assert.assertEquals(false, filter.getConfiguration()
-      .isGzipEnabled());
-    Assert.assertEquals(10, filter.getConfiguration()
-      .getCacheUpdatePeriod());
-    Assert.assertEquals(100, filter.getConfiguration()
-      .getModelUpdatePeriod());
+    Assert.assertEquals(false, filter.getConfiguration().isDebug());
+    Assert.assertEquals(false, filter.getConfiguration().isGzipEnabled());
+    Assert.assertEquals(10, filter.getConfiguration().getCacheUpdatePeriod());
+    Assert.assertEquals(100, filter.getConfiguration().getModelUpdatePeriod());
   }
 
 
   @Test
   public void testValidHeaderParamIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER))
-      .thenReturn("ETag: 998989");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989");
     filter.init(config);
   }
 
@@ -245,8 +228,8 @@ public class TestWroFilter {
   @Test
   public void testValidHeaderParamsAreSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER))
-      .thenReturn("ETag: 998989 | Expires: Thu, 15 Apr 2010 20:00:00 GMT");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn(
+      "ETag: 998989 | Expires: Thu, 15 Apr 2010 20:00:00 GMT");
     filter.init(config);
   }
 
@@ -254,8 +237,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER))
-      .thenReturn("ETag 998989 expires 1");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag 998989 expires 1");
     filter.init(config);
   }
 
@@ -266,31 +248,46 @@ public class TestWroFilter {
   @Test
   public void testConfigurationInitParam()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION))
-      .thenReturn("anyOtherString");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
     filter.init(config);
-    Assert.assertEquals(true, filter.getConfiguration()
-      .isDebug());
+    Assert.assertEquals(true, filter.getConfiguration().isDebug());
   }
 
 
-  @Test(expected = WroRuntimeException.class)
+  /**
+   * Check what happens when the request cannot be processed and assure that the we proceed with chain.
+   *
+   * @throws Exception
+   */
   public void cannotProcessConfigResourceStream()
     throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-
-    Mockito.when(request.getRequestURI())
-      .thenReturn("");
+    Mockito.when(request.getRequestURI()).thenReturn("");
     filter.doFilter(request, response, chain);
+    verifyChainIsCalled(chain);
   }
 
 
-  @Test(expected = WroRuntimeException.class)
+  /**
+   * @param chain
+   * @throws IOException
+   * @throws ServletException
+   */
+  private void verifyChainIsCalled(final FilterChain chain)
+    throws IOException, ServletException {
+    Mockito.verify(chain, Mockito.atLeastOnce()).doFilter(Mockito.any(HttpServletRequest.class),
+      Mockito.any(HttpServletResponse.class));
+  }
+
+
+  @Test
   public void cannotProcessInvalidUri()
     throws Exception {
-    requestGroupByUri("");
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    requestGroupByUri("", chain);
+    verifyChainIsCalled(chain);
   }
 
 
@@ -301,27 +298,30 @@ public class TestWroFilter {
   }
 
 
-  @Test(expected = InvalidGroupNameException.class)
+  @Test
   public void requestInvalidGroup()
     throws Exception {
-    requestGroupByUri("/folder/INVALID_GROUP.css");
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    requestGroupByUri("/folder/INVALID_GROUP.css", chain);
+    verifyChainIsCalled(chain);
   }
 
 
-  @Test(expected = UnauthorizedRequestException.class)
+  @Test
   public void cannotAccessUnauthorizedRequest()
     throws Exception {
+    final FilterChain chain = Mockito.mock(FilterChain.class);
     final String resourcePath = "/g1.css";
     final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + resourcePath;
     requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
       @Override
       protected HttpServletRequest newRequest() {
         final HttpServletRequest request = super.newRequest();
-        Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID))
-          .thenReturn(resourcePath);
+        Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourcePath);
         return request;
       }
-    });
+    }, chain);
+    verifyChainIsCalled(chain);
   }
 
 
@@ -335,8 +335,7 @@ public class TestWroFilter {
       @Override
       protected HttpServletRequest newRequest() {
         final HttpServletRequest request = super.newRequest();
-        Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID))
-          .thenReturn(resourcePath);
+        Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourcePath);
         return request;
       }
     });
@@ -345,7 +344,14 @@ public class TestWroFilter {
 
   private void requestGroupByUri(final String requestUri)
     throws IOException, ServletException {
-    requestGroupByUri(requestUri, new RequestBuilder(requestUri));
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    requestGroupByUri(requestUri, new RequestBuilder(requestUri), chain);
+  }
+
+
+  private void requestGroupByUri(final String requestUri, final FilterChain chain)
+    throws IOException, ServletException {
+    requestGroupByUri(requestUri, new RequestBuilder(requestUri), chain);
   }
 
 
@@ -354,15 +360,12 @@ public class TestWroFilter {
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI())
-      .thenReturn("/g2.js");
+    Mockito.when(request.getRequestURI()).thenReturn("/g2.js");
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
-    Mockito.when(response.getOutputStream())
-      .thenReturn(sos);
+    Mockito.when(response.getOutputStream()).thenReturn(sos);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION))
-      .thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
     filter.doFilter(request, response, chain);
   }
@@ -373,17 +376,37 @@ public class TestWroFilter {
    *
    * @param requestUri
    */
-  private void requestGroupByUri(final String requestUri, final RequestBuilder requestBuilder)
+  private void requestGroupByUri(final String requestUri, final RequestBuilder requestBuilder, final FilterChain chain)
     throws IOException, ServletException {
     initFilterWithValidConfig();
     final HttpServletRequest request = requestBuilder.newRequest();
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
-    Mockito.when(response.getOutputStream())
-      .thenReturn(sos);
-    final FilterChain chain = Mockito.mock(FilterChain.class);
+    Mockito.when(response.getOutputStream()).thenReturn(sos);
     filter.init(config);
     filter.doFilter(request, response, chain);
+  }
+
+
+  private void requestGroupByUri(final String requestUri, final RequestBuilder requestBuilder)
+    throws IOException, ServletException {
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    requestGroupByUri(requestUri, requestBuilder, chain);
+  }
+
+
+  @Test
+  public void testApiCallInDEPLOYMENTMode()
+    throws Exception {
+    initFilterWithValidConfig();
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/someMethod");
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    filter.init(config);
+    filter.doFilter(request, response, chain);
+
   }
 
   class RequestBuilder {
@@ -397,8 +420,7 @@ public class TestWroFilter {
 
     protected HttpServletRequest newRequest() {
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-      Mockito.when(request.getRequestURI())
-        .thenReturn(requestUri);
+      Mockito.when(request.getRequestURI()).thenReturn(requestUri);
       return request;
     }
   }

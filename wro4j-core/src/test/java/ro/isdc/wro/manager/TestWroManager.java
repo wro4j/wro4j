@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
@@ -113,7 +112,7 @@ public class TestWroManager extends AbstractWroTest {
     config.setCacheUpdatePeriod(periodValue);
     config.setModelUpdatePeriod(periodValue);
 
-    ConfigurationContext.get().setConfig(config);
+    Context.setConfig(config);
   }
 
 

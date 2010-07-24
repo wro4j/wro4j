@@ -31,14 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
-import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -95,6 +93,7 @@ public class WroFilter
    * A preferred name of the MBean object.
    */
   static final String PARAM_MBEAN_NAME = "mbeanName";
+
   /**
    * Filter config.
    */
@@ -165,7 +164,7 @@ public class WroFilter
       jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
           BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
       configuration = newConfiguration();
-      ConfigurationContext.get().setConfig(configuration);
+      Context.setConfig(configuration);
       LOG.info("jmxEnabled: " + jmxEnabled);
       LOG.info("wro4j configuration: " + configuration);
       if (jmxEnabled) {
@@ -350,20 +349,26 @@ public class WroFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
-      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-      final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
-      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-        return;
-      }
-      setResponseHeaders(response);
-      // process the uri using manager
-      wroManagerFactory.getInstance().process(request, response);
-      // remove context from the current thread local.
+      processRequest(request, response);
       Context.unset();
     } catch (final RuntimeException e) {
-      onRuntimeException(e, response);
+      onRuntimeException(e, response, chain);
     }
+  }
+
+  /**
+   * Perform actual processing.
+   */
+  private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
+    throws ServletException, IOException {
+    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+    final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
+    if (etagValue != null && etagValue.equals(ifNoneMatch)) {
+      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    }
+    setResponseHeaders(response);
+    // process the uri using manager
+    wroManagerFactory.getInstance().process(request, response);
   }
 
   /**
@@ -373,20 +378,20 @@ public class WroFilter
    * @param e
    *          {@link RuntimeException} thrown during request processing.
    */
-  protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response) {
-    if (!ConfigurationContext.get().getConfig().isDebug()) {
-      if (e instanceof InvalidGroupNameException || e instanceof UnauthorizedRequestException) {
-        try {
-          response.sendError(HttpServletResponse.SC_NOT_FOUND);
-          return;
-        } catch (final IOException ex) {
-          LOG.error("Error while redirecting to: " + HttpServletResponse.SC_NOT_FOUND);
-          throw e;
-        }
-      }
+  protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
+    final FilterChain chain) {
+    LOG.debug("runtime exception occured", e);
+    try {
+      LOG.debug("Cannot process. Proceeding with chain execution.");
+      chain.doFilter(Context.get().getRequest(), response);
+      return;
+    } catch (final Exception ex) {
+      // should never happen
+      LOG.error("Error while chaining the request: " + HttpServletResponse.SC_NOT_FOUND);
+      throw e;
     }
-    throw e;
   }
+
 
   /**
    * Method called for each request and responsible for setting response headers, used mostly for cache control.

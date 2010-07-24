@@ -28,7 +28,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.http.HttpHeader;
@@ -57,7 +56,10 @@ public class WroManager
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-
+  /**
+   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
+   */
+  public static final String PATH_API = "wroAPI";
   /**
    * ResourcesModel factory.
    */
@@ -103,7 +105,9 @@ public class WroManager
     // create model
     final WroModel model = modelFactory.getInstance();
     LOG.debug("processing: " + request.getRequestURI());
-    if (isProxyResourceRequest(request)) {
+    if (isApiRequest(request)) {
+
+    } else if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
     } else {
       is = buildGroupsInputStream(model, request, response);
@@ -115,6 +119,13 @@ public class WroManager
     os.close();
   }
 
+
+  /**
+   * Check if this is an API call (used to call some of the operations exposed by wro). API is exposed only in DEBUG mode.
+   */
+  private boolean isApiRequest(final HttpServletRequest request) {
+    return Context.getConfig().isDebug() && request.getRequestURI().contains(PATH_API);
+  }
 
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
@@ -133,7 +144,7 @@ public class WroManager
    * @throws IOException when Gzip operation fails.
    */
   private OutputStream getGzipedOutputStream(final HttpServletResponse response) throws IOException {
-    if (ConfigurationContext.get().getConfig().isGzipEnabled() && isGzipSupported()) {
+    if (Context.getConfig().isGzipEnabled() && isGzipSupported()) {
       // add gzip header and gzip response
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
       // Create a gzip stream
@@ -148,7 +159,7 @@ public class WroManager
    * @param model the model used to build stream.
    * @param request {@link HttpServletRequest} for this request cycle.
    * @param response {@link HttpServletResponse} used to set content type.
-   * @return {@link InputStream} for groups found in requestURI.
+   * @return {@link InputStream} for groups found in requestURI or null if the request is not as expected.
    */
   private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request,
       final HttpServletResponse response) {
@@ -159,7 +170,7 @@ public class WroManager
     final ResourceType type = groupExtractor.getResourceType(request);
     final String groupName = groupExtractor.getGroupName(request);
     final boolean minimize = groupExtractor.isMinimized(request);
-    if (groupName == null) {
+    if (groupName == null || type == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
     initScheduler(model);
@@ -216,7 +227,7 @@ public class WroManager
    */
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
-      final long period = ConfigurationContext.get().getConfig().getCacheUpdatePeriod();
+      final long period = Context.getConfig().getCacheUpdatePeriod();
       LOG.debug("runing thread with period of " + period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();

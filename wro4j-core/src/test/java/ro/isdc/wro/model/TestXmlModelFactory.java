@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ConfigurationContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -29,8 +28,8 @@ public class TestXmlModelFactory {
 
   @Before
   public void init() {
-    ConfigurationContext.get().getConfig().setCacheUpdatePeriod(0);
-    ConfigurationContext.get().getConfig().setModelUpdatePeriod(0);
+    Context.getConfig().setCacheUpdatePeriod(0);
+    Context.getConfig().setModelUpdatePeriod(0);
     final Context context = Mockito.mock(Context.class);
     Context.set(context);
   }
@@ -49,8 +48,8 @@ public class TestXmlModelFactory {
 
   @Test
   public void testWithUpdatePeriodSet() {
-    ConfigurationContext.get().getConfig().setCacheUpdatePeriod(1);
-    ConfigurationContext.get().getConfig().setModelUpdatePeriod(1);
+    Context.getConfig().setCacheUpdatePeriod(1);
+    Context.getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
 //
