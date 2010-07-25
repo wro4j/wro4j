@@ -13,7 +13,9 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 
 /**
- * Defines MBean which manage configuration.
+ * Defines MBean which manage configuration. There should be only one instance of this object in the application and it
+ * should be accessible even outside of the request cycle.
+ *
  * @author Alex Objelean
  */
 public final class WroConfiguration
@@ -37,8 +39,8 @@ public final class WroConfiguration
   /**
    * Listeners for the change of cache & model period properties.
    */
-  private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>();
-  private final List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>();
+  private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
+  private final List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
   /**
    * @return the name of the object used to register the MBean.
    */
@@ -143,7 +145,7 @@ public final class WroConfiguration
 	}
 
 	/**
-	 * Register a listener which is notified when the modelUpdate period value is changed.
+	 * Register a listener which is notified when the modelUpdate period value is changed. Registration is allowed only during
 	 *
 	 * @param listener to add.
 	 */
@@ -157,7 +159,7 @@ public final class WroConfiguration
 	 * @param listener to add.
 	 */
 	public void registerCacheUpdatePeriodChangeListener(final PropertyChangeListener listener) {
-		cacheUpdatePeriodListeners.add(listener);
+	  cacheUpdatePeriodListeners.add(listener);
 	}
 
   /**
@@ -171,9 +173,17 @@ public final class WroConfiguration
    * @param debug the debug to set
    */
   public void setDebug(final boolean debug) {
-    reloadCache();
-    reloadModel();
+    //Don't think that we really need to reload the cache here
     this.debug = debug;
+  }
+
+
+  /**
+   * Perform the cleanup, clear the listeners.
+   */
+  public void destroy() {
+    cacheUpdatePeriodListeners.clear();
+    modelUpdatePeriodListeners.clear();
   }
 
   /**

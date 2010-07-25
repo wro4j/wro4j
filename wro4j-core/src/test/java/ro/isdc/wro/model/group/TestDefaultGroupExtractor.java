@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group;
 
+
 import javax.servlet.http.HttpServletRequest;
 
 import junit.framework.Assert;

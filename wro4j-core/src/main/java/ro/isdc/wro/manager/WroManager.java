@@ -61,6 +61,14 @@ public class WroManager
    */
   public static final String PATH_API = "wroAPI";
   /**
+   * API - reload cache method call
+   */
+  public static final String API_RELOAD_CACHE = "reloadCache";
+  /**
+   * API - reload model method call
+   */
+  public static final String API_RELOAD_MODEL = "reloadModel";
+  /**
    * ResourcesModel factory.
    */
   private WroModelFactory modelFactory;
@@ -104,9 +112,24 @@ public class WroManager
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
-    LOG.debug("processing: " + request.getRequestURI());
+    //TODO move API related checks into separate class and determine filter mapping for better mapping
     if (isApiRequest(request)) {
-
+      if (request.getRequestURI().contains(API_RELOAD_CACHE)) {
+        Context.getConfig().reloadCache();
+        response.setContentType("application/json");
+        response.getWriter().write("{response: 'OK'}");
+        response.getWriter().flush();
+        response.getWriter().close();
+        return;
+      }
+      if (request.getRequestURI().contains(API_RELOAD_MODEL)) {
+        Context.getConfig().reloadModel();
+        response.setContentType("application/json");
+        response.getWriter().write("{response: 'OK'}");
+        response.getWriter().flush();
+        response.getWriter().close();
+        return;
+      }
     } else if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
     } else {

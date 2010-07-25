@@ -188,6 +188,14 @@ public class Context {
   }
 
   /**
+   * Perform context clean-up.
+   */
+  public static void destroy() {
+    unset();
+    CONFIG_INSTANCE.destroy();
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

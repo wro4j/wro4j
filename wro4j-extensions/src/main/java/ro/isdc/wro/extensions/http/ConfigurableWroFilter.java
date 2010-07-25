@@ -22,14 +22,12 @@ public class ConfigurableWroFilter extends WroFilter {
    * {@inheritDoc}
    */
   @Override
-  protected WroConfiguration newConfiguration() {
-    final WroConfiguration configuration = super.newConfiguration();
+  protected void initConfiguration(final WroConfiguration configuration) {
     //use injected properties for configuration
     configuration.setCacheUpdatePeriod(cacheUpdatePeriod);
     configuration.setModelUpdatePeriod(modelUpdatePeriod);
     configuration.setDebug(debug);
     configuration.setGzipEnabled(gzipEnabled);
-    return configuration;
   }
 
   /**

@@ -41,7 +41,7 @@ public class TestUrlUriLocator {
   @Test
   public void testValidUrl()
     throws IOException {
-    uriLocator.locate("http://www.google.com");
+    uriLocator.locate(" http://www.google.com");
   }
 
   @Test

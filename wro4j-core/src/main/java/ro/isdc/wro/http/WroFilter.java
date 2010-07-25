@@ -58,7 +58,7 @@ public class WroFilter
    */
   private static final String MBEAN_PREFIX = "wro4j-";
   /**
-   * The parameter used to specify headers to put into the response, used mostly for caching.
+   * The parameter used to specify headers to put into the response, used mainly for caching.
    */
   static final String PARAM_HEADER = "header";
   /**
@@ -70,8 +70,11 @@ public class WroFilter
    */
   static final String PARAM_CONFIGURATION = "configuration";
   /**
+   * Replace with a boolean used for debug
    * Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is assumed.
    */
+  //TODO deprecate and use a boolean value init-param
+  //@Deprecated
   static final String PARAM_VALUE_DEPLOYMENT = "DEPLOYMENT";
   /**
    * Gzip resources configuration option.
@@ -103,7 +106,7 @@ public class WroFilter
    * WroManagerFactory. The brain of the optimizer.
    */
   private WroManagerFactory wroManagerFactory;
-  private WroConfiguration configuration;
+//  private WroConfiguration configuration;
   /**
    * Flag for enable/disable jmx. By default this value is true.
    */
@@ -163,16 +166,15 @@ public class WroFilter
       // TODO do not use BooleanUtils -> create your utility method
       jmxEnabled = BooleanUtils.toBooleanDefaultIfNull(
           BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
-      configuration = newConfiguration();
-      Context.setConfig(configuration);
+      initConfiguration(Context.getConfig());
       LOG.info("jmxEnabled: " + jmxEnabled);
-      LOG.info("wro4j configuration: " + configuration);
+      LOG.info("wro4j configuration: " + Context.getConfig());
       if (jmxEnabled) {
         registerChangeListeners();
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
         if (!mbeanServer.isRegistered(name)) {
-          mbeanServer.registerMBean(configuration, name);
+          mbeanServer.registerMBean(Context.getConfig(), name);
         }
       }
     } catch (final JMException e) {
@@ -222,9 +224,10 @@ public class WroFilter
    * Register property change listeners.
    */
   private void registerChangeListeners() {
+    final WroConfiguration configuration = Context.getConfig();
     configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
       public void propertyChange(final PropertyChangeEvent event) {
-        // reset cache headers when any property is changed in order to avoid browser caching (using ETAG header)
+        // reset cache headers when any property is changed in order to avoid browser caching
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
           ((WroConfigurationChangeListener) wroManagerFactory).onCachePeriodChanged();
@@ -261,9 +264,7 @@ public class WroFilter
    *
    * @return {@link WroConfiguration} configured object with default values set.
    */
-  protected WroConfiguration newConfiguration() {
-    final WroConfiguration config = new WroConfiguration();
-
+  protected void initConfiguration(final WroConfiguration config) {
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     config.setGzipEnabled(gzipResources);
@@ -278,7 +279,6 @@ public class WroFilter
     config.setDebug(debug);
     config.setCacheUpdatePeriod(getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD));
     config.setModelUpdatePeriod(getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD));
-    return config;
   }
 
   /**
@@ -324,6 +324,7 @@ public class WroFilter
    *          value to parse.
    */
   private void parseHeader(final String header) {
+    LOG.debug("parseHeader: " + header);
     final String headerName = header.substring(0, header.indexOf(":"));
     if (!headersMap.containsKey(headerName)) {
       headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
@@ -431,18 +432,10 @@ public class WroFilter
   }
 
   /**
-   * This exists only for testing purposes.
-   *
-   * @return the applicationSettings
-   */
-  protected final WroConfiguration getConfiguration() {
-    return this.configuration;
-  }
-
-  /**
    * {@inheritDoc}
    */
   public void destroy() {
+    Context.destroy();
     wroManagerFactory.destroy();
   }
 }

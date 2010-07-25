@@ -3,10 +3,6 @@
  */
 package ro.isdc.wro;
 
-import java.util.Arrays;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base Wro Runtime exception. All exceptions will extend this runtime
@@ -22,17 +18,11 @@ public class WroRuntimeException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Logger for this class.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(WroRuntimeException.class);
-
-  /**
    * @param message
    * @param cause
    */
   public WroRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
-    LOG.error(message, cause);
   }
 
   /**
@@ -40,6 +30,5 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message) {
     super(message);
-    LOG.error(message + " " + Arrays.asList(getStackTrace()));
   }
 }

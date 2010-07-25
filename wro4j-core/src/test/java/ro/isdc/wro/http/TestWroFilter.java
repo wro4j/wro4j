@@ -5,6 +5,7 @@ package ro.isdc.wro.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -173,10 +175,8 @@ public class TestWroFilter {
 
 
       @Override
-      protected WroConfiguration newConfiguration() {
-        final WroConfiguration config = super.newConfiguration();
+      protected void initConfiguration(final WroConfiguration config) {
         config.setDebug(isDevelopment);
-        return config;
       }
     };
   }
@@ -205,15 +205,16 @@ public class TestWroFilter {
   @Test
   public void testFilterInitParamsAreSetProperly()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(WroFilter.PARAM_VALUE_DEPLOYMENT);
     Mockito.when(config.getInitParameter(WroFilter.PARAM_GZIP_RESOURCES)).thenReturn(Boolean.FALSE.toString());
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("10");
     Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
     filter.init(config);
-    Assert.assertEquals(false, filter.getConfiguration().isDebug());
-    Assert.assertEquals(false, filter.getConfiguration().isGzipEnabled());
-    Assert.assertEquals(10, filter.getConfiguration().getCacheUpdatePeriod());
-    Assert.assertEquals(100, filter.getConfiguration().getModelUpdatePeriod());
+    final WroConfiguration config = Context.getConfig();
+    Assert.assertEquals(false, config.isDebug());
+    Assert.assertEquals(false, config.isGzipEnabled());
+    Assert.assertEquals(10, config.getCacheUpdatePeriod());
+    Assert.assertEquals(100, config.getModelUpdatePeriod());
   }
 
 
@@ -250,7 +251,7 @@ public class TestWroFilter {
     throws Exception {
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
     filter.init(config);
-    Assert.assertEquals(true, filter.getConfiguration().isDebug());
+    Assert.assertEquals(true, Context.getConfig().isDebug());
   }
 
 
@@ -271,13 +272,20 @@ public class TestWroFilter {
 
 
   /**
-   * @param chain
-   * @throws IOException
-   * @throws ServletException
+   * Check if the chain call was performed.
    */
   private void verifyChainIsCalled(final FilterChain chain)
     throws IOException, ServletException {
     Mockito.verify(chain, Mockito.atLeastOnce()).doFilter(Mockito.any(HttpServletRequest.class),
+      Mockito.any(HttpServletResponse.class));
+  }
+
+  /**
+   * Check if the chain call was performed.
+   */
+  private void verifyChainIsNotCalled(final FilterChain chain)
+    throws IOException, ServletException {
+    Mockito.verify(chain, Mockito.never()).doFilter(Mockito.any(HttpServletRequest.class),
       Mockito.any(HttpServletResponse.class));
   }
 
@@ -365,7 +373,7 @@ public class TestWroFilter {
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
     Mockito.when(response.getOutputStream()).thenReturn(sos);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(WroFilter.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
     filter.doFilter(request, response, chain);
   }
@@ -394,19 +402,68 @@ public class TestWroFilter {
     requestGroupByUri(requestUri, requestBuilder, chain);
   }
 
-
+  /**
+   * Tests that in DEPLOYMENT mode the API is not exposed.
+   */
   @Test
   public void testApiCallInDEPLOYMENTMode()
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/someMethod");
-    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(WroFilter.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
-    filter.doFilter(request, response, chain);
+    filter.doFilter(request, Mockito.mock(HttpServletResponse.class), chain);
+    //No api method exposed -> proceed with chain
+    verifyChainIsCalled(chain);
+  }
 
+  /**
+   * Tests that in DEPLOYMENT mode the API is not exposed.
+   */
+  @Test
+  public void testApiCallInDEVELOPMENTModeAndInvalidApiCall()
+    throws Exception {
+    initFilterWithValidConfig();
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/someMethod");
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    //by default configuration is development
+    filter.init(config);
+    filter.doFilter(request, Mockito.mock(HttpServletResponse.class), chain);
+    //No api method exposed -> proceed with chain
+    verifyChainIsCalled(chain);
+  }
+
+
+  /**
+   * Tests that in DEPLOYMENT mode the API is not exposed.
+   */
+  @Test
+  public void testApiCallInDEVELOPMENTModeAndReloadCacheCall()
+    throws Exception {
+    initFilterWithValidConfig();
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/" + WroManager.API_RELOAD_CACHE);
+
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    //by default configuration is development
+    filter.init(config);
+    System.out.println("!!!!!!" + config.getInitParameter(WroFilter.PARAM_HEADER));
+    filter.doFilter(request, response, chain);
+    //No api method exposed -> proceed with chain
+    verifyChainIsNotCalled(chain);
+  }
+
+
+  /**
+   * Mocks the WroFilter.PARAM_CONFIGURATION init param with passed value.
+   */
+  private void setConfigurationMode(final String value) {
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(value);
   }
 
   class RequestBuilder {
