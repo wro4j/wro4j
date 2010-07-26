@@ -114,6 +114,7 @@ public class WroManager
     final WroModel model = modelFactory.getInstance();
     //TODO move API related checks into separate class and determine filter mapping for better mapping
     if (isApiRequest(request)) {
+      //must be case insensitive
       if (request.getRequestURI().contains(API_RELOAD_CACHE)) {
         Context.getConfig().reloadCache();
         response.setContentType("application/json");
