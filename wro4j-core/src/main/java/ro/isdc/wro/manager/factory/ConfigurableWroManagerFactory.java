@@ -197,7 +197,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       final String message = "No '" + initParamName + "' initParam was set";
       LOG.warn(message);
       return list;
-//      throw new WroRuntimeException(message);
     }
     for (final String token : tokens) {
       final T item = map.get(token);

@@ -173,10 +173,12 @@ public class TestWroFilter {
         return factory;
       }
 
-
+      /**
+       * {@inheritDoc}
+       */
       @Override
-      protected void initConfiguration(final WroConfiguration config) {
-        config.setDebug(isDevelopment);
+      protected boolean isDebug() {
+        return true;
       }
     };
   }

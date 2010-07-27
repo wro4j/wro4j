@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2008. All rights reserved.
+ * Copyright (c) 2010. All rights reserved.
  */
-package ro.isdc.wro.extensions.http;
+package ro.isdc.wro.http;
 
 import java.io.IOException;
 

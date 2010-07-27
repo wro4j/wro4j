@@ -11,6 +11,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.http.ConfigurableWroFilter;
 import ro.isdc.wro.manager.WroManagerFactory;
 
 /**
