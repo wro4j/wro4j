@@ -1,10 +1,7 @@
 package ro.isdc.wro4j.demo;
 
 
-import com.google.apphosting.api.ApiProxy;
 import junit.framework.TestCase;
-
-import java.io.File;
 
 /**
  * local service test

@@ -275,17 +275,19 @@
 					</archive>
 				</configuration>
 			</plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.scm</groupId>
-            <artifactId>maven-scm-provider-gitexe</artifactId>
-            <version>1.1-db-1</version>
-          </dependency>
-        </dependencies>
-      </plugin>      
+			<!--
+			  <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<dependencies>
+				  <dependency>
+					<groupId>org.apache.maven.scm</groupId>
+					<artifactId>maven-scm-provider-gitexe</artifactId>
+					<version>1.1-db-1</version>
+				  </dependency>
+				</dependencies>
+			  </plugin>      
+			-->  
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
