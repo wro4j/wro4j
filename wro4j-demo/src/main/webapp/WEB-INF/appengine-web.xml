@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-    <application>wro4j-demo</application>
-    <version>4</version>
+    <application>web-resource-optimizer</application>
+    <version>5</version>
     <sessions-enabled>true</sessions-enabled>
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>

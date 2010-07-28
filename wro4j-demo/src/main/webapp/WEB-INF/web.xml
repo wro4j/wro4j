@@ -13,7 +13,7 @@
 
   <context-param>
     <param-name>configuration</param-name>
-    <param-value>deployment</param-value>
+    <param-value>development</param-value>
   </context-param>
 
   <filter>
@@ -30,3 +30,4 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 </web-app>
+  
