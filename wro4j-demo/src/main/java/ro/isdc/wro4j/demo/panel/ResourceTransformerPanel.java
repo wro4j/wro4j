@@ -8,16 +8,25 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.PropertyModel;
 
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 
 /**
@@ -27,6 +36,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 public class ResourceTransformerPanel extends Panel {
   private String input;
   private String output;
+  private ResourcePostProcessor processor;
 
 
   public ResourceTransformerPanel(final String id) {
@@ -38,6 +48,7 @@ public class ResourceTransformerPanel extends Panel {
   private void addComponents() {
     final Form<?> form = new Form<Void>("form");
     form.setOutputMarkupId(true);
+    form.add(getProcessorSelect());
     form.add(new TextArea<String>("input", new PropertyModel<String>(this, "input")));
     form.add(new TextArea<String>("output", new PropertyModel<String>(this, "output")));
     form.add(new AjaxButton("transform") {
@@ -46,7 +57,6 @@ public class ResourceTransformerPanel extends Panel {
         try {
           output = null;
           if (input != null) {
-            final ResourcePostProcessor processor = new CssMinProcessor();
             final Writer writer = new StringWriter();
             processor.process(new StringReader(input), writer);
             //output = input.toUpperCase();
@@ -59,5 +69,22 @@ public class ResourceTransformerPanel extends Panel {
       }
     });
     add(form);
+  }
+
+
+  /**
+   * @return
+   */
+  private Component getProcessorSelect() {
+    final List<? extends ResourcePostProcessor> list = Arrays.asList(new CssMinProcessor(), new JSMinProcessor(),
+      new CssVariablesProcessor(), new JawrCssMinifierProcessor());
+    final IChoiceRenderer<ResourcePostProcessor> renderer = new ChoiceRenderer<ResourcePostProcessor>() {
+      @Override
+      public Object getDisplayValue(final ResourcePostProcessor object) {
+        return object.getClass().getSimpleName();
+      }
+    };
+    final Component component = new DropDownChoice<ResourcePostProcessor>("selectProcessor", new PropertyModel<ResourcePostProcessor>(this, "processor"), list, renderer);
+    return component;
   }
 }
