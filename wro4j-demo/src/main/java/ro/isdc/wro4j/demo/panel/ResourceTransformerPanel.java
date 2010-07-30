@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -36,6 +37,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 public class ResourceTransformerPanel extends Panel {
   private String input;
   private String output;
+  private String compressionRate = "N/A";
   private ResourcePostProcessor processor;
 
 
@@ -49,6 +51,7 @@ public class ResourceTransformerPanel extends Panel {
     final Form<?> form = new Form<Void>("form");
     form.setOutputMarkupId(true);
     form.add(getProcessorSelect());
+    form.add(new Label("compressionRate", new PropertyModel<String>(this, "compressionRate")));
     form.add(new TextArea<String>("input", new PropertyModel<String>(this, "input")));
     form.add(new TextArea<String>("output", new PropertyModel<String>(this, "output")));
     form.add(new AjaxButton("transform") {
@@ -61,6 +64,11 @@ public class ResourceTransformerPanel extends Panel {
             processor.process(new StringReader(input), writer);
             //output = input.toUpperCase();
             output = writer.toString();
+            if (input.length() != 0) {
+              compressionRate = "" + output.length() * 100 / input.length();
+            } else {
+              compressionRate = "N/A";
+            }
           }
           target.addComponent(form);
         } catch (final IOException e) {

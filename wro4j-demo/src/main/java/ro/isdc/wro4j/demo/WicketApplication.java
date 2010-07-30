@@ -42,6 +42,14 @@ public class WicketApplication
    * {@inheritDoc}
    */
   @Override
+  public String getConfigurationType() {
+    return DEVELOPMENT;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   protected ISessionStore newSessionStore() {
     return new HttpSessionStore(this);
   }

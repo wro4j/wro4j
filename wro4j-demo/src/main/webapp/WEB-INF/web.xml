@@ -11,11 +11,6 @@
     value might be either "development" (reloading when templates change) or 
     "deployment". If no configuration is found, "development" is the default. -->
 
-  <context-param>
-    <param-name>configuration</param-name>
-    <param-value>development</param-value>
-  </context-param>
-
   <filter>
     <filter-name>wicket.test</filter-name>
     <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
