@@ -12,16 +12,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Default implementation of {@link PreProcessorExecutor}.
+ * Apply all preProcessor on provided {@link Resource} and returns the result of execution as String.
+ * <p>
+ * This is useful when you want to preProcess a resource which is not a part of the model (css import use-case).
+ *
+ * @author Alex Objelean
  */
-public class DefaultPreProcessorExecutor
-    implements PreProcessorExecutor {
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultPreProcessorExecutor.class);
+public class PreProcessorExecutor {
+  private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   private final AbstractGroupsProcessor groupsProcessor;
 
 
@@ -31,13 +33,17 @@ public class DefaultPreProcessorExecutor
    * @param groupsProcessor
    *          to set.
    */
-  public DefaultPreProcessorExecutor(final AbstractGroupsProcessor groupsProcessor) {
+  public PreProcessorExecutor(final AbstractGroupsProcessor groupsProcessor) {
     this.groupsProcessor = groupsProcessor;
   }
 
-
   /**
-   * {@inheritDoc}
+   * Execute all the preProcessors on the given resource.
+   *
+   * @param resource {@link Resource} to preProcess.
+   * @param minimize whether the minimimize aware preProcessor must be applied.
+   * @return the result of preProcessing as string content.
+   * @throws IOException if {@link Resource} cannot be found or any other related errors.
    */
   public String execute(final Resource resource, final boolean minimize)
       throws IOException {

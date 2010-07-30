@@ -21,6 +21,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.AbstractGroupsProcessor;
+import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;

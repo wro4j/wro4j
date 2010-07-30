@@ -37,6 +37,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.FingerprintCreator;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -82,6 +83,10 @@ public class WroManager
    * Groups processor.
    */
   private GroupsProcessor groupsProcessor;
+  /**
+   * Content digester.
+   */
+  private FingerprintCreator fingerprintCreator;
 
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
@@ -95,7 +100,6 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-
 
   /**
    * Perform processing of the uri.
@@ -237,7 +241,7 @@ public class WroManager
   private ContentHashEntry getContentHashEntry(final String content) {
     String hash = null;
     if (content != null) {
-      hash = WroUtil.getMD5Hash(content.getBytes());
+      hash = fingerprintCreator.create(content);
     }
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
     LOG.debug("computed entry: " + entry);
@@ -407,6 +411,9 @@ public class WroManager
     if (this.cacheStrategy == null) {
       throw new WroRuntimeException("cacheStrategy was not set!");
     }
+    if (this.fingerprintCreator == null) {
+      throw new WroRuntimeException("fingerprintCreator was not set!");
+    }
   }
 
 
@@ -455,6 +462,14 @@ public class WroManager
       throw new IllegalArgumentException("cacheStrategy cannot be null!");
     }
     this.cacheStrategy = cacheStrategy;
+  }
+
+
+  /**
+   * @param contentDigester the contentDigester to set
+   */
+  public void setFingerprintCreator(final FingerprintCreator contentDigester) {
+    this.fingerprintCreator = contentDigester;
   }
 
 

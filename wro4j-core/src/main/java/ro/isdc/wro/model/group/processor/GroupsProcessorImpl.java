@@ -20,7 +20,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.StopWatch;
 
@@ -39,7 +38,7 @@ public final class GroupsProcessorImpl
    * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
    * (according to findbugs eclipse plugin).
    */
-  private final transient PreProcessorExecutor preProcessorExecutor = new DefaultPreProcessorExecutor(this);
+  private final transient PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor(this);
 
 
   /**

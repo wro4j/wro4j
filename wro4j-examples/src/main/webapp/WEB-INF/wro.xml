@@ -3,16 +3,16 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
+  <group name="dynamicResource">
+    <js>/dynamicResource/test.js</js>
+  </group>
+<!-- 
   <group name="all">
     <group-ref>dynamicResource</group-ref>
     <group-ref>jquery</group-ref>
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>dwr</group-ref>
-    <!--     
-    <group-ref>JSGroup</group-ref>
-		<group-ref>otherGroup</group-ref>
-     -->
 	</group>
   
   <group name="WEBINF-css">
@@ -41,12 +41,8 @@
 		<css>/static/css/variablesSupport.css</css>
 	</group>
   
-  <group name="dynamicResource">
-    <js>/dynamicResource/test.js</js>
-  </group>
   
-  
-    <group name="dwr">
+  <group name="dwr">
     <js>/dwr/engine.js</js>
     <js>/dwr/interface/DWRFacade.js</js>
   </group>
@@ -75,4 +71,5 @@
     <js>/static/js/jquery-validate.js</js>
     <js>/static/js/jquery-ui-all.js</js>
   </group>
+  -->
 </groups>

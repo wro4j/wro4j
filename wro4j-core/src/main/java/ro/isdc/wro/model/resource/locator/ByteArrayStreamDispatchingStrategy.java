@@ -8,15 +8,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
@@ -28,15 +34,20 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public final class ByteArrayStreamDispatchingStrategy
-  implements DynamicStreamLocatorStrategy {
+    implements DynamicStreamLocatorStrategy {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(ByteArrayStreamDispatchingStrategy.class);
+
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
-   * application behind it. So when it intercepts a requests for portal then it start bombing the the application
-   * behind the portal with multiple threads (web requests) that are combined with threads for wro4.
+   * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
+   * the portal with multiple threads (web requests) that are combined with threads for wro4.
    */
   public synchronized InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
-    final String location)
-    throws IOException {
+      final String location)
+      throws IOException {
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     try {
@@ -45,7 +56,7 @@ public final class ByteArrayStreamDispatchingStrategy
         // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
         // the thread responsible for refreshing resources)
 
-        //Returns the part URL from the protocol name up to the query string and contextPath.
+        // Returns the part URL from the protocol name up to the query string and contextPath.
         final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
 
         final String absolutePath = servletContextPath + location;
@@ -53,12 +64,12 @@ public final class ByteArrayStreamDispatchingStrategy
         return url.openStream();
       }
       // Wrap request
-      final HttpServletRequest wrappedRequest = getWrappedServletRequest(request, location);
+      final ServletRequest wrappedRequest = getWrappedServletRequest(request, location);
       // Wrap response
       final ServletResponse wrappedResponse = getWrappedServletResponse(response, os);
+      LOG.debug("dispatching request to:" + location);
       // use dispatcher
       dispatcher.include(wrappedRequest, wrappedResponse);
-      ServletContextUriLocator.LOG.debug("dispatching request to:" + location);
       // force flushing - the content will be written to
       // BytArrayOutputStream. Otherwise exactly 32K of data will be
       // written.
@@ -71,16 +82,15 @@ public final class ByteArrayStreamDispatchingStrategy
       throw new IOException("Error while dispatching the request for location " + location);
     }
     if (os.size() == 0) {
-      ServletContextUriLocator.LOG.warn("Wrong or empty resource with location : " + location);
+      LOG.warn("Wrong or empty resource with location : " + location);
     }
     return new ByteArrayInputStream(os.toByteArray());
   }
 
-
   /**
    * Build a wrapped servlet request which will be used for dispatching.
    */
-  private HttpServletRequest getWrappedServletRequest(final HttpServletRequest request, final String location) {
+  private ServletRequest getWrappedServletRequest(final HttpServletRequest request, final String location) {
     final HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(request) {
       @Override
       public String getRequestURI() {
@@ -100,16 +110,15 @@ public final class ByteArrayStreamDispatchingStrategy
     return wrappedRequest;
   }
 
-
   /**
    * Build a wrapped servlet response which will be used for dispatching.
    */
   private ServletResponse getWrappedServletResponse(final HttpServletResponse response, final ByteArrayOutputStream os) {
     /**
-     * Both servletOutputStream and PrintWriter must be overriden in order to be sure that dispatched servlet will
-     * write to the pipe.
+     * Both servletOutputStream and PrintWriter must be overriden in order to be sure that dispatched servlet will write
+     * to the pipe.
      */
-    final ServletResponse wrappedResponse = new HttpServletResponseWrapper(response) {
+    final HttpServletResponseWrapper wrappedResponse = new HttpServletResponseWrapper(response) {
       /**
        * PrintWrapper of wrapped response.
        */
@@ -122,14 +131,33 @@ public final class ByteArrayStreamDispatchingStrategy
 
       @Override
       public ServletOutputStream getOutputStream()
-        throws IOException {
+          throws IOException {
         return sos;
       }
 
+      /**
+       * By default, redirect does not allow writing to output stream its content. In order to support this use-case, we
+       * need to open a new connection and read the content manually.
+       */
+      @Override
+      public void sendRedirect(final String location)
+          throws IOException {
+        try {
+          LOG.debug("redirecting to: " + location);
+          final URL url = new URL(location);
+          final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+          final InputStream is = connection.getInputStream();
+          IOUtils.copy(is, sos);
+          is.close();
+        } catch (final IOException e) {
+          LOG.warn("Invalid response for location: " + location);
+          throw e;
+        }
+      }
 
       @Override
       public PrintWriter getWriter()
-        throws IOException {
+          throws IOException {
         return pw;
       }
     };

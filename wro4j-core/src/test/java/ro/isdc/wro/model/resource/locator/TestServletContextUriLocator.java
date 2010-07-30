@@ -7,6 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -15,6 +22,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -80,15 +88,67 @@ public class TestServletContextUriLocator {
   }
 
   /**
-   * Make this test method to follow a flow which will throw IOException
-   * @throws Exception
+   * Make this test method to follow a flow which throws IOException
    */
-  @Test/*(expected=IOException.class)*/
+  @Test
   public void testInvalidUrl()
     throws Exception {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
     Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
-    locator.locate("/css/resourcePath.css");
+
+    final InputStream is = locator.locate("/css/resourcePath.css");
+    //the response should be empty
+    Assert.assertEquals(-1, is.read());
+  }
+
+  /**
+   * Simulates a resource which redirects to some valid location.
+   */
+  @Test
+  public void testRedirectingResource()
+    throws Exception {
+    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
+    Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    final InputStream is = simulateRedirectWithLocation("http://code.jquery.com/jquery-1.4.2.js");
+    Assert.assertNotSame(-1, is.read());
+  }
+
+  /**
+   * Simulates a resource which redirects to some valid location.
+   */
+  @Test(expected=IOException.class)
+  public void testRedirectingResourceToInvalidLocation()
+    throws Exception {
+    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
+    Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    simulateRedirectWithLocation("http://INVALID/");
+  }
+
+
+  private InputStream simulateRedirectWithLocation(final String location)
+      throws IOException {
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    Mockito.when(Context.get().getResponse()).thenReturn(response);
+
+    final RequestDispatcher requestDispatcher = new RequestDispatcher() {
+      public void include(final ServletRequest request, final ServletResponse response)
+          throws ServletException, IOException {
+        final HttpServletResponse res = (HttpServletResponse) response;
+        //valid resource
+        res.sendRedirect(location);
+      }
+
+      public void forward(final ServletRequest request, final ServletResponse response)
+          throws ServletException, IOException {
+        throw new NotImplementedException();
+      }
+    };
+
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(Context.get().getRequest()).thenReturn(request);
+    Mockito.when(request.getRequestDispatcher(Mockito.anyString())).thenReturn(requestDispatcher);
+    final InputStream is = locator.locate("/doesntMatter");
+    return is;
   }
 
   @After

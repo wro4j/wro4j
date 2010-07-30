@@ -36,6 +36,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created Created on Nov 26, 2008
  */
+@SuppressWarnings("serial")
 public abstract class AbstractGroupsProcessor
   implements GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractGroupsProcessor.class);
