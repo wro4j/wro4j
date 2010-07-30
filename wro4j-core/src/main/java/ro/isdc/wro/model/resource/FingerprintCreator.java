@@ -5,7 +5,7 @@
 package ro.isdc.wro.model.resource;
 
 /**
- * Creates a fingerprint representation of content.
+ * Creates a fingerprint representation of the resource content.
  *
  * @author Alex Objelean
  */

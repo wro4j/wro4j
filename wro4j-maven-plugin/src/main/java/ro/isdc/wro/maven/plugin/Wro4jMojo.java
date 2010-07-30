@@ -146,7 +146,6 @@ public class Wro4jMojo
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
 
-    // updateClasspath();
     try {
       getLog().info("will process the following groups: " + targetGroups);
       // TODO create a Request object
@@ -160,6 +159,16 @@ public class Wro4jMojo
     } catch (final Exception e) {
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Encodes a version using some logic.
+   *
+   * @param group the name of the resource to encode.
+   * @return the name of the resource with the version encoded.
+   */
+  private String encodeVersion(final String group) {
+    return group;
   }
 
 
@@ -258,7 +267,7 @@ public class Wro4jMojo
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(request.getRequestURI()).thenReturn(group);
 
-    final File destinationFile = new File(parentFoder, group);
+    final File destinationFile = new File(parentFoder, encodeVersion(group));
     destinationFile.createNewFile();
     final FileOutputStream fos = new FileOutputStream(destinationFile);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
@@ -318,10 +327,10 @@ public class Wro4jMojo
 
 
   /**
-   * @param targetGroups comma separated group names.
+   * @param versionEncoder(targetGroups) comma separated group names.
    */
   public void setTargetGroups(final String targetGroups) {
-    this.targetGroups = targetGroups;
+    this.targetGroups = encodeVersion(targetGroups);
   }
 
 
@@ -341,9 +350,9 @@ public class Wro4jMojo
 
 
   /**
-   * @param wroManagerFactory the wroManagerFactory to set
+   * @param versionEncoder(wroManagerFactory) the wroManagerFactory to set
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
-    this.wroManagerFactory = wroManagerFactory;
+    this.wroManagerFactory = encodeVersion(wroManagerFactory);
   }
 }

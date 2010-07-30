@@ -2,7 +2,7 @@
  * Copyright (C) 2010 Betfair.
  * All rights reserved.
  */
-package ro.isdc.wro.model;
+package ro.isdc.wro.model.resource;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.FingerprintCreator;
 import ro.isdc.wro.util.StopWatch;
 
 /**

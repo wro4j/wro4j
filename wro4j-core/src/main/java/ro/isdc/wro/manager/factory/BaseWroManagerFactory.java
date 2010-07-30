@@ -16,7 +16,6 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.model.MD5FingerprintCreator;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -25,6 +24,7 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.FingerprintCreator;
+import ro.isdc.wro.model.resource.MD5FingerprintCreator;
 
 /**
  * A simple implementation of {@link WroManagerFactory} which doesn't define any processors or uriLocators.
