@@ -11,6 +11,8 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.processor.Minimize;
@@ -34,6 +36,10 @@ import ro.isdc.wro.model.resource.processor.algorithm.JSMin;
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
   /**
+   * Logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
+  /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
@@ -50,6 +56,7 @@ public class JSMinProcessor implements ResourcePreProcessor,
     } catch (final IOException e) {
       throw e;
 		} catch (final Exception e) {
+		  LOG.error("Exception wile processing js using JSMin", e);
 			throw new WroRuntimeException("Exception wile processing js using JSMin", e);
     } finally {
       reader.close();

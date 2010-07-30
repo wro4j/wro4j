@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,15 +66,6 @@ public class DefaultWildcardStreamLocator
       return o1.getName().compareTo(o2.getName());
     }
   };
-
-
-  public static void main(final String[] args) throws Exception {
-    URL url = new URL("http://www.soundpure.com/test?param=value");
-    System.out.println(url.getProtocol());
-    url = new URL("https://www.soundpure.com/test?param=value");
-    System.out.println(url.getProtocol());
-
-  }
 
   /**
    * {@inheritDoc}

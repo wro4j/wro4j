@@ -20,10 +20,9 @@ import ro.isdc.wro.test.util.ResourceProcessor;
  * @created Created on Nov 28, 2008
  */
 public class TestJsMinProcessor extends AbstractWroTest {
-  private final ResourcePostProcessor processor = new JSMinProcessor();
-
   @Test
-  public void test() throws IOException {
+  public void testAsPostProcessor() throws IOException {
+    final ResourcePostProcessor processor = new JSMinProcessor();
     compareProcessedResourceContents(
         "classpath:ro/isdc/wro/processor/jsmin-input.js",
         "classpath:ro/isdc/wro/processor/jsmin-output.js",
@@ -31,6 +30,20 @@ public class TestJsMinProcessor extends AbstractWroTest {
           public void process(final Reader reader, final Writer writer)
               throws IOException {
             processor.process(reader, writer);
+          }
+        });
+  }
+
+  @Test
+  public void testAsPreProcessor() throws IOException {
+    final ResourcePreProcessor processor = new JSMinProcessor();
+    compareProcessedResourceContents(
+        "classpath:ro/isdc/wro/processor/jsmin-input.js",
+        "classpath:ro/isdc/wro/processor/jsmin-output.js",
+        new ResourceProcessor() {
+          public void process(final Reader reader, final Writer writer)
+              throws IOException {
+            processor.process(null, reader, writer);
           }
         });
   }
