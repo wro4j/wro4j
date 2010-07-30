@@ -34,7 +34,7 @@ public class WicketApplication
   @Override
   protected void init() {
     // for Google App Engine
-    //getResourceSettings().setResourcePollFrequency(null);
+    getResourceSettings().setResourcePollFrequency(null);
     mountBookmarkablePage("/home", HomePage.class);
   }
 
@@ -43,7 +43,7 @@ public class WicketApplication
    */
   @Override
   public String getConfigurationType() {
-    return DEVELOPMENT;
+    return DEPLOYMENT;
   }
 
   /**
