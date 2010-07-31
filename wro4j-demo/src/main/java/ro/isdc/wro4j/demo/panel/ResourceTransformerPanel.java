@@ -21,7 +21,11 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
@@ -35,10 +39,15 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
  */
 @SuppressWarnings("serial")
 public class ResourceTransformerPanel extends Panel {
+  /**
+   * Logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceTransformerPanel.class);
+
   private String input;
   private String output;
   private String compressionRate = "N/A";
-  private ResourcePostProcessor processor;
+  private transient ResourcePostProcessor processor;
 
 
   public ResourceTransformerPanel(final String id) {
@@ -72,27 +81,29 @@ public class ResourceTransformerPanel extends Panel {
           }
           target.addComponent(form);
         } catch (final IOException e) {
-          System.out.println("exception occured: " + e);
+          LOG.error("exception occured: " + e);
         }
       }
     });
     add(form);
   }
 
-
-  /**
-   * @return
-   */
   private Component getProcessorSelect() {
-    final List<? extends ResourcePostProcessor> list = Arrays.asList(new CssMinProcessor(), new JSMinProcessor(),
-      new CssVariablesProcessor(), new JawrCssMinifierProcessor());
+    final IModel<List<? extends ResourcePostProcessor>> listModel = new LoadableDetachableModel<List<? extends ResourcePostProcessor>>() {
+      @Override
+      protected List<? extends ResourcePostProcessor> load() {
+        return Arrays.asList(new CssMinProcessor(), new JSMinProcessor(), new CssVariablesProcessor(),
+          new JawrCssMinifierProcessor());
+      }
+    };
     final IChoiceRenderer<ResourcePostProcessor> renderer = new ChoiceRenderer<ResourcePostProcessor>() {
       @Override
       public Object getDisplayValue(final ResourcePostProcessor object) {
         return object.getClass().getSimpleName();
       }
     };
-    final Component component = new DropDownChoice<ResourcePostProcessor>("selectProcessor", new PropertyModel<ResourcePostProcessor>(this, "processor"), list, renderer);
+    final Component component = new DropDownChoice<ResourcePostProcessor>(
+      "selectProcessor", new PropertyModel<ResourcePostProcessor>(this, "processor"), listModel, renderer);
     return component;
   }
 }
