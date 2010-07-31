@@ -8,12 +8,12 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
+import ro.isdc.wro.extensions.processor.rhino.less.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
@@ -90,7 +90,6 @@ public class TestLessCssProcessor extends AbstractWroTest {
   /**
    * This test is ignored, because its strangely fails when building with maven, but works when running in IDE.
    */
-  @Ignore
   @Test
   public void testInvalid()
     throws IOException {

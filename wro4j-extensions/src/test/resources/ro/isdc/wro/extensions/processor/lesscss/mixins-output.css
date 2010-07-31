@@ -1,3 +1,8 @@
+#header {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
 #footer {
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;

@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.extensions.processor;
+package ro.isdc.wro.extensions.processor.rhino.less;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,9 +17,6 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-
-import com.asual.lesscss.LessEngine;
-import com.asual.lesscss.LessException;
 
 
 /**
@@ -108,11 +105,11 @@ public class LessCssProcessor
   /**
    * Engine.
    */
-  private final LessEngine engine;
+  private final LessCSS engine;
 
 
   public LessCssProcessor() {
-    engine = new LessEngine();
+    engine = new LessCSS();
   }
 
 
@@ -123,8 +120,8 @@ public class LessCssProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      writer.write(engine.compile(content));
-    } catch (final LessException e) {
+      writer.write(engine.less(content));
+    } catch (final Exception e) {
       writer.write(content);
       LOG.warn("Exception while applying lessCss processor on the resource, no processing applied...", e);
     } finally {

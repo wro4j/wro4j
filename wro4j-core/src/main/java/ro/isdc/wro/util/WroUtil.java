@@ -107,6 +107,12 @@ public final class WroUtil {
     return startsWith(str, prefix, true);
   }
 
+  public static String toPackageAsFolder(final Class<?> clazz) {
+    if (clazz == null) {
+      throw new IllegalArgumentException("Class cannot be null!");
+    }
+    return clazz.getPackage().getName().replace('.', '/');
+  }
 
   /**
    * <p>
