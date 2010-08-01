@@ -43,6 +43,8 @@ public class TestPackerProcessor extends AbstractWroTest {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
+          System.out.println("Process ready");
+          System.in.read();
         }
       });
   }

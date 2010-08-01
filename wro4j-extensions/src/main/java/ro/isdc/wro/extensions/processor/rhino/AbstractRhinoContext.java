@@ -22,7 +22,7 @@ public class AbstractRhinoContext {
 
   public AbstractRhinoContext() {
     cf = new ContextFactory();
-    context = cf.enterContext();
+    context = cf.enter();
     scriptableObject = context.initStandardObjects();
     context.setOptimizationLevel(9);
   }

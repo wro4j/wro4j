@@ -19,6 +19,10 @@
       <param-value>TRUE</param-value>
     </init-param>
     <init-param>
+      <param-name>jmxEnabled</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
       <param-name>cacheUpdatePeriod</param-name>
       <param-value>0</param-value>
     </init-param>
@@ -85,6 +89,20 @@
     <servlet-name>externalResource</servlet-name>
     <url-pattern>/external/*</url-pattern>
   </servlet-mapping>
+
+  <filter>
+    <filter-name>wicket.test</filter-name>
+    <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
+    <init-param>
+      <param-name>applicationClassName</param-name>
+      <param-value>ro.isdc.wro.examples.WicketApplication</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>wicket.test</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>

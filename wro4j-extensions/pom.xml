@@ -30,6 +30,7 @@
 			<groupId>com.yahoo.platform.yui</groupId>
 			<artifactId>yuicompressor</artifactId>
 		</dependency>
+		<!-- --> 
 		<dependency>
 			<groupId>rhino</groupId>
 			<artifactId>js</artifactId>
@@ -55,4 +56,16 @@
 			<systemPath>${basedir}/lib/compiler.jar</systemPath>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

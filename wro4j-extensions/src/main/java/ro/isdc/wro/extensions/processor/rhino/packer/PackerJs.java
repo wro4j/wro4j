@@ -18,6 +18,10 @@ package ro.isdc.wro.extensions.processor.rhino.packer;
 
 import java.io.IOException;
 
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +67,11 @@ public class PackerJs extends AbstractRhinoContext {
     throws IOException {
     final StopWatch watch = new StopWatch();
     watch.start("pack");
-    LOG.debug("content to pack:" + doubleEscape(data));
-    final String packIt = "new Packer().pack(\"" + doubleEscape(data) + "\", true, true);";
+//    LOG.debug("content to pack:" + doubleEscape(data));
+    final String script = data;
+    getContext().evaluateString(getScriptableObject(), "var scriptToPack = \"" + script + "", "data", 1, null);
+    final String packIt = "new Packer().pack(scriptToPack, true, true);";
     LOG.debug("evaluating packer script");
-//    final Script s = getContext().compileReader(new StringReader(data), "data.js", 1, null);
-//    getContext().decompileScript(s, 1);
     final String result = getContext().evaluateString(getScriptableObject(), packIt, "packIt.js", 1, null).toString();
     LOG.debug("packer result: " + result);
     watch.stop();
@@ -78,5 +82,16 @@ public class PackerJs extends AbstractRhinoContext {
 
   private final String doubleEscape(final String data) {
     return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+  }
+
+  public static void main(final String[] args) throws Exception {
+    final ClasspathUriLocator uriLocator = new ClasspathUriLocator();
+
+    final String packagePath = WroUtil.toPackageAsFolder(PackerJs.class);
+    final String script = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/base2.js"));
+    final ScriptEngineManager m = new ScriptEngineManager();
+    final ScriptEngine engine = m.getEngineByName("JavaScript");
+    final ScriptContext ctx = engine.getContext();
+    System.out.println(engine.eval(script));
   }
 }

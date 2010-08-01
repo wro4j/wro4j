@@ -6,7 +6,6 @@
   <group name="dynamicResource">
     <js>/dynamicResource/test.js</js>
   </group>
-<!-- 
   <group name="all">
     <group-ref>dynamicResource</group-ref>
     <group-ref>jquery</group-ref>
@@ -71,5 +70,6 @@
     <js>/static/js/jquery-validate.js</js>
     <js>/static/js/jquery-ui-all.js</js>
   </group>
+<!-- 
   -->
 </groups>
