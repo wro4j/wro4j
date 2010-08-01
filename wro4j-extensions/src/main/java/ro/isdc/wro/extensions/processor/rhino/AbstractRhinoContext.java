@@ -22,15 +22,10 @@ public class AbstractRhinoContext {
 
   public AbstractRhinoContext() {
     cf = new ContextFactory();
+    //because YUI contains the Rhino in its dependency, we have to use this deprecated method
     context = cf.enter();
     scriptableObject = context.initStandardObjects();
     context.setOptimizationLevel(9);
-  }
-
-
-  protected final String removeNewLines(final String data) {
-    //replace("\"", "\\\"").
-    return data.replace("\n", "\\n").replace("\r", "\\r");
   }
 
   /**

@@ -48,6 +48,11 @@ public class LessCSS extends AbstractRhinoContext {
   }
 
 
+
+  private String removeNewLines(final String data) {
+    return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+  }
+
   /**
    * @param data css content to process.
    * @return processed css content.

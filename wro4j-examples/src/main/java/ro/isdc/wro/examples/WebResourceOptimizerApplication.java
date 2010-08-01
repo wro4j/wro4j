@@ -12,12 +12,13 @@ import org.apache.wicket.session.ISessionStore;
  *
  * @see wicket.myproject.Start#main(String[])
  */
-public class WicketApplication
+public class WebResourceOptimizerApplication
     extends WebApplication {
+  private boolean deploy = false;
   /**
    * Constructor
    */
-  public WicketApplication() {
+  public WebResourceOptimizerApplication() {
   }
 
   /**
@@ -34,7 +35,9 @@ public class WicketApplication
   @Override
   protected void init() {
     // for Google App Engine
-    getResourceSettings().setResourcePollFrequency(null);
+    if (deploy) {
+      getResourceSettings().setResourcePollFrequency(null);
+    }
     mountBookmarkablePage("/home", HomePage.class);
   }
 
@@ -43,7 +46,10 @@ public class WicketApplication
    */
   @Override
   public String getConfigurationType() {
-    return DEPLOYMENT;
+    if (deploy) {
+      return DEPLOYMENT;
+    }
+    return DEVELOPMENT;
   }
 
   /**
