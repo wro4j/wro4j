@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,11 +66,11 @@ public class WroManager
   /**
    * API - reload cache method call
    */
-  public static final String API_RELOAD_CACHE = "reloadCache";
+  public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
   /**
    * API - reload model method call
    */
-  public static final String API_RELOAD_MODEL = "reloadModel";
+  public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
   /**
    * ResourcesModel factory.
    */
@@ -107,38 +109,36 @@ public class WroManager
    * @param request
    *          {@link HttpServletRequest} to process.
    * @param response HttpServletResponse where to write the result content.
-   * @throws IOException when any IO related problem occurs.
+   * @throws IOException when any IO related problem occurs or if the request cannot be processed.
    */
   public final void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    //TODO return true if the request was processed in order to continue filter chain processing
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
     // create model
     final WroModel model = modelFactory.getInstance();
     //TODO move API related checks into separate class and determine filter mapping for better mapping
-    if (isApiRequest(request)) {
-      //must be case insensitive
-      if (request.getRequestURI().contains(API_RELOAD_CACHE)) {
-        Context.getConfig().reloadCache();
-        response.setContentType("application/json");
-        response.getWriter().write("{response: 'OK'}");
-        response.getWriter().flush();
-        response.getWriter().close();
-        return;
-      }
-      if (request.getRequestURI().contains(API_RELOAD_MODEL)) {
-        Context.getConfig().reloadModel();
-        response.setContentType("application/json");
-        response.getWriter().write("{response: 'OK'}");
-        response.getWriter().flush();
-        response.getWriter().close();
-        return;
-      }
-    } else if (isProxyResourceRequest(request)) {
+    if (matchesUrl(request, API_RELOAD_CACHE)) {
+      Context.getConfig().reloadCache();
+      response.setContentType("application/json");
+      response.getWriter().write("{response: 'OK'}");
+      response.getWriter().close();
+      return;
+    }
+    if (matchesUrl(request, API_RELOAD_MODEL)) {
+      Context.getConfig().reloadModel();
+      response.setContentType("application/json");
+      response.getWriter().write("{response: 'OK'}");
+      response.getWriter().close();
+      return;
+    }
+    if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
     } else {
       is = buildGroupsInputStream(model, request, response);
+    }
+    if (is == null) {
+      throw new WroRuntimeException("Cannot process this request: " + request.getRequestURL());
     }
     // use gziped response if supported
     final OutputStream os = getGzipedOutputStream(response);
@@ -149,10 +149,13 @@ public class WroManager
 
 
   /**
-   * Check if this is an API call (used to call some of the operations exposed by wro). API is exposed only in DEBUG mode.
+   * @param request
+   * @return
    */
-  private boolean isApiRequest(final HttpServletRequest request) {
-    return Context.getConfig().isDebug() && request.getRequestURI().contains(PATH_API);
+  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
+    final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
+    final Matcher m = pattern.matcher(request.getRequestURI());
+    return m.matches();
   }
 
   /**

@@ -181,9 +181,10 @@ public class ResourceTransformerPanel extends Panel {
   private static List<Class> findClasses(final File directory, final String packageName)
     throws ClassNotFoundException {
     final List<Class> classes = new ArrayList<Class>();
-    if (!directory.exists()) {
-      return classes;
-    }
+    //does not play well with GAE
+//    if (!directory.exists()) {
+//      return classes;
+//    }
     final File[] files = directory.listFiles();
     for (final File file : files) {
       if (file.isDirectory()) {

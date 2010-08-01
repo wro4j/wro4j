@@ -14,7 +14,7 @@ import org.apache.wicket.session.ISessionStore;
  */
 public class WebResourceOptimizerApplication
     extends WebApplication {
-  private boolean deploy = false;
+  private boolean deploy = true;
   /**
    * Constructor
    */

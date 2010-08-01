@@ -447,7 +447,7 @@ public class TestWroFilter {
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/" + WroManager.API_RELOAD_CACHE);
+    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
 
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
