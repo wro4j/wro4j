@@ -1,4 +1,4 @@
-package ro.isdc.wro.examples;
+package ro.isdc.wro.examples.page;
 
 
 import org.apache.wicket.PageParameters;

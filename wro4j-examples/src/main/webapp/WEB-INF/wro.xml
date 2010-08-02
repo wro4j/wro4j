@@ -7,12 +7,17 @@
     <js>/dynamicResource/test.js</js>
   </group>
   <group name="all">
+    <group-ref>twitterBar</group-ref>
     <group-ref>dynamicResource</group-ref>
     <group-ref>jquery</group-ref>
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>dwr</group-ref>
 	</group>
+  
+  <group name="twitterBar">
+    <js>http://widgets.twimg.com/j/2/widget.js</js>
+  </group>
   
   <group name="WEBINF-css">
     <js>/external/resource.js</js>  
