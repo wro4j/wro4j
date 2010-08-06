@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.extensions.processor;
+package ro.isdc.wro.extensions.processor.google;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

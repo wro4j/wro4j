@@ -10,6 +10,7 @@ import java.io.Writer;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
+import ro.isdc.wro.extensions.processor.google.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
