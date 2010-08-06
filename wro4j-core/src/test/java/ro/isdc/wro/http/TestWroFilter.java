@@ -453,7 +453,6 @@ public class TestWroFilter {
     final FilterChain chain = Mockito.mock(FilterChain.class);
     //by default configuration is development
     filter.init(config);
-    System.out.println("!!!!!!" + config.getInitParameter(WroFilter.PARAM_HEADER));
     filter.doFilter(request, response, chain);
     //No api method exposed -> proceed with chain
     verifyChainIsNotCalled(chain);

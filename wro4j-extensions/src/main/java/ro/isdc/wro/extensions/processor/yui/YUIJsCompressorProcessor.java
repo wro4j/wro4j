@@ -73,7 +73,7 @@ public class YUIJsCompressorProcessor
    * Performs renaming of variables.
    */
   boolean munge = false;
-  boolean verbose = true;
+  boolean verbose = false;
   boolean preserveAllSemiColons = false;
   boolean disableOptimizations = false;
 
