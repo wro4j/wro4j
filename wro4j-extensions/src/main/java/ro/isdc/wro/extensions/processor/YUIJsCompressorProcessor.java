@@ -12,6 +12,7 @@ import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -21,7 +22,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 
 /**
- * YUICssCompressorProcessor. Use YUI css compression utility for processing a css resource.
+ * YUICssCompressorProcessor - an adapter for YUI js compression utility for processing js resources.
  *
  * @author Alex Objelean
  * @created Created on Dec 4, 2008
@@ -34,16 +35,11 @@ public class YUIJsCompressorProcessor
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(YUIJsCompressorProcessor.class);
-
   // options of YUI compressor
   private final int linebreakpos = -1;
-
   boolean munge = true;
-
   boolean preserveAllSemiColons = true;
-
   boolean disableOptimizations = false;
-
   boolean verbose = true;
 
 
@@ -74,6 +70,8 @@ public class YUIJsCompressorProcessor
         }
       });
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
+    } catch(final RuntimeException e) {
+      throw new WroRuntimeException("Problem while applying YUI compressor", e);
     } finally {
       reader.close();
       writer.close();

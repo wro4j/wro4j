@@ -29,7 +29,7 @@ public class TestDefaultGroupExtractor {
     //by default configuration is in debug mode
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(true);
-    Context.setConfig(config);
+    Context.set(Context.standaloneContext(), config);
     groupExtractor = new DefaultGroupExtractor();
   }
 
@@ -82,7 +82,7 @@ public class TestDefaultGroupExtractor {
   public void testMinimizedWithFalseParamInDEPLOYMENTMode() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(false);
-    Context.setConfig(config);
+    Context.get().setConfig(config);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getParameter(DefaultGroupExtractor.PARAM_MINIMIZE)).thenReturn("false");
     Assert.assertEquals(true, groupExtractor.isMinimized(request));

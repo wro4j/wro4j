@@ -40,6 +40,9 @@ public class FallbackAwareXmlModelFactory
     }
     if (newModel == null) {
       LOG.warn("Couldn't load new model, reusing last Valid Model!");
+      if (lastValidModel == null) {
+        throw new WroRuntimeException("No valid model was found!");
+      }
       return lastValidModel;
     }
     lastValidModel = newModel;

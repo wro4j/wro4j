@@ -7,7 +7,6 @@ import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +27,10 @@ public class TestXmlModelFactory {
 
   @Before
   public void init() {
-    Context.getConfig().setCacheUpdatePeriod(0);
-    Context.getConfig().setModelUpdatePeriod(0);
-    final Context context = Mockito.mock(Context.class);
+    final Context context = Context.standaloneContext();
     Context.set(context);
+    context.getConfig().setCacheUpdatePeriod(0);
+    context.getConfig().setModelUpdatePeriod(0);
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)
@@ -48,8 +47,8 @@ public class TestXmlModelFactory {
 
   @Test
   public void testWithUpdatePeriodSet() {
-    Context.getConfig().setCacheUpdatePeriod(1);
-    Context.getConfig().setModelUpdatePeriod(1);
+    Context.get().getConfig().setCacheUpdatePeriod(1);
+    Context.get().getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
 //

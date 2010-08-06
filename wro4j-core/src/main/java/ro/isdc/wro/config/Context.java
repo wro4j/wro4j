@@ -27,11 +27,7 @@ public class Context {
    * created by this thread should be able to access the {@link Context}.
    */
   private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
-  /**
-   * {@link WroConfiguration} is not stored inside a {@link ThreadLocal}, because it must be accessible outside of
-   * request cycle.
-   */
-  private static WroConfiguration CONFIG_INSTANCE = new WroConfiguration();
+  private WroConfiguration wroConfig;
   /**
    * Request.
    */
@@ -52,8 +48,8 @@ public class Context {
   /**
    * @return {@link WroConfiguration} singleton instance.
    */
-  public static WroConfiguration getConfig() {
-    return CONFIG_INSTANCE;
+  public WroConfiguration getConfig() {
+    return wroConfig;
   }
 
 
@@ -62,8 +58,8 @@ public class Context {
    * <p/>
    * sets the {@link WroConfiguration} singleton instance.
    */
-  public static void setConfig(final WroConfiguration config) {
-    CONFIG_INSTANCE = config;
+  public void setConfig(final WroConfiguration config) {
+    wroConfig = config;
   }
 
 
@@ -112,17 +108,24 @@ public class Context {
     return CURRENT.get() != null;
   }
 
+  public static void set(final Context context) {
+    set(context, new WroConfiguration());
+  }
 
   /**
    * Associate a context with the CURRENT request cycle.
    *
    * @param context {@link Context} to set.
    */
-  public static void set(final Context context) {
+  public static void set(final Context context, final WroConfiguration config) {
     if (context == null) {
       throw new IllegalArgumentException("Context cannot be NULL!");
     }
+    if (config == null) {
+      throw new IllegalArgumentException("Config cannot be NULL!");
+    }
     CURRENT.set(context);
+    CURRENT.get().setConfig(config);
   }
 
 
@@ -146,7 +149,6 @@ public class Context {
    */
   private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
     this.request = new FieldsSavingRequestWrapper(request);
-
     this.response = response;
     if (filterConfig != null) {
       this.servletContext = filterConfig.getServletContext();
@@ -192,7 +194,6 @@ public class Context {
    */
   public static void destroy() {
     unset();
-    CONFIG_INSTANCE.destroy();
   }
 
   /**

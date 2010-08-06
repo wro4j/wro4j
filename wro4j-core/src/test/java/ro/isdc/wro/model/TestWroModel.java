@@ -9,7 +9,6 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -29,7 +28,7 @@ public class TestWroModel {
 
   @Before
   public void init() {
-    final Context context = Mockito.mock(Context.class);
+    final Context context = Context.standaloneContext();
     Context.set(context);
   }
 
