@@ -40,7 +40,6 @@ public class DefaultMavenContextAwareManagerFactory
    * {@link HttpServletRequest} associated with current request processing cycle.
    */
   private HttpServletRequest request;
-
   /**
    * Initialize the ManagerFactory with required properties.
    *
@@ -57,7 +56,6 @@ public class DefaultMavenContextAwareManagerFactory
   protected void onBeforeCreate() {
     Context.set(Context.standaloneContext(request));
   }
-
 
   @Override
   protected GroupExtractor newGroupExtractor() {
@@ -88,6 +86,7 @@ public class DefaultMavenContextAwareManagerFactory
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
     configureProcessors(groupsProcessor);
+    groupsProcessor.setIgnoreMissingResources(runContext.isIgnoreMissingResources());
     return groupsProcessor;
   }
 

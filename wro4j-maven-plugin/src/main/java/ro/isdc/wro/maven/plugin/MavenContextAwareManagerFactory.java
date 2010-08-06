@@ -16,10 +16,11 @@ import ro.isdc.wro.manager.WroManagerFactory;
 public interface MavenContextAwareManagerFactory
   extends WroManagerFactory {
   /**
-   * Called by maven plugin for initialization.
+   * Called by maven plugin for initialization. It is responsibility of the implementor to take care of
+   * {@link RunContext} in order to initialize the internals.
    *
-   * @param runContext
-   * @param request
+   * @param runContext {@link RunContext} holding properties associated with current context.
+   * @param request {@link HttpServletRequest} associated with current request cycle.
    */
   public void initialize(RunContext runContext, HttpServletRequest request);
 }
