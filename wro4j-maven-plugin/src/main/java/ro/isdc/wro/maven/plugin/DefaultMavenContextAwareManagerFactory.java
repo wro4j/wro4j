@@ -86,6 +86,7 @@ public class DefaultMavenContextAwareManagerFactory
   protected GroupsProcessor newGroupsProcessor() {
     final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
     configureProcessors(groupsProcessor);
+    //This is important in order to make plugin aware about ignoreMissingResources option.
     groupsProcessor.setIgnoreMissingResources(runContext.isIgnoreMissingResources());
     return groupsProcessor;
   }

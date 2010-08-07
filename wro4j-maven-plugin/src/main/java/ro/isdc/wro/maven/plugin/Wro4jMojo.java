@@ -135,6 +135,7 @@ public class Wro4jMojo extends AbstractMojo {
     runContext.setContextFolder(contextFolder);
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
+    runContext.setIgnoreMissingResources(ignoreMissingResources);
     return runContext;
   }
 
@@ -153,10 +154,9 @@ public class Wro4jMojo extends AbstractMojo {
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
+    getLog().info("ignoreMissingResources: " + ignoreMissingResources);
 
     try {
-      getLog().info("will process the following groups: " + targetGroups);
-      // TODO create a Request object
       for (final String group : getTargetGroupsAsList()) {
         for (final ResourceType resourceType : ResourceType.values()) {
           final File destinationFolder = computeDestinationFolder(resourceType);
@@ -252,10 +252,19 @@ public class Wro4jMojo extends AbstractMojo {
       throw new RuntimeException(e);
     }
     getLog().info("URLs: " + urlList);
-    final URLClassLoader cl = new URLClassLoader(
+    final URLClassLoader classLoader = new URLClassLoader(
       urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
-    Thread.currentThread().setContextClassLoader(cl);
+    Thread.currentThread().setContextClassLoader(classLoader);
   }
+
+//  List runtimeClasspathElements = project.getRuntimeClasspathElements();
+//  URL[] runtimeUrls = new URL[runtimeClasspathElements.size()];
+//  for (int i = 0; i < runtimeClasspathElements.size(); i++) {
+//    String element = (String) runtimeClasspathElements.get(i);
+//    runtimeUrls[i] = new File(element).toURI().toURL();
+//  }
+//  URLClassLoader newLoader = new URLClassLoader(runtimeUrls,
+//    Thread.currentThread().getContextClassLoader());
 
 
   /**
@@ -367,5 +376,14 @@ public class Wro4jMojo extends AbstractMojo {
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = encodeVersion(wroManagerFactory);
+  }
+
+
+  /**
+   * Used for testing.
+   * @param mavenProject the mavenProject to set
+   */
+  void setMavenProject(final MavenProject mavenProject) {
+    this.mavenProject = mavenProject;
   }
 }
