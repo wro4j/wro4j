@@ -208,6 +208,7 @@
 					</execution>
 				</executions>
 				<configuration>
+				  <wroManagerFactory>ro.isdc.wro.extensions.maven.YUIMavenManagerFactory</wroManagerFactory>
 					<targetGroups>all</targetGroups>
 				</configuration>
 			</plugin>

@@ -18,10 +18,6 @@
 			<artifactId>wro4j-core</artifactId>
 		</dependency>
 		<dependency>
-      <groupId>ro.isdc.wro4j</groupId>
-      <artifactId>wro4j-maven-plugin</artifactId>
-    </dependency>
-		<dependency>
 			<groupId>ro.isdc.wro4j</groupId>
 			<artifactId>wro4j-test-utils</artifactId>
 		</dependency>

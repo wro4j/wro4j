@@ -1,4 +1,4 @@
-package ro.isdc.wro.maven.plugin;
+package ro.isdc.wro.manager.factory.maven;
 
 import java.io.File;
 import java.io.FileInputStream;

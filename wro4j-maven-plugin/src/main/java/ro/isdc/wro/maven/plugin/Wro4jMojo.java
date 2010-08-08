@@ -25,6 +25,9 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.maven.DefaultMavenContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.maven.MavenContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.maven.RunContext;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 

@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.maven.plugin;
+package ro.isdc.wro.manager.factory.maven;
 
 import javax.servlet.http.HttpServletRequest;
 

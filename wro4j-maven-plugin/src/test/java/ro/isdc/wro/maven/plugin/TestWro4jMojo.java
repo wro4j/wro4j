@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.manager.factory.maven.DefaultMavenContextAwareManagerFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 
