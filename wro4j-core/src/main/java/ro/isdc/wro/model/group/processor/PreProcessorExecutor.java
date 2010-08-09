@@ -76,10 +76,13 @@ public class PreProcessorExecutor {
     try {
       reader = groupsProcessor.getResourceReader(resource);
     } catch (final IOException e) {
+      LOG.debug("IgnoreMissingResources" + groupsProcessor.isIgnoreMissingResources());
       if (groupsProcessor.isIgnoreMissingResources()) {
         LOG.warn("Invalid resource found: " + resource);
         return output;
       } else {
+        LOG.warn("Invalid resource found: " + resource + ". Cannot continue processing. IgnoreMissingResources is + "
+          + groupsProcessor.isIgnoreMissingResources());
         throw e;
       }
     }

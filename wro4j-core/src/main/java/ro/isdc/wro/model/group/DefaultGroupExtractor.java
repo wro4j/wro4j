@@ -69,6 +69,6 @@ public final class DefaultGroupExtractor implements GroupExtractor {
       throw new IllegalArgumentException("Request cannot be NULL!");
     }
     final String minimizeAsString = request.getParameter(PARAM_MINIMIZE);
-    return !(Context.getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
+    return !(Context.get().getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
   }
 }

@@ -92,13 +92,6 @@ public class ResourceTransformerPanel extends Panel {
     add(form);
   }
 
-  public static void main(final String[] args) {
-    final double rate = (357 * 100000000) / 999d;
-    final DecimalFormat format = new DecimalFormat("0.00");
-    System.out.println(rate);
-    System.out.println(format.format(rate));
-  }
-
   /**
    * @return
    */

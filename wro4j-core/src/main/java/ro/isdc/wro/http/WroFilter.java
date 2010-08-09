@@ -103,7 +103,10 @@ public class WroFilter
    * Filter config.
    */
   private FilterConfig filterConfig;
-
+  /**
+   * Wro configuration.
+   */
+  private WroConfiguration wroConfiguration;
   /**
    * WroManagerFactory. The brain of the optimizer.
    */
@@ -134,6 +137,8 @@ public class WroFilter
   public final void init(final FilterConfig config)
     throws ServletException {
     this.filterConfig = config;
+    wroConfiguration = new WroConfiguration();
+    initConfiguration(wroConfiguration);
     initWroManagerFactory();
     initHeaderValues();
     initJMX();
@@ -167,15 +172,14 @@ public class WroFilter
        * Flag for enable/disable jmx. By default this value is true.
        */
       final boolean jmxEnabled = getJmxEnabled();
-      initConfiguration(Context.getConfig());
       LOG.info("jmxEnabled: " + jmxEnabled);
-      LOG.info("wro4j configuration: " + Context.getConfig());
+      LOG.info("wro4j configuration: " + wroConfiguration);
       if (jmxEnabled) {
         registerChangeListeners();
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
         if (!mbeanServer.isRegistered(name)) {
-          mbeanServer.registerMBean(Context.getConfig(), name);
+          mbeanServer.registerMBean(wroConfiguration, name);
         }
       }
     } catch (final JMException e) {
@@ -241,8 +245,7 @@ public class WroFilter
    * Register property change listeners.
    */
   private void registerChangeListeners() {
-    final WroConfiguration configuration = Context.getConfig();
-    configuration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
+    wroConfiguration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
       public void propertyChange(final PropertyChangeEvent event) {
         // reset cache headers when any property is changed in order to avoid browser caching
         initHeaderValues();
@@ -251,7 +254,7 @@ public class WroFilter
         }
       }
     });
-    configuration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
+    wroConfiguration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
       public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
@@ -406,7 +409,7 @@ public class WroFilter
     final HttpServletResponse response = (HttpServletResponse)res;
     try {
       // add request, response & servletContext to thread local
-      Context.set(Context.webContext(request, response, filterConfig));
+      Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
       processRequest(request, response);
       Context.unset();
     } catch (final RuntimeException e) {
@@ -487,11 +490,19 @@ public class WroFilter
     }
   }
 
+  /**
+   * @return the {@link WroConfiguration} associated with this filter instance.
+   */
+  public final WroConfiguration getWroConfiguration() {
+    return this.wroConfiguration;
+  }
+
 
   /**
    * {@inheritDoc}
    */
   public void destroy() {
+    wroConfiguration.destroy();
     Context.destroy();
     wroManagerFactory.destroy();
   }

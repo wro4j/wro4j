@@ -74,6 +74,6 @@ public abstract class AbstractWroTest {
   private Reader getReaderFromUri(final String uri) throws IOException {
     // wrap reader with bufferedReader for top efficiency
     return new BufferedReader(new InputStreamReader(uriLocatorFactory
-        .getInstance(uri).locate(uri)));
+        .getInstance(uri).locate(uri), "UTF-8"));
   }
 }

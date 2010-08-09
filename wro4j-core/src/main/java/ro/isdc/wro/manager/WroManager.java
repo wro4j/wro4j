@@ -119,14 +119,14 @@ public class WroManager
     final WroModel model = modelFactory.getInstance();
     //TODO move API related checks into separate class and determine filter mapping for better mapping
     if (matchesUrl(request, API_RELOAD_CACHE)) {
-      Context.getConfig().reloadCache();
+      Context.get().getConfig().reloadCache();
       response.setContentType("application/json");
       response.getWriter().write("{response: 'OK'}");
       response.getWriter().close();
       return;
     }
     if (matchesUrl(request, API_RELOAD_MODEL)) {
-      Context.getConfig().reloadModel();
+      Context.get().getConfig().reloadModel();
       response.setContentType("application/json");
       response.getWriter().write("{response: 'OK'}");
       response.getWriter().close();
@@ -149,8 +149,7 @@ public class WroManager
 
 
   /**
-   * @param request
-   * @return
+   * Check if the request path matches the provided api path.
    */
   private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
     final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
@@ -175,7 +174,7 @@ public class WroManager
    * @throws IOException when Gzip operation fails.
    */
   private OutputStream getGzipedOutputStream(final HttpServletResponse response) throws IOException {
-    if (Context.getConfig().isGzipEnabled() && isGzipSupported()) {
+    if (Context.get().getConfig().isGzipEnabled() && isGzipSupported()) {
       // add gzip header and gzip response
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
       // Create a gzip stream
@@ -258,7 +257,7 @@ public class WroManager
    */
   private void initScheduler(final WroModel model) {
     if (scheduler == null) {
-      final long period = Context.getConfig().getCacheUpdatePeriod();
+      final long period = Context.get().getConfig().getCacheUpdatePeriod();
       LOG.debug("runing thread with period of " + period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor();

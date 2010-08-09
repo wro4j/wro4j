@@ -6,18 +6,28 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.maven.DefaultMavenContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.maven.MavenContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.maven.RunContext;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -25,11 +35,11 @@ import ro.isdc.wro.model.resource.ResourceType;
 /**
  * @goal run
  * @phase process-resources
+ * @requiresDependencyResolution runtime
  *
  * @author Alex Objelean
  */
-public class Wro4jMojo
-  extends AbstractMojo {
+public class Wro4jMojo extends AbstractMojo {
   /**
    * File containing the groups definitions.
    *
@@ -81,11 +91,11 @@ public class Wro4jMojo
    * @optional
    */
   private String wroManagerFactory;
-//
-//  /**
-//   * @parameter default-value="${project}"
-//   */
-//  private MavenProject mavenProject;
+
+  /**
+   * @parameter default-value="${project}"
+   */
+  private MavenProject mavenProject;
 
 
   /**
@@ -98,10 +108,11 @@ public class Wro4jMojo
     final MavenContextAwareManagerFactory managerFactory;
     if (wroManagerFactory != null) {
       try {
-        final Class<? extends MavenContextAwareManagerFactory> wroManagerFactoryClass = (Class<? extends MavenContextAwareManagerFactory>)Thread.currentThread().getContextClassLoader().loadClass(wroManagerFactory);
+        final Class<? extends MavenContextAwareManagerFactory> wroManagerFactoryClass = (Class<? extends MavenContextAwareManagerFactory>)Thread.currentThread().getContextClassLoader().loadClass(
+          wroManagerFactory.trim());
         managerFactory = wroManagerFactoryClass.newInstance();
       } catch (final Exception e) {
-        throw new MojoExecutionException("Invalid wroManagerFactory className: " + wroManagerFactory);
+        throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
       }
     } else {
       managerFactory = new DefaultMavenContextAwareManagerFactory() {
@@ -127,6 +138,7 @@ public class Wro4jMojo
     runContext.setContextFolder(contextFolder);
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
+    runContext.setIgnoreMissingResources(ignoreMissingResources);
     return runContext;
   }
 
@@ -137,7 +149,7 @@ public class Wro4jMojo
   public void execute()
     throws MojoExecutionException {
     validate();
-//    updateClasspath();
+    updateClasspath();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + targetGroups);
@@ -145,10 +157,9 @@ public class Wro4jMojo
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
+    getLog().info("ignoreMissingResources: " + ignoreMissingResources);
 
     try {
-      getLog().info("will process the following groups: " + targetGroups);
-      // TODO create a Request object
       for (final String group : getTargetGroupsAsList()) {
         for (final ResourceType resourceType : ResourceType.values()) {
           final File destinationFolder = computeDestinationFolder(resourceType);
@@ -160,6 +171,7 @@ public class Wro4jMojo
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
     }
   }
+
 
   /**
    * Encodes a version using some logic.
@@ -179,7 +191,8 @@ public class Wro4jMojo
    * @return destinationFoder where the result of resourceType will be copied.
    * @throws MojoExecutionException if computed folder is null.
    */
-  private File computeDestinationFolder(final ResourceType resourceType) throws MojoExecutionException {
+  private File computeDestinationFolder(final ResourceType resourceType)
+    throws MojoExecutionException {
     File folder = destinationFolder;
     if (resourceType == ResourceType.JS) {
       if (jsDestinationFolder != null) {
@@ -193,9 +206,10 @@ public class Wro4jMojo
     }
     getLog().info("folder: " + folder);
     if (folder == null) {
-      throw new MojoExecutionException("Couldn't compute destination folder for resourceType: "
-        + resourceType
-        + ". That means that you didn't define one of the following parameters: destinationFolder, cssDestinationFolder, jsDestinationFolder");
+      throw new MojoExecutionException(
+        "Couldn't compute destination folder for resourceType: "
+          + resourceType
+          + ". That means that you didn't define one of the following parameters: destinationFolder, cssDestinationFolder, jsDestinationFolder");
     }
     if (!folder.exists()) {
       folder.mkdirs();
@@ -223,27 +237,37 @@ public class Wro4jMojo
     }
   }
 
-//
-//  /**
-//   * Update the classpath.
-//   */
-//  private void updateClasspath() {
-//    // TODO update classloader by adding all runtime dependencies of the running project
-//    getLog().info("mavenProject: " + mavenProject);
-//    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
-//    final List<URL> urlList = new ArrayList<URL>();
-//    try {
-//      for (final Artifact artifact : artifacts) {
-//        urlList.add(artifact.getFile().toURI().toURL());
-//      }
-//    } catch (final MalformedURLException e) {
-//      getLog().error("Error retreiving URL for artifact", e);
-//      throw new RuntimeException(e);
-//    }
-//    getLog().info("URLs: " + urlList);
-//    final URLClassLoader cl = new URLClassLoader(urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
-//    Thread.currentThread().setContextClassLoader(cl);
+
+  /**
+   * Update the classpath.
+   */
+  private void updateClasspath() {
+    // TODO update classloader by adding all runtime dependencies of the running project
+    getLog().info("mavenProject: " + mavenProject);
+    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
+    final List<URL> urlList = new ArrayList<URL>();
+    try {
+      for (final Artifact artifact : artifacts) {
+        urlList.add(artifact.getFile().toURI().toURL());
+      }
+    } catch (final MalformedURLException e) {
+      getLog().error("Error retreiving URL for artifact", e);
+      throw new RuntimeException(e);
+    }
+    getLog().info("URLs: " + urlList);
+    final URLClassLoader classLoader = new URLClassLoader(
+      urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
+    Thread.currentThread().setContextClassLoader(classLoader);
+  }
+
+//  List runtimeClasspathElements = project.getRuntimeClasspathElements();
+//  URL[] runtimeUrls = new URL[runtimeClasspathElements.size()];
+//  for (int i = 0; i < runtimeClasspathElements.size(); i++) {
+//    String element = (String) runtimeClasspathElements.get(i);
+//    runtimeUrls[i] = new File(element).toURI().toURL();
 //  }
+//  URLClassLoader newLoader = new URLClassLoader(runtimeUrls,
+//    Thread.currentThread().getContextClassLoader());
 
 
   /**
@@ -280,8 +304,8 @@ public class Wro4jMojo
       getLog().info("No content found for group: " + group);
       destinationFile.delete();
     } else {
-      getLog().info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes"
-        + ") has been created!");
+      getLog().info(
+        destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
     }
   }
 
@@ -341,6 +365,7 @@ public class Wro4jMojo
     this.minimize = minimize;
   }
 
+
   /**
    * @param ignoreMissingResources the ignoreMissingResources to set
    */
@@ -354,5 +379,14 @@ public class Wro4jMojo
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = encodeVersion(wroManagerFactory);
+  }
+
+
+  /**
+   * Used for testing.
+   * @param mavenProject the mavenProject to set
+   */
+  void setMavenProject(final MavenProject mavenProject) {
+    this.mavenProject = mavenProject;
   }
 }

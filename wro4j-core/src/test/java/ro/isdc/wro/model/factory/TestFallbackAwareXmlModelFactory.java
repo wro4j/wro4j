@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 
 /**
  * Test class for {@link FallbackAwareXmlModelFactory}.
@@ -28,6 +29,8 @@ public class TestFallbackAwareXmlModelFactory {
   private boolean flag = false;
   @Before
   public void setUp() {
+    //initialize the context
+    Context.set(Context.standaloneContext());
     fallbackAwareModelFactory = new FallbackAwareXmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()

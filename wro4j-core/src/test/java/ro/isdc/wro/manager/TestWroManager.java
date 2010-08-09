@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,9 +39,10 @@ public class TestWroManager extends AbstractWroTest {
 
   @Before
   public void setUp() {
-    initConfigWithUpdatePeriodValue(0);
-    final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
-    Context.set(context);
+
+    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
+      Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    Context.set(context, newConfigWithUpdatePeriodValue(0));
     final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
     manager = factory.getInstance();
   }
@@ -67,9 +69,8 @@ public class TestWroManager extends AbstractWroTest {
   public void processValidModel() throws IOException {
     manager.setModelFactory(getValidModelFactory());
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    manager.process(request, response);
+    manager.process(request, Context.get().getResponse());
   }
 
 
@@ -94,25 +95,24 @@ public class TestWroManager extends AbstractWroTest {
   @Test
   public void testManagerWhenSchedulerIsStarted() throws Exception {
     manager.setModelFactory(getValidModelFactory());
-    initConfigWithUpdatePeriodValue(1);
+    newConfigWithUpdatePeriodValue(1);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
     manager.process(request, response);
-    // allow thread to do their job
-    Thread.sleep(2000);
+    // allow thread to do its job
+    Thread.sleep(500);
   }
 
 
   /**
    * Initialize {@link WroConfiguration} object with cacheUpdatePeriod & modelUpdatePeriod equal with provided argument.
    */
-  private void initConfigWithUpdatePeriodValue(final long periodValue) {
+  private WroConfiguration newConfigWithUpdatePeriodValue(final long periodValue) {
     final WroConfiguration config = new WroConfiguration();
     config.setCacheUpdatePeriod(periodValue);
     config.setModelUpdatePeriod(periodValue);
-
-    Context.setConfig(config);
+    return config;
   }
 
 

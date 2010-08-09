@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -212,7 +211,7 @@ public class TestWroFilter {
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("10");
     Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
     filter.init(config);
-    final WroConfiguration config = Context.getConfig();
+    final WroConfiguration config = filter.getWroConfiguration();
     Assert.assertEquals(false, config.isDebug());
     Assert.assertEquals(false, config.isGzipEnabled());
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
@@ -253,7 +252,7 @@ public class TestWroFilter {
     throws Exception {
     Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
     filter.init(config);
-    Assert.assertEquals(true, Context.getConfig().isDebug());
+    Assert.assertEquals(true, filter.getWroConfiguration().isDebug());
   }
 
 
@@ -454,7 +453,6 @@ public class TestWroFilter {
     final FilterChain chain = Mockito.mock(FilterChain.class);
     //by default configuration is development
     filter.init(config);
-    System.out.println("!!!!!!" + config.getInitParameter(WroFilter.PARAM_HEADER));
     filter.doFilter(request, response, chain);
     //No api method exposed -> proceed with chain
     verifyChainIsNotCalled(chain);
