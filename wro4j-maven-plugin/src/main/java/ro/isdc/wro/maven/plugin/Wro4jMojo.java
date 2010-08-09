@@ -105,30 +105,41 @@ public class Wro4jMojo extends AbstractMojo {
    * @param request {@link HttpServletRequest} to process
    * @return {@link WroManagerFactory} implementation.
    */
-  @SuppressWarnings("unchecked")
   private StandaloneContextAwareManagerFactory getManagerFactory(final HttpServletRequest request)
     throws MojoExecutionException {
     final StandaloneContextAwareManagerFactory managerFactory;
     if (wroManagerFactory != null) {
-      try {
-        final Class<? extends StandaloneContextAwareManagerFactory> wroManagerFactoryClass = (Class<? extends StandaloneContextAwareManagerFactory>)Thread.currentThread().getContextClassLoader().loadClass(
-          wroManagerFactory.trim());
-        managerFactory = wroManagerFactoryClass.newInstance();
-      } catch (final Exception e) {
-        throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
-      }
+      managerFactory = createCustomManagerFactory();
     } else {
-      managerFactory = createDefaultFactory();
+      managerFactory = createDefaultManagerFactory();
     }
     // initialize before return.
     managerFactory.initialize(createRunContext(), request);
     return managerFactory;
   }
 
+
+  /**
+   * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
+   */
+  private StandaloneContextAwareManagerFactory createCustomManagerFactory()
+    throws MojoExecutionException {
+    StandaloneContextAwareManagerFactory managerFactory;
+    try {
+      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+        wroManagerFactory.trim());
+      managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
+    } catch (final Exception e) {
+      throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
+    }
+    return managerFactory;
+  }
+
+
   /**
    * Creates default instance of {@link StandaloneContextAwareManagerFactory}.
    */
-  private StandaloneContextAwareManagerFactory createDefaultFactory() {
+  private StandaloneContextAwareManagerFactory createDefaultManagerFactory() {
     return new DefaultStandaloneContextAwareManagerFactory() {
       @Override
       protected GroupsProcessor newGroupsProcessor() {

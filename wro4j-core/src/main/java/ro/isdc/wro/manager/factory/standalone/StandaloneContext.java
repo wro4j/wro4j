@@ -12,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 
 /**
- * A context for running wro4j in standalone mode.
+ * A context for running wro4j in standalone mode. This context can be used by a build time solutions like maven.
  *
  * @author Alex Objelean
  */
