@@ -7,12 +7,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -252,12 +254,11 @@ public class Wro4jMojo extends AbstractMojo {
   /**
    * Update the classpath.
    */
-  @SuppressWarnings("unchecked")
   private void updateClasspath() throws MojoExecutionException {
     //this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
     List<String> classpathElements;
     try {
-      classpathElements = mavenProject.getRuntimeClasspathElements();
+      classpathElements = getRuntimeClasspathElements(mavenProject);
     } catch (final DependencyResolutionRequiredException e) {
       throw new MojoExecutionException("Could not get compile classpath elements", e);
     }
@@ -279,6 +280,32 @@ public class Wro4jMojo extends AbstractMojo {
       throw new RuntimeException(e);
     }
     Thread.currentThread().setContextClassLoader(realm.getClassLoader());
+  }
+
+  /**
+   * Creates a list of classpath elements having any scope but test.
+   */
+  @SuppressWarnings("unchecked")
+  public List<String> getRuntimeClasspathElements(final MavenProject mavenProject)
+      throws DependencyResolutionRequiredException {
+    getLog().debug("=====Building Runtime Classpath Elements=====");
+    final List<Artifact> artifacts = new ArrayList<Artifact>(mavenProject.getArtifacts());
+    final List<String> list = new ArrayList<String>(artifacts.size() + 1);
+    list.add(mavenProject.getBuild().getOutputDirectory());
+    for (final Artifact artifact : artifacts) {
+      getLog().debug("artifact: " + artifact.getFile().getPath());
+      //if (artifact.getArtifactHandler().isAddedToClasspath()) {
+        // TODO: let the scope handler deal with this
+        if (!Artifact.SCOPE_TEST.equals(artifact.getScope())) {
+          final File file = artifact.getFile();
+          if (file == null) {
+            throw new DependencyResolutionRequiredException(artifact);
+          }
+          list.add(file.getPath());
+        }
+//      }
+    }
+    return list;
   }
 
   /**
