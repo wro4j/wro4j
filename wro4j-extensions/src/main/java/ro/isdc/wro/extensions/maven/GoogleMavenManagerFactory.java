@@ -4,7 +4,7 @@
 package ro.isdc.wro.extensions.maven;
 
 import ro.isdc.wro.extensions.processor.google.GoogleClosureCompressorProcessor;
-import ro.isdc.wro.manager.factory.maven.DefaultMavenContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  */
-public class GoogleMavenManagerFactory extends DefaultMavenContextAwareManagerFactory {
+public class GoogleMavenManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
   /**
    * {@inheritDoc}
    */

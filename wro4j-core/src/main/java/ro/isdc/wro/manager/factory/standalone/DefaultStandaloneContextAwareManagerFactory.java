@@ -1,4 +1,4 @@
-package ro.isdc.wro.manager.factory.maven;
+package ro.isdc.wro.manager.factory.standalone;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.StandaloneWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -30,28 +29,27 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  */
-public class DefaultMavenContextAwareManagerFactory
-  extends StandaloneWroManagerFactory implements MavenContextAwareManagerFactory {
+public class DefaultStandaloneContextAwareManagerFactory
+  extends StandaloneWroManagerFactory implements StandaloneContextAwareManagerFactory {
   /**
-   * Holds the properties of the run mojo.
+   * Context used by stand-alone process.
    */
-  private RunContext runContext;
+  private StandaloneContext standaloneContext;
   /**
    * {@link HttpServletRequest} associated with current request processing cycle.
    */
   private HttpServletRequest request;
   /**
-   * Initialize the ManagerFactory with required properties.
-   *
-   * @param runContext
-   * @param request
+   * {@inheritDoc}
    */
-  public void initialize(final RunContext runContext, final HttpServletRequest request) {
-    this.runContext = runContext;
+  public void initialize(final StandaloneContext standaloneContext, final HttpServletRequest request) {
+    this.standaloneContext = standaloneContext;
     this.request = request;
   }
 
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected void onBeforeCreate() {
     Context.set(Context.standaloneContext(request));
@@ -62,7 +60,7 @@ public class DefaultMavenContextAwareManagerFactory
     return new GroupExtractorDecorator(super.newGroupExtractor()) {
       @Override
       public boolean isMinimized(final HttpServletRequest request) {
-        return runContext.isMinimize();
+        return standaloneContext.isMinimize();
       }
     };
   }
@@ -74,7 +72,7 @@ public class DefaultMavenContextAwareManagerFactory
       @Override
       protected InputStream getConfigResourceAsStream()
         throws IOException {
-        return new FileInputStream(runContext.getWroFile());
+        return new FileInputStream(standaloneContext.getWroFile());
       }
     };
   }
@@ -87,7 +85,7 @@ public class DefaultMavenContextAwareManagerFactory
     final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
     configureProcessors(groupsProcessor);
     //This is important in order to make plugin aware about ignoreMissingResources option.
-    groupsProcessor.setIgnoreMissingResources(runContext.isIgnoreMissingResources());
+    groupsProcessor.setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
     return groupsProcessor;
   }
 
@@ -114,7 +112,7 @@ public class DefaultMavenContextAwareManagerFactory
       public InputStream locate(final String uri)
         throws IOException {
         final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
-        return new FileInputStream(new File(runContext.getContextFolder(), uriWithoutPrefix));
+        return new FileInputStream(new File(standaloneContext.getContextFolder(), uriWithoutPrefix));
       }
     };
   }

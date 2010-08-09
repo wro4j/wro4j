@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.manager.factory.maven.DefaultMavenContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 
@@ -126,7 +126,7 @@ public class TestWro4jMojo {
   }
 
   public static final class ExceptionThrowingWroManagerFactory
-    extends DefaultMavenContextAwareManagerFactory {
+    extends DefaultStandaloneContextAwareManagerFactory {
     @Override
     protected void configureProcessors(final GroupsProcessor groupsProcessor) {
       final ResourcePostProcessor postProcessor = Mockito.mock(ResourcePostProcessor.class);
@@ -161,7 +161,7 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
-  public static class CustomManagerFactory extends DefaultMavenContextAwareManagerFactory {
+  public static class CustomManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
     @Override
     protected void configureProcessors(final GroupsProcessor groupsProcessor) {
     }

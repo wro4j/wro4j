@@ -25,9 +25,9 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.maven.DefaultMavenContextAwareManagerFactory;
-import ro.isdc.wro.manager.factory.maven.MavenContextAwareManagerFactory;
-import ro.isdc.wro.manager.factory.maven.RunContext;
+import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -103,19 +103,19 @@ public class Wro4jMojo extends AbstractMojo {
    * @return {@link WroManagerFactory} implementation.
    */
   @SuppressWarnings("unchecked")
-  private MavenContextAwareManagerFactory getManagerFactory(final HttpServletRequest request)
+  private StandaloneContextAwareManagerFactory getManagerFactory(final HttpServletRequest request)
     throws MojoExecutionException {
-    final MavenContextAwareManagerFactory managerFactory;
+    final StandaloneContextAwareManagerFactory managerFactory;
     if (wroManagerFactory != null) {
       try {
-        final Class<? extends MavenContextAwareManagerFactory> wroManagerFactoryClass = (Class<? extends MavenContextAwareManagerFactory>)Thread.currentThread().getContextClassLoader().loadClass(
+        final Class<? extends StandaloneContextAwareManagerFactory> wroManagerFactoryClass = (Class<? extends StandaloneContextAwareManagerFactory>)Thread.currentThread().getContextClassLoader().loadClass(
           wroManagerFactory.trim());
         managerFactory = wroManagerFactoryClass.newInstance();
       } catch (final Exception e) {
         throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
       }
     } else {
-      managerFactory = new DefaultMavenContextAwareManagerFactory() {
+      managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
         @Override
         protected GroupsProcessor newGroupsProcessor() {
           final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
@@ -131,10 +131,10 @@ public class Wro4jMojo extends AbstractMojo {
 
 
   /**
-   * Creates a {@link RunContext} by setting properties passed after mojo is initialized.
+   * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
-  private RunContext createRunContext() {
-    final RunContext runContext = new RunContext();
+  private StandaloneContext createRunContext() {
+    final StandaloneContext runContext = new StandaloneContext();
     runContext.setContextFolder(contextFolder);
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);

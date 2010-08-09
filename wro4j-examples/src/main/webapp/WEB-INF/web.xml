@@ -20,15 +20,15 @@
     </init-param>
     <init-param>
       <param-name>jmxEnabled</param-name>
-      <param-value>false</param-value>
+      <param-value>true</param-value>
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>0</param-value>
+      <param-value>60</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>0</param-value>
+      <param-value>60</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>

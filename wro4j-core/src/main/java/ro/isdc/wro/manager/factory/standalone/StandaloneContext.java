@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.manager.factory.maven;
+package ro.isdc.wro.manager.factory.standalone;
 
 import java.io.File;
 import java.io.Serializable;
@@ -12,12 +12,12 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 
 /**
- * A context for "run" mojo goal.
+ * A context for running wro4j in standalone mode.
  *
  * @author Alex Objelean
  */
 @SuppressWarnings("serial")
-public class RunContext
+public class StandaloneContext
   implements Serializable {
   private File wroFile;
   private File contextFolder;

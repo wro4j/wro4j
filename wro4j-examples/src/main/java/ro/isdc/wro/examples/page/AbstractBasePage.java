@@ -13,6 +13,7 @@ import ro.isdc.wro.examples.panel.TwitterBar;
  */
 public class AbstractBasePage extends WebPage {
   private static final long serialVersionUID = 1L;
+
   /**
    * Constructor that is invoked when page is invoked without a session.
    *

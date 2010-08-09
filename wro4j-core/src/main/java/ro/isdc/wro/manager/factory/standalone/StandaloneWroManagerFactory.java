@@ -1,12 +1,13 @@
 /*
  * Copyright (c) 2009.
  */
-package ro.isdc.wro.manager.factory;
+package ro.isdc.wro.manager.factory.standalone;
 
 import javax.servlet.ServletContext;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;

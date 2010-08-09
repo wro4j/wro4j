@@ -18,6 +18,7 @@ public class HomePage extends AbstractBasePage {
    * @param parameters Page parameters
    */
   public HomePage(final PageParameters parameters) {
+    super(parameters);
     add(new Label("message", "If you see this message wicket is properly configured and running"));
     add(new ResourceTransformerPanel("resourceTransformer"));
   }
