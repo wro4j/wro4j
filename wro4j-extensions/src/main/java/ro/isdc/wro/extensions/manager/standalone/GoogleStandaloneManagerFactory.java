@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.extensions.maven;
+package ro.isdc.wro.extensions.manager.standalone;
 
 import ro.isdc.wro.extensions.processor.google.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  */
-public class GoogleMavenManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
+public class GoogleStandaloneManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
   /**
    * {@inheritDoc}
    */
