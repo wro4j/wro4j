@@ -42,7 +42,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the
- * way it is configured, it builds
+ * way it is configured.
  *
  * @author Alex Objelean
  * @created Created on Oct 31, 2008
@@ -185,12 +185,11 @@ public class WroFilter
 
 
   /**
-   * Override this method for enabling JMX by other means.
+   * Override this method for enabling JMX by other means. Treat null value as true.
    *
    * @return flag for enabling JMX.
    */
   protected boolean getJmxEnabled() {
-    // treat null as true
     // TODO do not use BooleanUtils -> create your utility method
     return BooleanUtils.toBooleanDefaultIfNull(
       BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);

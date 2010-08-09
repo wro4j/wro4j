@@ -9,12 +9,12 @@ package ro.isdc.wro.model.resource;
  *
  * @author Alex Objelean
  */
-public interface VersionNameEncoder {
+public interface NamingStrategy {
   /**
    * Creates a new name of the resource which encodes a version.
    *
    * @param name old name of the resource.
    * @return new name of the resource with version encoded.
    */
-  public String encode(final String name);
+  public String rename(final String name);
 }

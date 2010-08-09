@@ -9,11 +9,11 @@ import org.apache.wicket.markup.html.panel.Panel;
 /**
  * @author Alex Objelean
  */
+@SuppressWarnings("serial")
 public class TwitterBar
     extends Panel {
   public TwitterBar(final String id) {
     super(id);
-
   }
 
 //  private String interpolateScript()

@@ -99,17 +99,17 @@ public class Context {
    * @return {@link Context} associated with CURRENT request cycle.
    */
   public static Context get() {
-    if (!isValid()) {
-      throw new WroRuntimeException("No context associated with CURRENT request cycle!");
-    }
+    validateContext();
     return CURRENT.get();
   }
 
   /**
-   * @return true if the Context is valid (not null), meaning that it is inside a request cycle.
+   * Checks if the {@link Context} is accessible from current request cycle.
    */
-  private static boolean isValid() {
-    return CURRENT.get() != null;
+  private static void validateContext() {
+    if (CURRENT.get() == null) {
+      throw new WroRuntimeException("No context associated with CURRENT request cycle!");
+    }
   }
 
 

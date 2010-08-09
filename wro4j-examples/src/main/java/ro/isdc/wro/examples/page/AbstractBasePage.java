@@ -1,11 +1,11 @@
 package ro.isdc.wro.examples.page;
 
 
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 
-import ro.isdc.wro.examples.panel.ResourceTransformerPanel;
+import ro.isdc.wro.examples.panel.TwitterBar;
 
 
 /**
@@ -19,7 +19,10 @@ public class AbstractBasePage extends WebPage {
    * @param parameters Page parameters
    */
   public AbstractBasePage(final PageParameters parameters) {
-    add(new Label("message", "If you see this message wicket is properly configured and running"));
-    add(new ResourceTransformerPanel("resourceTransformer"));
+    add(newSidebar("sidebar"));
+  }
+
+  private Component newSidebar(final String id) {
+    return new TwitterBar(id);
   }
 }
