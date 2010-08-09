@@ -392,6 +392,14 @@
       </distributionManagement>      
     </profile>
   </profiles>  
+  <!-- Repository for third party libraries -->
+  <repositories>
+    <repository>
+      <id>Wro4j Local Repo</id>
+      <url>file://${basedir}/../wro4j-repo</url>
+    </repository>
+  </repositories>
+  
   <!--
 	<distributionManagement>
     <repository>

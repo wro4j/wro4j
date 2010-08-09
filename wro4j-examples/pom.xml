@@ -31,11 +31,9 @@
 			<artifactId>wro4j-extensions</artifactId>
 		</dependency>
 		<dependency>
-      <groupId>com.google</groupId>
-      <artifactId>closure</artifactId>
+      <groupId>com.google.closure</groupId>
+      <artifactId>compiler</artifactId>
       <version>0.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/compiler.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>

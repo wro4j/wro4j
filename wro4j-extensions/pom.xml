@@ -50,12 +50,10 @@
 			<artifactId>spring</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google</groupId>
-			<artifactId>closure</artifactId>
-			<version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/compiler.jar</systemPath>
-		</dependency>
+      <groupId>com.google.closure</groupId>
+      <artifactId>compiler</artifactId>
+      <version>0.1</version>
+    </dependency>
 	</dependencies>
 	<build>
 		<plugins>

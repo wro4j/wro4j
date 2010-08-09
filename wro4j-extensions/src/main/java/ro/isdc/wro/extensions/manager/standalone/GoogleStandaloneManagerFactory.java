@@ -13,6 +13,8 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
+import com.google.javascript.jscomp.CompilationLevel;
+
 
 /**
  * A factory using google closure compressor for processing resources.
@@ -30,7 +32,7 @@ public class GoogleStandaloneManagerFactory extends DefaultStandaloneContextAwar
     groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
     groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
     groupsProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupsProcessor.addPostProcessor(new GoogleClosureCompressorProcessor());
+    groupsProcessor.addPostProcessor(new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
   }
 }

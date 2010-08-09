@@ -305,7 +305,7 @@ public class Wro4jMojo extends AbstractMojo {
     list.add(mavenProject.getBuild().getOutputDirectory());
     for (final Artifact artifact : artifacts) {
       getLog().debug("artifact: " + artifact.getFile().getPath());
-      //if (artifact.getArtifactHandler().isAddedToClasspath()) {
+      if (artifact.getArtifactHandler().isAddedToClasspath()) {
         // TODO: let the scope handler deal with this
         if (!Artifact.SCOPE_TEST.equals(artifact.getScope())) {
           final File file = artifact.getFile();
@@ -314,7 +314,7 @@ public class Wro4jMojo extends AbstractMojo {
           }
           list.add(file.getPath());
         }
-//      }
+      }
     }
     return list;
   }
