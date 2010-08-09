@@ -154,8 +154,8 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
-  @Test(expected=MojoExecutionException.class)
-  public void testNoGroupSet()
+  @Test
+  public void executeWithNullTargetGroupsProperty()
     throws Exception {
     mojo.setTargetGroups(null);
     mojo.execute();

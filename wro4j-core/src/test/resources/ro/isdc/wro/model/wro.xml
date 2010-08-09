@@ -7,4 +7,13 @@
     <css>classpath:1.css</css>
   </group>
 
+  <group name="g2">
+    <css>/path/to/resource</css>
+    <js>/path/to/resource</js>
+  </group>
+  
+  <group name="g3">
+    <js>/path/to/resource</js>
+    <group-ref>g2</group-ref>
+  </group>
 </groups>

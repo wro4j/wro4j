@@ -26,7 +26,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -43,6 +42,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -126,10 +126,10 @@ public class XmlModelFactory
       synchronized (this) {
         if (model == null) {
           final StopWatch stopWatch = new StopWatch();
-          stopWatch.start();
+          stopWatch.start("Create Model");
           model = newModel();
           stopWatch.stop();
-          LOG.debug("WroModel creation time: " + stopWatch.toString());
+          LOG.debug(stopWatch.prettyPrint());
         }
       }
     }

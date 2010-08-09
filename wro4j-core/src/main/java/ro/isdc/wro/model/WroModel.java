@@ -3,7 +3,9 @@
  */
 package ro.isdc.wro.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -29,6 +31,17 @@ public final class WroModel {
    */
   public final Set<Group> getGroups() {
     return groups;
+  }
+
+  /**
+   * @return a set of group names.
+   */
+  public final List<String> getGroupNames() {
+    final List<String> groupNames = new ArrayList<String>();
+    for (final Group group : getGroups()) {
+      groupNames.add(group.getName());
+    }
+    return groupNames;
   }
 
   /**

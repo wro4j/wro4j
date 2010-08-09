@@ -3143,7 +3143,7 @@ jQuery.extend({
 			complete: fn || !fn && easing ||
 				jQuery.isFunction( speed ) && speed,
 			duration: speed,
-			easing: fn && easin	g || easing && easing.constructor != Function && easing
+			easing: fn && easing || easing && easing.constructor != Function && easing
 		};
 
 		opt.duration = (opt.duration && opt.duration.constructor == Number ?

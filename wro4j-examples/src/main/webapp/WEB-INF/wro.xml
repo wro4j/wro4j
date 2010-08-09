@@ -13,6 +13,7 @@
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>dwr</group-ref>
+    <group-ref>wicket</group-ref>
 	</group>
   
   <group name="twitterBar">
@@ -45,6 +46,9 @@
 		<css>/static/css/variablesSupport.css</css>
 	</group>
   
+  <group name="wicket">
+    <js>classpath:org/apache/wicket/ajax/wicket-ajax-debug.js</js>
+  </group>
   
   <group name="dwr">
     <js>/dwr/engine.js</js>

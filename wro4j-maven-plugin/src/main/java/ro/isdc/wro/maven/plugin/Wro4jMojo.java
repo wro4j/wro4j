@@ -6,28 +6,27 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.classworlds.ClassRealm;
+import org.codehaus.classworlds.ClassWorld;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -70,9 +69,11 @@ public class Wro4jMojo extends AbstractMojo {
    */
   private File jsDestinationFolder;
   /**
-   * Comma separated group names.
+   * Comma separated group names. This field is optional. If no value is provided, a file for each group will be
+   * created.
    *
    * @parameter expression="${targetGroups}"
+   * @optional
    */
   private String targetGroups;
   /**
@@ -115,20 +116,33 @@ public class Wro4jMojo extends AbstractMojo {
         throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
       }
     } else {
-      managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
-        @Override
-        protected GroupsProcessor newGroupsProcessor() {
-          final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
-          groupsProcessor.setIgnoreMissingResources(ignoreMissingResources);
-          return groupsProcessor;
-        }
-      };
+      managerFactory = createDefaultFactory();
     }
     // initialize before return.
     managerFactory.initialize(createRunContext(), request);
     return managerFactory;
   }
 
+  /**
+   * Creates default instance of {@link StandaloneContextAwareManagerFactory}.
+   */
+  private StandaloneContextAwareManagerFactory createDefaultFactory() {
+    return new DefaultStandaloneContextAwareManagerFactory() {
+      @Override
+      protected GroupsProcessor newGroupsProcessor() {
+        final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+        groupsProcessor.setIgnoreMissingResources(ignoreMissingResources);
+        return groupsProcessor;
+      }
+    };
+  }
+
+  /**
+   * @return {@link WroModel} object.
+   */
+  private WroModel getModel() throws MojoExecutionException {
+    return getManagerFactory(Mockito.mock(HttpServletRequest.class)).getInstance().getModelFactory().getInstance();
+  }
 
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
@@ -229,9 +243,6 @@ public class Wro4jMojo extends AbstractMojo {
     if (destinationFolder == null) {
       throw new MojoExecutionException("destinationFolder was not set!");
     }
-    if (targetGroups == null) {
-      throw new MojoExecutionException("targetGroups was not set!");
-    }
     if (contextFolder == null) {
       throw new MojoExecutionException("contextFolder was not set!");
     }
@@ -241,39 +252,43 @@ public class Wro4jMojo extends AbstractMojo {
   /**
    * Update the classpath.
    */
-  private void updateClasspath() {
-    // TODO update classloader by adding all runtime dependencies of the running project
-    getLog().info("mavenProject: " + mavenProject);
-    final Collection<Artifact> artifacts = mavenProject.getArtifacts();
-    final List<URL> urlList = new ArrayList<URL>();
+  @SuppressWarnings("unchecked")
+  private void updateClasspath() throws MojoExecutionException {
+    //this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
+    List<String> classpathElements;
     try {
-      for (final Artifact artifact : artifacts) {
-        urlList.add(artifact.getFile().toURI().toURL());
+      classpathElements = mavenProject.getRuntimeClasspathElements();
+    } catch (final DependencyResolutionRequiredException e) {
+      throw new MojoExecutionException("Could not get compile classpath elements", e);
+    }
+    getLog().debug("============== Classpath ELEMENTS: ==============");
+
+    final ClassWorld world = new ClassWorld();
+    ClassRealm realm;
+    try {
+      realm = world.newRealm("maven.plugin." + getClass().getSimpleName(),
+          Thread.currentThread().getContextClassLoader());
+      for (final String element : classpathElements) {
+        final File elementFile = new File(element);
+        getLog().debug("Adding element to plugin classpath: " + elementFile.getPath());
+        final URL url = new URL("file:///" + elementFile.getPath() + (elementFile.isDirectory() ? "/" : ""));
+        realm.addConstituent(url);
       }
-    } catch (final MalformedURLException e) {
+    } catch (final Exception e) {
       getLog().error("Error retreiving URL for artifact", e);
       throw new RuntimeException(e);
     }
-    getLog().info("URLs: " + urlList);
-    final URLClassLoader classLoader = new URLClassLoader(
-      urlList.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
-    Thread.currentThread().setContextClassLoader(classLoader);
+    Thread.currentThread().setContextClassLoader(realm.getClassLoader());
   }
-
-//  List runtimeClasspathElements = project.getRuntimeClasspathElements();
-//  URL[] runtimeUrls = new URL[runtimeClasspathElements.size()];
-//  for (int i = 0; i < runtimeClasspathElements.size(); i++) {
-//    String element = (String) runtimeClasspathElements.get(i);
-//    runtimeUrls[i] = new File(element).toURI().toURL();
-//  }
-//  URLClassLoader newLoader = new URLClassLoader(runtimeUrls,
-//    Thread.currentThread().getContextClassLoader());
-
 
   /**
    * @return a list containing all groups needs to be processed.
    */
-  private List<String> getTargetGroupsAsList() {
+  private List<String> getTargetGroupsAsList() throws MojoExecutionException {
+    if (targetGroups == null) {
+      final WroModel model = getModel();
+      return model.getGroupNames();
+    }
     return Arrays.asList(targetGroups.split(","));
   }
 

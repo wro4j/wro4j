@@ -4,6 +4,9 @@
 package ro.isdc.wro.model;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -39,6 +42,15 @@ public class TestWroModel {
     final Group group = model.getGroupByName("g1");
     //create a copy of original list
     Assert.assertEquals(1, group.getResources().size());
+  }
+
+  @Test
+  public void testGetGroupNames() {
+    model = buildValidModel();
+    final List<String> groupNames = model.getGroupNames();
+    Collections.sort(groupNames);
+    final List<String> expected = Arrays.asList("g1","g2","g3");
+    Assert.assertEquals(expected, groupNames);
   }
 
   @Test(expected=InvalidGroupNameException.class)
