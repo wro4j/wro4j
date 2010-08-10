@@ -7,14 +7,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -176,7 +174,7 @@ public class Wro4jMojo extends AbstractMojo {
   public void execute()
     throws MojoExecutionException {
     validate();
-    updateClasspath();
+    updateClassloader();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + targetGroups);
@@ -265,17 +263,25 @@ public class Wro4jMojo extends AbstractMojo {
   /**
    * Update the classpath.
    */
-  private void updateClasspath() throws MojoExecutionException {
+  @SuppressWarnings("unchecked")
+  private void updateClassloader() throws MojoExecutionException {
     //this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
     List<String> classpathElements;
     try {
-      classpathElements = getRuntimeClasspathElements(mavenProject);
+      classpathElements = mavenProject.getRuntimeClasspathElements();
     } catch (final DependencyResolutionRequiredException e) {
       throw new MojoExecutionException("Could not get compile classpath elements", e);
     }
-    getLog().debug("============== Classpath ELEMENTS: ==============");
+    final ClassRealm realm = createRealm(classpathElements);
+    Thread.currentThread().setContextClassLoader(realm.getClassLoader());
+  }
 
+  /**
+   * @return {@link ClassRealm} based on project dependencies.
+   */
+  private ClassRealm createRealm(final List<String> classpathElements) {
     final ClassWorld world = new ClassWorld();
+    getLog().debug("Classpath elements:");
     ClassRealm realm;
     try {
       realm = world.newRealm("maven.plugin." + getClass().getSimpleName(),
@@ -290,33 +296,7 @@ public class Wro4jMojo extends AbstractMojo {
       getLog().error("Error retreiving URL for artifact", e);
       throw new RuntimeException(e);
     }
-    Thread.currentThread().setContextClassLoader(realm.getClassLoader());
-  }
-
-  /**
-   * Creates a list of classpath elements having any scope but test.
-   */
-  @SuppressWarnings("unchecked")
-  public List<String> getRuntimeClasspathElements(final MavenProject mavenProject)
-      throws DependencyResolutionRequiredException {
-    getLog().debug("=====Building Runtime Classpath Elements=====");
-    final List<Artifact> artifacts = new ArrayList<Artifact>(mavenProject.getArtifacts());
-    final List<String> list = new ArrayList<String>(artifacts.size() + 1);
-    list.add(mavenProject.getBuild().getOutputDirectory());
-    for (final Artifact artifact : artifacts) {
-      getLog().debug("artifact: " + artifact.getFile().getPath());
-      if (artifact.getArtifactHandler().isAddedToClasspath()) {
-        // TODO: let the scope handler deal with this
-        if (!Artifact.SCOPE_TEST.equals(artifact.getScope())) {
-          final File file = artifact.getFile();
-          if (file == null) {
-            throw new DependencyResolutionRequiredException(artifact);
-          }
-          list.add(file.getPath());
-        }
-      }
-    }
-    return list;
+    return realm;
   }
 
   /**
@@ -330,37 +310,42 @@ public class Wro4jMojo extends AbstractMojo {
     return Arrays.asList(targetGroups.split(","));
   }
 
-
   /**
    * Process a single group.
    *
-   * @throws IOException if any IO related exception occurs.
+   * @throws IOException
+   *           if any IO related exception occurs.
    */
   private void processGroup(final String group, final File parentFoder)
-    throws IOException, MojoExecutionException {
-    getLog().info("processing group: " + group);
+      throws IOException, MojoExecutionException {
+    FileOutputStream fos = null;
+    try {
+      getLog().info("processing group: " + group);
 
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(request.getRequestURI()).thenReturn(group);
+      final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+      final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+      Mockito.when(request.getRequestURI()).thenReturn(group);
 
-    final File destinationFile = new File(parentFoder, encodeVersion(group));
-    destinationFile.createNewFile();
-    final FileOutputStream fos = new FileOutputStream(destinationFile);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
+      final File destinationFile = new File(parentFoder, encodeVersion(group));
+      destinationFile.createNewFile();
+      fos = new FileOutputStream(destinationFile);
+      Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
 
-    getManagerFactory(request).getInstance().process(request, response);
+      getManagerFactory(request).getInstance().process(request, response);
 
-    fos.close();
-    // delete empty files
-    if (destinationFile.length() == 0) {
-      getLog().info("No content found for group: " + group);
-      destinationFile.delete();
-    } else {
-      getLog().info(
-        destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
+      // delete empty files
+      if (destinationFile.length() == 0) {
+        getLog().info("No content found for group: " + group);
+        destinationFile.delete();
+      } else {
+        getLog().info(
+            destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
+      }
+    } finally {
+      fos.close();
     }
   }
+
 
 
   /**
