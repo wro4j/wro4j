@@ -8,4 +8,5 @@ It is common knowledge that it is faster to serve one large file rather than two
 
 The main reason this project was born, is because the java community doesn't have too many options when it comes to choosing between this kind of frameworks. There are few similar projects: Jawr, JSO... but each of them has some kind of limitations or dependencies issues, no recent activity, etc... Also, I believe that competition is good and any framework brings something new you can learn from.
 
-The image below, resume the main purpose of why you should use wro4j.
+Notes:
+Before importing projects into your IDE, you have to add third party libraries to you maven repository. This can be easily done by running install.bat. By third party library, we mean any external jar that is not available through public maven repo and is required by wro4j modules in order the project to compile.

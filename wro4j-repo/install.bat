@@ -1,1 +1,0 @@
-mvn org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file -Dfile=com/google/closure/compiler/0.1/compiler-0.1.jar -DgroupId=com.google.closure -DartifactId=compiler -Dversion=0.1 -Dpackaging=jar
