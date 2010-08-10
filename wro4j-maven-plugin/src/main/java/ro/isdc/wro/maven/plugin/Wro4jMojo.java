@@ -174,7 +174,7 @@ public class Wro4jMojo extends AbstractMojo {
   public void execute()
     throws MojoExecutionException {
     validate();
-    updateClassloader();
+    extendPluginClasspath();
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + targetGroups);
@@ -264,7 +264,7 @@ public class Wro4jMojo extends AbstractMojo {
    * Update the classpath.
    */
   @SuppressWarnings("unchecked")
-  private void updateClassloader() throws MojoExecutionException {
+  private void extendPluginClasspath() throws MojoExecutionException {
     //this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
     List<String> classpathElements;
     try {
