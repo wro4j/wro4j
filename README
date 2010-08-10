@@ -1,4 +1,4 @@
-here are countless articles related to web performance. The most comprehensive one is performed by researchers from Yahoo. They have identified a number of best practices for making web pages fast. You can find the details here.
+There are countless articles related to web performance. The most comprehensive one is performed by researchers from Yahoo. They have identified a number of best practices for making web pages fast. You can find the details here.
 
 Also, they created a tool called YSlow: YSlow which analyzes web pages and tells you why they're slow based on the rules for high performance web sites. YSlow is a Firefox add-on integrated with the popular Firebug web development tool.
 
