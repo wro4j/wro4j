@@ -3,9 +3,11 @@
  */
 package ro.isdc.wro.extensions.processor.rhino;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.ScriptableObject;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import sun.org.mozilla.javascript.internal.ScriptableObject;
+
 
 
 /**
@@ -15,25 +17,24 @@ import org.mozilla.javascript.ScriptableObject;
  */
 public class AbstractRhinoContext {
 
-  private final ContextFactory cf;
-  private final Context context;
-  private final ScriptableObject scriptableObject;
-
+  private ScriptableObject scriptableObject;
+  private ScriptEngine scriptEngine;
 
   public AbstractRhinoContext() {
-    cf = new ContextFactory();
-    //because YUI contains the Rhino in its dependency, we have to use this deprecated method
-    context = cf.enter();
-    scriptableObject = context.initStandardObjects();
-    context.setOptimizationLevel(9);
+
+    // create a script engine manager
+    final ScriptEngineManager factory = new ScriptEngineManager();
+    // create JavaScript engine
+    scriptEngine = factory.getEngineByName("JavaScript");
   }
 
   /**
-   * @return the context
+   * @return the scriptEngine
    */
-  public final Context getContext() {
-    return this.context;
+  public ScriptEngine getScriptEngine() {
+    return this.scriptEngine;
   }
+
 
   /**
    * @return the scriptableObject

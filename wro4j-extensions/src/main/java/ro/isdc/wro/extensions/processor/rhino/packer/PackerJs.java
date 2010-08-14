@@ -18,14 +18,13 @@ package ro.isdc.wro.extensions.processor.rhino.packer;
 
 import java.io.IOException;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.rhino.AbstractRhinoContext;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.StopWatch;
@@ -51,10 +50,12 @@ public class PackerJs extends AbstractRhinoContext {
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
       final String base2 = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/base2.js"));
       final String packer = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/packer1.js"));
-      getContext().evaluateString(getScriptableObject(), base2, "base2.js", 1, null);
-      getContext().evaluateString(getScriptableObject(), packer, "packer.js", 1, null);
+      getScriptEngine().eval(base2);
+      getScriptEngine().eval(packer);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript packer.js", ex);
+    } catch (final ScriptException e) {
+      throw new WroRuntimeException("Unable to evaluate the script", e);
     }
   }
 
@@ -65,33 +66,26 @@ public class PackerJs extends AbstractRhinoContext {
    */
   public String pack(final String data)
     throws IOException {
-    final StopWatch watch = new StopWatch();
-    watch.start("pack");
-//    LOG.debug("content to pack:" + doubleEscape(data));
-    final String script = data;
-    getContext().evaluateString(getScriptableObject(), "var scriptToPack = \"" + script + "", "data", 1, null);
-    final String packIt = "new Packer().pack(scriptToPack, true, true);";
-    LOG.debug("evaluating packer script");
-    final String result = getContext().evaluateString(getScriptableObject(), packIt, "packIt.js", 1, null).toString();
-    LOG.debug("packer result: " + result);
-    watch.stop();
-    LOG.debug(watch.prettyPrint());
-    return result;
+    try {
+      final StopWatch watch = new StopWatch();
+      watch.start("pack");
+      final String script = multilineEscape(data);
+      getScriptEngine().eval("var scriptToPack = \"" + script + "\"");
+      LOG.debug("Script to pack evaluated");
+      final String packIt = "new Packer().pack(scriptToPack, true, true);";
+      LOG.debug("evaluating packer script");
+      final String result = getScriptEngine().eval(packIt).toString();
+      LOG.debug("packer result: " + result);
+      watch.stop();
+      LOG.debug(watch.prettyPrint());
+      return result;
+    } catch (final ScriptException e) {
+      throw new WroRuntimeException("Unable to evaluate the script", e);
+    }
   }
 
 
-  private final String doubleEscape(final String data) {
-    return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
-  }
-
-  public static void main(final String[] args) throws Exception {
-    final ClasspathUriLocator uriLocator = new ClasspathUriLocator();
-
-    final String packagePath = WroUtil.toPackageAsFolder(PackerJs.class);
-    final String script = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/base2.js"));
-    final ScriptEngineManager m = new ScriptEngineManager();
-    final ScriptEngine engine = m.getEngineByName("JavaScript");
-    final ScriptContext ctx = engine.getContext();
-    System.out.println(engine.eval(script));
+  private final String multilineEscape(final String data) {
+    return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
   }
 }

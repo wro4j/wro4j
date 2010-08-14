@@ -18,8 +18,11 @@ package ro.isdc.wro.extensions.processor.rhino.less;
 
 import java.io.IOException;
 
+import javax.script.ScriptException;
+
 import org.apache.commons.io.IOUtils;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.rhino.AbstractRhinoContext;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -40,10 +43,12 @@ public class LessCSS extends AbstractRhinoContext {
       final String lessjs = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/less.js"));
       final String runjs = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/run.js"));
 
-      getContext().evaluateString(getScriptableObject(), lessjs, "less.js", 1, null);
-      getContext().evaluateString(getScriptableObject(), runjs, "run.js", 1, null);
+      getScriptEngine().eval(lessjs);
+      getScriptEngine().eval(runjs);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
+    } catch (final ScriptException e) {
+      throw new WroRuntimeException("Unable to evaluate the script", e);
     }
   }
 
@@ -58,8 +63,12 @@ public class LessCSS extends AbstractRhinoContext {
    * @return processed css content.
    */
   public String less(final String data) {
-    final String lessitjs = "lessIt(\"" + removeNewLines(data) + "\");";
-    final String result = getContext().evaluateString(getScriptableObject(), lessitjs, "lessitjs.js", 1, null).toString();
-    return result;
+    try {
+      final String lessitjs = "lessIt(\"" + removeNewLines(data) + "\");";
+      final String result = (String)getScriptEngine().eval(lessitjs);
+      return result;
+    } catch (final ScriptException e) {
+      throw new WroRuntimeException("Could not execute the script", e);
+    }
   }
 }

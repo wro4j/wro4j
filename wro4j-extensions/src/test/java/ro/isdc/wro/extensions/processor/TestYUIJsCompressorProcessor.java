@@ -13,6 +13,8 @@ import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.yui.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.util.WroUtil;
+
 
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
@@ -23,16 +25,28 @@ import ro.isdc.wro.test.util.ResourceProcessor;
 public class TestYUIJsCompressorProcessor extends AbstractWroTest {
   private final ResourcePostProcessor processor = new YUIJsCompressorProcessor();
 
+
   @Test
-  public void test() throws IOException {
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/extensions/processor/yuijscompressor-input.js",
-        "classpath:ro/isdc/wro/extensions/processor/yuijscompressor-output.js",
-        new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(reader, writer);
-          }
-        });
+  public void testWithMunge()
+    throws IOException {
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
+      + WroUtil.toPackageAsFolder(getClass()) + "/yuijscompressor-munge-output.js", new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    });
+  }
+
+  @Test
+  public void testNoMunge()
+    throws IOException {
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
+      + WroUtil.toPackageAsFolder(getClass()) + "/yuijscompressor-nomunge-output.js", new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        new YUIJsCompressorProcessor(false).process(reader, writer);
+      }
+    });
   }
 }

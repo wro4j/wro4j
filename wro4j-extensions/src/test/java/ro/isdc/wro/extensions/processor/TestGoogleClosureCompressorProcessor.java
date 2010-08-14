@@ -12,6 +12,7 @@ import org.junit.Test;
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.google.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 import com.google.javascript.jscomp.CompilationLevel;
 
@@ -26,8 +27,8 @@ public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
   @Test
   public void testDefault()
     throws IOException {
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/googleClosure-input.js",
-      "classpath:ro/isdc/wro/extensions/processor/googleClosure-output.js", new ResourceProcessor() {
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
+      + WroUtil.toPackageAsFolder(getClass()) + "/googleClosure-output.js", new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           new GoogleClosureCompressorProcessor().process(reader, writer);
@@ -39,8 +40,8 @@ public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
   @Test
   public void testAdvanced()
     throws IOException {
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/googleClosure-input.js",
-      "classpath:ro/isdc/wro/extensions/processor/googleClosure-advanced-output.js", new ResourceProcessor() {
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
+      + WroUtil.toPackageAsFolder(getClass()) + "/googleClosure-advanced-output.js", new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS).process(reader, writer);

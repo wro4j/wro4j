@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +34,15 @@ public class TestPackerProcessor extends AbstractWroTest {
     processor = new PackerJsProcessor();
   }
 
-  @Ignore
   @Test
   public void testPacker()
     throws IOException {
     LOG.debug("testPacker");
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/packer-input.js",
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js",
       "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/packer-output.js", new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
-          System.out.println("Process ready");
-          System.in.read();
         }
       });
   }

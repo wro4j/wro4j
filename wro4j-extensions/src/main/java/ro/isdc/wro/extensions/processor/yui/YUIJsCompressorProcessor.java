@@ -17,6 +17,7 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.util.StopWatch;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
@@ -97,6 +98,8 @@ public class YUIJsCompressorProcessor
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
+    final StopWatch watch = new StopWatch();
+    watch.start("pack");
     try {
       final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new YUIErrorReporter());
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
@@ -105,6 +108,8 @@ public class YUIJsCompressorProcessor
     } finally {
       reader.close();
       writer.close();
+      watch.stop();
+      LOG.debug(watch.prettyPrint());
     }
   }
 }

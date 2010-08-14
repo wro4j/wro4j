@@ -33,7 +33,6 @@
 		<dependency>
       <groupId>com.google.closure</groupId>
       <artifactId>compiler</artifactId>
-      <version>0.1</version>
     </dependency>
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>

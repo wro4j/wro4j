@@ -172,13 +172,13 @@
 			<dependency>
 				<groupId>com.yahoo.platform.yui</groupId>
 				<artifactId>yuicompressor</artifactId>
-				<version>2.3.6</version>
+				<version>2.4.2</version>
 			</dependency>
-			<dependency>
-				<groupId>org.dojotoolkit</groupId>
-				<artifactId>custom_rhino</artifactId>
-				<version>0.9.0</version>
-			</dependency>
+      <dependency>
+        <groupId>com.google.closure</groupId>
+        <artifactId>compiler</artifactId>
+        <version>r361</version>
+      </dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
@@ -238,6 +238,7 @@
     </pluginManagement>  
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.5</source>
@@ -341,6 +342,7 @@
 
       <build>
         <plugins>
+        
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -395,8 +397,8 @@
   <!-- Repository for third party libraries -->
   <repositories>
     <repository>
-      <id>Wro4j Local Repo</id>
-      <url>file://${basedir}/../wro4j-repo</url>
+      <id>Jasig Repo - for YUI library</id>
+      <url>http://developer.jasig.org/repo/content/groups/m2-legacy</url>
     </repository>
   </repositories>
   

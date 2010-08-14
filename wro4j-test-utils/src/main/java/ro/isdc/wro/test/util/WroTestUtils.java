@@ -85,7 +85,7 @@ public class WroTestUtils {
    */
   private static String replaceTabsWithSpaces(final String input) {
     // replace tabs with spaces
-    return input.replaceAll("\\t", "  ");
+    return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
   }
 
 
