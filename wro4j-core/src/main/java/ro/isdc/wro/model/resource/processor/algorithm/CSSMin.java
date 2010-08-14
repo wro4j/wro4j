@@ -99,8 +99,10 @@ class Selector {
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append(selector).append("{");
-    for (final Property propertie : properties) {
-      sb.append(propertie.toString());
+    for (final Property property : properties) {
+      if (property != null) {
+        sb.append(property.toString());
+      }
     }
     sb.append("}");
     return sb.toString();
