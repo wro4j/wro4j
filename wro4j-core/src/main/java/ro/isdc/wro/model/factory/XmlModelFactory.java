@@ -43,6 +43,7 @@ import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -144,9 +145,11 @@ public class XmlModelFactory
     if (scheduler == null) {
       final long period = Context.get().getConfig().getModelUpdatePeriod();
       if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        // Run a scheduled task which updates the model
-        scheduler.scheduleAtFixedRate(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
+        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
+        // Run a scheduled task which updates the model.
+        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
+        // (thread tries to make up for lost time in some situations)
+        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
       }
     }
   }

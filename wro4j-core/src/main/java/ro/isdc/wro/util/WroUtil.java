@@ -5,6 +5,8 @@ package ro.isdc.wro.util;
 
 import java.util.Enumeration;
 import java.util.TimeZone;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -175,5 +177,19 @@ public final class WroUtil {
       }
     }
     return false;
+  }
+
+  /**
+   * @return a {@link ThreadFactory} which produces only daemon threads.
+   */
+  public static ThreadFactory createDaemonThreadFactory() {
+    final ThreadFactory backingThreadFactory = Executors.defaultThreadFactory();
+    return new ThreadFactory() {
+      public Thread newThread(final Runnable runnable) {
+        final Thread thread = backingThreadFactory.newThread(runnable);
+        thread.setDaemon(true);
+        return thread;
+      }
+    };
   }
 }

@@ -120,16 +120,10 @@ public class WroManager
     //TODO move API related checks into separate class and determine filter mapping for better mapping
     if (matchesUrl(request, API_RELOAD_CACHE)) {
       Context.get().getConfig().reloadCache();
-      response.setContentType("application/json");
-      response.getWriter().write("{response: 'OK'}");
-      response.getWriter().close();
       return;
     }
     if (matchesUrl(request, API_RELOAD_MODEL)) {
       Context.get().getConfig().reloadModel();
-      response.setContentType("application/json");
-      response.getWriter().write("{response: 'OK'}");
-      response.getWriter().close();
       return;
     }
     if (isProxyResourceRequest(request)) {
@@ -260,9 +254,9 @@ public class WroManager
       final long period = Context.get().getConfig().getCacheUpdatePeriod();
       LOG.debug("runing thread with period of " + period);
       if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        // Run a scheduled task which updates the model
-        // here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
+        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
+        // Run a scheduled task which updates the model.
+        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
         // (thread tries to make up for lost time in some situations)
         scheduler.scheduleWithFixedDelay(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
       }
