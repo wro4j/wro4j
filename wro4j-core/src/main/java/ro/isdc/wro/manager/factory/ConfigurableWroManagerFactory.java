@@ -26,11 +26,14 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
@@ -95,10 +98,19 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     preProcessors.put("cssVariables", new CssVariablesProcessor());
     preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
     preProcessors.put("cssDataUri", new CssDataUriPreProcessor());
+    preProcessors.put("cssCompressor", new CssCompressorProcessor());
+    preProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
+    preProcessors.put("jsMin", new JSMinProcessor());
+    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
+    preProcessors.put("conformColors", new ConformColorsCssProcessor());
 
     postProcessors.put("cssVariables", new CssVariablesProcessor());
+    postProcessors.put("cssCompressor", new CssCompressorProcessor());
     postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
     postProcessors.put("jsMin", new JSMinProcessor());
+    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
+    preProcessors.put("conformColors", new ConformColorsCssProcessor());
+
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);
   }

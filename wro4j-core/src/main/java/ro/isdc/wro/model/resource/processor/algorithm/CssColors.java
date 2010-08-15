@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package ro.isdc.wro.extensions.processor.algorithm;
+package ro.isdc.wro.model.resource.processor.algorithm;
 
 /**
  * Holds color mappings.
