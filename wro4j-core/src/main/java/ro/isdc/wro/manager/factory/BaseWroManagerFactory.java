@@ -26,16 +26,17 @@ import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.FingerprintCreator;
 import ro.isdc.wro.model.resource.MD5FingerprintCreator;
 
+
 /**
  * A simple implementation of {@link WroManagerFactory} which doesn't define any processors or uriLocators.
  *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public abstract class BaseWroManagerFactory implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
+public abstract class BaseWroManagerFactory
+  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
-   * Manager instance. Using volatile keyword fix the problem with
-   * double-checked locking in JDK 1.5.
+   * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
    */
   protected volatile WroManager manager;
   /**

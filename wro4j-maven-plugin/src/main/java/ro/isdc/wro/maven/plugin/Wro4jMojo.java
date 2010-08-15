@@ -3,16 +3,20 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -97,22 +101,29 @@ public class Wro4jMojo extends AbstractMojo {
    * @parameter default-value="${project}"
    */
   private MavenProject mavenProject;
+  /**
+   * An instance of {@link StandaloneContextAwareManagerFactory}.
+   */
+  private StandaloneContextAwareManagerFactory managerFactory;
 
 
   /**
-   * @param request {@link HttpServletRequest} to process
+   * This method will ensure that you have a right and initialized instance of
+   * {@link StandaloneContextAwareManagerFactory}.
+   *
    * @return {@link WroManagerFactory} implementation.
    */
-  private StandaloneContextAwareManagerFactory getManagerFactory(final HttpServletRequest request)
+  private StandaloneContextAwareManagerFactory getManagerFactory()
     throws MojoExecutionException {
-    final StandaloneContextAwareManagerFactory managerFactory;
-    if (wroManagerFactory != null) {
-      managerFactory = createCustomManagerFactory();
-    } else {
-      managerFactory = createDefaultManagerFactory();
+    if (managerFactory == null) {
+      if (wroManagerFactory != null) {
+        managerFactory = createCustomManagerFactory();
+      } else {
+        managerFactory = createDefaultManagerFactory();
+      }
+      // initialize before process.
+      managerFactory.initialize(createRunContext());
     }
-    // initialize before return.
-    managerFactory.initialize(createRunContext(), request);
     return managerFactory;
   }
 
@@ -154,7 +165,7 @@ public class Wro4jMojo extends AbstractMojo {
    */
   private WroModel getModel()
     throws MojoExecutionException {
-    return getManagerFactory(Mockito.mock(HttpServletRequest.class)).getInstance().getModelFactory().getInstance();
+    return getManagerFactory().getInstance().getModelFactory().getInstance();
   }
 
 
@@ -188,7 +199,8 @@ public class Wro4jMojo extends AbstractMojo {
     getLog().info("ignoreMissingResources: " + ignoreMissingResources);
 
     try {
-      for (final String group : getTargetGroupsAsList()) {
+      final Collection<String> groupsAsList = getTargetGroupsAsList();
+      for (final String group : groupsAsList) {
         for (final ResourceType resourceType : ResourceType.values()) {
           final File destinationFolder = computeDestinationFolder(resourceType);
           final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
@@ -205,10 +217,16 @@ public class Wro4jMojo extends AbstractMojo {
    * Encodes a version using some logic.
    *
    * @param group the name of the resource to encode.
+   * @param input the stream of the result content.
    * @return the name of the resource with the version encoded.
    */
-  private String encodeVersion(final String group) {
-    return group;
+  private String rename(final String group, final InputStream input)
+    throws MojoExecutionException {
+    try {
+      return getManagerFactory().getNamingStrategy().rename(group, input);
+    } catch (final IOException e) {
+      throw new MojoExecutionException("Error occured during renaming", e);
+    }
   }
 
 
@@ -325,19 +343,27 @@ public class Wro4jMojo extends AbstractMojo {
   private void processGroup(final String group, final File parentFoder)
     throws IOException, MojoExecutionException {
     FileOutputStream fos = null;
+    ByteArrayOutputStream resultOutputStream = null;
+    InputStream resultInputStream = null;
     try {
       getLog().info("processing group: " + group);
 
+      //mock request
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-      final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       Mockito.when(request.getRequestURI()).thenReturn(group);
+      //mock response
+      final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+      resultOutputStream = new ByteArrayOutputStream();
+      Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
-      final File destinationFile = new File(parentFoder, encodeVersion(group));
+      //perform processing
+      getManagerFactory().getInstance().process(request, response);
+
+      //encode version & write result to file
+      resultInputStream = new ByteArrayInputStream(resultOutputStream.toByteArray());
+      final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       destinationFile.createNewFile();
       fos = new FileOutputStream(destinationFile);
-      Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(fos));
-
-      getManagerFactory(request).getInstance().process(request, response);
 
       // delete empty files
       if (destinationFile.length() == 0) {
@@ -348,6 +374,8 @@ public class Wro4jMojo extends AbstractMojo {
           + " (" + destinationFile.length() + "bytes" + ") has been created!");
       }
     } finally {
+      resultOutputStream.close();
+      resultInputStream.close();
       fos.close();
     }
   }
@@ -397,7 +425,7 @@ public class Wro4jMojo extends AbstractMojo {
    * @param versionEncoder(targetGroups) comma separated group names.
    */
   public void setTargetGroups(final String targetGroups) {
-    this.targetGroups = encodeVersion(targetGroups);
+    this.targetGroups = targetGroups;
   }
 
 
@@ -421,7 +449,7 @@ public class Wro4jMojo extends AbstractMojo {
    * @param versionEncoder(wroManagerFactory) the wroManagerFactory to set
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
-    this.wroManagerFactory = encodeVersion(wroManagerFactory);
+    this.wroManagerFactory = wroManagerFactory;
   }
 
 

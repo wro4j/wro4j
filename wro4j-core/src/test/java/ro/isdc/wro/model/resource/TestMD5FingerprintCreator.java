@@ -25,7 +25,7 @@ public class TestMD5FingerprintCreator {
   }
 
   @Test
-  public void testHashForSampleInput() {
+  public void testHashForSampleInput() throws Exception {
     final String input = "testString";
     final String hash = fingerprintCreator.create(new ByteArrayInputStream(input.getBytes()));
     Assert.assertEquals("391a41aa2e8a564787d6c2ef246abc71", hash);

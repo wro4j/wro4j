@@ -4,6 +4,7 @@
  */
 package ro.isdc.wro.model.resource;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -13,8 +14,9 @@ import java.io.InputStream;
  */
 public interface FingerprintCreator {
   /**
-   * @param input to digest.
+   * @param inputStream to digest.
    * @return the hash of the content.
+   * @throws IOException if there was an error during reading the stream content.
    */
-  public String create(final InputStream input);
+  public String create(final InputStream inputStream) throws IOException;
 }

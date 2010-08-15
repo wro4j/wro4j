@@ -236,12 +236,16 @@ public class WroManager
    */
   private ContentHashEntry getContentHashEntry(final String content) {
     String hash = null;
-    if (content != null) {
-      hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
+    try {
+      if (content != null) {
+        hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
+      }
+      final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
+      LOG.debug("computed entry: " + entry);
+      return entry;
+    } catch (final IOException e) {
+      throw new WroRuntimeException("Should never happen", e);
     }
-    final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
-    LOG.debug("computed entry: " + entry);
-    return entry;
   }
 
 

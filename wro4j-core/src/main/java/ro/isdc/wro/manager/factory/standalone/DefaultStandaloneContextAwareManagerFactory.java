@@ -15,6 +15,8 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.NamingStrategy;
+import ro.isdc.wro.model.resource.NoOpNamingStrategy;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -36,15 +38,14 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   private StandaloneContext standaloneContext;
   /**
-   * {@link HttpServletRequest} associated with current request processing cycle.
+   * Rename the file name based on its original name and content.
    */
-  private HttpServletRequest request;
+  private NamingStrategy namingStrategy;
   /**
    * {@inheritDoc}
    */
-  public void initialize(final StandaloneContext standaloneContext, final HttpServletRequest request) {
+  public void initialize(final StandaloneContext standaloneContext) {
     this.standaloneContext = standaloneContext;
-    this.request = request;
   }
 
   /**
@@ -52,7 +53,7 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   @Override
   protected void onBeforeCreate() {
-    Context.set(Context.standaloneContext(request));
+    Context.set(Context.standaloneContext());
   }
 
   @Override
@@ -115,5 +116,25 @@ public class DefaultStandaloneContextAwareManagerFactory
         return new FileInputStream(new File(standaloneContext.getContextFolder(), uriWithoutPrefix));
       }
     };
+  }
+
+
+  /**
+   * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.
+   *
+   * @return a not null {@link NamingStrategy}. If no {@link NamingStrategy} is set, a NoOp implementation will return.
+   */
+  public final NamingStrategy getNamingStrategy() {
+    if (namingStrategy == null) {
+      namingStrategy = new NoOpNamingStrategy();
+    }
+    return this.namingStrategy;
+  }
+
+  /**
+   * @param namingStrategy the namingStrategy to set
+   */
+  public final void setNamingStrategy(final NamingStrategy namingStrategy) {
+    this.namingStrategy = namingStrategy;
   }
 }

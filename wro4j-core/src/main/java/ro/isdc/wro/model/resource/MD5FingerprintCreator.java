@@ -30,7 +30,7 @@ public class MD5FingerprintCreator
   /**
    * {@inheritDoc}
    */
-  public String create(final InputStream input) {
+  public String create(final InputStream input) throws IOException {
     if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");
     }
@@ -43,7 +43,7 @@ public class MD5FingerprintCreator
    * @param bytes used for hashing.
    * @return 32 bytes hash.
    */
-  public String getMD5Hash(final InputStream input) {
+  public String getMD5Hash(final InputStream input) throws IOException {
     LOG.debug("Computing hash");
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("md5 digest");
@@ -64,8 +64,6 @@ public class MD5FingerprintCreator
         hash.append(Character.forDigit(element & 0xf, 16));
       }
       return hash.toString();
-    } catch (final IOException e) {
-      throw new WroRuntimeException("Couldn't read the stream", e);
     } catch (final NoSuchAlgorithmException e) {
       throw new WroRuntimeException("Exception occured while computing md5 hash", e);
     } finally {

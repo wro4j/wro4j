@@ -4,6 +4,9 @@
  */
 package ro.isdc.wro.model.resource;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * Used to version a resource name somehow. There could be many strategies, like timestamp, content hashing, etc.
  *
@@ -13,8 +16,10 @@ public interface NamingStrategy {
   /**
    * Creates a new name of the resource which encodes a version.
    *
-   * @param name old name of the resource.
+   * @param originalName original name of the resource.
+   * @param inputStream the stream of the content to rename.
    * @return new name of the resource with version encoded.
+   * @throws IOException if there are stream reading problem.
    */
-  public String rename(final String name);
+  public String rename(final String originalName, final InputStream inputStream) throws IOException;
 }
