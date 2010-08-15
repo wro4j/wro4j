@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
-import ro.isdc.wro.extensions.processor.rhino.less.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
 

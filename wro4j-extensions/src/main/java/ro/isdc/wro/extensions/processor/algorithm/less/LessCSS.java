@@ -14,16 +14,17 @@
  *  limitations under the License.
  *  under the License.
  */
-package ro.isdc.wro.extensions.processor.rhino.less;
+package ro.isdc.wro.extensions.processor.algorithm.less;
 
 import java.io.IOException;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.rhino.AbstractRhinoContext;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.WroUtil;
 
@@ -33,18 +34,21 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Richard Nichols
  */
-public class LessCSS extends AbstractRhinoContext {
-
+public class LessCSS {
+  private ScriptEngine scriptEngine;
   public LessCSS() {
     try {
+      final ScriptEngineManager factory = new ScriptEngineManager();
+      // create JavaScript engine
+      scriptEngine = factory.getEngineByName("JavaScript");
       final ClasspathUriLocator uriLocator = new ClasspathUriLocator();
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
       final String lessjs = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/less.js"));
       final String runjs = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/run.js"));
 
-      getScriptEngine().eval(lessjs);
-      getScriptEngine().eval(runjs);
+      scriptEngine.eval(lessjs);
+      scriptEngine.eval(runjs);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
     } catch (final ScriptException e) {
@@ -65,7 +69,7 @@ public class LessCSS extends AbstractRhinoContext {
   public String less(final String data) {
     try {
       final String lessitjs = "lessIt(\"" + removeNewLines(data) + "\");";
-      final String result = (String)getScriptEngine().eval(lessitjs);
+      final String result = scriptEngine.eval(lessitjs).toString();
       return result;
     } catch (final ScriptException e) {
       throw new WroRuntimeException("Could not execute the script", e);

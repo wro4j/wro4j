@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.extensions.processor.yui;
+package ro.isdc.wro.extensions.processor.css;
 
 import java.io.IOException;
 import java.io.Reader;

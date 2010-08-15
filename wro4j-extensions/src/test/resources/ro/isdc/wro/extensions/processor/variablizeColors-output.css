@@ -1,0 +1,34 @@
+@color000: #00ff7f; /* used 1 times */
+@color001: #808080; /* used 2 times */
+@color002: #40e0d0; /* used 1 times */
+@color003: #ffff00; /* used 1 times */
+@color004: #ff00ff; /* used 1 times */
+@color005: #ffffff; /* used 1 times */
+@color006: #800080; /* used 1 times */
+@color007: #a9a9a9; /* used 1 times */
+@color008: #000000; /* used 1 times */
+@color009: #ffaa55; /* used 1 times */
+@color010: #00ff11; /* used 2 times */
+#main {
+  color: @color010;
+  background-color: @color004;
+}
+.box {
+  color: @color010;
+  background-color: @color001;
+}
+#nav {
+  background: @color005;
+  color: @color006;
+  background-color: @color003;
+}
+#sidebar {
+  background: @color009;
+  color: @color008;
+  background-color: @color001;
+}
+#example1 {
+  background: @color007 url(someimage.png) top left;
+  color: @color002;
+  background-color: @color000;
+}

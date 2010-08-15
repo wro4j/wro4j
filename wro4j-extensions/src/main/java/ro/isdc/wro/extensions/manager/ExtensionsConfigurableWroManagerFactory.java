@@ -5,10 +5,10 @@ package ro.isdc.wro.extensions.manager;
 
 import java.util.Map;
 
-import ro.isdc.wro.extensions.processor.google.GoogleClosureCompressorProcessor;
-import ro.isdc.wro.extensions.processor.rhino.less.LessCssProcessor;
-import ro.isdc.wro.extensions.processor.yui.YUICssCompressorProcessor;
-import ro.isdc.wro.extensions.processor.yui.YUIJsCompressorProcessor;
+import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;

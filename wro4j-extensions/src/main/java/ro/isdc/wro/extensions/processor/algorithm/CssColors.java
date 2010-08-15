@@ -14,10 +14,11 @@
  *  limitations under the License.
  *  under the License.
  */
-package ro.isdc.wro.extensions.processor.rhino.less;
+package ro.isdc.wro.extensions.processor.algorithm;
 
 /**
- * @version $Id$
+ * Holds color mappings.
+ *
  * @author Richard Nichols
  */
 public enum CssColors {

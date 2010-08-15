@@ -1,0 +1,23 @@
+#main {
+  color: #00ff11;
+  background-color: magenta;
+}
+.box {
+  color: #00ff11;
+  background-color: gray;
+}
+#nav {
+  background: white;
+  color: purple;
+  background-color: yellow;
+}
+#sidebar {
+  background: #fa5;
+  color: #000;
+  background-color: gray;
+}
+#example1 {
+  background: darkGray url(someimage.png) top left;
+  color: turquoise;
+  background-color: springGreen;
+}

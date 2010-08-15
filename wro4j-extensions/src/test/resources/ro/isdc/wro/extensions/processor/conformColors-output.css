@@ -1,0 +1,23 @@
+#main {
+  color: #00ff11;
+  background-color: #ff00ff;
+}
+.box {
+  color: #00ff11;
+  background-color: #808080;
+}
+#nav {
+  background: #ffffff;
+  color: #800080;
+  background-color: #ffff00;
+}
+#sidebar {
+  background: #ffaa55;
+  color: #000000;
+  background-color: #808080;
+}
+#example1 {
+  background: #a9a9a9 url(someimage.png) top left;
+  color: #40e0d0;
+  background-color: #00ff7f;
+}

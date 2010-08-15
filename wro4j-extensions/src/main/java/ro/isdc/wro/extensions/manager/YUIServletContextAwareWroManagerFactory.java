@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.extensions.manager;
 
-import ro.isdc.wro.extensions.processor.yui.YUICssCompressorProcessor;
-import ro.isdc.wro.extensions.processor.yui.YUIJsCompressorProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;

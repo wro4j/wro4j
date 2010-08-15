@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.extensions.processor.rhino.packer;
+package ro.isdc.wro.extensions.processor.js;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.processor.algorithm.packer.PackerJs;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;

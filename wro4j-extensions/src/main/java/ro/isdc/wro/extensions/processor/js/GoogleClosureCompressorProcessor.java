@@ -1,7 +1,7 @@
 /**
- * Copyright Alex Objelean
+ * Copyright@2010 Alex Objelean
  */
-package ro.isdc.wro.extensions.processor.google;
+package ro.isdc.wro.extensions.processor.js;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class GoogleClosureCompressorProcessor
       final CompilerOptions options = new CompilerOptions();
       // Advanced mode is used here, but additional options could be set, too.
       compilationLevel.setOptionsForCompilationLevel(options);
-      final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "function alert(x) {}");
+      final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
       final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(IOUtils.toByteArray(reader)));
 
       final Result result = compiler.compile(extern, input, options);

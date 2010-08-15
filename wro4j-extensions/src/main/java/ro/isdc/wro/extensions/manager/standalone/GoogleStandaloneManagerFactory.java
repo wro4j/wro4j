@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.extensions.manager.standalone;
 
-import ro.isdc.wro.extensions.processor.google.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
