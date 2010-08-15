@@ -148,12 +148,15 @@ public class Wro4jMojo extends AbstractMojo {
     };
   }
 
+
   /**
    * @return {@link WroModel} object.
    */
-  private WroModel getModel() throws MojoExecutionException {
+  private WroModel getModel()
+    throws MojoExecutionException {
     return getManagerFactory(Mockito.mock(HttpServletRequest.class)).getInstance().getModelFactory().getInstance();
   }
+
 
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
@@ -231,10 +234,9 @@ public class Wro4jMojo extends AbstractMojo {
     }
     getLog().info("folder: " + folder);
     if (folder == null) {
-      throw new MojoExecutionException(
-        "Couldn't compute destination folder for resourceType: "
-          + resourceType
-          + ". That means that you didn't define one of the following parameters: destinationFolder, cssDestinationFolder, jsDestinationFolder");
+      throw new MojoExecutionException("Couldn't compute destination folder for resourceType: " + resourceType
+        + ". That means that you didn't define one of the following parameters: "
+        + "destinationFolder, cssDestinationFolder, jsDestinationFolder");
     }
     if (!folder.exists()) {
       folder.mkdirs();
@@ -264,9 +266,10 @@ public class Wro4jMojo extends AbstractMojo {
    * Update the classpath.
    */
   @SuppressWarnings("unchecked")
-  private void extendPluginClasspath() throws MojoExecutionException {
-    //this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
-    List<String> classpathElements;
+  private void extendPluginClasspath()
+    throws MojoExecutionException {
+    // this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
+    List<String> classpathElements = null;
     try {
       classpathElements = mavenProject.getRuntimeClasspathElements();
     } catch (final DependencyResolutionRequiredException e) {
@@ -275,6 +278,7 @@ public class Wro4jMojo extends AbstractMojo {
     final ClassRealm realm = createRealm(classpathElements);
     Thread.currentThread().setContextClassLoader(realm.getClassLoader());
   }
+
 
   /**
    * @return {@link ClassRealm} based on project dependencies.
@@ -285,7 +289,7 @@ public class Wro4jMojo extends AbstractMojo {
     ClassRealm realm;
     try {
       realm = world.newRealm("maven.plugin." + getClass().getSimpleName(),
-          Thread.currentThread().getContextClassLoader());
+        Thread.currentThread().getContextClassLoader());
       for (final String element : classpathElements) {
         final File elementFile = new File(element);
         getLog().debug("Adding element to plugin classpath: " + elementFile.getPath());
@@ -299,10 +303,12 @@ public class Wro4jMojo extends AbstractMojo {
     return realm;
   }
 
+
   /**
    * @return a list containing all groups needs to be processed.
    */
-  private List<String> getTargetGroupsAsList() throws MojoExecutionException {
+  private List<String> getTargetGroupsAsList()
+    throws MojoExecutionException {
     if (targetGroups == null) {
       final WroModel model = getModel();
       return model.getGroupNames();
@@ -310,14 +316,14 @@ public class Wro4jMojo extends AbstractMojo {
     return Arrays.asList(targetGroups.split(","));
   }
 
+
   /**
    * Process a single group.
    *
-   * @throws IOException
-   *           if any IO related exception occurs.
+   * @throws IOException if any IO related exception occurs.
    */
   private void processGroup(final String group, final File parentFoder)
-      throws IOException, MojoExecutionException {
+    throws IOException, MojoExecutionException {
     FileOutputStream fos = null;
     try {
       getLog().info("processing group: " + group);
@@ -338,14 +344,13 @@ public class Wro4jMojo extends AbstractMojo {
         getLog().info("No content found for group: " + group);
         destinationFile.delete();
       } else {
-        getLog().info(
-            destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
+        getLog().info(destinationFile.getAbsolutePath()
+          + " (" + destinationFile.length() + "bytes" + ") has been created!");
       }
     } finally {
       fos.close();
     }
   }
-
 
 
   /**
@@ -422,6 +427,7 @@ public class Wro4jMojo extends AbstractMojo {
 
   /**
    * Used for testing.
+   *
    * @param mavenProject the mavenProject to set
    */
   void setMavenProject(final MavenProject mavenProject) {

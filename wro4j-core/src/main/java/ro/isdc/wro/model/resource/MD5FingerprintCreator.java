@@ -4,6 +4,9 @@
  */
 package ro.isdc.wro.model.resource;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -27,11 +30,11 @@ public class MD5FingerprintCreator
   /**
    * {@inheritDoc}
    */
-  public String create(final String content) {
-    if (content == null) {
+  public String create(final InputStream input) {
+    if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");
     }
-    return getMD5Hash(content.getBytes());
+    return getMD5Hash(input);
   }
 
   /**
@@ -40,22 +43,29 @@ public class MD5FingerprintCreator
    * @param bytes used for hashing.
    * @return 32 bytes hash.
    */
-  public String getMD5Hash(final byte[] bytes) {
+  public String getMD5Hash(final InputStream input) {
     LOG.debug("Computing hash");
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("md5 digest");
     final StringBuilder hash = new StringBuilder();
+    final InputStream bis = new BufferedInputStream(input);
     try {
-      final MessageDigest m = MessageDigest.getInstance("MD5");
-      m.update(bytes);
+      final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+      byte result = 0;
+      do {
+        result = (byte)bis.read();
+        messageDigest.update(result);
+      } while(result != -1);
       stopWatch.stop();
       stopWatch.start("compute hash");
-      final byte data[] = m.digest();
+      final byte data[] = messageDigest.digest();
       for (final byte element : data) {
         hash.append(Character.forDigit((element >> 4) & 0xf, 16));
         hash.append(Character.forDigit(element & 0xf, 16));
       }
       return hash.toString();
+    } catch (final IOException e) {
+      throw new WroRuntimeException("Couldn't read the stream", e);
     } catch (final NoSuchAlgorithmException e) {
       throw new WroRuntimeException("Exception occured while computing md5 hash", e);
     } finally {

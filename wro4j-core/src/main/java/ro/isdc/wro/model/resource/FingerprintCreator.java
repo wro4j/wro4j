@@ -4,6 +4,8 @@
  */
 package ro.isdc.wro.model.resource;
 
+import java.io.InputStream;
+
 /**
  * Creates a fingerprint representation of the resource content.
  *
@@ -11,8 +13,8 @@ package ro.isdc.wro.model.resource;
  */
 public interface FingerprintCreator {
   /**
-   * @param content to digest.
+   * @param input to digest.
    * @return the hash of the content.
    */
-  public String create(final String content);
+  public String create(final InputStream input);
 }

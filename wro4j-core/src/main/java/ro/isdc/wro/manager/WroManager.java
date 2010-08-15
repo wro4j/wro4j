@@ -237,7 +237,7 @@ public class WroManager
   private ContentHashEntry getContentHashEntry(final String content) {
     String hash = null;
     if (content != null) {
-      hash = fingerprintCreator.create(content);
+      hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
     }
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
     LOG.debug("computed entry: " + entry);
