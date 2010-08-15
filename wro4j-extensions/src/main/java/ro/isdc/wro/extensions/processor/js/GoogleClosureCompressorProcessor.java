@@ -14,9 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.processor.Minimize;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
@@ -34,7 +36,7 @@ import com.google.javascript.jscomp.Result;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
-  implements ResourcePostProcessor {
+  implements ResourcePostProcessor, ResourcePreProcessor {
   /**
    * Logger.
    */
@@ -65,6 +67,14 @@ public class GoogleClosureCompressorProcessor
     this.compilationLevel = compilationLevel;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
+    process(reader, writer);
+  }
 
   /**
    * {@inheritDoc}

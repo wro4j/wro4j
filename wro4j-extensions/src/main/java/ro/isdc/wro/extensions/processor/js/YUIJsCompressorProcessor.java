@@ -14,9 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.processor.Minimize;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
@@ -31,7 +33,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class YUIJsCompressorProcessor
-  implements ResourcePostProcessor {
+  implements ResourcePostProcessor, ResourcePreProcessor {
   /**
    * Logger for this class.
    */
@@ -91,6 +93,15 @@ public class YUIJsCompressorProcessor
    */
   public YUIJsCompressorProcessor(final boolean munge) {
     this.munge = munge;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
+    process(reader, writer);
   }
 
   /**

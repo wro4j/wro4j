@@ -5,7 +5,9 @@ package ro.isdc.wro.extensions.manager;
 
 import java.util.Map;
 
+import ro.isdc.wro.extensions.processor.css.ConformColorsCssProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
@@ -30,6 +32,8 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("yuiCssMin", new YUICssCompressorProcessor());
     map.put("yuiJsMin", new YUIJsCompressorProcessor());
     map.put("lessCss", new LessCssProcessor());
+    map.put("variablizeColors", new VariablizeColorsCssProcessor());
+    map.put("conformColors", new ConformColorsCssProcessor());
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
   }
@@ -39,6 +43,12 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   @Override
   protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
+    map.put("yuiCssMin", new YUICssCompressorProcessor());
+    map.put("yuiJsMin", new YUIJsCompressorProcessor());
     map.put("lessCss", new LessCssProcessor());
+    map.put("variablizeColors", new VariablizeColorsCssProcessor());
+    map.put("conformColors", new ConformColorsCssProcessor());
+    map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
+    map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
   }
 }

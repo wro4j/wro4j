@@ -8,9 +8,11 @@ import java.io.Reader;
 import java.io.Writer;
 
 import ro.isdc.wro.model.group.processor.Minimize;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
@@ -24,12 +26,20 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 @Minimize
 @SupportedResourceType(ResourceType.CSS)
 public class YUICssCompressorProcessor
-  implements ResourcePostProcessor {
+  implements ResourcePostProcessor, ResourcePreProcessor {
   /**
    * An option of CssCompressor.
    */
   private static final int linebreakpos = -1;
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
+    process(reader, writer);
+  }
 
   /**
    * {@inheritDoc}
