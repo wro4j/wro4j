@@ -54,11 +54,11 @@ public abstract class BaseWroManagerFactory
    * dependencies with default values (processors).
    */
   public final WroManager getInstance() {
-    onBeforeCreate();
     // use double-check locking
     if (this.manager == null) {
       synchronized (this) {
         if (this.manager == null) {
+          onBeforeCreate();
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());

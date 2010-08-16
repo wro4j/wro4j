@@ -25,6 +25,7 @@ import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -356,6 +357,8 @@ public class Wro4jMojo extends AbstractMojo {
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
+      //init context
+      Context.set(Context.standaloneContext(request));
       //perform processing
       getManagerFactory().getInstance().process(request, response);
 
@@ -374,9 +377,15 @@ public class Wro4jMojo extends AbstractMojo {
           + " (" + destinationFile.length() + "bytes" + ") has been created!");
       }
     } finally {
-      resultOutputStream.close();
-      resultInputStream.close();
-      fos.close();
+      if (resultOutputStream != null) {
+        resultOutputStream.close();
+      }
+      if (resultInputStream != null) {
+        resultInputStream.close();
+      }
+      if (fos != null) {
+        fos.close();
+      }
     }
   }
 

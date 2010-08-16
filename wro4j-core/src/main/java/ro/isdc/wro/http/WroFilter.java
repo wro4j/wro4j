@@ -479,7 +479,7 @@ public class WroFilter
       return new ServletContextAwareWroManagerFactory();
     } else {
       // Try to find the specified factory class
-      Class<?> factoryClass;
+      Class<?> factoryClass = null;
       try {
         factoryClass = Thread.currentThread().getContextClassLoader().loadClass(appFactoryClassName);
         // Instantiate the factory

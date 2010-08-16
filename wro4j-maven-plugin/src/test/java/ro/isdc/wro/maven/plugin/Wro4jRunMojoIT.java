@@ -23,15 +23,6 @@ public class Wro4jRunMojoIT
   private File destinationFolder;
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void setUp()
-      throws Exception {
-    super.setUp();
-  }
-
-  /**
    * @throws Exception
    */
   public void testMojoGoal()
@@ -43,7 +34,7 @@ public class Wro4jRunMojoIT
 
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
 
-    final URL url = getClass().getClassLoader().getResource("wro.xml");
+    final URL url = getClass().getClassLoader().getResource("unit/1/src/main/webapp/WEB-INF/wro.xml");
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
     mojo.setContextFolder(wroFile.getParentFile().getParentFile());
