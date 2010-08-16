@@ -58,7 +58,6 @@ public abstract class BaseWroManagerFactory
     if (this.manager == null) {
       synchronized (this) {
         if (this.manager == null) {
-          onBeforeCreate();
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
@@ -92,17 +91,6 @@ public abstract class BaseWroManagerFactory
   public void registerCallback(final PropertyChangeListener callback) {
     this.cacheChangeCallback = callback;
   }
-
-  /**
-   * Life-cycle method. Allow subclasses to initialize context before the manager is instantiated.<br>
-   * Usually, you will do here something like this:
-   * <code>
-   * Context myContext = ...
-   * Context.set(myContext);
-   * </code>
-   * in order to be able to set a context associated with current request cycle.
-   */
-  protected void onBeforeCreate() {}
 
   /**
    * @return {@link WroManager}

@@ -5,7 +5,6 @@ package ro.isdc.wro.manager.factory.standalone;
 
 import javax.servlet.ServletContext;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -26,14 +25,6 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  * @created Created on Nov 3, 2008
  */
 public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void onBeforeCreate() {
-    Context.set(Context.standaloneContext());
-  }
-
   /**
    * {@inheritDoc}
    */

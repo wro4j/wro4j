@@ -34,14 +34,12 @@ public class TestConfigurableWroManagerFactory {
   private FilterConfig filterConfig;
 
   public void initFactory(final FilterConfig filterConfig) {
-    factory = new ConfigurableWroManagerFactory() {
-    	@Override
-    	protected void onBeforeCreate() {
-    		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    		Context.set(Context.webContext(request, response, filterConfig));
-    	}
-    };
+    //init context
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    Context.set(Context.webContext(request, response, filterConfig));
+
+    factory = new ConfigurableWroManagerFactory();
     //create one instance for test
     factory.getInstance();
   }

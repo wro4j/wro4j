@@ -8,7 +8,6 @@ import java.io.InputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -46,14 +45,6 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   public void initialize(final StandaloneContext standaloneContext) {
     this.standaloneContext = standaloneContext;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void onBeforeCreate() {
-    Context.set(Context.standaloneContext());
   }
 
   @Override

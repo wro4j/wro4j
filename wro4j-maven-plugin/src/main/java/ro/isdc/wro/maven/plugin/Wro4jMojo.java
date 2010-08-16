@@ -122,6 +122,8 @@ public class Wro4jMojo extends AbstractMojo {
       } else {
         managerFactory = createDefaultManagerFactory();
       }
+      //setup the context
+      Context.set(Context.standaloneContext());
       // initialize before process.
       managerFactory.initialize(createRunContext());
     }
