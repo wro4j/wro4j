@@ -430,7 +430,7 @@ public class WroFilter
     }
     setResponseHeaders(response);
     // process the uri using manager
-    wroManagerFactory.getInstance().process(request, response);
+    wroManagerFactory.getInstance().process();
   }
 
 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -122,8 +123,6 @@ public class Wro4jMojo extends AbstractMojo {
       } else {
         managerFactory = createDefaultManagerFactory();
       }
-      //setup the context
-      Context.set(Context.standaloneContext());
       // initialize before process.
       managerFactory.initialize(createRunContext());
     }
@@ -201,6 +200,7 @@ public class Wro4jMojo extends AbstractMojo {
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("ignoreMissingResources: " + ignoreMissingResources);
 
+    Context.set(Context.standaloneContext());
     try {
       final Collection<String> groupsAsList = getTargetGroupsAsList();
       for (final String group : groupsAsList) {
@@ -360,9 +360,9 @@ public class Wro4jMojo extends AbstractMojo {
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
       //init context
-      Context.set(Context.standaloneContext(request));
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
       //perform processing
-      getManagerFactory().getInstance().process(request, response);
+      getManagerFactory().getInstance().process();
 
       //encode version & write result to file
       resultInputStream = new ByteArrayInputStream(resultOutputStream.toByteArray());

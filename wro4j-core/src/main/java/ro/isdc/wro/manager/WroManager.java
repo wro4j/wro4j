@@ -111,7 +111,9 @@ public class WroManager
    * @param response HttpServletResponse where to write the result content.
    * @throws IOException when any IO related problem occurs or if the request cannot be processed.
    */
-  public final void process(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+  public final void process() throws IOException {
+    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletResponse response = Context.get().getResponse();
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;

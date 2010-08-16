@@ -39,7 +39,6 @@ public class TestWroManager extends AbstractWroTest {
 
   @Before
   public void setUp() {
-
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
       Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
@@ -59,7 +58,10 @@ public class TestWroManager extends AbstractWroTest {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    manager.process(request, response);
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
+    manager.process();
     //compare written bytes to output stream with the content from specified css.
     WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"), new ByteArrayInputStream(out.toByteArray()));
   }
@@ -70,7 +72,9 @@ public class TestWroManager extends AbstractWroTest {
     manager.setModelFactory(getValidModelFactory());
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    manager.process(request, Context.get().getResponse());
+
+    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class)));
+    manager.process();
   }
 
 
@@ -99,7 +103,10 @@ public class TestWroManager extends AbstractWroTest {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    manager.process(request, response);
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
+    manager.process();
     // allow thread to do its job
     Thread.sleep(500);
   }

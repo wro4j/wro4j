@@ -79,18 +79,6 @@ public class Context {
     return new Context();
   }
 
-
-  /**
-   * Creates a Context which knows only about {@link HttpServletRequest} object.
-   *
-   * @param request {@link HttpServletRequest} for this context.
-   * @return {@link Context} instance.
-   */
-  public static Context standaloneContext(final HttpServletRequest request) {
-    return new Context(request, null, null);
-  }
-
-
   /**
    * @return {@link Context} associated with CURRENT request cycle.
    */
