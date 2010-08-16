@@ -161,16 +161,6 @@ public class Wro4jMojo extends AbstractMojo {
     };
   }
 
-
-  /**
-   * @return {@link WroModel} object.
-   */
-  private WroModel getModel()
-    throws MojoExecutionException {
-    return getManagerFactory().getInstance().getModelFactory().getInstance();
-  }
-
-
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
@@ -331,7 +321,7 @@ public class Wro4jMojo extends AbstractMojo {
   private List<String> getTargetGroupsAsList()
     throws MojoExecutionException {
     if (targetGroups == null) {
-      final WroModel model = getModel();
+      final WroModel model = getManagerFactory().getInstance().getModel();
       return model.getGroupNames();
     }
     return Arrays.asList(targetGroups.split(","));

@@ -478,15 +478,7 @@ public class WroManager
   /**
    * @return the modelFactory
    */
-  public final WroModelFactory getModelFactory() {
-    return this.modelFactory;
-  }
-
-
-  /**
-   * @return the groupExtractor
-   */
-  public final GroupExtractor getGroupExtractor() {
-    return this.groupExtractor;
+  public final WroModel getModel() {
+    return this.modelFactory.getInstance();
   }
 }
