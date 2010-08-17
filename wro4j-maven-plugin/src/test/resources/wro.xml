@@ -15,4 +15,8 @@
   <group name="g3">
     <js>classpath:ro/isdc/wro/maven/plugin/js/2.js</js>
   </group>
+  
+  <group name="g4">
+    <js>classpath:ro/isdc/wro/maven/plugin/js/*.js</js>
+  </group>
 </groups>

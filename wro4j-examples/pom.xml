@@ -200,8 +200,9 @@
 					</execution>
 				</executions>
 				<configuration>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-        <!-- 
+<!--         
+		<wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
+        
 					<targetGroups>all</targetGroups>
           -->
 				</configuration>

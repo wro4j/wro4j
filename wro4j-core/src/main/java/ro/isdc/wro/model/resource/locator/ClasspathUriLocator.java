@@ -67,9 +67,12 @@ public class ClasspathUriLocator
     // normalizing the location to use.
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, ""));
 
-    if (getWildcardStreamLocator().hasWildcard(uri)) {
-      final String fullPath = FilenameUtils.getFullPath(uri);
-      final URL url = ClassLoader.getSystemResource(fullPath);
+    if (getWildcardStreamLocator().hasWildcard(location)) {
+      LOG.debug("wildcard detected for location: " + location);
+      final String fullPath = FilenameUtils.getFullPath(location);
+      //final URL url = ClassLoader.getSystemResource(fullPath);
+      ////URL url = Thread.currentThread().getContextClassLoader().getResource(fullPath);
+      final URL url = getClass().getClassLoader().getSystemResource(fullPath);
       if (url == null) {
         final String message = "Couldn't get URL for the following path: " + fullPath;
         LOG.warn(message);

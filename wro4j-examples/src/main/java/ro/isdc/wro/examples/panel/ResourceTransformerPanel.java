@@ -49,6 +49,8 @@ public class ResourceTransformerPanel extends Panel {
   private String input;
   private String output;
   private String compressionRate = "N/A";
+  private String originalSize = "N/A";
+  private String compressedSize = "N/A";
   private transient ResourcePostProcessor processor;
 
 
@@ -63,11 +65,16 @@ public class ResourceTransformerPanel extends Panel {
     form.setOutputMarkupId(true);
     form.add(getProcessorSelect());
     form.add(new Label("compressionRate", new PropertyModel<String>(this, "compressionRate")));
+    form.add(new Label("originalSize", new PropertyModel<String>(this, "originalSize")));
+    form.add(new Label("compressedSize", new PropertyModel<String>(this, "compressedSize")));
     form.add(new TextArea<String>("input", new PropertyModel<String>(this, "input")));
     form.add(new TextArea<String>("output", new PropertyModel<String>(this, "output")));
     form.add(new AjaxButton("transform") {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+        if (processor == null) {
+          return;
+        }
         try {
           output = null;
           if (input != null) {
@@ -75,13 +82,15 @@ public class ResourceTransformerPanel extends Panel {
             processor.process(new StringReader(input), writer);
             // output = input.toUpperCase();
             output = writer.toString();
+            final DecimalFormat format = new DecimalFormat("0.00");
             if (input.length() != 0) {
               final double rate = 100 - output.length() * 100 / ((double)input.length());
-              final DecimalFormat format = new DecimalFormat("0.00");
               compressionRate = "" + format.format(rate);
             } else {
               compressionRate = "N/A";
             }
+            originalSize = format.format((double)input.length()/1024);
+            compressedSize = format.format((double)output.length()/1024);
           }
           target.addComponent(form);
         } catch (final IOException e) {

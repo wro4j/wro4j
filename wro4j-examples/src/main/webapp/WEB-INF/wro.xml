@@ -79,6 +79,11 @@
     <js>/static/js/jquery-validate.js</js>
     <js>/static/js/jquery-ui-all.js</js>
   </group>
+  
+  <group name="syntaxHighlighter">
+	<js>/static/module/syntaxHighlighter/scripts/*.js</js>
+	<css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
+  </group>
 <!-- 
   -->
 </groups>

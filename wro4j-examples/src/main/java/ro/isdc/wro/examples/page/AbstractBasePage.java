@@ -4,8 +4,7 @@ package ro.isdc.wro.examples.page;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
-
-import ro.isdc.wro.examples.panel.TwitterBar;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 
 
 /**
@@ -24,6 +23,7 @@ public class AbstractBasePage extends WebPage {
   }
 
   private Component newSidebar(final String id) {
-    return new TwitterBar(id);
+    //return new TwitterBar(id);
+    return new EmptyPanel(id);
   }
 }
