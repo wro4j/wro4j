@@ -69,7 +69,6 @@ public class MD5FingerprintCreator
     } finally {
       stopWatch.stop();
       LOG.debug("hash: " + hash.toString());
-      LOG.debug("hash computation took: " + stopWatch.prettyPrint());
     }
   }
 }

@@ -21,9 +21,11 @@ import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.test.util.WroTestUtils;
 
 
@@ -33,22 +35,23 @@ import ro.isdc.wro.test.util.WroTestUtils;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class TestWroManager extends AbstractWroTest {
+public class TestWroManager
+    extends AbstractWroTest {
   private WroManager manager;
-
 
   @Before
   public void setUp() {
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
-      Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
     final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
     manager = factory.getInstance();
+    manager.setModelFactory(getValidModelFactory());
   }
 
-
   @Test
-  public void testNoProcessorWroManagerFactory() throws IOException {
+  public void testNoProcessorWroManagerFactory()
+      throws IOException {
     final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
     manager = factory.getInstance();
     manager.setModelFactory(getValidModelFactory());
@@ -62,21 +65,57 @@ public class TestWroManager extends AbstractWroTest {
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
     manager.process();
-    //compare written bytes to output stream with the content from specified css.
-    WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"), new ByteArrayInputStream(out.toByteArray()));
+    // compare written bytes to output stream with the content from specified css.
+    WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
+        new ByteArrayInputStream(out.toByteArray()));
   }
 
-
   @Test
-  public void processValidModel() throws IOException {
-    manager.setModelFactory(getValidModelFactory());
+  public void processValidModel()
+      throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
 
-    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class)));
+    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+        Mockito.mock(FilterConfig.class)));
     manager.process();
   }
 
+  @Test
+  public void testReloadCacheCall() throws IOException {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
+
+    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+        Mockito.mock(FilterConfig.class)));
+    manager.process();
+  }
+
+  @Test
+  public void testManagerWithSchedulerAndUpdatePeriodSet() throws Exception {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
+    final Context context = Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+        Mockito.mock(FilterConfig.class));
+    final WroConfiguration config = new WroConfiguration();
+    //make it run each 10 millisecond
+    config.setModelUpdatePeriod(10);
+    config.setCacheUpdatePeriod(10);
+    Context.set(context, config);
+    manager.process();
+    //let scheduler run a while
+    Thread.sleep(100);
+  }
+
+  @Test
+  public void testReloadModelCall() throws IOException {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_MODEL);
+
+    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+        Mockito.mock(FilterConfig.class)));
+    manager.process();
+  }
 
   /**
    * @return a {@link XmlModelFactory} pointing to a valid config resource.
@@ -90,15 +129,14 @@ public class TestWroManager extends AbstractWroTest {
     };
   }
 
-
   /**
    * Test how manager behaves when the update period value is greater than zero and the scheduler starts.
    *
    * @throws Exception
    */
   @Test
-  public void testManagerWhenSchedulerIsStarted() throws Exception {
-    manager.setModelFactory(getValidModelFactory());
+  public void testManagerWhenSchedulerIsStarted()
+      throws Exception {
     newConfigWithUpdatePeriodValue(1);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -111,6 +149,22 @@ public class TestWroManager extends AbstractWroTest {
     Thread.sleep(500);
   }
 
+  @Test(expected=UnauthorizedRequestException.class)
+  public void testProxyUnauthorizedRequest() throws Exception {
+    processProxyWithResourceId("test");
+  }
+
+  private void processProxyWithResourceId(final String resourceId)
+      throws IOException {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourceId);
+    Mockito.when(request.getRequestURI()).thenReturn(
+        CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
+
+    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+        Mockito.mock(FilterConfig.class)));
+    manager.process();
+  }
 
   /**
    * Initialize {@link WroConfiguration} object with cacheUpdatePeriod & modelUpdatePeriod equal with provided argument.
@@ -121,7 +175,6 @@ public class TestWroManager extends AbstractWroTest {
     config.setModelUpdatePeriod(periodValue);
     return config;
   }
-
 
   @After
   public void tearDown() {

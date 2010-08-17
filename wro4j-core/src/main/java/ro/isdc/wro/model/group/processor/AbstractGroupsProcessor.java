@@ -62,7 +62,6 @@ public abstract class AbstractGroupsProcessor
    * Decorate the passed collection by overriding add family methods & calling
    * {@link AbstractGroupsProcessor#processInjectAnnotation(Object) on each added element.
    */
-  @SuppressWarnings("serial")
   private <T> Collection<T> decorateCollection(final Collection<T> c) {
     return new ArrayList<T>(c) {
       @Override
@@ -71,13 +70,11 @@ public abstract class AbstractGroupsProcessor
         super.add(index, element);
       };
 
-
       @Override
       public boolean add(final T element) {
         processInjectAnnotation(element);
         return super.add(element);
       };
-
 
       @Override
       public boolean addAll(final Collection<? extends T> c) {
@@ -86,7 +83,6 @@ public abstract class AbstractGroupsProcessor
         }
         return super.addAll(c);
       }
-
 
       @Override
       public boolean addAll(final int index, final Collection<? extends T> c) {

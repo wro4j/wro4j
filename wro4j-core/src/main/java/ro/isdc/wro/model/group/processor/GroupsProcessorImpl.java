@@ -111,7 +111,7 @@ public final class GroupsProcessorImpl
 
 
   /**
-   * Apply preProcess and merge the resource collection into the writer.
+   * Apply preProcess and merge the resources contents.
    *
    * @param resources
    *          what are the resources to merge.
@@ -124,7 +124,7 @@ public final class GroupsProcessorImpl
   private String preProcessAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
     final StringBuffer result = new StringBuffer();
     for (final Resource resource : resources) {
-      LOG.debug("\tmerging resource: " + resource);
+      LOG.debug("merging resource: " + resource);
       result.append(preProcessorExecutor.execute(resource, minimize));
     }
     return result.toString();

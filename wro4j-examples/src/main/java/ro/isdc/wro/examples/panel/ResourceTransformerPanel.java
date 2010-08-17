@@ -76,7 +76,7 @@ public class ResourceTransformerPanel extends Panel {
             // output = input.toUpperCase();
             output = writer.toString();
             if (input.length() != 0) {
-              final double rate = output.length() * 100 / ((double)input.length());
+              final double rate = 100 - output.length() * 100 / ((double)input.length());
               final DecimalFormat format = new DecimalFormat("0.00");
               compressionRate = "" + format.format(rate);
             } else {

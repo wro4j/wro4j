@@ -56,19 +56,17 @@ public class PreProcessorExecutor {
     if (!minimize) {
       GroupsProcessorImpl.removeMinimizeAwareProcessors(processors);
     }
-    final Writer output = applyPreProcessors(processors, resource);
-    return output.toString();
+    return applyPreProcessors(processors, resource);
   }
 
 
   /**
-   * TODO optimize <br/>
    * Apply a list of preprocessors on a resource.
    *
    * @throws IOException
    *           if any IO error occurs while processing.
    */
-  private Writer applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
+  private String applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
       throws IOException {
     // get original content
     Reader reader = null;
@@ -79,7 +77,7 @@ public class PreProcessorExecutor {
       LOG.debug("IgnoreMissingResources" + groupsProcessor.isIgnoreMissingResources());
       if (groupsProcessor.isIgnoreMissingResources()) {
         LOG.warn("Invalid resource found: " + resource);
-        return output;
+        return output.toString();
       } else {
         LOG.warn("Invalid resource found: " + resource + ". Cannot continue processing. IgnoreMissingResources is + "
           + groupsProcessor.isIgnoreMissingResources());
@@ -88,7 +86,7 @@ public class PreProcessorExecutor {
     }
     if (processors.isEmpty()) {
       IOUtils.copy(reader, output);
-      return output;
+      return output.toString();
     }
     Reader input = reader;
     for (final ResourcePreProcessor processor : processors) {
@@ -97,6 +95,6 @@ public class PreProcessorExecutor {
       processor.process(resource, input, output);
       input = new StringReader(output.toString());
     }
-    return output;
+    return output.toString();
   }
 }

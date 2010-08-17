@@ -188,7 +188,7 @@ public class WroManager
    * @return {@link InputStream} for groups found in requestURI or null if the request is not as expected.
    */
   private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request,
-      final HttpServletResponse response) {
+      final HttpServletResponse response) throws IOException {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("buildGroupsStream");
     InputStream is = null;
@@ -236,18 +236,14 @@ public class WroManager
   /**
    * Creates a {@link ContentHashEntry} for a given content.
    */
-  private ContentHashEntry getContentHashEntry(final String content) {
+  private ContentHashEntry getContentHashEntry(final String content) throws IOException {
     String hash = null;
-    try {
-      if (content != null) {
-        hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
-      }
-      final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
-      LOG.debug("computed entry: " + entry);
-      return entry;
-    } catch (final IOException e) {
-      throw new WroRuntimeException("Should never happen", e);
+    if (content != null) {
+      hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
     }
+    final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
+    LOG.debug("computed entry: " + entry);
+    return entry;
   }
 
 
@@ -424,9 +420,6 @@ public class WroManager
    *          the uriProcessor to set
    */
   public final void setGroupExtractor(final GroupExtractor groupExtractor) {
-    if (groupExtractor == null) {
-      throw new IllegalArgumentException("GroupExtractor cannot be null!");
-    }
     this.groupExtractor = groupExtractor;
   }
 
@@ -436,9 +429,6 @@ public class WroManager
    *          the groupsProcessor to set
    */
   public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    if (groupsProcessor == null) {
-      throw new IllegalArgumentException("GroupsProcessor cannot be null!");
-    }
     this.groupsProcessor = groupsProcessor;
   }
 
@@ -448,9 +438,6 @@ public class WroManager
    *          the modelFactory to set
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
-    if (modelFactory == null) {
-      throw new IllegalArgumentException("WroModelFactory cannot be null!");
-    }
     this.modelFactory = modelFactory;
   }
 
@@ -460,9 +447,6 @@ public class WroManager
    *          the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
-    if (cacheStrategy == null) {
-      throw new IllegalArgumentException("cacheStrategy cannot be null!");
-    }
     this.cacheStrategy = cacheStrategy;
   }
 
