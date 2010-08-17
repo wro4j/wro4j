@@ -99,7 +99,7 @@ public class DefaultWildcardStreamLocator
 
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
-      final String message = "No files found insinde the " + folder.getPath() + " for wildcard: " + wildcard;
+      final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
     // TODO sort files

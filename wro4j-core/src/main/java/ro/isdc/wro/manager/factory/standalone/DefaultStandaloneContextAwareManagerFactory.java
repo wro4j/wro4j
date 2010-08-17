@@ -8,6 +8,10 @@ import java.io.InputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -32,6 +36,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  */
 public class DefaultStandaloneContextAwareManagerFactory
   extends StandaloneWroManagerFactory implements StandaloneContextAwareManagerFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultStandaloneContextAwareManagerFactory.class);
   /**
    * Context used by stand-alone process.
    */
@@ -103,8 +108,18 @@ public class DefaultStandaloneContextAwareManagerFactory
       @Override
       public InputStream locate(final String uri)
         throws IOException {
+        //TODO this is duplicated code (from super) -> find a way to reuse it.
+        if (getWildcardStreamLocator().hasWildcard(uri)) {
+          final String fullPath = FilenameUtils.getFullPath(uri);
+          final String realPath = standaloneContext.getContextFolder().getPath() + fullPath;
+          return getWildcardStreamLocator().locateStream(uri, new File(realPath));
+        }
+
+        LOG.debug("locating uri: " + uri);
         final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
-        return new FileInputStream(new File(standaloneContext.getContextFolder(), uriWithoutPrefix));
+        final File file = new File(standaloneContext.getContextFolder(), uriWithoutPrefix);
+        LOG.debug("Opening file: " + file.getPath());
+        return new FileInputStream(file);
       }
     };
   }

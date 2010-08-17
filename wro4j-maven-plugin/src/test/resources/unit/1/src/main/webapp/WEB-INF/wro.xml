@@ -16,4 +16,8 @@
     <js>classpath:ro/isdc/wro/maven/plugin/js/2.js</js>
     <css>/static/main.css</css>
   </group>
+  
+  <group name="g4">
+    <css>/static/*.css</css>
+  </group>
 </groups>
