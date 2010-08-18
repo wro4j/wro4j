@@ -7,9 +7,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
 import org.mockito.Mockito;
 
 
@@ -33,6 +33,7 @@ public class Wro4jRunMojoIT
     final File testPom = new File(getBasedir(), "/src/test/resources/unit/1/pom.xml");
     mojo = (Wro4jMojo) lookupMojo("run", testPom);
     mojo.setIgnoreMissingResources(false);
+    mojo.setMinimize(true);
   }
 
   /**
@@ -40,7 +41,7 @@ public class Wro4jRunMojoIT
    */
   public void testMojoGoal()
       throws Exception {
-    destinationFolder = new File("wroTemp-" + new Date().getTime());
+    destinationFolder = new File("target/wroTemp-" + new Date().getTime());
     mojo.setDestinationFolder(destinationFolder);
 
     mojo.setMavenProject(Mockito.mock(MavenProject.class));

@@ -36,6 +36,7 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFacto
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
 /**
@@ -360,7 +361,8 @@ public class Wro4jMojo extends AbstractMojo {
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       destinationFile.createNewFile();
       fos = new FileOutputStream(destinationFile);
-      IOUtils.copy(resultInputStream, fos);
+      //use reader to detect encoding
+      IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
       // delete empty files
       if (destinationFile.length() == 0) {
         getLog().info("No content found for group: " + group);

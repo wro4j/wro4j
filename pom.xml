@@ -65,7 +65,12 @@
 		<maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>
     <junit.dependency>4.8.1</junit.dependency>    
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>	
+	<maven.compile.encoding>UTF-8</maven.compile.encoding>
+	<maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
 	</properties>
+	
   
   
 	<modules>
@@ -227,31 +232,32 @@
 				</excludes>
 			</resource>
 		</resources>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>2.0-beta-9</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>  
-		<plugins>
+		<pluginManagement> 	
+		  <plugins>
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-release-plugin</artifactId>
+			  <version>2.0-beta-9</version>
+			</plugin>		
+		  </plugins>
+		</pluginManagement>  
+		<plugins>				
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
+				<configuration>
 					<downloadSources>true</downloadSources>
 				</configuration>
-			</plugin>
+			</plugin>				
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -342,7 +348,6 @@
 
       <build>
         <plugins>
-        
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>

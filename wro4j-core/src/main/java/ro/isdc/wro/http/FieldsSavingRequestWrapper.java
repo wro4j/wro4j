@@ -11,11 +11,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * This is useful when a thread is launched not during the servlet processing, and we still need to know what are the
  * requestURI, requestURL & servletPath of the request which was the parent of this thread. If this wrapper is not
  * used, the request fields will be nullified by the container.
+ *
+ * @author Alex Objelean
  */
 public class FieldsSavingRequestWrapper extends HttpServletRequestWrapper {
-  private String requestURI;
-  private StringBuffer requestURL;
-  private String servletPath;
+  private final String requestURI;
+  private final StringBuffer requestURL;
+  private final String servletPath;
 
 
   /**

@@ -20,4 +20,8 @@
   <group name="g4">
     <css>/static/*.css</css>
   </group>
+  
+  <group name="g5">
+    <js>/static/scriptWithEncoding.js</js>
+  </group>
 </groups>

@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,8 +13,10 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -27,6 +30,9 @@ import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.test.util.WroTestUtils;
+import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.encoding.CharsetToolkit;
+import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
 /**
@@ -68,6 +74,35 @@ public class TestWroManager
     // compare written bytes to output stream with the content from specified css.
     WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
         new ByteArrayInputStream(out.toByteArray()));
+  }
+
+  /**
+   * This test actually works, but it is ignored because of encoding issues (I was unable to find a way to specify the
+   * encoding in pom.xml).
+   */
+  @Ignore
+  @Test
+  public void testProcessingResourceWithChineseEncoding()
+      throws IOException {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Context.get().getResponse();
+
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
+    Mockito.when(request.getRequestURI()).thenReturn("/chinese.js");
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
+    manager.process();
+    // compare written bytes to output stream with the content from specified css.
+    final InputStream expectedInputStream = new UnclosableBufferedInputStream(getInputStream("classpath:ro/isdc/wro/manager/chinese-output.js"));
+    final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
+    final String encoding = CharsetToolkit.guessEncoding(expectedInputStream).toString();
+    expectedInputStream.reset();
+    //Assert.assertArrayEquals(IOUtils.toByteArray(expectedInputStream), out.toByteArray());
+    WroTestUtils.compare(IOUtils.toString(expectedInputStream, encoding), IOUtils.toString(actualInputStream, encoding));
+    expectedInputStream.close();
+    actualInputStream.close();
   }
 
   @Test
@@ -124,7 +159,7 @@ public class TestWroManager
     return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() {
-        return getResourceAsStream(TestWroManager.class.getPackage().getName().replace(".", "/") + "/wro.xml");
+        return getResourceAsStream(WroUtil.toPackageAsFolder(TestWroManager.class) + "/wro.xml");
       }
     };
   }

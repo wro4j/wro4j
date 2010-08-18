@@ -109,6 +109,13 @@ public final class WroUtil {
     return startsWith(str, prefix, true);
   }
 
+  /**
+   * Creates a folder like implementation for a class. Ex: com.mycompany.MyClass -> com/mycompany/
+   *
+   * @param clazz
+   *          used as a base location for determining the package path.
+   * @return a string representation of the path where the class resides.
+   */
   public static String toPackageAsFolder(final Class<?> clazz) {
     if (clazz == null) {
       throw new IllegalArgumentException("Class cannot be null!");

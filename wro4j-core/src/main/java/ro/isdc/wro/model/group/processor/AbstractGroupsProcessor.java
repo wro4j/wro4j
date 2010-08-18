@@ -28,6 +28,7 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
 /**
@@ -195,7 +196,7 @@ public abstract class AbstractGroupsProcessor
     if (locator != null) {
       final InputStream is = locator.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
-      reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
     }
     if (reader == null) {
       // TODO skip invalid resource, instead of throwing exception

@@ -56,7 +56,7 @@
   </group>
   <group name="chineseEncoding">
     <js>http://search.trade2cn.com/js/list.js</js>
-    <js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js>
+    <!-- <js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js> -->
   </group>
 
   <group name="JSGroup">
@@ -81,7 +81,13 @@
   </group>
   
   <group name="syntaxHighlighter">
-	<js>/static/module/syntaxHighlighter/scripts/*.js</js>
-	<css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
+  
+  <!--
+  <js>/static/module/syntaxHighlighter/scripts/*.js</js>
+    -->
+    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/shBrushJScript.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/shBrushAppleScript.js</js>
+	  <css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
   </group>
 </groups>

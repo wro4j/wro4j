@@ -10,10 +10,8 @@ import javax.servlet.ServletOutputStream;
 
 /**
  * Delegating implementation of {@link javax.servlet.ServletOutputStream}.
- * 
- * @author alexandru.objelean / ISDC! Romania
- * @version $Revision: $
- * @date $Date: $
+ *
+ * @author Alex Objelean
  * @created Created on Nov 14, 2008
  */
 public final class DelegatingServletOutputStream extends ServletOutputStream {
@@ -24,7 +22,7 @@ public final class DelegatingServletOutputStream extends ServletOutputStream {
 
   /**
    * Create a DelegatingServletOutputStream for the given target stream.
-   * 
+   *
    * @param targetStream
    *          the target stream (never <code>null</code>)
    */

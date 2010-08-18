@@ -16,4 +16,8 @@
   <group name="g3">
     <css>classpath:2.css</css>
   </group>
+  
+  <group name="chinese">
+    <js>classpath:ro/isdc/wro/manager/chinese.js</js>
+  </group>
 </groups>

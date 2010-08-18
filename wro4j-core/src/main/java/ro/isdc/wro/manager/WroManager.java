@@ -219,9 +219,11 @@ public class WroManager
       cacheStrategy.put(cacheEntry, result);
     }
     if (result.getContent() != null) {
+      //make the input stream encoding aware.
       is = new ByteArrayInputStream(result.getContent().getBytes());
     }
     if (type != null) {
+      //TODO add also the charset?
       response.setContentType(type.getContentType());
     }
     //set ETag header

@@ -83,7 +83,6 @@ public abstract class AbstractWroTest {
    * @return
    */
   public InputStream getInputStream(final String uri) throws IOException {
-    // wrap reader with bufferedReader for top efficiency
     return uriLocatorFactory.getInstance(uri).locate(uri);
   }
 }
