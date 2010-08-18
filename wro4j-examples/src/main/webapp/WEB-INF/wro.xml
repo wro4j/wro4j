@@ -84,6 +84,4 @@
 	<js>/static/module/syntaxHighlighter/scripts/*.js</js>
 	<css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
   </group>
-<!-- 
-  -->
 </groups>

@@ -42,6 +42,7 @@ public class TestWro4jMojo {
   public void setUp()
     throws Exception {
     mojo = new Wro4jMojo();
+    mojo.setIgnoreMissingResources(false);
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
     destinationFolder = new File("wroTemp-" + new Date().getTime());

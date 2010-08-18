@@ -17,6 +17,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -359,7 +360,7 @@ public class Wro4jMojo extends AbstractMojo {
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       destinationFile.createNewFile();
       fos = new FileOutputStream(destinationFile);
-
+      IOUtils.copy(resultInputStream, fos);
       // delete empty files
       if (destinationFile.length() == 0) {
         getLog().info("No content found for group: " + group);

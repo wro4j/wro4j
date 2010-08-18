@@ -21,14 +21,25 @@ import org.mockito.Mockito;
 public class Wro4jRunMojoIT
     extends AbstractMojoTestCase {
   private File destinationFolder;
+  private Wro4jMojo mojo;
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void setUp()
+      throws Exception {
+    super.setUp();
+    final File testPom = new File(getBasedir(), "/src/test/resources/unit/1/pom.xml");
+    mojo = (Wro4jMojo) lookupMojo("run", testPom);
+    mojo.setIgnoreMissingResources(false);
+  }
 
   /**
    * @throws Exception
    */
   public void testMojoGoal()
       throws Exception {
-    final File testPom = new File(getBasedir(), "/src/test/resources/unit/1/pom.xml");
-    final Wro4jMojo mojo = (Wro4jMojo) lookupMojo("run", testPom);
     destinationFolder = new File("wroTemp-" + new Date().getTime());
     mojo.setDestinationFolder(destinationFolder);
 
