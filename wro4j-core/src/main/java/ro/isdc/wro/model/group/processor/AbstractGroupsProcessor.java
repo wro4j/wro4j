@@ -205,10 +205,11 @@ public abstract class AbstractGroupsProcessor
     return reader;
   }
 
-
   /**
-   * @param groups list of groups where to search resources to filter.
-   * @param type of resources to collect.
+   * @param groups
+   *          list of groups where to search resources to filter.
+   * @param type
+   *          of resources to collect.
    * @return a list of resources of provided type.
    */
   protected final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
@@ -220,7 +221,11 @@ public abstract class AbstractGroupsProcessor
     final List<Resource> filteredResources = new ArrayList<Resource>();
     for (final Resource resource : allResources) {
       if (type == resource.getType()) {
-        filteredResources.add(resource);
+        if (filteredResources.contains(resource)) {
+          LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
+        } else {
+          filteredResources.add(resource);
+        }
       }
     }
     return filteredResources;

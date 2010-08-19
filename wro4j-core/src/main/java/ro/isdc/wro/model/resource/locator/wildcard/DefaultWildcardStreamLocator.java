@@ -91,12 +91,12 @@ public class DefaultWildcardStreamLocator
     }
 
     final String wildcard = FilenameUtils.getName(uri);
+    LOG.debug("uri: " + uri);
     LOG.debug("wildcard: " + wildcard);
     final WildcardFileFilter fileFilter = new WildcardFileFilter(wildcard);
     final IOFileFilter folderFilter = getFolderFilter(wildcard);
     final Collection<File> files = FileUtils.listFiles(folder, fileFilter, folderFilter);
     sortFiles(files);
-
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;

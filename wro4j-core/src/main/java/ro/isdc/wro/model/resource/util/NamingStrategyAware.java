@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource;
+package ro.isdc.wro.model.resource.util;
 
 /**
  * Classes implementing this interface will have access to {@link NamingStrategy} implementation.

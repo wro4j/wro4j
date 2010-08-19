@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource;
+package ro.isdc.wro.model.resource.util;
 
 import java.io.InputStream;
 

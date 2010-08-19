@@ -4,7 +4,7 @@
 package ro.isdc.wro.extensions.manager.standalone;
 
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.resource.FingerprintEncoderNamingStrategy;
+import ro.isdc.wro.model.resource.util.FingerprintEncoderNamingStrategy;
 
 
 /**

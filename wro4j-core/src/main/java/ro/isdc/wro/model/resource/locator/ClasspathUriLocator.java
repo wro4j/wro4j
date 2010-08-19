@@ -23,7 +23,7 @@ import ro.isdc.wro.util.StringUtils;
  * @created Created on Nov 6, 2008
  */
 public class ClasspathUriLocator
-  extends WildcardUriLocatorSupport {
+    extends WildcardUriLocatorSupport {
   /**
    * Logger for this class.
    */
@@ -34,7 +34,6 @@ public class ClasspathUriLocator
    */
   public static final String PREFIX = "classpath:";
 
-
   /**
    * {@inheritDoc}
    */
@@ -42,23 +41,22 @@ public class ClasspathUriLocator
     return isValid(url);
   }
 
-
   /**
    * Check if a uri is a classpath resource.
    *
-   * @param uri to check.
+   * @param uri
+   *          to check.
    * @return true if the uri is a classpath resource.
    */
   public static boolean isValid(final String uri) {
     return uri.trim().startsWith(PREFIX);
   }
 
-
   /**
    * {@inheritDoc}
    */
   public InputStream locate(final String uri)
-    throws IOException {
+      throws IOException {
     if (uri == null) {
       throw new IllegalArgumentException("URI cannot be NULL!");
     }
@@ -70,9 +68,8 @@ public class ClasspathUriLocator
     if (getWildcardStreamLocator().hasWildcard(location)) {
       LOG.debug("wildcard detected for location: " + location);
       final String fullPath = FilenameUtils.getFullPath(location);
-      //final URL url = ClassLoader.getSystemResource(fullPath);
-      ////URL url = Thread.currentThread().getContextClassLoader().getResource(fullPath);
-      final URL url = getClass().getClassLoader().getSystemResource(fullPath);
+      //final URL url = getClass().getClassLoader().getSystemResource(fullPath);
+      final URL url = ClassLoader.getSystemResource(fullPath);
       if (url == null) {
         final String message = "Couldn't get URL for the following path: " + fullPath;
         LOG.warn(message);

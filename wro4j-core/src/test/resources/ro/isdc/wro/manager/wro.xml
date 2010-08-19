@@ -25,4 +25,17 @@
     <js>classpath:ro/isdc/wro/manager/specialCharacters.js</js>
   </group>
   
+  <group name="repeatedResources">
+    <js>classpath:ro/isdc/wro/manager/repeated/1.js</js>
+    <js>classpath:ro/isdc/wro/manager/repeated/1.js</js>
+    <js>classpath:ro/isdc/wro/manager/repeated/1.js</js>
+    <js>classpath:ro/isdc/wro/manager/repeated/1.js</js>
+  </group>
+  
+  <group name="wildcardRepeatedResources">
+    <js>classpath:ro/isdc/wro/manager/repeated/1.js</js>
+    <js>classpath:ro/isdc/wro/manager/repeated/*.js</js>
+  </group>
+  
+  
 </groups>

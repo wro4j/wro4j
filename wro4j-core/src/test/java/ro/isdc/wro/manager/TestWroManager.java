@@ -94,6 +94,18 @@ public class TestWroManager
     genericProcessAndCompare("/specialCharacters.js", "classpath:ro/isdc/wro/manager/specialCharacters-output.js");
   }
 
+  @Test
+  public void testRepeatedResourcesShouldBeSkipped()
+      throws IOException {
+    genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated/expected.js");
+  }
+
+  @Test
+  public void testWildcardRepeatedResourcesShouldBeSkiped()
+      throws IOException {
+    genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/repeated/expected.js");
+  }
+
   private void genericProcessAndCompare(final String requestUri, final String expectedResourceUri)
       throws IOException, FileNotFoundException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);

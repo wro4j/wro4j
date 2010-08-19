@@ -1,8 +1,7 @@
 /*
- * Copyright (C) 2010 Betfair.
- * All rights reserved.
+ * Copyright (C) 2010 Betfair. All rights reserved.
  */
-package ro.isdc.wro.model.resource;
+package ro.isdc.wro.model.resource.util;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.util.StopWatch;
 
+
 /**
  * Uses MD5 algorithm for creating fingerprint.
  *
@@ -27,10 +27,12 @@ public class MD5FingerprintCreator
    * Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(MD5FingerprintCreator.class);
+
   /**
    * {@inheritDoc}
    */
-  public String create(final InputStream input) throws IOException {
+  public String create(final InputStream input)
+      throws IOException {
     if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");
     }
@@ -40,10 +42,12 @@ public class MD5FingerprintCreator
   /**
    * Computes md5 hash.
    *
-   * @param bytes used for hashing.
+   * @param bytes
+   *          used for hashing.
    * @return 32 bytes hash.
    */
-  public String getMD5Hash(final InputStream input) throws IOException {
+  private String getMD5Hash(final InputStream input)
+      throws IOException {
     LOG.debug("Computing hash");
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("md5 digest");
@@ -53,9 +57,9 @@ public class MD5FingerprintCreator
       final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
       byte result = 0;
       do {
-        result = (byte)bis.read();
+        result = (byte) bis.read();
         messageDigest.update(result);
-      } while(result != -1);
+      } while (result != -1);
       stopWatch.stop();
       stopWatch.start("compute hash");
       final byte data[] = messageDigest.digest();

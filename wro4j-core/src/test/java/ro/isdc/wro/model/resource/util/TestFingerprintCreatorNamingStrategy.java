@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource;
+package ro.isdc.wro.model.resource.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +10,10 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ro.isdc.wro.model.resource.util.FingerprintCreator;
+import ro.isdc.wro.model.resource.util.FingerprintEncoderNamingStrategy;
+import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 /**
  * Test class for {@link FingerprintCreatorNamingStrategy}
