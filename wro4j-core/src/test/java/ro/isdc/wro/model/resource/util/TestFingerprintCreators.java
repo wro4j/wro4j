@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -16,18 +15,23 @@ import org.junit.Test;
  * @author Alex Objelean
  * @created 15 Aug 2010
  */
-public class TestMD5FingerprintCreator {
+public class TestFingerprintCreators {
   private FingerprintCreator fingerprintCreator;
 
-  @Before
-  public void setUp() {
+  @Test
+  public void testMD5() throws Exception {
+    final String input = "testString";
     fingerprintCreator = new MD5FingerprintCreator();
+    final String hash = fingerprintCreator.create(new ByteArrayInputStream(input.getBytes()));
+    Assert.assertEquals("536788f4dbdffeecfbb8f350a941eea3", hash);
   }
 
+
   @Test
-  public void testHashForSampleInput() throws Exception {
+  public void testCRC32() throws Exception {
     final String input = "testString";
+    fingerprintCreator = new CRC32FingerprintCreator();
     final String hash = fingerprintCreator.create(new ByteArrayInputStream(input.getBytes()));
-    Assert.assertEquals("391a41aa2e8a564787d6c2ef246abc71", hash);
+    Assert.assertEquals("18f4fd08", hash);
   }
 }

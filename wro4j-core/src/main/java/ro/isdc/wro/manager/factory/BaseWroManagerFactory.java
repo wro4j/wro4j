@@ -23,8 +23,8 @@ import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
+import ro.isdc.wro.model.resource.util.CRC32FingerprintCreator;
 import ro.isdc.wro.model.resource.util.FingerprintCreator;
-import ro.isdc.wro.model.resource.util.MD5FingerprintCreator;
 
 
 /**
@@ -82,7 +82,7 @@ public abstract class BaseWroManagerFactory
    * @return {@link FingerprintCreator} instance.
    */
   protected FingerprintCreator newFingerprintCreator() {
-    return new MD5FingerprintCreator();
+    return new CRC32FingerprintCreator();
   }
 
   /**
