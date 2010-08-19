@@ -6,6 +6,7 @@ package ro.isdc.wro.manager;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -84,18 +85,29 @@ public class TestWroManager
   @Test
   public void testProcessingResourceWithChineseEncoding()
       throws IOException {
+    genericProcessAndCompare("/chinese.js", "classpath:ro/isdc/wro/manager/chinese-output.js");
+  }
+
+  @Test
+  public void testProcessingResourceWithSpecialCharacters()
+      throws IOException {
+    genericProcessAndCompare("/specialCharacters.js", "classpath:ro/isdc/wro/manager/specialCharacters-output.js");
+  }
+
+  private void genericProcessAndCompare(final String requestUri, final String expectedResourceUri)
+      throws IOException, FileNotFoundException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
 
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
-    Mockito.when(request.getRequestURI()).thenReturn("/chinese.js");
+    Mockito.when(request.getRequestURI()).thenReturn(requestUri);
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
     manager.process();
     // compare written bytes to output stream with the content from specified css.
-    final InputStream expectedInputStream = new UnclosableBufferedInputStream(getInputStream("classpath:ro/isdc/wro/manager/chinese-output.js"));
+    final InputStream expectedInputStream = new UnclosableBufferedInputStream(getInputStream(expectedResourceUri));
     final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
     final String encoding = CharsetToolkit.guessEncoding(expectedInputStream).toString();
     expectedInputStream.reset();

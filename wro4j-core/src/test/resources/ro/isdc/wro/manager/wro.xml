@@ -20,4 +20,9 @@
   <group name="chinese">
     <js>classpath:ro/isdc/wro/manager/chinese.js</js>
   </group>
+  
+  <group name="specialCharacters">
+    <js>classpath:ro/isdc/wro/manager/specialCharacters.js</js>
+  </group>
+  
 </groups>
