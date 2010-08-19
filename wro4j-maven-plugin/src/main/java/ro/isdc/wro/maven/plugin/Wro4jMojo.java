@@ -3,11 +3,11 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +37,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
+import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
 /**
@@ -337,7 +338,6 @@ public class Wro4jMojo extends AbstractMojo {
    */
   private void processGroup(final String group, final File parentFoder)
     throws IOException, MojoExecutionException {
-    FileOutputStream fos = null;
     ByteArrayOutputStream resultOutputStream = null;
     InputStream resultInputStream = null;
     try {
@@ -355,14 +355,19 @@ public class Wro4jMojo extends AbstractMojo {
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
       //perform processing
       getManagerFactory().getInstance().process();
-
       //encode version & write result to file
-      resultInputStream = new ByteArrayInputStream(resultOutputStream.toByteArray());
+      resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       destinationFile.createNewFile();
-      fos = new FileOutputStream(destinationFile);
+      //allow the same stream to be read again
+      resultInputStream.reset();
+      getLog().debug("Created file: " + destinationFile.getName());
+
+      final OutputStream fos = new FileOutputStream(destinationFile);
       //use reader to detect encoding
       IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
+      fos.close();
+      getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length());
       // delete empty files
       if (destinationFile.length() == 0) {
         getLog().info("No content found for group: " + group);
@@ -377,9 +382,6 @@ public class Wro4jMojo extends AbstractMojo {
       }
       if (resultInputStream != null) {
         resultInputStream.close();
-      }
-      if (fos != null) {
-        fos.close();
       }
     }
   }

@@ -4,6 +4,7 @@
 package ro.isdc.wro.util.io;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -19,6 +20,10 @@ public class UnclosableBufferedInputStream
   public UnclosableBufferedInputStream(final InputStream in) {
     super(in);
     super.mark(Integer.MAX_VALUE);
+  }
+
+  public UnclosableBufferedInputStream(final byte[] bytes) {
+    this (new ByteArrayInputStream(bytes));
   }
 
   @Override

@@ -21,12 +21,15 @@ import org.apache.commons.lang.StringUtils;
 public class FingerprintEncoderNamingStrategy
   implements NamingStrategy {
   private FingerprintCreator fingerprintCreator = newFingerprintCreator();
+
+
   /**
-   * @return
+   * @return an implementation of {@link FingerprintCreator}.
    */
   protected FingerprintCreator newFingerprintCreator() {
-    return new MD5FingerprintCreator();
+    return new CRC32FingerprintCreator();
   }
+
   /**
    * {@inheritDoc}
    */
