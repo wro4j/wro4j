@@ -20,7 +20,9 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -38,7 +40,26 @@ public final class GroupsProcessorImpl
    * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
    * (according to findbugs eclipse plugin).
    */
-  private final transient PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor(this);
+  private final transient PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor() {
+    @Override
+    protected boolean ignoreMissingResources() {
+      return GroupsProcessorImpl.this.isIgnoreMissingResources();
+    };
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
+      return GroupsProcessorImpl.this.getPreProcessorsByType(resourceType);
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UriLocatorFactory getUriLocatorFactory() {
+      return GroupsProcessorImpl.this.getUriLocatorFactory();
+    }
+  };
 
 
   /**
@@ -96,7 +117,7 @@ public final class GroupsProcessorImpl
       stopWatch.stop();
       stopWatch.start("pre process and merge");
       // Merge
-      final String result = preProcessAndMerge(filteredResources, minimize);
+      final String result = preProcessorExecutor.processAndMerge(filteredResources, minimize);
       stopWatch.stop();
       stopWatch.start("post process");
       // postProcessing
@@ -108,28 +129,6 @@ public final class GroupsProcessorImpl
       throw new WroRuntimeException("Exception while merging resources", e);
     }
   }
-
-
-  /**
-   * Apply preProcess and merge the resources contents.
-   *
-   * @param resources
-   *          what are the resources to merge.
-   * @param minimize
-   *          whether minimize aware processors must be applied or not.
-   * @return preProcessed merged content.
-   * @throws IOException
-   *           if IO error occurs while merging.
-   */
-  private String preProcessAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
-    final StringBuffer result = new StringBuffer();
-    for (final Resource resource : resources) {
-      LOG.debug("merging resource: " + resource);
-      result.append(preProcessorExecutor.execute(resource, minimize));
-    }
-    return result.toString();
-  }
-
 
   /**
    * Perform postProcessing.

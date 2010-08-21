@@ -127,7 +127,7 @@ public class Wro4jMojo extends AbstractMojo {
         managerFactory = createDefaultManagerFactory();
       }
       // initialize before process.
-      managerFactory.initialize(createRunContext());
+      managerFactory.initialize(createStandaloneContext());
     }
     return managerFactory;
   }
@@ -167,7 +167,7 @@ public class Wro4jMojo extends AbstractMojo {
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
-  private StandaloneContext createRunContext() {
+  private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
     runContext.setContextFolder(contextFolder);
     runContext.setMinimize(minimize);

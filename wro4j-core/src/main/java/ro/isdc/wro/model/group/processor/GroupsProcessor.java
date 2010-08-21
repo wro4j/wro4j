@@ -89,12 +89,14 @@ public interface GroupsProcessor
 
 
   /**
+   * TODO: find a better place for this field (maybe WroContext?)
    * @param ignore flag indicating if missing resources should be ignored.
    */
   void setIgnoreMissingResources(boolean ignore);
 
 
   /**
+   * TODO: find a better place for this field (maybe WroContext?)
    * @return true if missing resources are ignored.
    */
   boolean isIgnoreMissingResources();

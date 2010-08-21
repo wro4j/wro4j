@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,12 +91,11 @@ public class CssImportPreProcessor
     }
     processed.add(resource);
     final StringBuffer sb = new StringBuffer();
-    final Collection<Resource> importsCollector = getImportedResources(resource);
-    for (final Resource imported : importsCollector) {
-      // for now, minimize always
-      // TODO: find a way to get minimize property dynamically.
-      sb.append(preProcessorExecutor.execute(imported, true));
-    }
+    final List<Resource> importsCollector = getImportedResources(resource);
+    // for now, minimize always
+    // TODO: find a way to get minimize property dynamically.
+    //groupExtractor.isMinimized(Context.get().getRequest())
+    sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : " + importsCollector.size());
     }
@@ -136,7 +134,7 @@ public class CssImportPreProcessor
   /**
    * Find a set of imported resources inside a given resource.
    */
-  private Collection<Resource> getImportedResources(final Resource resource)
+  private List<Resource> getImportedResources(final Resource resource)
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();

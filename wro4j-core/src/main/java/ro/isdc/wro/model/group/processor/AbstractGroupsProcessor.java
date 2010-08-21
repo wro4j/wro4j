@@ -3,11 +3,6 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,10 +20,8 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
 /**
@@ -182,29 +175,6 @@ public abstract class AbstractGroupsProcessor
     return found;
   }
 
-
-  /**
-   * @param resource {@link Resource} for which a Reader should be returned.
-   * @return {@link Reader} for the resource.
-   * @throws IOException if there was a problem retrieving a reader.
-   * @throws WroRuntimeException if {@link Reader} is null.
-   */
-  protected final Reader getResourceReader(final Resource resource)
-    throws IOException {
-    Reader reader = null;
-    final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
-    if (locator != null) {
-      final InputStream is = locator.locate(resource.getUri());
-      // wrap reader with bufferedReader for top efficiency
-      reader = new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
-    }
-    if (reader == null) {
-      // TODO skip invalid resource, instead of throwing exception
-      throw new IOException("Exception while retrieving InputStream from uri: " + resource.getUri());
-    }
-    return reader;
-  }
-
   /**
    * @param groups
    *          list of groups where to search resources to filter.
@@ -304,6 +274,7 @@ public abstract class AbstractGroupsProcessor
 
 
   /**
+   * TODO make this method private
    * @param type of resource for which you want to apply preProcessors or null if it doesn't matter (any resource).
    * @return a list of {@link ResourcePreProcessor} by provided type.
    */
@@ -313,6 +284,7 @@ public abstract class AbstractGroupsProcessor
 
 
   /**
+   * TODO make this method private
    * @param type of resource for which you want to apply postProcessors or null if it doesn't matter (any resource).
    * @return a list of {@link ResourcePostProcessor} by provided type.
    */

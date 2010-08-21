@@ -177,7 +177,6 @@ public final class WroConfiguration
     this.debug = debug;
   }
 
-
   /**
    * Perform the cleanup, clear the listeners.
    */
