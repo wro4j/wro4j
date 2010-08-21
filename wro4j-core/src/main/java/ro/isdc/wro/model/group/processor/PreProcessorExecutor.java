@@ -15,7 +15,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
@@ -91,13 +90,11 @@ public abstract class PreProcessorExecutor {
     try {
       reader = getResourceReader(resource);
     } catch (final IOException e) {
-      LOG.debug("IgnoreMissingResources: " + ignoreMissingResources());
+      LOG.warn("Invalid resource found: " + resource);
       if (ignoreMissingResources()) {
-        LOG.warn("Invalid resource found: " + resource);
         return output.toString();
       } else {
-        LOG.warn("Invalid resource found: " + resource + ". Cannot continue processing. IgnoreMissingResources is + "
-          + ignoreMissingResources());
+        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
         throw e;
       }
     }
@@ -117,9 +114,7 @@ public abstract class PreProcessorExecutor {
 
   /**
    * @param resource {@link Resource} for which a Reader should be returned.
-   * @return {@link Reader} for the resource.
-   * @throws IOException if there was a problem retrieving a reader.
-   * @throws WroRuntimeException if {@link Reader} is null.
+   * @return a Reader for the provided resource.
    */
   private Reader getResourceReader(final Resource resource)
     throws IOException {
