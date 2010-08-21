@@ -58,57 +58,54 @@ public abstract class PreProcessorExecutor {
    * Execute all the preProcessors on the provided resource.
    *
    * @param resource {@link Resource} to preProcess.
-   * @param minimize whether the minimimize aware preProcessor must be applied.
+   * @param minimize whether the minimize aware preProcessor must be applied.
    * @return the result of preProcessing as string content.
    * @throws IOException if {@link Resource} cannot be found or any other related errors.
    */
   private String execute(final Resource resource, final boolean minimize)
     throws IOException {
-    if (resource == null) {
-      throw new IllegalArgumentException("Resource cannot be null!");
-    }
+    //TODO: hold a list of processed resources in order to avoid duplicates
+
     // merge preProcessorsBy type and anyPreProcessors
     final Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
     processors.addAll(getPreProcessorsByType(null));
     if (!minimize) {
       GroupsProcessorImpl.removeMinimizeAwareProcessors(processors);
     }
-    return applyPreProcessors(processors, resource);
+    return applyPreProcessors(resource, processors);
   }
 
 
   /**
    * Apply a list of preprocessors on a resource.
-   *
-   * @throws IOException if any IO error occurs while processing.
    */
-  private String applyPreProcessors(final Collection<ResourcePreProcessor> processors, final Resource resource)
+  private String applyPreProcessors(final Resource resource, final Collection<ResourcePreProcessor> processors)
     throws IOException {
     // get original content
     Reader reader = null;
-    Writer output = new StringWriter();
+    Writer writer = new StringWriter();
     try {
       reader = getResourceReader(resource);
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: " + resource);
       if (ignoreMissingResources()) {
-        return output.toString();
+        return writer.toString();
       } else {
         LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
         throw e;
       }
     }
     if (processors.isEmpty()) {
-      IOUtils.copy(reader, output);
-      return output.toString();
+      IOUtils.copy(reader, writer);
+      return writer.toString();
     }
     for (final ResourcePreProcessor processor : processors) {
-      output = new StringWriter();
+      writer = new StringWriter();
       LOG.debug("applying preProcessor: " + processor.getClass().getName());
-      processor.process(resource, reader, output);
-      reader = new StringReader(output.toString());
+      processor.process(resource, reader, writer);
+      reader = new StringReader(writer.toString());
     }
-    return output.toString();
+    return writer.toString();
   }
 
 
