@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Comparator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -47,23 +46,6 @@ public class DefaultWildcardStreamLocator
    * Character to distinguish wildcard inside the uri.
    */
   private static final String RECURSIVE_WILDCARD = "**";
-  /**
-   * Comparator used to sort files in alphabetical ascending order.
-   */
-  public static final Comparator<File> ASCENDING_ORDER = new Comparator<File>() {
-    public int compare(final File o1, final File o2) {
-      return o1.getName().compareTo(o2.getName());
-    }
-  };
-
-  /**
-   * Comparator used to sort files in alphabetical descending order.
-   */
-  public static final Comparator<File> DESCENDING_ORDER = new Comparator<File>() {
-    public int compare(final File o1, final File o2) {
-      return o1.getName().compareTo(o2.getName());
-    }
-  };
 
   /**
    * {@inheritDoc}
@@ -97,7 +79,12 @@ public class DefaultWildcardStreamLocator
 
     final String uriFolder = FilenameUtils.getFullPath(uri);
 
-    final WildcardFileFilter fileFilter = new WildcardFileFilter(wildcard);
+    final IOFileFilter fileFilter = new IOFileFilterDecorator(new WildcardFileFilter(wildcard)) {
+      @Override
+      public boolean accept(final File file) {
+        return super.accept(file);
+      }
+    };
     final IOFileFilter folderFilter = new IOFileFilterDecorator(getFolderFilter(wildcard)) {
       @Override
       public boolean accept(final File dir, final String name) {
@@ -111,7 +98,6 @@ public class DefaultWildcardStreamLocator
     //if (config.removeDuplicates) {
     //}
 
-//    sortFiles(files);
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
@@ -125,17 +111,6 @@ public class DefaultWildcardStreamLocator
     out.close();
     return new ByteArrayInputStream(out.toByteArray());
   }
-//
-//  /**
-//   * Sort the files collection using by default alphabetical order. Override this method to provide a different type of
-//   * sorting. Or do nothing to leave it with its natural order.
-//   *
-//   * @param files
-//   *          - the collection to sort.
-//   */
-//  protected void sortFiles(final Collection<File> files) {
-//    Collections.sort(new ArrayList<File>(files), ASCENDING_ORDER);
-//  }
 
   /**
    * @param wildcard
