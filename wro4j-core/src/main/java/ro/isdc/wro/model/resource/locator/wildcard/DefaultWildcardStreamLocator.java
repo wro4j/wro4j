@@ -82,14 +82,16 @@ public class DefaultWildcardStreamLocator
     final IOFileFilter fileFilter = new IOFileFilterDecorator(new WildcardFileFilter(wildcard)) {
       @Override
       public boolean accept(final File file) {
-        return super.accept(file);
+        final boolean accept = super.accept(file);
+        LOG.debug("fileFilter: " + file.getPath());
+        return accept;
       }
     };
     final IOFileFilter folderFilter = new IOFileFilterDecorator(getFolderFilter(wildcard)) {
       @Override
-      public boolean accept(final File dir, final String name) {
-        final boolean accept = super.accept(dir, name);
-        LOG.debug("accept: " + dir.getPath() + " | name : " + name);
+      public boolean accept(final File file) {
+        final boolean accept = super.accept(file);
+        LOG.debug("FolderFilter: " + file.getPath());
         return accept;
       }
     };

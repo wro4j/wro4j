@@ -1,3 +1,2 @@
-function repeated() {
-  alert('this function should be included only once!');
+function repeated1() {
 }
