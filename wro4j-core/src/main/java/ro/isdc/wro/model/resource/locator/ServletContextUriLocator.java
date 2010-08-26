@@ -98,7 +98,7 @@ public class ServletContextUriLocator
           LOG.error(message);
           throw new IOException(message);
         }
-        return getWildcardStreamLocator().locateStream(uri, new File(realPath));
+        return getWildcardStreamLocator().locateStream(FilenameUtils.getName(uri), new File(realPath));
       }
     } catch (final IOException e) {
       LOG.warn("Couldn't localize the stream containing wildcard: " + e.getMessage()

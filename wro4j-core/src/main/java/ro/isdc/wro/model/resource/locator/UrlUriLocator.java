@@ -68,12 +68,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
       if (getWildcardStreamLocator().hasWildcard(uri)) {
         final String fullPath = FilenameUtils.getFullPath(uri);
         final URL url = new URL(fullPath);
-        if (url == null) {
-          final String message = "Couldn't get URL for the following path: " + fullPath;
-          LOG.warn(message);
-          throw new IOException(message);
-        }
-        return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+        return getWildcardStreamLocator().locateStream(FilenameUtils.getName(uri), new File(url.getFile()));
       }
     } catch (final IOException e) {
       LOG.warn("Couldn't localize the stream containing wildcard: " + e.getMessage()

@@ -112,7 +112,7 @@ public class DefaultStandaloneContextAwareManagerFactory
         if (getWildcardStreamLocator().hasWildcard(uri)) {
           final String fullPath = FilenameUtils.getFullPath(uri);
           final String realPath = standaloneContext.getContextFolder().getPath() + fullPath;
-          return getWildcardStreamLocator().locateStream(uri, new File(realPath));
+          return getWildcardStreamLocator().locateStream(FilenameUtils.getName(uri), new File(realPath));
         }
 
         LOG.debug("locating uri: " + uri);

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @created May 8, 2010
  */
 public class DefaultWildcardStreamLocator
-  implements WildcardStreamLocator {
+    implements WildcardStreamLocator {
   /**
    * Logger.
    */
@@ -74,35 +74,41 @@ public class DefaultWildcardStreamLocator
     return uri.matches(WILDCARD_REGEX);
   }
 
-
   /**
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
   public InputStream locateStream(final String uri, final File folder)
-    throws IOException {
+      throws IOException {
     if (uri == null || folder == null || !folder.isDirectory()) {
       final StringBuffer message = new StringBuffer("Invalid folder provided");
       if (folder != null) {
         message.append(", with path: " + folder.getPath());
       }
-      message.append(", with uri: " + uri);
+      message.append(", with fileNameWithWildcard: " + uri);
       throw new IOException(message.toString());
+    }
+    if (!hasWildcard(uri)) {
+      throw new IOException("No wildcard detected for the uri: " + uri);
     }
 
     final String wildcard = FilenameUtils.getName(uri);
     LOG.debug("uri: " + uri);
+    LOG.debug("folder: " + folder.getPath());
     LOG.debug("wildcard: " + wildcard);
     final WildcardFileFilter fileFilter = new WildcardFileFilter(wildcard);
     final IOFileFilter folderFilter = getFolderFilter(wildcard);
     final Collection<File> files = FileUtils.listFiles(folder, fileFilter, folderFilter);
+    //TODO remove duplicates if needed:
+    //if (config.removeDuplicates) {
+    //}
+
     sortFiles(files);
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
-    // TODO sort files
     for (final File file : files) {
       LOG.debug("file: " + file.getName());
       final InputStream is = new FileInputStream(file);
@@ -112,20 +118,20 @@ public class DefaultWildcardStreamLocator
     return new ByteArrayInputStream(out.toByteArray());
   }
 
-
   /**
    * Sort the files collection using by default alphabetical order. Override this method to provide a different type of
    * sorting. Or do nothing to leave it with its natural order.
    *
-   * @param files - the collection to sort.
+   * @param files
+   *          - the collection to sort.
    */
   protected void sortFiles(final Collection<File> files) {
     Collections.sort(new ArrayList<File>(files), ASCENDING_ORDER);
   }
 
-
   /**
-   * @param wildcard to use to determine if the folder filter should be recursive or not.
+   * @param wildcard
+   *          to use to determine if the folder filter should be recursive or not.
    * @return filter to be used for folders.
    */
   private IOFileFilter getFolderFilter(final String wildcard) {

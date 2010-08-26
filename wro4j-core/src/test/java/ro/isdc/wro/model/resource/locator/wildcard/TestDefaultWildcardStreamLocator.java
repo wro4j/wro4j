@@ -62,6 +62,11 @@ public class TestDefaultWildcardStreamLocator {
     locator.locateStream("/resource/*.css", null);
   }
 
+  @Test(expected=IOException.class)
+  public void cannotProcessUriWithoutWildcard() throws IOException {
+    final File folder = new File(ClassLoader.getSystemResource("").getFile());
+    locator.locateStream("/resource/noWildcard.css", folder);
+  }
   @Test
   public void testWithValidFolder() throws IOException {
     final File folder = new File(ClassLoader.getSystemResource("").getFile());
