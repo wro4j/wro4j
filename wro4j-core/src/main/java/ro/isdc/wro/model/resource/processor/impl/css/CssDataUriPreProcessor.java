@@ -6,11 +6,12 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
@@ -34,7 +35,7 @@ public class CssDataUriPreProcessor
   /**
    * Generates dataUri based on inputStream of the url's found inside the css resource.
    */
-  private DataUriGenerator dataUriGenerator;
+  private final DataUriGenerator dataUriGenerator;
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.
    */

@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * StringUtils Utility class. This class conatins Utility methods for
+ * StringUtils Utility class. This class contains Utility methods for
  * manipulating strings. Inspired from commons & spring.
  *
  * @author Alex Objelean
@@ -37,11 +37,6 @@ public final class StringUtils {
    * Windows folder separator.
    */
   private static final String WINDOWS_FOLDER_SEPARATOR = "\\";
-
-  /**
-   * Extension separator.
-   */
-  private static final char EXTENSION_SEPARATOR = '.';
 
   /**
    * Private constructor to prevent instantiation.
@@ -332,39 +327,6 @@ public final class StringUtils {
   private static boolean hasLength(final String str) {
     return hasLength((CharSequence) str);
   }
-
-  /**
-   * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
-   * "myfile.txt".
-   *
-   * @param path
-   *          the file path (may be <code>null</code>)
-   * @return the extracted filename, or <code>null</code> if none
-   */
-  public static String getFilename(final String path) {
-    if (path == null) {
-      return null;
-    }
-    final int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
-    return (separatorIndex != -1 ? path.substring(separatorIndex + 1) : path);
-  }
-
-  /**
-   * Extract the filename extension from the given path, e.g.
-   * "mypath/myfile.txt" -> "txt".
-   *
-   * @param path
-   *          the file path (may be <code>null</code>)
-   * @return the extracted filename extension, or <code>null</code> if none
-   */
-  public static String getFilenameExtension(final String path) {
-    if (path == null) {
-      return null;
-    }
-    final int sepIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
-    return (sepIndex != -1 ? path.substring(sepIndex + 1) : null);
-  }
-
 
   /**
    * Normalize the path by removing occurrences of "..".

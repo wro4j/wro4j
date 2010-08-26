@@ -75,7 +75,7 @@ public class ClasspathUriLocator
         LOG.warn(message);
         throw new IOException(message);
       }
-      return getWildcardStreamLocator().locateStream(location, new File(url.getFile()));
+      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
     }
 
     try {

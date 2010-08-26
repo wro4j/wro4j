@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -19,10 +21,9 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
-import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.AbstractGroupsProcessor;
-import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
+import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;

@@ -37,5 +37,7 @@
     <js>classpath:ro/isdc/wro/manager/repeated/*.js</js>
   </group>
   
-  
+  <group name="wildcardResources">
+    <js>classpath:ro/isdc/wro/manager/wildcard/*.js</js>
+  </group>  
 </groups>
