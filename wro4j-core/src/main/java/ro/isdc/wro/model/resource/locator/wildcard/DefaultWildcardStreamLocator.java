@@ -9,9 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 
 import org.apache.commons.io.FileUtils;
@@ -96,14 +94,24 @@ public class DefaultWildcardStreamLocator
     LOG.debug("uri: " + uri);
     LOG.debug("folder: " + folder.getPath());
     LOG.debug("wildcard: " + wildcard);
+
+    final String uriFolder = FilenameUtils.getFullPath(uri);
+
     final WildcardFileFilter fileFilter = new WildcardFileFilter(wildcard);
-    final IOFileFilter folderFilter = getFolderFilter(wildcard);
+    final IOFileFilter folderFilter = new IOFileFilterDecorator(getFolderFilter(wildcard)) {
+      @Override
+      public boolean accept(final File dir, final String name) {
+        final boolean accept = super.accept(dir, name);
+        LOG.debug("accept: " + dir.getPath() + " | name : " + name);
+        return accept;
+      }
+    };
     final Collection<File> files = FileUtils.listFiles(folder, fileFilter, folderFilter);
     //TODO remove duplicates if needed:
     //if (config.removeDuplicates) {
     //}
 
-    sortFiles(files);
+//    sortFiles(files);
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
@@ -117,17 +125,17 @@ public class DefaultWildcardStreamLocator
     out.close();
     return new ByteArrayInputStream(out.toByteArray());
   }
-
-  /**
-   * Sort the files collection using by default alphabetical order. Override this method to provide a different type of
-   * sorting. Or do nothing to leave it with its natural order.
-   *
-   * @param files
-   *          - the collection to sort.
-   */
-  protected void sortFiles(final Collection<File> files) {
-    Collections.sort(new ArrayList<File>(files), ASCENDING_ORDER);
-  }
+//
+//  /**
+//   * Sort the files collection using by default alphabetical order. Override this method to provide a different type of
+//   * sorting. Or do nothing to leave it with its natural order.
+//   *
+//   * @param files
+//   *          - the collection to sort.
+//   */
+//  protected void sortFiles(final Collection<File> files) {
+//    Collections.sort(new ArrayList<File>(files), ASCENDING_ORDER);
+//  }
 
   /**
    * @param wildcard
