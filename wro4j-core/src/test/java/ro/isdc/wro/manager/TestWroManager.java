@@ -106,6 +106,12 @@ public class TestWroManager
     genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/repeated/expected.js");
   }
 
+  @Test
+  public void testWildcardGroupResources()
+      throws IOException {
+    genericProcessAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
+  }
+
   private void genericProcessAndCompare(final String requestUri, final String expectedResourceUri)
       throws IOException, FileNotFoundException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
