@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 
 /**
  * Default implementation of UriLocator. Holds a list of uri locators. The
@@ -77,7 +78,7 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
           field.set(locator, duplicateResourceDetector);
         }
         //proceed with injection for inner UriLocator's.
-        if (UriLocator.class.isInstance(field)) {
+        if (WildcardStreamLocator.class.isAssignableFrom(field.getType())) {
           processInjectAnnotation(field);
         }
       }

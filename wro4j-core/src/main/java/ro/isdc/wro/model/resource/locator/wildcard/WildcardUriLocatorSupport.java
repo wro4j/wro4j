@@ -16,7 +16,7 @@ public abstract class WildcardUriLocatorSupport implements UriLocator {
   /**
    * Wildcard stream locator implementation.
    */
-  private WildcardStreamLocator wildcardStreamLocator;
+  protected WildcardStreamLocator wildcardStreamLocator;
 
   /**
    * Default constructor.
