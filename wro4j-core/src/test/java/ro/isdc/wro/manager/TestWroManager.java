@@ -97,7 +97,7 @@ public class TestWroManager
   @Test
   public void testRepeatedResourcesShouldBeSkipped()
       throws IOException {
-    genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated/expected.js");
+    genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
 
   @Test

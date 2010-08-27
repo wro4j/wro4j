@@ -3,9 +3,16 @@
  */
 package ro.isdc.wro.model.resource.factory;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 /**
@@ -21,6 +28,7 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
    * List of resource readers.
    */
   private List<UriLocator> uriLocators = new ArrayList<UriLocator>();
+  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
 
   /**
    * {@inheritDoc}
@@ -44,7 +52,56 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
     if (uriLocator == null) {
       throw new IllegalArgumentException("ResourceLocator cannot be null!");
     }
+    processInjectAnnotation(uriLocator);
+    //inject duplicateResourceDetector
     uriLocators.add(uriLocator);
+  }
+
+
+  /**
+   * Check for each field from the passed object if @Inject annotation is present & inject the required field if
+   * supported, otherwise warns about invalid usage.
+   *
+   * @param locator object to check for annotation presence.
+   */
+  //TODO move this method to WroUtils
+  private void processInjectAnnotation(final Object locator) {
+    try {
+      final Collection<Field> fields = getAllFields(locator);
+      for (final Field field : fields) {
+        if (field.isAnnotationPresent(Inject.class)) {
+          if (field.getType() != DuplicateResourceDetector.class) {
+            throw new WroRuntimeException("@Inject can be applied only on fields of "
+              + DuplicateResourceDetector.class.getName() + " type");
+          }
+          field.set(locator, duplicateResourceDetector);
+        }
+        //proceed with injection for inner UriLocator's.
+        if (UriLocator.class.isInstance(field)) {
+          processInjectAnnotation(field);
+        }
+      }
+    } catch (final Exception e) {
+      throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
+    }
+  }
+
+  /**
+   * Return all fields for given object, also those from super classes.
+   *
+   * @param object
+   * @return
+   */
+  private Collection<Field> getAllFields(final Object object) {
+    final Collection<Field> fields = new ArrayList<Field>();
+    fields.addAll(Arrays.asList(object.getClass().getDeclaredFields()));
+    //inspect super classes
+    Class<?> superClass = object.getClass().getSuperclass();
+    do {
+      fields.addAll(Arrays.asList(superClass.getDeclaredFields()));
+      superClass = superClass.getSuperclass();
+    } while(superClass != null);
+    return fields;
   }
 
   /**
@@ -56,5 +113,12 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
       throw new IllegalArgumentException("uriLocators list cannot be null!");
     }
     this.uriLocators = uriLocators;
+  }
+
+  /**
+   * @return the duplicateResourceDetector
+   */
+  public DuplicateResourceDetector getDuplicateResourceDetector() {
+    return duplicateResourceDetector;
   }
 }

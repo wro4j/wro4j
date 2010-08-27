@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
@@ -34,7 +35,6 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 public abstract class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
 
-
   /**
    * Apply preProcessors on resources and merge them.
    *
@@ -48,21 +48,23 @@ public abstract class PreProcessorExecutor {
     final StringBuffer result = new StringBuffer();
     for (final Resource resource : resources) {
       LOG.debug("merging resource: " + resource);
-      result.append(execute(resource, minimize));
+      result.append(processSingleResource(resource, resources, minimize));
     }
     return result.toString();
   }
 
-
   /**
    * Execute all the preProcessors on the provided resource.
    *
-   * @param resource {@link Resource} to preProcess.
-   * @param minimize whether the minimize aware preProcessor must be applied.
+   * @param resource
+   *          {@link Resource} to preProcess.
+   * @param resources
+   *          the list of all resources to be processed in this context.
+   * @param minimize
+   *          whether the minimize aware preProcessor must be applied.
    * @return the result of preProcessing as string content.
-   * @throws IOException if {@link Resource} cannot be found or any other related errors.
    */
-  private String execute(final Resource resource, final boolean minimize)
+  private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
     throws IOException {
     //TODO: hold a list of processed resources in order to avoid duplicates
 
@@ -72,20 +74,24 @@ public abstract class PreProcessorExecutor {
     if (!minimize) {
       GroupsProcessorImpl.removeMinimizeAwareProcessors(processors);
     }
-    return applyPreProcessors(resource, processors);
+    return applyPreProcessors(resource, resources, processors);
   }
 
 
   /**
    * Apply a list of preprocessors on a resource.
+   * @param resource the {@link Resource} on which processors will be applied
+   * @param resources
+   *          the list of all resources to be processed in this context.
+   * @param processors the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final Collection<ResourcePreProcessor> processors)
+  private String applyPreProcessors(final Resource resource, final List<Resource> resources, final Collection<ResourcePreProcessor> processors)
     throws IOException {
     // get original content
     Reader reader = null;
     Writer writer = new StringWriter();
     try {
-      reader = getResourceReader(resource);
+      reader = getResourceReader(resource, resources);
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: " + resource);
       if (ignoreMissingResources()) {
@@ -108,25 +114,38 @@ public abstract class PreProcessorExecutor {
     return writer.toString();
   }
 
-
   /**
-   * @param resource {@link Resource} for which a Reader should be returned.
+   * @param resource
+   *          {@link Resource} for which a Reader should be returned.
+   * @param resources
+   *          the list of all resources to be processed in this context. This is necessary in order to detect
+   *          duplicates.
    * @return a Reader for the provided resource.
    */
-  private Reader getResourceReader(final Resource resource)
-    throws IOException {
-    Reader reader = null;
-    final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
-    if (locator != null) {
-      final InputStream is = locator.locate(resource.getUri());
-      // wrap reader with bufferedReader for top efficiency
-      reader = new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
+  private Reader getResourceReader(final Resource resource, final List<Resource> resources)
+      throws IOException {
+    final DuplicateResourceDetector duplicateResourceDetector = getUriLocatorFactory().getDuplicateResourceDetector();
+    try {
+      Reader reader = null;
+      // populate duplicate Resource detector with known used resource uri's
+      for (final Resource r : resources) {
+        duplicateResourceDetector.addResourceUri(r.getUri());
+      }
+
+      final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+      if (locator != null) {
+        final InputStream is = locator.locate(resource.getUri());
+        // wrap reader with bufferedReader for top efficiency
+        reader = new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
+      }
+      if (reader == null) {
+        // TODO skip invalid resource, instead of throwing exception
+        throw new IOException("Exception while retrieving InputStream from uri: " + resource.getUri());
+      }
+      return reader;
+    } finally {
+      duplicateResourceDetector.reset();
     }
-    if (reader == null) {
-      // TODO skip invalid resource, instead of throwing exception
-      throw new IOException("Exception while retrieving InputStream from uri: " + resource.getUri());
-    }
-    return reader;
   }
 
   /**
@@ -135,9 +154,8 @@ public abstract class PreProcessorExecutor {
   protected abstract boolean ignoreMissingResources();
 
   /**
-   * TODO document.
-   * @param resourceType
-   * @return
+   * @param resourceType type of searched resources.
+   * @return a collection of {@link ResourcePreProcessor}'s by resourceType.
    */
   protected abstract Collection<ResourcePreProcessor> getPreProcessorsByType(ResourceType resourceType);
 

@@ -10,6 +10,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -20,6 +24,9 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 
 
 /**
@@ -46,6 +53,11 @@ public class DefaultWildcardStreamLocator
    * Character to distinguish wildcard inside the uri.
    */
   private static final String RECURSIVE_WILDCARD = "**";
+  /**
+   * Responsible for detecting duplicated resources.
+   */
+  @Inject
+  private DuplicateResourceDetector duplicateResourceDetector;
 
   /**
    * {@inheritDoc}
@@ -57,7 +69,6 @@ public class DefaultWildcardStreamLocator
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
   public InputStream locateStream(final String uri, final File folder)
       throws IOException {
     if (uri == null || folder == null || !folder.isDirectory()) {
@@ -77,28 +88,38 @@ public class DefaultWildcardStreamLocator
     LOG.debug("folder: " + folder.getPath());
     LOG.debug("wildcard: " + wildcard);
 
-    final String uriFolder = FilenameUtils.getFullPath(uri);
+    //maps resource uri's and corresponding file
+    //a ConcurrentHashMap is used because we remove some of the entries during the iteration
+    final Map<String, File> uriToFileMap = new ConcurrentHashMap<String, File>();
+
+    final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
+    final String parentFolderPath = folder.getPath();
 
     final IOFileFilter fileFilter = new IOFileFilterDecorator(new WildcardFileFilter(wildcard)) {
       @Override
       public boolean accept(final File file) {
         final boolean accept = super.accept(file);
-        LOG.debug("fileFilter: " + file.getPath());
+        if (accept && !file.isDirectory()) {
+          final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
+          final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
+          uriToFileMap.put(resourceUri, file);
+          LOG.debug("======\tfoundUri: " + resourceUri);
+        }
         return accept;
       }
     };
-    final IOFileFilter folderFilter = new IOFileFilterDecorator(getFolderFilter(wildcard)) {
-      @Override
-      public boolean accept(final File file) {
-        final boolean accept = super.accept(file);
-        LOG.debug("FolderFilter: " + file.getPath());
-        return accept;
-      }
-    };
-    final Collection<File> files = FileUtils.listFiles(folder, fileFilter, folderFilter);
+    FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
+
     //TODO remove duplicates if needed:
-    //if (config.removeDuplicates) {
-    //}
+    for (final String resourceUri : uriToFileMap.keySet()) {
+      if (isDuplicatedResourceUri(resourceUri)) {
+        LOG.warn("Duplicate resource detected: " + resourceUri);
+        //if (config.removeDuplicates) {
+        uriToFileMap.remove(resourceUri);
+      }
+    }
+
+    final Collection<File> files = uriToFileMap.values();
 
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
@@ -106,12 +127,25 @@ public class DefaultWildcardStreamLocator
       LOG.warn(message);
     }
     for (final File file : files) {
-      LOG.debug("file: " + file.getName());
       final InputStream is = new FileInputStream(file);
       IOUtils.copy(is, out);
     }
     out.close();
     return new ByteArrayInputStream(out.toByteArray());
+  }
+
+  /**
+   * Check if the resourceUri is already duplicated and afterwards add it to processed uri's.
+   *
+   * @return true if the resource is duplicated in the context of the current processing.
+   */
+  private boolean isDuplicatedResourceUri(final String resourceUri) {
+    if (duplicateResourceDetector == null) {
+      throw new WroRuntimeException("duplicateResourceDetector was not injected!");
+    }
+    final boolean result = duplicateResourceDetector.isDuplicateResourceUri(resourceUri);
+    duplicateResourceDetector.addResourceUri(resourceUri);
+    return result;
   }
 
   /**
