@@ -103,7 +103,7 @@ public class TestWroManager
   @Test
   public void testWildcardRepeatedResourcesShouldBeSkiped()
       throws IOException {
-    genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
+    genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
   }
 
   @Test

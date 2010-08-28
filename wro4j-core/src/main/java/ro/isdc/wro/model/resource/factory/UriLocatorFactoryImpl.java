@@ -75,11 +75,13 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
             throw new WroRuntimeException("@Inject can be applied only on fields of "
               + DuplicateResourceDetector.class.getName() + " type");
           }
+          field.setAccessible(true);
           field.set(locator, duplicateResourceDetector);
         }
         //proceed with injection for inner UriLocator's.
         if (WildcardStreamLocator.class.isAssignableFrom(field.getType())) {
-          processInjectAnnotation(field);
+          field.setAccessible(true);
+          processInjectAnnotation(field.get(locator));
         }
       }
     } catch (final Exception e) {

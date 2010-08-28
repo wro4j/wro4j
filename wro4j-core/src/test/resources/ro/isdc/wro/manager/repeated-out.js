@@ -1,1 +1,1 @@
-function repeated1(){};function child1(){};
+function repeated1(){};

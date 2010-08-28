@@ -9,9 +9,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -89,8 +91,8 @@ public class DefaultWildcardStreamLocator
     LOG.debug("wildcard: " + wildcard);
 
     //maps resource uri's and corresponding file
-    //a ConcurrentHashMap is used because we remove some of the entries during the iteration
-    final Map<String, File> uriToFileMap = new ConcurrentHashMap<String, File>();
+    //this map have to be ordered
+    final Map<String, File> uriToFileMap = new LinkedHashMap<String, File>();
 
     final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
     final String parentFolderPath = folder.getPath();
@@ -111,12 +113,17 @@ public class DefaultWildcardStreamLocator
     FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
 
     //TODO remove duplicates if needed:
+    LOG.error("map files: " + uriToFileMap.keySet());
+    final List<String> duplicateResourceList = new ArrayList<String>();
     for (final String resourceUri : uriToFileMap.keySet()) {
       if (isDuplicatedResourceUri(resourceUri)) {
         LOG.warn("Duplicate resource detected: " + resourceUri);
-        //if (config.removeDuplicates) {
-        uriToFileMap.remove(resourceUri);
+        duplicateResourceList.add(resourceUri);
       }
+    }
+    //if (config.removeDuplicates) {
+    for (final String duplicateResourceUri : duplicateResourceList) {
+      uriToFileMap.remove(duplicateResourceUri);
     }
 
     final Collection<File> files = uriToFileMap.values();

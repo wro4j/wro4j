@@ -4,18 +4,21 @@
  */
 package ro.isdc.wro.model.resource;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+
 
 /**
- * Used to detect duplicated resources. The implementation holds a detector context associated with each thread. This is necessary because the detection should be thread-safe.
+ * Used to detect duplicated resources. The implementation holds a detector context associated with each thread. This is
+ * necessary because the detection should be thread-safe. It is responsability of the client to populate the resources
+ * being processed during a single request cycle and to reset it after the processing is complete.
  *
  * @author Alex Objelean
  */
 public class DuplicateResourceDetector {
   private static final ThreadLocal<DetectorContext> DETECTOR_CONTEXT = new ThreadLocal<DuplicateResourceDetector.DetectorContext>();
   private class DetectorContext {
-    private final Collection<String> resourceUris = new ArrayList<String>();
+    private final Collection<String> resourceUris = new HashSet<String>();
   }
 
   private DetectorContext getSafeContext() {
@@ -27,15 +30,13 @@ public class DuplicateResourceDetector {
     return DETECTOR_CONTEXT.get();
   }
 
-  public DuplicateResourceDetector() {
-  }
-
 
   public void addResourceUri(final String resourceUri) {
     getSafeContext().resourceUris.add(resourceUri);
   }
 
   /**
+   * Checks if the resource uri is duplicate.
    * @param resourceUri
    * @return true if the resourceUri is
    */

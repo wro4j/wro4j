@@ -160,6 +160,7 @@ public abstract class PreProcessorExecutor {
   protected abstract Collection<ResourcePreProcessor> getPreProcessorsByType(ResourceType resourceType);
 
   /**
+   * TODO: use @Inject instead of this abstract method.
    * @return {@link UriLocatorFactory}.
    */
   protected abstract UriLocatorFactory getUriLocatorFactory();
