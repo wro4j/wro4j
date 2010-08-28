@@ -10,6 +10,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
  *
@@ -25,6 +27,9 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
+    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
+    final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    factory.addUriLocator(uriLocator);
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -41,7 +46,7 @@ public class TestUrlUriLocator {
   @Test
   public void testValidUrl()
     throws IOException {
-    uriLocator.locate(" http://www.google.com");
+    uriLocator.locate("http://www.google.com");
   }
 
   @Test

@@ -11,10 +11,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 
 /**
  * Default implementation of UriLocator. Holds a list of uri locators. The
@@ -25,6 +27,10 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
  * @created Created on Nov 4, 2008
  */
 public final class UriLocatorFactoryImpl implements UriLocatorFactory {
+  /**
+   * Logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(UriLocatorFactoryImpl.class);
   /**
    * List of resource readers.
    */
@@ -75,14 +81,15 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
             throw new WroRuntimeException("@Inject can be applied only on fields of "
               + DuplicateResourceDetector.class.getName() + " type");
           }
+          LOG.debug("Injecting " + DuplicateResourceDetector.class.getSimpleName() + " in the locator: " + locator.getClass().getSimpleName());
           field.setAccessible(true);
           field.set(locator, duplicateResourceDetector);
         }
-        //proceed with injection for inner UriLocator's.
-        if (WildcardStreamLocator.class.isAssignableFrom(field.getType())) {
-          field.setAccessible(true);
-          processInjectAnnotation(field.get(locator));
-        }
+//        //proceed with injection for inner UriLocator's.
+//        if (WildcardStreamLocator.class.isAssignableFrom(field.getType())) {
+//          field.setAccessible(true);
+//          processInjectAnnotation(field.get(locator));
+//        }
       }
     } catch (final Exception e) {
       throw new WroRuntimeException("Exception while trying to process Inject annotation", e);

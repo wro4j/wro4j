@@ -11,6 +11,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
+
 /**
  * @author Alex Objelean
  */
@@ -19,7 +21,7 @@ public class TestDefaultWildcardStreamLocator {
 
   @Before
   public void setUp() {
-    locator = new DefaultWildcardStreamLocator();
+    locator = new DefaultWildcardStreamLocator(new DuplicateResourceDetector());
   }
 
   @Test

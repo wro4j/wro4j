@@ -15,8 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -58,8 +56,17 @@ public class DefaultWildcardStreamLocator
   /**
    * Responsible for detecting duplicated resources.
    */
-  @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
+
+
+  /**
+   * Creates a WildcardStream locator capable of detecting duplicate resources.
+   *
+   * @param duplicateResourceDetector
+   */
+  public DefaultWildcardStreamLocator(final DuplicateResourceDetector duplicateResourceDetector) {
+    this.duplicateResourceDetector = duplicateResourceDetector;
+  }
 
   /**
    * {@inheritDoc}
