@@ -85,11 +85,6 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
           field.setAccessible(true);
           field.set(locator, duplicateResourceDetector);
         }
-//        //proceed with injection for inner UriLocator's.
-//        if (WildcardStreamLocator.class.isAssignableFrom(field.getType())) {
-//          field.setAccessible(true);
-//          processInjectAnnotation(field.get(locator));
-//        }
       }
     } catch (final Exception e) {
       throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
@@ -97,10 +92,7 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
   }
 
   /**
-   * Return all fields for given object, also those from super classes.
-   *
-   * @param object
-   * @return
+   * Return all fields for given object, also those from the super classes.
    */
   private Collection<Field> getAllFields(final Object object) {
     final Collection<Field> fields = new ArrayList<Field>();

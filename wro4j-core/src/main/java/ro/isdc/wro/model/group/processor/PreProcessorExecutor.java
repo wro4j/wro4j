@@ -34,7 +34,14 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
  */
 public abstract class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
+  private UriLocatorFactory uriLocatorFactory;
 
+  public PreProcessorExecutor(final UriLocatorFactory uriLocatorFactory) {
+    if (uriLocatorFactory == null) {
+      throw new IllegalArgumentException("uriLocatorFactory cannot be null!");
+    }
+    this.uriLocatorFactory = uriLocatorFactory;
+  }
   /**
    * Apply preProcessors on resources and merge them.
    *
@@ -124,7 +131,7 @@ public abstract class PreProcessorExecutor {
    */
   private Reader getResourceReader(final Resource resource, final List<Resource> resources)
       throws IOException {
-    final DuplicateResourceDetector duplicateResourceDetector = getUriLocatorFactory().getDuplicateResourceDetector();
+    final DuplicateResourceDetector duplicateResourceDetector = uriLocatorFactory.getDuplicateResourceDetector();
     try {
       Reader reader = null;
       // populate duplicate Resource detector with known used resource uri's
@@ -132,7 +139,7 @@ public abstract class PreProcessorExecutor {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
 
-      final UriLocator locator = getUriLocatorFactory().getInstance(resource.getUri());
+      final UriLocator locator = uriLocatorFactory.getInstance(resource.getUri());
       if (locator != null) {
         final InputStream is = locator.locate(resource.getUri());
         // wrap reader with bufferedReader for top efficiency
@@ -158,11 +165,5 @@ public abstract class PreProcessorExecutor {
    * @return a collection of {@link ResourcePreProcessor}'s by resourceType.
    */
   protected abstract Collection<ResourcePreProcessor> getPreProcessorsByType(ResourceType resourceType);
-
-  /**
-   * TODO: use @Inject instead of this abstract method.
-   * @return {@link UriLocatorFactory}.
-   */
-  protected abstract UriLocatorFactory getUriLocatorFactory();
 
 }
