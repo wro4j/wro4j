@@ -35,12 +35,16 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 public abstract class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   private UriLocatorFactory uriLocatorFactory;
-
-  public PreProcessorExecutor(final UriLocatorFactory uriLocatorFactory) {
+  private DuplicateResourceDetector duplicateResourceDetector;
+  public PreProcessorExecutor(final UriLocatorFactory uriLocatorFactory, final DuplicateResourceDetector duplicateResourceDetector) {
     if (uriLocatorFactory == null) {
       throw new IllegalArgumentException("uriLocatorFactory cannot be null!");
     }
+    if (duplicateResourceDetector == null) {
+      throw new IllegalArgumentException("duplicateResourceDetector cannot be null!");
+    }
     this.uriLocatorFactory = uriLocatorFactory;
+    this.duplicateResourceDetector = duplicateResourceDetector;
   }
   /**
    * Apply preProcessors on resources and merge them.
@@ -79,7 +83,7 @@ public abstract class PreProcessorExecutor {
     final Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
     processors.addAll(getPreProcessorsByType(null));
     if (!minimize) {
-      GroupsProcessorImpl.removeMinimizeAwareProcessors(processors);
+      GroupsProcessor.removeMinimizeAwareProcessors(processors);
     }
     return applyPreProcessors(resource, resources, processors);
   }
@@ -131,7 +135,6 @@ public abstract class PreProcessorExecutor {
    */
   private Reader getResourceReader(final Resource resource, final List<Resource> resources)
       throws IOException {
-    final DuplicateResourceDetector duplicateResourceDetector = uriLocatorFactory.getDuplicateResourceDetector();
     try {
       Reader reader = null;
       // populate duplicate Resource detector with known used resource uri's

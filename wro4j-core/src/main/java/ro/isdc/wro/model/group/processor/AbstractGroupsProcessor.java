@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -32,8 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 26, 2008
  */
 @SuppressWarnings("serial")
-public abstract class AbstractGroupsProcessor
-  implements GroupsProcessor {
+public abstract class AbstractGroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractGroupsProcessor.class);
   /**
    * a list of pre processors.
@@ -51,7 +51,7 @@ public abstract class AbstractGroupsProcessor
    * If true, missing resources are ignored. By default this value is true.
    */
   private boolean ignoreMissingResources = true;
-
+  private DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
 
   /**
    * Decorate the passed collection by overriding add family methods & calling
@@ -135,12 +135,12 @@ public abstract class AbstractGroupsProcessor
    * Analyze the field containing {@link Inject} annotation and set its value to appropriate value. Override this method
    * if you want to inject something else but uriLocatorFactory.
    *
-   * @param processor an instance of processor which is the holder of the field.
+   * @param object an object containing @Inject annotation.
    * @param field {@link Field} object containing {@link Inject} annotation.
    * @return true if field was injected with some not null value.
    * @throws IllegalAccessException
    */
-  protected boolean acceptAnnotatedField(final Object processor, final Field field)
+  protected boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
     field.setAccessible(true);
     if (field.getType().equals(UriLocatorFactory.class)) {
@@ -149,8 +149,13 @@ public abstract class AbstractGroupsProcessor
         throw new WroRuntimeException(
           "No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
       }
-      field.set(processor, uriLocatorFactory);
+      field.set(object, uriLocatorFactory);
       LOG.debug("Successfully injected field: " + field.getName());
+      return true;
+    }
+    if (field.getType().equals(DuplicateResourceDetector.class)) {
+      field.set(object, duplicateResourceDetector);
+      LOG.debug("Successfully injected duplicateResourceDetector: " + field.getName());
       return true;
     }
     return false;
@@ -263,7 +268,18 @@ public abstract class AbstractGroupsProcessor
    */
   public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
     this.uriLocatorFactory = uriLocatorFactory;
+//    configureUriLocatorFactory(uriLocatorFactory);
+    processInjectAnnotation(uriLocatorFactory);
   }
+
+
+//  /**
+//   * Allows subclasses to configure {@link UriLocatorFactory}.
+//   *
+//   * @param uriLocatorFactory to configure.
+//   */
+//  protected void configureUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+//  }
 
 
   /**
@@ -293,4 +309,11 @@ public abstract class AbstractGroupsProcessor
     return getProcessorsByType(type, postProcessors);
   }
 
+
+  /**
+   * @return the duplicateResourceDetector
+   */
+  public DuplicateResourceDetector getDuplicateResourceDetector() {
+    return this.duplicateResourceDetector;
+  }
 }

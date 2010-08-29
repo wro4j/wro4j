@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.factory;
 
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 /**
@@ -22,9 +21,4 @@ public interface UriLocatorFactory {
    * @return {@link UriLocator} implementation if any found or null otherwise.
    */
   UriLocator getInstance(final String uri);
-
-  /**
-   * @return {@link DuplicateResourceDetector} instance.
-   */
-  DuplicateResourceDetector getDuplicateResourceDetector();
 }

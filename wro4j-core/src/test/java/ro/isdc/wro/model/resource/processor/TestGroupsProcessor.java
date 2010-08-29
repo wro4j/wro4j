@@ -21,8 +21,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
-import ro.isdc.wro.model.group.processor.AbstractGroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -44,11 +43,11 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
  * @created Created on Jan 5, 2010
  */
 public class TestGroupsProcessor {
-  private AbstractGroupsProcessor groupsProcessor;
+  private GroupsProcessor groupsProcessor;
 
   @Before
   public void init() {
-    groupsProcessor = new GroupsProcessorImpl();
+    groupsProcessor = new GroupsProcessor();
   }
 
   @Test
@@ -210,8 +209,9 @@ public class TestGroupsProcessor {
     final List<Group> groups = Arrays.asList(group);
 
     final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
-    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+
+    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
 
     final ResourcePostProcessor postProcessor = Mockito.mock(JawrCssMinifierProcessor.class);
     groupsProcessor.addPostProcessor(postProcessor);
@@ -236,8 +236,10 @@ public class TestGroupsProcessor {
     group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
     final List<Group> groups = Arrays.asList(group);
     final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
-    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+
     groupsProcessor.addPreProcessor(new CssImportPreProcessor());
     final ResourcePreProcessor preProcessor = Mockito.mock(ResourcePreProcessor.class);
     groupsProcessor.addPreProcessor(preProcessor);

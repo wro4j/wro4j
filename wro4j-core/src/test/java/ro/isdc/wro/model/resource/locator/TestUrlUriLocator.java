@@ -10,6 +10,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 
 /**
@@ -27,8 +28,10 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
-    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    final GroupsProcessor groupsProcessor = new GroupsProcessor();
+    groupsProcessor.setUriLocatorFactory(factory);
+    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
     factory.addUriLocator(uriLocator);
   }
 

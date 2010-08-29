@@ -78,12 +78,11 @@ public class DefaultStandaloneContextAwareManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
+  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
+    super.configureGroupsProcessor(groupsProcessor);
     configureProcessors(groupsProcessor);
     //This is important in order to make plugin aware about ignoreMissingResources option.
     groupsProcessor.setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
-    return groupsProcessor;
   }
 
   /**

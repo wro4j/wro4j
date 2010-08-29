@@ -3,101 +3,177 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
- * Performs the processing of a group based on resourceType. The implementation should take care of
- * {@link WroConfiguration#isMinimize()} to skip the processors which perform minimization of resources, otherwise
- * changing of minimize flag will have no effect.
+ * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
+ * @created Created on Nov 3, 2008
  */
-public interface GroupsProcessor
-  extends Serializable {
+public final class GroupsProcessor
+    extends AbstractGroupsProcessor {
+  private static final long serialVersionUID = 1L;
+  private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
   /**
-   * Process a collection of groups by type.
+   * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
+   * (according to findbugs eclipse plugin).
+   */
+  private transient PreProcessorExecutor preProcessorExecutor;
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean acceptAnnotatedField(final Object processor, final Field field) throws IllegalAccessException {
+    boolean accept = super.acceptAnnotatedField(processor, field);
+    if (field.getType().equals(PreProcessorExecutor.class)) {
+      field.set(processor, getPreProcessorExecutor());
+      LOG.debug("Successfully injected field: " + field.getName());
+      accept = true;
+    }
+    return accept;
+  }
+
+  /**
+   * @return a not null instance of {@link PreProcessorExecutor}.
+   */
+  private PreProcessorExecutor getPreProcessorExecutor() {
+    if (preProcessorExecutor == null) {
+      preProcessorExecutor = new PreProcessorExecutor(getUriLocatorFactory(), getDuplicateResourceDetector()) {
+        @Override
+        protected boolean ignoreMissingResources() {
+          return GroupsProcessor.this.isIgnoreMissingResources();
+        };
+        @Override
+        protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
+          return GroupsProcessor.this.getPreProcessorsByType(resourceType);
+        }
+      };
+    }
+    return preProcessorExecutor;
+  }
+
+  /**
+   * Removes the generic processors of type <T> which have Minimize annotation from the provided collection of
+   * processors.
    *
-   * @param groups to process.
-   * @param type to process.
-   * @param minimize if true, the result of the processing will be minimized
-   * @return processed content as string.
+   * @param <T>
+   *          type of processor
+   * @param processors
+   *          a collection of processors.
    */
-  String process(final Collection<Group> groups, final ResourceType type, final boolean minimize);
+  static <T> void removeMinimizeAwareProcessors(final Collection<T> processors) {
+    final Collection<T> minimizeAwareProcessors = new ArrayList<T>();
+    for (final T processor : processors) {
+      if (processor.getClass().isAnnotationPresent(Minimize.class)) {
+        minimizeAwareProcessors.add(processor);
+      }
+    }
+    processors.removeAll(minimizeAwareProcessors);
+  }
 
 
   /**
-   * @param uriLocatorFactory {@link UriLocatorFactory} to set.
+   * {@inheritDoc}
+   * <p>
+   * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
-  void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory);
-
+  public String process(final Collection<Group> groups, final ResourceType type, final boolean minimize) {
+    if (groups == null) {
+      throw new IllegalArgumentException("List of groups cannot be null!");
+    }
+    if (type == null) {
+      throw new IllegalArgumentException("ResourceType cannot be null!");
+    }
+    final StopWatch stopWatch = new StopWatch();
+    stopWatch.start("filter resources");
+    // TODO find a way to reuse contents from cache
+    final List<Resource> filteredResources = getFilteredResources(groups, type);
+    try {
+      stopWatch.stop();
+      stopWatch.start("pre process and merge");
+      // Merge
+      final String result = getPreProcessorExecutor().processAndMerge(filteredResources, minimize);
+      stopWatch.stop();
+      stopWatch.start("post process");
+      // postProcessing
+      final String postProcessedResult = applyPostProcessors(type, result, minimize);
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
+      return postProcessedResult;
+    } catch (final IOException e) {
+      throw new WroRuntimeException("Exception while merging resources", e);
+    }
+  }
 
   /**
-   * @return {@link UriLocatorFactory} for this GroupsProcessor.
-   */
-  UriLocatorFactory getUriLocatorFactory();
-
-
-  /**
-   * Provide a list of preProcessors to apply on any type of content.
+   * Perform postProcessing.
    *
-   * @param processors a list of {@link ResourcePreProcessor} processors.
+   * @param resourceType
+   *          the type of the resources to process. This value will never be null.
+   * @param content
+   *          the merged content of all resources which were pre-processed.
+   * @param minimize
+   *          whether minimize aware post processor must be applied.
+   * @return the post processed contents.
    */
-  void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors);
+  private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize) throws IOException {
+    if (content == null) {
+      throw new IllegalArgumentException("content cannot be null!");
+    }
+    final Collection<ResourcePostProcessor> processors = getPostProcessorsByType(resourceType);
+    processors.addAll(getPostProcessorsByType(null));
+    if (!minimize) {
+      removeMinimizeAwareProcessors(processors);
+    }
+    final String output = applyPostProcessors(processors, content);
+    return output;
+  }
 
 
   /**
-   * Provide a list of postProcessors to apply on any type of content.
+   * Apply resourcePostProcessors.
    *
-   * @param processors a list of {@link ResourcePostProcessor} processors.
+   * @param processors
+   *          a collection of processors to apply on the content from the supplied writer.
+   * @param content
+   *          to process with all postProcessors.
+   * @return the post processed content.
    */
-  void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors);
-
-
-  /**
-   * Add a single css preProcessor to the chain of postProcessors.
-   *
-   * @param processor {@link ResourcePostProcessor} to add.
-   */
-  void addPostProcessor(final ResourcePostProcessor processor);
-
-
-  /**
-   * Add a single preProcessor to the chain of preProcessors.
-   *
-   * @param processor {@link ResourcePostProcessor} to add.
-   */
-  void addPreProcessor(final ResourcePreProcessor processor);
-
-
-  /**
-   * Search for the first available preprocessor of given type.
-   *
-   * @param processorClass to search in list of available preprocessors.
-   * @return {@link ResourcePreProcessor} instance if any found, or null if such processor doesn't exist.
-   */
-  <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass);
-
-
-  /**
-   * TODO: find a better place for this field (maybe WroContext?)
-   * @param ignore flag indicating if missing resources should be ignored.
-   */
-  void setIgnoreMissingResources(boolean ignore);
-
-
-  /**
-   * TODO: find a better place for this field (maybe WroContext?)
-   * @return true if missing resources are ignored.
-   */
-  boolean isIgnoreMissingResources();
+  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content) throws IOException {
+    if (processors.isEmpty()) {
+      return content;
+    }
+    Reader input = new StringReader(content.toString());
+    Writer output = null;
+    for (final ResourcePostProcessor processor : processors) {
+      output = new StringWriter();
+      LOG.debug("applying postProcessor: " + processor.getClass().getName());
+      processor.process(input, output);
+      input = new StringReader(output.toString());
+    }
+    return output.toString();
+  }
 }

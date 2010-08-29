@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -158,12 +157,10 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected final GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
+  protected final void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
     groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
     groupsProcessor.setResourcePreProcessors(getPreProcessors());
     groupsProcessor.setResourcePostProcessors(getPostProcessors());
-    return groupsProcessor;
   }
 
 

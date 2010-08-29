@@ -13,10 +13,8 @@ import org.junit.Test;
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -114,20 +112,12 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
    * This method will allow the fields containing @Inject annotations to be assigned.
    */
   private void updateGroupsProcessorDependencies(final ResourcePreProcessor processor) {
-    final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
-    groupsProcessor.setUriLocatorFactory(getUriLocatorFactory());
-    groupsProcessor.addPreProcessor(processor);
-  }
-
-
-  /**
-   * @return prepared {@link UriLocatorFactory} with few uriLocators set.
-   */
-  private UriLocatorFactory getUriLocatorFactory() {
+    final GroupsProcessor groupsProcessor = new GroupsProcessor();
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    groupsProcessor.setUriLocatorFactory(factory);
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());
     factory.addUriLocator(new ServletContextUriLocator());
-    return factory;
+    groupsProcessor.addPreProcessor(processor);
   }
 }

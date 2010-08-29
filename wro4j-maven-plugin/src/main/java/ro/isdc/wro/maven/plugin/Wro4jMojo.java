@@ -34,7 +34,6 @@ import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManag
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -154,14 +153,7 @@ public class Wro4jMojo extends AbstractMojo {
    * Creates default instance of {@link StandaloneContextAwareManagerFactory}.
    */
   private StandaloneContextAwareManagerFactory createDefaultManagerFactory() {
-    return new DefaultStandaloneContextAwareManagerFactory() {
-      @Override
-      protected GroupsProcessor newGroupsProcessor() {
-        final GroupsProcessor groupsProcessor = super.newGroupsProcessor();
-        groupsProcessor.setIgnoreMissingResources(ignoreMissingResources);
-        return groupsProcessor;
-      }
-    };
+    return new DefaultStandaloneContextAwareManagerFactory();
   }
 
   /**

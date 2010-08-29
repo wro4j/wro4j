@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 
 
@@ -37,7 +38,9 @@ public class TestServletContextUriLocator {
 
   @Before
   public void initContext() {
+    final GroupsProcessor groupsProcessor = new GroupsProcessor();
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    groupsProcessor.setUriLocatorFactory(factory);
     locator = new ServletContextUriLocator();
     factory.addUriLocator(locator);
     final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);

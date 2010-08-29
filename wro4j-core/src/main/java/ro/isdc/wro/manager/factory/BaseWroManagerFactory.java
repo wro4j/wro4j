@@ -22,7 +22,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.util.CRC32FingerprintCreator;
 import ro.isdc.wro.model.resource.util.FingerprintCreator;
 
@@ -61,7 +60,8 @@ public abstract class BaseWroManagerFactory
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
-          final GroupsProcessor groupsProcessor = newGroupsProcessor();
+          final GroupsProcessor groupsProcessor = new GroupsProcessor();
+          configureGroupsProcessor(groupsProcessor);
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           // it is important to instantiate dependencies first, otherwise another thread can start working with
           // uninitialized manager.
@@ -145,8 +145,7 @@ public abstract class BaseWroManagerFactory
   /**
    * @return {@link GroupsProcessor} configured processor.
    */
-  protected GroupsProcessor newGroupsProcessor() {
-    return new GroupsProcessorImpl();
+  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessorImpl) {
   }
 
   /**

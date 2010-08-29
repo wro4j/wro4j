@@ -7,7 +7,6 @@ import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -23,14 +22,12 @@ public class YUIServletContextAwareWroManagerFactory extends ServletContextAware
    * {@inheritDoc}
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupProcessor.addPostProcessor(new YUICssCompressorProcessor());
-    groupProcessor.addPostProcessor(new YUIJsCompressorProcessor());
-    return groupProcessor;
+  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
+    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
+    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
+    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+    groupsProcessor.addPostProcessor(new YUICssCompressorProcessor());
+    groupsProcessor.addPostProcessor(new YUIJsCompressorProcessor());
   }
 }

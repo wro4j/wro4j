@@ -75,12 +75,10 @@ public class WroManager
    * ResourcesModel factory.
    */
   private WroModelFactory modelFactory;
-
   /**
    * GroupExtractor.
    */
   private GroupExtractor groupExtractor;
-
   /**
    * Groups processor.
    */

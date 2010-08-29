@@ -4,7 +4,6 @@
 package ro.isdc.wro.manager.factory;
 
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -32,20 +31,18 @@ public class ExperimentalWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
+  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
+    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
 
-    groupProcessor.addPreProcessor(new CssDataUriPreProcessor());
-    groupProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
+    groupsProcessor.addPreProcessor(new CssDataUriPreProcessor());
+    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
+    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
+    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
 
-    groupProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupProcessor.addPostProcessor(new JSMinProcessor());
-    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-    return groupProcessor;
+    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+    groupsProcessor.addPostProcessor(new JSMinProcessor());
+    groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
   }
 
 

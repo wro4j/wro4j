@@ -10,8 +10,6 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -53,24 +51,15 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
    * Creates a default implementation of {@link GroupsProcessor} without any processors set.
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupsProcessor = new GroupsProcessorImpl();
-    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
-    return groupsProcessor;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  private UriLocatorFactory newUriLocatorFactory() {
+  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    groupsProcessor.setUriLocatorFactory(factory);
+
     // The order is important.
     factory.addUriLocator(newServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());
-    return factory;
   }
-
 
   /**
    * @return {@link ServletContextUriLocator} or a derivate locator which will be responsible for locating resources

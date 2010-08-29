@@ -4,8 +4,6 @@
 package ro.isdc.wro.manager.factory;
 
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.GroupsProcessorImpl;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -33,33 +31,22 @@ public class ServletContextAwareWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected GroupsProcessor newGroupsProcessor() {
-    final GroupsProcessor groupProcessor = new GroupsProcessorImpl();
-    groupProcessor.setUriLocatorFactory(newUriLocatorFactory());
-
-    // this one must be before the CssUrlRewritingProcessor
-    groupProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-
-    groupProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupProcessor.addPostProcessor(new JSMinProcessor());
-    groupProcessor.addPostProcessor(new JawrCssMinifierProcessor());
-    return groupProcessor;
-  }
-
-
-  /**
-   * Creates a new {@link UriLocatorFactory} implementation.
-   *
-   * @return {@link UriLocatorFactory} object.
-   */
-  private UriLocatorFactory newUriLocatorFactory() {
+  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
     final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    groupsProcessor.setUriLocatorFactory(factory);
+
     factory.addUriLocator(new ServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());
-    return factory;
+
+    // this one must be before the CssUrlRewritingProcessor
+    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
+    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
+    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
+
+    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+    groupsProcessor.addPostProcessor(new JSMinProcessor());
+    groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
   }
 }

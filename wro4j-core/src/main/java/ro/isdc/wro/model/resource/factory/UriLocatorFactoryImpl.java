@@ -27,15 +27,14 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * @created Created on Nov 4, 2008
  */
 public final class UriLocatorFactoryImpl implements UriLocatorFactory {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(UriLocatorFactoryImpl.class);
-  /**
-   * List of resource readers.
-   */
   private List<UriLocator> uriLocators = new ArrayList<UriLocator>();
-  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
+  @Inject
+  private DuplicateResourceDetector duplicateResourceDetector;
+  //TODO use this constructor to initialize the factory
+//  public UriLocatorFactoryImpl(final DuplicateResourceDetector duplicateResourceDetector) {
+//    this.duplicateResourceDetector = duplicateResourceDetector;
+//  }
 
   /**
    * {@inheritDoc}
@@ -78,8 +77,11 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (field.getType() != DuplicateResourceDetector.class) {
-            throw new WroRuntimeException("@Inject can be applied only on fields of "
+            throw new IllegalStateException("@Inject can be applied only on fields of "
               + DuplicateResourceDetector.class.getName() + " type");
+          }
+          if (duplicateResourceDetector == null) {
+            throw new IllegalStateException(DuplicateResourceDetector.class.getSimpleName() + " cannot be null!");
           }
           LOG.debug("Injecting " + DuplicateResourceDetector.class.getSimpleName() + " in the locator: " + locator.getClass().getSimpleName());
           field.setAccessible(true);
@@ -115,12 +117,5 @@ public final class UriLocatorFactoryImpl implements UriLocatorFactory {
       throw new IllegalArgumentException("uriLocators list cannot be null!");
     }
     this.uriLocators = uriLocators;
-  }
-
-  /**
-   * @return the duplicateResourceDetector
-   */
-  public DuplicateResourceDetector getDuplicateResourceDetector() {
-    return duplicateResourceDetector;
   }
 }
