@@ -53,13 +53,23 @@ public final class UriLocatorFactory {
    * @param uriLocator
    *          {@link UriLocator} object to add.
    */
-  public final void addUriLocator(final UriLocator uriLocator) {
+  private final void addUriLocator(final UriLocator uriLocator) {
     if (uriLocator == null) {
       throw new IllegalArgumentException("ResourceLocator cannot be null!");
     }
     processInjectAnnotation(uriLocator);
     //inject duplicateResourceDetector
     uriLocators.add(uriLocator);
+  }
+
+  /**
+   * Add a
+   * @param locators
+   */
+  public final void addUriLocator(final UriLocator... locators) {
+    for (final UriLocator locator : locators) {
+      addUriLocator(locator);
+    }
   }
 
 

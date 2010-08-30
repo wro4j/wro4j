@@ -104,8 +104,7 @@ public class TestGroupsProcessor {
 
   @Test
   public void injectAnnotationOnPreProcessorField() {
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    final UriLocatorFactory uriLocatorFactory = groupsProcessor.getUriLocatorFactory();
     groupsProcessor.addPreProcessor(new ResourcePreProcessor() {
       @Inject
       private UriLocatorFactory factory;
@@ -121,8 +120,6 @@ public class TestGroupsProcessor {
 
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInjectOnInvalidFieldOfPreProcessor() {
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
     groupsProcessor.addPreProcessor(new ResourcePreProcessor() {
       @Inject
       private Object someObject;
@@ -139,8 +136,7 @@ public class TestGroupsProcessor {
 
   @Test
   public void injectAnnotationOnPostProcessorField() {
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
+    final UriLocatorFactory uriLocatorFactory = groupsProcessor.getUriLocatorFactory();
     groupsProcessor.addPostProcessor(new ResourcePostProcessor() {
       @Inject
       private UriLocatorFactory factory;
@@ -153,8 +149,6 @@ public class TestGroupsProcessor {
 
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInjectOnInvalidFieldOfPostProcessor() {
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
     groupsProcessor.addPostProcessor(new ResourcePostProcessor() {
       @Inject
       private Object someObject;
@@ -166,7 +160,6 @@ public class TestGroupsProcessor {
 
   @Test(expected=WroRuntimeException.class)
   public void cannotAddProcessorBeforeSettingUriLocatorFactory() {
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
     groupsProcessor.addPostProcessor(new ResourcePostProcessor() {
       @Inject
       private Object someObject;
@@ -174,7 +167,6 @@ public class TestGroupsProcessor {
         throws IOException {
       }
     });
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
   }
 
   /**
@@ -206,11 +198,12 @@ public class TestGroupsProcessor {
     final Group group = new Group();
     group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
     final List<Group> groups = Arrays.asList(group);
-
-    final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
-
-    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+    groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        factory.addUriLocator(new ClasspathUriLocator());
+      };
+    };
 
     final ResourcePostProcessor postProcessor = Mockito.mock(JawrCssMinifierProcessor.class);
     groupsProcessor.addPostProcessor(postProcessor);
@@ -234,11 +227,12 @@ public class TestGroupsProcessor {
     final Group group = new Group();
     group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
     final List<Group> groups = Arrays.asList(group);
-    final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory();
-
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
-    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
-
+    groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        factory.addUriLocator(new ClasspathUriLocator());
+      };
+    };
     groupsProcessor.addPreProcessor(new CssImportPreProcessor());
     final ResourcePreProcessor preProcessor = Mockito.mock(ResourcePreProcessor.class);
     groupsProcessor.addPreProcessor(preProcessor);

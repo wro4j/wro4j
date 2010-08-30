@@ -22,10 +22,14 @@ public class TestUriLocatorFactory {
   private UriLocatorFactory factory;
   @Before
   public void setUp() {
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() ;
-    factory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(factory);
+    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        TestUriLocatorFactory.this.factory = factory;
+      }
+    };
   }
+
   @Test
   public void testNullUri() {
     final UriLocator uriLocator = factory.getInstance(null);
