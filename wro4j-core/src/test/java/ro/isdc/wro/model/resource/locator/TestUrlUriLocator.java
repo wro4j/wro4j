@@ -28,11 +28,13 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
-    final UriLocatorFactory factory = new UriLocatorFactory();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor();
-    groupsProcessor.setUriLocatorFactory(factory);
+    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        factory.addUriLocator(uriLocator);
+      }
+    };
     // it is important to add this locator to factory, in order to be sure it is initialized correctly.
-    factory.addUriLocator(uriLocator);
   }
 
   @Test(expected=IllegalArgumentException.class)

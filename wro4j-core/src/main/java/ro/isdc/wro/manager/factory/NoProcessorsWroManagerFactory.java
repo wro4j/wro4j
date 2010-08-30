@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -16,10 +15,11 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  * @created Created on May 4, 2010
  */
 public final class NoProcessorsWroManagerFactory extends BaseWroManagerFactory {
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    final UriLocatorFactory factory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(factory);
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
     factory.addUriLocator(new ServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());

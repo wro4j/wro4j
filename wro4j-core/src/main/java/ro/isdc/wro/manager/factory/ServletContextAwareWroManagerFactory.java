@@ -32,13 +32,6 @@ public class ServletContextAwareWroManagerFactory
    */
   @Override
   protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    final UriLocatorFactory factory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(factory);
-
-    factory.addUriLocator(new ServletContextUriLocator());
-    factory.addUriLocator(new ClasspathUriLocator());
-    factory.addUriLocator(new UrlUriLocator());
-
     // this one must be before the CssUrlRewritingProcessor
     groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
@@ -48,5 +41,15 @@ public class ServletContextAwareWroManagerFactory
     groupsProcessor.addPostProcessor(new CssVariablesProcessor());
     groupsProcessor.addPostProcessor(new JSMinProcessor());
     groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+    factory.addUriLocator(new ServletContextUriLocator());
+    factory.addUriLocator(new ClasspathUriLocator());
+    factory.addUriLocator(new UrlUriLocator());
   }
 }

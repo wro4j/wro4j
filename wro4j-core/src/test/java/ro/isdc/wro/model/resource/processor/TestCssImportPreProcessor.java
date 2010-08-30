@@ -112,12 +112,14 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
    * This method will allow the fields containing @Inject annotations to be assigned.
    */
   private void updateGroupsProcessorDependencies(final ResourcePreProcessor processor) {
-    final GroupsProcessor groupsProcessor = new GroupsProcessor();
-    final UriLocatorFactory factory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(factory);
-    factory.addUriLocator(new ClasspathUriLocator());
-    factory.addUriLocator(new UrlUriLocator());
-    factory.addUriLocator(new ServletContextUriLocator());
+    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        factory.addUriLocator(new ClasspathUriLocator());
+        factory.addUriLocator(new UrlUriLocator());
+        factory.addUriLocator(new ServletContextUriLocator());
+      }
+    };
     groupsProcessor.addPreProcessor(processor);
   }
 }

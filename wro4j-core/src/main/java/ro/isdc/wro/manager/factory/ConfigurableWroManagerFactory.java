@@ -145,21 +145,18 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
    */
-  private UriLocatorFactory newUriLocatorFactory() {
-    final UriLocatorFactory factory = new UriLocatorFactory();
+  @Override
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
     for (final UriLocator locator : getLocators()) {
       factory.addUriLocator(locator);
     }
-    return factory;
   }
-
 
   /**
    * {@inheritDoc}
    */
   @Override
   protected final void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
     groupsProcessor.setResourcePreProcessors(getPreProcessors());
     groupsProcessor.setResourcePostProcessors(getPostProcessors());
   }

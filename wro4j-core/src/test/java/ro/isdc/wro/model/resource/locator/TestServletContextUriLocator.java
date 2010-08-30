@@ -38,11 +38,13 @@ public class TestServletContextUriLocator {
 
   @Before
   public void initContext() {
-    final GroupsProcessor groupsProcessor = new GroupsProcessor();
-    final UriLocatorFactory factory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(factory);
     locator = new ServletContextUriLocator();
-    factory.addUriLocator(locator);
+    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        factory.addUriLocator(locator);
+      }
+    };
     final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
     Context.set(context);
   }

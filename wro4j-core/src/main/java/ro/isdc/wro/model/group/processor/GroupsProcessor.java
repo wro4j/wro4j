@@ -31,7 +31,7 @@ import ro.isdc.wro.util.StopWatch;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class GroupsProcessor
+public class GroupsProcessor
     extends AbstractGroupsProcessor {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);

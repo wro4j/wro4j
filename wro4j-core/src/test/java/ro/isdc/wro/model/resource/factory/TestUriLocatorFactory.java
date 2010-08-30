@@ -22,7 +22,7 @@ public class TestUriLocatorFactory {
   private UriLocatorFactory factory;
   @Before
   public void setUp() {
-    final GroupsProcessor groupsProcessor = new GroupsProcessor();
+    final GroupsProcessor groupsProcessor = new GroupsProcessor() ;
     factory = new UriLocatorFactory();
     groupsProcessor.setUriLocatorFactory(factory);
   }

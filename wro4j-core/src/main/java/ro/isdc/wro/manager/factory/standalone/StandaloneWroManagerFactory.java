@@ -9,7 +9,6 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -48,14 +47,10 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
   }
 
   /**
-   * Creates a default implementation of {@link GroupsProcessor} without any processors set.
+   * {@inheritDoc}
    */
   @Override
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    final UriLocatorFactory factory = new UriLocatorFactory();
-    groupsProcessor.setUriLocatorFactory(factory);
-
-    // The order is important.
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
     factory.addUriLocator(newServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());

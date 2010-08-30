@@ -43,15 +43,19 @@ public abstract class AbstractGroupsProcessor {
    * a list of post processors.
    */
   private final Collection<ResourcePostProcessor> postProcessors = decorateCollection(new ArrayList<ResourcePostProcessor>());
+  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
   /**
    * Used to get a stream of the resources.
    */
-  private UriLocatorFactory uriLocatorFactory;
+  private final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory(duplicateResourceDetector);
   /**
    * If true, missing resources are ignored. By default this value is true.
    */
   private boolean ignoreMissingResources = true;
-  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
+
+  public AbstractGroupsProcessor() {
+    configureUriLocatorFactory(uriLocatorFactory);
+  }
 
   /**
    * Decorate the passed collection by overriding add family methods & calling
@@ -263,23 +267,12 @@ public abstract class AbstractGroupsProcessor {
 
 
   /**
-   * It is important to setUriLocators before any processors are set. Otherwise, some of them (which depends on
-   * uriLocatorFactory) will not work properly.
+   * Allows subclasses to configure {@link UriLocatorFactory}.
+   *
+   * @param factory to configure.
    */
-  public final void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
-//    configureUriLocatorFactory(uriLocatorFactory);
-    processInjectAnnotation(uriLocatorFactory);
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
   }
-
-
-//  /**
-//   * Allows subclasses to configure {@link UriLocatorFactory}.
-//   *
-//   * @param uriLocatorFactory to configure.
-//   */
-//  protected void configureUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-//  }
 
 
   /**

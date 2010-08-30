@@ -31,8 +31,6 @@ public class ExperimentalWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.setUriLocatorFactory(newUriLocatorFactory());
-
     groupsProcessor.addPreProcessor(new CssDataUriPreProcessor());
     groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
@@ -44,18 +42,14 @@ public class ExperimentalWroManagerFactory extends BaseWroManagerFactory {
     groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
   }
 
-
   /**
-   * Creates a new {@link UriLocatorFactory} implementation.
-   *
-   * @return {@link IUriLocatorFactory} object.
+   * {@inheritDoc}
    */
-  private UriLocatorFactory newUriLocatorFactory() {
-    final UriLocatorFactory factory = new UriLocatorFactory();
+  @Override
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
     factory.addUriLocator(new ServletContextUriLocator());
     factory.addUriLocator(new ClasspathUriLocator());
     factory.addUriLocator(new UrlUriLocator());
-    return factory;
   }
 
 }

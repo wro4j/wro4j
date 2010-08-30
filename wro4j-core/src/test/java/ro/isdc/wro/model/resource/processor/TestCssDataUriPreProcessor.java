@@ -37,14 +37,14 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   @Before
   public void init() {
     processor = new CssDataUriPreProcessor();
-
-    final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor();
-    groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
-
-    uriLocatorFactory.addUriLocator(new ServletContextUriLocator());
-    uriLocatorFactory.addUriLocator(new UrlUriLocator());
-    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+      @Override
+      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+        factory.addUriLocator(new ServletContextUriLocator());
+        factory.addUriLocator(new UrlUriLocator());
+        factory.addUriLocator(new ClasspathUriLocator());
+      }
+    };
 
     groupsProcessor.addPreProcessor(processor);
   }

@@ -29,11 +29,11 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 public final class UriLocatorFactory {
   private static final Logger LOG = LoggerFactory.getLogger(UriLocatorFactory.class);
   private final List<UriLocator> uriLocators = new ArrayList<UriLocator>();
-  private DuplicateResourceDetector duplicateResourceDetector;
+  private final DuplicateResourceDetector duplicateResourceDetector;
   //TODO use this constructor to initialize the factory
-//  public UriLocatorFactory(final DuplicateResourceDetector duplicateResourceDetector) {
-//    this.duplicateResourceDetector = duplicateResourceDetector;
-//  }
+  public UriLocatorFactory(final DuplicateResourceDetector duplicateResourceDetector) {
+    this.duplicateResourceDetector = duplicateResourceDetector;
+  }
 
   /**
    * {@inheritDoc}
