@@ -65,6 +65,9 @@ public class DefaultWildcardStreamLocator
    * @param duplicateResourceDetector
    */
   public DefaultWildcardStreamLocator(final DuplicateResourceDetector duplicateResourceDetector) {
+    if (duplicateResourceDetector == null) {
+      throw new IllegalArgumentException("duplicateResourceDetector cannot be null!");
+    }
     this.duplicateResourceDetector = duplicateResourceDetector;
   }
 
@@ -112,7 +115,7 @@ public class DefaultWildcardStreamLocator
           final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
           final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
           uriToFileMap.put(resourceUri, file);
-          LOG.debug("======\tfoundUri: " + resourceUri);
+          LOG.debug("foundUri: " + resourceUri);
         }
         return accept;
       }
@@ -121,9 +124,10 @@ public class DefaultWildcardStreamLocator
 
     //TODO remove duplicates if needed:
     LOG.error("map files: " + uriToFileMap.keySet());
+    //holds duplicates to be removed from the map
     final List<String> duplicateResourceList = new ArrayList<String>();
     for (final String resourceUri : uriToFileMap.keySet()) {
-      if (isDuplicatedResourceUri(resourceUri)) {
+      if (isDuplicateResourceUri(resourceUri)) {
         LOG.warn("Duplicate resource detected: " + resourceUri);
         duplicateResourceList.add(resourceUri);
       }
@@ -153,7 +157,7 @@ public class DefaultWildcardStreamLocator
    *
    * @return true if the resource is duplicated in the context of the current processing.
    */
-  private boolean isDuplicatedResourceUri(final String resourceUri) {
+  private boolean isDuplicateResourceUri(final String resourceUri) {
     if (duplicateResourceDetector == null) {
       throw new WroRuntimeException("duplicateResourceDetector was not injected!");
     }

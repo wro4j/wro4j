@@ -52,9 +52,34 @@ public abstract class AbstractGroupsProcessor {
    * If true, missing resources are ignored. By default this value is true.
    */
   private boolean ignoreMissingResources = true;
+  /**
+   * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
+   * (according to findbugs eclipse plugin).
+   */
+  private transient PreProcessorExecutor preProcessorExecutor;
 
   public AbstractGroupsProcessor() {
     configureUriLocatorFactory(uriLocatorFactory);
+  }
+
+
+  /**
+   * @return a not null instance of {@link PreProcessorExecutor}.
+   */
+  protected final PreProcessorExecutor getPreProcessorExecutor() {
+    if (preProcessorExecutor == null) {
+      preProcessorExecutor = new PreProcessorExecutor(getUriLocatorFactory(), getDuplicateResourceDetector()) {
+        @Override
+        protected boolean ignoreMissingResources() {
+          return AbstractGroupsProcessor.this.isIgnoreMissingResources();
+        };
+        @Override
+        protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
+          return AbstractGroupsProcessor.this.getPreProcessorsByType(resourceType);
+        }
+      };
+    }
+    return preProcessorExecutor;
   }
 
   /**
@@ -124,7 +149,7 @@ public abstract class AbstractGroupsProcessor {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject can be applied only on fiels of "
+            throw new WroRuntimeException("@Inject can be applied only on fields of "
               + UriLocatorFactory.class.getName() + " type");
           }
         }
@@ -144,16 +169,17 @@ public abstract class AbstractGroupsProcessor {
    * @return true if field was injected with some not null value.
    * @throws IllegalAccessException
    */
-  protected boolean acceptAnnotatedField(final Object object, final Field field)
+  private boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
     field.setAccessible(true);
     if (field.getType().equals(UriLocatorFactory.class)) {
       // accept even private modifiers
-      if (uriLocatorFactory == null) {
-        throw new WroRuntimeException(
-          "No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
-      }
-      field.set(object, uriLocatorFactory);
+      field.set(object, getUriLocatorFactory());
+      LOG.debug("Successfully injected field: " + field.getName());
+      return true;
+    }
+    if (field.getType().equals(PreProcessorExecutor.class)) {
+      field.set(object, getPreProcessorExecutor());
       LOG.debug("Successfully injected field: " + field.getName());
       return true;
     }
@@ -164,7 +190,6 @@ public abstract class AbstractGroupsProcessor {
     }
     return false;
   }
-
 
   /**
    * @param <T> processor type. Can be {@link ResourcePreProcessor} or {@link ResourcePostProcessor}.
@@ -279,6 +304,10 @@ public abstract class AbstractGroupsProcessor {
    * @return the uriLocatorFactory
    */
   public final UriLocatorFactory getUriLocatorFactory() {
+    if (uriLocatorFactory == null) {
+      throw new WroRuntimeException(
+        "No uriLocatorFactory detected! Did you forget to call setUriLocatorFactory before adding any processors?");
+    }
     return this.uriLocatorFactory;
   }
 

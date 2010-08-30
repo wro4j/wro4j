@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +20,6 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -35,45 +33,7 @@ public class GroupsProcessor
     extends AbstractGroupsProcessor {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
-  /**
-   * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
-   * (according to findbugs eclipse plugin).
-   */
-  private transient PreProcessorExecutor preProcessorExecutor;
 
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected boolean acceptAnnotatedField(final Object processor, final Field field) throws IllegalAccessException {
-    boolean accept = super.acceptAnnotatedField(processor, field);
-    if (field.getType().equals(PreProcessorExecutor.class)) {
-      field.set(processor, getPreProcessorExecutor());
-      LOG.debug("Successfully injected field: " + field.getName());
-      accept = true;
-    }
-    return accept;
-  }
-
-  /**
-   * @return a not null instance of {@link PreProcessorExecutor}.
-   */
-  private PreProcessorExecutor getPreProcessorExecutor() {
-    if (preProcessorExecutor == null) {
-      preProcessorExecutor = new PreProcessorExecutor(getUriLocatorFactory(), getDuplicateResourceDetector()) {
-        @Override
-        protected boolean ignoreMissingResources() {
-          return GroupsProcessor.this.isIgnoreMissingResources();
-        };
-        @Override
-        protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
-          return GroupsProcessor.this.getPreProcessorsByType(resourceType);
-        }
-      };
-    }
-    return preProcessorExecutor;
-  }
 
   /**
    * Removes the generic processors of type <T> which have Minimize annotation from the provided collection of
