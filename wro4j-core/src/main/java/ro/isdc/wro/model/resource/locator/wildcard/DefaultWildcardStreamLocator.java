@@ -123,7 +123,7 @@ public class DefaultWildcardStreamLocator
     FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
 
     //TODO remove duplicates if needed:
-    LOG.error("map files: " + uriToFileMap.keySet());
+    LOG.debug("map files: " + uriToFileMap.keySet());
     //holds duplicates to be removed from the map
     final List<String> duplicateResourceList = new ArrayList<String>();
     for (final String resourceUri : uriToFileMap.keySet()) {

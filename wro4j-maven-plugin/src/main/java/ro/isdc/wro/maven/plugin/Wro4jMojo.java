@@ -359,7 +359,7 @@ public class Wro4jMojo extends AbstractMojo {
       //use reader to detect encoding
       IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
       fos.close();
-      getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length());
+      getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
       // delete empty files
       if (destinationFile.length() == 0) {
         getLog().info("No content found for group: " + group);

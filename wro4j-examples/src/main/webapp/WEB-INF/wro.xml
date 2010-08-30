@@ -81,8 +81,10 @@
   </group>
   
   <group name="syntaxHighlighter">
-  <js>/static/module/syntaxHighlighter/scripts/*.js</js>
-  <!--
+    <js>/static/js/jquery.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/*.js</js>
+    <!--
     <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
     <js>/static/module/syntaxHighlighter/scripts/shBrushJScript.js</js>
     <js>/static/module/syntaxHighlighter/scripts/shBrushAppleScript.js</js>  
