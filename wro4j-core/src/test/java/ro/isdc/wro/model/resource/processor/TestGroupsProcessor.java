@@ -26,7 +26,6 @@ import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
@@ -208,7 +207,7 @@ public class TestGroupsProcessor {
     group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
     final List<Group> groups = Arrays.asList(group);
 
-    final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
+    final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory();
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
 
     uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
@@ -235,7 +234,7 @@ public class TestGroupsProcessor {
     final Group group = new Group();
     group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
     final List<Group> groups = Arrays.asList(group);
-    final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
+    final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory();
 
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
     uriLocatorFactory.addUriLocator(new ClasspathUriLocator());

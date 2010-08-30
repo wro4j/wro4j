@@ -51,7 +51,7 @@ public abstract class AbstractGroupsProcessor {
    * If true, missing resources are ignored. By default this value is true.
    */
   private boolean ignoreMissingResources = true;
-  private DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
+  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
 
   /**
    * Decorate the passed collection by overriding add family methods & calling

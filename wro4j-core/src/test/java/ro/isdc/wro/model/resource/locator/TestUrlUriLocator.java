@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
@@ -28,7 +28,7 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
-    final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    final UriLocatorFactory factory = new UriLocatorFactory();
     final GroupsProcessor groupsProcessor = new GroupsProcessor();
     groupsProcessor.setUriLocatorFactory(factory);
     // it is important to add this locator to factory, in order to be sure it is initialized correctly.

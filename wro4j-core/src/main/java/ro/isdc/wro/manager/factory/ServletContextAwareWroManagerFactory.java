@@ -4,7 +4,7 @@
 package ro.isdc.wro.manager.factory;
 
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
@@ -32,7 +32,7 @@ public class ServletContextAwareWroManagerFactory
    */
   @Override
   protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
+    final UriLocatorFactory factory = new UriLocatorFactory();
     groupsProcessor.setUriLocatorFactory(factory);
 
     factory.addUriLocator(new ServletContextUriLocator());

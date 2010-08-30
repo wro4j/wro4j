@@ -7,15 +7,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 
-import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.test.util.ResourceProcessor;
 import ro.isdc.wro.test.util.WroTestUtils;
@@ -31,20 +28,18 @@ public abstract class AbstractWroTest {
   /**
    * UriLocator Factory.
    */
-  private UriLocatorFactoryImpl uriLocatorFactory;
+  private UriLocatorFactory uriLocatorFactory;
 
   /**
    * Create UriLocatorfactory and set uriLocators to be used for tests.
    */
   @Before
   public void initUriLocatorFactory() {
-    uriLocatorFactory = new UriLocatorFactoryImpl();
-    final List<UriLocator> resourceLocators = new ArrayList<UriLocator>();
+    uriLocatorFactory = new UriLocatorFactory();
     // populate the list. The order is important.
-    resourceLocators.add(new ServletContextUriLocator());
-    resourceLocators.add(new ClasspathUriLocator());
-    resourceLocators.add(new UrlUriLocator());
-    uriLocatorFactory.setUriLocators(resourceLocators);
+    uriLocatorFactory.addUriLocator(new ServletContextUriLocator());
+    uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+    uriLocatorFactory.addUriLocator(new UrlUriLocator());
   }
 
   /**

@@ -14,16 +14,16 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
 /**
- * Test class for {@link UriLocatorFactory}.
+ * Test class for {@link IUriLocatorFactory}.
  *
  * @author Alex Objelean
  */
 public class TestUriLocatorFactory {
-  private UriLocatorFactoryImpl factory;
+  private UriLocatorFactory factory;
   @Before
   public void setUp() {
     final GroupsProcessor groupsProcessor = new GroupsProcessor();
-    factory = new UriLocatorFactoryImpl();
+    factory = new UriLocatorFactory();
     groupsProcessor.setUriLocatorFactory(factory);
   }
   @Test

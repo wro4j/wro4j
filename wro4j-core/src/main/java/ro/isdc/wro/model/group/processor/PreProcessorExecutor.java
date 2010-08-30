@@ -34,8 +34,8 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
  */
 public abstract class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
-  private UriLocatorFactory uriLocatorFactory;
-  private DuplicateResourceDetector duplicateResourceDetector;
+  private final UriLocatorFactory uriLocatorFactory;
+  private final DuplicateResourceDetector duplicateResourceDetector;
   public PreProcessorExecutor(final UriLocatorFactory uriLocatorFactory, final DuplicateResourceDetector duplicateResourceDetector) {
     if (uriLocatorFactory == null) {
       throw new IllegalArgumentException("uriLocatorFactory cannot be null!");

@@ -17,7 +17,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -147,8 +146,10 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   private UriLocatorFactory newUriLocatorFactory() {
-    final UriLocatorFactoryImpl factory = new UriLocatorFactoryImpl();
-    factory.setUriLocators(getLocators());
+    final UriLocatorFactory factory = new UriLocatorFactory();
+    for (final UriLocator locator : getLocators()) {
+      factory.addUriLocator(locator);
+    }
     return factory;
   }
 

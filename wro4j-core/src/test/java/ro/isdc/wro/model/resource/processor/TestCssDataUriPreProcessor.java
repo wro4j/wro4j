@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactoryImpl;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
@@ -38,7 +38,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   public void init() {
     processor = new CssDataUriPreProcessor();
 
-    final UriLocatorFactoryImpl uriLocatorFactory = new UriLocatorFactoryImpl();
+    final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory();
     final GroupsProcessor groupsProcessor = new GroupsProcessor();
     groupsProcessor.setUriLocatorFactory(uriLocatorFactory);
 
