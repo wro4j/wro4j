@@ -22,7 +22,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 public final class DefaultGroupExtractor implements GroupExtractor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultGroupExtractor.class);
   /**
-   * Servlet path constants.
+   * The name of the attribute where the servlet path is stored when requestDispatcher.include is called.
    */
   public static final String ATTR_INCLUDE_PATH = "javax.servlet.include.servlet_path";
   /**
