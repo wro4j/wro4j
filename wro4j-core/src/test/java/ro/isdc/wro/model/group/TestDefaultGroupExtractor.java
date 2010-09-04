@@ -109,6 +109,22 @@ public class TestDefaultGroupExtractor {
     Assert.assertEquals(null, groupExtractor.getResourceType(request));
   }
 
+  @Test
+  public void testRequestDispatchedWithInclude() {
+    final HttpServletRequest request = mockRequestForUri("all.someInvalidType");
+    Mockito.when(request.getAttribute(DefaultGroupExtractor.ATTR_INCLUDE_PATH)).thenReturn("dispatched.type");
+    Assert.assertEquals("dispatched", groupExtractor.getGroupName(request));
+    Assert.assertEquals(null, groupExtractor.getResourceType(request));
+  }
+
+  @Test
+  public void testRequestDispatchedWithForward() {
+    final HttpServletRequest request = mockRequestForUri("all.someInvalidType");
+    Mockito.when(request.getAttribute(DefaultGroupExtractor.ATTR_FORWARD_PATH)).thenReturn("dispatched.type");
+    Assert.assertEquals("dispatched", groupExtractor.getGroupName(request));
+    Assert.assertEquals(null, groupExtractor.getResourceType(request));
+  }
+
   private HttpServletRequest mockRequestForUri(final String uri) {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(uri);
