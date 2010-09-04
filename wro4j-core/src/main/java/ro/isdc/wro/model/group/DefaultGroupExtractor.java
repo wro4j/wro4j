@@ -25,7 +25,6 @@ public final class DefaultGroupExtractor implements GroupExtractor {
    * Servlet path constants.
    */
   public static final String ATTR_INCLUDE_PATH = "javax.servlet.include.servlet_path";
-  public static final String ATTR_FORWARD_PATH = "javax.servlet.forward.servlet_path";
   /**
    * The name of the parameter used to decide if the group must be minimized.
    */
@@ -38,12 +37,9 @@ public final class DefaultGroupExtractor implements GroupExtractor {
       throw new IllegalArgumentException("Uri cannot be NULL!");
     }
     final String includeUriPath = (String) request.getAttribute(ATTR_INCLUDE_PATH);
-    final String forwardUriPath = (String) request.getAttribute(ATTR_FORWARD_PATH);
     String uri = request.getRequestURI();
     //check if include or uri path are present and use one of these as request uri.
     uri = includeUriPath != null ? includeUriPath : uri;
-    uri = forwardUriPath != null ? forwardUriPath : uri;
-
     final String groupName = FilenameUtils.getBaseName(uri);
     return StringUtils.isEmpty(groupName) ? null : groupName;
   }

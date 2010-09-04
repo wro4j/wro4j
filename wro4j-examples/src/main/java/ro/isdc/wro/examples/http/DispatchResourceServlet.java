@@ -23,6 +23,7 @@ public class DispatchResourceServlet extends HttpServlet {
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
     final RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/wro/all.js");
+    //an include will not preserve response headers
     dispatcher.forward(req, resp);
   }
 }
