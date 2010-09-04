@@ -1,11 +1,9 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.examples;
+package ro.isdc.wro.examples.http;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,18 +14,13 @@ import javax.servlet.http.HttpServletResponse;
  * @author Alex Objelean
  */
 @SuppressWarnings("serial")
-public class DynamicResourceServlet extends HttpServlet {
-  private static DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
-
+public class RedirectResourceServlet extends HttpServlet {
   /**
    * {@inheritDoc}
    */
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
-//    resp.setContentType("text/javascript");
-//    final String result = "document.write('<h1>" + dateFormat.format(new Date()) + "</h1>');";
-//    resp.getWriter().write(result);
     resp.sendRedirect("http://code.jquery.com/jquery-1.4.2.js");
   }
 }

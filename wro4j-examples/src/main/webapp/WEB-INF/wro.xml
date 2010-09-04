@@ -4,7 +4,8 @@
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
   <group name="dynamicResource">
-    <js>/dynamicResource/test.js</js>
+    <js>/resource/redirect.js</js>
+    <js>/resource/dynamic.js</js>
   </group>
   <group name="all">
     <group-ref>twitterBar</group-ref>
@@ -27,11 +28,10 @@
   
   <group name="wildcard">
     <css>/static/**.css</css>
-    <js>/dynamicResource/*.js</js>
+    <js>/resource/*.js</js>
     <js>/static/js/*.js</js>
     <css>/WEB-INF/css/*.css</css>
     <css>classpath:ro/isdc/wro/resources/**.cs?</css>
-    
   </group>
 
   <group name="uniform">

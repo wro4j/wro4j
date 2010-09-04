@@ -24,11 +24,11 @@
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>60</param-value>
+      <param-value>120</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>60</param-value>
+      <param-value>120</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>
@@ -50,6 +50,9 @@
   <filter-mapping>
     <filter-name>WebResourceOptimizer</filter-name>
     <url-pattern>/wro/*</url-pattern>
+    <dispatcher>FORWARD</dispatcher> 
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
 
   <!-- DWR Servlet -->
@@ -69,14 +72,32 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>dynamicResource</servlet-name>
+    <servlet-name>resource.dynamic</servlet-name>
     <display-name>Dynamic Resource Servlet</display-name>
-    <servlet-class>ro.isdc.wro.examples.DynamicResourceServlet</servlet-class>
+    <servlet-class>ro.isdc.wro.examples.http.DynamicResourceServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>resource.redirect</servlet-name>
+    <display-name>Dynamic Resource Servlet</display-name>
+    <servlet-class>ro.isdc.wro.examples.http.RedirectResourceServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>resource.dispatch</servlet-name>
+    <display-name>Dynamic Resource Servlet</display-name>
+    <servlet-class>ro.isdc.wro.examples.http.DispatchResourceServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>dynamicResource</servlet-name>
-    <url-pattern>/dynamicResource/*</url-pattern>
+    <servlet-name>resource.dynamic</servlet-name>
+    <url-pattern>/resource/dynamic.js</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>resource.redirect</servlet-name>
+    <url-pattern>/resource/redirect.js</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>resource.dispatch</servlet-name>
+    <url-pattern>/resource/dispatch.js</url-pattern>
   </servlet-mapping>
 
  <servlet>

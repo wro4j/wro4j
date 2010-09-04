@@ -106,12 +106,7 @@ public class LessCssProcessor
   /**
    * Engine.
    */
-  private final LessCSS engine;
-
-
-  public LessCssProcessor() {
-    engine = new LessCSS();
-  }
+  private LessCSS engine;
 
 
   /**
@@ -121,7 +116,7 @@ public class LessCssProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      writer.write(engine.less(content));
+      writer.write(getEngine().less(content));
     } catch (final Exception e) {
       writer.write(content);
       LOG.warn("Exception while applying lessCss processor on the resource, no processing applied...", e);
@@ -129,6 +124,17 @@ public class LessCssProcessor
       reader.close();
       writer.close();
     }
+  }
+
+
+  /**
+   * A getter used for lazy loading.
+   */
+  private LessCSS getEngine() {
+    if (engine == null) {
+      engine = new LessCSS();
+    }
+    return engine;
   }
 
 
