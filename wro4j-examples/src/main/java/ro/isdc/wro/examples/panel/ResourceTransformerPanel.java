@@ -33,7 +33,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 
 /**
@@ -105,10 +118,27 @@ public class ResourceTransformerPanel extends Panel {
   }
 
   /**
-   * @return
+   * @return a list of resource post processors
    */
   private static List<? extends ResourcePostProcessor> getProcessors() {
     final List<ResourcePostProcessor> list = new ArrayList<ResourcePostProcessor>();
+    //hardcode the list:
+    if (true) {
+      list.add(new CommentStripperProcessor());
+      list.add(new ConformColorsCssProcessor());
+      list.add(new CssCompressorProcessor());
+      list.add(new CssVariablesProcessor());
+      list.add(new JawrCssMinifierProcessor());
+      list.add(new VariablizeColorsCssProcessor());
+      list.add(new JSMinProcessor());
+      list.add(new MultiLineCommentStripperProcessor());
+      list.add(new SingleLineCommentStripperProcessor());
+      list.add(new LessCssProcessor());
+      list.add(new YUICssCompressorProcessor());
+      list.add(new GoogleClosureCompressorProcessor());
+      list.add(new YUIJsCompressorProcessor());
+    }
+    //inspect the classpath
     try {
       final Class<?>[] classes = getClasses(WroRuntimeException.class.getPackage().getName());
       for (final Class<?> clazz : classes) {

@@ -20,15 +20,15 @@
     </init-param>
     <init-param>
       <param-name>jmxEnabled</param-name>
-      <param-value>true</param-value>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>120</param-value>
+      <param-value>0</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>120</param-value>
+      <param-value>0</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>
@@ -102,7 +102,7 @@
 
  <servlet>
     <servlet-name>externalResource</servlet-name>
-    <display-name>External Resource Servlet</display-name>
+    <display-name>External Resource SerRvlet</display-name>
     <servlet-class>ro.isdc.wro.examples.ExternalResourceServlet</servlet-class>
   </servlet>
 
