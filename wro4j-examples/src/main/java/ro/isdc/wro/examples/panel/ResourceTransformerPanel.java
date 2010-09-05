@@ -137,6 +137,7 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new YUICssCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor());
       list.add(new YUIJsCompressorProcessor());
+      return list;
     }
     //inspect the classpath
     try {
