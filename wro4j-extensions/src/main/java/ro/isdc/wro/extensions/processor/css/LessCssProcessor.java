@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.algorithm.less.LessCSS;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -108,7 +109,6 @@ public class LessCssProcessor
    */
   private LessCSS engine;
 
-
   /**
    * {@inheritDoc}
    */
@@ -117,7 +117,7 @@ public class LessCssProcessor
     final String content = IOUtils.toString(reader);
     try {
       writer.write(getEngine().less(content));
-    } catch (final Exception e) {
+    } catch (final WroRuntimeException e) {
       writer.write(content);
       LOG.warn("Exception while applying lessCss processor on the resource, no processing applied...", e);
     } finally {

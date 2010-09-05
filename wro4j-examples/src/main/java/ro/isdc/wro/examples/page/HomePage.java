@@ -2,7 +2,6 @@ package ro.isdc.wro.examples.page;
 
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.basic.Label;
 
 import ro.isdc.wro.examples.panel.ResourceTransformerPanel;
 
@@ -19,7 +18,6 @@ public class HomePage extends AbstractBasePage {
    */
   public HomePage(final PageParameters parameters) {
     super(parameters);
-    add(new Label("message", "If you see this message wicket is properly configured and running"));
     add(new ResourceTransformerPanel("resourceTransformer"));
   }
 }

@@ -1,5 +1,9 @@
 <wicket:panel>
   <form wicket:id="form" method="post">
+    <p>
+      Choose a processor from this list, insert some code (css or js,
+	    depending on choosed processor) and press transform button.
+	  </p>
     <select wicket:id="selectProcessor"></select>
     <input wicket:id="transform" type="button" value="transform" />
     <div>
@@ -22,7 +26,7 @@
                     <ul>
                       <li>Original size: <b wicket:id="originalSize"></b> KB</li>
                       <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
-                      <li>Compression Rate: <b wicket:id="compressionRate"></b>%.</li>                    
+                      <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>                    
                     </ul>
                   </div>
                 </dd>

@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.algorithm.packer.PackerJs;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -36,13 +37,7 @@ public class PackerJsProcessor
   /**
    * Engine.
    */
-  private final PackerJs engine;
-
-
-  public PackerJsProcessor() {
-    engine = new PackerJs();
-  }
-
+  private PackerJs engine;
 
   /**
    * {@inheritDoc}
@@ -51,14 +46,25 @@ public class PackerJsProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      writer.write(engine.pack(content));
-    } catch (final Exception e) {
+      writer.write(getEngine().pack(content));
+    } catch (final WroRuntimeException e) {
       writer.write(content);
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+
+  /**
+   * @return PackerJs engine.
+   */
+  private PackerJs getEngine() {
+    if (engine == null) {
+      engine = new PackerJs();
+    }
+    return engine;
   }
 
 

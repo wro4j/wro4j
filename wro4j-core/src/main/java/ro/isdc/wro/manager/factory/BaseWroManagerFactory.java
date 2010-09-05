@@ -84,6 +84,12 @@ public abstract class BaseWroManagerFactory
     return this.manager;
   }
 
+
+  /**
+   * Override this method if you want to add new uri locators.
+   *
+   * @param factory {@link UriLocatorFactory} to configure.
+   */
   protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
   }
 

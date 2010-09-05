@@ -77,7 +77,7 @@ public class ClasspathUriLocator
       }
       return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
     }
-
+    //TODO replace with ClassLoader.getSystemResourceAsStream(name) ?
     try {
       final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
       // TODO check if this is needed

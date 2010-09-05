@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.slf4j.Logger;
@@ -71,16 +70,6 @@ public final class WroUtil {
     final String pathInfo = noSlash.substring(nextSlash);
     return pathInfo;
   }
-
-
-  /**
-   * @return folder path for some uri - the part until the last / character. For instance if request uri is:
-   *         /app/wro/all.css => /app/wro/
-   */
-  public static String getFolderOfUri(final String uri) {
-    return FilenameUtils.getFullPath(uri);
-  }
-
 
   /**
    * <p>

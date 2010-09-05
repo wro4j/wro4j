@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -34,11 +33,9 @@ public class PackerJs {
       // create JavaScript engine
       scriptEngine = factory.getEngineByName("JavaScript");
 
-      final ClasspathUriLocator uriLocator = new ClasspathUriLocator();
-
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
-      final String base2 = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/base2.js"));
-      final String packer = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/packer.js"));
+      final String base2 = IOUtils.toString(ClassLoader.getSystemResourceAsStream(packagePath + "/base2.js"));
+      final String packer = IOUtils.toString(ClassLoader.getSystemResourceAsStream(packagePath + "/packer.js"));
       scriptEngine.eval(base2);
       scriptEngine.eval(packer);
     } catch (final IOException ex) {

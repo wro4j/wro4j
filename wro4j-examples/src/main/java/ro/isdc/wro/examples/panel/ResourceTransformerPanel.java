@@ -45,12 +45,12 @@ public class ResourceTransformerPanel extends Panel {
    * Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(ResourceTransformerPanel.class);
-
+  private static final String VALUE_NOT_AVAILABLE = "N/A";
   private String input;
   private String output;
-  private String compressionRate = "N/A";
-  private String originalSize = "N/A";
-  private String compressedSize = "N/A";
+  private String compressionRate = VALUE_NOT_AVAILABLE;
+  private String originalSize = VALUE_NOT_AVAILABLE;
+  private String compressedSize = VALUE_NOT_AVAILABLE;
   private transient ResourcePostProcessor processor;
 
 
@@ -76,6 +76,9 @@ public class ResourceTransformerPanel extends Panel {
           return;
         }
         try {
+          compressionRate = VALUE_NOT_AVAILABLE;
+          compressedSize = VALUE_NOT_AVAILABLE;
+          originalSize = VALUE_NOT_AVAILABLE;
           output = null;
           if (input != null) {
             final Writer writer = new StringWriter();
@@ -107,8 +110,8 @@ public class ResourceTransformerPanel extends Panel {
   private static List<? extends ResourcePostProcessor> getProcessors() {
     final List<ResourcePostProcessor> list = new ArrayList<ResourcePostProcessor>();
     try {
-      final Class[] classes = getClasses(WroRuntimeException.class.getPackage().getName());
-      for (final Class clazz : classes) {
+      final Class<?>[] classes = getClasses(WroRuntimeException.class.getPackage().getName());
+      for (final Class<?> clazz : classes) {
         if (ResourcePostProcessor.class.isAssignableFrom(clazz)) {
           try {
             final ResourcePostProcessor processor = (ResourcePostProcessor)clazz.newInstance();
@@ -153,7 +156,7 @@ public class ResourceTransformerPanel extends Panel {
    * @throws ClassNotFoundException
    * @throws IOException
    */
-  private static Class[] getClasses(final String packageName)
+  private static Class<?>[] getClasses(final String packageName)
     throws ClassNotFoundException, IOException {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     assert classLoader != null;
@@ -164,7 +167,7 @@ public class ResourceTransformerPanel extends Panel {
       final URL resource = resources.nextElement();
       dirs.add(new File(resource.getFile()));
     }
-    final ArrayList<Class> classes = new ArrayList<Class>();
+    final ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
     for (final File directory : dirs) {
       classes.addAll(findClasses(directory, packageName));
     }
@@ -173,16 +176,16 @@ public class ResourceTransformerPanel extends Panel {
 
 
   /**
-   * Recursive method used to find all classes in a given directory and subdirs.
+   * Recursive method used to find all classes in a given directory and sub-directories.
    *
    * @param directory The base directory
    * @param packageName The package name for classes found inside the base directory
    * @return The classes
    * @throws ClassNotFoundException
    */
-  private static List<Class> findClasses(final File directory, final String packageName)
+  private static List<Class<?>> findClasses(final File directory, final String packageName)
     throws ClassNotFoundException {
-    final List<Class> classes = new ArrayList<Class>();
+    final List<Class<?>> classes = new ArrayList<Class<?>>();
     //does not play well with GAE
 //    if (!directory.exists()) {
 //      return classes;

@@ -70,21 +70,12 @@ public abstract class AbstractWroTest {
         processor);
   }
 
-  /**
-   * @param expectedContentResourceUri
-   * @return
-   */
   private Reader getReaderFromUri(final String uri) throws IOException {
     // wrap reader with bufferedReader for top efficiency
-    return new BufferedReader(new InputStreamReader(uriLocatorFactory
-        .getInstance(uri).locate(uri)));
+    return new BufferedReader(new InputStreamReader(uriLocatorFactory.locate(uri)));
   }
 
-  /**
-   * @param expectedContentResourceUri
-   * @return
-   */
   public InputStream getInputStream(final String uri) throws IOException {
-    return uriLocatorFactory.getInstance(uri).locate(uri);
+    return uriLocatorFactory.locate(uri);
   }
 }

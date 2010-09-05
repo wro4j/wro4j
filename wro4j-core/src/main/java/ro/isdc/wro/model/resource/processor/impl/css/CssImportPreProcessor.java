@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,8 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StringUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -126,8 +125,7 @@ public class CssImportPreProcessor
    */
   private String getResourceContent(final Resource resource)
     throws IOException {
-    final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
-    final Reader reader = new InputStreamReader(uriLocator.locate(resource.getUri()));
+    final Reader reader = new InputStreamReader(uriLocatorFactory.locate(resource.getUri()));
     return IOUtils.toString(reader);
   }
 
@@ -173,7 +171,7 @@ public class CssImportPreProcessor
    * @return absolute url of the resource to import.
    */
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
-    final String folder = WroUtil.getFolderOfUri(relativeResource.getUri());
+    final String folder = FilenameUtils.getFullPath(relativeResource.getUri());
     // remove '../' & normalize the path.
     final String absoluteImportUrl = StringUtils.normalizePath(folder + importUrl);
     return absoluteImportUrl;

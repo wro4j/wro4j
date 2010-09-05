@@ -40,7 +40,6 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.FingerprintCreator;
 import ro.isdc.wro.util.StopWatch;
@@ -340,16 +339,11 @@ public class WroManager
   private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
-    final UriLocator uriLocator = groupsProcessor.getUriLocatorFactory().getInstance(resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    final InputStream is = uriLocator.locate(resourceId);
-    if (is == null) {
-      throw new WroRuntimeException("Could not Locate resource: " + resourceId);
-    }
-    return is;
+    return groupsProcessor.getUriLocatorFactory().locate(resourceId);
   }
 
 

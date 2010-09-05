@@ -19,7 +19,6 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
@@ -138,23 +137,13 @@ public abstract class PreProcessorExecutor {
   private Reader getResourceReader(final Resource resource, final List<Resource> resources)
       throws IOException {
     try {
-      Reader reader = null;
       // populate duplicate Resource detector with known used resource uri's
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-
-      final UriLocator locator = uriLocatorFactory.getInstance(resource.getUri());
-      if (locator != null) {
-        final InputStream is = locator.locate(resource.getUri());
-        // wrap reader with bufferedReader for top efficiency
-        reader = new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
-      }
-      if (reader == null) {
-        // TODO skip invalid resource, instead of throwing exception
-        throw new IOException("Exception while retrieving InputStream from uri: " + resource.getUri());
-      }
-      return reader;
+      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      // wrap reader with bufferedReader for top efficiency
+      return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
     } finally {
       duplicateResourceDetector.reset();
     }

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,6 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -216,6 +216,6 @@ public class CssUrlRewritingProcessor
    */
   protected String getUrlPrefix() {
     final String requestURI = Context.get().getRequest().getRequestURI();
-    return WroUtil.getFolderOfUri(requestURI) + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
+    return FilenameUtils.getFullPath(requestURI) + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
   }
 }

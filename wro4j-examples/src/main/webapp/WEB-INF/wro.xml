@@ -5,7 +5,7 @@
 
   <group name="dynamicResource">
     <js>/resource/redirect.js</js>
-    <js>/resource/dynamic.js</js>
+    <!-- <js>/resource/dynamic.js</js> -->
   </group>
   <group name="all">
     <group-ref>twitterBar</group-ref>
@@ -81,10 +81,11 @@
   </group>
   
   <group name="syntaxHighlighter">
-    <js>/static/js/jquery.js</js>
     <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
     <js>/static/module/syntaxHighlighter/scripts/*.js</js>
     <!--
+    
     <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
     <js>/static/module/syntaxHighlighter/scripts/shBrushJScript.js</js>
     <js>/static/module/syntaxHighlighter/scripts/shBrushAppleScript.js</js>  

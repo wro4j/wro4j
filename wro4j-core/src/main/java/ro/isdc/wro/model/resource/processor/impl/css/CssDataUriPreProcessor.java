@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 
 
@@ -64,8 +63,7 @@ public class CssDataUriPreProcessor
     final String fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     String result = imageUrl;
     try {
-      final UriLocator uriLocator = uriLocatorFactory.getInstance(fullPath);
-      final String dataUri = dataUriGenerator.generateDataURI(uriLocator.locate(fullPath), fileName);
+      final String dataUri = dataUriGenerator.generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
       if (replaceWithDataUri(dataUri)) {
         result = dataUri;
       }

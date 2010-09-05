@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.factory;
 
+import java.io.IOException;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -10,7 +12,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -30,22 +32,20 @@ public class TestUriLocatorFactory {
     };
   }
 
-  @Test
-  public void testNullUri() {
-    final UriLocator uriLocator = factory.getInstance(null);
-    Assert.assertNull(uriLocator);
+  @Test(expected=IOException.class)
+  public void testNullUri() throws Exception {
+    factory.locate(null);
+  }
+
+  @Test(expected=IOException.class)
+  public void testInvalidUri() throws Exception {
+    factory.addUriLocator(new ClasspathUriLocator());
+    factory.locate("http://www.google.com");
   }
 
   @Test
-  public void testInvalidUri() {
+  public void testValidUri() throws Exception {
     factory.addUriLocator(new ClasspathUriLocator());
-    final UriLocator uriLocator = factory.getInstance("http://www.google.com");
-    Assert.assertNull(uriLocator);
-  }
-
-  @Test
-  public void testValidUri() {
-    factory.addUriLocator(new ClasspathUriLocator());
-    Assert.assertNotNull(factory.getInstance("classpath:some/classpath/resource.properties"));
+    Assert.assertNotNull(factory.locate("classpath:" + WroUtil.toPackageAsFolder(TestUriLocatorFactory.class)));
   }
 }

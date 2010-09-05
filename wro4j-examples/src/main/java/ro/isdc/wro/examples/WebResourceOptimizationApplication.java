@@ -14,13 +14,13 @@ import ro.isdc.wro.examples.page.HomePage;
  *
  * @see wicket.myproject.Start#main(String[])
  */
-public class WebResourceOptimizerApplication
+public class WebResourceOptimizationApplication
     extends WebApplication {
   private boolean deploy = true;
   /**
    * Constructor
    */
-  public WebResourceOptimizerApplication() {
+  public WebResourceOptimizationApplication() {
   }
 
   /**

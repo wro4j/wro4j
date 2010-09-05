@@ -25,7 +25,6 @@ import javax.script.ScriptException;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -36,16 +35,16 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class LessCSS {
   private ScriptEngine scriptEngine;
+
   public LessCSS() {
     try {
       final ScriptEngineManager factory = new ScriptEngineManager();
       // create JavaScript engine
       scriptEngine = factory.getEngineByName("JavaScript");
-      final ClasspathUriLocator uriLocator = new ClasspathUriLocator();
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
-      final String lessjs = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/less.js"));
-      final String runjs = IOUtils.toString(uriLocator.locate("classpath:" + packagePath + "/run.js"));
+      final String lessjs = IOUtils.toString(ClassLoader.getSystemResourceAsStream(packagePath + "/less.js"));
+      final String runjs = IOUtils.toString(ClassLoader.getSystemResourceAsStream(packagePath + "/run.js"));
 
       scriptEngine.eval(lessjs);
       scriptEngine.eval(runjs);
@@ -57,10 +56,10 @@ public class LessCSS {
   }
 
 
-
   private String removeNewLines(final String data) {
     return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
   }
+
 
   /**
    * @param data css content to process.
