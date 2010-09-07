@@ -22,19 +22,39 @@
                 <dt>Output</dt>
                 <dd>
                   <textarea wicket:id="output" cols="40" rows="20" readonly="readonly"></textarea>
-                  <div>
-                    <ul>
-                      <li>Original size: <b wicket:id="originalSize"></b> KB</li>
-                      <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
-                      <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>                    
-                    </ul>
-                  </div>
+                </dd>
+              </dl>
+            </td>
+            <td>
+              <dl>
+                <dt>Details</dt>
+                <dd>
+                  <ul>
+                    <li>Original size: <b wicket:id="originalSize"></b> KB</li>
+                    <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
+                    <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>
+                    <li>Processing Time: <b wicket:id="processingTime"></b> ms</li>                    
+                  </ul>
                 </dd>
               </dl>
             </td>
           </tr>
         </tbody>
       </table>
+      <p>
+        Notes: 
+        <ul>
+          <li>
+            Google closure processor doesn't work here, because
+            Google AppEngine doesn't allow thread creation. It will be available
+            when Google Closure compiler will have an option to disable using
+            threads while compressing the js code.          
+          </li>
+          <li>
+            Don't use a very large input content, because there is an input size limitation. 
+          </li>
+        </ul>
+      </p>      
     </div>
   </form>
 </wicket:panel>

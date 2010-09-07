@@ -13,12 +13,13 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -49,6 +50,8 @@ import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
+import com.google.javascript.jscomp.CompilationLevel;
+
 
 /**
  * @author Alex Objelean
@@ -65,6 +68,7 @@ public class ResourceTransformerPanel extends Panel {
   private String compressionRate = VALUE_NOT_AVAILABLE;
   private String originalSize = VALUE_NOT_AVAILABLE;
   private String compressedSize = VALUE_NOT_AVAILABLE;
+  private String processingTime = VALUE_NOT_AVAILABLE;
   private transient ResourcePostProcessor processor;
 
 
@@ -81,9 +85,16 @@ public class ResourceTransformerPanel extends Panel {
     form.add(new Label("compressionRate", new PropertyModel<String>(this, "compressionRate")));
     form.add(new Label("originalSize", new PropertyModel<String>(this, "originalSize")));
     form.add(new Label("compressedSize", new PropertyModel<String>(this, "compressedSize")));
+    form.add(new Label("processingTime", new PropertyModel<Long>(this, "processingTime")));
     form.add(new TextArea<String>("input", new PropertyModel<String>(this, "input")));
     form.add(new TextArea<String>("output", new PropertyModel<String>(this, "output")));
-    form.add(new AjaxButton("transform") {
+    form.add(getTransformButton());
+    add(form);
+  }
+
+
+  private Component getTransformButton() {
+    final Component c = new IndicatingAjaxButton("transform") {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (processor == null) {
@@ -93,6 +104,7 @@ public class ResourceTransformerPanel extends Panel {
           compressionRate = VALUE_NOT_AVAILABLE;
           compressedSize = VALUE_NOT_AVAILABLE;
           originalSize = VALUE_NOT_AVAILABLE;
+          final long processingTimeAsLong = new Date().getTime();
           output = null;
           if (input != null) {
             final Writer writer = new StringWriter();
@@ -108,14 +120,15 @@ public class ResourceTransformerPanel extends Panel {
             }
             originalSize = format.format((double)input.length()/1024);
             compressedSize = format.format((double)output.length()/1024);
+            processingTime = String.valueOf(new Date().getTime() - processingTimeAsLong);
           }
           target.addComponent(form);
         } catch (final IOException e) {
           LOG.error("exception occured: " + e);
         }
       }
-    });
-    add(form);
+    };
+    return c;
   }
 
   /**
@@ -138,6 +151,7 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new PackerJsProcessor());
       list.add(new YUICssCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor());
+      list.add(new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
       list.add(new YUIJsCompressorProcessor());
       return list;
     }
