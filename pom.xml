@@ -187,7 +187,7 @@
       <dependency>
         <groupId>com.google.closure</groupId>
         <artifactId>compiler</artifactId>
-        <version>r361</version>
+        <version>r407</version>
       </dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>

@@ -43,9 +43,9 @@ public class LessCSS {
       scriptEngine = factory.getEngineByName("JavaScript");
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
-
-      final String lessjs = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(packagePath + "/less.js"));
-      final String runjs = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(packagePath + "/run.js"));
+      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      final String lessjs = IOUtils.toString(classLoader.getResourceAsStream(packagePath + "/less.js"));
+      final String runjs = IOUtils.toString(classLoader.getResourceAsStream(packagePath + "/run.js"));
 
       scriptEngine.eval(lessjs);
       scriptEngine.eval(runjs);

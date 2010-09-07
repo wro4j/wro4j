@@ -34,8 +34,9 @@ public class PackerJs {
       scriptEngine = factory.getEngineByName("JavaScript");
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
-      final String base2 = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(packagePath + "/base2.js"));
-      final String packer = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(packagePath + "/packer.js"));
+      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      final String base2 = IOUtils.toString(classLoader.getResourceAsStream(packagePath + "/base2.js"));
+      final String packer = IOUtils.toString(classLoader.getResourceAsStream(packagePath + "/packer.js"));
       scriptEngine.eval(base2);
       scriptEngine.eval(packer);
     } catch (final IOException ex) {
