@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.resource.processor.algorithm;
+package ro.isdc.wro.util;
 
 /**
  * <p>

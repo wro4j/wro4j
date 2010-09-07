@@ -15,6 +15,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.util.Base64;
+
 
 /**
  * Generator for Data URIs. Inspired from: http://github.com/nzakas/cssembed.
