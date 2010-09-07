@@ -29,9 +29,9 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * This class is borrowed from Richard Nichols visural project.
+ * This class is inspired from Richard Nichols visural project.
  *
- * @author Richard Nichols
+ * @author Alex Objelean
  */
 public class LessCSS {
   private ScriptEngine scriptEngine;
@@ -43,8 +43,9 @@ public class LessCSS {
       scriptEngine = factory.getEngineByName("JavaScript");
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
-      final String lessjs = IOUtils.toString(ClassLoader.getSystemResourceAsStream(packagePath + "/less.js"));
-      final String runjs = IOUtils.toString(ClassLoader.getSystemResourceAsStream(packagePath + "/run.js"));
+
+      final String lessjs = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(packagePath + "/less.js"));
+      final String runjs = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(packagePath + "/run.js"));
 
       scriptEngine.eval(lessjs);
       scriptEngine.eval(runjs);

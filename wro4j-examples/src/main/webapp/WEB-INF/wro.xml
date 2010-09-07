@@ -8,7 +8,9 @@
     <!-- <js>/resource/dynamic.js</js> -->
   </group>
   <group name="all">
+  <!-- 
     <group-ref>twitterBar</group-ref>
+  -->    
     <group-ref>dynamicResource</group-ref>
     <group-ref>jquery</group-ref>
     <group-ref>WEBINF-css</group-ref>

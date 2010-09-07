@@ -83,8 +83,11 @@ public class GoogleClosureCompressorProcessor
     throws IOException {
     try {
       final Compiler compiler = new Compiler();
+      //make it play nice with GAE
+      compiler.disableThreads();
       final CompilerOptions options = new CompilerOptions();
       // Advanced mode is used here, but additional options could be set, too.
+
       compilationLevel.setOptionsForCompilationLevel(options);
       final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
       final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(IOUtils.toByteArray(reader)));

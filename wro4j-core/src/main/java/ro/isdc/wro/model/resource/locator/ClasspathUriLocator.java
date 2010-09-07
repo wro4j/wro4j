@@ -66,29 +66,33 @@ public class ClasspathUriLocator
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, ""));
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
-      LOG.debug("wildcard detected for location: " + location);
-      final String fullPath = FilenameUtils.getFullPath(location);
-      //final URL url = getClass().getClassLoader().getSystemResource(fullPath);
-      final URL url = ClassLoader.getSystemResource(fullPath);
-      if (url == null) {
-        final String message = "Couldn't get URL for the following path: " + fullPath;
-        LOG.warn(message);
-        throw new IOException(message);
-      }
-      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+      return locateWildcardUri(uri, location);
     }
-    //TODO replace with ClassLoader.getSystemResourceAsStream(name) ?
-    try {
-      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-      // TODO check if this is needed
-      final InputStream is = classLoader.getResourceAsStream(location);
-      if (is == null) {
-        throw new NullPointerException();
-      }
-      final URL url = classLoader.getResource(location);
-      return url.openStream();
-    } catch (final NullPointerException e) {
+    // TODO replace with ClassLoader.getSystemResourceAsStream(name) ?
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    // TODO check if this is needed
+    final InputStream is = classLoader.getResourceAsStream(location);
+    if (is == null) {
       throw new IOException("Couldn't get InputStream from this resource: " + uri);
     }
+    final URL url = classLoader.getResource(location);
+    return url.openStream();
+  }
+
+  /**
+   * @return an input stream for an uri containing a wildcard for a given location.
+   */
+  private InputStream locateWildcardUri(final String uri, final String location)
+      throws IOException {
+    LOG.debug("wildcard detected for location: " + location);
+    final String fullPath = FilenameUtils.getFullPath(location);
+    //final URL url = getClass().getClassLoader().getSystemResource(fullPath);
+    final URL url = ClassLoader.getSystemResource(fullPath);
+    if (url == null) {
+      final String message = "Couldn't get URL for the following path: " + fullPath;
+      LOG.warn(message);
+      throw new IOException(message);
+    }
+    return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
   }
 }

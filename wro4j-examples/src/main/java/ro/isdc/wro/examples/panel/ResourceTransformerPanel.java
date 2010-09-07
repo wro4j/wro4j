@@ -36,6 +36,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
@@ -134,6 +135,7 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new MultiLineCommentStripperProcessor());
       list.add(new SingleLineCommentStripperProcessor());
       list.add(new LessCssProcessor());
+      list.add(new PackerJsProcessor());
       list.add(new YUICssCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor());
       list.add(new YUIJsCompressorProcessor());
