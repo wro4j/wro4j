@@ -30,9 +30,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 @SupportedResourceType(ResourceType.JS)
 public class PackerJsProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(PackerJsProcessor.class);
   /**
    * Engine.

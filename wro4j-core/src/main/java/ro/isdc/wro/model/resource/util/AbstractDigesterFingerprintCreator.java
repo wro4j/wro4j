@@ -53,7 +53,7 @@ public abstract class AbstractDigesterFingerprintCreator
 
 
   /**
-   * @return
+   * @return MessageDigest used for hashing.
    * @throws NoSuchAlgorithmException
    */
   protected abstract MessageDigest newMessageDigest() throws NoSuchAlgorithmException;

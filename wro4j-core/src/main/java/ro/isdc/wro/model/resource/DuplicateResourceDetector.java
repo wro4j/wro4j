@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 /**
  * Used to detect duplicated resources. The implementation holds a detector context associated with each thread. This is
- * necessary because the detection should be thread-safe. It is responsability of the client to populate the resources
+ * necessary because the detection should be thread-safe. It is responsibility of the client to populate the resources
  * being processed during a single request cycle and to reset it after the processing is complete.
  *
  * @author Alex Objelean

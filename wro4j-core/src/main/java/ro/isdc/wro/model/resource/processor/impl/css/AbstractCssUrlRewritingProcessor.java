@@ -30,9 +30,6 @@ import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssUrlRewritingProcessor
   implements ResourcePreProcessor {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
 
   /**

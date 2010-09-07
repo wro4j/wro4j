@@ -25,21 +25,20 @@ import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
 @SupportedResourceType(ResourceType.CSS)
 public class ConformColorsCssProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  private Lessify lessify = new Lessify();
+  private Lessify lessify;
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     try {
-      final String result = lessify.conformColors(IOUtils.toString(reader));
+      final String result = new Lessify().conformColors(IOUtils.toString(reader));
       writer.write(result);
     } finally {
       reader.close();
       writer.close();
     }
   }
-
 
   /**
    * {@inheritDoc}
@@ -48,5 +47,4 @@ public class ConformColorsCssProcessor
     throws IOException {
     process(reader, writer);
   }
-
 }

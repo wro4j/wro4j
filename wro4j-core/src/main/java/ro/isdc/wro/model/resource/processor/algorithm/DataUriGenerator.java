@@ -23,14 +23,8 @@ import org.slf4j.LoggerFactory;
  * @created May 7, 2010
  */
 public class DataUriGenerator {
-  /**
-   *
-   */
-  private static final String DATA_URI_PREFIX = "data:";
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(DataUriGenerator.class);
+  private static final String DATA_URI_PREFIX = "data:";
   private final Map<String, String> binaryTypes = new HashMap<String, String>();
   private final Map<String, String> textTypes = new HashMap<String, String>();
 

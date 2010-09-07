@@ -27,26 +27,17 @@ import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
  */
 public class CssDataUriPreProcessor
   extends AbstractCssUrlRewritingProcessor {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(CssDataUriPreProcessor.class);
   /**
    * Generates dataUri based on inputStream of the url's found inside the css resource.
    */
-  private final DataUriGenerator dataUriGenerator;
+  private DataUriGenerator dataUriGenerator;
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
 
-  /**
-   * Default constructor.
-   */
-  public CssDataUriPreProcessor() {
-    dataUriGenerator = new DataUriGenerator();
-  }
 
   /**
    * Replace provided url with the new url if needed.
@@ -57,13 +48,16 @@ public class CssDataUriPreProcessor
    */
   @Override
   protected final String replaceImageUrl(final String cssUri, final String imageUrl) {
+    if (uriLocatorFactory == null) {
+      throw new IllegalStateException("No UriLocatorFactory was injected!");
+    }
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     final String fileName = FilenameUtils.getName(imageUrl);
     final String fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     String result = imageUrl;
     try {
-      final String dataUri = dataUriGenerator.generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
+      final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
       if (replaceWithDataUri(dataUri)) {
         result = dataUri;
       }
@@ -73,6 +67,12 @@ public class CssDataUriPreProcessor
     return result;
   }
 
+  private DataUriGenerator getDataUriGenerator() {
+    if (dataUriGenerator == null) {
+      dataUriGenerator = new DataUriGenerator();
+    }
+    return dataUriGenerator;
+  }
 
   /**
    * Decides whether the computed dataUri should replace the image url. It is useful when you want to limit the dataUri size.

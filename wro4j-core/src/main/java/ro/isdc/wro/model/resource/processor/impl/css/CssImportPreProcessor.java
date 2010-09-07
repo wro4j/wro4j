@@ -38,9 +38,6 @@ import ro.isdc.wro.util.StringUtils;
 @SupportedResourceType(ResourceType.CSS)
 public class CssImportPreProcessor
   implements ResourcePreProcessor {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.
@@ -66,6 +63,7 @@ public class CssImportPreProcessor
    */
   public synchronized void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
+    validate();
     try {
       final String result = parseCss(resource, reader);
       writer.write(result);
@@ -73,6 +71,18 @@ public class CssImportPreProcessor
     } finally {
       reader.close();
       writer.close();
+    }
+  }
+
+  /**
+   * Checks if required fields were injected.
+   */
+  private void validate() {
+    if (uriLocatorFactory == null) {
+      throw new IllegalStateException("No UriLocator was injected");
+    }
+    if (preProcessorExecutor == null) {
+      throw new IllegalStateException("No preProcessorExecutor was injected");
     }
   }
 

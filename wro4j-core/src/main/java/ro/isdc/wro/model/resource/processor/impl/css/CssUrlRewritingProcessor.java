@@ -104,9 +104,6 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  */
 public class CssUrlRewritingProcessor
   extends AbstractCssUrlRewritingProcessor {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
 
   /**

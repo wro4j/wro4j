@@ -100,9 +100,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 @SupportedResourceType(ResourceType.CSS)
 public class LessCssProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   /**
    * Engine.

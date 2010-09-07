@@ -35,9 +35,6 @@ import ro.isdc.wro.model.resource.processor.algorithm.JSMin;
 @SupportedResourceType(ResourceType.JS)
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
   /**
    * {@inheritDoc}

@@ -37,9 +37,6 @@ import com.google.javascript.jscomp.Result;
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
   implements ResourcePostProcessor, ResourcePreProcessor {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(GoogleClosureCompressorProcessor.class);
   /**
    * {@link CompilationLevel} to use for compression.

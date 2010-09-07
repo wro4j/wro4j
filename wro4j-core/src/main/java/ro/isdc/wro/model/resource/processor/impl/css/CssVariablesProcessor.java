@@ -34,9 +34,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 @SupportedResourceType(ResourceType.CSS)
 public class CssVariablesProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(CssVariablesProcessor.class);
   /**
    * Pattern used to find variables definition. For instance:<br/>
