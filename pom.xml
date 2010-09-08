@@ -98,7 +98,7 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>wro4j-test-utils</artifactId>
 				<version>${project.version}</version>
-				<scope>test</scope>
+        <scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
@@ -199,6 +199,12 @@
 				<artifactId>spring</artifactId>
 				<version>2.5.6</version>
 			</dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.dependency}</version>
+        <scope>test</scope>
+      </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
@@ -216,18 +222,18 @@
 			<artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>      	 
 		</dependency>
-			<!-- For test -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.dependency}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>${mockito.dependency}</version>
-			</dependency>		
+    <!-- For test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.dependency}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>${mockito.dependency}</version>
+    </dependency>		
 	</dependencies>
 
 	<build>
