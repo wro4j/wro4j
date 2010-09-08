@@ -58,9 +58,6 @@ import com.google.javascript.jscomp.CompilationLevel;
  */
 @SuppressWarnings("serial")
 public class ResourceTransformerPanel extends Panel {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(ResourceTransformerPanel.class);
   private static final String VALUE_NOT_AVAILABLE = "N/A";
   private String input;

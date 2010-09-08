@@ -178,22 +178,44 @@
 				<version>2.3</version>
 				<scope>provided</scope>
 			</dependency>
-			<!-- Third Party Tools -->
+			<!-- Third Party Tools -->			
 			<dependency>
 				<groupId>com.yahoo.platform.yui</groupId>
 				<artifactId>yuicompressor</artifactId>
 				<version>2.4.2</version>
+			</dependency>			
+			<dependency>
+				<groupId>rhino</groupId>
+				<artifactId>js</artifactId>
+				<version>1.6R7</version>
 			</dependency>
-      <dependency>
-        <groupId>com.google.closure</groupId>
-        <artifactId>compiler</artifactId>
-        <version>r407</version>
-      </dependency>
+		  <dependency>
+			<groupId>com.google.closure</groupId>
+			<artifactId>compiler</artifactId>
+			<version>r407</version>
+		  </dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
 				<version>2.5.6</version>
 			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.dependency}</version>
+			</dependency>			
+		</dependencies>				
+	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>      	 
+		</dependency>
 			<!-- For test -->
 			<dependency>
 				<groupId>junit</groupId>
@@ -205,19 +227,7 @@
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
 				<version>${mockito.dependency}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>      
-		</dependency>
+			</dependency>		
 	</dependencies>
 
 	<build>

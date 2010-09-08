@@ -4,8 +4,10 @@
 package ro.isdc.wro.extensions.processor.algorithm.packer;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
@@ -29,9 +31,14 @@ public class PackerJs {
 
   public PackerJs() {
     try {
-      final ScriptEngineManager factory = new ScriptEngineManager();
+      final ScriptEngineManager manager = new ScriptEngineManager();
+      final List<ScriptEngineFactory> factories = getAvailableEngines(manager);
       // create JavaScript engine
-      scriptEngine = factory.getEngineByName("JavaScript");
+      scriptEngine = manager.getEngineByName("js");
+      if (scriptEngine == null) {
+        throw new IllegalStateException("No ScriptManager for JavaScript is available. Available managers are: "
+            + factories);
+      }
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
       final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -46,6 +53,36 @@ public class PackerJs {
     }
   }
 
+
+  private List<ScriptEngineFactory> getAvailableEngines(final ScriptEngineManager manager) {
+    final List<ScriptEngineFactory> engines = manager.getEngineFactories();
+    if (engines.isEmpty()) {
+      LOG.debug("No scripting engines were found");
+    } else {
+      LOG.debug("The following " + engines.size() + " scripting engines were found");
+      for (final ScriptEngineFactory engine : engines) {
+        LOG.debug("Engine name: " + engine.getEngineName());
+        LOG.debug("\tVersion: " + engine.getEngineVersion());
+        LOG.debug("\tLanguage: " + engine.getLanguageName());
+        final List<String> extensions = engine.getExtensions();
+        if (extensions.size() > 0) {
+          LOG.debug("\tEngine supports the following extensions:");
+          for (final String e : extensions) {
+            LOG.debug("\t\t" + e);
+          }
+        }
+        final List<String> shortNames = engine.getNames();
+        if (shortNames.size() > 0) {
+          LOG.debug("\tEngine has the following short names:");
+          for (final String n : engine.getNames()) {
+            LOG.debug("\t\t" + n);
+          }
+        }
+        LOG.debug("=========================");
+      }
+    }
+    return engines;
+  }
 
   /**
    * @param data js content to process.

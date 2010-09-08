@@ -16,12 +16,7 @@ import ro.isdc.wro.examples.page.HomePage;
  */
 public class WebResourceOptimizationApplication
     extends WebApplication {
-  private boolean deploy = true;
-  /**
-   * Constructor
-   */
-  public WebResourceOptimizationApplication() {
-  }
+  private final boolean deploy = true;
 
   /**
    * @see wicket.Application#getHomePage()
@@ -40,6 +35,13 @@ public class WebResourceOptimizationApplication
     if (deploy) {
       getResourceSettings().setResourcePollFrequency(null);
     }
+    //settings
+    getMarkupSettings().setStripWicketTags(true);
+    getMarkupSettings().setStripComments(true);
+    getMarkupSettings().setCompressWhitespace(true);
+    getPageSettings().setAutomaticMultiWindowSupport(false);
+
+    //mounts
     mountBookmarkablePage("/home", HomePage.class);
   }
 
@@ -59,7 +61,7 @@ public class WebResourceOptimizationApplication
    */
   @Override
   protected ISessionStore newSessionStore() {
+    //wouldn't work with SecondLevelCacheSessionStore on GAE
     return new HttpSessionStore(this);
   }
-
 }
