@@ -29,6 +29,7 @@ public class PackerJs {
   private static final Logger LOG = LoggerFactory.getLogger(PackerJs.class);
   private ScriptEngine scriptEngine;
 
+
   public PackerJs() {
     try {
       final ScriptEngineManager manager = new ScriptEngineManager();
@@ -37,8 +38,9 @@ public class PackerJs {
       scriptEngine = manager.getEngineByName("js");
       if (scriptEngine == null) {
         throw new IllegalStateException("No ScriptManager for JavaScript is available. Available managers are: "
-            + factories);
+          + factories);
       }
+      LOG.debug("Using ScriptEngine: " + scriptEngine);
 
       final String packagePath = WroUtil.toPackageAsFolder(getClass());
       final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -78,11 +80,11 @@ public class PackerJs {
             LOG.debug("\t\t" + n);
           }
         }
-        LOG.debug("=========================");
       }
     }
     return engines;
   }
+
 
   /**
    * @param data js content to process.
@@ -113,3 +115,4 @@ public class PackerJs {
     return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
   }
 }
+
