@@ -13,13 +13,15 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 
+
 /**
  * Default implementation capable of extracting a single group from the request.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class DefaultGroupExtractor implements GroupExtractor {
+public class DefaultGroupExtractor
+  implements GroupExtractor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultGroupExtractor.class);
   /**
    * The name of the attribute where the servlet path is stored when requestDispatcher.include is called.
@@ -29,6 +31,8 @@ public final class DefaultGroupExtractor implements GroupExtractor {
    * The name of the parameter used to decide if the group must be minimized.
    */
   public static final String PARAM_MINIMIZE = "minimize";
+
+
   /**
    * {@inheritDoc}
    */
@@ -36,9 +40,9 @@ public final class DefaultGroupExtractor implements GroupExtractor {
     if (request == null) {
       throw new IllegalArgumentException("Uri cannot be NULL!");
     }
-    final String includeUriPath = (String) request.getAttribute(ATTR_INCLUDE_PATH);
+    final String includeUriPath = (String)request.getAttribute(ATTR_INCLUDE_PATH);
     String uri = request.getRequestURI();
-    //check if include or uri path are present and use one of these as request uri.
+    // check if include or uri path are present and use one of these as request uri.
     uri = includeUriPath != null ? includeUriPath : uri;
     final String groupName = FilenameUtils.getBaseName(uri);
     return StringUtils.isEmpty(groupName) ? null : groupName;
@@ -67,9 +71,12 @@ public final class DefaultGroupExtractor implements GroupExtractor {
     return type;
   }
 
+
   /**
    * The minimization is can be switched off only in debug mode.
-   * @return false if the request contains parameter {@link DefaultGroupExtractor#PARAM_MINIMIZE} with value false, otherwise returns true.
+   *
+   * @return false if the request contains parameter {@link DefaultGroupExtractor#PARAM_MINIMIZE} with value false,
+   *         otherwise returns true.
    */
   public boolean isMinimized(final HttpServletRequest request) {
     if (request == null) {
