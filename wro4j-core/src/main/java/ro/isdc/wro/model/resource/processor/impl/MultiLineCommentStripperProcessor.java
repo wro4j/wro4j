@@ -15,9 +15,9 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
- * SingleLineCommentStripperPostProcessor. Remove single line comments from
- * processed resource.
+ * Removes multi line comments from processed resource.
  *
  * @author Alex Objelean
  * @created Created on Nov 28, 2008

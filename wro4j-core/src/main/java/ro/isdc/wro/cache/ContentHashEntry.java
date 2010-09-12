@@ -26,9 +26,7 @@ public final class ContentHashEntry
   /**
    * Factory method.
    *
-   * @param content
-   * @param hash
-   * @return
+   * @return {@link ContentHashEntry} based on supplied values.
    */
   public static final ContentHashEntry valueOf(final String content, final String hash) {
     return new ContentHashEntry(content, hash);

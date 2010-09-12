@@ -57,4 +57,11 @@ public class GroupExtractorDecorator
   public boolean isMinimized(final HttpServletRequest request) {
     return decorated.isMinimized(request);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public String encodeGroupUrl(final String groupName, final ResourceType resourceType, final boolean minimize) {
+    return decorated.encodeGroupUrl(groupName, resourceType, minimize);
+  }
 }

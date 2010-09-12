@@ -96,8 +96,8 @@ public class WroFilter
    */
   static final String PARAM_MBEAN_NAME = "mbeanName";
   /**
-  * Default value used by Cache-control header.
-  */
+   * Default value used by Cache-control header.
+   */
   private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
   /**
    * Filter config.
@@ -160,8 +160,8 @@ public class WroFilter
         }
       });
     }
+//    filterConfig.getServletContext().setAttribute("wro4j:wroManagerFactory", wroManagerFactory);
   }
-
 
   /**
    * Expose MBean to tell JMX infrastructure about our MBean.
@@ -489,6 +489,7 @@ public class WroFilter
       }
     }
   }
+
 
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.

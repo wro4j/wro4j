@@ -71,6 +71,13 @@ public class DefaultGroupExtractor
     return type;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public String encodeGroupUrl(final String groupName, final ResourceType resourceType, final boolean minimize) {
+    return new StringBuilder(groupName).append(".").append(resourceType.name().toLowerCase()).append("?").append(
+      PARAM_MINIMIZE).append("=").append(minimize).toString();
+  }
 
   /**
    * The minimization is can be switched off only in debug mode.

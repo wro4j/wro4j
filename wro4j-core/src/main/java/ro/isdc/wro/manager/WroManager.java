@@ -53,7 +53,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Oct 30, 2008
  */
 public class WroManager
-    implements WroConfigurationChangeListener, CacheChangeCallbackAware {
+  implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Logger for this class.
    */
@@ -100,23 +100,23 @@ public class WroManager
    */
   private ScheduledExecutorService scheduler;
 
+
   /**
    * Perform processing of the uri.
    *
-   * @param request
-   *          {@link HttpServletRequest} to process.
+   * @param request {@link HttpServletRequest} to process.
    * @param response HttpServletResponse where to write the result content.
    * @throws IOException when any IO related problem occurs or if the request cannot be processed.
    */
-  public final void process() throws IOException {
+  public final void process()
+    throws IOException {
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
     // create model
-    final WroModel model = modelFactory.getInstance();
-    //TODO move API related checks into separate class and determine filter mapping for better mapping
+    // TODO move API related checks into separate class and determine filter mapping for better mapping
     if (matchesUrl(request, API_RELOAD_CACHE)) {
       Context.get().getConfig().reloadCache();
       return;
@@ -128,7 +128,7 @@ public class WroManager
     if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
     } else {
-      is = buildGroupsInputStream(model, request, response);
+      is = buildGroupsInputStream(request, response);
     }
     if (is == null) {
       throw new WroRuntimeException("Cannot process this request: " + request.getRequestURL());
@@ -150,6 +150,7 @@ public class WroManager
     return m.matches();
   }
 
+
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
@@ -161,12 +162,12 @@ public class WroManager
   /**
    * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}.
    *
-   * @param response
-   *          {@link HttpServletResponse} object.
+   * @param response {@link HttpServletResponse} object.
    * @return wrapped gziped OutputStream.
    * @throws IOException when Gzip operation fails.
    */
-  private OutputStream getGzipedOutputStream(final HttpServletResponse response) throws IOException {
+  private OutputStream getGzipedOutputStream(final HttpServletResponse response)
+    throws IOException {
     if (Context.get().getConfig().isGzipEnabled() && isGzipSupported()) {
       // add gzip header and gzip response
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
@@ -184,11 +185,11 @@ public class WroManager
    * @param response {@link HttpServletResponse} used to set content type.
    * @return {@link InputStream} for groups found in requestURI or null if the request is not as expected.
    */
-  private InputStream buildGroupsInputStream(final WroModel model, final HttpServletRequest request,
-      final HttpServletResponse response) throws IOException {
+  private InputStream buildGroupsInputStream(final HttpServletRequest request, final HttpServletResponse response)
+    throws IOException {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("buildGroupsStream");
-    InputStream is = null;
+    InputStream inputStream = null;
     // find names & type
     final ResourceType type = groupExtractor.getResourceType(request);
     final String groupName = groupExtractor.getGroupName(request);
@@ -196,46 +197,73 @@ public class WroManager
     if (groupName == null || type == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
-    initScheduler(model);
+    initScheduler();
 
-    final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
-
-    LOG.debug("Searching cache entry: " + cacheEntry);
-    // Cache based on uri
-    ContentHashEntry result = cacheStrategy.get(cacheEntry);
-    if (result == null) {
-      LOG.debug("Cache is empty. Perform processing...");
-      // process groups & put result in the cache
-      // find processed result for a group
-      final List<Group> groupAsList = new ArrayList<Group>();
-      final Group group = model.getGroupByName(groupName);
-      groupAsList.add(group);
-
-      final String content = groupsProcessor.process(groupAsList, type, minimize);
-      result = getContentHashEntry(content);
-      cacheStrategy.put(cacheEntry, result);
-    }
-    if (result.getContent() != null) {
-      //make the input stream encoding aware.
-      is = new ByteArrayInputStream(result.getContent().getBytes());
+    final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
+    if (contentHashEntry.getContent() != null) {
+      // make the input stream encoding aware.
+      inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());
     }
     if (type != null) {
-      //TODO add also the charset?
+      // TODO add also the charset?
       response.setContentType(type.getContentType());
     }
-    //set ETag header
-    response.setHeader(HttpHeader.ETAG.toString(), result.getHash());
+    // set ETag header
+    response.setHeader(HttpHeader.ETAG.toString(), contentHashEntry.getHash());
 
     stopWatch.stop();
     LOG.debug("WroManager process time: " + stopWatch.toString());
-    return is;
+    return inputStream;
   }
 
 
   /**
-   * Creates a {@link ContentHashEntry} for a given content.
+   * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js
+   *
+   * @return a path to the resource with the fingerprint encoded as a folder name.
    */
-  private ContentHashEntry getContentHashEntry(final String content) throws IOException {
+  public String encodeFingerprintIntoGroupPath(final String groupName, final ResourceType resourceType,
+    final boolean minimize) {
+    try {
+      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, resourceType, minimize);
+      final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
+      // encode the fingerprint of the resource into the resource path
+      return String.format("%s/%s", contentHashEntry.getHash(), groupUrl);
+    } catch (final IOException e) {
+      return "";
+    }
+  }
+
+  /**
+   * @return {@link ContentHashEntry} object.
+   */
+  private ContentHashEntry getContentHashEntry(final String groupName, final ResourceType type, final boolean minimize)
+    throws IOException {
+    final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
+    LOG.debug("Searching cache entry: " + cacheEntry);
+    // Cache based on uri
+    ContentHashEntry contentHashEntry = cacheStrategy.get(cacheEntry);
+    if (contentHashEntry == null) {
+      LOG.debug("Cache is empty. Perform processing...");
+      // process groups & put result in the cache
+      // find processed result for a group
+      final List<Group> groupAsList = new ArrayList<Group>();
+      final Group group = modelFactory.getInstance().getGroupByName(groupName);
+      groupAsList.add(group);
+
+      final String content = groupsProcessor.process(groupAsList, type, minimize);
+      contentHashEntry = getContentHashEntryByContent(content);
+      cacheStrategy.put(cacheEntry, contentHashEntry);
+    }
+    return contentHashEntry;
+  }
+
+
+  /**
+   * Creates a {@link ContentHashEntry} based on provided content.
+   */
+  private ContentHashEntry getContentHashEntryByContent(final String content)
+    throws IOException {
     String hash = null;
     if (content != null) {
       hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
@@ -247,10 +275,9 @@ public class WroManager
 
 
   /**
-   * @param model
-   *          {@link WroModel} object.
+   * Initialize the scheduler based on configuration values.
    */
-  private void initScheduler(final WroModel model) {
+  private void initScheduler() {
     if (scheduler == null) {
       final long period = Context.get().getConfig().getCacheUpdatePeriod();
       LOG.debug("runing thread with period of " + period);
@@ -259,18 +286,16 @@ public class WroManager
         // Run a scheduled task which updates the model.
         // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
         // (thread tries to make up for lost time in some situations)
-        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(model), 0, period, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
       }
     }
   }
 
 
   /**
-   * @param model
-   *          Model containing
    * @return a {@link Runnable} which will update the cache content with latest data.
    */
-  private Runnable getSchedulerRunnable(final WroModel model) {
+  private Runnable getSchedulerRunnable() {
     return new Runnable() {
       public void run() {
         try {
@@ -279,6 +304,7 @@ public class WroManager
             cacheChangeCallback.propertyChange(null);
           }
           LOG.info("reloading cache");
+          final WroModel model = modelFactory.getInstance();
           // process groups & put update cache
           final Collection<Group> groups = model.getGroups();
           // update cache for all resources
@@ -290,12 +316,11 @@ public class WroManager
                 // TODO notify the filter about the change - expose a callback
                 // TODO check if request parameter can be fetched here without errors.
                 // groupExtractor.isMinimized(Context.get().getRequest())
-                final Boolean[] minimizeValues = new Boolean[] {
-                    true, false
-                };
+                final Boolean[] minimizeValues = new Boolean[] { true, false };
                 for (final boolean minimize : minimizeValues) {
                   final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
-                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize), getContentHashEntry(content));
+                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
+                    getContentHashEntryByContent(content));
                 }
               }
             }
@@ -330,13 +355,12 @@ public class WroManager
   /**
    * Resolve the stream for a request.
    *
-   * @param request
-   *          {@link HttpServletRequest} object.
+   * @param request {@link HttpServletRequest} object.
    * @return {@link InputStream} not null object if the resource is valid and can be accessed
-   * @throws IOException
-   *           if no stream could be resolved.
+   * @throws IOException if no stream could be resolved.
    */
-  private InputStream locateInputeStream(final HttpServletRequest request) throws IOException {
+  private InputStream locateInputeStream(final HttpServletRequest request)
+    throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
     final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
@@ -410,8 +434,7 @@ public class WroManager
 
 
   /**
-   * @param groupExtractor
-   *          the uriProcessor to set
+   * @param groupExtractor the uriProcessor to set
    */
   public final void setGroupExtractor(final GroupExtractor groupExtractor) {
     this.groupExtractor = groupExtractor;
@@ -419,8 +442,7 @@ public class WroManager
 
 
   /**
-   * @param groupsProcessor
-   *          the groupsProcessor to set
+   * @param groupsProcessor the groupsProcessor to set
    */
   public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
     this.groupsProcessor = groupsProcessor;
@@ -428,8 +450,7 @@ public class WroManager
 
 
   /**
-   * @param modelFactory
-   *          the modelFactory to set
+   * @param modelFactory the modelFactory to set
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
     this.modelFactory = modelFactory;
@@ -437,8 +458,7 @@ public class WroManager
 
 
   /**
-   * @param cacheStrategy
-   *          the cache to set
+   * @param cacheStrategy the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     this.cacheStrategy = cacheStrategy;

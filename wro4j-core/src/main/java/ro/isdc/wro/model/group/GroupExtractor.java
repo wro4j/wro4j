@@ -37,4 +37,13 @@ public interface GroupExtractor {
    * @return true if the expected result must be minimized.
    */
   boolean isMinimized(final HttpServletRequest request);
+
+
+  /**
+   * This method is a opposite of the other 3 methods. Instead of decoding, it encodes groupName, resourceType and
+   * minimize option into url. It should not return entire url, but only the last part.
+   *
+   * @return a part of the url path which encodes the groupName, resourceType and minimize option.
+   */
+  String encodeGroupUrl(final String groupName, final ResourceType resourceType, final boolean minimize);
 }

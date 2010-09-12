@@ -28,7 +28,7 @@ import com.google.javascript.jscomp.Result;
 
 
 /**
- * Command line runner: @see http://maven.apache.org/shared/maven-archiver/examples/classpath.html
+ * Uses Google closure compiler for js minimization.
  *
  * @see http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html
  * @author Alex Objelean
