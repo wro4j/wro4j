@@ -41,7 +41,7 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.util.FingerprintCreator;
+import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -85,7 +85,7 @@ public class WroManager
   /**
    * Content digester.
    */
-  private FingerprintCreator fingerprintCreator;
+  private HashBuilder hashBuilder;
 
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
@@ -222,16 +222,30 @@ public class WroManager
    *
    * @return a path to the resource with the fingerprint encoded as a folder name.
    */
-  public String encodeFingerprintIntoGroupPath(final String groupName, final ResourceType resourceType,
+  public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
     final boolean minimize) {
     try {
       final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, resourceType, minimize);
       final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
       // encode the fingerprint of the resource into the resource path
-      return String.format("%s/%s", contentHashEntry.getHash(), groupUrl);
+      return formatVersionedResource(contentHashEntry.getHash(), groupUrl);
     } catch (final IOException e) {
       return "";
     }
+  }
+
+
+  /**
+   * Format the version of the resource in the path. Default implementation use hash as a folder: <hash>/groupName.js.
+   * The implementation can be changed to follow a different versioning style, like version parameter:
+   * /groupName.js?version=<hash>
+   *
+   * @param hash Hash of the resource.
+   * @param resourcePath Path of the resource.
+   * @return formatted versioned path of the resource.
+   */
+  protected String formatVersionedResource(final String hash, final String resourcePath) {
+    return String.format("%s/%s", hash, resourcePath);
   }
 
   /**
@@ -266,7 +280,7 @@ public class WroManager
     throws IOException {
     String hash = null;
     if (content != null) {
-      hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
+      hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
     }
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
     LOG.debug("computed entry: " + entry);
@@ -427,8 +441,8 @@ public class WroManager
     if (this.cacheStrategy == null) {
       throw new WroRuntimeException("cacheStrategy was not set!");
     }
-    if (this.fingerprintCreator == null) {
-      throw new WroRuntimeException("fingerprintCreator was not set!");
+    if (this.hashBuilder == null) {
+      throw new WroRuntimeException("hashBuilder was not set!");
     }
   }
 
@@ -468,8 +482,8 @@ public class WroManager
   /**
    * @param contentDigester the contentDigester to set
    */
-  public void setFingerprintCreator(final FingerprintCreator contentDigester) {
-    this.fingerprintCreator = contentDigester;
+  public void setHashBuilder(final HashBuilder contentDigester) {
+    this.hashBuilder = contentDigester;
   }
 
 

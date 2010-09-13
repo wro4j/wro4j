@@ -18,14 +18,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alex Objelean
  */
-public class CRC32FingerprintCreator
-  implements FingerprintCreator {
-  private static final Logger LOG = LoggerFactory.getLogger(CRC32FingerprintCreator.class);
+public class CRC32HashBuilder
+  implements HashBuilder {
+  private static final Logger LOG = LoggerFactory.getLogger(CRC32HashBuilder.class);
 
   /**
    * {@inheritDoc}
    */
-  public String create(final InputStream input)
+  public String getHash(final InputStream input)
     throws IOException {
     if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");

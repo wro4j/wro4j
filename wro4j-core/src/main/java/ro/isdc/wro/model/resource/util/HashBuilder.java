@@ -12,11 +12,11 @@ import java.io.InputStream;
  *
  * @author Alex Objelean
  */
-public interface FingerprintCreator {
+public interface HashBuilder {
   /**
    * @param inputStream to digest.
    * @return the hash of the content.
    * @throws IOException if there was an error during reading the stream content.
    */
-  public String create(final InputStream inputStream) throws IOException;
+  public String getHash(final InputStream inputStream) throws IOException;
 }

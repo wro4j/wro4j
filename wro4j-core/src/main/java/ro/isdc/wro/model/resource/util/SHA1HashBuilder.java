@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author Alex Objelean
  */
-public class SHA1FingerprintCreator extends AbstractDigesterFingerprintCreator {
+public class SHA1HashBuilder extends AbstractDigesterHashBuilder {
   /**
    * {@inheritDoc}
    */

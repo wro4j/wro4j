@@ -12,8 +12,8 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author Alex Objelean
  */
-public class MD5FingerprintCreator
-  extends AbstractDigesterFingerprintCreator {
+public class MD5HashBuilder
+  extends AbstractDigesterHashBuilder {
   /**
    * {@inheritDoc}
    */

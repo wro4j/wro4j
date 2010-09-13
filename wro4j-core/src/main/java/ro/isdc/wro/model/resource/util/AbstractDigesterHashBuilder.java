@@ -17,19 +17,19 @@ import ro.isdc.wro.WroRuntimeException;
 
 
 /**
- * Uses SHA1 algorithm for creating fingerprint.
+ * Uses abstract digester for creating a hash.
  *
  * @author Alex Objelean
  */
-public abstract class AbstractDigesterFingerprintCreator
-  implements FingerprintCreator {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterFingerprintCreator.class);
+public abstract class AbstractDigesterHashBuilder
+  implements HashBuilder {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterHashBuilder.class);
 
 
   /**
    * {@inheritDoc}
    */
-  public String create(final InputStream input)
+  public String getHash(final InputStream input)
     throws IOException {
     if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");

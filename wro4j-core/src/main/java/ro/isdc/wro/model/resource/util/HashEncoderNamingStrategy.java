@@ -11,23 +11,23 @@ import org.apache.commons.lang.StringUtils;
 
 
 /**
- * The simplest implementation of {@link NamingStrategy} which encodes the fingerprint hash code into the name of the
+ * The simplest implementation of {@link NamingStrategy} which encodes the hash code into the name of the
  * resource. For instance: For <code>group.js</code> -> <code>group-<hashcode>.js</code>. This implementation uses by
- * default {@link MD5FingerprintCreator} implementation.
+ * default {@link MD5HashBuilder} implementation.
  *
  * @author Alex Objelean
  * @created 15 Aug 2010
  */
-public class FingerprintEncoderNamingStrategy
+public class HashEncoderNamingStrategy
   implements NamingStrategy {
-  private FingerprintCreator fingerprintCreator = newFingerprintCreator();
+  private HashBuilder hashBuilder = newHashBuilder();
 
 
   /**
-   * @return an implementation of {@link FingerprintCreator}.
+   * @return an implementation of {@link HashBuilder}.
    */
-  protected FingerprintCreator newFingerprintCreator() {
-    return new CRC32FingerprintCreator();
+  protected HashBuilder newHashBuilder() {
+    return new CRC32HashBuilder();
   }
 
   /**
@@ -37,7 +37,7 @@ public class FingerprintEncoderNamingStrategy
     throws IOException {
     final String baseName = FilenameUtils.getBaseName(originalName);
     final String extension = FilenameUtils.getExtension(originalName);
-    final String hash = fingerprintCreator.create(inputStream);
+    final String hash = hashBuilder.getHash(inputStream);
     final StringBuilder sb = new StringBuilder(baseName).append("-").append(hash);
     if (!StringUtils.isEmpty(extension)) {
       sb.append(".").append(extension);

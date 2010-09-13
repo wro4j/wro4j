@@ -3,18 +3,28 @@
  */
 package ro.isdc.wro.util;
 
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import ro.isdc.wro.http.HttpHeader;
 
@@ -26,9 +36,6 @@ import ro.isdc.wro.http.HttpHeader;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(WroUtil.class);
   /**
    * Empty line pattern.
@@ -190,91 +197,66 @@ public final class WroUtil {
   }
 
 
-//  /**
-//   * Returns the filter path read from the web.xml
-//   *
-//   * @param filterName the name of the searched filter.
-//   * @param is Stream of the web.xml file.
-//   * @return
-//   */
-//  public static String getFilterPath(final String filterName, final InputStream is)
-//    throws ServletException {
-//    final String prefix = "filter";
-//    final String mapping = prefix + "-mapping";
-//    final String name = prefix + "-name";
-//
-//    // Filter mappings look like this:
-//    //
-//    // <filter-mapping> <filter-name>WicketFilter</filter-name>
-//    // <url-pattern>/*</url-pattern> <...> <filter-mapping>
-//    try {
-//      final ArrayList<String> urlPatterns = new ArrayList<String>();
-//
-//      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//      factory.setNamespaceAware(true);
-//      final Document document = factory.newDocumentBuilder().parse(is);
-//      document.getDocumentElement().normalize();
-//      final NodeList groupNodeList = document.getElementsByTagName(name);
-//
-//      final XmlPullParser parser = new XmlPullParser();
-//      parser.parse(is);
-//
-//      while (true) {
-//        XmlTag elem;
-//        do {
-//          elem = (XmlTag)parser.nextTag();
-//        } while (elem != null && (!(elem.getName().equals(mapping) && elem.isOpen())));
-//
-//        if (elem == null) {
-//          break;
-//        }
-//
-//        String encounteredFilterName = null, urlPattern = null;
-//
-//        do {
-//          elem = (XmlTag)parser.nextTag();
-//          if (elem.isOpen()) {
-//            parser.setPositionMarker();
-//          } else if (elem.isClose() && elem.getName().equals(name)) {
-//            encounteredFilterName = parser.getInputFromPositionMarker(elem.getPos()).toString().trim();
-//          } else if (elem.isClose() && elem.getName().equals("url-pattern")) {
-//            urlPattern = parser.getInputFromPositionMarker(elem.getPos()).toString().trim();
-//          }
-//        } while (urlPattern == null || encounteredFilterName == null);
-//
-//        if (filterName.equals(encounteredFilterName)) {
-//          urlPatterns.add(urlPattern);
-//        }
-//      }
-//
-//      final String prefixUppered = Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1);
-//
-//      // By the time we get here, we have a list of urlPatterns we match
-//      // this filter against.
-//      // In all likelihood, we will only have one. If we have none, we
-//      // have an error.
-//      // If we have more than one, we pick the first one to use for any
-//      // 302 redirects that require absolute URLs.
-//      if (urlPatterns.size() == 0) {
-//        throw new IllegalArgumentException("Error initializing Wicket" + prefixUppered + " - you have no <" + mapping
-//          + "> element with a url-pattern that uses " + prefix + ": " + filterName);
-//      }
-//      final String urlPattern = urlPatterns.get(0);
-//
-//      // Check for leading '/' and trailing '*'.
-//      if (!urlPattern.startsWith("/") || !urlPattern.endsWith("*")) {
-//        throw new IllegalArgumentException("<" + mapping + "> for Wicket" + prefixUppered + " \"" + filterName
-//          + "\" must start with '/' and end with '*'.");
-//      }
-//
-//      // Strip trailing '*' and keep leading '/'.
-//      return stripWildcard(urlPattern);
-//    } catch (final IOException e) {
-//      throw new ServletException("Error finding <" + prefix + "> " + filterName + " in web.xml", e);
-//    } catch (final ParseException e) {
-//      throw new ServletException("Error finding <" + prefix + "> " + filterName + " in web.xml", e);
-//    }
-//  }
+  /**
+   * Returns the filter path read from the web.xml
+   *
+   * @param filterName the name of the searched filter.
+   * @param is Stream of the web.xml file.
+   * @return the filterPath for the searched filterName with wildcard removed.
+   */
+  public static String getFilterPath(final String filterName, final InputStream is)
+    throws ServletException {
+    if (filterName == null) {
+      throw new IllegalArgumentException("filterName cannot be null!");
+    }
+    if (is == null) {
+      throw new IllegalArgumentException("InputStream cannot be null!");
+    }
+    final String prefix = "filter";
+    final String mapping = prefix + "-mapping";
+
+    try {
+      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      final Document document = factory.newDocumentBuilder().parse(is);
+      document.getDocumentElement().normalize();
+
+      final XPathFactory xPathFactory = XPathFactory.newInstance();
+      final XPath xpath = xPathFactory.newXPath();
+      final XPathExpression filterNameExpression = xpath.compile("//filter-mapping/filter-name/text()");
+      final XPathExpression urlPatternExpression = xpath.compile("url-pattern/text()");
+
+      final Object result = filterNameExpression.evaluate(document, XPathConstants.NODESET);
+
+      String urlPattern = null;
+
+      final NodeList nodes = (NodeList) result;
+      for (int i = 0; i < nodes.getLength(); i++) {
+        final Node node = nodes.item(i);
+        LOG.debug("node: " + node);
+        if (filterName.equals(node.getTextContent())) {
+          final Node filterMappingNode = node.getParentNode().getParentNode();
+          LOG.debug("filterMappingNode: " + filterMappingNode);
+          urlPattern = urlPatternExpression.evaluate(filterMappingNode);
+          LOG.debug("urlPattern: " + urlPattern);
+        }
+      }
+
+      final String prefixUppered = Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1);
+
+      // Check for leading '/' and trailing '*'.
+      if (!urlPattern.startsWith("/") || !urlPattern.endsWith("*")) {
+        throw new IllegalArgumentException("<" + mapping + "> for WroFilter" + prefixUppered + " \"" + filterName
+          + "\" must start with '/' and end with '*'.");
+      }
+
+      // Strip trailing '*' and keep leading '/'.
+      return stripWildcard(urlPattern);
+    } catch (final Exception e) {
+      LOG.error(e.getMessage(), e);
+      throw new ServletException("Error finding <" + prefix + "> " + filterName + " in web.xml", e);
+    }
+  }
 
 
   /**

@@ -23,8 +23,8 @@ import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.util.CRC32FingerprintCreator;
-import ro.isdc.wro.model.resource.util.FingerprintCreator;
+import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
+import ro.isdc.wro.model.resource.util.HashBuilder;
 
 
 /**
@@ -76,7 +76,7 @@ public abstract class BaseWroManagerFactory
           manager.setModelFactory(modelFactory);
           manager.setGroupsProcessor(groupsProcessor);
           manager.setCacheStrategy(cacheStrategy);
-          manager.setFingerprintCreator(newFingerprintCreator());
+          manager.setHashBuilder(newHashBuilder());
           manager.registerCallback(cacheChangeCallback);
         }
       }
@@ -94,10 +94,10 @@ public abstract class BaseWroManagerFactory
   }
 
   /**
-   * @return {@link FingerprintCreator} instance.
+   * @return {@link HashBuilder} instance.
    */
-  protected FingerprintCreator newFingerprintCreator() {
-    return new CRC32FingerprintCreator();
+  protected HashBuilder newHashBuilder() {
+    return new CRC32HashBuilder();
   }
 
   /**
