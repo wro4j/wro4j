@@ -26,9 +26,6 @@ import ro.isdc.wro.http.HttpHeader;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(WroUtil.class);
   /**
    * Empty line pattern.
@@ -190,13 +187,13 @@ public final class WroUtil {
   }
 
 
-//  /**
-//   * Returns the filter path read from the web.xml
-//   *
-//   * @param filterName the name of the searched filter.
-//   * @param is Stream of the web.xml file.
-//   * @return
-//   */
+  /**
+   * Returns the filter path read from the web.xml
+   *
+   * @param filterName the name of the searched filter.
+   * @param is Stream of the web.xml file.
+   * @return
+   */
 //  public static String getFilterPath(final String filterName, final InputStream is)
 //    throws ServletException {
 //    final String prefix = "filter";

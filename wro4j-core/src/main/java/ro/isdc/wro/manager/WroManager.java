@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,6 +267,7 @@ public class WroManager
     throws IOException {
     String hash = null;
     if (content != null) {
+      LOG.debug("Content to fingerprint: [" + StringUtils.abbreviate(content, 40) + "]");
       hash = fingerprintCreator.create(new ByteArrayInputStream(content.getBytes()));
     }
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);

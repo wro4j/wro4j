@@ -14,6 +14,8 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import junit.framework.Assert;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +31,10 @@ import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.util.CRC32FingerprintCreator;
+import ro.isdc.wro.model.resource.util.MD5FingerprintCreator;
 import ro.isdc.wro.test.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.encoding.CharsetToolkit;
@@ -239,6 +244,22 @@ public class TestWroManager
     config.setCacheUpdatePeriod(periodValue);
     config.setModelUpdatePeriod(periodValue);
     return config;
+  }
+
+  @Test
+  public void testCRC32Fingerprint()
+      throws Exception {
+    manager.setFingerprintCreator(new CRC32FingerprintCreator());
+    final String path = manager.encodeFingerprintIntoGroupPath("g3", ResourceType.CSS, true);
+    Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
+  }
+
+  @Test
+  public void testMD5Fingerprint()
+      throws Exception {
+    manager.setFingerprintCreator(new MD5FingerprintCreator());
+    final String path = manager.encodeFingerprintIntoGroupPath("g3", ResourceType.CSS, true);
+    Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }
 
   @After
