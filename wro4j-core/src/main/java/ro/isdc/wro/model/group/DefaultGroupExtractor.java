@@ -75,8 +75,7 @@ public class DefaultGroupExtractor
    * {@inheritDoc}
    */
   public String encodeGroupUrl(final String groupName, final ResourceType resourceType, final boolean minimize) {
-    return new StringBuilder(groupName).append(".").append(resourceType.name().toLowerCase()).append("?").append(
-      PARAM_MINIMIZE).append("=").append(minimize).toString();
+    return String.format("%s.%s?" + PARAM_MINIMIZE + "=%s", groupName, resourceType.name().toLowerCase(), minimize);
   }
 
   /**
