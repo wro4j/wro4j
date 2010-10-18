@@ -12,6 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.util.WroUtil;
 
 /**
  * @author Alex Objelean
@@ -69,6 +72,7 @@ public class TestDefaultWildcardStreamLocator {
     final File folder = new File(ClassLoader.getSystemResource("").getFile());
     locator.locateStream("/resource/noWildcard.css", folder);
   }
+
   @Test
   public void testWithValidFolder() throws IOException {
     final File folder = new File(ClassLoader.getSystemResource("").getFile());
@@ -79,5 +83,22 @@ public class TestDefaultWildcardStreamLocator {
   public void testWithInvalidFolder() throws IOException {
     final File folder = new File(ClassLoader.getSystemResource("1.css").getFile());
     locator.locateStream("/resource/*.css", folder);
+  }
+
+  @Test
+  public void testWildcardLocator() throws IOException {
+    locator = new DefaultWildcardStreamLocator(null) {
+      @Override
+      protected void handleFoundFiles(final java.util.Collection<File> files) {
+        Assert.assertEquals(2, files.size());
+      };
+    };
+    final UriLocator uriLocator = new ClasspathUriLocator() {
+      @Override
+      protected WildcardStreamLocator newWildcardStreamLocator() {
+        return locator;
+      }
+    };
+    uriLocator.locate("classpath:" + WroUtil.toPackageAsFolder(this.getClass()) + "/*.css");
   }
 }

@@ -16,6 +16,9 @@ import java.util.HashSet;
  * @author Alex Objelean
  */
 public class DuplicateResourceDetector {
+  /**
+   * Duplicate resource detector is different for separate threads. Each thread will have its own duplicateResourceDetector.
+   */
   private static final ThreadLocal<DetectorContext> DETECTOR_CONTEXT = new ThreadLocal<DuplicateResourceDetector.DetectorContext>();
   private class DetectorContext {
     private final Collection<String> resourceUris = new HashSet<String>();

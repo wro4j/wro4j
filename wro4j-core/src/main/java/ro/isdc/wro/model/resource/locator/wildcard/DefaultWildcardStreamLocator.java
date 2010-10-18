@@ -25,7 +25,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 
 
@@ -65,9 +64,6 @@ public class DefaultWildcardStreamLocator
    * @param duplicateResourceDetector
    */
   public DefaultWildcardStreamLocator(final DuplicateResourceDetector duplicateResourceDetector) {
-    if (duplicateResourceDetector == null) {
-      throw new IllegalArgumentException("duplicateResourceDetector cannot be null!");
-    }
     this.duplicateResourceDetector = duplicateResourceDetector;
   }
 
@@ -83,6 +79,21 @@ public class DefaultWildcardStreamLocator
    */
   public InputStream locateStream(final String uri, final File folder)
       throws IOException {
+    final Collection<File> files = findMatchedFiles(uri, folder);
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    for (final File file : files) {
+      final InputStream is = new FileInputStream(file);
+      IOUtils.copy(is, out);
+    }
+    out.close();
+    return new ByteArrayInputStream(out.toByteArray());
+  }
+
+  /**
+   * @return a collection of files found inside a given folder for a search uri which contains a wildcard.
+   */
+  private Collection<File> findMatchedFiles(final String uri, final File folder)
+    throws IOException {
     if (uri == null || folder == null || !folder.isDirectory()) {
       final StringBuffer message = new StringBuffer("Invalid folder provided");
       if (folder != null) {
@@ -138,18 +149,23 @@ public class DefaultWildcardStreamLocator
     }
 
     final Collection<File> files = uriToFileMap.values();
-
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
     if (files.isEmpty()) {
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
-    for (final File file : files) {
-      final InputStream is = new FileInputStream(file);
-      IOUtils.copy(is, out);
-    }
-    out.close();
-    return new ByteArrayInputStream(out.toByteArray());
+    handleFoundFiles(files);
+    return files;
+  }
+
+
+  /**
+   * Used to do something with found collection of files before they are merged into a single stream. This is useful for
+   * testing.
+   *
+   * @param files a collection of found files after the wildcard has beed applied on searched folder.
+   */
+  protected void handleFoundFiles(final Collection<File> files) {
+    //do nothing
   }
 
   /**
@@ -159,7 +175,9 @@ public class DefaultWildcardStreamLocator
    */
   private boolean isDuplicateResourceUri(final String resourceUri) {
     if (duplicateResourceDetector == null) {
-      throw new WroRuntimeException("duplicateResourceDetector was not injected!");
+      //when duplicateResourceDetector is not injected (unit tests or using locators outside of wro4j), the duplication is assumed to not be enabled.
+      LOG.warn("DuplicateResourceDetector not enabled, assuming no duplicate found for: " + resourceUri);
+      return false;
     }
     final boolean result = duplicateResourceDetector.isDuplicateResourceUri(resourceUri);
     duplicateResourceDetector.addResourceUri(resourceUri);

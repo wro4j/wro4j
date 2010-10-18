@@ -50,8 +50,6 @@ public class SmartEncodingInputStream
   private static final Logger LOG = LoggerFactory.getLogger(SmartEncodingInputStream.class);
   private final InputStream is;
   private int bufferLength;
-  private final boolean enforce8Bit;
-  private final Charset defaultCharset;
   private final byte[] buffer;
   private int counter;
   private final Charset charset;
@@ -88,12 +86,10 @@ public class SmartEncodingInputStream
       final boolean enforce8Bit) throws IOException {
     this.is = is;
     this.bufferLength = bufferLength;
-    this.enforce8Bit = enforce8Bit;
     this.buffer = new byte[bufferLength];
     this.counter = 0;
 
     this.bufferLength = is.read(buffer);
-    this.defaultCharset = defaultCharset;
     final CharsetToolkit charsetToolkit = new CharsetToolkit(buffer, defaultCharset);
     charsetToolkit.setEnforce8Bit(enforce8Bit);
     this.charset = charsetToolkit.guessEncoding();
@@ -162,6 +158,7 @@ public class SmartEncodingInputStream
    *         of the stream has been reached.
    * @throws IOException
    */
+  @Override
   public int read()
       throws IOException {
     if (counter < bufferLength)
