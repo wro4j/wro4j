@@ -67,7 +67,7 @@ public final class ByteArrayStreamDispatchingStrategy
       final ServletRequest wrappedRequest = getWrappedServletRequest(request, location);
       // Wrap response
       final ServletResponse wrappedResponse = getWrappedServletResponse(response, os);
-      LOG.debug("dispatching request to:" + location);
+      LOG.debug("dispatching request to location: " + location);
       // use dispatcher
       dispatcher.include(wrappedRequest, wrappedResponse);
       // force flushing - the content will be written to

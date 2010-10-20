@@ -93,6 +93,10 @@ public class ResourceTransformerPanel extends Panel {
   private Component getTransformButton() {
     final Component c = new IndicatingAjaxButton("transform") {
       @Override
+      protected void onError(final AjaxRequestTarget target, final Form<?> form) {
+        target.appendJavascript("alert('Unexpected error occured');");
+      }
+      @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (processor == null) {
           return;
@@ -120,7 +124,8 @@ public class ResourceTransformerPanel extends Panel {
             processingTime = String.valueOf(new Date().getTime() - processingTimeAsLong);
           }
           target.addComponent(form);
-        } catch (final IOException e) {
+        } catch (final Exception e) {
+          target.prependJavascript("alert('Cannot process the input: " + e.getMessage() + "');");
           LOG.error("exception occured: " + e);
         }
       }

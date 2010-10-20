@@ -101,8 +101,8 @@ public class ServletContextUriLocator
         return getWildcardStreamLocator().locateStream(uri, new File(realPath));
       }
     } catch (final IOException e) {
-      LOG.warn("Couldn't localize the stream containing wildcard: " + e.getMessage()
-        + ". Trying to locate the stream without the wildcard.");
+      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
+        + "\".\n Trying to locate the stream without the wildcard.");
     }
 
     // first attempt

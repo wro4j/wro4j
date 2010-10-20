@@ -59,7 +59,7 @@
   </developers>
   
 	<properties>
-    <commons-io.dependency>1.4</commons-io.dependency>
+    <commons-io.dependency>2.0</commons-io.dependency>
     <commons-lang.dependency>2.5</commons-lang.dependency>       
     <slf4j.dependency>1.6.0</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
@@ -278,13 +278,6 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<downloadSources>true</downloadSources>
-				</configuration>
-			</plugin>				
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>

@@ -2,11 +2,11 @@ package ro.isdc.wro.examples.page;
 
 
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.IAjaxIndicatorAware;
 import org.apache.wicket.extensions.ajax.markup.html.AjaxIndicatorAppender;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 
 /**
