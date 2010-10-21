@@ -52,4 +52,17 @@ public class TestBomStripperPreProcessor extends AbstractWroTest {
         });
   }
 
+  @Test
+  public void testWithChineseCharacters() throws IOException {
+    compareProcessedResourceContents(
+        "http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js",
+        "classpath:ro/isdc/wro/processor/bom/chineseEncoding-output.js",
+        new ResourceProcessor() {
+          public void process(final Reader reader, final Writer writer)
+              throws IOException {
+            processor.process(null, reader, writer);
+          }
+        });
+  }
+
 }

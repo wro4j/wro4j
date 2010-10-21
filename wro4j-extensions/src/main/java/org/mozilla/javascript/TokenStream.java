@@ -29,12 +29,6 @@ package org.mozilla.javascript;
 
 import java.io.*;
 
-import org.mozilla.javascript.Kit;
-import org.mozilla.javascript.ObjToIntMap;
-import org.mozilla.javascript.Parser;
-import org.mozilla.javascript.ScriptRuntime;
-import org.mozilla.javascript.Token;
-
 /**
  * This class implements the JavaScript scanner.
  *

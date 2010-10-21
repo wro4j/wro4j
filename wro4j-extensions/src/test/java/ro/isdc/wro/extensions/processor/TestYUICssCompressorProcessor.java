@@ -24,10 +24,23 @@ public class TestYUICssCompressorProcessor extends AbstractWroTest {
   private final ResourcePostProcessor processor = new YUICssCompressorProcessor();
 
   @Test
-  public void test() throws IOException {
+  public void testLargeCss() throws IOException {
     compareProcessedResourceContents(
         "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-input.css",
         "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-output.css",
+        new ResourceProcessor() {
+          public void process(final Reader reader, final Writer writer)
+              throws IOException {
+            processor.process(reader, writer);
+          }
+        });
+  }
+
+  @Test
+  public void testSmallCss() throws IOException {
+    compareProcessedResourceContents(
+        "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-inputSmall.css",
+        "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-outputSmall.css",
         new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {

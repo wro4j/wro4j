@@ -82,7 +82,6 @@ public abstract class PreProcessorExecutor {
 
     // merge preProcessorsBy type and anyPreProcessors
     final Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
-    processors.addAll(getPreProcessorsByType(null));
     if (!minimize) {
       GroupsProcessor.removeMinimizeAwareProcessors(processors);
     }

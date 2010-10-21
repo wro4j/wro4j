@@ -25,6 +25,29 @@ import ro.isdc.wro.util.WroUtil;
 public class TestYUIJsCompressorProcessor extends AbstractWroTest {
   private final ResourcePostProcessor processor = new YUIJsCompressorProcessor();
 
+  @Test
+  public void testWicketEventJsWithMunge()
+    throws IOException {
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.js", "classpath:"
+      + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.yui-munge.js", new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    });
+  }
+
+  @Test
+  public void testWicketEventJsWithNoMunge()
+    throws IOException {
+    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.js", "classpath:"
+      + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.yui-nomunge.js", new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        new YUIJsCompressorProcessor(false).process(reader, writer);
+      }
+    });
+  }
 
   @Test
   public void testWithMunge()
@@ -37,6 +60,8 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
       }
     });
   }
+
+
 
   @Test
   public void testNoMunge()

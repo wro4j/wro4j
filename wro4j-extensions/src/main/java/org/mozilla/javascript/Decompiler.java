@@ -27,13 +27,6 @@
 
 package org.mozilla.javascript;
 
-import org.mozilla.javascript.Decompiler;
-import org.mozilla.javascript.FunctionNode;
-import org.mozilla.javascript.Kit;
-import org.mozilla.javascript.ScriptRuntime;
-import org.mozilla.javascript.Token;
-import org.mozilla.javascript.UintMap;
-
 /**
  * The following class save decompilation information about the source.
  * Source information is returned from the parser as a String

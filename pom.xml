@@ -67,8 +67,8 @@
     <junit.dependency>4.8.1</junit.dependency>    
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>	
-	<maven.compile.encoding>UTF-8</maven.compile.encoding>
-	<maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
+    <maven.compile.encoding>UTF-8</maven.compile.encoding>
+    <maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
 	</properties>
 	
   
@@ -115,11 +115,6 @@
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>${commons-lang.dependency}</version>
-			</dependency>	
-			<dependency>
-				<groupId>javax.inject</groupId> 
-				<artifactId>javax.inject</artifactId> 
-				<version>1</version>
 			</dependency>	
       <dependency>
 				<groupId>org.slf4j</groupId>

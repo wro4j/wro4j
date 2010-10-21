@@ -32,10 +32,6 @@
 			<artifactId>yuicompressor</artifactId>
 		</dependency>
     -->
-    <dependency>
-      <groupId>rhino</groupId>
-      <artifactId>js</artifactId>
-    </dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -51,6 +47,10 @@
 		<dependency>
       <groupId>com.google.closure</groupId>
       <artifactId>compiler</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>rhino</groupId>
+      <artifactId>js</artifactId>
     </dependency>
 	</dependencies>
 	<build>

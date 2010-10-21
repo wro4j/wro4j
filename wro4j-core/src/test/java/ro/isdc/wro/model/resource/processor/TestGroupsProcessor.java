@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -21,12 +19,15 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -53,6 +54,35 @@ public class TestGroupsProcessor {
   public void testNoProcessorsSet() {
   	Assert.assertTrue(groupsProcessor.getPostProcessorsByType(null).isEmpty());
   }
+
+  /**
+   * Test if getPostProcessorsByType is implemented correctly
+   */
+  @Test
+  public void testMixedPreProcessors() {
+    final Collection<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
+    processors.add(new CssMinProcessor());
+    processors.add(new BomStripperPreProcessor());
+    groupsProcessor.setResourcePreProcessors(processors);
+    Assert.assertEquals(1, groupsProcessor.getPreProcessorsByType(null).size());
+    Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
+    Assert.assertEquals(1, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
+  }
+
+  /**
+   * Test if getPostProcessorsByType is implemented correctly
+   */
+  @Test
+  public void testMixedPostProcessors() {
+    final Collection<ResourcePostProcessor> processors = new ArrayList<ResourcePostProcessor>();
+    processors.add(new CssMinProcessor());
+    processors.add(new CommentStripperProcessor());
+    groupsProcessor.setResourcePostProcessors(processors);
+    Assert.assertEquals(1, groupsProcessor.getPostProcessorsByType(null).size());
+    Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.CSS).size());
+    Assert.assertEquals(1, groupsProcessor.getPostProcessorsByType(ResourceType.JS).size());
+  }
+
   /**
    * Test if getPostProcessorsByType is implemented correctly
    */
@@ -75,8 +105,8 @@ public class TestGroupsProcessor {
   	processors.add(new SingleLineCommentStripperProcessor());
   	groupsProcessor.setResourcePostProcessors(processors);
   	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(null).size());
-  	Assert.assertEquals(0, groupsProcessor.getPostProcessorsByType(ResourceType.CSS).size());
-  	Assert.assertEquals(0, groupsProcessor.getPostProcessorsByType(ResourceType.JS).size());
+  	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.CSS).size());
+  	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.JS).size());
   }
 
   @Test
@@ -98,8 +128,8 @@ public class TestGroupsProcessor {
   	processors.add(new SingleLineCommentStripperProcessor());
   	groupsProcessor.setResourcePreProcessors(processors);
   	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(null).size());
-  	Assert.assertEquals(0, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
-  	Assert.assertEquals(0, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
+  	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
+  	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
   }
 
   @Test

@@ -175,7 +175,7 @@ public class DefaultWildcardStreamLocator
    */
   private boolean isDuplicateResourceUri(final String resourceUri) {
     if (duplicateResourceDetector == null) {
-      //when duplicateResourceDetector is not injected (unit tests or using locators outside of wro4j), the duplication is assumed to not be enabled.
+      //when duplicateResourceDetector is not set (unit tests or using locators outside of wro4j), the duplication is assumed to not be enabled.
       LOG.warn("DuplicateResourceDetector not enabled, assuming no duplicate found for: " + resourceUri);
       return false;
     }

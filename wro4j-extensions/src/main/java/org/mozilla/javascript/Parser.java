@@ -1,5 +1,4 @@
 /* ***** BEGIN LICENSE BLOCK *****
-
  *
  * Version: MPL 1.1
  *
@@ -28,8 +27,8 @@
 
 package org.mozilla.javascript;
 
-import java.io.IOException;
 import java.io.Reader;
+import java.io.IOException;
 import java.util.Hashtable;
 
 /**
@@ -54,7 +53,7 @@ public class Parser
         TI_CHECK_LABEL = 1 << 17;  // indicates to check for label
 
     CompilerEnvirons compilerEnv;
-    private final ErrorReporter errorReporter;
+    private ErrorReporter errorReporter;
     private String sourceURI;
     boolean calledByCompileFunction;
 
@@ -87,26 +86,26 @@ public class Parser
         static final long serialVersionUID = 5882582646773765630L;
     }
 
-    public Parser(final CompilerEnvirons compilerEnv, final ErrorReporter errorReporter)
+    public Parser(CompilerEnvirons compilerEnv, ErrorReporter errorReporter)
     {
         this.compilerEnv = compilerEnv;
         this.errorReporter = errorReporter;
     }
 
-    protected Decompiler createDecompiler(final CompilerEnvirons compilerEnv)
+    protected Decompiler createDecompiler(CompilerEnvirons compilerEnv)
     {
         return new Decompiler();
     }
 
-    void addStrictWarning(final String messageId, final String messageArg)
+    void addStrictWarning(String messageId, String messageArg)
     {
         if (compilerEnv.isStrictMode())
             addWarning(messageId, messageArg);
     }
 
-    void addWarning(final String messageId, final String messageArg)
+    void addWarning(String messageId, String messageArg)
     {
-        final String message = ScriptRuntime.getMessage1(messageId, messageArg);
+        String message = ScriptRuntime.getMessage1(messageId, messageArg);
         if (compilerEnv.reportWarningAsError()) {
             ++syntaxErrorCount;
             errorReporter.error(message, sourceURI, ts.getLineno(),
@@ -116,23 +115,23 @@ public class Parser
                                   ts.getLine(), ts.getOffset());
     }
 
-    void addError(final String messageId)
+    void addError(String messageId)
     {
         ++syntaxErrorCount;
-        final String message = ScriptRuntime.getMessage0(messageId);
+        String message = ScriptRuntime.getMessage0(messageId);
         errorReporter.error(message, sourceURI, ts.getLineno(),
                             ts.getLine(), ts.getOffset());
     }
 
-    void addError(final String messageId, final String messageArg)
+    void addError(String messageId, String messageArg)
     {
         ++syntaxErrorCount;
-        final String message = ScriptRuntime.getMessage1(messageId, messageArg);
+        String message = ScriptRuntime.getMessage1(messageId, messageArg);
         errorReporter.error(message, sourceURI, ts.getLineno(),
                             ts.getLine(), ts.getOffset());
     }
 
-    RuntimeException reportError(final String messageId)
+    RuntimeException reportError(String messageId)
     {
         addError(messageId);
 
@@ -192,7 +191,7 @@ public class Parser
     private int nextToken()
         throws IOException
     {
-        final int tt = peekToken();
+        int tt = peekToken();
         consumeToken();
         return tt;
     }
@@ -201,15 +200,15 @@ public class Parser
         throws IOException
     {
         peekToken();
-        final int ttFlagged = currentFlaggedToken;
+        int ttFlagged = currentFlaggedToken;
         consumeToken();
         return ttFlagged;
     }
 
-    private boolean matchToken(final int toMatch)
+    private boolean matchToken(int toMatch)
         throws IOException
     {
-        final int tt = peekToken();
+        int tt = peekToken();
         if (tt != toMatch) {
             return false;
         }
@@ -235,7 +234,7 @@ public class Parser
         currentFlaggedToken |= TI_CHECK_LABEL;
     }
 
-    private void mustMatchToken(final int toMatch, final String messageId)
+    private void mustMatchToken(int toMatch, String messageId)
         throws IOException, ParserException
     {
         if (!matchToken(toMatch)) {
@@ -265,9 +264,9 @@ public class Parser
         return nestingOfFunction != 0;
     }
 
-    private Node enterLoop(final Node loopLabel)
+    private Node enterLoop(Node loopLabel)
     {
-        final Node loop = nf.createLoopNode(loopLabel, ts.getLineno());
+        Node loop = nf.createLoopNode(loopLabel, ts.getLineno());
         if (loopSet == null) {
             loopSet = new ObjArray();
             if (loopAndSwitchSet == null) {
@@ -285,9 +284,9 @@ public class Parser
         loopAndSwitchSet.pop();
     }
 
-    private Node enterSwitch(final Node switchSelector, final int lineno)
+    private Node enterSwitch(Node switchSelector, int lineno)
     {
-        final Node switchNode = nf.createSwitch(switchSelector, lineno);
+        Node switchNode = nf.createSwitch(switchSelector, lineno);
         if (loopAndSwitchSet == null) {
             loopAndSwitchSet = new ObjArray();
         }
@@ -308,14 +307,14 @@ public class Parser
      * parse failure will result in a call to the ErrorReporter from
      * CompilerEnvirons.)
      */
-    public ScriptOrFnNode parse(final String sourceString,
-                                final String sourceURI, final int lineno)
+    public ScriptOrFnNode parse(String sourceString,
+                                String sourceURI, int lineno)
     {
         this.sourceURI = sourceURI;
         this.ts = new TokenStream(this, null, sourceString, lineno);
         try {
             return parse();
-        } catch (final IOException ex) {
+        } catch (IOException ex) {
             // Should never happen
             throw new IllegalStateException();
         }
@@ -329,8 +328,8 @@ public class Parser
      * parse failure will result in a call to the ErrorReporter from
      * CompilerEnvirons.)
      */
-    public ScriptOrFnNode parse(final Reader sourceReader,
-                                final String sourceURI, final int lineno)
+    public ScriptOrFnNode parse(Reader sourceReader,
+                                String sourceURI, int lineno)
         throws IOException
     {
         this.sourceURI = sourceURI;
@@ -344,22 +343,22 @@ public class Parser
         this.decompiler = createDecompiler(compilerEnv);
         this.nf = new IRFactory(this);
         currentScriptOrFn = nf.createScript();
-        final int sourceStartOffset = decompiler.getCurrentOffset();
+        int sourceStartOffset = decompiler.getCurrentOffset();
         this.encodedSource = null;
         decompiler.addToken(Token.SCRIPT);
 
         this.currentFlaggedToken = Token.EOF;
         this.syntaxErrorCount = 0;
 
-        final int baseLineno = ts.getLineno();  // line number where source starts
+        int baseLineno = ts.getLineno();  // line number where source starts
 
         /* so we have something to add nodes to until
          * we've collected all the source */
-        final Node pn = nf.createLeaf(Token.BLOCK);
+        Node pn = nf.createLeaf(Token.BLOCK);
 
         try {
             for (;;) {
-                final int tt = peekToken();
+                int tt = peekToken();
 
                 if (tt <= Token.EOF) {
                     break;
@@ -372,7 +371,7 @@ public class Parser
                         n = function(calledByCompileFunction
                                      ? FunctionNode.FUNCTION_EXPRESSION
                                      : FunctionNode.FUNCTION_STATEMENT);
-                    } catch (final ParserException e) {
+                    } catch (ParserException e) {
                         break;
                     }
                 } else {
@@ -380,8 +379,8 @@ public class Parser
                 }
                 nf.addChildToBack(pn, n);
             }
-        } catch (final StackOverflowError ex) {
-            final String msg = ScriptRuntime.getMessage0(
+        } catch (StackOverflowError ex) {
+            String msg = ScriptRuntime.getMessage0(
                 "msg.too.deep.parser.recursion");
             throw Context.reportRuntimeError(msg, sourceURI,
                                              ts.getLineno(), null, 0);
@@ -398,7 +397,7 @@ public class Parser
         currentScriptOrFn.setBaseLineno(baseLineno);
         currentScriptOrFn.setEndLineno(ts.getLineno());
 
-        final int sourceEndOffset = decompiler.getCurrentOffset();
+        int sourceEndOffset = decompiler.getCurrentOffset();
         currentScriptOrFn.setEncodedSourceBounds(sourceStartOffset,
                                                  sourceEndOffset);
 
@@ -422,11 +421,11 @@ public class Parser
         throws IOException
     {
         ++nestingOfFunction;
-        final Node pn = nf.createBlock(ts.getLineno());
+        Node pn = nf.createBlock(ts.getLineno());
         try {
             bodyLoop: for (;;) {
                 Node n;
-                final int tt = peekToken();
+                int tt = peekToken();
                 switch (tt) {
                   case Token.ERROR:
                   case Token.EOF:
@@ -443,7 +442,7 @@ public class Parser
                 }
                 nf.addChildToBack(pn, n);
             }
-        } catch (final ParserException e) {
+        } catch (ParserException e) {
             // Ignore it
         } finally {
             --nestingOfFunction;
@@ -452,13 +451,13 @@ public class Parser
         return pn;
     }
 
-    private Node function(final int functionType)
+    private Node function(int functionType)
         throws IOException, ParserException
     {
         int syntheticType = functionType;
-        final int baseLineno = ts.getLineno();  // line number where source starts
+        int baseLineno = ts.getLineno();  // line number where source starts
 
-        final int functionSourceStart = decompiler.markFunctionStart(functionType);
+        int functionSourceStart = decompiler.markFunctionStart(functionType);
         String name;
         Node memberExprNode = null;
         if (matchToken(Token.NAME)) {
@@ -468,7 +467,7 @@ public class Parser
                 if (compilerEnv.isAllowMemberExprAsFunctionName()) {
                     // Extension to ECMA: if 'function <name>' does not follow
                     // by '(', assume <name> starts memberExpr
-                    final Node memberExprHead = nf.createName(name);
+                    Node memberExprHead = nf.createName(name);
                     name = "";
                     memberExprNode = memberExprTail(false, memberExprHead);
                 }
@@ -492,9 +491,9 @@ public class Parser
             syntheticType = FunctionNode.FUNCTION_EXPRESSION;
         }
 
-        final boolean nested = insideFunction();
+        boolean nested = insideFunction();
 
-        final FunctionNode fnNode = nf.createFunction(name);
+        FunctionNode fnNode = nf.createFunction(name);
         if (nested || nestingOfWith > 0) {
             // 1. Nested functions are not affected by the dynamic scope flag
             // as dynamic scope is already a parent of their scope.
@@ -504,22 +503,22 @@ public class Parser
             fnNode.itsIgnoreDynamicScope = true;
         }
 
-        final int functionIndex = currentScriptOrFn.addFunction(fnNode);
+        int functionIndex = currentScriptOrFn.addFunction(fnNode);
 
         int functionSourceEnd;
 
-        final ScriptOrFnNode savedScriptOrFn = currentScriptOrFn;
+        ScriptOrFnNode savedScriptOrFn = currentScriptOrFn;
         currentScriptOrFn = fnNode;
-        final int savedNestingOfWith = nestingOfWith;
+        int savedNestingOfWith = nestingOfWith;
         nestingOfWith = 0;
-        final Hashtable savedLabelSet = labelSet;
+        Hashtable savedLabelSet = labelSet;
         labelSet = null;
-        final ObjArray savedLoopSet = loopSet;
+        ObjArray savedLoopSet = loopSet;
         loopSet = null;
-        final ObjArray savedLoopAndSwitchSet = loopAndSwitchSet;
+        ObjArray savedLoopAndSwitchSet = loopAndSwitchSet;
         loopAndSwitchSet = null;
-        final boolean savedHasReturnValue = hasReturnValue;
-        final int savedFunctionEndFlags = functionEndFlags;
+        boolean savedHasReturnValue = hasReturnValue;
+        int savedFunctionEndFlags = functionEndFlags;
 
         Node body;
         try {
@@ -531,7 +530,7 @@ public class Parser
                         decompiler.addToken(Token.COMMA);
                     first = false;
                     mustMatchToken(Token.NAME, "msg.no.parm");
-                    final String s = ts.getString();
+                    String s = ts.getString();
                     if (fnNode.hasParamOrVar(s)) {
                         addWarning("msg.dup.parms", s);
                     }
@@ -550,7 +549,7 @@ public class Parser
 
             if (compilerEnv.isStrictMode() && !body.hasConsistentReturnUsage())
             {
-              final String msg = name.length() > 0 ? "msg.no.return.value"
+              String msg = name.length() > 0 ? "msg.no.return.value"
                                              : "msg.anon.no.return.value";
               addStrictWarning(msg, name);
             }
@@ -579,7 +578,7 @@ public class Parser
         fnNode.setEndLineno(ts.getLineno());
 
         if (name != null) {
-          final int index = currentScriptOrFn.getParamOrVarIndex(name);
+          int index = currentScriptOrFn.getParamOrVarIndex(name);
           if (index >= 0 && index < currentScriptOrFn.getParamCount())
             addStrictWarning("msg.var.hides.arg", name);
         }
@@ -598,7 +597,7 @@ public class Parser
     private Node statements()
         throws IOException
     {
-        final Node pn = nf.createBlock(ts.getLineno());
+        Node pn = nf.createBlock(ts.getLineno());
 
         int tt;
         while((tt = peekToken()) > Token.EOF && tt != Token.RC) {
@@ -613,7 +612,7 @@ public class Parser
     {
         mustMatchToken(Token.LP, "msg.no.paren.cond");
         decompiler.addToken(Token.LP);
-        final Node pn = expr(false);
+        Node pn = expr(false);
         mustMatchToken(Token.RP, "msg.no.paren.after.cond");
         decompiler.addToken(Token.RP);
 
@@ -634,10 +633,10 @@ public class Parser
     {
         Node label = null;
 
-        final int tt = peekTokenOrEOL();
+        int tt = peekTokenOrEOL();
         if (tt == Token.NAME) {
             consumeToken();
-            final String name = ts.getString();
+            String name = ts.getString();
             decompiler.addName(name);
             if (labelSet != null) {
                 label = (Node)labelSet.get(name);
@@ -654,18 +653,18 @@ public class Parser
         throws IOException
     {
         try {
-            final Node pn = statementHelper(null);
+            Node pn = statementHelper(null);
             if (pn != null) {
                 if (compilerEnv.isStrictMode() && !pn.hasSideEffects())
                     addStrictWarning("msg.no.side.effects", "");
                 return pn;
             }
-        } catch (final ParserException e) { }
+        } catch (ParserException e) { }
 
         // skip to end of statement
-        final int lineno = ts.getLineno();
+        int lineno = ts.getLineno();
         guessingStatementEnd: for (;;) {
-            final int tt = peekTokenOrEOL();
+            int tt = peekTokenOrEOL();
             consumeToken();
             switch (tt) {
               case Token.ERROR:
@@ -697,10 +696,10 @@ public class Parser
             consumeToken();
 
             decompiler.addToken(Token.IF);
-            final int lineno = ts.getLineno();
-            final Node cond = condition();
+            int lineno = ts.getLineno();
+            Node cond = condition();
             decompiler.addEOL(Token.LC);
-            final Node ifTrue = statement();
+            Node ifTrue = statement();
             Node ifFalse = null;
             if (matchToken(Token.ELSE)) {
                 decompiler.addToken(Token.RC);
@@ -717,7 +716,7 @@ public class Parser
             consumeToken();
 
             decompiler.addToken(Token.SWITCH);
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
             mustMatchToken(Token.LP, "msg.no.paren.switch");
             decompiler.addToken(Token.LP);
             pn = enterSwitch(expr(false), lineno);
@@ -758,7 +757,7 @@ public class Parser
                         break switchLoop;
                     }
 
-                    final Node block = nf.createLeaf(Token.BLOCK);
+                    Node block = nf.createLeaf(Token.BLOCK);
                     while ((tt = peekToken()) != Token.RC
                            && tt != Token.CASE
                            && tt != Token.DEFAULT
@@ -782,11 +781,11 @@ public class Parser
             consumeToken();
             decompiler.addToken(Token.WHILE);
 
-            final Node loop = enterLoop(statementLabel);
+            Node loop = enterLoop(statementLabel);
             try {
-                final Node cond = condition();
+                Node cond = condition();
                 decompiler.addEOL(Token.LC);
-                final Node body = statement();
+                Node body = statement();
                 decompiler.addEOL(Token.RC);
                 pn = nf.createWhile(loop, cond, body);
             } finally {
@@ -800,13 +799,13 @@ public class Parser
             decompiler.addToken(Token.DO);
             decompiler.addEOL(Token.LC);
 
-            final Node loop = enterLoop(statementLabel);
+            Node loop = enterLoop(statementLabel);
             try {
-                final Node body = statement();
+                Node body = statement();
                 decompiler.addToken(Token.RC);
                 mustMatchToken(Token.WHILE, "msg.no.while.do");
                 decompiler.addToken(Token.WHILE);
-                final Node cond = condition();
+                Node cond = condition();
                 pn = nf.createDoWhile(loop, body, cond);
             } finally {
                 exitLoop();
@@ -824,7 +823,7 @@ public class Parser
             boolean isForEach = false;
             decompiler.addToken(Token.FOR);
 
-            final Node loop = enterLoop(statementLabel);
+            Node loop = enterLoop(statementLabel);
             try {
 
                 Node init;  // Node init is also foo in 'foo in Object'
@@ -902,7 +901,7 @@ public class Parser
 
           case Token.TRY: {
             consumeToken();
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
 
             Node tryblock;
             Node catchblocks = null;
@@ -916,7 +915,7 @@ public class Parser
             catchblocks = nf.createLeaf(Token.BLOCK);
 
             boolean sawDefaultCatch = false;
-            final int peek = peekToken();
+            int peek = peekToken();
             if (peek == Token.CATCH) {
                 while (matchToken(Token.CATCH)) {
                     if (sawDefaultCatch) {
@@ -927,7 +926,7 @@ public class Parser
                     decompiler.addToken(Token.LP);
 
                     mustMatchToken(Token.NAME, "msg.bad.catchcond");
-                    final String varName = ts.getString();
+                    String varName = ts.getString();
                     decompiler.addName(varName);
 
                     Node catchCond = null;
@@ -976,7 +975,7 @@ public class Parser
                 reportError("msg.bad.throw.eol");
             }
 
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
             decompiler.addToken(Token.THROW);
             pn = nf.createThrow(expr(false), lineno);
             break;
@@ -984,7 +983,7 @@ public class Parser
 
           case Token.BREAK: {
             consumeToken();
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
 
             decompiler.addToken(Token.BREAK);
 
@@ -1003,13 +1002,13 @@ public class Parser
 
           case Token.CONTINUE: {
             consumeToken();
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
 
             decompiler.addToken(Token.CONTINUE);
 
             Node loop;
             // matchJumpLabelName only matches if there is one
-            final Node label = matchJumpLabelName();
+            Node label = matchJumpLabelName();
             if (label == null) {
                 if (loopSet == null || loopSet.size() == 0) {
                     reportError("msg.continue.outside");
@@ -1031,10 +1030,10 @@ public class Parser
             consumeToken();
 
             decompiler.addToken(Token.WITH);
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
             mustMatchToken(Token.LP, "msg.no.paren.with");
             decompiler.addToken(Token.LP);
-            final Node obj = expr(false);
+            Node obj = expr(false);
             mustMatchToken(Token.RP, "msg.no.paren.after.with");
             decompiler.addToken(Token.RP);
             decompiler.addEOL(Token.LC);
@@ -1066,7 +1065,7 @@ public class Parser
             }
             consumeToken();
             decompiler.addToken(Token.RETURN);
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
 
             Node retExpr;
             /* This is ugly, but we don't want to require a semicolon. */
@@ -1131,7 +1130,7 @@ public class Parser
             mustHaveXML();
 
             decompiler.addToken(Token.DEFAULT);
-            final int nsLine = ts.getLineno();
+            int nsLine = ts.getLineno();
 
             if (!(matchToken(Token.NAME)
                   && ts.getString().equals("xml")))
@@ -1152,13 +1151,13 @@ public class Parser
             }
             decompiler.addToken(Token.ASSIGN);
 
-            final Node expr = expr(false);
+            Node expr = expr(false);
             pn = nf.createDefaultNamespace(expr, nsLine);
             break;
 
           case Token.NAME: {
-            final int lineno = ts.getLineno();
-            final String name = ts.getString();
+            int lineno = ts.getLineno();
+            String name = ts.getString();
             setCheckForLabel();
             pn = expr(false);
             if (pn.getType() != Token.LABEL) {
@@ -1203,14 +1202,14 @@ public class Parser
           }
 
           default: {
-            final int lineno = ts.getLineno();
+            int lineno = ts.getLineno();
             pn = expr(false);
             pn = nf.createExprStatement(pn, lineno);
             break;
           }
         }
 
-        final int ttFlagged = peekFlaggedToken();
+        int ttFlagged = peekFlaggedToken();
         switch (ttFlagged & CLEAR_TI_MASK) {
           case Token.SEMI:
             // Consume ';' as a part of expression
@@ -1242,7 +1241,7 @@ public class Parser
      * @throws IOException
      * @throws ParserException
      */
-    private Node variables(final int context)
+    private Node variables(int context)
         throws IOException, ParserException
     {
         Node pn;
@@ -1260,7 +1259,7 @@ public class Parser
             Node name;
             Node init;
             mustMatchToken(Token.NAME, "msg.bad.var");
-            final String s = ts.getString();
+            String s = ts.getString();
 
             if (!first)
                 decompiler.addToken(Token.COMMA);
@@ -1279,7 +1278,7 @@ public class Parser
                         addError("msg.const.redecl", s);
                 }
             } else {
-                final int dupState = currentScriptOrFn.addVar(s);
+                int dupState = currentScriptOrFn.addVar(s);
                 if (dupState == ScriptOrFnNode.DUPLICATE_CONST)
                     addError("msg.const.redecl", s);
                 else if (dupState == ScriptOrFnNode.DUPLICATE_PARAMETER)
@@ -1304,7 +1303,7 @@ public class Parser
         return pn;
     }
 
-    private Node expr(final boolean inForInit)
+    private Node expr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = assignExpr(inForInit);
@@ -1317,12 +1316,12 @@ public class Parser
         return pn;
     }
 
-    private Node assignExpr(final boolean inForInit)
+    private Node assignExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = condExpr(inForInit);
 
-        final int tt = peekToken();
+        int tt = peekToken();
         if (Token.FIRST_ASSIGN <= tt && tt <= Token.LAST_ASSIGN) {
             consumeToken();
             decompiler.addToken(tt);
@@ -1332,24 +1331,24 @@ public class Parser
         return pn;
     }
 
-    private Node condExpr(final boolean inForInit)
+    private Node condExpr(boolean inForInit)
         throws IOException, ParserException
     {
-        final Node pn = orExpr(inForInit);
+        Node pn = orExpr(inForInit);
 
         if (matchToken(Token.HOOK)) {
             decompiler.addToken(Token.HOOK);
-            final Node ifTrue = assignExpr(false);
+            Node ifTrue = assignExpr(false);
             mustMatchToken(Token.COLON, "msg.no.colon.cond");
             decompiler.addToken(Token.COLON);
-            final Node ifFalse = assignExpr(inForInit);
+            Node ifFalse = assignExpr(inForInit);
             return nf.createCondExpr(pn, ifTrue, ifFalse);
         }
 
         return pn;
     }
 
-    private Node orExpr(final boolean inForInit)
+    private Node orExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = andExpr(inForInit);
@@ -1361,7 +1360,7 @@ public class Parser
         return pn;
     }
 
-    private Node andExpr(final boolean inForInit)
+    private Node andExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = bitOrExpr(inForInit);
@@ -1373,7 +1372,7 @@ public class Parser
         return pn;
     }
 
-    private Node bitOrExpr(final boolean inForInit)
+    private Node bitOrExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = bitXorExpr(inForInit);
@@ -1384,7 +1383,7 @@ public class Parser
         return pn;
     }
 
-    private Node bitXorExpr(final boolean inForInit)
+    private Node bitXorExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = bitAndExpr(inForInit);
@@ -1395,7 +1394,7 @@ public class Parser
         return pn;
     }
 
-    private Node bitAndExpr(final boolean inForInit)
+    private Node bitAndExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = eqExpr(inForInit);
@@ -1406,12 +1405,12 @@ public class Parser
         return pn;
     }
 
-    private Node eqExpr(final boolean inForInit)
+    private Node eqExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = relExpr(inForInit);
         for (;;) {
-            final int tt = peekToken();
+            int tt = peekToken();
             switch (tt) {
               case Token.EQ:
               case Token.NE:
@@ -1450,12 +1449,12 @@ public class Parser
         return pn;
     }
 
-    private Node relExpr(final boolean inForInit)
+    private Node relExpr(boolean inForInit)
         throws IOException, ParserException
     {
         Node pn = shiftExpr();
         for (;;) {
-            final int tt = peekToken();
+            int tt = peekToken();
             switch (tt) {
               case Token.IN:
                 if (inForInit)
@@ -1481,7 +1480,7 @@ public class Parser
     {
         Node pn = addExpr();
         for (;;) {
-            final int tt = peekToken();
+            int tt = peekToken();
             switch (tt) {
               case Token.LSH:
               case Token.URSH:
@@ -1501,7 +1500,7 @@ public class Parser
     {
         Node pn = mulExpr();
         for (;;) {
-            final int tt = peekToken();
+            int tt = peekToken();
             if (tt == Token.ADD || tt == Token.SUB) {
                 consumeToken();
                 decompiler.addToken(tt);
@@ -1520,7 +1519,7 @@ public class Parser
     {
         Node pn = unaryExpr();
         for (;;) {
-            final int tt = peekToken();
+            int tt = peekToken();
             switch (tt) {
               case Token.MUL:
               case Token.DIV:
@@ -1583,13 +1582,13 @@ public class Parser
         case Token.LT:
             if (compilerEnv.isXmlAvailable()) {
                 consumeToken();
-                final Node pn = xmlInitializer();
+                Node pn = xmlInitializer();
                 return memberExprTail(true, pn);
             }
             // Fall thru to the default handling of RELOP
 
         default:
-            final Node pn = memberExpr(true);
+            Node pn = memberExpr(true);
 
             // Don't look across a newline boundary for a postfix incop.
             tt = peekTokenOrEOL();
@@ -1613,10 +1612,10 @@ public class Parser
         }
 
         /* Make a NEW node to append to. */
-        final Node pnXML = nf.createLeaf(Token.NEW);
+        Node pnXML = nf.createLeaf(Token.NEW);
 
         String xml = ts.getString();
-        final boolean fAnonymous = xml.trim().startsWith("<>");
+        boolean fAnonymous = xml.trim().startsWith("<>");
 
         Node pn = nf.createName(fAnonymous ? "XMLList" : "XML");
         nf.addChildToBack(pnXML, pn);
@@ -1643,7 +1642,7 @@ public class Parser
                 if (ts.isXMLAttribute()) {
                     /* Need to put the result in double quotes */
                     expr = nf.createUnary(Token.ESCXMLATTR, expr);
-                    final Node prepend = nf.createBinary(Token.ADD,
+                    Node prepend = nf.createBinary(Token.ADD,
                                                    nf.createString("\""),
                                                    expr);
                     expr = nf.createBinary(Token.ADD,
@@ -1672,7 +1671,7 @@ public class Parser
         }
     }
 
-    private void argumentList(final Node listNode)
+    private void argumentList(Node listNode)
         throws IOException, ParserException
     {
         boolean matched;
@@ -1691,7 +1690,7 @@ public class Parser
         decompiler.addToken(Token.RP);
     }
 
-    private Node memberExpr(final boolean allowCallSyntax)
+    private Node memberExpr(boolean allowCallSyntax)
         throws IOException, ParserException
     {
         int tt;
@@ -1734,7 +1733,7 @@ public class Parser
         return memberExprTail(allowCallSyntax, pn);
     }
 
-    private Node memberExprTail(final boolean allowCallSyntax, Node pn)
+    private Node memberExprTail(boolean allowCallSyntax, Node pn)
         throws IOException, ParserException
     {
       tailLoop:
@@ -1834,13 +1833,13 @@ public class Parser
         throws IOException
     {
         memberTypeFlags |= Node.ATTRIBUTE_FLAG;
-        final int tt = nextToken();
+        int tt = nextToken();
 
         switch (tt) {
           // handles: @name, @ns::name, @ns::*, @ns::[expr]
           case Token.NAME:
             {
-                final String s = ts.getString();
+                String s = ts.getString();
                 decompiler.addName(s);
                 pn = propertyName(pn, s, memberTypeFlags);
             }
@@ -1872,7 +1871,7 @@ public class Parser
     /**
      * Check if :: follows name in which case it becomes qualified name
      */
-    private Node propertyName(Node pn, String name, final int memberTypeFlags)
+    private Node propertyName(Node pn, String name, int memberTypeFlags)
         throws IOException, ParserException
     {
         String namespace = null;
@@ -1880,7 +1879,7 @@ public class Parser
             decompiler.addToken(Token.COLONCOLON);
             namespace = name;
 
-            final int tt = nextToken();
+            int tt = nextToken();
             switch (tt) {
               // handles name::name
               case Token.NAME:
@@ -1918,7 +1917,7 @@ public class Parser
     {
         Node pn;
 
-        final int ttFlagged = nextFlaggedToken();
+        int ttFlagged = nextFlaggedToken();
         int tt = ttFlagged & CLEAR_TI_MASK;
 
         switch(tt) {
@@ -1927,7 +1926,7 @@ public class Parser
             return function(FunctionNode.FUNCTION_EXPRESSION);
 
           case Token.LB: {
-            final ObjArray elems = new ObjArray();
+            ObjArray elems = new ObjArray();
             int skipCount = 0;
             decompiler.addToken(Token.LB);
             boolean after_lb_or_comma = true;
@@ -1959,7 +1958,7 @@ public class Parser
           }
 
           case Token.LC: {
-            final ObjArray elems = new ObjArray();
+            ObjArray elems = new ObjArray();
             decompiler.addToken(Token.LC);
             if (!matchToken(Token.RC)) {
 
@@ -2015,7 +2014,7 @@ public class Parser
 
                       case Token.NUMBER:
                         consumeToken();
-                        final double n = ts.getNumber();
+                        double n = ts.getNumber();
                         decompiler.addNumber(n);
                         property = ScriptRuntime.getIndexObject(n);
                         plainProperty(elems, property);
@@ -2057,7 +2056,7 @@ public class Parser
             return pn;
 
           case Token.NAME: {
-            final String name = ts.getString();
+            String name = ts.getString();
             if ((ttFlagged & TI_CHECK_LABEL) != 0) {
                 if (peekToken() == Token.COLON) {
                     // Do not consume colon, it is used as unwind indicator
@@ -2077,13 +2076,13 @@ public class Parser
           }
 
           case Token.NUMBER: {
-            final double n = ts.getNumber();
+            double n = ts.getNumber();
             decompiler.addNumber(n);
             return nf.createNumber(n);
           }
 
           case Token.STRING: {
-            final String s = ts.getString();
+            String s = ts.getString();
             decompiler.addString(s);
             return nf.createString(s);
           }
@@ -2092,11 +2091,11 @@ public class Parser
           case Token.ASSIGN_DIV: {
             // Got / or /= which should be treated as regexp in fact
             ts.readRegExp(tt);
-            final String flags = ts.regExpFlags;
+            String flags = ts.regExpFlags;
             ts.regExpFlags = null;
-            final String re = ts.getString();
+            String re = ts.getString();
             decompiler.addRegexp(re, flags);
-            final int index = currentScriptOrFn.addRegexp(re, flags);
+            int index = currentScriptOrFn.addRegexp(re, flags);
             return nf.createRegExp(index);
           }
 
@@ -2126,7 +2125,7 @@ public class Parser
         return null;    // should never reach here
     }
 
-    private void plainProperty(final ObjArray elems, final Object property)
+    private void plainProperty(ObjArray elems, Object property)
             throws IOException {
         mustMatchToken(Token.COLON, "msg.no.colon.prop");
 
@@ -2137,15 +2136,15 @@ public class Parser
         elems.add(assignExpr(false));
     }
 
-    private boolean getterSetterProperty(final ObjArray elems, final Object property,
-                                         final boolean isGetter) throws IOException {
-        final Node f = function(FunctionNode.FUNCTION_EXPRESSION);
+    private boolean getterSetterProperty(ObjArray elems, Object property,
+                                         boolean isGetter) throws IOException {
+        Node f = function(FunctionNode.FUNCTION_EXPRESSION);
         if (f.getType() != Token.FUNCTION) {
             reportError("msg.bad.prop");
             return false;
         }
-        final int fnIndex = f.getExistingIntProp(Node.FUNCTION_PROP);
-        final FunctionNode fn = currentScriptOrFn.getFunctionNode(fnIndex);
+        int fnIndex = f.getExistingIntProp(Node.FUNCTION_PROP);
+        FunctionNode fn = currentScriptOrFn.getFunctionNode(fnIndex);
         if (fn.getFunctionName().length() != 0) {
             reportError("msg.bad.prop");
             return false;

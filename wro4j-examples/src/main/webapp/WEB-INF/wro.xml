@@ -56,9 +56,10 @@
     <js>/dwr/engine.js</js>
     <js>/dwr/interface/DWRFacade.js</js>
   </group>
+  
   <group name="chineseEncoding">
-    <js>http://search.trade2cn.com/js/list.js</js>
-    <!-- <js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js> -->
+    <js>http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js</js>
+     <!--<js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js> -->
   </group>
 
   <group name="JSGroup">

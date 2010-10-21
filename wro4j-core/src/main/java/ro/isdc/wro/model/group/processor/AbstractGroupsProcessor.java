@@ -10,13 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -201,9 +200,8 @@ public abstract class AbstractGroupsProcessor {
     final Collection<T> found = new ArrayList<T>();
     for (final T processor : availableProcessors) {
       final SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
-      final boolean isAnyTypeSatisfied = type == null && supportedType == null;
-      final boolean isTypeSatisfied = type != null && supportedType != null && type == supportedType.value();
-      if (isAnyTypeSatisfied || isTypeSatisfied) {
+      final boolean isTypeSatisfied = supportedType == null || (supportedType != null && type == supportedType.value());
+      if (isTypeSatisfied) {
         found.add(processor);
       }
     }

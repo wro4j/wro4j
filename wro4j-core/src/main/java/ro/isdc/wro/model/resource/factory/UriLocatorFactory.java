@@ -11,19 +11,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
+
 /**
- * Default implementation of UriLocator. Holds a list of uri locators. The
- * uriLocator will be created based on the first uriLocator from the supplied
- * list which will accept the url.
+ * Default implementation of UriLocator. Holds a list of uri locators. The uriLocator will be created based on the first
+ * uriLocator from the supplied list which will accept the url.
  *
  * @author Alex Objelean
  * @created Created on Nov 4, 2008
@@ -46,13 +45,15 @@ public final class UriLocatorFactory {
    * @return {@link InputStream} of the resource.
    * @throws IOException if uri is invalid or resource couldn't be located.
    */
-  public InputStream locate(final String uri) throws IOException {
+  public InputStream locate(final String uri)
+    throws IOException {
     final UriLocator uriLocator = getInstance(uri);
     if (uriLocator == null) {
       throw new IOException("No locator is capable of handling uri: " + uri);
     }
     return uriLocator.locate(uri);
   }
+
 
   /**
    * @param uri to handle by the locator.
@@ -68,23 +69,25 @@ public final class UriLocatorFactory {
     return null;
   }
 
+
   /**
    * Add a single resource to the list of supported resource locators.
    *
-   * @param uriLocator
-   *          {@link UriLocator} object to add.
+   * @param uriLocator {@link UriLocator} object to add.
    */
   private final void addUriLocator(final UriLocator uriLocator) {
     if (uriLocator == null) {
       throw new IllegalArgumentException("ResourceLocator cannot be null!");
     }
     processInjectAnnotation(uriLocator);
-    //inject duplicateResourceDetector
+    // inject duplicateResourceDetector
     uriLocators.add(uriLocator);
   }
 
+
   /**
    * Add a
+   *
    * @param locators
    */
   public final void addUriLocator(final UriLocator... locators) {
@@ -100,7 +103,7 @@ public final class UriLocatorFactory {
    *
    * @param locator object to check for annotation presence.
    */
-  //TODO move this method to WroUtils
+  // TODO move this method to WroUtils
   private void processInjectAnnotation(final Object locator) {
     try {
       final Collection<Field> fields = getAllFields(locator);
@@ -113,7 +116,8 @@ public final class UriLocatorFactory {
           if (duplicateResourceDetector == null) {
             throw new IllegalStateException(DuplicateResourceDetector.class.getSimpleName() + " cannot be null!");
           }
-          LOG.debug("Injecting " + DuplicateResourceDetector.class.getSimpleName() + " in the locator: " + locator.getClass().getSimpleName());
+          LOG.debug("Injecting " + DuplicateResourceDetector.class.getSimpleName() + " in the locator: "
+            + locator.getClass().getSimpleName());
           field.setAccessible(true);
           field.set(locator, duplicateResourceDetector);
         }
@@ -123,18 +127,19 @@ public final class UriLocatorFactory {
     }
   }
 
+
   /**
    * Return all fields for given object, also those from the super classes.
    */
   private Collection<Field> getAllFields(final Object object) {
     final Collection<Field> fields = new ArrayList<Field>();
     fields.addAll(Arrays.asList(object.getClass().getDeclaredFields()));
-    //inspect super classes
+    // inspect super classes
     Class<?> superClass = object.getClass().getSuperclass();
     do {
       fields.addAll(Arrays.asList(superClass.getDeclaredFields()));
       superClass = superClass.getSuperclass();
-    } while(superClass != null);
+    } while (superClass != null);
     return fields;
   }
 }

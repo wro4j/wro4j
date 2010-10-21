@@ -3,8 +3,7 @@
  */
 package ro.isdc.wro.model.resource.locator.wildcard;
 
-import javax.inject.Inject;
-
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
@@ -15,7 +14,8 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * @author Alex Objelean
  * @created Created on May 09, 2010
  */
-public abstract class WildcardUriLocatorSupport implements UriLocator {
+public abstract class WildcardUriLocatorSupport
+  implements UriLocator {
   @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
   /**
@@ -23,12 +23,14 @@ public abstract class WildcardUriLocatorSupport implements UriLocator {
    */
   private WildcardStreamLocator wildcardStreamLocator;
 
+
   /**
    * @return default implementation of {@link WildcardStreamLocator}.
    */
   protected WildcardStreamLocator newWildcardStreamLocator() {
     return new DefaultWildcardStreamLocator(duplicateResourceDetector);
   }
+
 
   /**
    * @return the wildcardStreamLocator

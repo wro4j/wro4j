@@ -73,7 +73,7 @@ public class YUIJsCompressorProcessor
   // options of YUI compressor
   private final int linebreakpos = -1;
   /**
-   * Performs renaming of variables.
+   * Renames variables.
    */
   boolean munge = false;
   boolean verbose = false;
@@ -115,6 +115,7 @@ public class YUIJsCompressorProcessor
       final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new YUIErrorReporter());
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
     } catch (final RuntimeException e) {
+      LOG.error("Problem while applying YUI compressor", e);
       throw new WroRuntimeException("Problem while applying YUI compressor", e);
     } finally {
       reader.close();

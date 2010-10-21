@@ -111,6 +111,12 @@ public class TestWroManager
     genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
   }
 
+//  @Test
+//  public void testChineseEncoding()
+//      throws IOException {
+//    genericProcessAndCompare("/chineseEncoding.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
+//  }
+
   @Test
   public void testWildcardGroupResources()
       throws IOException {
