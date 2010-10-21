@@ -53,6 +53,9 @@ public class TestBomStripperPreProcessor extends AbstractWroTest {
         });
   }
 
+  /**
+   * This test is ignored because it fails when run outside of IDE (encoding issues)
+   */
   @Ignore
   @Test
   public void testWithChineseCharacters() throws IOException {

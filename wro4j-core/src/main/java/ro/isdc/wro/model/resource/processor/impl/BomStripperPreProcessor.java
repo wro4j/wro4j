@@ -82,8 +82,7 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      //using w ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
-      //IOUtils.copy(new BomStripperInputStream(new ReaderInputStream(reader)), writer);
+      //using ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
       IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
     } finally {
       reader.close();
