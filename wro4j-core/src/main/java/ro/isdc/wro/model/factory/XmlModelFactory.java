@@ -149,6 +149,7 @@ public class XmlModelFactory
         // Run a scheduled task which updates the model.
         // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
         // (thread tries to make up for lost time in some situations)
+        LOG.info("Schedule Model Update for " + period + " seconds period");
         scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
       }
     }

@@ -5,6 +5,7 @@ package ro.isdc.wro.model;
 
 import java.io.InputStream;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -31,6 +32,11 @@ public class TestXmlModelFactory {
     Context.set(context);
     context.getConfig().setCacheUpdatePeriod(0);
     context.getConfig().setModelUpdatePeriod(0);
+  }
+
+  @After
+  public void tearDown() {
+    factory.destroy();
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)

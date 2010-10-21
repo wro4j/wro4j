@@ -10,6 +10,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,16 +29,21 @@ import ro.isdc.wro.test.util.WroTestUtils;
  */
 public class TestWroModel {
   private WroModel model;
-
+  private WroModelFactory factory;
   @Before
   public void init() {
     final Context context = Context.standaloneContext();
     Context.set(context);
+    model = buildValidModel();
+  }
+
+  @After
+  public void tearDown() {
+    factory.destroy();
   }
 
   @Test
   public void testGetExistingGroup() {
-    model = buildValidModel();
     Assert.assertFalse(model.getGroups().isEmpty());
     final Group group = model.getGroupByName("g1");
     //create a copy of original list
@@ -46,7 +52,6 @@ public class TestWroModel {
 
   @Test
   public void testGetGroupNames() {
-    model = buildValidModel();
     final List<String> groupNames = model.getGroupNames();
     Collections.sort(groupNames);
     final List<String> expected = Arrays.asList("g1","g2","g3");
@@ -55,7 +60,6 @@ public class TestWroModel {
 
   @Test(expected=InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
-    model = buildValidModel();
     Assert.assertFalse(model.getGroups().isEmpty());
     model.getGroupByName("INVALID_GROUP");
   }
@@ -64,7 +68,7 @@ public class TestWroModel {
    * @return a valid {@link WroModel} pre populated with some valid resources.
    */
   private WroModel buildValidModel() {
-    final WroModelFactory factory = new XmlModelFactory() {
+    factory = new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() {
         return WroTestUtils.getClassRelativeResource(TestWroModel.class, "wro.xml");

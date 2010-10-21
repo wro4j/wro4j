@@ -9,6 +9,7 @@ import java.io.InputStream;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,6 +54,12 @@ public class TestFallbackAwareXmlModelFactory {
         return null;
       }
     };
+  }
+
+  @After
+  public void tearDown() {
+    fallbackAwareModelFactory.destroy();
+    xmlModelFactory.destroy();
   }
 
   @Test

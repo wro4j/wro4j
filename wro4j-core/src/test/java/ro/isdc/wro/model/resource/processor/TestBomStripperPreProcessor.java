@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
@@ -52,6 +53,7 @@ public class TestBomStripperPreProcessor extends AbstractWroTest {
         });
   }
 
+  @Ignore
   @Test
   public void testWithChineseCharacters() throws IOException {
     compareProcessedResourceContents(

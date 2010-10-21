@@ -61,6 +61,12 @@ public class TestWroManager
     manager.setModelFactory(getValidModelFactory());
   }
 
+  @After
+  public void tearDown() {
+    manager.destroy();
+    Context.unset();
+  }
+
   @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
@@ -266,11 +272,5 @@ public class TestWroManager
     manager.setHashBuilder(new MD5HashBuilder());
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
-  }
-
-  @After
-  public void tearDown() {
-    manager.destroy();
-    Context.unset();
   }
 }

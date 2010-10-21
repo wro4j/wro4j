@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.resource.processor.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -10,7 +11,6 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ReaderInputStream;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -83,8 +83,8 @@ public final class BomStripperPreProcessor
       throws IOException {
     try {
       //using w ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
-      IOUtils.copy(new BomStripperInputStream(new ReaderInputStream(reader)), writer);
-//      IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
+      //IOUtils.copy(new BomStripperInputStream(new ReaderInputStream(reader)), writer);
+      IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
     } finally {
       reader.close();
       writer.close();
