@@ -191,10 +191,15 @@ public abstract class AbstractGroupsProcessor {
   }
 
   /**
-   * @param <T> processor type. Can be {@link ResourcePreProcessor} or {@link ResourcePostProcessor}.
+   * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor} or null (any).
    * @param type {@link ResourceType} to apply for searching on available processors.
    * @param availableProcessors a list where to perform the search.
-   * @return a list of found processors which satisfy the search criteria.
+   * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:
+   *        <ul>
+   *          <li>If you search by null (any) type - you'll get only processors which can be applied on any resource (not any particular type)</li>
+   *          <li>If you search by JS type - you'll get processors which can be applied on JS resources & any (null) resources </li>
+   *          <li>If you search by CSS type - you'll get processors which can be applied on CSS resources & any (null) resources </li>
+   *        </ul>
    */
   private <T> Collection<T> getProcessorsByType(final ResourceType type, final Collection<T> availableProcessors) {
     final Collection<T> found = new ArrayList<T>();

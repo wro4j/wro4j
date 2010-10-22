@@ -8,14 +8,25 @@
 
 package com.yahoo.platform.yui.compressor;
 
-import org.mozilla.javascript.*;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.mozilla.javascript.CompilerEnvirons;
+import org.mozilla.javascript.ErrorReporter;
+import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.Parser;
+import org.mozilla.javascript.ScriptRuntime;
+import org.mozilla.javascript.Token;
 
 public class JavaScriptCompressor {
 
@@ -43,7 +54,7 @@ public class JavaScriptCompressor {
 
         twos = new ArrayList();
         for (int i = 0; i < ones.size(); i++) {
-            String one = (String) ones.get(i);
+            final String one = (String) ones.get(i);
             for (char c = 'a'; c <= 'z'; c++)
                 twos.add(one + Character.toString(c));
             for (char c = 'A'; c <= 'Z'; c++)
@@ -62,7 +73,7 @@ public class JavaScriptCompressor {
 
         threes = new ArrayList();
         for (int i = 0; i < twos.size(); i++) {
-            String two = (String) twos.get(i);
+            final String two = (String) twos.get(i);
             for (char c = 'a'; c <= 'z'; c++)
                 threes.add(two + Character.toString(c));
             for (char c = 'A'; c <= 'Z'; c++)
@@ -243,12 +254,12 @@ public class JavaScriptCompressor {
         reserved.add("undefined");
     }
 
-    private static int countChar(String haystack, char needle) {
+    private static int countChar(final String haystack, final char needle) {
         int idx = 0;
         int count = 0;
-        int length = haystack.length();
+        final int length = haystack.length();
         while (idx < length) {
-            char c = haystack.charAt(idx++);
+            final char c = haystack.charAt(idx++);
             if (c == needle) {
                 count++;
             }
@@ -256,7 +267,7 @@ public class JavaScriptCompressor {
         return count;
     }
 
-    private static int printSourceString(String source, int offset, StringBuffer sb) {
+    private static int printSourceString(final String source, int offset, final StringBuffer sb) {
         int length = source.charAt(offset);
         ++offset;
         if ((0x8000 & length) != 0) {
@@ -264,16 +275,16 @@ public class JavaScriptCompressor {
             ++offset;
         }
         if (sb != null) {
-            String str = source.substring(offset, offset + length);
+            final String str = source.substring(offset, offset + length);
             sb.append(str);
         }
         return offset + length;
     }
 
-    private static int printSourceNumber(String source,
-            int offset, StringBuffer sb) {
+    private static int printSourceNumber(final String source,
+            int offset, final StringBuffer sb) {
         double number = 0.0;
-        char type = source.charAt(offset);
+        final char type = source.charAt(offset);
         ++offset;
         if (type == 'S') {
             if (sb != null) {
@@ -304,25 +315,25 @@ public class JavaScriptCompressor {
         return offset;
     }
 
-    private static ArrayList parse(Reader in, ErrorReporter reporter)
+    private static ArrayList parse(final Reader in, final ErrorReporter reporter)
             throws IOException, EvaluatorException {
 
-        CompilerEnvirons env = new CompilerEnvirons();
-        Parser parser = new Parser(env, reporter);
+        final CompilerEnvirons env = new CompilerEnvirons();
+        final Parser parser = new Parser(env, reporter);
         parser.parse(in, null, 1);
-        String source = parser.getEncodedSource();
+        final String source = parser.getEncodedSource();
 
         int offset = 0;
-        int length = source.length();
-        ArrayList tokens = new ArrayList();
-        StringBuffer sb = new StringBuffer();
+        final int length = source.length();
+        final ArrayList tokens = new ArrayList();
+        final StringBuffer sb = new StringBuffer();
 
         while (offset < length) {
-            int tt = source.charAt(offset++);
+            final int tt = source.charAt(offset++);
             switch (tt) {
 
-                case Token.CONDCOMMENT:
-                case Token.KEEPCOMMENT:
+//                case Token.CONDCOMMENT:
+//                case Token.KEEPCOMMENT:
                 case Token.NAME:
                 case Token.REGEXP:
                 case Token.STRING:
@@ -338,7 +349,7 @@ public class JavaScriptCompressor {
                     break;
 
                 default:
-                    String literal = (String) literals.get(new Integer(tt));
+                    final String literal = (String) literals.get(new Integer(tt));
                     if (literal != null) {
                         tokens.add(new JavaScriptToken(tt, literal));
                     }
@@ -349,7 +360,7 @@ public class JavaScriptCompressor {
         return tokens;
     }
 
-    private static void processStringLiterals(ArrayList tokens, boolean merge) {
+    private static void processStringLiterals(final ArrayList tokens, final boolean merge) {
 
         String tv;
         int i, length = tokens.size();
@@ -397,8 +408,8 @@ public class JavaScriptCompressor {
                 // a few additional bytes.
 
                 char quotechar;
-                int singleQuoteCount = countChar(tv, '\'');
-                int doubleQuoteCount = countChar(tv, '"');
+                final int singleQuoteCount = countChar(tv, '\'');
+                final int doubleQuoteCount = countChar(tv, '"');
                 if (doubleQuoteCount <= singleQuoteCount) {
                     quotechar = '"';
                 } else {
@@ -425,7 +436,7 @@ public class JavaScriptCompressor {
     }
 
     // Add necessary escaping that was removed in Rhino's tokenizer.
-    private static String escapeString(String s, char quotechar) {
+    private static String escapeString(final String s, final char quotechar) {
 
         assert quotechar == '"' || quotechar == '\'';
 
@@ -433,9 +444,9 @@ public class JavaScriptCompressor {
             return null;
         }
 
-        StringBuffer sb = new StringBuffer();
+        final StringBuffer sb = new StringBuffer();
         for (int i = 0, L = s.length(); i < L; i++) {
-            int c = s.charAt(i);
+            final int c = s.charAt(i);
             if (c == quotechar) {
                 sb.append("\\");
             }
@@ -453,15 +464,15 @@ public class JavaScriptCompressor {
      */
     private static final Pattern SIMPLE_IDENTIFIER_NAME_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
-    private static boolean isValidIdentifier(String s) {
-        Matcher m = SIMPLE_IDENTIFIER_NAME_PATTERN.matcher(s);
+    private static boolean isValidIdentifier(final String s) {
+        final Matcher m = SIMPLE_IDENTIFIER_NAME_PATTERN.matcher(s);
         return (m.matches() && !reserved.contains(s));
     }
 
     /*
     * Transforms obj["foo"] into obj.foo whenever possible, saving 3 bytes.
     */
-    private static void optimizeObjectMemberAccess(ArrayList tokens) {
+    private static void optimizeObjectMemberAccess(final ArrayList tokens) {
 
         String tv;
         int i, length;
@@ -491,7 +502,7 @@ public class JavaScriptCompressor {
     /*
      * Transforms 'foo': ... into foo: ... whenever possible, saving 2 bytes.
      */
-    private static void optimizeObjLitMemberDecl(ArrayList tokens) {
+    private static void optimizeObjLitMemberDecl(final ArrayList tokens) {
 
         String tv;
         int i, length;
@@ -526,26 +537,26 @@ public class JavaScriptCompressor {
     private ScriptOrFnScope globalScope = new ScriptOrFnScope(-1, null);
     private Hashtable indexedScopes = new Hashtable();
 
-    public JavaScriptCompressor(Reader in, ErrorReporter reporter)
+    public JavaScriptCompressor(final Reader in, final ErrorReporter reporter)
             throws IOException, EvaluatorException {
 
         this.logger = reporter;
         this.tokens = parse(in, reporter);
     }
 
-    public void compress(Writer out, Configuration config) throws IOException {
-        int linebreakpos = config.getLineBreak();
-        boolean munge = config.isMunge();
-        boolean preserveSemicolons = config.isPreserveSemicolons();
-        boolean disableOptimizations = !config.isOptimize();
-        boolean verbose = config.isVerbose();
+    public void compress(final Writer out, final Configuration config) throws IOException {
+        final int linebreakpos = config.getLineBreak();
+        final boolean munge = config.isMunge();
+        final boolean preserveSemicolons = config.isPreserveSemicolons();
+        final boolean disableOptimizations = !config.isOptimize();
+        final boolean verbose = config.isVerbose();
 
         compress(out, linebreakpos, munge, verbose,
                                 preserveSemicolons, disableOptimizations);
     }
 
-    public void compress(Writer out, int linebreak, boolean munge, boolean verbose,
-            boolean preserveAllSemiColons, boolean disableOptimizations)
+    public void compress(final Writer out, final int linebreak, final boolean munge, final boolean verbose,
+            final boolean preserveAllSemiColons, final boolean disableOptimizations)
             throws IOException {
 
         this.munge = munge;
@@ -561,7 +572,7 @@ public class JavaScriptCompressor {
         buildSymbolTree();
         // DO NOT TOUCH this.tokens BETWEEN THESE TWO PHASES (BECAUSE OF this.indexedScopes)
         mungeSymboltree();
-        StringBuffer sb = printSymbolTree(linebreak, preserveAllSemiColons);
+        final StringBuffer sb = printSymbolTree(linebreak, preserveAllSemiColons);
 
         out.write(sb.toString());
     }
@@ -570,7 +581,7 @@ public class JavaScriptCompressor {
         return (ScriptOrFnScope) scopes.peek();
     }
 
-    private void enterScope(ScriptOrFnScope scope) {
+    private void enterScope(final ScriptOrFnScope scope) {
         scopes.push(scope);
     }
 
@@ -582,7 +593,7 @@ public class JavaScriptCompressor {
         return (JavaScriptToken) tokens.get(offset++);
     }
 
-    private JavaScriptToken getToken(int delta) {
+    private JavaScriptToken getToken(final int delta) {
         return (JavaScriptToken) tokens.get(offset + delta);
     }
 
@@ -591,7 +602,7 @@ public class JavaScriptCompressor {
      * the specified scope or in any scope above it. Returns null
      * if this symbol does not have a corresponding identifier.
      */
-    private JavaScriptIdentifier getIdentifier(String symbol, ScriptOrFnScope scope) {
+    private JavaScriptIdentifier getIdentifier(final String symbol, ScriptOrFnScope scope) {
         JavaScriptIdentifier identifier;
         while (scope != null) {
             identifier = scope.getIdentifier(symbol);
@@ -626,13 +637,13 @@ public class JavaScriptCompressor {
         scope.preventMunging();
     }
 
-    private String getDebugString(int max) {
+    private String getDebugString(final int max) {
         assert max > 0;
-        StringBuffer result = new StringBuffer();
-        int start = Math.max(offset - max, 0);
-        int end = Math.min(offset + max, tokens.size());
+        final StringBuffer result = new StringBuffer();
+        final int start = Math.max(offset - max, 0);
+        final int end = Math.min(offset + max, tokens.size());
         for (int i = start; i < end; i++) {
-            JavaScriptToken token = (JavaScriptToken) tokens.get(i);
+            final JavaScriptToken token = (JavaScriptToken) tokens.get(i);
             if (i == offset - 1) {
                 result.append(" ---> ");
             }
@@ -644,7 +655,7 @@ public class JavaScriptCompressor {
         return result.toString();
     }
 
-    private void warn(String message, boolean showDebugString) {
+    private void warn(String message, final boolean showDebugString) {
         if (verbose) {
             if (showDebugString) {
                 message = message + "\n" + getDebugString(10);
@@ -718,10 +729,10 @@ public class JavaScriptCompressor {
             String hints = token.getValue();
             // Remove the leading and trailing quotes...
             hints = hints.substring(1, hints.length() - 1).trim();
-            StringTokenizer st1 = new StringTokenizer(hints, ",");
+            final StringTokenizer st1 = new StringTokenizer(hints, ",");
             while (st1.hasMoreTokens()) {
-                String hint = st1.nextToken();
-                int idx = hint.indexOf(':');
+                final String hint = st1.nextToken();
+                final int idx = hint.indexOf(':');
                 if (idx <= 0 || idx >= hint.length() - 1) {
                     if (mode == BUILDING_SYMBOL_TREE) {
                         // No need to report the error twice, hence the test...
@@ -729,8 +740,8 @@ public class JavaScriptCompressor {
                     }
                     break;
                 }
-                String variableName = hint.substring(0, idx).trim();
-                String variableType = hint.substring(idx + 1).trim();
+                final String variableName = hint.substring(0, idx).trim();
+                final String variableType = hint.substring(idx + 1).trim();
                 if (mode == BUILDING_SYMBOL_TREE) {
                     fnScope.addHint(variableName, variableType);
                 } else if (mode == CHECKING_SYMBOL_TREE) {
@@ -793,11 +804,11 @@ public class JavaScriptCompressor {
         ScriptOrFnScope currentScope;
         JavaScriptIdentifier identifier;
 
-        int expressionBraceNesting = braceNesting;
+        final int expressionBraceNesting = braceNesting;
         int bracketNesting = 0;
         int parensNesting = 0;
 
-        int length = tokens.size();
+        final int length = tokens.size();
 
         while (offset < length) {
 
@@ -844,12 +855,12 @@ public class JavaScriptCompressor {
                     parensNesting--;
                     break;
 
-                case Token.CONDCOMMENT:
-                    if (mode == BUILDING_SYMBOL_TREE) {
-                        protectScopeFromObfuscation(currentScope);
-                        warn("Using JScript conditional comments is not recommended." + (munge ? " Moreover, using JScript conditional comments reduces the level of compression!" : ""), true);
-                    }
-                    break;
+//                case Token.CONDCOMMENT:
+//                    if (mode == BUILDING_SYMBOL_TREE) {
+//                        protectScopeFromObfuscation(currentScope);
+//                        warn("Using JScript conditional comments is not recommended." + (munge ? " Moreover, using JScript conditional comments reduces the level of compression!" : ""), true);
+//                    }
+//                    break;
 
                 case Token.NAME:
                     symbol = token.getValue();
@@ -903,13 +914,13 @@ public class JavaScriptCompressor {
         }
     }
 
-    private void parseScope(ScriptOrFnScope scope) {
+    private void parseScope(final ScriptOrFnScope scope) {
 
         String symbol;
         JavaScriptToken token;
         JavaScriptIdentifier identifier;
 
-        int length = tokens.size();
+        final int length = tokens.size();
 
         enterScope(scope);
 
@@ -996,13 +1007,13 @@ public class JavaScriptCompressor {
                 case Token.CATCH:
                     parseCatch();
                     break;
-
-                case Token.CONDCOMMENT:
-                    if (mode == BUILDING_SYMBOL_TREE) {
-                        protectScopeFromObfuscation(scope);
-                        warn("Using JScript conditional comments is not recommended." + (munge ? " Moreover, using JScript conditional comments reduces the level of compression." : ""), true);
-                    }
-                    break;
+//
+//                case Token.CONDCOMMENT:
+//                    if (mode == BUILDING_SYMBOL_TREE) {
+//                        protectScopeFromObfuscation(scope);
+//                        warn("Using JScript conditional comments is not recommended." + (munge ? " Moreover, using JScript conditional comments reduces the level of compression." : ""), true);
+//                    }
+//                    break;
 
                 case Token.NAME:
                     symbol = token.getValue();
@@ -1090,7 +1101,7 @@ public class JavaScriptCompressor {
         globalScope.munge();
     }
 
-    private StringBuffer printSymbolTree(int linebreakpos, boolean preserveAllSemiColons)
+    private StringBuffer printSymbolTree(final int linebreakpos, final boolean preserveAllSemiColons)
             throws IOException {
 
         offset = 0;
@@ -1102,8 +1113,8 @@ public class JavaScriptCompressor {
         ScriptOrFnScope currentScope;
         JavaScriptIdentifier identifier;
 
-        int length = tokens.size();
-        StringBuffer result = new StringBuffer();
+        final int length = tokens.size();
+        final StringBuffer result = new StringBuffer();
 
         int linestartpos = 0;
 
@@ -1287,18 +1298,18 @@ public class JavaScriptCompressor {
                     }
                     break;
 
-                case Token.CONDCOMMENT:
-                case Token.KEEPCOMMENT:
-                    if (result.length() > 0 && result.charAt(result.length() - 1) != '\n') {
-                        result.append("\n");
-                    }
-                    result.append("/*");
-                    result.append(symbol);
-                    result.append("*/\n");
-                    break;
+//                case Token.CONDCOMMENT:
+//                case Token.KEEPCOMMENT:
+//                    if (result.length() > 0 && result.charAt(result.length() - 1) != '\n') {
+//                        result.append("\n");
+//                    }
+//                    result.append("/*");
+//                    result.append(symbol);
+//                    result.append("*/\n");
+//                    break;
 
                 default:
-                    String literal = (String) literals.get(new Integer(token.getType()));
+                    final String literal = (String) literals.get(new Integer(token.getType()));
                     if (literal != null) {
                         result.append(literal);
                     } else {
@@ -1313,9 +1324,10 @@ public class JavaScriptCompressor {
         // several minified files (the absence of an ending semi-colon at the
         // end of one file may very likely cause a syntax error)
         if (!preserveAllSemiColons &&
-                result.length() > 0 &&
-                getToken(-1).getType() != Token.CONDCOMMENT &&
-                getToken(-1).getType() != Token.KEEPCOMMENT) {
+                result.length() > 0
+//                && getToken(-1).getType() != Token.CONDCOMMENT &&
+//                getToken(-1).getType() != Token.KEEPCOMMENT
+                ) {
             if (result.charAt(result.length() - 1) == '\n') {
                 result.setCharAt(result.length() - 1, ';');
             } else {
