@@ -18,9 +18,8 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -91,13 +90,16 @@ public class ResourceTransformerPanel extends Panel {
 
 
   private Component getTransformButton() {
-    final Component c = new IndicatingAjaxButton("transform") {
+    //IndicatingAjax
+    final Component c = new Button("transform") {
+//      @Override
+//      protected void onError(final AjaxRequestTarget target, final Form<?> form) {
+//        target.appendJavascript("alert('Unexpected error occured');");
+//      }
+
       @Override
-      protected void onError(final AjaxRequestTarget target, final Form<?> form) {
-        target.appendJavascript("alert('Unexpected error occured');");
-      }
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+      public void onSubmit() {
+        System.out.println("#####################onSubmit##########################");
         if (processor == null) {
           return;
         }
@@ -123,9 +125,10 @@ public class ResourceTransformerPanel extends Panel {
             compressedSize = format.format((double)output.length()/1024);
             processingTime = String.valueOf(new Date().getTime() - processingTimeAsLong);
           }
-          target.addComponent(form);
+//          target.addComponent(form);
         } catch (final Exception e) {
-          target.prependJavascript("alert('Cannot process the input: " + e.getMessage() + "');");
+          info("Cannot process the input: " + e.getMessage() + "");
+//          target.prependJavascript("alert('Cannot process the input: " + e.getMessage() + "');");
           LOG.error("exception occured: " + e);
         }
       }

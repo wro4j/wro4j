@@ -3,16 +3,19 @@
  */
 package ro.isdc.wro.extensions.processor.js;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -77,7 +80,7 @@ public class YUIJsCompressorProcessor
    */
   boolean munge = false;
   boolean verbose = false;
-  boolean preserveAllSemiColons = false;
+  boolean preserveAllSemiColons = true;
   boolean disableOptimizations = false;
 
   /**
@@ -111,13 +114,19 @@ public class YUIJsCompressorProcessor
     throws IOException {
     final StopWatch watch = new StopWatch();
     watch.start("pack");
+    final InputStream is = new ByteArrayInputStream(IOUtils.toByteArray(reader));
     try {
-      final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new YUIErrorReporter());
+      final JavaScriptCompressor compressor = new JavaScriptCompressor(new InputStreamReader(is), new YUIErrorReporter());
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
     } catch (final RuntimeException e) {
       LOG.error("Problem while applying YUI compressor", e);
-      throw new WroRuntimeException("Problem while applying YUI compressor", e);
+      //keep js unchanged if it contains errors -> this should be configurable
+      LOG.debug("Leave resource unchanged...");
+      is.reset();
+      IOUtils.copy(is, writer);
+      //throw new WroRuntimeException("Problem while applying YUI compressor", e);
     } finally {
+      is.close();
       reader.close();
       writer.close();
       watch.stop();

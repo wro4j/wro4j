@@ -24,11 +24,11 @@
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>0</param-value>
+      <param-value>30</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>0</param-value>
+      <param-value>15</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>
@@ -44,7 +44,7 @@
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,cssMinJawr,jsMin</param-value>
+      <param-value>cssVariables,yuiCssMin,googleClosureSimple</param-value>
     </init-param>
   </filter>
   <filter-mapping>

@@ -7,16 +7,16 @@
     <js>/resource/redirect.js</js>
     <!-- <js>/resource/dynamic.js</js> -->
   </group>
+  
   <group name="all">
+    <group-ref>jquery</group-ref>
   <!-- 
     <group-ref>twitterBar</group-ref>
-  -->    
     <group-ref>dynamicResource</group-ref>
-    <group-ref>jquery</group-ref>
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>dwr</group-ref>
-    <group-ref>wicket</group-ref>
+    -->
 	</group>
   
   <group name="twitterBar">
@@ -30,7 +30,6 @@
   
   <group name="wildcard">
     <css>/static/**.css</css>
-    <js>/resource/*.js</js>
     <js>/static/js/*.js</js>
     <css>/WEB-INF/css/*.css</css>
     <css>classpath:ro/isdc/wro/resources/**.cs?</css>
@@ -63,24 +62,23 @@
   </group>
 
   <group name="JSGroup">
-    <js>/static/js/css-browser-selector.js</js>
-    <js>/static/js/jquery.blockUI.js</js>
-    <js>/static/js/jquery.selectboxes.js</js>
-    <js>/static/js/DOMWindow.js</js>
-    <js>/static/js/calendar_stripped.js</js>
-    <js>/static/js/base.js</js>
-    <js>/static/js/validator-src.js</js>
-    <js>/static/js/error-handlers-src.js</js>
-    <js>/static/js/stringify.js</js>
     <js>/dwr/engine.js</js>
     <js>/dwr/interface/DWRFacade.js</js>
   </group>
 
   <group name="jquery">
-    <js>/static/js/jquery.js</js>
+    <js>http://code.jquery.com/jquery-1.4.3.js</js>
+    <group-ref>jquery-mobile</group-ref>
+    <!-- 
     <js>/static/js/jquery.livequery.js</js>
     <js>/static/js/jquery-validate.js</js>
     <js>/static/js/jquery-ui-all.js</js>
+     -->
+  </group>
+  
+  <group name="jquery-mobile">
+    <css>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.css</css>
+    <js>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.js</js>
   </group>
   
   <group name="syntaxHighlighter">

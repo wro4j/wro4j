@@ -84,7 +84,7 @@ public class WroManager
    */
   private GroupsProcessor groupsProcessor;
   /**
-   * Content digester.
+   * HashBuilder for creating a hash based on the processed content.
    */
   private HashBuilder hashBuilder;
 
@@ -150,7 +150,6 @@ public class WroManager
     final Matcher m = pattern.matcher(request.getRequestURI());
     return m.matches();
   }
-
 
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.

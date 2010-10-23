@@ -4,51 +4,46 @@
       Choose a processor from this list, insert some code (css or js,
 	    depending on choosed processor) and press transform button.
 	  </p>
-    <select wicket:id="selectProcessor"></select>
-    <input wicket:id="transform" type="button" value="transform" />
-    <div>
-      <table>
-        <tbody valign="top">
-          <tr>
-            <td>
-              <dl>
-                <dt>Input</dt>
-                <dd><textarea wicket:id="input" cols="40" rows="20"></textarea>
-                </dd>
-              </dl>
-            </td>
-            <td>
-              <dl>
-                <dt>Output</dt>
-                <dd>
-                  <textarea wicket:id="output" cols="40" rows="20" readonly="readonly"></textarea>
-                </dd>
-              </dl>
-            </td>
-            <td>
-              <dl>
-                <dt>Details</dt>
-                <dd>
-                  <ul>
-                    <li>Original size: <b wicket:id="originalSize"></b> KB</li>
-                    <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
-                    <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>
-                    <li>Processing Time: <b wicket:id="processingTime"></b> ms</li>                    
-                  </ul>
-                </dd>
-              </dl>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p>
-        Notes: 
-        <ul>
+	  <div class="ui-grid-a">
+		  <div class="ui-block-a">
+		    <select wicket:id="selectProcessor"></select>
+		  </div>
+		</div>
+    <div class="ui-grid-b">
+      <div class="ui-block-a">
+        <input wicket:id="transform" type="submit" value="transform" />
+      </div>
+      <div class="ui-block-b"></div>
+      <div class="ui-block-c">
+        <h2>Details</h2>
+        <ul data-inset="true" data-theme="c" data-dividertheme="a">
+          <li>Original size: <b wicket:id="originalSize"></b> KB</li>
+          <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
+          <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>
+          <li>Processing Time: <b wicket:id="processingTime"></b> ms</li>                    
+        </ul>
+      </div>
+    </div>
+		<div class="ui-grid-a">
+      <div class="ui-block-a">
+        <h2>Input</h2>
+        <textarea wicket:id="input" cols="40" rows="20" style="height: 300px; width: 90%;"></textarea>
+      </div>
+      <div class="ui-block-b">
+        <h2>Output</h2>
+        <textarea wicket:id="output" cols="40" rows="20" readonly="readonly" style="height: 300px; width: 90%;"></textarea>
+      </div>
+    </div>  
+      
+    <div class="ui-grid-a">
+      <div class="ui-block-a">
+        <h1>Notes</h1>
+        <ul data-inset="true" data-theme="c" data-dividertheme="a">
           <li>
-            PackerJS could be very slow for large javascript files.
+           PackerJS could be very slow for large javascript files.
           </li>
         </ul>
-      </p>      
-    </div>
+      </div>
+    </div>      
   </form>
 </wicket:panel>

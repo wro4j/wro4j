@@ -26,6 +26,18 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
   private final ResourcePostProcessor processor = new YUIJsCompressorProcessor();
 
   @Test
+  public void testInvalidJsShouldBeUnchanged()
+    throws IOException {
+    final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
+    compareProcessedResourceContents(resourceUri, resourceUri, new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    });
+  }
+
+  @Test
   public void testWicketEventJsWithMunge()
     throws IOException {
     compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.js", "classpath:"

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -79,6 +80,7 @@ public class GoogleClosureCompressorProcessor
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     try {
+      Compiler.setLoggingLevel(Level.SEVERE);
       final Compiler compiler = new Compiler();
       //make it play nice with GAE
       compiler.disableThreads();
@@ -93,7 +95,7 @@ public class GoogleClosureCompressorProcessor
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
-        LOG.warn("The JS to compress contains errors: " + Arrays.toString(result.errors));
+        LOG.debug("The JS to compress contains errors: " + Arrays.toString(result.errors));
       }
     } finally {
       reader.close();

@@ -23,8 +23,8 @@ import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.HashBuilder;
+import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 
 
 /**
@@ -97,7 +97,7 @@ public abstract class BaseWroManagerFactory
    * @return {@link HashBuilder} instance.
    */
   protected HashBuilder newHashBuilder() {
-    return new CRC32HashBuilder();
+    return new MD5HashBuilder();
   }
 
   /**
