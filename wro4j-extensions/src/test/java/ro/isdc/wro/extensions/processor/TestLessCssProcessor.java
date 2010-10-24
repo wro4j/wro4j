@@ -3,10 +3,19 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
+import java.util.Collection;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,6 +25,7 @@ import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -26,19 +36,25 @@ import ro.isdc.wro.test.util.ResourceProcessor;
  */
 public class TestLessCssProcessor extends AbstractWroTest {
   private static final Logger LOG = LoggerFactory.getLogger(TestLessCssProcessor.class);
+  //Path the the folder where test resources are located
+  private static final String PATH_COMMON = WroUtil.toPackageAsFolder(TestLessCssProcessor.class) + "/lesscss/";
+  //uri path of the test resources
+  private static final String URI_PATH_COMMON = "classpath:" + PATH_COMMON;
   private ResourcePostProcessor processor;
+
 
   @Before
   public void setUp() {
     processor = new LessCssProcessor();
   }
 
+
   @Test
   public void testMixins()
     throws IOException {
     LOG.debug("testMixins");
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/lesscss/mixins.css",
-      "classpath:ro/isdc/wro/extensions/processor/lesscss/mixins-output.css", new ResourceProcessor() {
+    compareProcessedResourceContents(URI_PATH_COMMON + "/mixins.css", URI_PATH_COMMON + "/mixins-output.css",
+      new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
@@ -51,8 +67,8 @@ public class TestLessCssProcessor extends AbstractWroTest {
   public void testNestedRules()
     throws IOException {
     LOG.debug("testNestedRules");
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/lesscss/nestedRules.css",
-      "classpath:ro/isdc/wro/extensions/processor/lesscss/nestedRules-output.css", new ResourceProcessor() {
+    compareProcessedResourceContents(URI_PATH_COMMON + "/nestedRules.css", URI_PATH_COMMON + "/nestedRules-output.css",
+      new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
@@ -65,8 +81,8 @@ public class TestLessCssProcessor extends AbstractWroTest {
   public void testOperations()
     throws IOException {
     LOG.debug("testOperations");
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/lesscss/operations.css",
-      "classpath:ro/isdc/wro/extensions/processor/lesscss/operations-output.css", new ResourceProcessor() {
+    compareProcessedResourceContents(URI_PATH_COMMON + "/operations.css", URI_PATH_COMMON + "/operations-output.css",
+      new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
@@ -74,18 +90,20 @@ public class TestLessCssProcessor extends AbstractWroTest {
       });
   }
 
+
   @Test
   public void testVariables()
     throws IOException {
     LOG.debug("testVariables");
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/lesscss/variables.css",
-      "classpath:ro/isdc/wro/extensions/processor/lesscss/variables-output.css", new ResourceProcessor() {
+    compareProcessedResourceContents(URI_PATH_COMMON + "/variables.css", URI_PATH_COMMON + "/variables-output.css",
+      new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
         }
       });
   }
+
 
   /**
    * This test is ignored, because its strangely fails when building with maven, but works when running in IDE.
@@ -94,12 +112,40 @@ public class TestLessCssProcessor extends AbstractWroTest {
   public void testInvalid()
     throws IOException {
     LOG.debug("testInvalid");
-    compareProcessedResourceContents("classpath:ro/isdc/wro/extensions/processor/lesscss/invalid.css",
-      "classpath:ro/isdc/wro/extensions/processor/lesscss/invalid-output.css", new ResourceProcessor() {
+    compareProcessedResourceContents(URI_PATH_COMMON + "/invalid.css", URI_PATH_COMMON + "/invalid.css",
+      new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(reader, writer);
         }
       });
+  }
+
+
+  /**
+   * This test is ignored, because its strangely fails when building with maven, but works when running in IDE.
+   */
+  @Test
+  public void testLessCssFromFolder()
+    throws IOException {
+    final String fullPath = FilenameUtils.getFullPath(PATH_COMMON);
+    final URL url = ClassLoader.getSystemResource(fullPath);
+    final File lessFolder = new File(url.getFile(), "less");
+    final Collection<File> lessFiles = FileUtils.listFiles(lessFolder, new WildcardFileFilter("*.less"),
+      FalseFileFilter.INSTANCE);
+
+    final ResourceProcessor resourceProcessor = new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    };
+
+    for (final File file : lessFiles) {
+      final InputStream lessFileStream = new FileInputStream(file);
+      final InputStream cssFileStream = new FileInputStream(new File(lessFolder, FilenameUtils.getBaseName(file.getName()) + ".css"));
+      LOG.debug("processing: " + file.getName());
+      compareProcessedResourceContents(lessFileStream, cssFileStream, resourceProcessor);
+    }
   }
 }

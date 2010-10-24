@@ -1,0 +1,26 @@
+.parens {
+  @var: 1px;
+  border: (@var * 2) solid black;
+  margin: (@var * 1) (@var + 2) (4px * 4px) 3px;
+  width: (6px * 6px);
+  padding: 2px (6px * 6px);
+}
+
+.more-parens {
+  @var: (2px * 2px);
+  padding: (2 * @var) 4px 4px (@var * 1px);
+  width: (@var * @var) * 6px;
+  height: (7px * 7px) + (8px * 8px);
+  margin: 4px * (5px + 5px) / 2 - (@var * 2);
+  //margin: (6 * 6)px;
+}
+
+.nested-parens {
+  width: 2px * (4px * (2px + (1px + 6px))) - 1px;
+  height: ((2px+3px)*(2px+3px) / (9px-4px)) + 1px;
+}
+
+.mixed-units {
+  margin: 2px 4em 1 5pc;
+  padding: (2px + 4px) 1em 2px 2px;
+}

@@ -43,7 +43,12 @@ public class TestClasspathUriLocator {
 
   @Test
   public void resourceAvailable() throws IOException {
-    uriLocator.locate(createUri("test.css"));
+    Assert.assertNotNull(uriLocator.locate(createUri("test.css")));
+  }
+
+  @Test
+  public void resourceAvailableWithTrailingSpaces() throws IOException {
+    Assert.assertNotNull(uriLocator.locate(createUri(" test.css ")));
   }
 
   @Test

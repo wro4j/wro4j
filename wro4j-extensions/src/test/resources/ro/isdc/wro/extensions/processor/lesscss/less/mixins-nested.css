@@ -1,0 +1,14 @@
+.class .inner {
+  height: 300px;
+}
+.class .inner .innest {
+  width: 30px;
+  border-width: 60px;
+}
+.class2 .inner {
+  height: 600px;
+}
+.class2 .inner .innest {
+  width: 60px;
+  border-width: 120px;
+}

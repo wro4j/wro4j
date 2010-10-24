@@ -57,6 +57,11 @@ public class DefaultWildcardStreamLocator
    */
   private DuplicateResourceDetector duplicateResourceDetector;
 
+  /**
+   * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
+   */
+  public DefaultWildcardStreamLocator() {
+  }
 
   /**
    * Creates a WildcardStream locator capable of detecting duplicate resources.

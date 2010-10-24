@@ -1,5 +1,7 @@
 @color: #f0f0f0;
+@width: 42px;
 
 body {
     color: @color;
+    width: @width;
 }

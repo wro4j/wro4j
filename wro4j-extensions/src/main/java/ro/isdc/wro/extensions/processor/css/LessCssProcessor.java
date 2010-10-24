@@ -116,7 +116,7 @@ public class LessCssProcessor
       writer.write(getEngine().less(content));
     } catch (final WroRuntimeException e) {
       writer.write(content);
-      LOG.warn("Exception while applying lessCss processor on the resource, no processing applied...", e);
+      LOG.warn("Exception while  applying lessCss processor on the resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
