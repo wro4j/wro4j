@@ -76,7 +76,7 @@
 
 
 .border-radius (@r) {
-    both: @r * 10px;
+    both: @r * 10;
 }
 .border-radius (@r, left) {
     left: @r;
@@ -86,11 +86,11 @@
 }
 
 .only-right {
-    .border-radius(33px, right);
+    .border-radius(33, right);
 }
 .only-left {
-    .border-radius(33px, left);
+    .border-radius(33, left);
 }
 .left-right {
-    .border-radius(33px);
+    .border-radius(33);
 }

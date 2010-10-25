@@ -2,8 +2,8 @@
   color: #111111;
   height: 9px;
   width: 3em;
-  substraction: 0px;
-  division: 1px;
+  substraction: 0;
+  division: 1;
 }
 #operations .spacing {
   height: 9px;
@@ -24,7 +24,7 @@
   width: 4px;
 }
 .shorthands {
-  padding: -1px 2px 0px -4px;
+  padding: -1px 2px 0 -4px;
 }
 .colors {
   color: #123;

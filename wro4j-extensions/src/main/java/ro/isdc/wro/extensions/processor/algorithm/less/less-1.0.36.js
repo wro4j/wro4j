@@ -1,6 +1,3 @@
-//Make it work nice with Rhino server side script engine who doesn't know 
-//about window and other DOM related functions and properties specific to client-side scripting.
-var window = {};
 //
 // LESS - Leaner CSS v1.0.36
 // http://lesscss.org
@@ -552,9 +549,9 @@ less.Parser = function Parser(env) {
             // rule, which represents `{ ... }`, the `ruleset` rule, and this `primary` rule,
             // as represented by this simplified grammar:
             //
-            //     primary  →  (ruleset | rule)+
-            //     ruleset  →  selector+ block
-            //     block    →  '{' primary '}'
+            //     primary  â†’  (ruleset | rule)+
+            //     ruleset  â†’  selector+ block
+            //     block    â†’  '{' primary '}'
             //
             // Only at one point is the primary rule not called from the
             // block rule: at the root level.
@@ -1010,7 +1007,7 @@ less.Parser = function Parser(env) {
                 }
             },
             rule: function () {
-                var value, c = input.charAt(i), important;
+                var value, c = input.charAt(i), important, name;
                 save();
 
                 if (c === '.' || c === '#' || c === '&') { return }
@@ -2204,4 +2201,4 @@ require('less/tree').find = function (obj, fun) {
     return null;
 };
 
-})(window);
+})(window); 

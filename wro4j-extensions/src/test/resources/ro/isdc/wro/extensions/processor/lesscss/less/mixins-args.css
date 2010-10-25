@@ -21,21 +21,21 @@
   height: 49%;
 }
 .var-args {
-  width: 45px;
+  width: 45;
   height: 17%;
 }
 .multi-mix {
   width: 10px;
   height: 29%;
-  margin: 4px;
-  padding: 5px;
+  margin: 4;
+  padding: 5;
 }
 body {
   padding: 30px;
   color: #ff0000;
 }
 .scope-mix {
-  width: 8px;
+  width: 8;
 }
 .content {
   width: 600px;

@@ -51,7 +51,7 @@ p + h1 {
   font: 100%/16px Arial;
   margin: 1px 0;
   padding: 0 auto;
-  background: url("http://www.lesscss.org/spec.html") no-repeat 0px 4px;
+  background: url("http://www.lesscss.org/spec.html") no-repeat 0 4px;
 }
 #more-shorthands {
   margin: 0;

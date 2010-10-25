@@ -1,5 +1,5 @@
 .mixin (@a: 1px, @b: 50%) {
-  width: @a * 5px;
+  width: @a * 5;
   height: @b - 1%;
 }
 
@@ -8,7 +8,7 @@
 }
 
 .mixiny
-(@a: 0px, @b: 0px) {
+(@a: 0, @b: 0) {
   margin: @a;
   padding: @b;
 }
@@ -47,7 +47,7 @@
 
 .multi-mix {
   .mixin(2px, 30%);
-  .mixiny(4px, 5px);
+  .mixiny(4, 5);
 }
 
 .maxa(@arg1: 10, @arg2: #f00) {
@@ -59,13 +59,13 @@ body {
   .maxa(15);
 }
 
-@glob: 5px;
+@glob: 5;
 .global-mixin(@a:2) {
   width: @glob + @a;
 }
 
 .scope-mix {
-  .global-mixin(3px);
+  .global-mixin(3);
 }
 
 .nested-ruleset (@width: 200px) {

@@ -1,7 +1,3 @@
-var window = window || {
-	less: less
-};
-var less = window.less;
 var lessIt = function(css) {
     var result;
     var parser = new window.less.Parser();

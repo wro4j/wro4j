@@ -17,15 +17,15 @@
 package ro.isdc.wro.extensions.processor.algorithm.less;
 
 import java.io.IOException;
+import java.io.InputStream;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-import org.apache.commons.io.IOUtils;
+import org.mozilla.javascript.RhinoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -34,30 +34,34 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public class LessCSS {
-  private ScriptEngine scriptEngine;
+  private static final Logger LOG = LoggerFactory.getLogger(LessCSS.class);
 
-  public LessCSS() {
+  public LessCSS() {}
+
+
+  /**
+   * Initialize script builder for evaluation.
+   */
+  private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final ScriptEngineManager factory = new ScriptEngineManager();
-      // create JavaScript engine
-      scriptEngine = factory.getEngineByName("JavaScript");
+      final String SCRIPT_LESS = "less-1.0.36.js";
+      final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
+      final String SCRIPT_RUN = "run.js";
+      final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
 
-      final String packagePath = WroUtil.toPackageAsFolder(getClass());
-      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-      final String lessjs = IOUtils.toString(classLoader.getResourceAsStream(packagePath + "/less-1.0.36.js"));
-      final String runjs = IOUtils.toString(classLoader.getResourceAsStream(packagePath + "/run.js"));
-
-      scriptEngine.eval(lessjs);
-      scriptEngine.eval(runjs);
+      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(lessStream, SCRIPT_LESS).evaluateChain(runStream,
+        SCRIPT_RUN);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
-    } catch (final ScriptException e) {
-      throw new WroRuntimeException("Unable to evaluate the script", e);
     }
   }
 
-
-  private String removeNewLines(final String data) {
+  /**
+   * Replace new line characters with empty spaces.
+   * @param data
+   * @return
+   */
+  private static String removeNewLines(final String data) {
     return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
   }
 
@@ -67,12 +71,21 @@ public class LessCSS {
    * @return processed css content.
    */
   public String less(final String data) {
+    final StopWatch stopWatch = new StopWatch();
+    stopWatch.start("initContext");
+    final RhinoScriptBuilder builder = initScriptBuilder();
+    stopWatch.stop();
+
+    stopWatch.start("lessify");
     try {
       final String lessitjs = "lessIt(\"" + removeNewLines(data) + "\");";
-      final String result = scriptEngine.eval(lessitjs).toString();
-      return result;
-    } catch (final ScriptException e) {
+      final Object result = builder.evaluate(lessitjs, "lessIt");
+      return String.valueOf(result);
+    } catch (final RhinoException e) {
       throw new WroRuntimeException("Could not execute the script", e);
+    } finally {
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
     }
   }
 }

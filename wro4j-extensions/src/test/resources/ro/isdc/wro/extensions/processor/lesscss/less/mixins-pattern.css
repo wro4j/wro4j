@@ -41,15 +41,15 @@
   border-left: 4px;
 }
 .only-right {
-  both: 330px;
-  right: 33px;
+  both: 330;
+  right: 33;
 }
 .only-left {
-  both: 330px;
-  left: 33px;
+  both: 330;
+  left: 33;
 }
 .left-right {
-  both: 330px;
-  left: 33px;
-  right: 33px;
+  both: 330;
+  left: 33;
+  right: 33;
 }

@@ -3,7 +3,7 @@
     color: blue;
   }
   .class .sub {
-    width: 42px;
+    width: 42;
   }
   .top, header > h1 {
     color: #444444;
@@ -11,6 +11,6 @@
 }
 @media screen {
   body {
-    max-width: 480px;
+    max-width: 480;
   }
 }
