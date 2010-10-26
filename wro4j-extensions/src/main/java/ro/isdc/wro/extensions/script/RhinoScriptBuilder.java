@@ -10,6 +10,9 @@ import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.tools.ToolErrorReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -18,6 +21,7 @@ import org.mozilla.javascript.Scriptable;
  * @author Alex Objelean
  */
 public class RhinoScriptBuilder {
+  private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
   private Context context;
   private Scriptable scope;
 
@@ -34,6 +38,8 @@ public class RhinoScriptBuilder {
   private void initContext() {
     context = Context.enter();
     context.setOptimizationLevel(-1);
+    //TODO redirect errors from System.err to LOG.error()
+    context.setErrorReporter(new ToolErrorReporter(false));
     context.setLanguageVersion(Context.VERSION_1_7);
     scope = context.initStandardObjects();
 
