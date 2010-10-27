@@ -3,16 +3,17 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.net.URL;
 
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.test.util.WroTestUtils;
+import ro.isdc.wro.util.WroUtil;
 
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
@@ -22,44 +23,12 @@ import ro.isdc.wro.test.util.ResourceProcessor;
  */
 public class TestYUICssCompressorProcessor extends AbstractWroTest {
   private final ResourcePostProcessor processor = new YUICssCompressorProcessor();
-
   @Test
-  public void testLargeCss() throws IOException {
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-input.css",
-        "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-output.css",
-        new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(reader, writer);
-          }
-        });
-  }
-
-  @Test
-  public void testSmallCss() throws IOException {
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-inputSmall.css",
-        "classpath:ro/isdc/wro/extensions/processor/yuicsscompressor-outputSmall.css",
-        new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(reader, writer);
-          }
-        });
-  }
-
-
-  @Test
-  public void testAbsoluteBackgroundUrl()
+  public void testFromFolder()
     throws IOException {
-    //Output should be the same as input.
-    final String resourcePath = "classpath:ro/isdc/wro/extensions/processor/absoluteBackgroundUrl.css";
-    compareProcessedResourceContents(resourcePath, resourcePath, new ResourceProcessor() {
-        public void process(final Reader reader, final Writer writer)
-            throws IOException {
-          processor.process(reader, writer);
-        }
-      });
+    final URL url = getClass().getResource("yui");
+    final File sourceFolder = new File(url.getFile());
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "yuicss",
+      WroUtil.newResourceProcessor(processor));
   }
 }

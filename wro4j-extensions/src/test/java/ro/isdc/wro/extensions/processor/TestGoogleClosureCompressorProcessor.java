@@ -3,15 +3,16 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.net.URL;
 
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.test.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -25,27 +26,22 @@ import com.google.javascript.jscomp.CompilationLevel;
  */
 public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
   @Test
-  public void testDefault()
+  public void testSimpleFromFolder()
     throws IOException {
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
-      + WroUtil.toPackageAsFolder(getClass()) + "/googleClosure-output.js", new ResourceProcessor() {
-        public void process(final Reader reader, final Writer writer)
-          throws IOException {
-          new GoogleClosureCompressorProcessor().process(reader, writer);
-        }
-      });
+    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
+
+    final URL url = getClass().getResource("google");
+    final File sourceFolder = new File(url.getFile());
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "simplejs", WroUtil.newResourceProcessor(processor));
   }
 
 
-  @Test
-  public void testAdvanced()
+  public void testAdvancedFromFolder()
     throws IOException {
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
-      + WroUtil.toPackageAsFolder(getClass()) + "/googleClosure-advanced-output.js", new ResourceProcessor() {
-        public void process(final Reader reader, final Writer writer)
-          throws IOException {
-          new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS).process(reader, writer);
-        }
-      });
+    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
+
+    final URL url = getClass().getResource("google");
+    final File sourceFolder = new File(url.getFile());
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "advancedjs", WroUtil.newResourceProcessor(processor));
   }
 }

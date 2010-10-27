@@ -5,7 +5,6 @@
  * Library version.
  */
 
-var exports = {};
 exports.version = '0.5.0'
 
 /**

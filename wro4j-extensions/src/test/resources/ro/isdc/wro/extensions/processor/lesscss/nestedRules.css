@@ -1,7 +1,7 @@
 #header {
   color: red;
-  a {
-    font-weight: bold;
-    text-decoration: none;
-  }
+}
+#header a {
+  font-weight: bold;
+  text-decoration: none;
 }

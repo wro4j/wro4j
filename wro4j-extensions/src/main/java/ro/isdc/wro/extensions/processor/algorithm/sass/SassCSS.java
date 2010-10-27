@@ -33,8 +33,8 @@ public class SassCSS {
     try {
       final String SCRIPT_LESS = "sass-0.5.0.js";
       final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
-
-      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(lessStream, SCRIPT_LESS);
+      final String scriptInitSass = "var exports = {};";
+      return RhinoScriptBuilder.newChain().evaluateChain(scriptInitSass, "initSass").evaluateChain(lessStream, SCRIPT_LESS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript sass.js", ex);
     }

@@ -64,7 +64,7 @@ public abstract class AbstractWroTest {
     throws IOException {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
-    WroTestUtils.compareProcessedResourceContents(resultReader, expectedReader, processor);
+    WroTestUtils.compare(resultReader, expectedReader, processor);
   }
 
   /**
@@ -78,7 +78,7 @@ public abstract class AbstractWroTest {
     throws IOException {
     final Reader readerToProcess = new InputStreamReader(streamToProcess);
     final Reader expectedReader = new InputStreamReader(expectedStream);
-    WroTestUtils.compareProcessedResourceContents(readerToProcess, expectedReader, processor);
+    WroTestUtils.compare(readerToProcess, expectedReader, processor);
   }
 
 

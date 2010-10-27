@@ -66,7 +66,7 @@ public abstract class AbstractWroTest {
       final ResourceProcessor processor) throws IOException {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
-    WroTestUtils.compareProcessedResourceContents(resultReader, expectedReader,
+    WroTestUtils.compare(resultReader, expectedReader,
         processor);
   }
 

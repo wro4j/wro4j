@@ -3,16 +3,16 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.net.URL;
 
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.test.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -26,64 +26,29 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
   private final ResourcePostProcessor processor = new YUIJsCompressorProcessor();
 
   @Test
+  public void testWithMungeFromFolder()
+    throws IOException {
+    final ResourcePostProcessor processor = new YUIJsCompressorProcessor(true);
+
+    final URL url = getClass().getResource("yui");
+    final File sourceFolder = new File(url.getFile());
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "mungejs", WroUtil.newResourceProcessor(processor));
+  }
+
+  @Test
+  public void testWithNoMungeFromFolder()
+    throws IOException {
+    final ResourcePostProcessor processor = new YUIJsCompressorProcessor(false);
+
+    final URL url = getClass().getResource("yui");
+    final File sourceFolder = new File(url.getFile());
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "nomungejs", WroUtil.newResourceProcessor(processor));
+  }
+
+  @Test
   public void testInvalidJsShouldBeUnchanged()
     throws IOException {
     final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
-    compareProcessedResourceContents(resourceUri, resourceUri, new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    });
-  }
-
-  @Test
-  public void testWicketEventJsWithMunge()
-    throws IOException {
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.js", "classpath:"
-      + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.yui-munge.js", new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    });
-  }
-
-  @Test
-  public void testWicketEventJsWithNoMunge()
-    throws IOException {
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.js", "classpath:"
-      + WroUtil.toPackageAsFolder(getClass()) + "/wicket-event.yui-nomunge.js", new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        new YUIJsCompressorProcessor(false).process(reader, writer);
-      }
-    });
-  }
-
-  @Test
-  public void testWithMunge()
-    throws IOException {
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
-      + WroUtil.toPackageAsFolder(getClass()) + "/yuijscompressor-munge-output.js", new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    });
-  }
-
-
-
-  @Test
-  public void testNoMunge()
-    throws IOException {
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js", "classpath:"
-      + WroUtil.toPackageAsFolder(getClass()) + "/yuijscompressor-nomunge-output.js", new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        new YUIJsCompressorProcessor(false).process(reader, writer);
-      }
-    });
+    compareProcessedResourceContents(resourceUri, resourceUri, WroUtil.newResourceProcessor(processor));
   }
 }

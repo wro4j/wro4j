@@ -3,19 +3,17 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.test.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -26,7 +24,6 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Apr 21, 2010
  */
 public class TestPackerProcessor extends AbstractWroTest {
-  private static final Logger LOG = LoggerFactory.getLogger(TestPackerProcessor.class);
   private ResourcePostProcessor processor;
 
   @Before
@@ -35,15 +32,9 @@ public class TestPackerProcessor extends AbstractWroTest {
   }
 
   @Test
-  public void testPacker()
-    throws IOException {
-    LOG.debug("testPacker");
-    compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/input.js",
-      "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/packer-output.js", new ResourceProcessor() {
-        public void process(final Reader reader, final Writer writer)
-          throws IOException {
-          processor.process(reader, writer);
-        }
-      });
+  public void testFromFolder() throws IOException {
+    final URL url = getClass().getResource("packer");
+    final File sourceFolder = new File(url.getFile());
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "pack", WroUtil.newResourceProcessor(processor));
   }
 }

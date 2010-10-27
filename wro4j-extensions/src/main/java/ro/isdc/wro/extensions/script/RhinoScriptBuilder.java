@@ -78,6 +78,19 @@ public class RhinoScriptBuilder {
   }
 
   /**
+   * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
+   *
+   * @param script the string representation of the script to evaluate.
+   * @param sourceName the name of the evaluated script.
+   * @return evaluated object.
+   * @throws IOException if the script couldn't be retrieved.
+   */
+  public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
+    context.evaluateString(scope, script, sourceName, 1, null);
+    return this;
+  }
+
+  /**
    * Evaluates a script from a stream.
    *
    * @param script {@link InputStream} of the script to evaluate.

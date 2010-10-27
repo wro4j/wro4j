@@ -3,7 +3,10 @@
  */
 package ro.isdc.wro.util;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
@@ -27,6 +30,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ro.isdc.wro.http.HttpHeader;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.test.util.ResourceProcessor;
 
 
 /**
@@ -354,4 +360,31 @@ public final class WroUtil {
     return result.substring(1, result.length() - 1);
   }
 
+  /**
+   * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
+   * @param preProcessor {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
+   * @return instance of {@link ResourceProcessor}.
+   */
+  public static ResourceProcessor newResourceProcessor(final ResourcePreProcessor preProcessor) {
+    return new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        preProcessor.process(null, reader, writer);
+      }
+    };
+  }
+
+  /**
+   * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePostProcessor}.
+   * @param postProcessor {@link ResourcePostProcessor} to use as a {@link ResourceProcessor}.
+   * @return instance of {@link ResourceProcessor}.
+   */
+  public static ResourceProcessor newResourceProcessor(final ResourcePostProcessor postProcessor) {
+    return new ResourceProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        postProcessor.process(reader, writer);
+      }
+    };
+  }
 }
