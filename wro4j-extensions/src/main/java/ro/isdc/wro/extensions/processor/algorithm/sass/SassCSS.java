@@ -1,7 +1,7 @@
 /*
  *  Copyright 2010.
  */
-package ro.isdc.wro.extensions.processor.algorithm.less;
+package ro.isdc.wro.extensions.processor.algorithm.sass;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,14 +16,14 @@ import ro.isdc.wro.util.StopWatch;
 
 
 /**
- * This class is inspired from Richard Nichols visural project.
+ * Sass implementation.
  *
  * @author Alex Objelean
  */
-public class LessCSS {
-  private static final Logger LOG = LoggerFactory.getLogger(LessCSS.class);
+public class SassCSS {
+  private static final Logger LOG = LoggerFactory.getLogger(SassCSS.class);
 
-  public LessCSS() {}
+  public SassCSS() {}
 
 
   /**
@@ -31,15 +31,12 @@ public class LessCSS {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_LESS = "less-1.0.36.js";
+      final String SCRIPT_LESS = "sass-0.5.0.js";
       final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
-      final String SCRIPT_RUN = "run.js";
-      final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
 
-      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(lessStream, SCRIPT_LESS).evaluateChain(runStream,
-        SCRIPT_RUN);
+      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(lessStream, SCRIPT_LESS);
     } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript less.js", ex);
+      throw new IllegalStateException("Failed reading javascript sass.js", ex);
     }
   }
 
@@ -63,10 +60,10 @@ public class LessCSS {
     final RhinoScriptBuilder builder = initScriptBuilder();
     stopWatch.stop();
 
-    stopWatch.start("lessify");
+    stopWatch.start("sass rendering");
     try {
-      final String lessitjs = "lessIt(\"" + removeNewLines(data) + "\");";
-      final Object result = builder.evaluate(lessitjs, "lessIt");
+      final String lessitjs = "exports.render(\"" + removeNewLines(data) + "\");";
+      final Object result = builder.evaluate(lessitjs, "sassRender");
       return String.valueOf(result);
     } catch (final RhinoException e) {
       throw new WroRuntimeException("Could not execute the script", e);

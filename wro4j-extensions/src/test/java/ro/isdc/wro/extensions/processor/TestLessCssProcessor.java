@@ -128,6 +128,9 @@ public class TestLessCssProcessor extends AbstractWroTest {
   @Test
   public void testLessCssFromFolder()
     throws IOException {
+
+
+
     final String fullPath = FilenameUtils.getFullPath(PATH_COMMON);
     final URL url = ClassLoader.getSystemResource(fullPath);
     final File lessFolder = new File(url.getFile(), "less");

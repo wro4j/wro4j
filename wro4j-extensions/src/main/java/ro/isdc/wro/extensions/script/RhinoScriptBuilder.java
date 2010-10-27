@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Used to evaluate javascript on the serverside using rhino javascript engine.
+ * Used to evaluate javascript on the serverside using rhino javascript engine. Encapsulate and hides all implementation
+ * details used by rhino to evaluate javascript on the serverside.
  *
  * @author Alex Objelean
  */
