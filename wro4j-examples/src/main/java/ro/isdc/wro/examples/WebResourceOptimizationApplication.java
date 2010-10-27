@@ -15,7 +15,7 @@ import ro.isdc.wro.examples.page.HomePage;
  */
 public class WebResourceOptimizationApplication
     extends WebApplication {
-  private final boolean deploy = false;
+  private final boolean deploy = true;
 
   /**
    * @see wicket.Application#getHomePage()
@@ -53,10 +53,7 @@ public class WebResourceOptimizationApplication
    */
   @Override
   public String getConfigurationType() {
-    if (deploy) {
-      return DEPLOYMENT;
-    }
-    return DEVELOPMENT;
+    return deploy ? DEPLOYMENT: DEVELOPMENT;
   }
 }
 
