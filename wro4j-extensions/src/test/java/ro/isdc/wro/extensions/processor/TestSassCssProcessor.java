@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.test.util.WroTestUtils;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 

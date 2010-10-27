@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.util.ResourceProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 

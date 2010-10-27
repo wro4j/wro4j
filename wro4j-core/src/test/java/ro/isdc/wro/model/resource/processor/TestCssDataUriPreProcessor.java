@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.util.ResourceProcessor;
 
 
 /**

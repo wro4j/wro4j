@@ -32,7 +32,6 @@ import org.w3c.dom.NodeList;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
 
 
 /**

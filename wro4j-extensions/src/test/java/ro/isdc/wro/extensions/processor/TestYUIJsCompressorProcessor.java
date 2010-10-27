@@ -12,7 +12,7 @@ import org.junit.Test;
 import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.test.util.WroTestUtils;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 

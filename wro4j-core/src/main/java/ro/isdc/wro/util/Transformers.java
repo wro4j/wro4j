@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.test.util;
+package ro.isdc.wro.util;
 
 import org.apache.commons.io.FilenameUtils;
 

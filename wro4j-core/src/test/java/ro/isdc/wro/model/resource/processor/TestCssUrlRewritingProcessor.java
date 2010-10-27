@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.test.util.ResourceProcessor;
+import ro.isdc.wro.util.ResourceProcessor;
 
 
 /**

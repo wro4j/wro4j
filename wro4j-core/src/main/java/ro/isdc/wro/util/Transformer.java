@@ -1,4 +1,4 @@
-package ro.isdc.wro.test.util;
+package ro.isdc.wro.util;
 
 /**
  * Transform some an object of some type to another object of the same type.

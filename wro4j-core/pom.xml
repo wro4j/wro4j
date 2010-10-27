@@ -16,10 +16,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>ro.isdc.wro4j</groupId>
-			<artifactId>wro4j-test-utils</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 		</dependency>

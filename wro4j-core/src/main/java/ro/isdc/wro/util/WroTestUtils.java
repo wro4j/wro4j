@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.test.util;
+package ro.isdc.wro.util;
 
 import java.io.File;
 import java.io.FileInputStream;

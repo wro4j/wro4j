@@ -35,7 +35,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
-import ro.isdc.wro.test.util.WroTestUtils;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.encoding.CharsetToolkit;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
