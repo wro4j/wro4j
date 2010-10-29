@@ -32,16 +32,16 @@ public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
 
     final URL url = getClass().getResource("google");
     final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "simplejs", WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "simple.js", WroUtil.newResourceProcessor(processor));
   }
 
-
+  @Test
   public void testAdvancedFromFolder()
     throws IOException {
     final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
 
     final URL url = getClass().getResource("google");
     final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "advancedjs", WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "advanced.js", WroUtil.newResourceProcessor(processor));
   }
 }

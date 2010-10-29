@@ -28,7 +28,7 @@ public class TestYUICssCompressorProcessor extends AbstractWroTest {
     throws IOException {
     final URL url = getClass().getResource("yui");
     final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "yuicss",
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "yui.css",
       WroUtil.newResourceProcessor(processor));
   }
 }

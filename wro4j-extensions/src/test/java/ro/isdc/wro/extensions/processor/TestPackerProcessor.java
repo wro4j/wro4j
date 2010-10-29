@@ -35,6 +35,6 @@ public class TestPackerProcessor extends AbstractWroTest {
   public void testFromFolder() throws IOException {
     final URL url = getClass().getResource("packer");
     final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "pack", WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "pack.js", WroUtil.newResourceProcessor(processor));
   }
 }

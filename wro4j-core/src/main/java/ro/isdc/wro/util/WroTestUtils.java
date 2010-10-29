@@ -118,8 +118,8 @@ public class WroTestUtils {
 
 
   /**
-   * Process and compare files from the same folder. Use the extension to make distinction between the source files (files to process) and
-   * target files (files to compare with).
+   * Process and compare files from the same folder. Use the extension to make distinction between the source files
+   * (files to process) and target files (files to compare with).
    *
    * @param sourceFolder the folder where the files to compare resides.
    * @param sourceFileExtension the extension of the files used to process.
@@ -134,9 +134,11 @@ public class WroTestUtils {
       Transformers.extensionTransformer(targetFileExtension), processor);
   }
 
+
   /**
-   * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourceProcessor)
-   * Same as {@link WroTestUtils#compareSameFolderByExtension(File, String, String, ResourceProcessor)}, but let you define the way target file name is named.
+   * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourceProcessor) Same as
+   *      {@link WroTestUtils#compareSameFolderByExtension(File, String, String, ResourceProcessor)}, but let you define
+   *      the way target file name is named.
    *
    * @param sourceFolder
    * @param sourceFileExtension
@@ -156,8 +158,8 @@ public class WroTestUtils {
    *
    * @param sourceFolder the folder where the files to compare resides.
    * @param sourceFileFilter the {@link IOFileFilter} used to select source files (files to be processed).
-   * @param toTargetFileName the {@link Transformer} which creates the name of the target file used to compare with
-   *        the source processed content.
+   * @param toTargetFileName the {@link Transformer} which creates the name of the target file used to compare with the
+   *        source processed content.
    * @param processor {@link ResourceProcessor} to apply on source files.
    * @throws IOException
    */
@@ -165,22 +167,30 @@ public class WroTestUtils {
     final Transformer<String> toTargetFileName, final ResourceProcessor processor)
     throws IOException {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
+    int processedNumber = 0;
     for (final File file : files) {
       LOG.debug("processing: " + file.getName());
-      final File targetFile = new File(
-        sourceFolder, toTargetFileName.transform(file.getName()));
-      final InputStream targetFileStream = new FileInputStream(targetFile);
-      LOG.debug("comparing with: " + targetFile.getName());
-      compare(new FileInputStream(file), targetFileStream, processor);
+      File targetFile = null;
+      try {
+        targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
+        final InputStream targetFileStream = new FileInputStream(targetFile);
+        LOG.debug("comparing with: " + targetFile.getName());
+        compare(new FileInputStream(file), targetFileStream, processor);
+        processedNumber++;
+      } catch (final IOException e) {
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
+      }
     }
-    logSuccess(files.size());
+    logSuccess(processedNumber);
   }
+
 
   private static void logSuccess(final int size) {
     LOG.debug("===============");
     LOG.debug("Successfully compared: " + size + " files.");
     LOG.debug("===============");
   }
+
 
   /**
    * Process and compare the files which a located in different folders.
@@ -212,12 +222,19 @@ public class WroTestUtils {
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourceProcessor processor)
     throws IOException {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
+    int processedNumber = 0;
     for (final File file : files) {
-      final InputStream outputFileStream = new FileInputStream(new File(
-        targetFolder, toTargetFileName.transform(file.getName())));
-      LOG.debug("processing: " + file.getName());
-      compare(new FileInputStream(file), outputFileStream, processor);
+      File targetFile = null;
+      try {
+        targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
+        final InputStream targetFileStream = new FileInputStream(targetFile);
+        LOG.debug("processing: " + file.getName());
+        compare(new FileInputStream(file), targetFileStream, processor);
+        processedNumber++;
+      } catch (final IOException e) {
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
+      }
     }
-    logSuccess(files.size());
+    logSuccess(processedNumber);
   }
 }

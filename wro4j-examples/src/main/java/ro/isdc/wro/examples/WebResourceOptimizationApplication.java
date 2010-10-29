@@ -40,6 +40,7 @@ public class WebResourceOptimizationApplication
     getMarkupSettings().setCompressWhitespace(true);
     getPageSettings().setAutomaticMultiWindowSupport(false);
     getDebugSettings().setDevelopmentUtilitiesEnabled(true);
+//    setPageManagerProvider(IPageManagerProvider)
 
     //mounts
     getRootRequestMapperAsCompound().add(new MountedMapper("/home", HomePage.class));

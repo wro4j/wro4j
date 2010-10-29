@@ -32,7 +32,7 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
 
     final URL url = getClass().getResource("yui");
     final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "mungejs", WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "munge.js", WroUtil.newResourceProcessor(processor));
   }
 
   @Test
@@ -42,7 +42,7 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
 
     final URL url = getClass().getResource("yui");
     final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "nomungejs", WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "nomunge.js", WroUtil.newResourceProcessor(processor));
   }
 
   @Test
