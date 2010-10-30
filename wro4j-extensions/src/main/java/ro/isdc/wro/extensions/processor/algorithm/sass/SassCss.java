@@ -1,7 +1,7 @@
 /*
  *  Copyright 2010.
  */
-package ro.isdc.wro.extensions.processor.algorithm.less;
+package ro.isdc.wro.extensions.processor.algorithm.sass;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,17 +13,18 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * This class is inspired from Richard Nichols visural project.
+ * Sass implementation.
  *
  * @author Alex Objelean
  */
-public class LessCSS {
-  private static final Logger LOG = LoggerFactory.getLogger(LessCSS.class);
+public class SassCss {
+  private static final Logger LOG = LoggerFactory.getLogger(SassCss.class);
 
-  public LessCSS() {}
+  public SassCss() {}
 
 
   /**
@@ -31,27 +32,14 @@ public class LessCSS {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_LESS = "less-1.0.36.js";
+      final String SCRIPT_LESS = "sass-0.5.0.js";
       final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
-      final String SCRIPT_RUN = "run.js";
-      final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
-
-      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(lessStream, SCRIPT_LESS).evaluateChain(runStream,
-        SCRIPT_RUN);
+      final String scriptInitSass = "var exports = {};";
+      return RhinoScriptBuilder.newChain().evaluateChain(scriptInitSass, "initSass").evaluateChain(lessStream, SCRIPT_LESS);
     } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript less.js", ex);
+      throw new IllegalStateException("Failed reading javascript sass.js", ex);
     }
   }
-
-  /**
-   * Replace new line characters with empty spaces.
-   * @param data
-   * @return
-   */
-  private static String removeNewLines(final String data) {
-    return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
-  }
-
 
   /**
    * @param data css content to process.
@@ -63,10 +51,10 @@ public class LessCSS {
     final RhinoScriptBuilder builder = initScriptBuilder();
     stopWatch.stop();
 
-    stopWatch.start("lessify");
+    stopWatch.start("sass rendering");
     try {
-      final String lessitjs = "lessIt(\"" + removeNewLines(data) + "\");";
-      final Object result = builder.evaluate(lessitjs, "lessIt");
+      final String execute = "exports.render(" + WroUtil.toJSMultiLineString(data) + ");";
+      final Object result = builder.evaluate(execute, "sassRender");
       return String.valueOf(result);
     } catch (final RhinoException e) {
       throw new WroRuntimeException("Could not execute the script", e);

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -52,9 +53,8 @@ public class PackerJs {
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       watch.start("pack");
-      final String script = multilineEscape(data);
 
-      final String packIt = "new Packer().pack(\"" + script + "\", true, true);";
+      final String packIt = "new Packer().pack(" + WroUtil.toJSMultiLineString(data) + ", true, true);";
       final Object result = builder.evaluate(packIt, "packerIt");
       watch.stop();
       LOG.debug(watch.prettyPrint());
@@ -62,11 +62,6 @@ public class PackerJs {
     } catch (final RhinoException e) {
       throw new WroRuntimeException("Unable to evaluate the script", e);
     }
-  }
-
-
-  private final String multilineEscape(final String data) {
-    return data.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
   }
 }
 

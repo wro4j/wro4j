@@ -156,13 +156,22 @@ public final class WroUtil {
     return location.replace(getPathInfoFromLocation(location), "");
   }
 
-
   /**
    * @param request {@link HttpServletRequest} object.
    * @return true if this request support gzip encoding.
    */
   public static boolean isGzipSupported(final HttpServletRequest request) {
     return headerContains(request, HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
+  }
+
+  /**
+   * Transforms a java multi-line string into javascript multi-line string.
+   * This technique was found at {@link http://mook.wordpress.com/2005/10/30/multi-line-strings-in-javascript/}
+   * @param data a string containing new lines.
+   * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
+   */
+  public static String toJSMultiLineString(final String data) {
+    return "(<r><![CDATA[" + data + "]]></r>).toString()";
   }
 
 

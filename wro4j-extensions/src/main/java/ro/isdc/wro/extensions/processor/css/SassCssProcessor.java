@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.sass.SassCSS;
+import ro.isdc.wro.extensions.processor.algorithm.sass.SassCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -34,7 +34,7 @@ public class SassCssProcessor
   /**
    * Engine.
    */
-  private SassCSS engine;
+  private SassCss engine;
 
   /**
    * {@inheritDoc}
@@ -57,9 +57,9 @@ public class SassCssProcessor
   /**
    * A getter used for lazy loading.
    */
-  private SassCSS getEngine() {
+  private SassCss getEngine() {
     if (engine == null) {
-      engine = new SassCSS();
+      engine = new SassCss();
     }
     return engine;
   }

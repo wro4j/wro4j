@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.slf4j.Logger;
@@ -101,6 +102,9 @@ public class RhinoScriptBuilder {
   public Object evaluate(final InputStream script, final String sourceName) throws IOException {
     try {
       return evaluateScript(script, sourceName);
+    } catch (final JavaScriptException e) {
+      LOG.error("JavaScriptException occured: " + e.getMessage());
+      throw e;
     } finally {
       Context.exit();
     }
@@ -129,6 +133,9 @@ public class RhinoScriptBuilder {
   public Object evaluate(final Reader script, final String sourceName) throws IOException {
     try {
       return context.evaluateReader(scope, script, sourceName, 1, null);
+    } catch (final JavaScriptException e) {
+      LOG.error("JavaScriptException occured: " + e.getMessage());
+      throw e;
     } finally {
       Context.exit();
     }
@@ -145,6 +152,9 @@ public class RhinoScriptBuilder {
   public Object evaluate(final String script, final String sourceName) {
     try {
       return context.evaluateString(scope, script, sourceName, 1, null);
+    } catch (final JavaScriptException e) {
+      LOG.error("JavaScriptException occured: " + e.getMessage());
+      throw e;
     } finally {
       Context.exit();
     }

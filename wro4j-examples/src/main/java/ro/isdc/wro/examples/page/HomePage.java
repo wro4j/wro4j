@@ -1,7 +1,7 @@
 package ro.isdc.wro.examples.page;
 
 
-import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.PageParameters;
 
 import ro.isdc.wro.examples.panel.ResourceTransformerPanel;
 

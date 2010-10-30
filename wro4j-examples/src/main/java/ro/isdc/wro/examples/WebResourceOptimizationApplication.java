@@ -1,8 +1,10 @@
 package ro.isdc.wro.examples;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.protocol.http.HttpSessionStore;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.request.mapper.MountedMapper;
+import org.apache.wicket.session.ISessionStore;
 
 import ro.isdc.wro.examples.page.HomePage;
 
@@ -15,8 +17,6 @@ import ro.isdc.wro.examples.page.HomePage;
  */
 public class WebResourceOptimizationApplication
     extends WebApplication {
-  private final boolean deploy = true;
-
   /**
    * @see wicket.Application#getHomePage()
    */
@@ -31,7 +31,7 @@ public class WebResourceOptimizationApplication
   @Override
   protected void init() {
     // for Google App Engine
-    if (deploy) {
+    if (isDeploy()) {
       getResourceSettings().setResourcePollFrequency(null);
     }
     //settings
@@ -43,10 +43,15 @@ public class WebResourceOptimizationApplication
 //    setPageManagerProvider(IPageManagerProvider)
 
     //mounts
-    getRootRequestMapperAsCompound().add(new MountedMapper("/home", HomePage.class));
+    mountBookmarkablePage("/home", HomePage.class);
     //getRootRequestMapper().mapHandler(new BookmarkablePageRequestHandler(new PageProvider(HomePage.class)));
 //    getRootRequestMapper().mapHandler(new RenderPageRequestHandler(new PageProvider(HomePage.class)));
 
+  }
+
+
+  public static WebResourceOptimizationApplication get() {
+    return (WebResourceOptimizationApplication) Application.get();
   }
 
   /**
@@ -54,7 +59,23 @@ public class WebResourceOptimizationApplication
    */
   @Override
   public String getConfigurationType() {
-    return deploy ? DEPLOYMENT: DEVELOPMENT;
+    return isDeploy() ? DEPLOYMENT: DEVELOPMENT;
+  }
+
+  /**
+   * @return true if application is to be deployed on GAE.
+   */
+  public boolean isDeploy() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected ISessionStore newSessionStore() {
+    //wouldn't work with SecondLevelCacheSessionStore on GAE
+    return new HttpSessionStore(this);
   }
 }
 

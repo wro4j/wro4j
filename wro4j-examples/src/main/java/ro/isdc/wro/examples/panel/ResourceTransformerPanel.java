@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
@@ -99,7 +100,6 @@ public class ResourceTransformerPanel extends Panel {
 
       @Override
       public void onSubmit() {
-        System.out.println("#####################onSubmit##########################");
         if (processor == null) {
           return;
         }
@@ -153,6 +153,7 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new MultiLineCommentStripperProcessor());
       list.add(new SingleLineCommentStripperProcessor());
       list.add(new LessCssProcessor());
+      list.add(new SassCssProcessor());
       list.add(new PackerJsProcessor());
       list.add(new YUICssCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor());

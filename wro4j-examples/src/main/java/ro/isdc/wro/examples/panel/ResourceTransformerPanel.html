@@ -1,29 +1,29 @@
 <wicket:panel>
   <form wicket:id="form" method="post">
-    <p>
-      Choose a processor from this list, insert some code (css or js,
-	    depending on choosed processor) and press transform button.
-	  </p>
-	  <div class="ui-grid-a">
-		  <div class="ui-block-a">
-		    <select wicket:id="selectProcessor"></select>
-		  </div>
-		</div>
     <div class="ui-grid-a">
       <div class="ui-block-a">
-        <input wicket:id="transform" type="submit" value="transform" />
+        <h3>Description</h3>
+		    <p>
+		      Choose a processor from this list, insert some code (css or js,
+		      depending on choosed processor) and press transform button.
+		    </p>      
       </div>
-      <div class="ui-block-b"></div>
-      <div class="ui-block-c">
-        <h2>Details</h2>
-        <ul data-inset="true" data-theme="c" data-dividertheme="a">
-          <li>Original size: <b wicket:id="originalSize"></b> KB</li>
-          <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
-          <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>
-          <li>Processing Time: <b wicket:id="processingTime"></b> ms</li>                    
-        </ul>
+      <div class="ui-block-b" style="font-size: 0.8em;">
+        <h3>Processing Results</h3>
+	      <ul data-inset="true" data-theme="c" data-dividertheme="a">
+	        <li>Original size: <b wicket:id="originalSize"></b> KB</li>
+	        <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
+	        <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>
+	        <li>Processing Time: <b wicket:id="processingTime"></b> ms</li>                    
+	      </ul>
       </div>
-    </div>
+    </div>    
+	  
+	  <div data-role="fieldcontain">
+		  <label for="selectProcessor" class="select">Choose the processor</label>
+		  <select wicket:id="selectProcessor"></select>
+		  <input type="submit" wicket:id="transform" data-role="button" data-theme="b" data-icon="refresh" value="Transform"/>
+		</div>
 		<div class="ui-grid-a">
       <div class="ui-block-a">
         <h2>Input</h2>

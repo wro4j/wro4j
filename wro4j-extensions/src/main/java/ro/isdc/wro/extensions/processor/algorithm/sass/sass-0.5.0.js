@@ -59,8 +59,10 @@ function tokenize(str) {
     if (token)
       stack.push(token),
       token = null
-    else 
-      throw new Error("SyntaxError: near `" + str.slice(0, 25).replace('\n', '\\n') + "'")
+    else {
+    	throw new Error("SyntaxError: near `" + str.slice(0, 25).replace('\n', '\\n') + "'")
+    }
+      
   }
   return stack
 }

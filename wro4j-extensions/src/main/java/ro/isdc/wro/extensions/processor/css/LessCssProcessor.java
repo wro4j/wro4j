@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.less.LessCSS;
+import ro.isdc.wro.extensions.processor.algorithm.less.LessCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -104,7 +104,7 @@ public class LessCssProcessor
   /**
    * Engine.
    */
-  private LessCSS engine;
+  private LessCss engine;
 
   /**
    * {@inheritDoc}
@@ -127,9 +127,9 @@ public class LessCssProcessor
   /**
    * A getter used for lazy loading.
    */
-  private LessCSS getEngine() {
+  private LessCss getEngine() {
     if (engine == null) {
-      engine = new LessCSS();
+      engine = new LessCss();
     }
     return engine;
   }

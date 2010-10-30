@@ -15,7 +15,7 @@
 
   <properties>
     <wro4j.version>1.3.0-SNAPSHOT</wro4j.version>
-    <wicket.version>1.5-M2.1</wicket.version>
+    <wicket.version>1.4.12</wicket.version>
     <gae.version>1.3.2</gae.version>
     <project_charset>UTF-8</project_charset>
   </properties>
