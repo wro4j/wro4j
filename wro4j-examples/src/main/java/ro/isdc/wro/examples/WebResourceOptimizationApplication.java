@@ -40,13 +40,9 @@ public class WebResourceOptimizationApplication
     getMarkupSettings().setCompressWhitespace(true);
     getPageSettings().setAutomaticMultiWindowSupport(false);
     getDebugSettings().setDevelopmentUtilitiesEnabled(true);
-//    setPageManagerProvider(IPageManagerProvider)
 
     //mounts
     mountBookmarkablePage("/home", HomePage.class);
-    //getRootRequestMapper().mapHandler(new BookmarkablePageRequestHandler(new PageProvider(HomePage.class)));
-//    getRootRequestMapper().mapHandler(new RenderPageRequestHandler(new PageProvider(HomePage.class)));
-
   }
 
 
@@ -66,7 +62,7 @@ public class WebResourceOptimizationApplication
    * @return true if application is to be deployed on GAE.
    */
   public boolean isDeploy() {
-    return false;
+    return true;
   }
 
   /**

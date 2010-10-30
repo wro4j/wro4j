@@ -24,11 +24,11 @@
     </init-param>
     <init-param>
       <param-name>cacheUpdatePeriod</param-name>
-      <param-value>30</param-value>
+      <param-value>0</param-value>
     </init-param>
     <init-param>
       <param-name>modelUpdatePeriod</param-name>
-      <param-value>15</param-value>
+      <param-value>0</param-value>
     </init-param>
     <init-param>
       <param-name>managerFactoryClassName</param-name>
