@@ -60,7 +60,7 @@ public class PackerJs {
       LOG.debug(watch.prettyPrint());
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Unable to evaluate the script", e);
+      throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
     }
   }
 }

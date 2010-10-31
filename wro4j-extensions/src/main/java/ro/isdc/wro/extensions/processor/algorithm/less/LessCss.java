@@ -61,7 +61,7 @@ public class LessCss {
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Could not execute the script", e);
+      throw new WroRuntimeException("Could not execute the script because: " + e.getMessage(), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

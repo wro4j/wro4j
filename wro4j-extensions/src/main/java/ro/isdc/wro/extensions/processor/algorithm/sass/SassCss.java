@@ -45,7 +45,7 @@ public class SassCss {
    * @param data css content to process.
    * @return processed css content.
    */
-  public String less(final String data) {
+  public String process(final String data) {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("initContext");
     final RhinoScriptBuilder builder = initScriptBuilder();
@@ -57,7 +57,7 @@ public class SassCss {
       final Object result = builder.evaluate(execute, "sassRender");
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Could not execute the script", e);
+      throw new WroRuntimeException("Could not execute the script because: " + e.getMessage(), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

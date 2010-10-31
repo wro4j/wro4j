@@ -46,12 +46,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>com.yahoo.platform.yui</groupId>
-      <artifactId>yuicompressor</artifactId>
-    </dependency>
-    -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -200,6 +194,7 @@
           <port>81</port>
         </configuration>
       </plugin>
+      <!-- 
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
@@ -213,11 +208,12 @@
         </executions>
         <configuration>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-          <!-- <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory> 
+           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory> 
             <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory> 
-            <targetGroups>all</targetGroups> -->
+            <targetGroups>all</targetGroups> 
         </configuration>
       </plugin>
+       -->
     </plugins>
   </build>
   <repositories>

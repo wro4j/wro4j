@@ -4,6 +4,7 @@ import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.HttpSessionStore;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.target.coding.IndexedHybridUrlCodingStrategy;
 import org.apache.wicket.session.ISessionStore;
 
 import ro.isdc.wro.examples.page.HomePage;
@@ -42,7 +43,8 @@ public class WebResourceOptimizationApplication
     getDebugSettings().setDevelopmentUtilitiesEnabled(true);
 
     //mounts
-    mountBookmarkablePage("/home", HomePage.class);
+    mount(new IndexedHybridUrlCodingStrategy("/home", HomePage.class));
+//    mountBookmarkablePage("/home", HomePage.class);
   }
 
 
