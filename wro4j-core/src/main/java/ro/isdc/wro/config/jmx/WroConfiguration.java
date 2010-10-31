@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringStyle;
  */
 public final class WroConfiguration
   implements WroConfigurationMBean {
-	/**
+  private static final Logger LOG = LoggerFactory.getLogger(WroConfiguration.class);
+  /**
 	 * How often to run a thread responsible for refreshing the cache.
 	 */
   private long cacheUpdatePeriod;
@@ -104,7 +107,8 @@ public final class WroConfiguration
    * {@inheritDoc}
    */
   public void reloadCache() {
-  	reloadCacheWithNewValue(null);
+  	LOG.debug("reloadCache");
+    reloadCacheWithNewValue(null);
   }
 
 
@@ -116,6 +120,7 @@ public final class WroConfiguration
 	 */
 	private void reloadCacheWithNewValue(final Long newValue) {
 		final long newValueAsPrimitive = newValue == null ? getModelUpdatePeriod() : newValue;
+    LOG.debug("invoking " + cacheUpdatePeriodListeners.size() + " listeners");
 		for (final PropertyChangeListener listener : cacheUpdatePeriodListeners) {
   		final PropertyChangeEvent event = new PropertyChangeEvent(this, "cache", getCacheUpdatePeriod(), newValueAsPrimitive);
 			listener.propertyChange(event);
@@ -126,6 +131,7 @@ public final class WroConfiguration
    * {@inheritDoc}
    */
   public void reloadModel() {
+    LOG.debug("reloadModel");
   	reloadModelWithNewValue(null);
   }
 

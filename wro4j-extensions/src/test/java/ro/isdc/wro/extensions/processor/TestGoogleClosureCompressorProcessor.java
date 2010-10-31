@@ -19,7 +19,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 
 
 /**
- * TestGoogleClosureCompressorProcessor.
+ * Test google closure js processor.
  *
  * @author Alex Objelean
  * @created Created on Apr 18, 2010

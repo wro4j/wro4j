@@ -66,6 +66,10 @@
     <js>/dwr/interface/DWRFacade.js</js>
   </group>
 
+  <group name="justJquery">
+    <js>/static/js/jquery-1.4.3.js</js>
+  </group>
+
   <group name="jquery">
     <js>http://code.jquery.com/jquery-1.4.3.js</js>
     <group-ref>jquery-mobile</group-ref>

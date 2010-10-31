@@ -38,6 +38,7 @@ import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
+import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
@@ -144,21 +145,26 @@ public class ResourceTransformerPanel extends Panel {
     //hardcode the list:
     if (true) {
       list.add(new CommentStripperProcessor());
-      list.add(new ConformColorsCssProcessor());
-      list.add(new CssCompressorProcessor());
-      list.add(new CssVariablesProcessor());
-      list.add(new JawrCssMinifierProcessor());
-      list.add(new VariablizeColorsCssProcessor());
-      list.add(new JSMinProcessor());
       list.add(new MultiLineCommentStripperProcessor());
       list.add(new SingleLineCommentStripperProcessor());
+
+      list.add(new ConformColorsCssProcessor());
+      list.add(new CssVariablesProcessor());
+      list.add(new VariablizeColorsCssProcessor());
+
       list.add(new LessCssProcessor());
       list.add(new SassCssProcessor());
-      list.add(new PackerJsProcessor());
       list.add(new YUICssCompressorProcessor());
+      list.add(new JawrCssMinifierProcessor());
+      list.add(new CssCompressorProcessor());
+
+      list.add(new PackerJsProcessor());
+      list.add(new UglifyJsProcessor());
+      list.add(new JSMinProcessor());
       list.add(new GoogleClosureCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-      list.add(new YUIJsCompressorProcessor());
+      list.add(new YUIJsCompressorProcessor(true));
+      list.add(new YUIJsCompressorProcessor(false));
       return list;
     }
     //inspect the classpath

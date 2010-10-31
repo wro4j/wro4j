@@ -30,14 +30,14 @@ public class PackerJs {
   private RhinoScriptBuilder initScriptBuilder() {
     try {
       final String SCRIPT_BASE2 = "base2.js";
-      final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_BASE2);
+      final InputStream baseStream = getClass().getResourceAsStream(SCRIPT_BASE2);
       final String SCRIPT_PACKER = "packer.js";
       final InputStream runStream = getClass().getResourceAsStream(SCRIPT_PACKER);
 
-      return RhinoScriptBuilder.newChain().evaluateChain(lessStream, SCRIPT_BASE2).evaluateChain(runStream,
+      return RhinoScriptBuilder.newChain().evaluateChain(baseStream, SCRIPT_BASE2).evaluateChain(runStream,
         SCRIPT_PACKER);
     } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript less.js", ex);
+      throw new IllegalStateException("Failed reading init script", ex);
     }
   }
 

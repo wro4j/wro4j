@@ -16,7 +16,7 @@ import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**
- * TestMultiLineCommentStripperPostProcessor.java.
+ * Test YUI css compressor processor.
  *
  * @author Alex Objelean
  * @created Created on Nov 28, 2008

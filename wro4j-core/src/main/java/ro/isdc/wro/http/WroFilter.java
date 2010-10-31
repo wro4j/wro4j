@@ -49,9 +49,6 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class WroFilter
   implements Filter {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
   /**
    * The prefix to use for default mbean name.

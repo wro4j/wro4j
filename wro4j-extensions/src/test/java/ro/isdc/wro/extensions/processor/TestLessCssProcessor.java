@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * TestLessCssProcessor.
+ * Test less css processor.
  *
  * @author Alex Objelean
  * @created Created on Apr 21, 2010
