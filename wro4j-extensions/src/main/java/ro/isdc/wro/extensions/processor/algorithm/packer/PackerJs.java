@@ -29,16 +29,29 @@ public class PackerJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_BASE2 = "base2.js";
-      final InputStream baseStream = getClass().getResourceAsStream(SCRIPT_BASE2);
-      final String SCRIPT_PACKER = "packer.js";
-      final InputStream runStream = getClass().getResourceAsStream(SCRIPT_PACKER);
-
-      return RhinoScriptBuilder.newChain().evaluateChain(baseStream, SCRIPT_BASE2).evaluateChain(runStream,
-        SCRIPT_PACKER);
+      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForBase2(), "base2.js").evaluateChain(
+        getStreamForPacker(), "packer.js");
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
+  }
+
+  /**
+   * Override this method if you have a newer version of base2.js file.
+   *
+   * @return Stream for base2.js
+   */
+  protected InputStream getStreamForBase2() {
+    return getClass().getResourceAsStream("base2.js");
+  }
+
+  /**
+   * Override this method if you have a newer version of packer.js file.
+   *
+   * @return Stream for packer.js
+   */
+  protected InputStream getStreamForPacker() {
+    return getClass().getResourceAsStream("packer.js");
   }
 
   /**
@@ -54,7 +67,7 @@ public class PackerJs {
       watch.stop();
       watch.start("pack");
 
-      final String packIt = "new Packer().pack(" + WroUtil.toJSMultiLineString(data) + ", true, true);";
+      final String packIt = buildPackScript(WroUtil.toJSMultiLineString(data));
       final Object result = builder.evaluate(packIt, "packerIt");
       watch.stop();
       LOG.debug(watch.prettyPrint());
@@ -62,6 +75,14 @@ public class PackerJs {
     } catch (final RhinoException e) {
       throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * @param data script to pack.
+   * @return Script used to pack and return the packed result.
+   */
+  protected String buildPackScript(final String data) {
+    return "new Packer().pack(" + data + ", true, true);";
   }
 }
 
