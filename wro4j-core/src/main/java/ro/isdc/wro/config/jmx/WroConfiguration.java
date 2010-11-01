@@ -107,7 +107,6 @@ public final class WroConfiguration
    * {@inheritDoc}
    */
   public void reloadCache() {
-  	LOG.debug("reloadCache");
     reloadCacheWithNewValue(null);
   }
 
@@ -131,7 +130,6 @@ public final class WroConfiguration
    * {@inheritDoc}
    */
   public void reloadModel() {
-    LOG.debug("reloadModel");
   	reloadModelWithNewValue(null);
   }
 

@@ -75,8 +75,7 @@ public class ClasspathUriLocator
     if (is == null) {
       throw new IOException("Couldn't get InputStream from this resource: " + uri);
     }
-    final URL url = classLoader.getResource(location);
-    return url.openStream();
+    return is;
   }
 
   /**

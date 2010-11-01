@@ -170,15 +170,15 @@ public class WroFilter
        */
       final boolean jmxEnabled = getJmxEnabled();
       LOG.info("jmxEnabled: " + jmxEnabled);
-      LOG.info("wro4j configuration: " + wroConfiguration);
+      registerChangeListeners();
       if (jmxEnabled) {
-        registerChangeListeners();
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
         if (!mbeanServer.isRegistered(name)) {
           mbeanServer.registerMBean(wroConfiguration, name);
         }
       }
+      LOG.info("wro4j configuration: " + wroConfiguration);
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
@@ -259,6 +259,7 @@ public class WroFilter
         }
       }
     });
+    LOG.debug("Cache & Model change listeners were registered");
   }
 
 

@@ -64,7 +64,7 @@ public class WebResourceOptimizationApplication
    * @return true if application is to be deployed on GAE.
    */
   public boolean isDeploy() {
-    return false;
+    return true;
   }
 
   /**
