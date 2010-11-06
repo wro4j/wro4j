@@ -594,7 +594,7 @@ function NodeWithToken(str, start, end) {
 NodeWithToken.prototype.toString = function() { return this.name; };
 
 function parse($TEXT, strict_mode, embed_tokens) {
-
+	
         var S = {
                 input: tokenizer($TEXT, true),
                 token: null,
@@ -637,7 +637,7 @@ function parse($TEXT, strict_mode, embed_tokens) {
         };
 
         function token_error(token, msg) {
-                croak(msg, token.line, token.col);
+        	croak(msg, token.line, token.col);
         };
 
         function unexpected(token) {
@@ -706,7 +706,8 @@ function parse($TEXT, strict_mode, embed_tokens) {
                                 ? labeled_statement(prog1(S.token.value, next, next))
                                 : simple_statement();
 
-                    case "punc":
+                    case "punc": {
+                    
                         switch (S.token.value) {
                             case "{":
                                 return as("block", block_());
@@ -719,8 +720,8 @@ function parse($TEXT, strict_mode, embed_tokens) {
                             default:
                                 unexpected();
                         }
-
-                    case "keyword":
+                    }
+                    case "keyword": {
                         switch (prog1(S.token.value, next)) {
                             case "break":
                                 return break_cont("break");
@@ -766,9 +767,9 @@ function parse($TEXT, strict_mode, embed_tokens) {
                             case "try":
                                 return try_();
 
-                            case "var":
+                            case "var": {
                                 return prog1(var_, semicolon);
-
+                            }
                             case "const":
                                 return prog1(const_, semicolon);
 
@@ -781,7 +782,8 @@ function parse($TEXT, strict_mode, embed_tokens) {
                             default:
                                 unexpected();
                         }
-                }
+                    }
+               }
         };
 
         function labeled_statement(label) {

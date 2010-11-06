@@ -602,7 +602,7 @@ function ast_squeeze(ast, options) {
         // 3. remove obviously dead code
         // 4. transform consecutive statements using the comma operator
         function tighten(statements, block_type) {
-                statements = statements.reduce(function(a, stat){
+        		statements = statements.reduce(function(a, stat){
                         if (stat[0] == "block") {
                                 if (stat[1]) {
                                         a.push.apply(a, stat[1]);
