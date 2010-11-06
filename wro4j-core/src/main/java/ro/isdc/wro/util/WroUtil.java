@@ -166,7 +166,7 @@ public final class WroUtil {
 
   /**
    * Transforms a java multi-line string into javascript multi-line string.
-   * This technique was found at {@link http://mook.wordpress.com/2005/10/30/multi-line-strings-in-javascript/}
+   * This technique was found at {@link http://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
    * @param data a string containing new lines.
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
@@ -181,6 +181,7 @@ public final class WroUtil {
     return result.toString();
   }
 
+  //This approach have some problems and won't be used. It appends extra ] character when the string contains ]] occurence.
 //  /**
 //   * Transforms a java multi-line string into javascript multi-line string.
 //   * This technique was found at {@link http://mook.wordpress.com/2005/10/30/multi-line-strings-in-javascript/}
