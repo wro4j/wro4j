@@ -8,7 +8,7 @@
 
 package com.yahoo.platform.yui.compressor;
 
-import org.mozilla.javascript.Token;
+import org.mozilla.javascript.Token1;
 
 /**
  * JavaScriptIdentifier represents a variable/function identifier.
@@ -21,7 +21,7 @@ class JavaScriptIdentifier extends JavaScriptToken {
     private boolean markedForMunging = true;
 
     JavaScriptIdentifier(String value, ScriptOrFnScope declaredScope) {
-        super(Token.NAME, value);
+        super(Token1.NAME, value);
         this.declaredScope = declaredScope;
     }
 
