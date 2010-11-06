@@ -28,7 +28,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 
 /**
- * YUICssCompressorProcessor - an adapter for YUI js compression utility for processing js resources.
+ * YUIJsCompressorProcessor - an adapter for YUI js compression utility for processing js resources.
  *
  * @author Alex Objelean
  * @created Created on Dec 4, 2008

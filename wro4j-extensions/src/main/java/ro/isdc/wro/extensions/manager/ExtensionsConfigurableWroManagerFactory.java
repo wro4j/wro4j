@@ -8,6 +8,7 @@ import java.util.Map;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
@@ -31,6 +32,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("yuiCssMin", new YUICssCompressorProcessor());
     map.put("yuiJsMin", new YUIJsCompressorProcessor(false));
     map.put("yuiJsMinAdvanced", new YUIJsCompressorProcessor(true));
+    map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
     map.put("lessCss", new LessCssProcessor());
     map.put("sassCss", new SassCssProcessor());
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
@@ -45,6 +47,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("yuiCssMin", new YUICssCompressorProcessor());
     map.put("yuiJsMin", new YUIJsCompressorProcessor(false));
     map.put("yuiJsMinAdvanced", new YUIJsCompressorProcessor(true));
+    map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
     map.put("lessCss", new LessCssProcessor());
     map.put("sassCss", new SassCssProcessor());
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
