@@ -118,7 +118,7 @@ public abstract class PreProcessorExecutor {
     }
     for (final ResourcePreProcessor processor : processors) {
       writer = new StringWriter();
-      LOG.debug("applying preProcessor: " + processor.getClass().getName());
+      LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
       processor.process(resource, reader, writer);
       reader = new StringReader(writer.toString());
     }
