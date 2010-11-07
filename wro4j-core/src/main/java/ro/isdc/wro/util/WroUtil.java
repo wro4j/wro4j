@@ -177,7 +177,6 @@ public final class WroUtil {
       result.append(", \"" + line.replace("\\","\\\\").replace("\"","\\\"").replaceAll("\\r|\\n", "") + "\"");
     }
     result.append("].join(\"\\n\")");
-    LOG.debug("result: " + result);
     return result.toString();
   }
 

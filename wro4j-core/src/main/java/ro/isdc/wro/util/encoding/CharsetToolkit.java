@@ -1,12 +1,10 @@
 package ro.isdc.wro.util.encoding;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Collection;
 
@@ -406,24 +404,5 @@ public class CharsetToolkit {
   public static Charset[] getAvailableCharsets() {
     final Collection collection = Charset.availableCharsets().values();
     return (Charset[]) collection.toArray(new Charset[collection.size()]);
-  }
-
-  public static void main(final String[] args)
-      throws FileNotFoundException, IOException {
-    // File file = new File("utf-8.txt");
-    final File file = new File("windows-1252.txt");
-
-    final Charset guessedCharset = CharsetToolkit.guessEncoding(file, 4096);
-    System.err.println("Charset found: " + guessedCharset.displayName());
-
-    final FileInputStream fis = new FileInputStream(file);
-    final InputStreamReader isr = new InputStreamReader(fis, guessedCharset);
-    final BufferedReader br = new BufferedReader(isr);
-
-    String line;
-    while ((line = br.readLine()) != null) {
-      System.out.println(line);
-    }
-
   }
 }

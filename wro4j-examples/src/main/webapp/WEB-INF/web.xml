@@ -40,11 +40,11 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,dojoShrinksafe</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,packerJs</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,yuiCssMin</param-value>
+      <param-value>cssVariables,yuiCssMin,beautifyJs</param-value>
     </init-param>
   </filter>
   <filter-mapping>

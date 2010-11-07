@@ -82,7 +82,6 @@ public class PackerJs {
    * @return Script used to pack and return the packed result.
    */
   protected String buildPackScript(final String data) {
-    LOG.debug("data to pack: " + data);
     return "new Packer().pack(" + data + ", true, true);";
   }
 }
