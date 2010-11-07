@@ -130,6 +130,7 @@ public final class WroConfiguration
    * {@inheritDoc}
    */
   public void reloadModel() {
+    LOG.debug("reloadModel");
   	reloadModelWithNewValue(null);
   }
 

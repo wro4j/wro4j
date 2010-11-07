@@ -81,8 +81,7 @@ public class WroTestUtils {
   /**
    * Compares two strings by removing trailing spaces & tabs for correct comparison.
    */
-  public static void compare(final String expected, final String actual)
-    throws IOException {
+  public static void compare(final String expected, final String actual) {
     Assert.assertEquals(replaceTabsWithSpaces(expected.trim()), replaceTabsWithSpaces(actual.trim()));
   }
 
@@ -176,6 +175,7 @@ public class WroTestUtils {
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("comparing with: " + targetFile.getName());
         compare(new FileInputStream(file), targetFileStream, processor);
+        LOG.debug("Compare ... [OK]");
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
@@ -230,6 +230,7 @@ public class WroTestUtils {
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("processing: " + file.getName());
         compare(new FileInputStream(file), targetFileStream, processor);
+        LOG.debug("Compare ... [OK]");
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());

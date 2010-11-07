@@ -120,10 +120,12 @@ public class WroManager
     // TODO move API related checks into separate class and determine filter mapping for better mapping
     if (matchesUrl(request, API_RELOAD_CACHE)) {
       Context.get().getConfig().reloadCache();
+      preventCacheResponse(response);
       return;
     }
     if (matchesUrl(request, API_RELOAD_MODEL)) {
       Context.get().getConfig().reloadModel();
+      preventCacheResponse(response);
       return;
     }
     if (isProxyResourceRequest(request)) {
@@ -139,6 +141,18 @@ public class WroManager
     IOUtils.copy(is, os);
     is.close();
     os.close();
+  }
+
+
+  /**
+   * Prevent the response to be cached by browser by adding some header attributes.
+   *
+   * @param response {@link HttpServletResponse} to prevent cache.
+   */
+  private void preventCacheResponse(final HttpServletResponse response) {
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Cache-Control", "no-cache");
+    response.setDateHeader("Expires", 0);
   }
 
 

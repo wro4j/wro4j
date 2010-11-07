@@ -18,6 +18,10 @@
     <group-ref>dwr</group-ref>
     -->
 	</group>
+
+  <group name="problem">
+    <js>/static/js/problem.js</js>
+  </group>
   
   <group name="twitterBar">
     <js>http://widgets.twimg.com/j/2/widget.js</js>
@@ -73,7 +77,7 @@
   <group name="jquery">
     <js>http://code.jquery.com/jquery-1.4.3.js</js>
     <group-ref>jquery-mobile</group-ref>
-    <!-- 
+    <!--
     <js>/static/js/jquery.livequery.js</js>
     <js>/static/js/jquery-validate.js</js>
     <js>/static/js/jquery-ui-all.js</js>

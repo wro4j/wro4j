@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.algorithm.packer.PackerJs;
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -27,6 +28,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created 31 Jul 2010
  */
+@Minimize
 @SupportedResourceType(ResourceType.JS)
 public class PackerJsProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
