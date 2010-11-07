@@ -44,7 +44,7 @@
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,yuiCssMin,beautifyJs</param-value>
+      <param-value>cssVariables,yuiCssMin</param-value>
     </init-param>
   </filter>
   <filter-mapping>
