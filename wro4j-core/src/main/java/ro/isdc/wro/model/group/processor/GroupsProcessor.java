@@ -130,7 +130,7 @@ public class GroupsProcessor
     Writer output = null;
     for (final ResourcePostProcessor processor : processors) {
       output = new StringWriter();
-      LOG.debug("applying postProcessor: " + processor.getClass().getName());
+      LOG.debug("PostProcessing - " + processor.getClass().getSimpleName());
       processor.process(input, output);
       input = new StringReader(output.toString());
     }
