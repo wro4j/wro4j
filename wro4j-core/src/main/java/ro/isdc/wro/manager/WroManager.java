@@ -113,6 +113,7 @@ public class WroManager
     throws IOException {
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
+
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
@@ -150,9 +151,9 @@ public class WroManager
    * @param response {@link HttpServletResponse} to prevent cache.
    */
   private void preventCacheResponse(final HttpServletResponse response) {
-    response.setHeader("Pragma", "no-cache");
-    response.setHeader("Cache-Control", "no-cache");
-    response.setDateHeader("Expires", 0);
+    response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
+    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
+    response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
   }
 
 
@@ -171,7 +172,6 @@ public class WroManager
   private boolean isProxyResourceRequest(final HttpServletRequest request) {
     return request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES);
   }
-
 
   /**
    * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}.
@@ -214,6 +214,18 @@ public class WroManager
     initScheduler();
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
+
+    //TODO move ETag check in wroManagerFactory
+    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+    final String etagValue = contentHashEntry.getHash();
+    if (etagValue != null && etagValue.equals(ifNoneMatch)) {
+      LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
+          + " status code");
+      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      //because we cannot return null, return a stream containing nothing.
+      return new ByteArrayInputStream(new byte[] {});
+    }
+
     if (contentHashEntry.getContent() != null) {
       // make the input stream encoding aware.
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());

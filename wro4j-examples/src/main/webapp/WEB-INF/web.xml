@@ -40,7 +40,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,packerJs</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,yuiJsMin</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>

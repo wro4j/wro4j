@@ -349,7 +349,6 @@ public class WroFilter
     cal.roll(Calendar.YEAR, 10);
 
     headersMap.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-    // headersMap.put(HttpHeader.ETAG.toString(), Long.toHexString(timestamp));
     headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
     headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
 
@@ -421,11 +420,6 @@ public class WroFilter
    */
   private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
-    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-    final String etagValue = headersMap.get(HttpHeader.ETAG.toString());
-    if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-    }
     setResponseHeaders(response);
     // process the uri using manager
     wroManagerFactory.getInstance().process();

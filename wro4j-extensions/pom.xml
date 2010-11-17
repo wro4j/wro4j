@@ -21,12 +21,6 @@
 			<artifactId>servlet-api</artifactId>
 		</dependency>
 		<!-- Other Dependencies --> 
-		<!--
-    <dependency>
-			<groupId>com.yahoo.platform.yui</groupId>
-			<artifactId>yuicompressor</artifactId>
-		</dependency>
-    -->
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -37,7 +31,9 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring</artifactId>
+			<artifactId>spring-web</artifactId>
+      <version>2.5.6</version>
+      <optional>true</optional>
 		</dependency>
 		<dependency>
       <groupId>com.google.closure</groupId>
