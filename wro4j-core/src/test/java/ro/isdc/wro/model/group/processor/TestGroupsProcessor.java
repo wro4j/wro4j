@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010. All rights reserved.
  */
-package ro.isdc.wro.model.resource.processor;
+package ro.isdc.wro.model.group.processor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -26,6 +26,8 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;

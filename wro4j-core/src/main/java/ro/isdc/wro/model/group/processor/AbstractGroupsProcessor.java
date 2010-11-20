@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -42,22 +40,32 @@ public abstract class AbstractGroupsProcessor {
    * a list of post processors.
    */
   private final Collection<ResourcePostProcessor> postProcessors = decorateCollection(new ArrayList<ResourcePostProcessor>());
-  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
   /**
    * Used to get a stream of the resources.
    */
-  private final UriLocatorFactory uriLocatorFactory = new UriLocatorFactory(duplicateResourceDetector);
+  @Inject
+  private UriLocatorFactory uriLocatorFactory;
   /**
    * If true, missing resources are ignored. By default this value is true.
    */
+  //TODO move to config
   private boolean ignoreMissingResources = true;
   /**
    * Default preprocessor executor. This field is transient because {@link PreProcessorExecutor} is not serializable
    * (according to findbugs eclipse plugin).
    */
+  @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
+  private Injector injector;
 
   public AbstractGroupsProcessor() {
+    injector = new Injector(ignoreMissingResources) {
+      @Override
+      protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
+        return AbstractGroupsProcessor.this.getPreProcessorsByType(type);
+      };
+    };
+    injector.inject(this);
     configureUriLocatorFactory(uriLocatorFactory);
   }
 
@@ -66,18 +74,6 @@ public abstract class AbstractGroupsProcessor {
    * @return a not null instance of {@link PreProcessorExecutor}.
    */
   protected final PreProcessorExecutor getPreProcessorExecutor() {
-    if (preProcessorExecutor == null) {
-      preProcessorExecutor = new PreProcessorExecutor(getUriLocatorFactory(), getDuplicateResourceDetector()) {
-        @Override
-        protected boolean ignoreMissingResources() {
-          return AbstractGroupsProcessor.this.isIgnoreMissingResources();
-        };
-        @Override
-        protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
-          return AbstractGroupsProcessor.this.getPreProcessorsByType(resourceType);
-        }
-      };
-    }
     return preProcessorExecutor;
   }
 
@@ -89,20 +85,20 @@ public abstract class AbstractGroupsProcessor {
     return new ArrayList<T>(c) {
       @Override
       public void add(final int index, final T element) {
-        processInjectAnnotation(element);
+        injector.inject(element);
         super.add(index, element);
       };
 
       @Override
       public boolean add(final T element) {
-        processInjectAnnotation(element);
+        injector.inject(element);
         return super.add(element);
       };
 
       @Override
       public boolean addAll(final Collection<? extends T> c) {
         for (final T element : c) {
-          processInjectAnnotation(element);
+          injector.inject(element);
         }
         return super.addAll(c);
       }
@@ -110,7 +106,7 @@ public abstract class AbstractGroupsProcessor {
       @Override
       public boolean addAll(final int index, final Collection<? extends T> c) {
         for (final T element : c) {
-          processInjectAnnotation(element);
+          injector.inject(element);
         }
         return super.addAll(index, c);
       }
@@ -133,61 +129,6 @@ public abstract class AbstractGroupsProcessor {
       }
     }
     return null;
-  }
-
-
-  /**
-   * Check for each field from the passed object if @Inject annotation is present & inject the required field if
-   * supported, otherwise warns about invalid usage.
-   *
-   * @param processor object to check for annotation presence.
-   */
-  private void processInjectAnnotation(final Object processor) {
-    try {
-      final Field[] fields = processor.getClass().getDeclaredFields();
-      for (final Field field : fields) {
-        if (field.isAnnotationPresent(Inject.class)) {
-          if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject can be applied only on fields of "
-              + UriLocatorFactory.class.getName() + " type");
-          }
-        }
-      }
-    } catch (final Exception e) {
-      throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
-    }
-  }
-
-
-  /**
-   * Analyze the field containing {@link Inject} annotation and set its value to appropriate value. Override this method
-   * if you want to inject something else but uriLocatorFactory.
-   *
-   * @param object an object containing @Inject annotation.
-   * @param field {@link Field} object containing {@link Inject} annotation.
-   * @return true if field was injected with some not null value.
-   * @throws IllegalAccessException
-   */
-  private boolean acceptAnnotatedField(final Object object, final Field field)
-    throws IllegalAccessException {
-    field.setAccessible(true);
-    if (field.getType().equals(UriLocatorFactory.class)) {
-      // accept even private modifiers
-      field.set(object, getUriLocatorFactory());
-      LOG.debug("Successfully injected field: " + field.getName());
-      return true;
-    }
-    if (field.getType().equals(PreProcessorExecutor.class)) {
-      field.set(object, getPreProcessorExecutor());
-      LOG.debug("Successfully injected field: " + field.getName());
-      return true;
-    }
-    if (field.getType().equals(DuplicateResourceDetector.class)) {
-      field.set(object, duplicateResourceDetector);
-      LOG.debug("Successfully injected duplicateResourceDetector: " + field.getName());
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -238,15 +179,6 @@ public abstract class AbstractGroupsProcessor {
     }
     return filteredResources;
   }
-
-
-  /**
-   * @return the ignoreMissingResources
-   */
-  public boolean isIgnoreMissingResources() {
-    return this.ignoreMissingResources;
-  }
-
 
   /**
    * @param ignoreMissingResources the ignoreMissingResources to set
@@ -320,7 +252,7 @@ public abstract class AbstractGroupsProcessor {
    * @param type of resource for which you want to apply preProcessors or null if it doesn't matter (any resource).
    * @return a list of {@link ResourcePreProcessor} by provided type.
    */
-  public final Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
+  Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
     return getProcessorsByType(type, preProcessors);
   }
 
@@ -330,15 +262,7 @@ public abstract class AbstractGroupsProcessor {
    * @param type of resource for which you want to apply postProcessors or null if it doesn't matter (any resource).
    * @return a list of {@link ResourcePostProcessor} by provided type.
    */
-  public final Collection<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
+  Collection<ResourcePostProcessor> getPostProcessorsByType(final ResourceType type) {
     return getProcessorsByType(type, postProcessors);
-  }
-
-
-  /**
-   * @return the duplicateResourceDetector
-   */
-  public DuplicateResourceDetector getDuplicateResourceDetector() {
-    return this.duplicateResourceDetector;
   }
 }

@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -33,19 +34,14 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
  */
 public abstract class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
-  private final UriLocatorFactory uriLocatorFactory;
-  private final DuplicateResourceDetector duplicateResourceDetector;
+  @Inject
+  private UriLocatorFactory uriLocatorFactory;
+  @Inject
+  private DuplicateResourceDetector duplicateResourceDetector;
 
 
-  public PreProcessorExecutor(final UriLocatorFactory uriLocatorFactory, final DuplicateResourceDetector duplicateResourceDetector) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalArgumentException("uriLocatorFactory cannot be null!");
-    }
-    if (duplicateResourceDetector == null) {
-      throw new IllegalArgumentException("duplicateResourceDetector cannot be null!");
-    }
-    this.uriLocatorFactory = uriLocatorFactory;
-    this.duplicateResourceDetector = duplicateResourceDetector;
+  public PreProcessorExecutor(final Injector injector) {
+    injector.inject(this);
   }
   /**
    * Apply preProcessors on resources and merge them.
@@ -158,5 +154,4 @@ public abstract class PreProcessorExecutor {
    * @return a collection of {@link ResourcePreProcessor}'s by resourceType.
    */
   protected abstract Collection<ResourcePreProcessor> getPreProcessorsByType(ResourceType resourceType);
-
 }
