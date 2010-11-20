@@ -5,9 +5,13 @@ package ro.isdc.wro.model.group.processor;
 
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -19,6 +23,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 public class InjectorProcessorsFactoryDecorator
   implements ProcessorsFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(InjectorProcessorsFactoryDecorator.class);
   private ProcessorsFactory decorated;
   private Injector injector;
 
@@ -45,9 +50,13 @@ public class InjectorProcessorsFactoryDecorator
    */
   protected void scanPreProcessors() {
     // TODO ensure that it is not called to often
+    final StopWatch watch = new StopWatch();
+    watch.start("scan pre processors");
     for (final ResourcePreProcessor processor : decorated.getPreProcessors()) {
       injector.inject(processor);
     }
+    watch.stop();
+    LOG.debug(watch.prettyPrint());
   }
 
 
@@ -61,10 +70,14 @@ public class InjectorProcessorsFactoryDecorator
 
 
   protected void scanPostProcessors() {
+    final StopWatch watch = new StopWatch();
+    watch.start("scan post processors");
     // TODO ensure that it is not called to often
     for (final ResourcePostProcessor processor : decorated.getPostProcessors()) {
       injector.inject(processor);
     }
+    watch.stop();
+    LOG.debug(watch.prettyPrint());
   }
 
 }
