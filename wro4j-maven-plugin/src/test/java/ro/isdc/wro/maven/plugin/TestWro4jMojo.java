@@ -22,8 +22,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 
 
 /**
@@ -64,13 +65,18 @@ public class TestWro4jMojo {
     mojo.setContextFolder(wroFile.getParentFile().getParentFile());
   }
 
-  private void setWroWithValidResources() throws Exception {
+
+  private void setWroWithValidResources()
+    throws Exception {
     setWroFile("wro.xml");
   }
 
-  private void setWroWithInvalidResources() throws Exception {
+
+  private void setWroWithInvalidResources()
+    throws Exception {
     setWroFile("wroWithInvalidResources.xml");
   }
+
 
   @Test
   public void testMojoWithPropertiesSet()
@@ -80,14 +86,15 @@ public class TestWro4jMojo {
   }
 
 
-  @Test(expected=MojoExecutionException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testNoDestinationFolderSet()
     throws Exception {
     mojo.setDestinationFolder(null);
     mojo.execute();
   }
 
-  @Test(expected=MojoExecutionException.class)
+
+  @Test(expected = MojoExecutionException.class)
   public void testOnlyCssDestinationFolderSet()
     throws Exception {
     mojo.setCssDestinationFolder(cssDestinationFolder);
@@ -95,13 +102,15 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
-  @Test(expected=MojoExecutionException.class)
+
+  @Test(expected = MojoExecutionException.class)
   public void testOnlyJsDestinationFolderSet()
     throws Exception {
     mojo.setJsDestinationFolder(jsDestinationFolder);
     mojo.setDestinationFolder(null);
     mojo.execute();
   }
+
 
   @Test
   public void testJsAndCssDestinationFolderSet()
@@ -111,49 +120,60 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
-  @Test(expected=MojoExecutionException.class)
-  public void cannotExecuteWhenInvalidResourcesPresentAndDoNotIgnoreMissingResources() throws Exception {
+
+  @Test(expected = MojoExecutionException.class)
+  public void cannotExecuteWhenInvalidResourcesPresentAndDoNotIgnoreMissingResources()
+    throws Exception {
     setWroWithInvalidResources();
     mojo.setIgnoreMissingResources(false);
     mojo.execute();
-    //TODO check cause type?
+    // TODO check cause type?
   }
 
+
   @Test
-  public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue() throws Exception {
+  public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue()
+    throws Exception {
     setWroWithInvalidResources();
     mojo.setIgnoreMissingResources(true);
     mojo.execute();
   }
 
-  public static final class ExceptionThrowingWroManagerFactory
-    extends DefaultStandaloneContextAwareManagerFactory {
+  public static final class ExceptionThrowingWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void configureProcessors(final GroupsProcessor groupsProcessor) {
+    protected ProcessorsFactory newProcessorsFactory() {
+      final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
       final ResourcePostProcessor postProcessor = Mockito.mock(ResourcePostProcessor.class);
       try {
-        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Reader.class), Mockito.any(Writer.class));
+        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Reader.class),
+          Mockito.any(Writer.class));
       } catch (final IOException e) {
         Assert.fail("never happen");
       }
-      groupsProcessor.addPostProcessor(postProcessor);
+      factory.addPostProcessor(postProcessor);
+      return factory;
     }
   }
 
 
-  @Test(expected=MojoExecutionException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testMojoWithWroManagerFactorySet()
     throws Exception {
     mojo.setWroManagerFactory(ExceptionThrowingWroManagerFactory.class.getName());
     mojo.execute();
   }
 
-  @Test(expected=MojoExecutionException.class)
+
+  @Test(expected = MojoExecutionException.class)
   public void testInvalidMojoWithWroManagerFactorySet()
     throws Exception {
     mojo.setWroManagerFactory("INVALID_CLASS_NAME");
     mojo.execute();
   }
+
 
   @Test
   public void executeWithNullTargetGroupsProperty()
@@ -163,29 +183,32 @@ public class TestWro4jMojo {
   }
 
   public static class CustomManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
-    @Override
-    protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-    }
   }
 
-  @Test(expected=MojoExecutionException.class)
-  public void testMojoWithCustomManagerFactoryWithInvalidResourceAndNotIgnoreMissingResources() throws Exception {
+
+  @Test(expected = MojoExecutionException.class)
+  public void testMojoWithCustomManagerFactoryWithInvalidResourceAndNotIgnoreMissingResources()
+    throws Exception {
     setWroWithInvalidResources();
     mojo.setIgnoreMissingResources(false);
     mojo.setWroManagerFactory(CustomManagerFactory.class.getName());
     mojo.execute();
   }
 
+
   @Test
-  public void testMojoWithCustomManagerFactoryWithInvalidResourceAndIgnoreMissingResources() throws Exception {
+  public void testMojoWithCustomManagerFactoryWithInvalidResourceAndIgnoreMissingResources()
+    throws Exception {
     setWroWithInvalidResources();
     mojo.setIgnoreMissingResources(true);
     mojo.setWroManagerFactory(CustomManagerFactory.class.getName());
     mojo.execute();
   }
 
+
   @After
-  public void tearDown() throws Exception {
+  public void tearDown()
+    throws Exception {
     FileUtils.deleteDirectory(destinationFolder);
     FileUtils.deleteDirectory(cssDestinationFolder);
     FileUtils.deleteDirectory(jsDestinationFolder);

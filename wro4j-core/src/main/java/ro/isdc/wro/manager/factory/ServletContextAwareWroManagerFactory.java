@@ -3,11 +3,12 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -31,16 +32,17 @@ public class ServletContextAwareWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    // this one must be before the CssUrlRewritingProcessor
-    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
 
-    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupsProcessor.addPostProcessor(new JSMinProcessor());
-    groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+    factory.addPostProcessor(new CssVariablesProcessor());
+    factory.addPostProcessor(new JSMinProcessor());
+    factory.addPostProcessor(new JawrCssMinifierProcessor());
+    return factory;
   }
 
   /**

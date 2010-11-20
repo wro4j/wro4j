@@ -120,6 +120,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
         factory.addUriLocator(new ServletContextUriLocator());
       }
     };
-    groupsProcessor.addPreProcessor(processor);
+    groupsProcessor.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
   }
 }

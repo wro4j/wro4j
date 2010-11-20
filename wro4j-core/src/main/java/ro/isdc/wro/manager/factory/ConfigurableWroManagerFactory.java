@@ -15,14 +15,15 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -156,11 +157,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected final void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.setResourcePreProcessors(getPreProcessors());
-    groupsProcessor.setResourcePostProcessors(getPostProcessors());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.setResourcePreProcessors(getPreProcessors());
+    factory.setResourcePostProcessors(getPostProcessors());
+    return factory;
   }
-
 
   /**
    * This method has friendly modifier in order to be able to test it.

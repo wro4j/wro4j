@@ -17,9 +17,14 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -29,29 +34,40 @@ import ro.isdc.wro.util.StopWatch;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class GroupsProcessor
-    extends AbstractGroupsProcessor {
+public class GroupsProcessor {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
-
+  /**
+   * Used to get a stream of the resources.
+   */
+  @Inject
+  private UriLocatorFactory uriLocatorFactory;
+  /**
+   * If true, missing resources are ignored. By default this value is true.
+   */
+  // TODO move to config
+  private boolean ignoreMissingResources = true;
+  private Injector injector;
+  // TODO use Injector when retrieving processors
+  private ProcessorsFactory processorsFactory;
 
   /**
-   * Removes the generic processors of type <T> which have Minimize annotation from the provided collection of
-   * processors.
-   *
-   * @param <T>
-   *          type of processor
-   * @param processors
-   *          a collection of processors.
+   * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
+   * plugin).
    */
-  static <T> void removeMinimizeAwareProcessors(final Collection<T> processors) {
-    final Collection<T> minimizeAwareProcessors = new ArrayList<T>();
-    for (final T processor : processors) {
-      if (processor.getClass().isAnnotationPresent(Minimize.class)) {
-        minimizeAwareProcessors.add(processor);
-      }
-    }
-    processors.removeAll(minimizeAwareProcessors);
+  @Inject
+  private transient PreProcessorExecutor preProcessorExecutor;
+
+
+  public GroupsProcessor() {
+    injector = new Injector(ignoreMissingResources) {
+      @Override
+      protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
+        return ProcessorsUtils.getProcessorsByType(type, processorsFactory.getPreProcessors());
+      };
+    };
+    injector.inject(this);
+    configureUriLocatorFactory(uriLocatorFactory);
   }
 
 
@@ -75,7 +91,7 @@ public class GroupsProcessor
       stopWatch.stop();
       stopWatch.start("pre process and merge");
       // Merge
-      final String result = getPreProcessorExecutor().processAndMerge(filteredResources, minimize);
+      final String result = preProcessorExecutor.processAndMerge(filteredResources, minimize);
       stopWatch.stop();
       stopWatch.start("post process");
       // postProcessing
@@ -88,25 +104,25 @@ public class GroupsProcessor
     }
   }
 
+
   /**
    * Perform postProcessing.
    *
-   * @param resourceType
-   *          the type of the resources to process. This value will never be null.
-   * @param content
-   *          the merged content of all resources which were pre-processed.
-   * @param minimize
-   *          whether minimize aware post processor must be applied.
+   * @param resourceType the type of the resources to process. This value will never be null.
+   * @param content the merged content of all resources which were pre-processed.
+   * @param minimize whether minimize aware post processor must be applied.
    * @return the post processed contents.
    */
-  private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize) throws IOException {
+  private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize)
+    throws IOException {
     if (content == null) {
       throw new IllegalArgumentException("content cannot be null!");
     }
-    final Collection<ResourcePostProcessor> processors = getPostProcessorsByType(resourceType);
-    processors.addAll(getPostProcessorsByType(null));
+    final Collection<ResourcePostProcessor> allPostProcessors = getProcessorsFactory().getPostProcessors();
+    Collection<ResourcePostProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
+    processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
-      removeMinimizeAwareProcessors(processors);
+      processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
     final String output = applyPostProcessors(processors, content);
     return output;
@@ -116,13 +132,12 @@ public class GroupsProcessor
   /**
    * Apply resourcePostProcessors.
    *
-   * @param processors
-   *          a collection of processors to apply on the content from the supplied writer.
-   * @param content
-   *          to process with all postProcessors.
+   * @param processors a collection of processors to apply on the content from the supplied writer.
+   * @param content to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content) throws IOException {
+  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
+    throws IOException {
     if (processors.isEmpty()) {
       return content;
     }
@@ -135,5 +150,71 @@ public class GroupsProcessor
       input = new StringReader(output.toString());
     }
     return output.toString();
+  }
+
+
+  /**
+   * Allows subclasses to configure {@link UriLocatorFactory}.
+   *
+   * @param factory to configure.
+   */
+  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {}
+
+
+  /**
+   * @param groups list of groups where to search resources to filter.
+   * @param type of resources to collect.
+   * @return a list of resources of provided type.
+   */
+  protected final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
+    final List<Resource> allResources = new ArrayList<Resource>();
+    for (final Group group : groups) {
+      allResources.addAll(group.getResources());
+    }
+    // retain only resources of needed type
+    final List<Resource> filteredResources = new ArrayList<Resource>();
+    for (final Resource resource : allResources) {
+      if (type == resource.getType()) {
+        if (filteredResources.contains(resource)) {
+          LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
+        } else {
+          filteredResources.add(resource);
+        }
+      }
+    }
+    return filteredResources;
+  }
+
+
+  /**
+   * @param ignoreMissingResources the ignoreMissingResources to set
+   */
+  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
+    this.ignoreMissingResources = ignoreMissingResources;
+  }
+
+
+  /**
+   * @param processorsFactory the processorsFactory to set
+   */
+  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+    //decorate to ensure scan of @Inject annotations.
+    this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, injector);
+  }
+
+
+  /**
+   * @return the processorsFactory
+   */
+  public ProcessorsFactory getProcessorsFactory() {
+    return this.processorsFactory;
+  }
+
+
+  /**
+   * @return the uriLocatorFactory
+   */
+  public final UriLocatorFactory getUriLocatorFactory() {
+    return this.uriLocatorFactory;
   }
 }

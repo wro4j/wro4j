@@ -20,6 +20,7 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
@@ -77,9 +78,9 @@ public abstract class PreProcessorExecutor {
     //TODO: hold a list of processed resources in order to avoid duplicates
 
     // merge preProcessorsBy type and anyPreProcessors
-    final Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
+    Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
     if (!minimize) {
-      GroupsProcessor.removeMinimizeAwareProcessors(processors);
+      processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
     return applyPreProcessors(resource, resources, processors);
   }

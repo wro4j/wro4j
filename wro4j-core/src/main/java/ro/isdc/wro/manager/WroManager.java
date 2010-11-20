@@ -41,6 +41,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -404,11 +405,21 @@ public class WroManager
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
-    final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
+    final CssUrlRewritingProcessor processor = findCssUrlRewritingPreProcessor();
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
     return groupsProcessor.getUriLocatorFactory().locate(resourceId);
+  }
+
+
+  /**
+   * @return {@link CssUrlRewritingProcessor} instance if it is used.
+   */
+  protected CssUrlRewritingProcessor findCssUrlRewritingPreProcessor() {
+    final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
+      groupsProcessor.getProcessorsFactory().getPreProcessors());
+    return processor;
   }
 
 

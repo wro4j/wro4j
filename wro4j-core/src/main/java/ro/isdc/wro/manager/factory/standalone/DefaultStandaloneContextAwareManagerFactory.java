@@ -19,6 +19,8 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -80,24 +82,25 @@ public class DefaultStandaloneContextAwareManagerFactory
   @Override
   protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
     super.configureGroupsProcessor(groupsProcessor);
-    configureProcessors(groupsProcessor);
     //This is important in order to make plugin aware about ignoreMissingResources option.
     groupsProcessor.setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
   }
 
+
   /**
-   * Configure the pre and post processors. Override this to specify your own processors.
-   *
-   * @param groupsProcessor
+   * {@inheritDoc}
    */
-  protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
-    groupsProcessor.addPostProcessor(new JSMinProcessor());
-    groupsProcessor.addPostProcessor(new JawrCssMinifierProcessor());
+  @Override
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPostProcessor(new CssVariablesProcessor());
+    factory.addPostProcessor(new JSMinProcessor());
+    factory.addPostProcessor(new JawrCssMinifierProcessor());
+    return factory;
   }
 
 

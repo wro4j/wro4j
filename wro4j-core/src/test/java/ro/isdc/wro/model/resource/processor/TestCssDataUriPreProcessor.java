@@ -45,8 +45,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
         factory.addUriLocator(new ClasspathUriLocator());
       }
     };
-
-    groupsProcessor.addPreProcessor(processor);
+    groupsProcessor.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
   }
 
 
