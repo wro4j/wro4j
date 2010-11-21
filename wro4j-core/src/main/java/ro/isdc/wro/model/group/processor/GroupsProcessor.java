@@ -20,11 +20,9 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -37,39 +35,14 @@ import ro.isdc.wro.util.StopWatch;
 public class GroupsProcessor {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
-  /**
-   * Used to get a stream of the resources.
-   */
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
-  /**
-   * If true, missing resources are ignored. By default this value is true.
-   */
-  // TODO move to config
-  private boolean ignoreMissingResources = true;
-  private Injector injector;
-  // TODO use Injector when retrieving processors
   private ProcessorsFactory processorsFactory;
-
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-
-
-  public GroupsProcessor() {
-    injector = new Injector(ignoreMissingResources) {
-      @Override
-      protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type) {
-        return ProcessorsUtils.getProcessorsByType(type, processorsFactory.getPreProcessors());
-      };
-    };
-    injector.inject(this);
-    configureUriLocatorFactory(uriLocatorFactory);
-  }
-
 
   /**
    * {@inheritDoc}
@@ -118,7 +91,7 @@ public class GroupsProcessor {
     if (content == null) {
       throw new IllegalArgumentException("content cannot be null!");
     }
-    final Collection<ResourcePostProcessor> allPostProcessors = getProcessorsFactory().getPostProcessors();
+    final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     Collection<ResourcePostProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
     processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
@@ -152,15 +125,6 @@ public class GroupsProcessor {
     return output.toString();
   }
 
-
-  /**
-   * Allows subclasses to configure {@link UriLocatorFactory}.
-   *
-   * @param factory to configure.
-   */
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {}
-
-
   /**
    * @param groups list of groups where to search resources to filter.
    * @param type of resources to collect.
@@ -183,38 +147,5 @@ public class GroupsProcessor {
       }
     }
     return filteredResources;
-  }
-
-
-  /**
-   * @param ignoreMissingResources the ignoreMissingResources to set
-   */
-  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
-    this.ignoreMissingResources = ignoreMissingResources;
-  }
-
-
-  /**
-   * @param processorsFactory the processorsFactory to set
-   */
-  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
-    //decorate to ensure scan of @Inject annotations.
-    this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, injector);
-  }
-
-
-  /**
-   * @return the processorsFactory
-   */
-  public ProcessorsFactory getProcessorsFactory() {
-    return this.processorsFactory;
-  }
-
-
-  /**
-   * @return the uriLocatorFactory
-   */
-  public final UriLocatorFactory getUriLocatorFactory() {
-    return this.uriLocatorFactory;
   }
 }

@@ -12,8 +12,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -37,15 +38,17 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   @Before
   public void init() {
     processor = new CssDataUriPreProcessor();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+    new WroManager() {
       @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(new ServletContextUriLocator());
-        factory.addUriLocator(new UrlUriLocator());
-        factory.addUriLocator(new ClasspathUriLocator());
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator(), new UrlUriLocator(),
+          new ClasspathUriLocator());
+      }
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return new SimpleProcessorsFactory().addPreProcessor(processor);
       }
     };
-    groupsProcessor.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
   }
 
 

@@ -10,7 +10,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 
 /**
@@ -28,13 +29,13 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
+    new WroManager() {
       @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(uriLocator);
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return new SimpleUriLocatorFactory().addUriLocator(uriLocator);
       }
     };
-    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
   }
 
   @Test(expected=IllegalArgumentException.class)

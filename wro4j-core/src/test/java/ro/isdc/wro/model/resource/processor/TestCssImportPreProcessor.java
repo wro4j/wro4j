@@ -8,13 +8,15 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.group.Group;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -29,8 +31,23 @@ import ro.isdc.wro.util.ResourceProcessor;
  * @author Alex Objelean
  */
 public class TestCssImportPreProcessor extends AbstractWroTest {
-  private final CssImportPreProcessor processor = new CssImportPreProcessor();
+  private CssImportPreProcessor processor;
 
+  @Before
+  public void setUp() {
+    processor = new CssImportPreProcessor();
+    new WroManager() {
+      @Override
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator(), new UrlUriLocator(),
+          new ClasspathUriLocator());
+      }
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return new SimpleProcessorsFactory().addPreProcessor(processor);
+      }
+    };
+  }
 
   @Test
   public void testPreProcessorWithoutRecursion1()
@@ -86,7 +103,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   private void genericTest(final String inputUri, final String outputUri)
     throws IOException {
     // this is necessary use GroupsProcessor instrumentation on added processor
-    updateGroupsProcessorDependencies(processor);
     final Resource resource = createResource(inputUri);
     compareProcessedResourceContents(inputUri, outputUri, new ResourceProcessor() {
       public void process(final Reader reader, final Writer writer)
@@ -96,7 +112,6 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     });
   }
 
-
   /**
    * Create a resource and add associate it with a group.
    */
@@ -105,21 +120,5 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
     final Resource resource = Resource.create(uri, ResourceType.CSS);
     group.setResources(Arrays.asList(new Resource[] { resource }));
     return resource;
-  }
-
-
-  /**
-   * This method will allow the fields containing @Inject annotations to be assigned.
-   */
-  private void updateGroupsProcessorDependencies(final ResourcePreProcessor processor) {
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
-      @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(new ClasspathUriLocator());
-        factory.addUriLocator(new UrlUriLocator());
-        factory.addUriLocator(new ServletContextUriLocator());
-      }
-    };
-    groupsProcessor.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
   }
 }

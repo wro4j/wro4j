@@ -10,7 +10,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 
 /**
@@ -28,13 +29,12 @@ public class TestClasspathUriLocator {
   @Before
   public void init() {
     uriLocator = new ClasspathUriLocator();
-    final GroupsProcessor g = new GroupsProcessor() {
+    new WroManager() {
       @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(uriLocator);
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return new SimpleUriLocatorFactory().addUriLocator(uriLocator);
       }
     };
-
   }
 
   private String createUri(final String location) {

@@ -22,7 +22,7 @@ import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StringUtils;
 
@@ -39,10 +39,10 @@ public class CssImportPreProcessor
   implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
   /**
-   * Contains a {@link UriLocatorFactory} reference injected externally.
+   * Contains a {@link SimpleUriLocatorFactory} reference injected externally.
    */
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private SimpleUriLocatorFactory uriLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
   /**

@@ -9,10 +9,13 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 
 /**
  * This factory will create a WroManager which is able to run itself outside of
@@ -34,7 +37,7 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected WroManager newManager() {
+  protected final WroManager newWroManager() {
     return new WroManager() {
       /**
        * Just return false, without checking the request headers.
@@ -43,18 +46,25 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
       protected boolean isGzipSupported() {
         return false;
       }
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return StandaloneWroManagerFactory.this.newProcessorsFactory();
+      }
+      @Override
+      protected UriLocatorFactory newUriLocatorFactory() {
+        final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
+        factory.addUriLocator(newServletContextUriLocator());
+        factory.addUriLocator(new ClasspathUriLocator());
+        factory.addUriLocator(new UrlUriLocator());
+        return factory;
+      }
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-    factory.addUriLocator(newServletContextUriLocator());
-    factory.addUriLocator(new ClasspathUriLocator());
-    factory.addUriLocator(new UrlUriLocator());
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new SimpleProcessorsFactory();
   }
+
 
   /**
    * @return {@link ServletContextUriLocator} or a derivate locator which will be responsible for locating resources

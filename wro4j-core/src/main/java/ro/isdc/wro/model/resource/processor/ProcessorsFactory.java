@@ -7,7 +7,7 @@ import java.util.Collection;
 
 
 /**
- * Builds processors to be used for group processing.
+ * Locates processors to be used for group processing.
  *
  * @author Alex Objelean
  */

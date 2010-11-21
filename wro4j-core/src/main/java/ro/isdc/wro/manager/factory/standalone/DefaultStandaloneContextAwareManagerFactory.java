@@ -12,12 +12,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
@@ -52,6 +52,8 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   public void initialize(final StandaloneContext standaloneContext) {
     this.standaloneContext = standaloneContext;
+    //This is important in order to make plugin aware about ignoreMissingResources option.
+    Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
   }
 
   @Override
@@ -76,20 +78,6 @@ public class DefaultStandaloneContextAwareManagerFactory
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    super.configureGroupsProcessor(groupsProcessor);
-    //This is important in order to make plugin aware about ignoreMissingResources option.
-    groupsProcessor.setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
@@ -102,7 +90,6 @@ public class DefaultStandaloneContextAwareManagerFactory
     factory.addPostProcessor(new JawrCssMinifierProcessor());
     return factory;
   }
-
 
   @Override
   protected ServletContextUriLocator newServletContextUriLocator() {

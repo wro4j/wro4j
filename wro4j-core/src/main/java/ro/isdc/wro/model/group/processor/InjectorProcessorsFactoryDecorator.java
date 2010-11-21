@@ -27,12 +27,15 @@ public class InjectorProcessorsFactoryDecorator
   private ProcessorsFactory decorated;
   private Injector injector;
 
-
   public InjectorProcessorsFactoryDecorator(final ProcessorsFactory decorated, final Injector injector) {
+    if (decorated == null) {
+      throw new IllegalArgumentException("processorsFactory cannot be null!");
+    }
+    if (injector == null) {
+      throw new IllegalArgumentException("injector cannot be null!");
+    }
     this.decorated = decorated;
     this.injector = injector;
-    scanPreProcessors();
-    scanPostProcessors();
   }
 
   /**

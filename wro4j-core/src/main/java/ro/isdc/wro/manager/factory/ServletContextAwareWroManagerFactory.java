@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -32,26 +34,33 @@ public class ServletContextAwareWroManagerFactory
    * {@inheritDoc}
    */
   @Override
+  protected final WroManager newWroManager() {
+    return new WroManager() {
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return ServletContextAwareWroManagerFactory.this.newProcessorsFactory();
+      }
+      @Override
+      protected UriLocatorFactory newUriLocatorFactory() {
+        final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
+        factory.addUriLocator(new ServletContextUriLocator());
+        factory.addUriLocator(new ClasspathUriLocator());
+        factory.addUriLocator(new UrlUriLocator());
+        return factory;
+      }
+    };
+  }
+
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-    factory.addPreProcessor(new BomStripperPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
     factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new BomStripperPreProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
 
     factory.addPostProcessor(new CssVariablesProcessor());
     factory.addPostProcessor(new JSMinProcessor());
     factory.addPostProcessor(new JawrCssMinifierProcessor());
     return factory;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-    factory.addUriLocator(new ServletContextUriLocator());
-    factory.addUriLocator(new ClasspathUriLocator());
-    factory.addUriLocator(new UrlUriLocator());
   }
 }

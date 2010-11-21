@@ -14,38 +14,50 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
-import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.InjectorUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+
 
 /**
  * Injector scans fields of an object instance and checks if a value can be provided to a field; Injector will ignore
  * all non-null fields.
  *
  * @author Alex Objelean
+ * @created 20 Nov 2010
  */
-public abstract class Injector {
+public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
   private UriLocatorFactory uriLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
-  public Injector(final boolean ignoreMissingResources) {
-    uriLocatorFactory = new UriLocatorFactory(this);
-    //TODO refactor
-    preProcessorExecutor = new PreProcessorExecutor(this) {
-      @Override
-      protected boolean ignoreMissingResources() {
-        return ignoreMissingResources;
-      };
-      @Override
-      protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
-        return Injector.this.getPreProcessorsByType(resourceType);
-      }
-    };
+  private ProcessorsFactory processorsFactory;
+
+
+  public Injector(final UriLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
+    if (uriLocatorFactory == null) {
+      throw new IllegalArgumentException("uriLocatorFactory cannot be null");
+    }
+    if (processorsFactory == null) {
+      throw new IllegalArgumentException("processorsFactory cannot be null");
+    }
+    this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(uriLocatorFactory, this);
+    this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, this);
   }
 
-  protected abstract Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType type);
+  private PreProcessorExecutor getPreProcessorExecutor() {
+    if (preProcessorExecutor == null) {
+      preProcessorExecutor = new PreProcessorExecutor();
+      inject(preProcessorExecutor);
+    }
+    return preProcessorExecutor;
+  }
 
+  /**
+   * Scans the object and inject the supported values into the fields having @Inject annotation present.
+   *
+   * @param object {@link Object} which will be scanned for @Inject annotation presence.
+   */
   public void inject(final Object object) {
     processInjectAnnotation(object);
   }
@@ -63,15 +75,17 @@ public abstract class Injector {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject can be applied only on fields of "
+            throw new WroRuntimeException("@Inject can be applied only on these types "
               + UriLocatorFactory.class.getName() + " type");
           }
         }
       }
     } catch (final Exception e) {
+      LOG.error("Error while scanning @Inject annotation", e);
       throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
     }
   }
+
 
   /**
    * Return all fields for given object, also those from the super classes.
@@ -99,23 +113,28 @@ public abstract class Injector {
    */
   private boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
-    field.setAccessible(true);
-    if (field.getType().equals(UriLocatorFactory.class)) {
+    try {
       // accept even private modifiers
-      field.set(object, uriLocatorFactory);
-      LOG.debug("Successfully injected field: " + field.getName());
-      return true;
+      field.setAccessible(true);
+      if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
+        field.set(object, uriLocatorFactory);
+        return true;
+      }
+      if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
+        field.set(object, processorsFactory);
+        return true;
+      }
+      if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
+        field.set(object, getPreProcessorExecutor());
+        return true;
+      }
+      if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
+        field.set(object, duplicateResourceDetector);
+        return true;
+      }
+      return false;
+    } finally {
+      LOG.debug("Injected field: " + field.getName());
     }
-    if (field.getType().equals(PreProcessorExecutor.class)) {
-      field.set(object, preProcessorExecutor);
-      LOG.debug("Successfully injected field: " + field.getName());
-      return true;
-    }
-    if (field.getType().equals(DuplicateResourceDetector.class)) {
-      field.set(object, duplicateResourceDetector);
-      LOG.debug("Successfully injected duplicateResourceDetector: " + field.getName());
-      return true;
-    }
-    return false;
   }
 }

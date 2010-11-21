@@ -23,7 +23,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 
 
@@ -39,16 +40,15 @@ public class TestServletContextUriLocator {
   @Before
   public void initContext() {
     locator = new ServletContextUriLocator();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+    new WroManager() {
       @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(locator);
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return new SimpleUriLocatorFactory().addUriLocator(locator);
       }
     };
     final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
     Context.set(context);
   }
-
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotAcceptNullUri()

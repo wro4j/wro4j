@@ -11,7 +11,8 @@ import java.io.Reader;
 
 import org.junit.Before;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -29,7 +30,7 @@ public abstract class AbstractWroTest {
   /**
    * UriLocator Factory.
    */
-  private UriLocatorFactory uriLocatorFactory;
+  private SimpleUriLocatorFactory uriLocatorFactory;
 
 
   /**
@@ -37,15 +38,15 @@ public abstract class AbstractWroTest {
    */
   @Before
   public void initUriLocatorFactory() {
-    // initialize the factory created by GroupsProcessor
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+    // initialize the factory through manager, in order to let the Injector scan @Inject annotations.
+    new WroManager() {
       @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        uriLocatorFactory = factory;
-        // populate the list. The order is important.
+      protected UriLocatorFactory newUriLocatorFactory() {
+        uriLocatorFactory = new SimpleUriLocatorFactory();
         uriLocatorFactory.addUriLocator(new ServletContextUriLocator());
         uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
         uriLocatorFactory.addUriLocator(new UrlUriLocator());
+        return uriLocatorFactory;
       }
     };
   }

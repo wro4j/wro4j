@@ -10,7 +10,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.WroUtil;
 
@@ -21,13 +21,14 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public class TestUriLocatorFactory {
-  private UriLocatorFactory factory;
+  private SimpleUriLocatorFactory factory;
   @Before
   public void setUp() {
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
+    new WroManager() {
       @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        TestUriLocatorFactory.this.factory = factory;
+      protected UriLocatorFactory newUriLocatorFactory() {
+        factory = new SimpleUriLocatorFactory();
+        return factory;
       }
     };
   }

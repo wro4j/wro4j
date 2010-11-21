@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -142,26 +144,28 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
 
-
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-    for (final UriLocator locator : getLocators()) {
-      factory.addUriLocator(locator);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected ProcessorsFactory newProcessorsFactory() {
-    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-    factory.setResourcePreProcessors(getPreProcessors());
-    factory.setResourcePostProcessors(getPostProcessors());
-    return factory;
+  protected WroManager newWroManager() {
+    return new WroManager() {
+      @Override
+      protected UriLocatorFactory newUriLocatorFactory() {
+        final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
+        for (final UriLocator locator : getLocators()) {
+          factory.addUriLocator(locator);
+        }
+        return factory;
+      }
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+        factory.setResourcePreProcessors(getPreProcessors());
+        factory.setResourcePostProcessors(getPostProcessors());
+        return factory;
+      }
+    };
   }
 
   /**

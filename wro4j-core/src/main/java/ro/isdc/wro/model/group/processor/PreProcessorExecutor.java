@@ -15,11 +15,13 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
@@ -33,17 +35,15 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
  *
  * @author Alex Objelean
  */
-public abstract class PreProcessorExecutor {
+public final class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private SimpleUriLocatorFactory uriLocatorFactory;
   @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
+  @Inject
+  private ProcessorsFactory processorsFactory;
 
-
-  public PreProcessorExecutor(final Injector injector) {
-    injector.inject(this);
-  }
   /**
    * Apply preProcessors on resources and merge them.
    *
@@ -102,10 +102,11 @@ public abstract class PreProcessorExecutor {
       reader = getResourceReader(resource, resources);
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: " + resource);
-      if (ignoreMissingResources()) {
+      final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
+      if (ignoreMissintResources) {
         return writer.toString();
       } else {
-        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
+        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissintResources);
         throw e;
       }
     }
@@ -146,13 +147,10 @@ public abstract class PreProcessorExecutor {
   }
 
   /**
-   * @return true if the missing resources should be ignored.
-   */
-  protected abstract boolean ignoreMissingResources();
-
-  /**
    * @param resourceType type of searched resources.
    * @return a collection of {@link ResourcePreProcessor}'s by resourceType.
    */
-  protected abstract Collection<ResourcePreProcessor> getPreProcessorsByType(ResourceType resourceType);
+  protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
+    return ProcessorsUtils.getProcessorsByType(resourceType, processorsFactory.getPreProcessors());
+  }
 }

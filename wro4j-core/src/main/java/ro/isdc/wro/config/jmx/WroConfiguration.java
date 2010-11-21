@@ -40,6 +40,10 @@ public final class WroConfiguration
    */
   private boolean debug;
   /**
+   * If true, missing resources are ignored. By default this value is true.
+   */
+  private boolean ignoreMissingResources = true;
+  /**
    * Listeners for the change of cache & model period properties.
    */
   private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
@@ -180,6 +184,21 @@ public final class WroConfiguration
   public void setDebug(final boolean debug) {
     //Don't think that we really need to reload the cache here
     this.debug = debug;
+  }
+
+
+  /**
+   * @return the ignoreMissingResources
+   */
+  public boolean isIgnoreMissingResources() {
+    return this.ignoreMissingResources;
+  }
+
+  /**
+   * @param ignoreMissingResources the ignoreMissingResources to set
+   */
+  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
+    this.ignoreMissingResources = ignoreMissingResources;
   }
 
   /**

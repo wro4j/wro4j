@@ -40,8 +40,13 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -101,6 +106,36 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
+  private Injector injector;
+  private ProcessorsFactory processorsFactory;
+  private UriLocatorFactory uriLocatorFactory;
+
+
+  public WroManager() {
+    uriLocatorFactory = newUriLocatorFactory();
+    processorsFactory = newProcessorsFactory();
+    injector = new Injector(uriLocatorFactory, processorsFactory);
+  }
+
+
+  /**
+   * Override to provide a different or modified factory.
+   *
+   * @return {@link ProcessorsFactory} object.
+   */
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new SimpleProcessorsFactory();
+  }
+
+
+  /**
+   * Override to provide a different or modified factory.
+   *
+   * @return {@link UriLocatorFactory} object.
+   */
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory();
+  }
 
 
   /**
@@ -167,12 +202,14 @@ public class WroManager
     return m.matches();
   }
 
+
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
   private boolean isProxyResourceRequest(final HttpServletRequest request) {
     return request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES);
   }
+
 
   /**
    * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}.
@@ -216,14 +253,14 @@ public class WroManager
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
-    //TODO move ETag check in wroManagerFactory
+    // TODO move ETag check in wroManagerFactory
     final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
     final String etagValue = contentHashEntry.getHash();
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
       LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
-          + " status code");
+        + " status code");
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      //because we cannot return null, return a stream containing nothing.
+      // because we cannot return null, return a stream containing nothing.
       return new ByteArrayInputStream(new byte[] {});
     }
 
@@ -275,6 +312,7 @@ public class WroManager
     return String.format("%s/%s", hash, resourcePath);
   }
 
+
   /**
    * @return {@link ContentHashEntry} object.
    */
@@ -292,7 +330,7 @@ public class WroManager
       final Group group = modelFactory.getInstance().getGroupByName(groupName);
       groupAsList.add(group);
 
-      final String content = groupsProcessor.process(groupAsList, type, minimize);
+      final String content = getGroupsProcessor().process(groupAsList, type, minimize);
       contentHashEntry = getContentHashEntryByContent(content);
       cacheStrategy.put(cacheEntry, contentHashEntry);
     }
@@ -360,7 +398,7 @@ public class WroManager
                 // groupExtractor.isMinimized(Context.get().getRequest())
                 final Boolean[] minimizeValues = new Boolean[] { true, false };
                 for (final boolean minimize : minimizeValues) {
-                  final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
+                  final String content = getGroupsProcessor().process(groupAsList, resourceType, minimize);
                   cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
                     getContentHashEntryByContent(content));
                 }
@@ -375,6 +413,13 @@ public class WroManager
     };
   }
 
+  private GroupsProcessor getGroupsProcessor() {
+    if (groupsProcessor == null) {
+      groupsProcessor = new GroupsProcessor();
+      injector.inject(groupsProcessor);
+    }
+    return groupsProcessor;
+  }
 
   /**
    * {@inheritDoc}
@@ -409,7 +454,7 @@ public class WroManager
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    return groupsProcessor.getUriLocatorFactory().locate(resourceId);
+    return uriLocatorFactory.locate(resourceId);
   }
 
 
@@ -418,7 +463,7 @@ public class WroManager
    */
   protected CssUrlRewritingProcessor findCssUrlRewritingPreProcessor() {
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
-      groupsProcessor.getProcessorsFactory().getPreProcessors());
+      processorsFactory.getPreProcessors());
     return processor;
   }
 
@@ -473,9 +518,6 @@ public class WroManager
     if (this.modelFactory == null) {
       throw new WroRuntimeException("ModelFactory was not set!");
     }
-    if (this.groupsProcessor == null) {
-      throw new WroRuntimeException("GroupsProcessor was not set!");
-    }
     if (this.cacheStrategy == null) {
       throw new WroRuntimeException("cacheStrategy was not set!");
     }
@@ -490,14 +532,6 @@ public class WroManager
    */
   public final void setGroupExtractor(final GroupExtractor groupExtractor) {
     this.groupExtractor = groupExtractor;
-  }
-
-
-  /**
-   * @param groupsProcessor the groupsProcessor to set
-   */
-  public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    this.groupsProcessor = groupsProcessor;
   }
 
 
