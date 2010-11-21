@@ -35,7 +35,6 @@ public class InjectorProcessorsFactoryDecorator
     scanPostProcessors();
   }
 
-
   /**
    * {@inheritDoc}
    */
@@ -79,5 +78,4 @@ public class InjectorProcessorsFactoryDecorator
     watch.stop();
     LOG.debug(watch.prettyPrint());
   }
-
 }
