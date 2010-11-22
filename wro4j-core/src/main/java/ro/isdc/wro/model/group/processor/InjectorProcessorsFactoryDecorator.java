@@ -22,19 +22,15 @@ import ro.isdc.wro.util.StopWatch;
  * @created 21 Nov 2010
  */
 public class InjectorProcessorsFactoryDecorator
-  implements ProcessorsFactory {
+  extends ProcessorsFactoryDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(InjectorProcessorsFactoryDecorator.class);
-  private ProcessorsFactory decorated;
-  private Injector injector;
+  private final Injector injector;
 
   public InjectorProcessorsFactoryDecorator(final ProcessorsFactory decorated, final Injector injector) {
-    if (decorated == null) {
-      throw new IllegalArgumentException("processorsFactory cannot be null!");
-    }
+    super(decorated);
     if (injector == null) {
       throw new IllegalArgumentException("injector cannot be null!");
     }
-    this.decorated = decorated;
     this.injector = injector;
   }
 
@@ -43,7 +39,7 @@ public class InjectorProcessorsFactoryDecorator
    */
   public Collection<ResourcePreProcessor> getPreProcessors() {
     scanPreProcessors();
-    return decorated.getPreProcessors();
+    return super.getPreProcessors();
   }
 
 
@@ -52,13 +48,9 @@ public class InjectorProcessorsFactoryDecorator
    */
   protected void scanPreProcessors() {
     // TODO ensure that it is not called to often
-    final StopWatch watch = new StopWatch();
-    watch.start("scan pre processors");
-    for (final ResourcePreProcessor processor : decorated.getPreProcessors()) {
+    for (final ResourcePreProcessor processor : super.getPreProcessors()) {
       injector.inject(processor);
     }
-    watch.stop();
-    LOG.debug(watch.prettyPrint());
   }
 
 
@@ -67,7 +59,7 @@ public class InjectorProcessorsFactoryDecorator
    */
   public Collection<ResourcePostProcessor> getPostProcessors() {
     scanPostProcessors();
-    return decorated.getPostProcessors();
+    return super.getPostProcessors();
   }
 
 
@@ -75,7 +67,7 @@ public class InjectorProcessorsFactoryDecorator
     final StopWatch watch = new StopWatch();
     watch.start("scan post processors");
     // TODO ensure that it is not called to often
-    for (final ResourcePostProcessor processor : decorated.getPostProcessors()) {
+    for (final ResourcePostProcessor processor : super.getPostProcessors()) {
       injector.inject(processor);
     }
     watch.stop();

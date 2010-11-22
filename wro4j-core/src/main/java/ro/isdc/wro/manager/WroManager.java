@@ -39,6 +39,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -93,7 +94,6 @@ public class WroManager
    * HashBuilder for creating a hash based on the processed content.
    */
   private HashBuilder hashBuilder;
-
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
@@ -106,15 +106,23 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-  private Injector injector;
+  private final Injector injector;
+  @Inject
   private ProcessorsFactory processorsFactory;
+  @Inject
   private UriLocatorFactory uriLocatorFactory;
 
 
   public WroManager() {
-    uriLocatorFactory = newUriLocatorFactory();
-    processorsFactory = newProcessorsFactory();
-    injector = new Injector(uriLocatorFactory, processorsFactory);
+    injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+    injector.inject(this);
+  }
+
+  /**
+   * @return the injector
+   */
+  public Injector getInjector() {
+    return injector;
   }
 
 
@@ -209,7 +217,6 @@ public class WroManager
   private boolean isProxyResourceRequest(final HttpServletRequest request) {
     return request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES);
   }
-
 
   /**
    * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}.

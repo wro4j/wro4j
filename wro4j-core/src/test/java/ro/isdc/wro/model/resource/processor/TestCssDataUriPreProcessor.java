@@ -12,13 +12,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
 
@@ -38,17 +32,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   @Before
   public void init() {
     processor = new CssDataUriPreProcessor();
-    new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator(), new UrlUriLocator(),
-          new ClasspathUriLocator());
-      }
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return new SimpleProcessorsFactory().addPreProcessor(processor);
-      }
-    };
+    initProcessor(processor);
   }
 
 

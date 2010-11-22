@@ -12,15 +12,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
 
@@ -31,22 +26,13 @@ import ro.isdc.wro.util.ResourceProcessor;
  * @author Alex Objelean
  */
 public class TestCssImportPreProcessor extends AbstractWroTest {
-  private CssImportPreProcessor processor;
+  private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     processor = new CssImportPreProcessor();
-    new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator(), new UrlUriLocator(),
-          new ClasspathUriLocator());
-      }
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return new SimpleProcessorsFactory().addPreProcessor(processor);
-      }
-    };
+    initProcessor(processor);
   }
 
   @Test

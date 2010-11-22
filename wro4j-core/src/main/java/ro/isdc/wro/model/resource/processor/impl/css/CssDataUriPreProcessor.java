@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 
 
@@ -32,10 +32,10 @@ public class CssDataUriPreProcessor
    */
   private DataUriGenerator dataUriGenerator;
   /**
-   * Contains a {@link SimpleUriLocatorFactory} reference injected externally.
+   * Contains a {@link UriLocatorFactory} reference injected externally.
    */
   @Inject
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory uriLocatorFactory;
 
 
   /**

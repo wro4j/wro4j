@@ -9,14 +9,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.junit.Before;
-
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.util.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -30,25 +32,44 @@ public abstract class AbstractWroTest {
   /**
    * UriLocator Factory.
    */
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  private final UriLocatorFactory uriLocatorFactory = createDefaultUriLocatorFactory();
 
-
+  private UriLocatorFactory createDefaultUriLocatorFactory() {
+    return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
+        new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+  }
   /**
-   * Create UriLocatorfactory and set uriLocators to be used for tests.
+   * @return the injector
    */
-  @Before
-  public void initUriLocatorFactory() {
-    // initialize the factory through manager, in order to let the Injector scan @Inject annotations.
-    new WroManager() {
+  protected final void initProcessor(final ResourcePreProcessor processor) {
+    final WroManager manager = new WroManager() {
       @Override
       protected UriLocatorFactory newUriLocatorFactory() {
-        uriLocatorFactory = new SimpleUriLocatorFactory();
-        uriLocatorFactory.addUriLocator(new ServletContextUriLocator());
-        uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
-        uriLocatorFactory.addUriLocator(new UrlUriLocator());
         return uriLocatorFactory;
       }
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return new SimpleProcessorsFactory().addPreProcessor(processor);
+      }
     };
+    manager.getInjector().inject(processor);
+  }
+
+  /**
+   * @return the injector
+   */
+  protected final void initProcessor(final ResourcePostProcessor processor) {
+    final WroManager manager = new WroManager() {
+      @Override
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return uriLocatorFactory;
+      }
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return new SimpleProcessorsFactory().addPostProcessor(processor);
+      }
+    };
+    manager.getInjector().inject(processor);
   }
 
   /**

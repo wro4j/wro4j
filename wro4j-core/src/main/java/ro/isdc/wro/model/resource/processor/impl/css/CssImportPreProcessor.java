@@ -4,7 +4,6 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StringUtils;
 
@@ -39,10 +38,10 @@ public class CssImportPreProcessor
   implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
   /**
-   * Contains a {@link SimpleUriLocatorFactory} reference injected externally.
+   * Contains a {@link UriLocatorFactory} reference injected externally.
    */
   @Inject
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory uriLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
   /**
@@ -90,7 +89,6 @@ public class CssImportPreProcessor
    * @param resource {@link Resource} to process.
    * @param reader Reader for processed resource.
    * @return css content with all imports processed.
-   * @throws IOException
    */
   private String parseCss(final Resource resource, final Reader reader)
     throws IOException {
@@ -128,17 +126,6 @@ public class CssImportPreProcessor
     return sb.toString();
   }
 
-
-  /**
-   * @return the content of the resource as string.
-   */
-  private String getResourceContent(final Resource resource)
-    throws IOException {
-    final Reader reader = new InputStreamReader(uriLocatorFactory.locate(resource.getUri()));
-    return IOUtils.toString(reader);
-  }
-
-
   /**
    * Find a set of imported resources inside a given resource.
    */
@@ -147,7 +134,7 @@ public class CssImportPreProcessor
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
     // Check if @Scanner#findWithinHorizon can be used instead
-    final String css = getResourceContent(resource);
+    final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()));
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));
@@ -167,8 +154,7 @@ public class CssImportPreProcessor
    */
   private Resource buildImportedResource(final Resource resource, final String importUrl) {
     final String absoluteUrl = computeAbsoluteUrl(resource, importUrl);
-    final Resource importResource = Resource.create(absoluteUrl, ResourceType.CSS);
-    return importResource;
+    return Resource.create(absoluteUrl, ResourceType.CSS);
   }
 
 

@@ -52,10 +52,8 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
       }
       @Override
       protected UriLocatorFactory newUriLocatorFactory() {
-        final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-        factory.addUriLocator(newServletContextUriLocator());
-        factory.addUriLocator(new ClasspathUriLocator());
-        factory.addUriLocator(new UrlUriLocator());
+        final UriLocatorFactory factory = new SimpleUriLocatorFactory().addUriLocator(newServletContextUriLocator()).addUriLocator(
+            new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
         return factory;
       }
     };

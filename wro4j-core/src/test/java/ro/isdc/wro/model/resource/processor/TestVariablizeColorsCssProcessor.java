@@ -28,6 +28,7 @@ public class TestVariablizeColorsCssProcessor extends AbstractWroTest {
   @Before
   public void setUp() {
     processor = new VariablizeColorsCssProcessor();
+    initProcessor(processor);
   }
 
   @Test

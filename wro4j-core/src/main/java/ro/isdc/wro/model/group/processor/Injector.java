@@ -17,6 +17,7 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.factory.InjectorUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -29,9 +30,9 @@ import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
-  private UriLocatorFactory uriLocatorFactory;
+  private final UriLocatorFactory uriLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
-  private ProcessorsFactory processorsFactory;
+  private final ProcessorsFactory processorsFactory;
 
 
   public Injector(final UriLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
@@ -59,7 +60,14 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
+    LOG.debug("scanning @Inject in object of type: " + object.getClass());
+    final StopWatch watch = new StopWatch();
+    watch.start("scan pre processors");
+
     processInjectAnnotation(object);
+
+    watch.stop();
+    LOG.debug(watch.prettyPrint());
   }
 
 
@@ -82,7 +90,7 @@ public final class Injector {
       }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);
-      throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
+      throw new WroRuntimeException("Exception while trying to process @Inject annotation", e);
     }
   }
 

@@ -31,7 +31,7 @@ public abstract class AbstractWroTest {
   /**
    * UriLocator Factory.
    */
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory uriLocatorFactory;
 
 
   /**
@@ -43,10 +43,8 @@ public abstract class AbstractWroTest {
     new WroManager() {
       @Override
       protected UriLocatorFactory newUriLocatorFactory() {
-        uriLocatorFactory = new SimpleUriLocatorFactory();
-        uriLocatorFactory.addUriLocator(new ServletContextUriLocator());
-        uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
-        uriLocatorFactory.addUriLocator(new UrlUriLocator());
+        uriLocatorFactory = new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
+            new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
         return uriLocatorFactory;
       }
     };

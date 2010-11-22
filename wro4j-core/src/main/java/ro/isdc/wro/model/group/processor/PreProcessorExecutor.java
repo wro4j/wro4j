@@ -19,8 +19,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -38,7 +37,7 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 public final class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory uriLocatorFactory;
   @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
   @Inject
@@ -78,7 +77,8 @@ public final class PreProcessorExecutor {
     //TODO: hold a list of processed resources in order to avoid duplicates
 
     // merge preProcessorsBy type and anyPreProcessors
-    Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
+    Collection<ResourcePreProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
+        processorsFactory.getPreProcessors());
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
@@ -144,13 +144,5 @@ public final class PreProcessorExecutor {
     } finally {
       duplicateResourceDetector.reset();
     }
-  }
-
-  /**
-   * @param resourceType type of searched resources.
-   * @return a collection of {@link ResourcePreProcessor}'s by resourceType.
-   */
-  protected Collection<ResourcePreProcessor> getPreProcessorsByType(final ResourceType resourceType) {
-    return ProcessorsUtils.getProcessorsByType(resourceType, processorsFactory.getPreProcessors());
   }
 }
