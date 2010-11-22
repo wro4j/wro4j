@@ -106,12 +106,11 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-  private final Injector injector;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-
+  private final Injector injector;
 
   public WroManager() {
     injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());

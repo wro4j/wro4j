@@ -130,7 +130,7 @@ public class GroupsProcessor {
    * @param type of resources to collect.
    * @return a list of resources of provided type.
    */
-  protected final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
+  private final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
     final List<Resource> allResources = new ArrayList<Resource>();
     for (final Group group : groups) {
       allResources.addAll(group.getResources());
