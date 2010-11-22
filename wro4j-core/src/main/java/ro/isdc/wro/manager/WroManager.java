@@ -119,6 +119,7 @@ public class WroManager
   }
 
   /**
+   * Used only for unit testing.
    * @return the injector
    */
   public Injector getInjector() {

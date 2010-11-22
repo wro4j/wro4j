@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.model.resource.factory;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
@@ -31,14 +28,7 @@ public class InjectorUriLocatorFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  public InputStream locate(final String uri)
-    throws IOException {
-    return super.locate(uri);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public UriLocator getInstance(final String uri) {
     final UriLocator uriLocator = super.getInstance(uri);
     injector.inject(uriLocator);

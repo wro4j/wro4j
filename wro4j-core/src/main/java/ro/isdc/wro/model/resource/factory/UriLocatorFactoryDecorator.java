@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.model.resource.factory;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 /**
@@ -15,7 +12,7 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * @created 22 Nov 2010
  */
 public class UriLocatorFactoryDecorator
-  implements UriLocatorFactory {
+  extends AbstractUriLocatorFactory {
   private final UriLocatorFactory uriLocatorFactory;
 
   public UriLocatorFactoryDecorator(final UriLocatorFactory uriLocatorFactory) {
@@ -23,14 +20,6 @@ public class UriLocatorFactoryDecorator
       throw new IllegalArgumentException("uriLocatorFactory cannot be null!");
     }
     this.uriLocatorFactory = uriLocatorFactory;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public InputStream locate(final String uri)
-    throws IOException {
-    return uriLocatorFactory.locate(uri);
   }
 
   /**
