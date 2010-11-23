@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -33,29 +32,27 @@ public class ExperimentalWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected WroManager newWroManager() {
-    return new WroManager() {
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-        factory.addPreProcessor(new CssDataUriPreProcessor());
-        factory.addPreProcessor(new BomStripperPreProcessor());
-        factory.addPreProcessor(new CssUrlRewritingProcessor());
-        factory.addPreProcessor(new CssImportPreProcessor());
-        factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new CssDataUriPreProcessor());
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
 
-        factory.addPostProcessor(new CssVariablesProcessor());
-        factory.addPostProcessor(new JSMinProcessor());
-        factory.addPostProcessor(new JawrCssMinifierProcessor());
-        return factory;
-      }
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        final UriLocatorFactory factory = new SimpleUriLocatorFactory().addUriLocator(
-            new ServletContextUriLocator()).addUriLocator(new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
-        return factory;
-      }
-    };
+    factory.addPostProcessor(new CssVariablesProcessor());
+    factory.addPostProcessor(new JSMinProcessor());
+    factory.addPostProcessor(new JawrCssMinifierProcessor());
+    return factory;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected UriLocatorFactory newUriLocatorFactory() {
+    final UriLocatorFactory factory = new SimpleUriLocatorFactory().addUriLocator(
+        new ServletContextUriLocator()).addUriLocator(new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+    return factory;
+  }
 }

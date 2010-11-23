@@ -46,19 +46,16 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
       protected boolean isGzipSupported() {
         return false;
       }
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return StandaloneWroManagerFactory.this.newProcessorsFactory();
-      }
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        final UriLocatorFactory factory = new SimpleUriLocatorFactory().addUriLocator(newServletContextUriLocator()).addUriLocator(
-            new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
-        return factory;
-      }
     };
   }
 
+  @Override
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory().addUriLocator(newServletContextUriLocator()).addUriLocator(
+        new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+  }
+
+  @Override
   protected ProcessorsFactory newProcessorsFactory() {
     return new SimpleProcessorsFactory();
   }

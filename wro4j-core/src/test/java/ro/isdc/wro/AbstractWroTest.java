@@ -9,13 +9,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
@@ -42,34 +41,16 @@ public abstract class AbstractWroTest {
    * @return the injector
    */
   protected final void initProcessor(final ResourcePreProcessor processor) {
-    final WroManager manager = new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return uriLocatorFactory;
-      }
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return new SimpleProcessorsFactory().addPreProcessor(processor);
-      }
-    };
-    manager.getInjector().inject(processor);
+    final Injector injector = new Injector(uriLocatorFactory, new SimpleProcessorsFactory().addPreProcessor(processor));
+    injector.inject(processor);
   }
 
   /**
    * @return the injector
    */
   protected final void initProcessor(final ResourcePostProcessor processor) {
-    final WroManager manager = new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return uriLocatorFactory;
-      }
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return new SimpleProcessorsFactory().addPostProcessor(processor);
-      }
-    };
-    manager.getInjector().inject(processor);
+    final Injector injector = new Injector(uriLocatorFactory, new SimpleProcessorsFactory().addPostProcessor(processor));
+    injector.inject(processor);
   }
 
   /**

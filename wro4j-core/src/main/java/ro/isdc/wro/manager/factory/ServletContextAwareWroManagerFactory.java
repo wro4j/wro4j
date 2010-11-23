@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -34,20 +33,15 @@ public class ServletContextAwareWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected final WroManager newWroManager() {
-    return new WroManager() {
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return ServletContextAwareWroManagerFactory.this.newProcessorsFactory();
-      }
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return new SimpleUriLocatorFactory().addUriLocator(
-            new ServletContextUriLocator()).addUriLocator(new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
-      }
-    };
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory().addUriLocator(
+        new ServletContextUriLocator()).addUriLocator(new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
     factory.addPreProcessor(new CssUrlRewritingProcessor());

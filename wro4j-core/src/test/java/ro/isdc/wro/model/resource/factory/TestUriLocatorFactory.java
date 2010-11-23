@@ -10,13 +10,12 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Test class for {@link IUriLocatorFactory}.
+ * Test class for {@link SimpleUriLocatorFactory}.
  *
  * @author Alex Objelean
  */
@@ -24,13 +23,7 @@ public class TestUriLocatorFactory {
   private SimpleUriLocatorFactory factory;
   @Before
   public void setUp() {
-    new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        factory = new SimpleUriLocatorFactory();
-        return factory;
-      }
-    };
+    factory = new SimpleUriLocatorFactory();
   }
 
   @Test(expected=IOException.class)

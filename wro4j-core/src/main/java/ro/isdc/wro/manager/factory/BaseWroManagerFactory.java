@@ -21,6 +21,11 @@ import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 
@@ -63,7 +68,8 @@ public abstract class BaseWroManagerFactory
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           // it is important to instantiate dependencies first, otherwise another thread can start working with
           // uninitialized manager.
-          this.manager = newWroManager();
+          final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+          this.manager = newWroManager(injector);
           manager.setGroupExtractor(groupExtractor);
           manager.setModelFactory(modelFactory);
           manager.setCacheStrategy(cacheStrategy);
@@ -75,12 +81,33 @@ public abstract class BaseWroManagerFactory
     return this.manager;
   }
 
+
+  /**
+   * Override to provide a different or modified factory.
+   *
+   * @return {@link ProcessorsFactory} object.
+   */
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new SimpleProcessorsFactory();
+  }
+
+
+  /**
+   * Override to provide a different or modified factory.
+   *
+   * @return {@link UriLocatorFactory} object.
+   */
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory();
+  }
+
+
   /**
    * Allows client code to override and configure WroManager dependencies (uriLocatorFactory & processorsFactory).
    * @return new instance of {@link WroManager}.
    */
-  protected WroManager newWroManager() {
-    return new WroManager();
+  protected WroManager newWroManager(final Injector injector) {
+    return new WroManager(injector);
   }
 
   /**

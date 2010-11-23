@@ -43,11 +43,9 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -112,9 +110,12 @@ public class WroManager
   private UriLocatorFactory uriLocatorFactory;
   private final Injector injector;
 
-  public WroManager() {
-    injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+
+  public WroManager(final Injector injector) {
+    this.injector = injector;
+    groupsProcessor = new GroupsProcessor();
     injector.inject(this);
+    injector.inject(groupsProcessor);
   }
 
   /**
@@ -124,27 +125,6 @@ public class WroManager
   public Injector getInjector() {
     return injector;
   }
-
-
-  /**
-   * Override to provide a different or modified factory.
-   *
-   * @return {@link ProcessorsFactory} object.
-   */
-  protected ProcessorsFactory newProcessorsFactory() {
-    return new SimpleProcessorsFactory();
-  }
-
-
-  /**
-   * Override to provide a different or modified factory.
-   *
-   * @return {@link UriLocatorFactory} object.
-   */
-  protected UriLocatorFactory newUriLocatorFactory() {
-    return new SimpleUriLocatorFactory();
-  }
-
 
   /**
    * Perform processing of the uri.
@@ -337,7 +317,7 @@ public class WroManager
       final Group group = modelFactory.getInstance().getGroupByName(groupName);
       groupAsList.add(group);
 
-      final String content = getGroupsProcessor().process(groupAsList, type, minimize);
+      final String content = groupsProcessor.process(groupAsList, type, minimize);
       contentHashEntry = getContentHashEntryByContent(content);
       cacheStrategy.put(cacheEntry, contentHashEntry);
     }
@@ -405,7 +385,7 @@ public class WroManager
                 // groupExtractor.isMinimized(Context.get().getRequest())
                 final Boolean[] minimizeValues = new Boolean[] { true, false };
                 for (final boolean minimize : minimizeValues) {
-                  final String content = getGroupsProcessor().process(groupAsList, resourceType, minimize);
+                  final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
                   cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
                     getContentHashEntryByContent(content));
                 }
@@ -418,14 +398,6 @@ public class WroManager
         }
       }
     };
-  }
-
-  private GroupsProcessor getGroupsProcessor() {
-    if (groupsProcessor == null) {
-      groupsProcessor = new GroupsProcessor();
-      injector.inject(groupsProcessor);
-    }
-    return groupsProcessor;
   }
 
   /**
@@ -457,23 +429,13 @@ public class WroManager
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
-    final CssUrlRewritingProcessor processor = findCssUrlRewritingPreProcessor();
+    final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
+      processorsFactory.getPreProcessors());
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
     return uriLocatorFactory.locate(resourceId);
   }
-
-
-  /**
-   * @return {@link CssUrlRewritingProcessor} instance if it is used.
-   */
-  protected CssUrlRewritingProcessor findCssUrlRewritingPreProcessor() {
-    final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
-      processorsFactory.getPreProcessors());
-    return processor;
-  }
-
 
   /**
    * {@inheritDoc}
