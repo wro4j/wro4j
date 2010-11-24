@@ -28,6 +28,7 @@ import org.codehaus.classworlds.ClassWorld;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -125,6 +126,7 @@ public class Wro4jMojo extends AbstractMojo {
       } else {
         managerFactory = createDefaultManagerFactory();
       }
+
       // initialize before process.
       managerFactory.initialize(createStandaloneContext());
     }
@@ -344,7 +346,8 @@ public class Wro4jMojo extends AbstractMojo {
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
       //init context
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      final WroConfiguration config = Context.get().getConfig();
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       //perform processing
       getManagerFactory().getInstance().process();
       //encode version & write result to file

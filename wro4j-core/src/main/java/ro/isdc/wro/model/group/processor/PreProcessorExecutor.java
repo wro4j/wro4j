@@ -103,6 +103,7 @@ public final class PreProcessorExecutor {
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: " + resource);
       final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
+      LOG.debug("IgnoreMissingResources: " + ignoreMissintResources);
       if (ignoreMissintResources) {
         return writer.toString();
       } else {

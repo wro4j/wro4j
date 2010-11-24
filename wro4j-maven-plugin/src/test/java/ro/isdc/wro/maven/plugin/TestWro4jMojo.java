@@ -13,14 +13,15 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -42,10 +43,11 @@ public class TestWro4jMojo {
   @Before
   public void setUp()
     throws Exception {
+    Context.set(Context.standaloneContext());
     mojo = new Wro4jMojo();
     mojo.setIgnoreMissingResources(false);
+    mojo.setMinimize(true);
     setWroWithValidResources();
-    mojo.setTargetGroups("g1");
     destinationFolder = new File("wroTemp-" + new Date().getTime());
     destinationFolder.mkdir();
     cssDestinationFolder = new File("wroTemp-css-" + new Date().getTime());
@@ -79,9 +81,17 @@ public class TestWro4jMojo {
 
 
   @Test
+  public void testMojoWithPropertiesSetAndOneTargetGroup()
+    throws Exception {
+    mojo.setTargetGroups("g1");
+    mojo.setIgnoreMissingResources(true);
+    mojo.execute();
+  }
+
+  @Test
   public void testMojoWithPropertiesSet()
     throws Exception {
-    mojo.setIgnoreMissingResources(true);
+    mojo.setIgnoreMissingResources(false);
     mojo.execute();
   }
 
@@ -127,7 +137,6 @@ public class TestWro4jMojo {
     setWroWithInvalidResources();
     mojo.setIgnoreMissingResources(false);
     mojo.execute();
-    // TODO check cause type?
   }
 
 

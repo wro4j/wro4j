@@ -17,7 +17,6 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.factory.InjectorUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
-import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -60,14 +59,14 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
-    LOG.debug("scanning @Inject in object of type: " + object.getClass());
-    final StopWatch watch = new StopWatch();
-    watch.start("scan pre processors");
+//    LOG.debug("scanning @Inject in object of type: " + object.getClass());
+//    final StopWatch watch = new StopWatch();
+//    watch.start("scan pre processors");
 
     processInjectAnnotation(object);
 
-    watch.stop();
-    LOG.debug(watch.prettyPrint());
+//    watch.stop();
+//    LOG.debug(watch.prettyPrint());
   }
 
 
@@ -142,7 +141,7 @@ public final class Injector {
       }
       return false;
     } finally {
-      LOG.debug("Injected field: " + field.getName());
+//      LOG.debug("Injected field: " + field.getName());
     }
   }
 }
