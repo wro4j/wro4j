@@ -5,7 +5,6 @@ package ro.isdc.wro.manager.factory.standalone;
 
 import javax.servlet.ServletContext;
 
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -32,22 +31,22 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new XmlModelFactory();
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected final WroManager newWroManager() {
-    return new WroManager() {
-      /**
-       * Just return false, without checking the request headers.
-       */
-      @Override
-      protected boolean isGzipSupported() {
-        return false;
-      }
-    };
-  }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  protected final WroManager newWroManager() {
+//    return new WroManager() {
+//      /**
+//       * Just return false, without checking the request headers.
+//       */
+//      @Override
+//      protected boolean isGzipSupported() {
+//        return false;
+//      }
+//    };
+//  }
 
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {

@@ -87,7 +87,7 @@ public class WroManager
   /**
    * Groups processor.
    */
-  private GroupsProcessor groupsProcessor;
+  private final GroupsProcessor groupsProcessor;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */

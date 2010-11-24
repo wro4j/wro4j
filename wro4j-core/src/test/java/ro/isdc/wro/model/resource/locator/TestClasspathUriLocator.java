@@ -10,10 +10,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
  *
@@ -29,12 +25,6 @@ public class TestClasspathUriLocator {
   @Before
   public void init() {
     uriLocator = new ClasspathUriLocator();
-    new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return new SimpleUriLocatorFactory().addUriLocator(uriLocator);
-      }
-    };
   }
 
   private String createUri(final String location) {

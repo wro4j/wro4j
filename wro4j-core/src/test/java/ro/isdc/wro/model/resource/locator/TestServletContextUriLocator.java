@@ -23,9 +23,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 
 
 /**
@@ -40,12 +37,6 @@ public class TestServletContextUriLocator {
   @Before
   public void initContext() {
     locator = new ServletContextUriLocator();
-    new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return new SimpleUriLocatorFactory().addUriLocator(locator);
-      }
-    };
     final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
     Context.set(context);
   }

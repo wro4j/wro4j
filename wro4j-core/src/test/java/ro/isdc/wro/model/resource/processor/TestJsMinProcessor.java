@@ -9,9 +9,10 @@ import java.io.Writer;
 
 import org.junit.Test;
 
-import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
+import ro.isdc.wro.util.WroTestUtils;
+
 
 /**
  * TestMultiLineCommentStripperPostProcessor.java.
@@ -19,14 +20,13 @@ import ro.isdc.wro.util.ResourceProcessor;
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-public class TestJsMinProcessor extends AbstractWroTest {
+public class TestJsMinProcessor {
   @Test
-  public void testAsPostProcessor() throws IOException {
+  public void testAsPostProcessor()
+      throws IOException {
     final ResourcePostProcessor processor = new JSMinProcessor();
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/processor/jsmin-input.js",
-        "classpath:ro/isdc/wro/processor/jsmin-output.js",
-        new ResourceProcessor() {
+    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
+        "classpath:ro/isdc/wro/processor/jsmin-output.js", new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {
             processor.process(reader, writer);
@@ -35,12 +35,11 @@ public class TestJsMinProcessor extends AbstractWroTest {
   }
 
   @Test
-  public void testAsPreProcessor() throws IOException {
+  public void testAsPreProcessor()
+      throws IOException {
     final ResourcePreProcessor processor = new JSMinProcessor();
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/processor/jsmin-input.js",
-        "classpath:ro/isdc/wro/processor/jsmin-output.js",
-        new ResourceProcessor() {
+    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
+        "classpath:ro/isdc/wro/processor/jsmin-output.js", new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {
             processor.process(null, reader, writer);

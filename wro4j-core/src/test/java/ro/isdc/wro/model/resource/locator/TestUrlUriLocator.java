@@ -10,12 +10,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-
 /**
- * Tests if {@link ClasspathUriLocator} works properly.
+ * Tests if {@link UrlUriLocator} works properly.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -29,13 +25,6 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
-    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
-    new WroManager() {
-      @Override
-      protected UriLocatorFactory newUriLocatorFactory() {
-        return new SimpleUriLocatorFactory().addUriLocator(uriLocator);
-      }
-    };
   }
 
   @Test(expected=IllegalArgumentException.class)

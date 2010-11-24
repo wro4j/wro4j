@@ -10,9 +10,9 @@ import java.io.Writer;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -20,12 +20,12 @@ import ro.isdc.wro.util.ResourceProcessor;
  *
  * @author Alex Objelean
  */
-public class TestBomStripperPreProcessor extends AbstractWroTest {
+public class TestBomStripperPreProcessor {
   private final ResourcePreProcessor processor = new BomStripperPreProcessor();
 
   @Test
   public void testWithBom() throws IOException {
-    compareProcessedResourceContents(
+    WroTestUtils.compareProcessedResourceContents(
         "classpath:ro/isdc/wro/processor/bom/bom-input.js",
         "classpath:ro/isdc/wro/processor/bom/bom-output.js",
         new ResourceProcessor() {
@@ -42,7 +42,7 @@ public class TestBomStripperPreProcessor extends AbstractWroTest {
    */
   @Test
   public void testWithoutBom() throws IOException {
-    compareProcessedResourceContents(
+    WroTestUtils.compareProcessedResourceContents(
         "classpath:ro/isdc/wro/processor/bom/nobom.js",
         "classpath:ro/isdc/wro/processor/bom/nobom.js",
         new ResourceProcessor() {
@@ -59,7 +59,7 @@ public class TestBomStripperPreProcessor extends AbstractWroTest {
   @Ignore
   @Test
   public void testWithChineseCharacters() throws IOException {
-    compareProcessedResourceContents(
+    WroTestUtils.compareProcessedResourceContents(
         "http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js",
         "classpath:ro/isdc/wro/processor/bom/chineseEncoding-output.js",
         new ResourceProcessor() {

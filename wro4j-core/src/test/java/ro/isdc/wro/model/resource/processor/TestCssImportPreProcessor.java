@@ -11,13 +11,13 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -25,30 +25,29 @@ import ro.isdc.wro.util.ResourceProcessor;
  *
  * @author Alex Objelean
  */
-public class TestCssImportPreProcessor extends AbstractWroTest {
+public class TestCssImportPreProcessor {
   private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     processor = new CssImportPreProcessor();
-    initProcessor(processor);
+    WroTestUtils.initProcessor(processor);
   }
 
   @Test
   public void testPreProcessorWithoutRecursion1()
-    throws IOException {
+      throws IOException {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test1-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
+        "classpath:ro/isdc/wro/processor/cssImports/test1-output.css");
   }
 
   @Test
   public void testPreProcessorWithoutRecursion2()
-    throws IOException {
+      throws IOException {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/test2-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/test2-output.css");
+        "classpath:ro/isdc/wro/processor/cssImports/test2-output.css");
   }
-
 
   /**
    * Checks a situation when the css contains an import to itself.
@@ -57,42 +56,44 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
    */
   @Test
   public void testPreProcessorWithImmediateRecursivity()
-    throws IOException {
+      throws IOException {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/testRecursive-output.css");
+        "classpath:ro/isdc/wro/processor/cssImports/testRecursive-output.css");
   }
-
 
   /**
    * Level 2 recursivity test. When a referred css contain an import to original css.
    */
   @Test
   public void testPreProcessorWithDeepRecursivity()
-    throws IOException {
+      throws IOException {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/testRecursive1-input.css",
-      "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-output.css");
+        "classpath:ro/isdc/wro/processor/cssImports/testRecursive1-output.css");
   }
 
   @Test
-  public void testPreProcessorWithBackgrounds() throws IOException {
+  public void testPreProcessorWithBackgrounds()
+      throws IOException {
     genericTest("classpath:ro/isdc/wro/processor/cssImports/testPostProcessorWithBackgrounds-input.css",
-    "classpath:ro/isdc/wro/processor/cssImports/testPostProcessorWithBackgrounds-output.css");
+        "classpath:ro/isdc/wro/processor/cssImports/testPostProcessorWithBackgrounds-output.css");
   }
 
-
   /**
-   * @param inputUri the uri of the input css to process.
-   * @param outputUri the uri of the output css containing the expected processed content.
-   * @param groupResourceUris an array of expected uri's contained inside the Group after processing.
+   * @param inputUri
+   *          the uri of the input css to process.
+   * @param outputUri
+   *          the uri of the output css containing the expected processed content.
+   * @param groupResourceUris
+   *          an array of expected uri's contained inside the Group after processing.
    * @throws IOException
    */
   private void genericTest(final String inputUri, final String outputUri)
-    throws IOException {
+      throws IOException {
     // this is necessary use GroupsProcessor instrumentation on added processor
     final Resource resource = createResource(inputUri);
-    compareProcessedResourceContents(inputUri, outputUri, new ResourceProcessor() {
+    WroTestUtils.compareProcessedResourceContents(inputUri, outputUri, new ResourceProcessor() {
       public void process(final Reader reader, final Writer writer)
-        throws IOException {
+          throws IOException {
         processor.process(resource, reader, writer);
       }
     });
@@ -104,7 +105,9 @@ public class TestCssImportPreProcessor extends AbstractWroTest {
   private Resource createResource(final String uri) {
     final Group group = new Group();
     final Resource resource = Resource.create(uri, ResourceType.CSS);
-    group.setResources(Arrays.asList(new Resource[] { resource }));
+    group.setResources(Arrays.asList(new Resource[] {
+      resource
+    }));
     return resource;
   }
 }

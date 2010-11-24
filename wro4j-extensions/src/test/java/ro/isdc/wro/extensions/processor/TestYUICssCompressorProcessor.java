@@ -9,7 +9,6 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -21,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-public class TestYUICssCompressorProcessor extends AbstractWroTest {
+public class TestYUICssCompressorProcessor {
   private final ResourcePostProcessor processor = new YUICssCompressorProcessor();
   @Test
   public void testFromFolder()

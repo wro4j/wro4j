@@ -9,7 +9,6 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -22,7 +21,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-public class TestYUIJsCompressorProcessor extends AbstractWroTest {
+public class TestYUIJsCompressorProcessor {
   private final ResourcePostProcessor processor = new YUIJsCompressorProcessor();
 
   @Test
@@ -49,6 +48,6 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
   public void testInvalidJsShouldBeUnchanged()
     throws IOException {
     final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
-    compareProcessedResourceContents(resourceUri, resourceUri, WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, WroUtil.newResourceProcessor(processor));
   }
 }
