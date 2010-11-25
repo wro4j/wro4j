@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ro.isdc.wro.http.HttpHeader;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -390,10 +391,19 @@ public final class WroUtil {
    * @return instance of {@link ResourceProcessor}.
    */
   public static ResourceProcessor newResourceProcessor(final ResourcePreProcessor preProcessor) {
+    return newResourceProcessor(null, preProcessor);
+  }
+
+  /**
+   * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
+   * @param preProcessor {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
+   * @return instance of {@link ResourceProcessor}.
+   */
+  public static ResourceProcessor newResourceProcessor(final Resource resource, final ResourcePreProcessor preProcessor) {
     return new ResourceProcessor() {
       public void process(final Reader reader, final Writer writer)
         throws IOException {
-        preProcessor.process(null, reader, writer);
+        preProcessor.process(resource, reader, writer);
       }
     };
   }
