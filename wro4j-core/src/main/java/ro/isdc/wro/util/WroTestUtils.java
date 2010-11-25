@@ -25,6 +25,10 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+
 
 /**
  * WroTestUtils.
@@ -133,6 +137,12 @@ public class WroTestUtils {
       Transformers.extensionTransformer(targetFileExtension), processor);
   }
 
+  public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
+    final String targetFileExtension, final ResourcePreProcessor processor)
+    throws IOException {
+    compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension),
+      Transformers.extensionTransformer(targetFileExtension), processor);
+  }
 
   /**
    * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourceProcessor) Same as
@@ -165,6 +175,19 @@ public class WroTestUtils {
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
     final Transformer<String> toTargetFileName, final ResourceProcessor processor)
     throws IOException {
+    //TODO create adaptor and use it
+    final ResourcePreProcessor preProcessor = new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    };
+    compareFromSameFolder(sourceFolder, sourceFileFilter, toTargetFileName, preProcessor);
+  }
+
+  public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
+    final Transformer<String> toTargetFileName, final ResourcePreProcessor processor)
+    throws IOException {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
@@ -174,7 +197,10 @@ public class WroTestUtils {
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("comparing with: " + targetFile.getName());
-        compare(new FileInputStream(file), targetFileStream, processor);
+        // ResourceType doesn't matter here
+        final ResourceProcessor resourceProcessor = WroUtil.newResourceProcessor(
+          Resource.create("file:" + file.getAbsolutePath(), ResourceType.CSS), processor);
+        compare(new FileInputStream(file), targetFileStream, resourceProcessor);
         LOG.debug("Compare ... [OK]");
         processedNumber++;
       } catch (final IOException e) {
