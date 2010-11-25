@@ -10,13 +10,13 @@
   
   <group name="all">
     <group-ref>jquery</group-ref>
-  <!-- 
+  
     <group-ref>twitterBar</group-ref>
     <group-ref>dynamicResource</group-ref>
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>dwr</group-ref>
-    -->
+  <!--   -->
 	</group>
 
   <group name="problem">

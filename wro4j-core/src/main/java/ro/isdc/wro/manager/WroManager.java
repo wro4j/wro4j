@@ -108,22 +108,12 @@ public class WroManager
   private ProcessorsFactory processorsFactory;
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-  private final Injector injector;
 
 
   public WroManager(final Injector injector) {
-    this.injector = injector;
     groupsProcessor = new GroupsProcessor();
     injector.inject(this);
     injector.inject(groupsProcessor);
-  }
-
-  /**
-   * Used only for unit testing.
-   * @return the injector
-   */
-  public Injector getInjector() {
-    return injector;
   }
 
   /**
@@ -409,11 +399,9 @@ public class WroManager
 
 
   /**
-   * Allow subclasses to turn off gzipping.
-   *
    * @return true if Gzip is Supported
    */
-  protected boolean isGzipSupported() {
+  private boolean isGzipSupported() {
     return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 

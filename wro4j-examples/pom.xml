@@ -193,7 +193,7 @@
           <port>81</port>
         </configuration>
       </plugin>
-      <!-- 
+      
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
@@ -206,13 +206,16 @@
           </execution>
         </executions>
         <configuration>
+          <ignoreMissingResources>true</ignoreMissingResources>
+        <!-- 
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory> 
-            <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory> 
-            <targetGroups>all</targetGroups> 
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
+           -->
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory> 
+          <targetGroups>all</targetGroups> 
         </configuration>
       </plugin>
-       -->
+      <!--  -->
     </plugins>
   </build>
   <repositories>

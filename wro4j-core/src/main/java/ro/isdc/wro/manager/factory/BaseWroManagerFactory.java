@@ -64,12 +64,9 @@ public abstract class BaseWroManagerFactory
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
-
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
-          // it is important to instantiate dependencies first, otherwise another thread can start working with
-          // uninitialized manager.
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
-          this.manager = newWroManager(injector);
+          this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
           manager.setModelFactory(modelFactory);
           manager.setCacheStrategy(cacheStrategy);
@@ -99,15 +96,6 @@ public abstract class BaseWroManagerFactory
    */
   protected UriLocatorFactory newUriLocatorFactory() {
     return new SimpleUriLocatorFactory();
-  }
-
-
-  /**
-   * Allows client code to override and configure WroManager dependencies (uriLocatorFactory & processorsFactory).
-   * @return new instance of {@link WroManager}.
-   */
-  protected WroManager newWroManager(final Injector injector) {
-    return new WroManager(injector);
   }
 
   /**
