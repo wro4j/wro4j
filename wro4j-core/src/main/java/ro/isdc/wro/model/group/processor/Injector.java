@@ -59,6 +59,9 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
+    if (object == null) {
+      throw new IllegalArgumentException("Object cannot be null!");
+    }
 //    LOG.debug("scanning @Inject in object of type: " + object.getClass());
 //    final StopWatch watch = new StopWatch();
 //    watch.start("scan pre processors");
@@ -99,6 +102,7 @@ public final class Injector {
    */
   private Collection<Field> getAllFields(final Object object) {
     final Collection<Field> fields = new ArrayList<Field>();
+    LOG.debug("getAllFields of: " + object);
     fields.addAll(Arrays.asList(object.getClass().getDeclaredFields()));
     // inspect super classes
     Class<?> superClass = object.getClass().getSuperclass();

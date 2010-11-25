@@ -48,13 +48,9 @@ public class CssImportPreProcessor
    * List of processed resources, useful for detecting deep recursion.
    */
   private final List<Resource> processed = new ArrayList<Resource>();
-
   /** The url pattern */
-  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?"
-    // any sequence of characters, except an unescaped ')'
-    + "\\s*?\\);?", // Any number of whitespaces, then ')'
-    Pattern.CASE_INSENSITIVE); // works with 'URL('
-
+  //@import\s*(?:url\()?["']?([^"')]+)["']?\)?;?
+  private static final Pattern PATTERN = Pattern.compile("@import\\s*(?:url\\()?[\"']?([^\"')]+)[\"')]?\\)?;?", Pattern.CASE_INSENSITIVE);
 
   /**
    * {@inheritDoc}

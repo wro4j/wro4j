@@ -31,7 +31,10 @@ public class InjectorUriLocatorFactoryDecorator
   @Override
   public UriLocator getInstance(final String uri) {
     final UriLocator uriLocator = super.getInstance(uri);
-    injector.inject(uriLocator);
+    //TODO shouldn't we throw exception here?
+    if (uriLocator != null) {
+      injector.inject(uriLocator);
+    }
     return uriLocator;
   }
 }
