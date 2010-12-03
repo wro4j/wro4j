@@ -14,8 +14,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 
-import javax.annotation.processing.Processor;
-
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
