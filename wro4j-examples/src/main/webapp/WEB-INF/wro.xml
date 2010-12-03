@@ -75,7 +75,7 @@
   </group>
 
   <group name="jquery">
-    <js>http://code.jquery.com/jquery-1.4.3.js</js>
+    <js>http://code.jquery.com/jquery-1.4.4.min.js</js>
     <group-ref>jquery-mobile</group-ref>
     <!--
     <js>/static/js/jquery.livequery.js</js>
@@ -86,7 +86,7 @@
   
   <group name="jquery-mobile">
     <css>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.css</css>
-    <js>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.js</js>
+    <js> http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.js</js>
   </group>
   
   <group name="syntaxHighlighter">
