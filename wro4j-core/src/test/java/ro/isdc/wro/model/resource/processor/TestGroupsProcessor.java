@@ -255,7 +255,7 @@ public class TestGroupsProcessor {
   @Test
   public void testGroupWithCssImportProcessor() throws Exception {
     final Group group = new Group();
-    group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/processor/cssImports/test1-input.css", ResourceType.CSS)));
+    group.setResources(Arrays.asList(Resource.create("classpath:ro/isdc/wro/model/resource/processor/cssImport/test1.css", ResourceType.CSS)));
     final List<Group> groups = Arrays.asList(group);
     groupsProcessor = new GroupsProcessor() {
       @Override
