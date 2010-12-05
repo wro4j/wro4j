@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -122,12 +123,44 @@ public final class ByteArrayStreamDispatchingStrategy
       /**
        * PrintWrapper of wrapped response.
        */
-      private final PrintWriter pw = new PrintWriter(os);
+      private PrintWriter pw = new PrintWriter(os);
 
       /**
        * Servlet output stream of wrapped response.
        */
-      private final ServletOutputStream sos = new DelegatingServletOutputStream(os);
+      private ServletOutputStream sos = new DelegatingServletOutputStream(os);
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void sendError(final int sc)
+        throws IOException {
+        onError(sc, "");
+        super.sendError(sc);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void sendError(final int sc, final String msg)
+        throws IOException {
+        onError(sc, msg);
+        super.sendError(sc, msg);
+      }
+
+      /**
+       * Use an empty stream to avoid container writing unwanted message when a resource is missing.
+       * @param sc status code.
+       * @param msg
+       */
+      private void onError(final int sc, final String msg) {
+        LOG.debug("Error detected with code: " + sc + " and message: " + msg);
+        final OutputStream emptyStream = new ByteArrayOutputStream();
+        pw = new PrintWriter(emptyStream);
+        sos = new DelegatingServletOutputStream(emptyStream);
+      }
 
       @Override
       public ServletOutputStream getOutputStream()

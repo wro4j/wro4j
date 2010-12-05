@@ -23,6 +23,10 @@
     <js>/static/js/problem.js</js>
   </group>
   
+  <group name="invalid">
+    <js>/invalid/resource.js</js>
+  </group>
+  
   <group name="twitterBar">
     <js>http://widgets.twimg.com/j/2/widget.js</js>
   </group>
