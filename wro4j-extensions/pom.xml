@@ -38,6 +38,7 @@
 		<dependency>
       <groupId>com.google.closure</groupId>
       <artifactId>compiler</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>rhino</groupId>
