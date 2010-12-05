@@ -51,6 +51,7 @@ public final class UriLocatorFactory {
     if (uriLocator == null) {
       throw new IOException("No locator is capable of handling uri: " + uri);
     }
+    LOG.debug("locating uri: " + uri + ", using locator: " + uriLocator);
     return uriLocator.locate(uri);
   }
 
