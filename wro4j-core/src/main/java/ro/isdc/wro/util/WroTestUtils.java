@@ -14,7 +14,10 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 
+import javax.annotation.processing.Processor;
+
 import junit.framework.Assert;
+import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -143,7 +146,13 @@ public class WroTestUtils {
    * Compares two strings by removing trailing spaces & tabs for correct comparison.
    */
   public static void compare(final String expected, final String actual) {
-    Assert.assertEquals(replaceTabsWithSpaces(expected.trim()), replaceTabsWithSpaces(actual.trim()));
+    try {
+      Assert.assertEquals(replaceTabsWithSpaces(expected.trim()), replaceTabsWithSpaces(actual.trim()));
+      LOG.debug("Compare.... [OK]");
+    } catch (final ComparisonFailure e) {
+      LOG.debug("Compare.... [FAIL]");
+      throw e;
+    }
   }
 
 
@@ -258,7 +267,6 @@ public class WroTestUtils {
         final ResourceProcessor resourceProcessor = WroUtil.newResourceProcessor(
           Resource.create("file:" + file.getAbsolutePath(), ResourceType.CSS), processor);
         compare(new FileInputStream(file), targetFileStream, resourceProcessor);
-        LOG.debug("Compare ... [OK]");
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
