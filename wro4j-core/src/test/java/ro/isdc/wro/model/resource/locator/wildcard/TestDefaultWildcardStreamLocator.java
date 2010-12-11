@@ -5,6 +5,9 @@ package ro.isdc.wro.model.resource.locator.wildcard;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import junit.framework.Assert;
 
@@ -86,6 +89,29 @@ public class TestDefaultWildcardStreamLocator {
   }
 
   @Test
+  public void testWildcardResourcesOrderedAlphabetically() throws IOException {
+    locator = new DefaultWildcardStreamLocator() {
+      @Override
+      protected void handleFoundFiles(final Collection<File> files) {
+        final Collection<String> filenameList = new ArrayList<String>();
+        for (final File file : files) {
+          filenameList.add(file.getName());
+        }
+        Assert.assertEquals(Arrays.toString(new String[] {
+          "tools.expose-1.0.5.js", "tools.overlay-1.1.2.js", "tools.overlay.apple-1.0.1.js", "tools.overlay.gallery-1.0.0.js"
+        }), Arrays.toString(filenameList.toArray()));
+      };
+    };
+    final UriLocator uriLocator = new ClasspathUriLocator() {
+      @Override
+      protected WildcardStreamLocator newWildcardStreamLocator() {
+        return locator;
+      }
+    };
+    uriLocator.locate("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.js");
+  }
+
+  @Test
   public void testWildcardLocator() throws IOException {
     locator = new DefaultWildcardStreamLocator(null) {
       @Override
@@ -99,6 +125,6 @@ public class TestDefaultWildcardStreamLocator {
         return locator;
       }
     };
-    uriLocator.locate("classpath:" + WroUtil.toPackageAsFolder(this.getClass()) + "/*.css");
+    uriLocator.locate("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.css");
   }
 }
