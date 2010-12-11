@@ -189,10 +189,15 @@
 				<artifactId>js</artifactId>
 				<version>1.7R2</version>
 			</dependency>
+      <dependency>
+        <groupId>com.google.javascript</groupId> 
+        <artifactId>closure-compiler</artifactId>
+        <version>r606</version>
+      </dependency>
 		  <dependency>
-			<groupId>com.google.closure</groupId>
-			<artifactId>compiler</artifactId>
-			<version>r531</version>
+        <groupId>com.google.closure</groupId>
+        <artifactId>compiler</artifactId>
+        <version>r531</version>
 		  </dependency>
 		  <dependency>
 			<groupId>junit</groupId>
@@ -414,8 +419,8 @@
   <!-- Repository for third party libraries -->
   <repositories>
     <repository>
-      <id>Jasig Repo - for YUI library</id>
-      <url>http://developer.jasig.org/repo/content/groups/m2-legacy</url>
+      <id>Sonatype</id>
+      <url>http://oss.sonatype.org/content/groups/public</url>
     </repository>
   </repositories>
   
