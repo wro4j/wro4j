@@ -32,7 +32,7 @@ public class LessCss {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_LESS = "less-1.0.38.js";
+      final String SCRIPT_LESS = "less-1.0.40.js";
       final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
       final String SCRIPT_RUN = "run.js";
       final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
