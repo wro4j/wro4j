@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
-  <version>1.3.1</version>
+  <version>1.3.2</version>
 	<packaging>pom</packaging>	
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
@@ -64,7 +64,7 @@
     <slf4j.dependency>1.6.0</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>
-    <junit.dependency>4.8.1</junit.dependency>    
+    <junit.dependency>4.8.2</junit.dependency>    
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>	
     <maven.compile.encoding>UTF-8</maven.compile.encoding>
@@ -189,26 +189,27 @@
 				<artifactId>js</artifactId>
 				<version>1.7R2</version>
 			</dependency>
-		  <dependency>
-			<groupId>com.google.closure</groupId>
-			<artifactId>compiler</artifactId>
-			<version>r531</version>
-		  </dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring</artifactId>
-				<version>2.5.6</version>
-			</dependency>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.dependency}</version>
-        <scope>test</scope>
+        <groupId>com.google.javascript</groupId> 
+        <artifactId>closure-compiler</artifactId>
+        <version>r606</version>
       </dependency>
+		  <dependency>
+        <groupId>com.google.closure</groupId>
+        <artifactId>compiler</artifactId>
+        <version>r531</version>
+		  </dependency>
+		  <dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.dependency}</version>
+			<scope>test</scope>
+		  </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
 				<version>${mockito.dependency}</version>
+				<scope>test</scope>
 			</dependency>			
 		</dependencies>				
 	</dependencyManagement>
@@ -220,7 +221,6 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>      	 
 		</dependency>
     <!-- For test -->
     <dependency>
@@ -232,6 +232,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
+	  <scope>test</scope>
       <version>${mockito.dependency}</version>
     </dependency>		
 	</dependencies>
@@ -418,8 +419,8 @@
   <!-- Repository for third party libraries -->
   <repositories>
     <repository>
-      <id>Jasig Repo - for YUI library</id>
-      <url>http://developer.jasig.org/repo/content/groups/m2-legacy</url>
+      <id>Sonatype</id>
+      <url>http://oss.sonatype.org/content/groups/public</url>
     </repository>
   </repositories>
   

@@ -12,7 +12,7 @@ package ro.isdc.wro.http;
 public enum HttpHeader {
   CACHE_CONTROL("Cache-Control"), LAST_MODIFIED("Last-Modified"), ETAG("ETag"), EXPIRES("Expires"), IF_MODIFIED_SINCE(
     "If-Modified-Since"), IF_NONE_MATCH("If-None-Match"), CONTENT_ENCODING("Content-Encoding"), ACCEPT_ENCODING(
-    "Accept-Encoding");
+    "Accept-Encoding"), PRAGMA("Pragma");
   /**
    * HTTP header as string.
    */

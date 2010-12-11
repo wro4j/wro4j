@@ -83,6 +83,7 @@ public class ServletContextUriLocator
    */
   public InputStream locate(final String uri)
     throws IOException {
+    LOG.debug("locating uri: " + uri);
     if (uri == null) {
       throw new IllegalArgumentException("URI cannot be NULL!");
     }

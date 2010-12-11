@@ -12,7 +12,7 @@
     </filter-class>
     <init-param>
       <param-name>configuration</param-name>
-      <param-value>DEVELOPMENT</param-value>
+      <param-value>development</param-value>
     </init-param>
     <init-param>
       <param-name>gzipResources</param-name>
@@ -40,7 +40,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,packerJs</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,jsMin</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>

@@ -4,7 +4,6 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -49,13 +48,10 @@ public class CssImportPreProcessor
    * List of processed resources, useful for detecting deep recursion.
    */
   private final List<Resource> processed = new ArrayList<Resource>();
-
   /** The url pattern */
-  private static final Pattern PATTERN = Pattern.compile("@import\\s*url\\(\\s*?" + "[\"']?([^\"']*?)[\"']?"
-    // any sequence of characters, except an unescaped ')'
-    + "\\s*?\\);?", // Any number of whitespaces, then ')'
-    Pattern.CASE_INSENSITIVE); // works with 'URL('
-
+  ///^(\s|\n)*
+  //@import\s*(?:url\()?["']?([^"')]+)["']?\)?;?
+  private static final Pattern PATTERN = Pattern.compile("@import\\s*(?:url\\()?[\"']?([^\"')]+)[\"')]?\\)?;?", Pattern.CASE_INSENSITIVE);
 
   /**
    * {@inheritDoc}
@@ -128,17 +124,6 @@ public class CssImportPreProcessor
     return sb.toString();
   }
 
-
-  /**
-   * @return the content of the resource as string.
-   */
-  private String getResourceContent(final Resource resource)
-    throws IOException {
-    final Reader reader = new InputStreamReader(uriLocatorFactory.locate(resource.getUri()));
-    return IOUtils.toString(reader);
-  }
-
-
   /**
    * Find a set of imported resources inside a given resource.
    */
@@ -147,7 +132,7 @@ public class CssImportPreProcessor
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
     // Check if @Scanner#findWithinHorizon can be used instead
-    final String css = getResourceContent(resource);
+    final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()));
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));

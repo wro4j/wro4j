@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -118,7 +118,7 @@ public class DefaultWildcardStreamLocator
 
     //maps resource uri's and corresponding file
     //this map have to be ordered
-    final Map<String, File> uriToFileMap = new LinkedHashMap<String, File>();
+    final Map<String, File> uriToFileMap = new TreeMap<String, File>();
 
     final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
     final String parentFolderPath = folder.getPath();
