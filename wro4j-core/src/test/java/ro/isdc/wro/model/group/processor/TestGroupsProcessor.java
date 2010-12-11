@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import org.junit.Test;
+
 
 /**
  * TestGroupsProcessor.
@@ -11,6 +13,8 @@ package ro.isdc.wro.model.group.processor;
  * @created Created on Jan 5, 2010
  */
 public class TestGroupsProcessor {
+  @Test
+  public void justPass() {}
 //  private GroupsProcessor groupsProcessor;
 //
 //  @Before
