@@ -81,12 +81,14 @@ public class GoogleClosureCompressorProcessor
     try {
       Compiler.setLoggingLevel(Level.SEVERE);
       final Compiler compiler = new Compiler();
+      final CompilerOptions options = new CompilerOptions();
+//      options.setCodingConvention(new DefaultCodingConvention());
       //make it play nice with GAE
       compiler.disableThreads();
-      final CompilerOptions options = new CompilerOptions();
       // Advanced mode is used here, but additional options could be set, too.
-
       compilationLevel.setOptionsForCompilationLevel(options);
+      compiler.initOptions(options);
+
       final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
       final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(IOUtils.toByteArray(reader)));
 
