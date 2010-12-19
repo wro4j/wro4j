@@ -24,6 +24,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DefaultCodingConvention;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
 
@@ -82,7 +83,7 @@ public class GoogleClosureCompressorProcessor
       Compiler.setLoggingLevel(Level.SEVERE);
       final Compiler compiler = new Compiler();
       final CompilerOptions options = new CompilerOptions();
-//      options.setCodingConvention(new DefaultCodingConvention());
+      options.setCodingConvention(new DefaultCodingConvention());
       //make it play nice with GAE
       compiler.disableThreads();
       // Advanced mode is used here, but additional options could be set, too.
