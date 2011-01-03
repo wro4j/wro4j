@@ -60,10 +60,8 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
+  private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
   /**
    * wro API mapping path. If request uri contains this, exposed API method will be invoked.
    */
@@ -200,6 +198,7 @@ public class WroManager
     if (Context.get().getConfig().isGzipEnabled() && isGzipSupported()) {
       // add gzip header and gzip response
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
+      response.setHeader("Vary", "Accept-Encoding");
       // Create a gzip stream
       return new GZIPOutputStream(response.getOutputStream());
     }
@@ -232,15 +231,15 @@ public class WroManager
 
     // TODO move ETag check in wroManagerFactory
     final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-    final String etagValue = contentHashEntry.getHash();
+    //enclose etag value in quotes to be compliant with the RFC
+    final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
       LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
         + " status code");
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       // because we cannot return null, return a stream containing nothing.
-      return new ByteArrayInputStream(new byte[] {});
+      return EMPTY_STREAM;
     }
-
     if (contentHashEntry.getContent() != null) {
       // make the input stream encoding aware.
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());
@@ -249,8 +248,9 @@ public class WroManager
       // TODO add also the charset?
       response.setContentType(type.getContentType());
     }
+
     // set ETag header
-    response.setHeader(HttpHeader.ETAG.toString(), contentHashEntry.getHash());
+    response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
     stopWatch.stop();
     LOG.debug("WroManager process time: " + stopWatch.toString());
