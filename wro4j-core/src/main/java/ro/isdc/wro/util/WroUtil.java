@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
@@ -29,7 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -52,7 +52,13 @@ public final class WroUtil {
    */
   private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("E, dd MMM yyyy HH:mm:ss z",
     TimeZone.getTimeZone("GMT"));
-
+  /**
+   * Patterns used to search for mangled Accept-Encoding header.
+   */
+  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(
+    "^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$", Pattern.CASE_INSENSITIVE);
+  private static final Pattern PATTERN_GZIP = Pattern.compile(
+    "^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?|X{4,13}|~{4,13}|-{4,13})$", Pattern.CASE_INSENSITIVE);
 
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
@@ -158,11 +164,25 @@ public final class WroUtil {
   }
 
   /**
-   * @param request {@link HttpServletRequest} object.
+   * Analyze headers of the request and searches for mangled (by proxy) for "Accept-Encoding" header and its mangled
+   * variations and gzip header value and its mangled variations.
+   *
    * @return true if this request support gzip encoding.
    */
   public static boolean isGzipSupported(final HttpServletRequest request) {
-    return headerContains(request, HttpHeader.ACCEPT_ENCODING.toString(), "gzip");
+    final Enumeration<String> headerNames = request.getHeaderNames();
+    if (headerNames != null) {
+      while (headerNames.hasMoreElements()) {
+        final String headerName = headerNames.nextElement();
+        final Matcher m = PATTERN_ACCEPT_ENCODING.matcher(headerName);
+        if (m.find()) {
+          final String headerValue = request.getHeader(headerName);
+          final Matcher mValue = PATTERN_GZIP.matcher(headerValue);
+          return mValue.find();
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -201,10 +221,10 @@ public final class WroUtil {
    */
   @SuppressWarnings("unchecked")
   private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
-    final Enumeration<String> accepted = request.getHeaders(header);
-    if (accepted != null) {
-      while (accepted.hasMoreElements()) {
-        final String headerValue = accepted.nextElement();
+    final Enumeration<String> headerValues = request.getHeaders(header);
+    if (headerValues != null) {
+      while (headerValues.hasMoreElements()) {
+        final String headerValue = headerValues.nextElement();
         if (headerValue.indexOf(value) != -1) {
           return true;
         }
@@ -245,91 +265,6 @@ public final class WroUtil {
     }
     final String prefix = "filter";
     final String mapping = prefix + "-mapping";
-  /**
-   * Returns the filter path read from the web.xml
-   *
-   * @param filterName the name of the searched filter.
-   * @param is Stream of the web.xml file.
-   * @return
-   */
-//  public static String getFilterPath(final String filterName, final InputStream is)
-//    throws ServletException {
-//    final String prefix = "filter";
-//    final String mapping = prefix + "-mapping";
-//    final String name = prefix + "-name";
-//
-//    // Filter mappings look like this:
-//    //
-//    // <filter-mapping> <filter-name>WicketFilter</filter-name>
-//    // <url-pattern>/*</url-pattern> <...> <filter-mapping>
-//    try {
-//      final ArrayList<String> urlPatterns = new ArrayList<String>();
-//
-//      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//      factory.setNamespaceAware(true);
-//      final Document document = factory.newDocumentBuilder().parse(is);
-//      document.getDocumentElement().normalize();
-//      final NodeList groupNodeList = document.getElementsByTagName(name);
-//
-//      final XmlPullParser parser = new XmlPullParser();
-//      parser.parse(is);
-//
-//      while (true) {
-//        XmlTag elem;
-//        do {
-//          elem = (XmlTag)parser.nextTag();
-//        } while (elem != null && (!(elem.getName().equals(mapping) && elem.isOpen())));
-//
-//        if (elem == null) {
-//          break;
-//        }
-//
-//        String encounteredFilterName = null, urlPattern = null;
-//
-//        do {
-//          elem = (XmlTag)parser.nextTag();
-//          if (elem.isOpen()) {
-//            parser.setPositionMarker();
-//          } else if (elem.isClose() && elem.getName().equals(name)) {
-//            encounteredFilterName = parser.getInputFromPositionMarker(elem.getPos()).toString().trim();
-//          } else if (elem.isClose() && elem.getName().equals("url-pattern")) {
-//            urlPattern = parser.getInputFromPositionMarker(elem.getPos()).toString().trim();
-//          }
-//        } while (urlPattern == null || encounteredFilterName == null);
-//
-//        if (filterName.equals(encounteredFilterName)) {
-//          urlPatterns.add(urlPattern);
-//        }
-//      }
-//
-//      final String prefixUppered = Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1);
-//
-//      // By the time we get here, we have a list of urlPatterns we match
-//      // this filter against.
-//      // In all likelihood, we will only have one. If we have none, we
-//      // have an error.
-//      // If we have more than one, we pick the first one to use for any
-//      // 302 redirects that require absolute URLs.
-//      if (urlPatterns.size() == 0) {
-//        throw new IllegalArgumentException("Error initializing Wicket" + prefixUppered + " - you have no <" + mapping
-//          + "> element with a url-pattern that uses " + prefix + ": " + filterName);
-//      }
-//      final String urlPattern = urlPatterns.get(0);
-//
-//      // Check for leading '/' and trailing '*'.
-//      if (!urlPattern.startsWith("/") || !urlPattern.endsWith("*")) {
-//        throw new IllegalArgumentException("<" + mapping + "> for Wicket" + prefixUppered + " \"" + filterName
-//          + "\" must start with '/' and end with '*'.");
-//      }
-//
-//      // Strip trailing '*' and keep leading '/'.
-//      return stripWildcard(urlPattern);
-//    } catch (final IOException e) {
-//      throw new ServletException("Error finding <" + prefix + "> " + filterName + " in web.xml", e);
-//    } catch (final ParseException e) {
-//      throw new ServletException("Error finding <" + prefix + "> " + filterName + " in web.xml", e);
-//    }
-//  }
 
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
