@@ -27,28 +27,35 @@
                          <mihai.bazon@gmail.com>
                        http://mihai.bazon.net/blog
 
-  Distributed under a ZLIB license:
+  Distributed under the BSD license:
 
     Copyright 2010 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
-    This software is provided 'as-is', without any express or implied
-    warranty. In no event will the authors be held liable for any
-    damages arising from the use of this software.
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
 
-    Permission is granted to anyone to use this software for any
-    purpose, including commercial applications, and to alter it and
-    redistribute it freely, subject to the following restrictions:
+        * Redistributions of source code must retain the above
+          copyright notice, this list of conditions and the following
+          disclaimer.
 
-    1. The origin of this software must not be misrepresented; you must
-       not claim that you wrote the original software. If you use this
-       software in a product, an acknowledgment in the product
-       documentation would be appreciated but is not required.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials
+          provided with the distribution.
 
-    2. Altered source versions must be plainly marked as such, and must
-       not be misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-       distribution.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS” AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+    THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
 
  ***********************************************************************/
 
@@ -62,7 +69,7 @@ var jsp = require("./parse-js"),
 
 function ast_walker(ast) {
         function _vardefs(defs) {
-                return defs.map(function(def){
+                return MAP(defs, function(def){
                         var a = [ def[0] ];
                         if (def.length > 1)
                                 a[1] = walk(def[1]);
@@ -80,12 +87,12 @@ function ast_walker(ast) {
                         return [ "name", name ];
                 },
                 "toplevel": function(statements) {
-                        return [ "toplevel", statements.map(walk) ];
+                        return [ "toplevel", MAP(statements, walk) ];
                 },
                 "block": function(statements) {
                         var out = [ "block" ];
                         if (statements != null)
-                                out.push(statements.map(walk));
+                                out.push(MAP(statements, walk));
                         return out;
                 },
                 "var": function(defs) {
@@ -97,21 +104,21 @@ function ast_walker(ast) {
                 "try": function(t, c, f) {
                         return [
                                 "try",
-                                t.map(walk),
-                                c != null ? [ c[0], c[1].map(walk) ] : null,
-                                f != null ? f.map(walk) : null
+                                MAP(t, walk),
+                                c != null ? [ c[0], MAP(c[1], walk) ] : null,
+                                f != null ? MAP(f, walk) : null
                         ];
                 },
                 "throw": function(expr) {
                         return [ "throw", walk(expr) ];
                 },
                 "new": function(ctor, args) {
-                        return [ "new", walk(ctor), args.map(walk) ];
+                        return [ "new", walk(ctor), MAP(args, walk) ];
                 },
                 "switch": function(expr, body) {
-                        return [ "switch", walk(expr), body.map(function(branch){
+                        return [ "switch", walk(expr), MAP(body, function(branch){
                                 return [ branch[0] ? walk(branch[0]) : null,
-                                         branch[1].map(walk) ];
+                                         MAP(branch[1], walk) ];
                         }) ];
                 },
                 "break": function(label) {
@@ -130,13 +137,13 @@ function ast_walker(ast) {
                         return [ "dot", walk(expr) ].concat(slice(arguments, 1));
                 },
                 "call": function(expr, args) {
-                        return [ "call", walk(expr), args.map(walk) ];
+                        return [ "call", walk(expr), MAP(args, walk) ];
                 },
                 "function": function(name, args, body) {
-                        return [ "function", name, args.slice(), body.map(walk) ];
+                        return [ "function", name, args.slice(), MAP(body, walk) ];
                 },
                 "defun": function(name, args, body) {
-                        return [ "defun", name, args.slice(), body.map(walk) ];
+                        return [ "defun", name, args.slice(), MAP(body, walk) ];
                 },
                 "if": function(conditional, t, e) {
                         return [ "if", walk(conditional), walk(t), walk(e) ];
@@ -169,21 +176,23 @@ function ast_walker(ast) {
                         return [ "sub", walk(expr), walk(subscript) ];
                 },
                 "object": function(props) {
-                        return [ "object", props.map(function(p){
-                                return [ p[0], walk(p[1]) ];
+                        return [ "object", MAP(props, function(p){
+                                return p.length == 2
+                                        ? [ p[0], walk(p[1]) ]
+                                        : [ p[0], walk(p[1]), p[2] ]; // get/set-ter
                         }) ];
                 },
                 "regexp": function(rx, mods) {
                         return [ "regexp", rx, mods ];
                 },
                 "array": function(elements) {
-                        return [ "array", elements.map(walk) ];
+                        return [ "array", MAP(elements, walk) ];
                 },
                 "stat": function(stat) {
                         return [ "stat", walk(stat) ];
                 },
                 "seq": function() {
-                        return [ "seq" ].concat(slice(arguments).map(walk));
+                        return [ "seq" ].concat(MAP(slice(arguments), walk));
                 },
                 "label": function(name, block) {
                         return [ "label", name, walk(block) ];
@@ -374,8 +383,8 @@ function ast_add_scope(ast) {
 
         function _lambda(name, args, body) {
                 return [ this[0], define(name), args, with_new_scope(function(){
-                        args.map(define);
-                        return body.map(walk);
+                        MAP(args, define);
+                        return MAP(body, walk);
                 })];
         };
 
@@ -389,17 +398,17 @@ function ast_add_scope(ast) {
                                         s.uses_with = true;
                         },
                         "var": function(defs) {
-                                defs.map(function(d){ define(d[0]) });
+                                MAP(defs, function(d){ define(d[0]) });
                         },
                         "const": function(defs) {
-                                defs.map(function(d){ define(d[0]) });
+                                MAP(defs, function(d){ define(d[0]) });
                         },
                         "try": function(t, c, f) {
                                 if (c != null) return [
                                         "try",
-                                        t.map(walk),
-                                        [ define(c[0]), c[1].map(walk) ],
-                                        f != null ? f.map(walk) : null
+                                        MAP(t, walk),
+                                        [ define(c[0]), MAP(c[1], walk) ],
+                                        f != null ? MAP(f, walk) : null
                                 ];
                         },
                         "name": function(name) {
@@ -421,7 +430,7 @@ function ast_add_scope(ast) {
                 // scopes where eval was detected and their parents
                 // are marked with uses_eval, unless they define the
                 // "eval" name.
-                having_eval.map(function(scope){
+                MAP(having_eval, function(scope){
                         if (!scope.has("eval")) while (scope) {
                                 scope.uses_eval = true;
                                 scope = scope.parent;
@@ -463,8 +472,8 @@ function ast_mangle(ast, do_toplevel) {
         function _lambda(name, args, body) {
                 if (name) name = get_mangled(name);
                 body = with_scope(body.scope, function(){
-                        args = args.map(function(name){ return get_mangled(name) });
-                        return body.map(walk);
+                        args = MAP(args, function(name){ return get_mangled(name) });
+                        return MAP(body, walk);
                 });
                 return [ this[0], name, args, body ];
         };
@@ -482,14 +491,25 @@ function ast_mangle(ast, do_toplevel) {
         };
 
         function _vardefs(defs) {
-                return defs.map(function(d){
+                return MAP(defs, function(d){
                         return [ get_mangled(d[0]), walk(d[1]) ];
                 });
         };
 
         return w.with_walkers({
                 "function": _lambda,
-                "defun": _lambda,
+                "defun": function() {
+                        // move function declarations to the top when
+                        // they are not in some block.
+                        var ast = _lambda.apply(this, arguments);
+                        switch (w.parent()[0]) {
+                            case "toplevel":
+                            case "function":
+                            case "defun":
+                                return MAP.at_top(ast);
+                        }
+                        return ast;
+                },
                 "var": function(defs) {
                         return [ "var", _vardefs(defs) ];
                 },
@@ -501,13 +521,13 @@ function ast_mangle(ast, do_toplevel) {
                 },
                 "try": function(t, c, f) {
                         return [ "try",
-                                 t.map(walk),
-                                 c != null ? [ get_mangled(c[0]), c[1].map(walk) ] : null,
-                                 f != null ? f.map(walk) : null ];
+                                 MAP(t, walk),
+                                 c != null ? [ get_mangled(c[0]), MAP(c[1], walk) ] : null,
+                                 f != null ? MAP(f, walk) : null ];
                 },
                 "toplevel": function(body) {
                         return with_scope(this.scope, function(){
-                                return [ "toplevel", body.map(walk) ];
+                                return [ "toplevel", MAP(body, walk) ];
                         });
                 },
                 "for-in": function(has_var, name, obj, stat) {
@@ -667,7 +687,7 @@ function ast_squeeze(ast, options) {
 
         function clone(obj) {
                 if (obj && obj.constructor == Array)
-                        return obj.map(clone);
+                        return MAP(obj, clone);
                 return obj;
         };
 
@@ -691,7 +711,7 @@ function ast_squeeze(ast, options) {
 
         function _lambda(name, args, body) {
                 return [ this[0], name, args, with_scope(body.scope, function(){
-                        return tighten(body.map(walk), "lambda");
+                        return tighten(MAP(body, walk), "lambda");
                 }) ];
         };
 
@@ -928,13 +948,13 @@ function ast_squeeze(ast, options) {
                 "if": make_if,
                 "toplevel": function(body) {
                         return [ "toplevel", with_scope(this.scope, function(){
-                                return tighten(body.map(walk));
+                                return tighten(MAP(body, walk));
                         }) ];
                 },
                 "switch": function(expr, body) {
                         var last = body.length - 1;
-                        return [ "switch", walk(expr), body.map(function(branch, i){
-                                var block = tighten(branch[1].map(walk));
+                        return [ "switch", walk(expr), MAP(body, function(branch, i){
+                                var block = tighten(MAP(branch[1], walk));
                                 if (i == last && block.length > 0) {
                                         var node = block[block.length - 1];
                                         if (node[0] == "break" && !node[1])
@@ -946,7 +966,7 @@ function ast_squeeze(ast, options) {
                 "function": _lambda,
                 "defun": _lambda,
                 "block": function(body) {
-                        if (body) return rmblock([ "block", tighten(body.map(walk)) ]);
+                        if (body) return rmblock([ "block", tighten(MAP(body, walk)) ]);
                 },
                 "binary": function(op, left, right) {
                         left = walk(left);
@@ -979,9 +999,9 @@ function ast_squeeze(ast, options) {
                 "try": function(t, c, f) {
                         return [
                                 "try",
-                                tighten(t.map(walk)),
-                                c != null ? [ c[0], tighten(c[1].map(walk)) ] : null,
-                                f != null ? tighten(f.map(walk)) : null
+                                tighten(MAP(t, walk)),
+                                c != null ? [ c[0], tighten(MAP(c[1], walk)) ] : null,
+                                f != null ? tighten(MAP(f, walk)) : null
                         ];
                 },
                 "unary-prefix": function(op, cond) {
@@ -1174,10 +1194,10 @@ function gen_code(ast, beautify) {
                 },
                 "block": make_block,
                 "var": function(defs) {
-                        return "var " + add_commas(defs.map(make_1vardef)) + ";";
+                        return "var " + add_commas(MAP(defs, make_1vardef)) + ";";
                 },
                 "const": function(defs) {
-                        return "const " + add_commas(defs.map(make_1vardef)) + ";";
+                        return "const " + add_commas(MAP(defs, make_1vardef)) + ";";
                 },
                 "try": function(tr, ca, fi) {
                         var out = [ "try", make_block(tr) ];
@@ -1189,7 +1209,7 @@ function gen_code(ast, beautify) {
                         return add_spaces([ "throw", make(expr) ]) + ";";
                 },
                 "new": function(ctor, args) {
-                        args = args.length > 0 ? "(" + add_commas(args.map(make)) + ")" : "";
+                        args = args.length > 0 ? "(" + add_commas(MAP(args, make)) + ")" : "";
                         return add_spaces([ "new", parenthesize(ctor, "seq", "binary", "conditional", "assign", function(expr){
                                 var w = ast_walker(), has_call = {};
                                 try {
@@ -1233,7 +1253,9 @@ function gen_code(ast, beautify) {
                 },
                 "dot": function(expr) {
                         var out = make(expr), i = 1;
-                        if (needs_parens(expr))
+                        if (expr[0] == "num")
+                                out += ".";
+                        else if (needs_parens(expr))
                                 out = "(" + out + ")";
                         while (i < arguments.length)
                                 out += "." + make_name(arguments[i++]);
@@ -1243,7 +1265,7 @@ function gen_code(ast, beautify) {
                         var f = make(func);
                         if (needs_parens(func))
                                 f = "(" + f + ")";
-                        return f + "(" + add_commas(args.map(function(expr){
+                        return f + "(" + add_commas(MAP(args, function(expr){
                                 return parenthesize(expr, "seq");
                         })) + ")";
                 },
@@ -1321,7 +1343,12 @@ function gen_code(ast, beautify) {
                         if (props.length == 0)
                                 return "{}";
                         return "{" + newline + with_indent(function(){
-                                return props.map(function(p){
+                                return MAP(props, function(p){
+                                        if (p.length == 3) {
+                                                // getter/setter.  The name is in p[0], the arg.list in p[1][2], the
+                                                // body in p[1][3] and type ("get" / "set") in p[2].
+                                                return indent(make_function(p[0], p[1][2], p[1][3], p[2]));
+                                        }
                                         var key = p[0], val = make(p[1]);
                                         if (beautify && beautify.quote_keys) {
                                                 key = make_string(key);
@@ -1341,13 +1368,15 @@ function gen_code(ast, beautify) {
                 },
                 "array": function(elements) {
                         if (elements.length == 0) return "[]";
-                        return add_spaces([ "[", add_commas(elements.map(make)), "]" ]);
+                        return add_spaces([ "[", add_commas(MAP(elements, function(el){
+                                return parenthesize(el, "seq");
+                        })), "]" ]);
                 },
                 "stat": function(stmt) {
                         return make(stmt).replace(/;*\s*$/, ";");
                 },
                 "seq": function() {
-                        return add_commas(slice(arguments).map(make));
+                        return add_commas(MAP(slice(arguments), make));
                 },
                 "label": function(name, block) {
                         return add_spaces([ make_name(name), ":", make(block) ]);
@@ -1397,12 +1426,12 @@ function gen_code(ast, beautify) {
                 return make(th);
         };
 
-        function make_function(name, args, body) {
-                var out = "function";
+        function make_function(name, args, body, keyword) {
+                var out = keyword || "function";
                 if (name) {
                         out += " " + make_name(name);
                 }
-                out += "(" + add_commas(args.map(make_name)) + ")";
+                out += "(" + add_commas(MAP(args, make_name)) + ")";
                 return add_spaces([ out, make_block(body) ]);
         };
 
@@ -1420,13 +1449,13 @@ function gen_code(ast, beautify) {
                                 a.push(code);
                         }
                 }
-                return a.map(indent);
+                return MAP(a, indent);
         };
 
         function make_switch_block(body) {
                 var n = body.length;
                 if (n == 0) return "{}";
-                return "{" + newline + body.map(function(branch, i){
+                return "{" + newline + MAP(body, function(branch, i){
                         var has_body = branch[1].length > 0, code = with_indent(function(){
                                 return indent(branch[0]
                                               ? add_spaces([ "case", make(branch[0]) + ":" ])
@@ -1503,6 +1532,24 @@ function is_identifier(name) {
 function HOP(obj, prop) {
         return Object.prototype.hasOwnProperty.call(obj, prop);
 };
+
+// some utilities
+
+var MAP;
+
+(function(){
+        MAP = function(a, f, o) {
+                var ret = [];
+                for (var i = 0; i < a.length; ++i) {
+                        var val = f.call(o, a[i], i);
+                        if (val instanceof AtTop) ret.unshift(val.v);
+                        else ret.push(val);
+                }
+                return ret;
+        };
+        MAP.at_top = function(val) { return new AtTop(val) };
+        function AtTop(val) { this.v = val };
+})();
 
 /* -----[ Exports ]----- */
 

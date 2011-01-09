@@ -24,29 +24,36 @@
                          <mihai.bazon@gmail.com>
                        http://mihai.bazon.net/blog
 
-  Distributed under the same terms as the original code (ZLIB license):
+  Distributed under the BSD license:
 
     Copyright 2010 (c) Mihai Bazon <mihai.bazon@gmail.com>
     Based on parse-js (http://marijn.haverbeke.nl/parse-js/).
 
-    This software is provided 'as-is', without any express or implied
-    warranty. In no event will the authors be held liable for any
-    damages arising from the use of this software.
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
 
-    Permission is granted to anyone to use this software for any
-    purpose, including commercial applications, and to alter it and
-    redistribute it freely, subject to the following restrictions:
+        * Redistributions of source code must retain the above
+          copyright notice, this list of conditions and the following
+          disclaimer.
 
-    1. The origin of this software must not be misrepresented; you must
-       not claim that you wrote the original software. If you use this
-       software in a product, an acknowledgment in the product
-       documentation would be appreciated but is not required.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials
+          provided with the distribution.
 
-    2. Altered source versions must be plainly marked as such, and must
-       not be misrepresented as being the original software.
-
-    3. This notice may not be removed or altered from any source
-       distribution.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS” AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+    THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
 
  ***********************************************************************/
 
@@ -118,7 +125,8 @@ var KEYWORDS_BEFORE_EXPRESSION = array_to_hash([
         "new",
         "delete",
         "throw",
-        "else"
+        "else",
+        "case"
 ]);
 
 var KEYWORDS_ATOM = array_to_hash([
@@ -326,7 +334,7 @@ function tokenizer($TEXT, skip_comments) {
         };
 
         function read_num(prefix) {
-                var has_e = false, after_e = false, has_x = false;
+                var has_e = false, after_e = false, has_x = false, has_dot = prefix == ".";
                 var num = read_while(function(ch, i){
                         if (ch == "x" || ch == "X") {
                                 if (has_x) return false;
@@ -342,7 +350,12 @@ function tokenizer($TEXT, skip_comments) {
                         }
                         if (ch == "+") return after_e;
                         after_e = false;
-                        return is_alphanumeric_char(ch) || ch == ".";
+                        if (ch == ".") {
+                                if (!has_dot)
+                                        return has_dot = true;
+                                return false;
+                        }
+                        return is_alphanumeric_char(ch);
                 });
                 if (prefix)
                         num = prefix + num;
@@ -414,6 +427,7 @@ function tokenizer($TEXT, skip_comments) {
                             text = S.text.substring(S.pos, i),
                             tok = token("comment2", text);
                         S.pos = i + 2;
+                        S.line += text.split("\n").length - 1;
                         S.newline_before = text.indexOf("\n") >= 0;
                         return tok;
                 });
@@ -460,9 +474,10 @@ function tokenizer($TEXT, skip_comments) {
 
         var handle_slash = skip_comments ? function() {
                 next();
+                var regex_allowed = S.regex_allowed;
                 switch (peek()) {
-                    case "/": read_line_comment(); return next_token();
-                    case "*": read_multiline_comment(); return next_token();
+                    case "/": read_line_comment(); S.regex_allowed = regex_allowed; return next_token();
+                    case "*": read_multiline_comment(); S.regex_allowed = regex_allowed; return next_token();
                 }
                 return S.regex_allowed ? read_regexp() : read_operator("/");
         } : function() {
@@ -594,7 +609,7 @@ function NodeWithToken(str, start, end) {
 NodeWithToken.prototype.toString = function() { return this.name; };
 
 function parse($TEXT, strict_mode, embed_tokens) {
-	
+
         var S = {
                 input: tokenizer($TEXT, true),
                 token: null,
@@ -637,7 +652,7 @@ function parse($TEXT, strict_mode, embed_tokens) {
         };
 
         function token_error(token, msg) {
-        	croak(msg, token.line, token.col);
+                croak(msg, token.line, token.col);
         };
 
         function unexpected(token) {
@@ -706,8 +721,7 @@ function parse($TEXT, strict_mode, embed_tokens) {
                                 ? labeled_statement(prog1(S.token.value, next, next))
                                 : simple_statement();
 
-                    case "punc": {
-                    
+                    case "punc":
                         switch (S.token.value) {
                             case "{":
                                 return as("block", block_());
@@ -720,8 +734,8 @@ function parse($TEXT, strict_mode, embed_tokens) {
                             default:
                                 unexpected();
                         }
-                    }
-                    case "keyword": {
+
+                    case "keyword":
                         switch (prog1(S.token.value, next)) {
                             case "break":
                                 return break_cont("break");
@@ -767,9 +781,9 @@ function parse($TEXT, strict_mode, embed_tokens) {
                             case "try":
                                 return try_();
 
-                            case "var": {
+                            case "var":
                                 return prog1(var_, semicolon);
-                            }
+
                             case "const":
                                 return prog1(const_, semicolon);
 
@@ -782,8 +796,7 @@ function parse($TEXT, strict_mode, embed_tokens) {
                             default:
                                 unexpected();
                         }
-                    }
-               }
+                }
         };
 
         function labeled_statement(label) {
@@ -1032,10 +1045,14 @@ function parse($TEXT, strict_mode, embed_tokens) {
                         if (!strict_mode && is("punc", "}"))
                                 // allow trailing comma
                                 break;
+                        var type = S.token.type;
                         var name = as_property_name();
-                        expect(":");
-                        var value = expression(false);
-                        a.push([ name, value ]);
+                        if (type == "name" && (name == "get" || name == "set") && !is("punc", ":")) {
+                                a.push([ as_name(), function_(false), name ]);
+                        } else {
+                                expect(":");
+                                a.push([ name, expression(false) ]);
+                        }
                 }
                 next();
                 return as("object", a);
