@@ -41,7 +41,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -110,22 +109,34 @@ public class TestWroManager {
   }
 
   @Test
-  public void testRepeatedResourcesShouldBeSkipped()
+  public void testDuplicatedResourcesShouldBeSkipped()
       throws IOException {
     genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
 
   @Test
-  public void testWildcardRepeatedResourcesShouldBeSkiped()
+  public void testWildcardDuplicatedResourcesShouldBeSkiped()
       throws IOException {
     genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
   }
 
-  // @Test
-  // public void testChineseEncoding()
-  // throws IOException {
-  // genericProcessAndCompare("/chineseEncoding.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
-  // }
+  @Test
+  public void testMinimizeAttributeIsFalseOnResource()
+      throws IOException {
+    genericProcessAndCompare("/resourceMinimizeFalse.js", "classpath:ro/isdc/wro/manager/sample.js");
+  }
+
+  @Test
+  public void testMinimizeAttributeIsTrueOnResource()
+      throws IOException {
+    genericProcessAndCompare("/resourceMinimizeTrue.js", "classpath:ro/isdc/wro/manager/sample.min.js");
+  }
+
+//  @Test
+//  public void testChineseEncoding()
+//      throws IOException {
+//    genericProcessAndCompare("/chineseEncoding.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
+//  }
 
   @Test
   public void testWildcardGroupResources()
@@ -229,7 +240,7 @@ public class TestWroManager {
     return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() {
-        return getResourceAsStream(WroUtil.toPackageAsFolder(TestWroManager.class) + "/wro.xml");
+        return TestWroManager.class.getResourceAsStream("wro.xml");
       }
     };
   }

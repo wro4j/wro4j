@@ -33,9 +33,10 @@ public class GoogleStandaloneManagerFactory extends DefaultStandaloneContextAwar
     factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
+    factory.addPreProcessor(new JawrCssMinifierProcessor());
+
     factory.addPostProcessor(new CssVariablesProcessor());
-    factory.addPostProcessor(new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
-    factory.addPostProcessor(new JawrCssMinifierProcessor());
     return factory;
   }
 }

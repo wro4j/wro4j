@@ -87,9 +87,10 @@ public class DefaultStandaloneContextAwareManagerFactory
     factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new JSMinProcessor());
+    factory.addPreProcessor(new JawrCssMinifierProcessor());
+
     factory.addPostProcessor(new CssVariablesProcessor());
-    factory.addPostProcessor(new JSMinProcessor());
-    factory.addPostProcessor(new JawrCssMinifierProcessor());
     return factory;
   }
 

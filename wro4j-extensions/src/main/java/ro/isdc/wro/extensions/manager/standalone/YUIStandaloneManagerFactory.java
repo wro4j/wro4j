@@ -31,9 +31,10 @@ public class YUIStandaloneManagerFactory extends DefaultStandaloneContextAwareMa
     factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new YUIJsCompressorProcessor());
+    factory.addPreProcessor(new YUICssCompressorProcessor());
+
     factory.addPostProcessor(new CssVariablesProcessor());
-    factory.addPostProcessor(new YUIJsCompressorProcessor());
-    factory.addPostProcessor(new YUICssCompressorProcessor());
     return factory;
   }
 }

@@ -26,6 +26,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -94,6 +95,11 @@ public class XmlModelFactory
    * Group name attribute used in xml.
    */
   private static final String ATTR_GROUP_NAME = "name";
+  /**
+   * Minimize attribute specified on resource level, used to turn on/off minimization on this particular resource during
+   * pre processing.
+   */
+  private static final String ATTR_MINIMIZE = "minimize";
 
   /**
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
@@ -333,8 +339,6 @@ public class XmlModelFactory
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
-    //LOG.debug("\ttagName=" + tagName);
-    //LOG.debug("\turi=" + uri);
     if (TAG_JS.equals(tagName)) {
       type = ResourceType.JS;
     } else if (TAG_CSS.equals(tagName)) {
@@ -342,15 +346,17 @@ public class XmlModelFactory
     } else if (TAG_GROUP_REF.equals(tagName)) {
       // uri in this case is the group name
       final Element groupElement = allGroupElements.get(uri);
-      //LOG.debug("\tparse groupRef: " + uri + ": " + groupElement);
       resources.addAll(parseGroup(groupElement, groups));
     } else {
       // should not ever happen due to validation of xml.
       throw new WroRuntimeException("Usupported resource type: " + tagName);
     }
-    //LOG.debug("\ttype=" + type);
     if (type != null) {
-      resources.add(Resource.create(uri, type));
+      final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
+      final boolean minimize = StringUtils.isEmpty(minimizeAsString) ? true : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
+      final Resource resource = Resource.create(uri, type);
+      resource.setMinimize(minimize);
+      resources.add(resource);
     }
   }
 

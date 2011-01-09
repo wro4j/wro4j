@@ -14,8 +14,16 @@
 
 	<xsd:complexType name="Group">
 		<xsd:choice maxOccurs="unbounded" minOccurs="1">
-			<xsd:element name="css" type="xsd:string" />
-			<xsd:element name="js" type="xsd:string" />
+			<xsd:element name="css">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="minimize" type="xsd:boolean" use="optional" default="true"/>
+        </xsd:complexType>
+			</xsd:element>
+			<xsd:element name="js">
+        <xsd:complexType mixed="true">
+          <xsd:attribute name="minimize" type="xsd:boolean" use="optional" default="true"/>
+        </xsd:complexType>
+      </xsd:element>		
 			<xsd:element name="group-ref" type="xsd:IDREF" />
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:ID" use="required" />

@@ -17,11 +17,16 @@ public class Resource {
    * The type of resource.
    */
   private final ResourceType type;
-
   /**
    * Resource identifier.
    */
   private final String uri;
+  /**
+   * Used to skip minimization during pre processing. Useful when you know that the resource is already minimized and no
+   * minimization is needed. Default value is true.
+   */
+  private boolean minimize = true;
+
   /**
    * Constructor.
    *
@@ -84,6 +89,22 @@ public class Resource {
   }
 
   /**
+   * @return the minimize
+   */
+  public boolean isMinimize() {
+    return this.minimize;
+  }
+
+
+  /**
+   * @param minimize the minimize to set
+   */
+  public void setMinimize(final boolean minimize) {
+    this.minimize = minimize;
+  }
+
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -111,6 +132,6 @@ public class Resource {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this).append("uri", uri).toString();
+    return new ToStringBuilder(this).append("uri", uri).append("minimize", minimize).toString();
   }
 }
