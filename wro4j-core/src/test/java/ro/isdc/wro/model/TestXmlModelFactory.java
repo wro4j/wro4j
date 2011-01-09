@@ -4,6 +4,9 @@
 package ro.isdc.wro.model;
 
 import java.io.InputStream;
+import java.util.List;
+
+import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -14,7 +17,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
+import ro.isdc.wro.model.resource.Resource;
 
 /**
  * TestProcessor.java.
@@ -84,6 +89,27 @@ public class TestXmlModelFactory {
     };
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.getInstance();
+    LOG.debug("model: " + model);
+  }
+
+
+  @Test
+  public void testMinimizeAttributePresence() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("wro-minimizeAttribute.xml");
+      }
+    };
+    //the uriLocator factory doesn't have any locators set...
+    final WroModel model = factory.getInstance();
+    final Group group = model.getGroupByName(model.getGroupNames().get(0));
+    final List<Resource> resourceList = group.getResources();
+    LOG.debug("resources: " + resourceList);
+    Assert.assertEquals(false, resourceList.get(0).isMinimize());
+    Assert.assertEquals(true, resourceList.get(1).isMinimize());
+    Assert.assertEquals(true, resourceList.get(2).isMinimize());
     LOG.debug("model: " + model);
   }
 }

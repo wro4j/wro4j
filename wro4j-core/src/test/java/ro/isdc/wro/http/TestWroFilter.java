@@ -171,10 +171,6 @@ public class TestWroFilter {
       protected WroManagerFactory getWroManagerFactory() {
         return factory;
       }
-
-      /**
-       * {@inheritDoc}
-       */
       @Override
       protected boolean isDebug() {
         return true;
@@ -186,7 +182,7 @@ public class TestWroFilter {
   @Test
   public void testValidAppFactoryClassNameIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(filter.PARAM_MANAGER_FACTORY)).thenReturn(
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_MANAGER_FACTORY)).thenReturn(
       ServletContextAwareWroManagerFactory.class.getName());
     filter.init(config);
   }
@@ -195,7 +191,7 @@ public class TestWroFilter {
   @Test
   public void testJmxDisabled()
     throws Exception {
-    Mockito.when(config.getInitParameter(filter.PARAM_JMX_ENABLED)).thenReturn("false");
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_JMX_ENABLED)).thenReturn("false");
     filter.init(config);
   }
 

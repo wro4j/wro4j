@@ -30,8 +30,12 @@ public class SemicolonAppenderPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
-      IOUtils.copy(reader, writer);
-      writer.write(';');
+      final String content = IOUtils.toString(reader);
+      writer.write(content);
+      // check if the last character is a semicolon and append only if one is missing.
+      if (!content.matches("(?is).*;[\\s\\r\\n]*$")) {
+        writer.write(';');
+      }
     } finally {
       reader.close();
       writer.close();

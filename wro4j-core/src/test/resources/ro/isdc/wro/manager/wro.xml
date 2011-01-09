@@ -44,5 +44,13 @@
   
   <group name="wildcardResources">
     <js>classpath:ro/isdc/wro/manager/wildcard/*.js</js>
+  </group>
+  
+  <group name="resourceMinimizeFalse">
+    <js minimize="false">classpath:ro/isdc/wro/manager/sample.js</js>
+  </group>  
+  
+  <group name="resourceMinimizeTrue">
+    <js>classpath:ro/isdc/wro/manager/sample.js</js>
   </group>  
 </groups>

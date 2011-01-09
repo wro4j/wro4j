@@ -290,6 +290,13 @@ public abstract class AbstractGroupsProcessor {
    * Add a {@link ResourcePostProcessor}.
    */
   public void addPostProcessor(final ResourcePostProcessor processor) {
+    if (processor.getClass().isAnnotationPresent(Minimize.class)) {
+      //TODO move large messages to properties file
+      LOG.warn("It is recommended to add minimize aware processors to " +
+      		"pre processors instead of post processor, otherwise you " +
+      		"won't be able to disable minimization on specific resources " +
+      		"using minimize='false' attribute.");
+    }
     postProcessors.add(processor);
   }
 
