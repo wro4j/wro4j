@@ -67,6 +67,8 @@ public class GroupsProcessor
     if (type == null) {
       throw new IllegalArgumentException("ResourceType cannot be null!");
     }
+    //Supress spurious duplicate resource detection on reload
+    getDuplicateResourceDetector().reset();
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache

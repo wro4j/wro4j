@@ -118,16 +118,22 @@ public abstract class PreProcessorExecutor {
     }
     for (final ResourcePreProcessor processor : processors) {
       writer = new StringWriter();
-      LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
-      processor.process(resource, reader, writer);
+
+      //skip minimize validation if resource doesn't want to be minimized
+      final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
+      if (applyProcessor) {
+        LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
+        processor.process(resource, reader, writer);
+      } else {
+        IOUtils.copy(reader, writer);
+        LOG.debug("skipped processing on resource: " + resource);
+      }
       reader = new StringReader(writer.toString());
     }
     return writer.toString();
   }
 
   /**
-   * @param resource
-   *          {@link Resource} for which a Reader should be returned.
    * @param resources
    *          the list of all resources to be processed in this context. This is necessary in order to detect
    *          duplicates.

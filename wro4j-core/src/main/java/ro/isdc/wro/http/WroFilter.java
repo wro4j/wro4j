@@ -367,10 +367,10 @@ public class WroFilter
         throw new WroRuntimeException("Invalid header init-param value: " + headerParam
           + ". A correct value should have the following format: "
           + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
-          + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | ETag: 123456789", e);
+          + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
       }
     }
-    LOG.info("Header Values :" + headersMap);
+    LOG.debug("Header Values: " + headersMap);
   }
 
 

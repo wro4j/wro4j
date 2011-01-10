@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +23,16 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
@@ -36,7 +42,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.encoding.CharsetToolkit;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -49,6 +54,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class TestWroManager
     extends AbstractWroTest {
+  private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
   private WroManager manager;
 
   @Before
@@ -106,15 +112,27 @@ public class TestWroManager
   }
 
   @Test
-  public void testRepeatedResourcesShouldBeSkipped()
+  public void testDuplicatedResourcesShouldBeSkipped()
       throws IOException {
     genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
 
   @Test
-  public void testWildcardRepeatedResourcesShouldBeSkiped()
+  public void testWildcardDuplicatedResourcesShouldBeSkiped()
       throws IOException {
     genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
+  }
+
+  @Test
+  public void testMinimizeAttributeIsFalseOnResource()
+      throws IOException {
+    genericProcessAndCompare("/resourceMinimizeFalse.js", "classpath:ro/isdc/wro/manager/sample.js");
+  }
+
+  @Test
+  public void testMinimizeAttributeIsTrueOnResource()
+      throws IOException {
+    genericProcessAndCompare("/resourceMinimizeTrue.js", "classpath:ro/isdc/wro/manager/sample.min.js");
   }
 
 //  @Test
@@ -146,7 +164,6 @@ public class TestWroManager
     final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
     final String encoding = CharsetToolkit.guessEncoding(expectedInputStream).toString();
     expectedInputStream.reset();
-    //Assert.assertArrayEquals(IOUtils.toByteArray(expectedInputStream), out.toByteArray());
     WroTestUtils.compare(IOUtils.toString(expectedInputStream, encoding), IOUtils.toString(actualInputStream, encoding));
     expectedInputStream.close();
     actualInputStream.close();
@@ -156,11 +173,26 @@ public class TestWroManager
   public void processValidModel()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
 
-    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-        Mockito.mock(FilterConfig.class)));
+    //Test also that ETag header value contains quotes
+    Mockito.doAnswer(new Answer<Void>() {
+      public Void answer(final InvocationOnMock invocation)
+        throws Throwable {
+        LOG.debug("Header: " + Arrays.toString(invocation.getArguments()));
+        final Object[] arguments = invocation.getArguments();
+        if (HttpHeader.ETAG.toString().equals(arguments[0])) {
+          final String etagHeaderValue = (String) arguments[1];
+          Assert.assertTrue(etagHeaderValue.matches("\".*?\""));
+        }
+        return null;
+      }
+    }).when(response).setHeader(Mockito.anyString(), Mockito.anyString());
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
     manager.process();
+
   }
 
   @Test
@@ -206,7 +238,7 @@ public class TestWroManager
     return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() {
-        return getResourceAsStream(WroUtil.toPackageAsFolder(TestWroManager.class) + "/wro.xml");
+        return TestWroManager.class.getResourceAsStream("wro.xml");
       }
     };
   }

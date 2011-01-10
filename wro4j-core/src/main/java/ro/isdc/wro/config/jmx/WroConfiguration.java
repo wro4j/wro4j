@@ -195,6 +195,7 @@ public final class WroConfiguration
    */
   @Override
   public String toString() {
-  	return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("debug", debug).append("gzipEnabled", gzipEnabled).append(
+      "cacheUpdatePeriod", this.cacheUpdatePeriod).append("modelUpdatePeriod", this.modelUpdatePeriod).toString();
   }
 }
