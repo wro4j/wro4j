@@ -134,8 +134,6 @@ public abstract class PreProcessorExecutor {
   }
 
   /**
-   * @param resource
-   *          {@link Resource} for which a Reader should be returned.
    * @param resources
    *          the list of all resources to be processed in this context. This is necessary in order to detect
    *          duplicates.
