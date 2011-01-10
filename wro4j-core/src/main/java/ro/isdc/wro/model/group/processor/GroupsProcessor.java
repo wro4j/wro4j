@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
@@ -37,6 +38,8 @@ public class GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
   @Inject
   private ProcessorsFactory processorsFactory;
+  @Inject
+  private DuplicateResourceDetector duplicateResourceDetector;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
@@ -56,6 +59,8 @@ public class GroupsProcessor {
     if (type == null) {
       throw new IllegalArgumentException("ResourceType cannot be null!");
     }
+    //Supress spurious duplicate resource detection on reload
+    duplicateResourceDetector.reset();
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
