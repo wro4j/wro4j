@@ -6,6 +6,11 @@ package ro.isdc.wro.model.resource.processor;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.model.group.processor.Minimize;
+
 
 /**
  * Default implementation of processors factory. Holds processors in an array list and provide methods which allow
@@ -16,6 +21,7 @@ import java.util.Collection;
  */
 public class SimpleProcessorsFactory
   implements ProcessorsFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(SimpleProcessorsFactory.class);
   /**
    * a list of pre processors.
    */
@@ -77,6 +83,13 @@ public class SimpleProcessorsFactory
    * Add a {@link ResourcePostProcessor}.
    */
   public SimpleProcessorsFactory addPostProcessor(final ResourcePostProcessor processor) {
+    if (processor.getClass().isAnnotationPresent(Minimize.class)) {
+      //TODO move large messages to properties file
+      LOG.warn("It is recommended to add minimize aware processors to " +
+          "pre processors instead of post processor, otherwise you " +
+          "won't be able to disable minimization on specific resources " +
+          "using minimize='false' attribute.");
+    }
     postProcessors.add(processor);
     return this;
   }
