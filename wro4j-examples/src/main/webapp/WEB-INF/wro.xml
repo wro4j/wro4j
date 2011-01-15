@@ -10,13 +10,11 @@
   
   <group name="all">
     <group-ref>jquery</group-ref>
-  <!-- 
     <group-ref>twitterBar</group-ref>
     <group-ref>dynamicResource</group-ref>
     <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
     <group-ref>dwr</group-ref>
-    -->
 	</group>
 
   <group name="problem">
@@ -97,12 +95,6 @@
     <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
     <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
     <js>/static/module/syntaxHighlighter/scripts/*.js</js>
-    <!--
-    
-    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/shBrushJScript.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/shBrushAppleScript.js</js>  
-    -->
 	  <css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
   </group>
 </groups>
