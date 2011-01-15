@@ -91,10 +91,12 @@ public abstract class PreProcessorExecutor {
 
 
   /**
+   * TODO: refactor this method.
+   * <p/>
    * Apply a list of preprocessors on a resource.
+   *
    * @param resource the {@link Resource} on which processors will be applied
-   * @param resources
-   *          the list of all resources to be processed in this context.
+   * @param resources the list of all resources to be processed in this context.
    * @param processors the list of processor to apply on the resource.
    */
   private String applyPreProcessors(final Resource resource, final List<Resource> resources, final Collection<ResourcePreProcessor> processors)
@@ -104,35 +106,39 @@ public abstract class PreProcessorExecutor {
     Reader reader = null;
     Writer writer = new StringWriter();
     try {
-      reader = getResourceReader(resource, resources);
-    } catch (final IOException e) {
-      LOG.warn("Invalid resource found: " + resource);
-      if (ignoreMissingResources()) {
-        return writer.toString();
-      } else {
-        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
-        throw e;
+      try {
+        reader = getResourceReader(resource, resources);
+      } catch (final IOException e) {
+        LOG.warn("Invalid resource found: " + resource);
+        if (ignoreMissingResources()) {
+          return writer.toString();
+        } else {
+          LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
+          throw e;
+        }
       }
-    }
-    if (processors.isEmpty()) {
-      IOUtils.copy(reader, writer);
-      return writer.toString();
-    }
-    for (final ResourcePreProcessor processor : processors) {
-      writer = new StringWriter();
-
-      //skip minimize validation if resource doesn't want to be minimized
-      final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
-      if (applyProcessor) {
-        LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
-        processor.process(resource, reader, writer);
-      } else {
+      if (processors.isEmpty()) {
         IOUtils.copy(reader, writer);
-        LOG.debug("skipped processing on resource: " + resource);
+        return writer.toString();
       }
-      reader = new StringReader(writer.toString());
+      for (final ResourcePreProcessor processor : processors) {
+        writer = new StringWriter();
+        // skip minimize validation if resource doesn't want to be minimized
+        final boolean applyProcessor = resource.isMinimize()
+          || !processor.getClass().isAnnotationPresent(Minimize.class);
+        if (applyProcessor) {
+          LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
+          processor.process(resource, reader, writer);
+        } else {
+          IOUtils.copy(reader, writer);
+          LOG.debug("skipped processing on resource: " + resource);
+        }
+        reader = new StringReader(writer.toString());
+      }
+      return writer.toString();
+    } finally {
+      reader.close();
     }
-    return writer.toString();
   }
 
   /**
