@@ -10,6 +10,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.util.WroTestUtils;
+
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
  *
