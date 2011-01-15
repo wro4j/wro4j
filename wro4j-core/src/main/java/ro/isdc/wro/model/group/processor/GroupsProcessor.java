@@ -59,6 +59,7 @@ public class GroupsProcessor {
     if (type == null) {
       throw new IllegalArgumentException("ResourceType cannot be null!");
     }
+
     //Supress spurious duplicate resource detection on reload
     duplicateResourceDetector.reset();
     final StopWatch stopWatch = new StopWatch();
