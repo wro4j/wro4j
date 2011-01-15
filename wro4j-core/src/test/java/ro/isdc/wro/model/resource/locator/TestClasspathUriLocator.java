@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
@@ -58,7 +59,7 @@ public class TestClasspathUriLocator {
 
   @Test
   public void testWildcard1Resources() throws IOException {
-    uriLocator.locate(createUri("*.css"));
+    WroTestUtils.compare(uriLocator.locate(createUri("ro/isdc/wro/http/*.merged")), uriLocator.locate(createUri("ro/isdc/wro/http/*.css")));
   }
 
   @Test
