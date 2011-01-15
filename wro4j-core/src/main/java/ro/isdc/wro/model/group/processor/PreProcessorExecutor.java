@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,9 +151,9 @@ public abstract class PreProcessorExecutor {
       }
       is = uriLocatorFactory.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
-      return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
+      return new BufferedReader(new InputStreamReader(new AutoCloseInputStream(
+        new SmartEncodingInputStream(is))));
     } finally {
-      is.close();
       duplicateResourceDetector.reset();
     }
   }
