@@ -98,6 +98,7 @@ public abstract class PreProcessorExecutor {
    */
   private String applyPreProcessors(final Resource resource, final List<Resource> resources, final Collection<ResourcePreProcessor> processors)
     throws IOException {
+    //TODO close reader & writer?
     // get original content
     Reader reader = null;
     Writer writer = new StringWriter();
@@ -141,15 +142,17 @@ public abstract class PreProcessorExecutor {
    */
   private Reader getResourceReader(final Resource resource, final List<Resource> resources)
       throws IOException {
+    InputStream is = null;
     try {
       // populate duplicate Resource detector with known used resource uri's
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      is = uriLocatorFactory.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
       return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
     } finally {
+      is.close();
       duplicateResourceDetector.reset();
     }
   }
