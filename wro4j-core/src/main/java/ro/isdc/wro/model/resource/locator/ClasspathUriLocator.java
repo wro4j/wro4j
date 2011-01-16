@@ -68,10 +68,7 @@ public class ClasspathUriLocator
     if (getWildcardStreamLocator().hasWildcard(location)) {
       return locateWildcardUri(uri, location);
     }
-    // TODO replace with ClassLoader.getSystemResourceAsStream(name) ?
-    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    // TODO check if this is needed
-    final InputStream is = classLoader.getResourceAsStream(location);
+    final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
       throw new IOException("Couldn't get InputStream from this resource: " + uri);
     }
