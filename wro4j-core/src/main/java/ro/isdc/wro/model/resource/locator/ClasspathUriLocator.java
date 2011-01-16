@@ -68,10 +68,7 @@ public class ClasspathUriLocator
     if (getWildcardStreamLocator().hasWildcard(location)) {
       return locateWildcardUri(uri, location);
     }
-    // TODO replace with ClassLoader.getSystemResourceAsStream(name) ?
-    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    // TODO check if this is needed
-    final InputStream is = classLoader.getResourceAsStream(location);
+    final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
       throw new IOException("Couldn't get InputStream from this resource: " + uri);
     }
@@ -84,10 +81,8 @@ public class ClasspathUriLocator
   private InputStream locateWildcardUri(final String uri, final String location)
       throws IOException {
     LOG.debug("wildcard detected for location: " + location);
-    // prefix with '/' because we use class relative resource retrieval. Using ClassLoader.getSystemResource doesn't
-    // work well.
-    final String fullPath = "/" + FilenameUtils.getFullPathNoEndSeparator(location);
-    final URL url = getClass().getResource(fullPath);
+    final String fullPath = FilenameUtils.getFullPath(location);
+    final URL url = Thread.currentThread().getContextClassLoader().getResource(fullPath);
     if (url == null) {
       final String message = "Couldn't get URL for the following path: " + fullPath;
       LOG.warn(message);

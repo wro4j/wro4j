@@ -95,16 +95,8 @@
     <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
     <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
     <js>/static/module/syntaxHighlighter/scripts/*.js</js>
-    <!--
-    
-    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/shBrushJScript.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/shBrushAppleScript.js</js>  
-    -->
 	  <css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
   </group>
-  
-  
   
   <group name="classpath">
     <css>classpath:com/mysite/myapplication/web/resources/*.css</css>
