@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,23 +103,22 @@ public abstract class PreProcessorExecutor {
     //TODO close reader & writer?
     // get original content
     Reader reader = null;
-    Writer writer = new StringWriter();
     try {
       try {
         reader = getResourceReader(resource, resources);
       } catch (final IOException e) {
         LOG.warn("Invalid resource found: " + resource);
         if (ignoreMissingResources()) {
-          return writer.toString();
+          return "";
         } else {
           LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
           throw e;
         }
       }
       if (processors.isEmpty()) {
-        IOUtils.copy(reader, writer);
-        return writer.toString();
+        return IOUtils.toString(reader);
       }
+      Writer writer = null;
       for (final ResourcePreProcessor processor : processors) {
         writer = new StringWriter();
         // skip minimize validation if resource doesn't want to be minimized
@@ -137,7 +135,10 @@ public abstract class PreProcessorExecutor {
       }
       return writer.toString();
     } finally {
-      reader.close();
+      if (reader != null) {
+        //it is important to close the reader here, otherwise some web servers will complain
+        reader.close();
+      }
     }
   }
 
@@ -157,8 +158,7 @@ public abstract class PreProcessorExecutor {
       }
       is = uriLocatorFactory.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
-      return new BufferedReader(new InputStreamReader(new AutoCloseInputStream(
-        new SmartEncodingInputStream(is))));
+      return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
     } finally {
       duplicateResourceDetector.reset();
     }
