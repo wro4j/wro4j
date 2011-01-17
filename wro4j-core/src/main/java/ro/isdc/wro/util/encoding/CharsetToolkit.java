@@ -1,7 +1,5 @@
 package ro.isdc.wro.util.encoding;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -263,28 +261,6 @@ public class CharsetToolkit {
     final byte[] buffer = IOUtils.toByteArray(inputStream);
     final CharsetToolkit toolkit = new CharsetToolkit(buffer);
     toolkit.setDefaultCharset(getDefaultSystemCharset());
-    return toolkit.guessEncoding();
-  }
-
-  public static Charset guessEncoding(final File f, final int bufferLength)
-      throws FileNotFoundException, IOException {
-    final FileInputStream fis = new FileInputStream(f);
-    final byte[] buffer = new byte[bufferLength];
-    fis.read(buffer);
-    fis.close();
-    final CharsetToolkit toolkit = new CharsetToolkit(buffer);
-    toolkit.setDefaultCharset(getDefaultSystemCharset());
-    return toolkit.guessEncoding();
-  }
-
-  public static Charset guessEncoding(final File f, final int bufferLength, final Charset defaultCharset)
-      throws FileNotFoundException, IOException {
-    final FileInputStream fis = new FileInputStream(f);
-    final byte[] buffer = new byte[bufferLength];
-    fis.read(buffer);
-    fis.close();
-    final CharsetToolkit toolkit = new CharsetToolkit(buffer);
-    toolkit.setDefaultCharset(defaultCharset);
     return toolkit.guessEncoding();
   }
 

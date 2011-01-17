@@ -10,6 +10,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.util.WroTestUtils;
+
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
  *
@@ -48,7 +50,7 @@ public class TestClasspathUriLocator {
 
   @Test
   public void testWildcard1Resources() throws IOException {
-    uriLocator.locate(createUri("*.css"));
+    WroTestUtils.compare(uriLocator.locate(createUri("ro/isdc/wro/http/*.merged")), uriLocator.locate(createUri("ro/isdc/wro/http/*.css")));
   }
 
   @Test

@@ -30,14 +30,14 @@ import java.util.regex.Pattern;
  * @author Richard Nichols
  */
 public class Lessify {
-  private static final Pattern PATTER_COLOR = Pattern.compile("#[0-9a-fA-F]{3,6}[^0-9a-fA-F]");
-  private static final Pattern PATTER_WORD_COLOR = Pattern.compile(getGiantCssColorRegex());
+  private static final Pattern PATTERN_COLOR = Pattern.compile("#[0-9a-fA-F]{3,6}[^0-9a-fA-F]");
+  private static final Pattern PATTERN_WORD_COLOR = Pattern.compile(getGiantCssColorRegex());
 
 
   public String variablizeColors(String css) {
     final Set<String> colors = new HashSet<String>();
     css = conformColors(css);
-    final Matcher m = PATTER_COLOR.matcher(css);
+    final Matcher m = PATTERN_COLOR.matcher(css);
     final Map<String, Integer> colorCount = new HashMap<String, Integer>();
     while (m.find()) {
       final String color = m.group().substring(1, m.group().length() - 1);
@@ -66,13 +66,13 @@ public class Lessify {
 
 
   public String conformColors(String css) {
-    Matcher m = PATTER_COLOR.matcher(css);
+    Matcher m = PATTERN_COLOR.matcher(css);
     final Map<String, String> colGroup = new HashMap<String, String>();
     while (m.find()) {
       final String color = m.group().substring(1, m.group().length() - 1);
       colGroup.put(m.group(), conformColor(color));
     }
-    m = PATTER_WORD_COLOR.matcher(css);
+    m = PATTERN_WORD_COLOR.matcher(css);
     while (m.find()) {
       final String color = m.group().substring(1, m.group().length() - 1);
       colGroup.put(m.group(), "#" + conformColor(color));

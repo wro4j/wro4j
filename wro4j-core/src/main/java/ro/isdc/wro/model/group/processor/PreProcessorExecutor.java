@@ -27,8 +27,8 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
 /**
- * TODO: refactor this class.
- * Apply all preProcessor on provided {@link Resource} and returns the result of execution as String.
+ * TODO: refactor this class. Apply all preProcessor on provided {@link Resource} and returns the result of execution as
+ * String.
  * <p>
  * This is useful when you want to preProcess a resource which is not a part of the model (css import use-case).
  *
@@ -42,6 +42,7 @@ public final class PreProcessorExecutor {
   private DuplicateResourceDetector duplicateResourceDetector;
   @Inject
   private ProcessorsFactory processorsFactory;
+
 
   /**
    * Apply preProcessors on resources and merge them.
@@ -61,24 +62,22 @@ public final class PreProcessorExecutor {
     return result.toString();
   }
 
+
   /**
    * Execute all the preProcessors on the provided resource.
    *
-   * @param resource
-   *          {@link Resource} to preProcess.
-   * @param resources
-   *          the list of all resources to be processed in this context.
-   * @param minimize
-   *          whether the minimize aware preProcessor must be applied.
+   * @param resource {@link Resource} to preProcess.
+   * @param resources the list of all resources to be processed in this context.
+   * @param minimize whether the minimize aware preProcessor must be applied.
    * @return the result of preProcessing as string content.
    */
   private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
     throws IOException {
-    //TODO: hold a list of processed resources in order to avoid duplicates
+    // TODO: hold a list of processed resources in order to avoid duplicates
 
     // merge preProcessorsBy type and anyPreProcessors
     Collection<ResourcePreProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
-        processorsFactory.getPreProcessors());
+      processorsFactory.getPreProcessors());
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
@@ -87,67 +86,76 @@ public final class PreProcessorExecutor {
 
 
   /**
+   * TODO: refactor this method.
+   * <p/>
    * Apply a list of preprocessors on a resource.
+   *
    * @param resource the {@link Resource} on which processors will be applied
-   * @param resources
-   *          the list of all resources to be processed in this context.
+   * @param resources the list of all resources to be processed in this context.
    * @param processors the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final List<Resource> resources, final Collection<ResourcePreProcessor> processors)
+  private String applyPreProcessors(final Resource resource, final List<Resource> resources,
+    final Collection<ResourcePreProcessor> processors)
     throws IOException {
+    // TODO close reader & writer?
     // get original content
     Reader reader = null;
-    Writer writer = new StringWriter();
     try {
-      reader = getResourceReader(resource, resources);
-    } catch (final IOException e) {
-      LOG.warn("Invalid resource found: " + resource);
-      final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
-      LOG.debug("IgnoreMissingResources: " + ignoreMissintResources);
-      if (ignoreMissintResources) {
-        return writer.toString();
-      } else {
-        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissintResources);
-        throw e;
+      try {
+        reader = getResourceReader(resource, resources);
+      } catch (final IOException e) {
+        LOG.warn("Invalid resource found: " + resource);
+        final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
+        LOG.debug("IgnoreMissingResources: " + ignoreMissintResources);
+        if (ignoreMissintResources) {
+          return "";
+        } else {
+          LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissintResources);
+          throw e;
+        }
       }
-    }
-    if (processors.isEmpty()) {
-      IOUtils.copy(reader, writer);
+      if (processors.isEmpty()) {
+        return IOUtils.toString(reader);
+      }
+      Writer writer = null;
+      for (final ResourcePreProcessor processor : processors) {
+        writer = new StringWriter();
+        // skip minimize validation if resource doesn't want to be minimized
+        final boolean applyProcessor = resource.isMinimize()
+          || !processor.getClass().isAnnotationPresent(Minimize.class);
+        if (applyProcessor) {
+          LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
+          processor.process(resource, reader, writer);
+        } else {
+          IOUtils.copy(reader, writer);
+          LOG.debug("skipped processing on resource: " + resource);
+        }
+        reader = new StringReader(writer.toString());
+      }
       return writer.toString();
-    }
-    for (final ResourcePreProcessor processor : processors) {
-      writer = new StringWriter();
-
-      //skip minimize validation if resource doesn't want to be minimized
-      final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
-      if (applyProcessor) {
-        LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
-        processor.process(resource, reader, writer);
-      } else {
-        IOUtils.copy(reader, writer);
-        LOG.debug("skipped processing on resource: " + resource);
+    } finally {
+      if (reader != null) {
+        // it is important to close the reader here, otherwise some web servers will complain
+        reader.close();
       }
-      reader = new StringReader(writer.toString());
     }
-    return writer.toString();
   }
 
+
   /**
-   * @param resource
-   *          {@link Resource} for which a Reader should be returned.
-   * @param resources
-   *          the list of all resources to be processed in this context. This is necessary in order to detect
-   *          duplicates.
+   * @param resources the list of all resources to be processed in this context. This is necessary in order to detect
+   *        duplicates.
    * @return a Reader for the provided resource.
    */
   private Reader getResourceReader(final Resource resource, final List<Resource> resources)
-      throws IOException {
+    throws IOException {
+    InputStream is = null;
     try {
       // populate duplicate Resource detector with known used resource uri's
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      is = uriLocatorFactory.locate(resource.getUri());
       // wrap reader with bufferedReader for top efficiency
       return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
     } finally {

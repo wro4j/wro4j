@@ -2,7 +2,7 @@
  * Defines print function. Used for debugging.
  */
 function print(message) {
-  java.lang.System.out.println(message);
+  org.slf4j.LoggerFactory.getLogger("Rhino").debug(message);	
 }
 /**
  * Defines array reduce function 
