@@ -1,6 +1,5 @@
 package ro.isdc.wro.model.group.processor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -101,7 +100,6 @@ public abstract class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final List<Resource> resources, final Collection<ResourcePreProcessor> processors)
     throws IOException {
     //TODO close reader & writer?
-    // get original content
     Reader reader = null;
     try {
       try {
@@ -131,12 +129,12 @@ public abstract class PreProcessorExecutor {
           IOUtils.copy(reader, writer);
           LOG.debug("skipped processing on resource: " + resource);
         }
+        reader.close();
         reader = new StringReader(writer.toString());
       }
       return writer.toString();
     } finally {
       if (reader != null) {
-        //it is important to close the reader here, otherwise some web servers will complain
         reader.close();
       }
     }
@@ -157,8 +155,7 @@ public abstract class PreProcessorExecutor {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
       is = uriLocatorFactory.locate(resource.getUri());
-      // wrap reader with bufferedReader for top efficiency
-      return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
+      return new InputStreamReader(new SmartEncodingInputStream(is));
     } finally {
       duplicateResourceDetector.reset();
     }
