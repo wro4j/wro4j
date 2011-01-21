@@ -24,6 +24,6 @@ public class UglifyJsProcessor extends BeautifyJsProcessor {
    */
   @Override
   protected UglifyJs newEngine() {
-    return new UglifyJs(true);
+    return UglifyJs.uglifyJs();
   }
 }

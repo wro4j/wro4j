@@ -78,8 +78,12 @@ public class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final InputStream script, final String sourceName) throws IOException {
-    context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
-    return this;
+    try {
+      context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+      return this;
+    } finally {
+      script.close();
+    }
   }
 
   /**
@@ -122,8 +126,12 @@ public class RhinoScriptBuilder {
    * @throws IOException
    */
   private Object evaluateScript(final InputStream script, final String sourceName)
-    throws IOException {
-    return context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+      throws IOException {
+    try {
+      return context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+    } finally {
+      script.close();
+    }
   }
 
   /**
@@ -141,6 +149,7 @@ public class RhinoScriptBuilder {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
     } finally {
+      script.close();
       Context.exit();
     }
   }

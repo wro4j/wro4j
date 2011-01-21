@@ -34,7 +34,7 @@ public class BeautifyJsProcessor
   /**
    * Engine.
    */
-  private UglifyJs engine;
+  private final UglifyJs engine;
 
   /**
    * Default constructor. Instantiates uglifyJs engine.
@@ -47,7 +47,7 @@ public class BeautifyJsProcessor
    * @return new instance of {@link UglifyJs} engine.
    */
   protected UglifyJs newEngine() {
-    return new UglifyJs(false);
+    return UglifyJs.beautifyJs();
   }
 
   /**
