@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,19 +66,19 @@ public class ClasspathUriLocator
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, "")).trim();
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
-      return new AutoCloseInputStream(locateWildcardUri(uri, location));
+      return locateWildcardStream(uri, location);
     }
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
       throw new IOException("Couldn't get InputStream from this resource: " + uri);
     }
-    return new AutoCloseInputStream(is);
+    return is;
   }
 
   /**
    * @return an input stream for an uri containing a wildcard for a given location.
    */
-  private InputStream locateWildcardUri(final String uri, final String location)
+  private InputStream locateWildcardStream(final String uri, final String location)
       throws IOException {
     LOG.debug("wildcard detected for location: " + location);
     // prefix with '/' because we use class relative resource retrieval. Using ClassLoader.getSystemResource doesn't
