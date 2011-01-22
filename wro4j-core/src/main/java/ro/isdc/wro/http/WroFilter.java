@@ -434,7 +434,7 @@ public class WroFilter
    */
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
     final FilterChain chain) {
-    LOG.debug("runtime exception occured", e);
+    LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);

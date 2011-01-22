@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,13 +67,13 @@ public class ClasspathUriLocator
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, "")).trim();
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
-      return locateWildcardUri(uri, location);
+      return new AutoCloseInputStream(locateWildcardUri(uri, location));
     }
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
       throw new IOException("Couldn't get InputStream from this resource: " + uri);
     }
-    return is;
+    return new AutoCloseInputStream(is);
   }
 
   /**
