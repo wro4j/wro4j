@@ -66,7 +66,7 @@ public class ClasspathUriLocator
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, "")).trim();
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
-      return locateWildcardUri(uri, location);
+      return locateWildcardStream(uri, location);
     }
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
@@ -78,7 +78,7 @@ public class ClasspathUriLocator
   /**
    * @return an input stream for an uri containing a wildcard for a given location.
    */
-  private InputStream locateWildcardUri(final String uri, final String location)
+  private InputStream locateWildcardStream(final String uri, final String location)
       throws IOException {
     LOG.debug("wildcard detected for location: " + location);
     // prefix with '/' because we use class relative resource retrieval. Using ClassLoader.getSystemResource doesn't
