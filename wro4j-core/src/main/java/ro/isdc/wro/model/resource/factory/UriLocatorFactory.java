@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * @author Alex Objelean
  * @created Created on Nov 4, 2008
  */
-public final class UriLocatorFactory {
+public class UriLocatorFactory {
   private static final Logger LOG = LoggerFactory.getLogger(UriLocatorFactory.class);
   private final List<UriLocator> uriLocators = new ArrayList<UriLocator>();
   private final DuplicateResourceDetector duplicateResourceDetector;
@@ -52,7 +53,7 @@ public final class UriLocatorFactory {
       throw new IOException("No locator is capable of handling uri: " + uri);
     }
     LOG.debug("locating uri: " + uri + ", using locator: " + uriLocator);
-    return uriLocator.locate(uri);
+    return new AutoCloseInputStream(uriLocator.locate(uri));
   }
 
 
