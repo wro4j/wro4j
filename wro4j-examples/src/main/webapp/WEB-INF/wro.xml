@@ -98,8 +98,6 @@
 	  <css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
   </group>
   
-  
-  
   <group name="classpath">
     <css>classpath:com/mysite/myapplication/web/resources/*.css</css>
     <js>classpath:com/mysite/myapplication/web/resources/*.js</js>
