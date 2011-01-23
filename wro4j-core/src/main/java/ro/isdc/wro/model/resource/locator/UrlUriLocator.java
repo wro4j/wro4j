@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +64,6 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
       throw new IllegalArgumentException("uri cannot be NULL!");
     }
     LOG.debug("Reading uri: " + uri);
-
     try {
       if (getWildcardStreamLocator().hasWildcard(uri)) {
         final String fullPath = FilenameUtils.getFullPath(uri);
@@ -76,6 +76,6 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     }
 
     final URL url = new URL(uri);
-    return url.openStream();
+    return new BufferedInputStream(url.openStream());
   }
 }

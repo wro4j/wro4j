@@ -1,9 +1,7 @@
 package ro.isdc.wro.model.group.processor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -97,67 +95,53 @@ public final class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final List<Resource> resources,
     final Collection<ResourcePreProcessor> processors)
     throws IOException {
-    // TODO close reader & writer?
-    // get original content
-    Reader reader = null;
-    try {
-      try {
-        reader = getResourceReader(resource, resources);
-      } catch (final IOException e) {
-        LOG.warn("Invalid resource found: " + resource);
-        final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
-        LOG.debug("IgnoreMissingResources: " + ignoreMissintResources);
-        if (ignoreMissintResources) {
-          return "";
-        } else {
-          LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissintResources);
-          throw e;
-        }
-      }
-      if (processors.isEmpty()) {
-        return IOUtils.toString(reader);
-      }
-      Writer writer = null;
-      for (final ResourcePreProcessor processor : processors) {
-        writer = new StringWriter();
-        // skip minimize validation if resource doesn't want to be minimized
-        final boolean applyProcessor = resource.isMinimize()
-          || !processor.getClass().isAnnotationPresent(Minimize.class);
-        if (applyProcessor) {
-          LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
-          processor.process(resource, reader, writer);
-        } else {
-          IOUtils.copy(reader, writer);
-          LOG.debug("skipped processing on resource: " + resource);
-        }
-        reader = new StringReader(writer.toString());
-      }
-      return writer.toString();
-    } finally {
-      if (reader != null) {
-        // it is important to close the reader here, otherwise some web servers will complain
-        reader.close();
-      }
+    String resourceContent = getResourceContent(resource, resources);
+    if (processors.isEmpty()) {
+      return resourceContent;
     }
+    Writer writer = null;
+    for (final ResourcePreProcessor processor : processors) {
+      writer = new StringWriter();
+      // skip minimize validation if resource doesn't want to be minimized
+      final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
+      if (applyProcessor) {
+        LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
+        final Reader reader = new StringReader(resourceContent);
+        processor.process(resource, reader, writer);
+        reader.close();
+      } else {
+        writer.write(resourceContent);
+        LOG.debug("skipped processing on resource: " + resource);
+      }
+      resourceContent = writer.toString();
+    }
+    return writer.toString();
   }
 
 
   /**
-   * @param resources the list of all resources to be processed in this context. This is necessary in order to detect
-   *        duplicates.
    * @return a Reader for the provided resource.
    */
-  private Reader getResourceReader(final Resource resource, final List<Resource> resources)
+  private String getResourceContent(final Resource resource, final List<Resource> resources)
     throws IOException {
-    InputStream is = null;
     try {
       // populate duplicate Resource detector with known used resource uri's
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-      is = uriLocatorFactory.locate(resource.getUri());
-      // wrap reader with bufferedReader for top efficiency
-      return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
+      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      final String result = IOUtils.toString(new SmartEncodingInputStream(is));
+      is.close();
+      return result;
+    } catch (final IOException e) {
+      LOG.warn("Invalid resource found: " + resource);
+      final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
+      if (ignoreMissintResources) {
+        return "";
+      } else {
+        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissintResources);
+        throw e;
+      }
     } finally {
       duplicateResourceDetector.reset();
     }

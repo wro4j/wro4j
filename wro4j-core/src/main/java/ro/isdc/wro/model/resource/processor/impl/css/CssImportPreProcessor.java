@@ -128,7 +128,6 @@ public class CssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    // Check if @Scanner#findWithinHorizon can be used instead
     final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()));
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {

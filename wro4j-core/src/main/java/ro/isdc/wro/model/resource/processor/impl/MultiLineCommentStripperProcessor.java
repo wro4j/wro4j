@@ -22,30 +22,36 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-public class MultiLineCommentStripperProcessor implements ResourcePreProcessor,
-    ResourcePostProcessor {
+public class MultiLineCommentStripperProcessor
+  implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * Pattern containing a regex matching multiline comments & empty new lines.
    */
-  public static Pattern PATTERN = Pattern.compile("[\\t ]*/\\*.*?\\*/\\r\\n?",
-      Pattern.DOTALL);
+  public static Pattern PATTERN = Pattern.compile("[\\t ]*/\\*.*?\\*/\\r\\n?", Pattern.DOTALL);
+
 
   /**
    * {@inheritDoc}
    */
   public void process(final Reader source, final Writer destination)
-      throws IOException {
-    final String content = IOUtils.toString(source);
-    String result = PATTERN.matcher(content).replaceAll("");
-    result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
-    destination.write(result);
+    throws IOException {
+    try {
+      final String content = IOUtils.toString(source);
+      String result = PATTERN.matcher(content).replaceAll("");
+      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
+      destination.write(result);
+    } finally {
+      source.close();
+      destination.close();
+    }
   }
+
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader,
-      final Writer writer) throws IOException {
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
     // resourceUri doesn't matter
     process(reader, writer);
   }

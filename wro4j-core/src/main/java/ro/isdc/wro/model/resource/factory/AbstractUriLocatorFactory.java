@@ -6,6 +6,7 @@ package ro.isdc.wro.model.resource.factory;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,6 @@ public abstract class AbstractUriLocatorFactory implements UriLocatorFactory {
     if (uriLocator == null) {
       throw new IOException("No locator is capable of handling uri: " + uri);
     }
-    return uriLocator.locate(uri);
+    return new AutoCloseInputStream(uriLocator.locate(uri));
   }
 }

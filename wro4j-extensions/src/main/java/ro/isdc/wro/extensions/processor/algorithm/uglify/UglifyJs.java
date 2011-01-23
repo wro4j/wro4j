@@ -24,12 +24,26 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class UglifyJs {
   private static final Logger LOG = LoggerFactory.getLogger(UglifyJs.class);
-  private boolean uglify;
+  private final boolean uglify;
   /**
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice formatted).
    */
-  public UglifyJs(final boolean uglify) {
+  private UglifyJs(final boolean uglify) {
     this.uglify = uglify;
+  }
+
+  /**
+   * Factory method for creating the uglifyJs engine.
+   */
+  public static UglifyJs uglifyJs() {
+    return new UglifyJs(true);
+  }
+
+  /**
+   * Factory method for creating the beautifyJs engine.
+   */
+  public static UglifyJs beautifyJs() {
+    return new UglifyJs(false);
   }
 
   /**
@@ -49,6 +63,8 @@ public class UglifyJs {
         SCRIPT_JSON).evaluateChain(parseStream, SCRIPT_PARSE).evaluateChain(processStream, SCRIPT_PROCESS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
+    } finally {
+
     }
   }
 
