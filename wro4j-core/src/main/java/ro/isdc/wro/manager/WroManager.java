@@ -293,7 +293,9 @@ public class WroManager
 
       final String content = groupsProcessor.process(groupAsList, type, minimize);
       contentHashEntry = getContentHashEntryByContent(content);
-      cacheStrategy.put(cacheEntry, contentHashEntry);
+      if (!Context.get().getConfig().isDisableCache()) {
+        cacheStrategy.put(cacheEntry, contentHashEntry);
+      }
     }
     return contentHashEntry;
   }

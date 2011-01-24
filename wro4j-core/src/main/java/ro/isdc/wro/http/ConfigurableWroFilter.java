@@ -20,7 +20,7 @@ public class ConfigurableWroFilter extends WroFilter {
   private String mbeanName;
   private long cacheUpdatePeriod = 0;
   private long modelUpdatePeriod = 0;
-
+  private boolean disableCache;
   /**
    * {@inheritDoc}
    */
@@ -28,6 +28,23 @@ public class ConfigurableWroFilter extends WroFilter {
   protected boolean isDebug() {
     return debug;
   }
+
+  /**
+   * @return the disableCache
+   */
+  @Override
+  public boolean isDisableCache() {
+    return this.disableCache;
+  }
+
+  /**
+   * @param disableCache the disableCache to set
+   */
+  public void setDisableCache(final boolean disableCache) {
+    this.disableCache = disableCache;
+  }
+
+
 
   /**
    * {@inheritDoc}
