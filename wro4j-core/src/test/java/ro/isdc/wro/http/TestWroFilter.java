@@ -251,6 +251,24 @@ public class TestWroFilter {
     Assert.assertEquals(true, filter.getWroConfiguration().isDebug());
   }
 
+  @Test
+  public void testDisableCacheInitParamInDeploymentMode()
+    throws Exception {
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_DISABLE_CACHE)).thenReturn("true");
+    filter.init(config);
+    Assert.assertEquals(false, filter.getWroConfiguration().isDebug());
+    Assert.assertEquals(false, filter.getWroConfiguration().isDisableCache());
+  }
+
+  @Test
+  public void testDisableCacheInitParamInDevelopmentMode()
+    throws Exception {
+    Mockito.when(config.getInitParameter(WroFilter.PARAM_DISABLE_CACHE)).thenReturn("true");
+    filter.init(config);
+    Assert.assertEquals(true, filter.getWroConfiguration().isDebug());
+    Assert.assertEquals(true, filter.getWroConfiguration().isDisableCache());
+  }
 
   /**
    * Check what happens when the request cannot be processed and assure that the we proceed with chain.

@@ -44,6 +44,12 @@ public final class WroConfiguration
    */
   private boolean ignoreMissingResources = true;
   /**
+   * Flag which will force no caching of the processed content only in DEVELOPMENT mode. In DEPLOYMENT mode changing
+   * this flag will have no effect.
+   */
+  private boolean disableCache;
+
+  /**
    * Listeners for the change of cache & model period properties.
    */
   private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
@@ -202,6 +208,21 @@ public final class WroConfiguration
   }
 
   /**
+   * @return the disableCache
+   */
+  public boolean isDisableCache() {
+    //disable cache only if you are in DEVELOPMENT mode (aka debug)
+    return this.disableCache && debug;
+  }
+
+  /**
+   * @param disableCache the disableCache to set
+   */
+  public void setDisableCache(final boolean disableCache) {
+    this.disableCache = disableCache;
+  }
+
+  /**
    * Perform the cleanup, clear the listeners.
    */
   public void destroy() {
@@ -214,7 +235,8 @@ public final class WroConfiguration
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("debug", debug).append("gzipEnabled", gzipEnabled).append(
-      "cacheUpdatePeriod", this.cacheUpdatePeriod).append("modelUpdatePeriod", this.modelUpdatePeriod).toString();
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("debug", isDebug()).append("gzipEnabled",
+      isGzipEnabled()).append("cacheUpdatePeriod", getCacheUpdatePeriod()).append("modelUpdatePeriod",
+      getModelUpdatePeriod()).append("disableCache", isDisableCache()).toString();
   }
 }
