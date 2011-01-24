@@ -77,6 +77,11 @@ public class WroFilter
    */
   static final String PARAM_GZIP_RESOURCES = "gzipResources";
   /**
+   * Disable cache configuration option. When true, the processed content won't be cached in DEVELOPMENT mode. In
+   * DEPLOYMENT mode changing this flag will have no effect.
+   */
+  static final String PARAM_DISABLE_CACHE = "disableCache";
+  /**
    * Parameter containing an integer value for specifying how often (in seconds) the cache should be refreshed.
    */
   static final String PARAM_CACHE_UPDATE_PERIOD = "cacheUpdatePeriod";
@@ -287,6 +292,7 @@ public class WroFilter
     config.setDebug(isDebug());
     config.setCacheUpdatePeriod(getCacheUpdatePeriod());
     config.setModelUpdatePeriod(getModelUpdatePeriod());
+    config.setDisableCache(isDisableCache());
   }
 
 
@@ -299,6 +305,15 @@ public class WroFilter
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     return gzipResources;
+  }
+
+  /**
+   * @return flag value configured by filter config init parameter.
+   */
+  protected boolean isDisableCache() {
+    final String paramValue = filterConfig.getInitParameter(PARAM_DISABLE_CACHE);
+    final boolean flag = paramValue == null ? false : Boolean.valueOf(paramValue);
+    return flag;
   }
 
 
