@@ -206,9 +206,6 @@ public class WroManager
     //enclose etag value in quotes to be compliant with the RFC
     final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
 
-    //add content length
-    response.setContentLength(contentHashEntry.getContent().length());
-
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
       LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
           + " status code");
@@ -217,6 +214,8 @@ public class WroManager
       return EMPTY_STREAM;
     }
     if (contentHashEntry.getContent() != null) {
+      //add content length
+      response.setContentLength(contentHashEntry.getContent().length());
       // make the input stream encoding aware.
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());
     }
