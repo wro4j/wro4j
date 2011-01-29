@@ -133,12 +133,12 @@ public class WroManager
     // TODO move API related checks into separate class and determine filter mapping for better mapping
     if (matchesUrl(request, API_RELOAD_CACHE)) {
       Context.get().getConfig().reloadCache();
-      preventCacheResponse(response);
+      WroUtil.addNoCacheHeaders(response);
       return;
     }
     if (matchesUrl(request, API_RELOAD_MODEL)) {
       Context.get().getConfig().reloadModel();
-      preventCacheResponse(response);
+      WroUtil.addNoCacheHeaders(response);
       return;
     }
     if (isProxyResourceRequest(request)) {
@@ -155,19 +155,6 @@ public class WroManager
     is.close();
     os.close();
   }
-
-
-  /**
-   * Prevent the response to be cached by browser by adding some header attributes.
-   *
-   * @param response {@link HttpServletResponse} to prevent cache.
-   */
-  private void preventCacheResponse(final HttpServletResponse response) {
-    response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
-    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
-    response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
-  }
-
 
   /**
    * Check if the request path matches the provided api path.
@@ -233,6 +220,7 @@ public class WroManager
     final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
     //enclose etag value in quotes to be compliant with the RFC
     final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
+
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
       LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
         + " status code");
@@ -241,6 +229,8 @@ public class WroManager
       return EMPTY_STREAM;
     }
     if (contentHashEntry.getContent() != null) {
+      //add content length
+      response.setContentLength(contentHashEntry.getContent().length());
       // make the input stream encoding aware.
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());
     }
