@@ -100,7 +100,7 @@ public class WroFilter
   /**
    * Default value used by Cache-control header.
    */
-  private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
+  private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
   /**
    * Filter config.
    */
@@ -359,14 +359,14 @@ public class WroFilter
    */
   private void initHeaderValues() {
     // put defaults
-    final Long timestamp = new Date().getTime();
-    final Calendar cal = Calendar.getInstance();
-    cal.roll(Calendar.YEAR, 10);
-
-    headersMap.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-    headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
-    headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
-
+    if (!wroConfiguration.isDebug()) {
+      final Long timestamp = new Date().getTime();
+      final Calendar cal = Calendar.getInstance();
+      cal.roll(Calendar.YEAR, 1);
+      headersMap.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
+      headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
+      headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+    }
     final String headerParam = filterConfig.getInitParameter(PARAM_HEADER);
     if (headerParam != null) {
       try {
@@ -470,6 +470,10 @@ public class WroFilter
     // Force resource caching as best as possible
     for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
       response.setHeader(entry.getKey(), entry.getValue());
+    }
+    //prevent caching when in development mode
+    if (wroConfiguration.isDebug()) {
+      WroUtil.addNoCacheHeaders(response);
     }
   }
 
