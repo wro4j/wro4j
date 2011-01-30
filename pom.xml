@@ -197,6 +197,12 @@
 		  </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.dependency}</version>
+				<scope>test</scope>
+			</dependency>			      
+			<dependency>
+				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
 				<version>${mockito.dependency}</version>
 				<scope>test</scope>

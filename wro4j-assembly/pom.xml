@@ -18,6 +18,8 @@
 			<artifactId>wro4j-extensions</artifactId>
 			<exclusions>
 				<exclusion>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-all</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -29,7 +31,7 @@
 		<!-- Other Dependencies -->
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
+			<artifactId>mockito-core</artifactId>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
