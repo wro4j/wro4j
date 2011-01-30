@@ -23,19 +23,27 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.OptionDef;
+import org.kohsuke.args4j.spi.BooleanOptionHandler;
+import org.kohsuke.args4j.spi.OptionHandler;
+import org.kohsuke.args4j.spi.Parameters;
+import org.kohsuke.args4j.spi.Setter;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -47,25 +55,71 @@ import com.google.common.base.Preconditions;
  */
 public class Main {
   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+  public static class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor> {
+    public CompressorOptionHandler(final CmdLineParser parser, final OptionDef option,
+      final Setter<? super ResourcePreProcessor> setter) {
+      super(parser, option, setter);
+    }
+
+
+    @Override
+    public String getDefaultMetaVariable() {
+      return null;
+    }
+
+
+    @Override
+    public int parseArguments(final Parameters params)
+      throws CmdLineException {
+      if (option.isArgument()) {
+        final String valueStr = params.getParameter(0).toLowerCase();
+        System.out.println("parse value: " + valueStr);
+      }
+      setter.addValue(new JSMinProcessor());
+      return 0;
+    }
+
+  }
+
   public static class Options {
-    @Option(name="-minimize", usage="Turns minimization on or off")
+    @Option(name = "-minimize", handler = BooleanOptionHandler.class, usage = "Turns minimization on or off")
     private boolean minimize = true;
-    @Option(name="-targetGroups")
+    @Option(name = "-targetGroups")
     private String targetGroups;
-    @Option(name="-ignoreMissingResources")
+    @Option(name = "-ignoreMissingResources", usage = "If false, processing will not continue if there is at least one missing resource")
     private boolean ignoreMissingResources = true;
-    @Option(name="-wroFile")
+    @Option(name = "-wroFile")
     private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
-    @Option(name="-contextFolder")
+    @Option(name = "-contextFolder")
     private File contextFolder = new File(System.getProperty("user.dir"));
-    @Option(name="-destinationFolder")
+    @Option(name = "-destinationFolder")
     private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
+    @Option(name = "-compressor", handler = CompressorOptionHandler.class)
+    private ResourcePreProcessor compressor;
+
+    /**
+     * @return the compressor
+     */
+    public ResourcePreProcessor getCompressor() {
+      return this.compressor;
+    }
+
+
+    /**
+     * @param compressor the compressor to set
+     */
+    public void setCompressor(final ResourcePreProcessor compressor) {
+      this.compressor = compressor;
+    }
+
+
     /**
      * @return the destinationFolder
      */
     public File getDestinationFolder() {
       return this.destinationFolder;
     }
+
 
     /**
      * @param destinationFolder the destinationFolder to set
@@ -74,12 +128,14 @@ public class Main {
       this.destinationFolder = destinationFolder;
     }
 
+
     /**
      * @return the contextFolder
      */
     public File getContextFolder() {
       return this.contextFolder;
     }
+
 
     /**
      * @param contextFolder the contextFolder to set
@@ -88,12 +144,14 @@ public class Main {
       this.contextFolder = contextFolder;
     }
 
+
     /**
      * @return the ignoreMissingResources
      */
     public boolean isIgnoreMissingResources() {
       return this.ignoreMissingResources;
     }
+
 
     /**
      * @param ignoreMissingResources the ignoreMissingResources to set
@@ -102,12 +160,14 @@ public class Main {
       this.ignoreMissingResources = ignoreMissingResources;
     }
 
+
     /**
      * @return the wroFile
      */
     public File getWroFile() {
       return this.wroFile;
     }
+
 
     /**
      * @param wroFile the wroFile to set
@@ -116,12 +176,14 @@ public class Main {
       this.wroFile = wroFile;
     }
 
+
     /**
      * @return the minimize
      */
     public boolean isMinimize() {
       return this.minimize;
     }
+
 
     /**
      * @param minimize the minimize to set
@@ -130,6 +192,7 @@ public class Main {
       this.minimize = minimize;
     }
 
+
     /**
      * @return the targetGroups
      */
@@ -137,12 +200,14 @@ public class Main {
       return this.targetGroups;
     }
 
+
     /**
      * @param targetGroups the targetGroups to set
      */
     public void setTargetGroups(final String targetGroups) {
       this.targetGroups = targetGroups;
     }
+
 
     /**
      * {@inheritDoc}
@@ -153,18 +218,17 @@ public class Main {
     }
   }
 
-  public static void main(final String[] args) throws Exception {
+
+  public static void main(final String[] args)
+    throws Exception {
     final Options options = new Options();
     final CmdLineParser parser = new CmdLineParser(options);
     try {
-      System.out.println("Options: " + options);
-      System.err.println("start argument parsing");
-      System.err.println("arguments are: " + Arrays.toString(args));
       parser.parseArgument(args);
+      System.out.println("Options: " + options);
       new Main(options).process();
     } catch (final CmdLineException e) {
       System.err.println(e.getMessage());
-      e.printStackTrace();
       parser.printUsage(System.err);
       return;
     }
@@ -174,10 +238,12 @@ public class Main {
   private File cssDestinationFolder;
   private File jsDestinationFolder;
 
+
   public Main(final Options options) {
     Preconditions.checkNotNull(options);
     this.options = options;
   }
+
 
   public void process() {
     try {
@@ -199,6 +265,7 @@ public class Main {
     }
   }
 
+
   /**
    * @return a list containing all groups needs to be processed.
    */
@@ -209,6 +276,7 @@ public class Main {
     }
     return Arrays.asList(options.getTargetGroups().split(","));
   }
+
 
   /**
    * Computes the destination folder based on resource type.
@@ -254,28 +322,28 @@ public class Main {
     try {
       LOG.info("processing group: " + group);
 
-      //mock request
+      // mock request
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       Mockito.when(request.getRequestURI()).thenReturn(group);
-      //mock response
+      // mock response
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
-      //init context
+      // init context
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-      //perform processing
+      // perform processing
       getManagerFactory().getInstance().process();
-      //encode version & write result to file
+      // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       destinationFile.createNewFile();
-      //allow the same stream to be read again
+      // allow the same stream to be read again
       resultInputStream.reset();
       LOG.debug("Created file: " + destinationFile.getName());
 
       final OutputStream fos = new FileOutputStream(destinationFile);
-      //use reader to detect encoding
+      // use reader to detect encoding
       IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
       fos.close();
       LOG.info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
@@ -284,8 +352,7 @@ public class Main {
         LOG.info("No content found for group: " + group);
         destinationFile.delete();
       } else {
-        LOG.info(destinationFile.getAbsolutePath()
-          + " (" + destinationFile.length() + "bytes" + ") has been created!");
+        LOG.info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
       }
     } finally {
       if (resultOutputStream != null) {
@@ -296,6 +363,7 @@ public class Main {
       }
     }
   }
+
 
   /**
    * Encodes a version using some logic.
@@ -317,11 +385,17 @@ public class Main {
    * @return {@link WroManagerFactory} implementation.
    */
   private StandaloneContextAwareManagerFactory getManagerFactory() {
-    final StandaloneContextAwareManagerFactory managerFactory = new GoogleStandaloneManagerFactory();
+    final StandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
+      @Override
+      protected void configureProcessors(final GroupsProcessor groupsProcessor) {
+        groupsProcessor.addPreProcessor(options.getCompressor());
+      }
+    };
     // initialize before process.
     managerFactory.initialize(createStandaloneContext());
     return managerFactory;
   }
+
 
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.

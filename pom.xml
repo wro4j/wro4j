@@ -227,8 +227,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-	  <scope>test</scope>
+      <artifactId>mockito-core</artifactId>
+	    <scope>test</scope>
       <version>${mockito.dependency}</version>
     </dependency>		
 	</dependencies>
