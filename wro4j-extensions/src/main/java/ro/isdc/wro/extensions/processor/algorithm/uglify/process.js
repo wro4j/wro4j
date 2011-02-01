@@ -1352,7 +1352,8 @@ function gen_code(ast, beautify) {
                                         var key = p[0], val = make(p[1]);
                                         if (beautify && beautify.quote_keys) {
                                                 key = make_string(key);
-                                        } else if (typeof key == "number" || !beautify && +key + "" == key) {
+                                        } else if ((typeof key == "number" || !beautify && +key + "" == key)
+                                                   && parseFloat(key) >= 0) {
                                                 key = make_num(+key);
                                         } else if (!is_identifier(key)) {
                                                 key = make_string(key);
@@ -1445,8 +1446,16 @@ function gen_code(ast, beautify) {
                         var stat = statements[i];
                         var code = make(stat);
                         if (code != ";") {
-                                if (!beautify && i == last)
-                                        code = code.replace(/;+\s*$/, "");
+                                if (!beautify && i == last) {
+                                        if ((stat[0] == "while" && empty(stat[2])) ||
+                                            (member(stat[0], [ "for", "for-in"] ) && empty(stat[4])) ||
+                                            (stat[0] == "if" && empty(stat[2]) && !stat[3]) ||
+                                            (stat[0] == "if" && stat[3] && empty(stat[3]))) {
+                                                code = code.replace(/;*\s*$/, ";");
+                                        } else {
+                                                code = code.replace(/;+\s*$/, "");
+                                        }
+                                }
                                 a.push(code);
                         }
                 }
@@ -1502,47 +1511,43 @@ function gen_code(ast, beautify) {
 };
 
 function split_lines(code, max_line_length) {
-        var next_token = jsp.tokenizer(code, false);
-        var last_split = 0;
-        var this_token;
-        var prev_token;
-        var was_split;
         var splits = [ 0 ];
-        function current_length() {
-                return this_token.pos - last_split;
-        };
-        function split_here() {
-                was_split = true;
-                last_split = this_token.pos;
-                splits.push(last_split);
-        };
-        while (true) {
-                prev_token = this_token;
-                this_token = next_token();
-                if (this_token.type == "eof") break;
-                // don't split if the previos token was a keyword.
-                // this should shield us from the "no newline allowed after return" etc.
-                was_split = false;
-                if (prev_token) {
-                        if (prev_token.type == "keyword") {
-                                continue;
+        jsp.parse(function(){
+                var next_token = jsp.tokenizer(code);
+                var last_split = 0;
+                var prev_token;
+                function current_length(tok) {
+                        return tok.pos - last_split;
+                };
+                function split_here(tok) {
+                        last_split = tok.pos;
+                        splits.push(last_split);
+                };
+                function custom(){
+                        var tok = next_token.apply(this, arguments);
+                        out: {
+                                if (prev_token) {
+                                        if (prev_token.type == "keyword") break out;
+                                }
+                                if (current_length(tok) > max_line_length) {
+                                        switch (tok.type) {
+                                            case "keyword":
+                                            case "atom":
+                                            case "name":
+                                            case "punc":
+                                                split_here(tok);
+                                                break out;
+                                        }
+                                }
                         }
-                        if (prev_token.type == "comment1") {
-                                last_split = this_token.pos;
-                                continue;
-                        }
-                }
-                if (current_length() > max_line_length) {
-                        switch (this_token.type) {
-                            case "keyword":
-                            case "atom":
-                            case "name":
-                            case "punc":
-                                split_here();
-                                break;
-                        }
-                }
-        }
+                        prev_token = tok;
+                        return tok;
+                };
+                custom.context = function() {
+                        return next_token.context.apply(this, arguments);
+                };
+                return custom;
+        }());
         return splits.map(function(pos, i){
                 return code.substring(pos, splits[i + 1] || code.length);
         }).join("\n");
