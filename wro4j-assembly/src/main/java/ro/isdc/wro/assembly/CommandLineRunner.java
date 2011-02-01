@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -20,14 +21,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.OptionDef;
-import org.kohsuke.args4j.spi.BooleanOptionHandler;
-import org.kohsuke.args4j.spi.OptionHandler;
-import org.kohsuke.args4j.spi.Parameters;
-import org.kohsuke.args4j.spi.Setter;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,186 +44,51 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
-import com.google.common.base.Preconditions;
-
 
 /**
  * @author Alex Objelean
  */
-public class Main {
-  private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-  public static class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor> {
-    public CompressorOptionHandler(final CmdLineParser parser, final OptionDef option,
-      final Setter<? super ResourcePreProcessor> setter) {
-      super(parser, option, setter);
-    }
-
-
-    @Override
-    public String getDefaultMetaVariable() {
-      return null;
-    }
-
-
-    @Override
-    public int parseArguments(final Parameters params)
-      throws CmdLineException {
-      if (option.isArgument()) {
-        final String valueStr = params.getParameter(0).toLowerCase();
-        System.out.println("parse value: " + valueStr);
-      }
-      setter.addValue(new JSMinProcessor());
-      return 0;
-    }
-
-  }
-
-  public static class Options {
-    @Option(name = "-minimize", handler = BooleanOptionHandler.class, usage = "Turns minimization on or off")
-    private boolean minimize = true;
-    @Option(name = "-targetGroups")
-    private String targetGroups;
-    @Option(name = "-ignoreMissingResources", usage = "If false, processing will not continue if there is at least one missing resource")
-    private boolean ignoreMissingResources = true;
-    @Option(name = "-wroFile")
-    private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
-    @Option(name = "-contextFolder")
-    private File contextFolder = new File(System.getProperty("user.dir"));
-    @Option(name = "-destinationFolder")
-    private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
-    @Option(name = "-compressor", handler = CompressorOptionHandler.class)
-    private ResourcePreProcessor compressor;
-
-    /**
-     * @return the compressor
-     */
-    public ResourcePreProcessor getCompressor() {
-      return this.compressor;
-    }
-
-
-    /**
-     * @param compressor the compressor to set
-     */
-    public void setCompressor(final ResourcePreProcessor compressor) {
-      this.compressor = compressor;
-    }
-
-
-    /**
-     * @return the destinationFolder
-     */
-    public File getDestinationFolder() {
-      return this.destinationFolder;
-    }
-
-
-    /**
-     * @param destinationFolder the destinationFolder to set
-     */
-    public void setDestinationFolder(final File destinationFolder) {
-      this.destinationFolder = destinationFolder;
-    }
-
-
-    /**
-     * @return the contextFolder
-     */
-    public File getContextFolder() {
-      return this.contextFolder;
-    }
-
-
-    /**
-     * @param contextFolder the contextFolder to set
-     */
-    public void setContextFolder(final File contextFolder) {
-      this.contextFolder = contextFolder;
-    }
-
-
-    /**
-     * @return the ignoreMissingResources
-     */
-    public boolean isIgnoreMissingResources() {
-      return this.ignoreMissingResources;
-    }
-
-
-    /**
-     * @param ignoreMissingResources the ignoreMissingResources to set
-     */
-    public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
-      this.ignoreMissingResources = ignoreMissingResources;
-    }
-
-
-    /**
-     * @return the wroFile
-     */
-    public File getWroFile() {
-      return this.wroFile;
-    }
-
-
-    /**
-     * @param wroFile the wroFile to set
-     */
-    public void setWroFile(final File wroFile) {
-      this.wroFile = wroFile;
-    }
-
-
-    /**
-     * @return the minimize
-     */
-    public boolean isMinimize() {
-      return this.minimize;
-    }
-
-
-    /**
-     * @param minimize the minimize to set
-     */
-    public void setMinimize(final boolean minimize) {
-      this.minimize = minimize;
-    }
-
-
-    /**
-     * @return the targetGroups
-     */
-    public String getTargetGroups() {
-      return this.targetGroups;
-    }
-
-
-    /**
-     * @param targetGroups the targetGroups to set
-     */
-    public void setTargetGroups(final String targetGroups) {
-      this.targetGroups = targetGroups;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-      return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
-  }
+public class CommandLineRunner {
+  private static final Logger LOG = LoggerFactory.getLogger(CommandLineRunner.class);
+  @Option(name = "-m", aliases = { "--minimize" }, usage = "When this option is present, the minimization is turned on")
+  private boolean minimize;
+  @Option(name = "-targetGroups")
+  private String targetGroups;
+  @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "When this option is present, the missing resources are ignored")
+  private boolean ignoreMissingResources;
+  @Option(name = "-wroFile")
+  private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
+  @Option(name = "-contextFolder")
+  private File contextFolder = new File(System.getProperty("user.dir"));
+  @Option(name = "-destinationFolder")
+  private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
+  @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Alias of the compressor to process scripts")
+  private ResourcePreProcessor compressor = new JSMinProcessor();
+  @Argument
+  private List<String> arguments = new ArrayList<String>();
+  private File cssDestinationFolder;
+  private File jsDestinationFolder;
 
 
   public static void main(final String[] args)
     throws Exception {
-    final Options options = new Options();
-    final CmdLineParser parser = new CmdLineParser(options);
+//    final InputStreamReader reader = new InputStreamReader(System.in);
+//    final BufferedReader in = new BufferedReader(reader);
+//    final String[] inArgs = in.readLine().split(" ");
+    new CommandLineRunner().doMain(args);
+  }
+
+
+  /**
+   * @param args
+   */
+  public void doMain(final String[] args) {
+    final CmdLineParser parser = new CmdLineParser(this);
+    parser.setUsageWidth(120);
     try {
       parser.parseArgument(args);
-      System.out.println("Options: " + options);
-      new Main(options).process();
+      //System.out.println("Options: " + this);
+      process();
     } catch (final CmdLineException e) {
       System.err.println(e.getMessage());
       parser.printUsage(System.err);
@@ -234,22 +96,11 @@ public class Main {
     }
   }
 
-  private Options options;
-  private File cssDestinationFolder;
-  private File jsDestinationFolder;
 
-
-  public Main(final Options options) {
-    Preconditions.checkNotNull(options);
-    this.options = options;
-  }
-
-
-  public void process() {
+  private void process() {
     try {
-      if (!options.getWroFile().exists()) {
-        throw new WroRuntimeException("No wro.xml file found at this location: "
-          + options.getWroFile().getAbsolutePath());
+      if (!wroFile.exists()) {
+        throw new WroRuntimeException("No wro.xml file found at this location: " + wroFile.getAbsolutePath());
       }
       Context.set(Context.standaloneContext());
       final Collection<String> groupsAsList = getTargetGroupsAsList();
@@ -270,11 +121,11 @@ public class Main {
    * @return a list containing all groups needs to be processed.
    */
   private List<String> getTargetGroupsAsList() {
-    if (options.getTargetGroups() == null) {
+    if (targetGroups == null) {
       final WroModel model = getManagerFactory().getInstance().getModel();
       return model.getGroupNames();
     }
-    return Arrays.asList(options.getTargetGroups().split(","));
+    return Arrays.asList(targetGroups.split(","));
   }
 
 
@@ -286,7 +137,7 @@ public class Main {
    * @throws MojoExecutionException if computed folder is null.
    */
   private File computeDestinationFolder(final ResourceType resourceType) {
-    File folder = options.getDestinationFolder();
+    File folder = destinationFolder;
     if (resourceType == ResourceType.JS) {
       if (jsDestinationFolder != null) {
         folder = jsDestinationFolder;
@@ -388,7 +239,7 @@ public class Main {
     final StandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
       @Override
       protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-        groupsProcessor.addPreProcessor(options.getCompressor());
+        groupsProcessor.addPreProcessor(compressor);
       }
     };
     // initialize before process.
@@ -402,10 +253,18 @@ public class Main {
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolder(options.getContextFolder());
-    runContext.setMinimize(options.isMinimize());
-    runContext.setWroFile(options.getWroFile());
-    runContext.setIgnoreMissingResources(options.isIgnoreMissingResources());
+    runContext.setContextFolder(contextFolder);
+    runContext.setMinimize(minimize);
+    runContext.setWroFile(wroFile);
+    runContext.setIgnoreMissingResources(ignoreMissingResources);
     return runContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }
