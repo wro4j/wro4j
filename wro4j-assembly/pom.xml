@@ -51,7 +51,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>ro.isdc.wro.assembly.Main</mainClass>
+							<mainClass>ro.isdc.wro.assembly.CommandLineRunner</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

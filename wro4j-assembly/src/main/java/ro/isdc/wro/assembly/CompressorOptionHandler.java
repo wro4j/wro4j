@@ -41,7 +41,7 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put("jsMin", new JSMinProcessor());
-    map.put("yuiJsMin", new YUIJsCompressorProcessor());
+    map.put("yuiJsMin", new YUIJsCompressorProcessor(false));
     map.put("yuiJsMinAdvanced", new YUIJsCompressorProcessor(true));
     map.put("uglifyJs", new UglifyJsProcessor());
     map.put("beautifyJs", new BeautifyJsProcessor());
