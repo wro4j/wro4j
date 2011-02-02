@@ -12,6 +12,8 @@ import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
@@ -31,7 +33,9 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @author Alex Objelean
  */
 public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor> {
-  Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+  private static final Logger LOG = LoggerFactory.getLogger(CompressorOptionHandler.class);
+
+  private Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
 
   public CompressorOptionHandler(final CmdLineParser parser, final OptionDef option,
     final Setter<? super ResourcePreProcessor> setter) {
@@ -61,16 +65,14 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
   @Override
   public int parseArguments(final Parameters params)
     throws CmdLineException {
-    System.out.println("parseArgument");
-    System.out.println("params: " + params);
-    System.out.println("option.isArgument: " + option.isArgument());
     final String value = params.getParameter(0);
+    LOG.debug("compressor argument: " + value);
     final ResourcePreProcessor processor = map.get(value);
     if (processor == null) {
       throw new CmdLineException("No compressor defined for alias: " + value + ". Available alias are: " + map.keySet());
     }
     setter.addValue(processor);
-    return 0;
+    return 1;
   }
 
 }
