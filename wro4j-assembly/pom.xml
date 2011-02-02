@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
-	<artifactId>wro4j-assembly</artifactId>
+	<artifactId>wro4j-runner</artifactId>
 	<packaging>jar</packaging>
 	<name>Web Resource Optimizer Extensions</name>
 	<parent>
@@ -51,7 +51,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>ro.isdc.wro.assembly.CommandLineRunner</mainClass>
+							<mainClass>ro.isdc.wro.runner.Wro4jCommandLineRunner</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

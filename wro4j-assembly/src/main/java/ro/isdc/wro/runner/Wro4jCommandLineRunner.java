@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.assembly;
+package ro.isdc.wro.runner;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,7 +22,6 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.mockito.Mockito;
@@ -40,34 +39,39 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
 /**
+ * Default command line runner. Interprets arguments and perform a processing.
+ *
  * @author Alex Objelean
  */
-public class CommandLineRunner {
-  private static final Logger LOG = LoggerFactory.getLogger(CommandLineRunner.class);
-  @Option(name = "-m", aliases = { "--minimize" }, usage = "When this option is present, the minimization is turned on")
+public class Wro4jCommandLineRunner {
+  private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
+  @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
-  @Option(name = "-targetGroups")
+  @Option(name = "-targetGroups", metaVar = "GROUPS",usage = "Comma separated name of the groups from wro.xml to process.")
   private String targetGroups;
-  @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "When this option is present, the missing resources are ignored")
+  @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
-  @Option(name = "-wroFile")
+  @Option(name = "-wroFile", metaVar = "PATH_TO_WRO.XML", usage="The path to the wro.xml. By default this is the user current folder.")
   private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
-  @Option(name = "-contextFolder")
+  @Option(name = "-contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private File contextFolder = new File(System.getProperty("user.dir"));
-  @Option(name = "-destinationFolder")
+  @Option(name = "-destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
   private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
-  @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Alias of the compressor to process scripts")
+  @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Name of the compressor to process scripts")
   private ResourcePreProcessor compressor = new JSMinProcessor();
   @Argument
   private List<String> arguments = new ArrayList<String>();
-  private File cssDestinationFolder;
-  private File jsDestinationFolder;
 
 
   public static void main(final String[] args)
@@ -75,7 +79,7 @@ public class CommandLineRunner {
 //    final InputStreamReader reader = new InputStreamReader(System.in);
 //    final BufferedReader in = new BufferedReader(reader);
 //    final String[] inArgs = in.readLine().split(" ");
-    new CommandLineRunner().doMain(args);
+    new Wro4jCommandLineRunner().doMain(args);
   }
 
 
@@ -87,12 +91,14 @@ public class CommandLineRunner {
     parser.setUsageWidth(120);
     try {
       parser.parseArgument(args);
-      //System.out.println("Options: " + this);
+      System.out.println("Options: " + this);
       process();
-    } catch (final CmdLineException e) {
-      System.err.println(e.getMessage());
+    } catch (final Exception e) {
+      System.err.println(e.getMessage() + "\n\n");
+      System.err.println("=======================================");
+      System.err.println("ARGUMENTS");
+      System.err.println("=======================================");
       parser.printUsage(System.err);
-      return;
     }
   }
 
@@ -103,10 +109,13 @@ public class CommandLineRunner {
         throw new WroRuntimeException("No wro.xml file found at this location: " + wroFile.getAbsolutePath());
       }
       Context.set(Context.standaloneContext());
+      //create destinationFolder if needed
+      if (!destinationFolder.exists()) {
+        destinationFolder.mkdirs();
+      }
       final Collection<String> groupsAsList = getTargetGroupsAsList();
       for (final String group : groupsAsList) {
         for (final ResourceType resourceType : ResourceType.values()) {
-          final File destinationFolder = computeDestinationFolder(resourceType);
           final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
           processGroup(groupWithExtension, destinationFolder);
         }
@@ -126,38 +135,6 @@ public class CommandLineRunner {
       return model.getGroupNames();
     }
     return Arrays.asList(targetGroups.split(","));
-  }
-
-
-  /**
-   * Computes the destination folder based on resource type.
-   *
-   * @param resourceType {@link ResourceType} to process.
-   * @return destinationFoder where the result of resourceType will be copied.
-   * @throws MojoExecutionException if computed folder is null.
-   */
-  private File computeDestinationFolder(final ResourceType resourceType) {
-    File folder = destinationFolder;
-    if (resourceType == ResourceType.JS) {
-      if (jsDestinationFolder != null) {
-        folder = jsDestinationFolder;
-      }
-    }
-    if (resourceType == ResourceType.CSS) {
-      if (cssDestinationFolder != null) {
-        folder = cssDestinationFolder;
-      }
-    }
-    LOG.info("folder: " + folder);
-    if (folder == null) {
-      throw new RuntimeException("Couldn't compute destination folder for resourceType: " + resourceType
-        + ". That means that you didn't define one of the following parameters: "
-        + "destinationFolder, cssDestinationFolder, jsDestinationFolder");
-    }
-    if (!folder.exists()) {
-      folder.mkdirs();
-    }
-    return folder;
   }
 
 
@@ -239,6 +216,11 @@ public class CommandLineRunner {
     final StandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
       @Override
       protected void configureProcessors(final GroupsProcessor groupsProcessor) {
+        groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
+        groupsProcessor.addPreProcessor(new CssImportPreProcessor());
+        groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
+        groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
+        groupsProcessor.addPreProcessor(new JawrCssMinifierProcessor());
         groupsProcessor.addPreProcessor(compressor);
       }
     };

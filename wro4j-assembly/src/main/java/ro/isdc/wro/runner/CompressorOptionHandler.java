@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.assembly;
+package ro.isdc.wro.runner;
 
 import java.util.HashMap;
 import java.util.Map;
