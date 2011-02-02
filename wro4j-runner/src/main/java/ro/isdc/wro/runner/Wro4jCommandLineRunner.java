@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.mockito.Mockito;
@@ -58,11 +56,11 @@ public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
   @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
-  @Option(name = "-targetGroups", metaVar = "GROUPS",usage = "Comma separated name of the groups from wro.xml to process.")
+  @Option(name = "-targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
   private String targetGroups;
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
-  @Option(name = "-wroFile", metaVar = "PATH_TO_WRO.XML", usage="The path to the wro.xml. By default this is the user current folder.")
+  @Option(name = "-wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro.xml. By default this is the user current folder.")
   private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
   @Option(name = "-contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private File contextFolder = new File(System.getProperty("user.dir"));
@@ -70,15 +68,13 @@ public class Wro4jCommandLineRunner {
   private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
   @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Name of the compressor to process scripts")
   private ResourcePreProcessor compressor = new JSMinProcessor();
-  @Argument
-  private List<String> arguments = new ArrayList<String>();
 
 
   public static void main(final String[] args)
     throws Exception {
-//    final InputStreamReader reader = new InputStreamReader(System.in);
-//    final BufferedReader in = new BufferedReader(reader);
-//    final String[] inArgs = in.readLine().split(" ");
+    // final InputStreamReader reader = new InputStreamReader(System.in);
+    // final BufferedReader in = new BufferedReader(reader);
+    // final String[] inArgs = in.readLine().split(" ");
     new Wro4jCommandLineRunner().doMain(args);
   }
 
@@ -109,7 +105,7 @@ public class Wro4jCommandLineRunner {
         throw new WroRuntimeException("No wro.xml file found at this location: " + wroFile.getAbsolutePath());
       }
       Context.set(Context.standaloneContext());
-      //create destinationFolder if needed
+      // create destinationFolder if needed
       if (!destinationFolder.exists()) {
         destinationFolder.mkdirs();
       }
@@ -241,6 +237,7 @@ public class Wro4jCommandLineRunner {
     runContext.setIgnoreMissingResources(ignoreMissingResources);
     return runContext;
   }
+
 
   /**
    * {@inheritDoc}
