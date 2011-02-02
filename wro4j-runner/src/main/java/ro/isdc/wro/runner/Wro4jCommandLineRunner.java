@@ -3,10 +3,12 @@
  */
 package ro.isdc.wro.runner;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,6 +46,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -57,15 +60,15 @@ public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
   @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
-  @Option(name = "-targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
+  @Option(name = "--targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
   private String targetGroups;
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
-  @Option(name = "-wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro.xml. By default this is the user current folder.")
+  @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro.xml. By default this is the user current folder.")
   private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
-  @Option(name = "-contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
+  @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private File contextFolder = new File(System.getProperty("user.dir"));
-  @Option(name = "-destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
+  @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
   private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
   @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Name of the compressor to process scripts")
   private ResourcePreProcessor compressor = new JSMinProcessor();
@@ -73,10 +76,18 @@ public class Wro4jCommandLineRunner {
 
   public static void main(final String[] args)
     throws Exception {
-    // final InputStreamReader reader = new InputStreamReader(System.in);
-    // final BufferedReader in = new BufferedReader(reader);
-    // final String[] inArgs = in.readLine().split(" ");
-    new Wro4jCommandLineRunner().doMain(args);
+    new Wro4jCommandLineRunner().doMain(inputArguments());
+  }
+
+
+  /**
+   * Used to read argument from standard input.
+   */
+  static String[] inputArguments()
+    throws IOException {
+    final InputStreamReader reader = new InputStreamReader(System.in);
+    final BufferedReader in = new BufferedReader(reader);
+    return in.readLine().split(" ");
   }
 
 
@@ -86,6 +97,8 @@ public class Wro4jCommandLineRunner {
   public void doMain(final String[] args) {
     final CmdLineParser parser = new CmdLineParser(this);
     parser.setUsageWidth(80);
+    final StopWatch watch = new StopWatch();
+    watch.start("processing");
     try {
       parser.parseArgument(args);
       LOG.debug("Options: " + this);
@@ -96,6 +109,9 @@ public class Wro4jCommandLineRunner {
       System.err.println("ARGUMENTS");
       System.err.println("=======================================");
       parser.printUsage(System.err);
+    } finally {
+      watch.stop();
+      LOG.info("Processing took: {}ms",  watch.getLastTaskTimeMillis());
     }
   }
 
