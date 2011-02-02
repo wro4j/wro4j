@@ -33,8 +33,8 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
   @Override
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
     map.put("yuiCssMin", new YUICssCompressorProcessor());
-    map.put("yuiJsMin", new YUIJsCompressorProcessor(false));
-    map.put("yuiJsMinAdvanced", new YUIJsCompressorProcessor(true));
+    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
+    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
     map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
     map.put("uglifyJs", new UglifyJsProcessor());
     map.put("beautifyJs", new BeautifyJsProcessor());
@@ -51,8 +51,8 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
   @Override
   protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
     map.put("yuiCssMin", new YUICssCompressorProcessor());
-    map.put("yuiJsMin", new YUIJsCompressorProcessor(false));
-    map.put("yuiJsMinAdvanced", new YUIJsCompressorProcessor(true));
+    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
+    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
     map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
     map.put("uglifyJs", new UglifyJsProcessor());
     map.put("beautifyJs", new BeautifyJsProcessor());

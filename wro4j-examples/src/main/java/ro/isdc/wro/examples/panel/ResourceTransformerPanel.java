@@ -165,8 +165,8 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new JSMinProcessor());
       list.add(new GoogleClosureCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-      list.add(new YUIJsCompressorProcessor(true));
-      list.add(new YUIJsCompressorProcessor(false));
+      list.add(YUIJsCompressorProcessor.doMungeCompressor());
+      list.add(YUIJsCompressorProcessor.noMungeCompressor());
       return list;
     }
     //inspect the classpath

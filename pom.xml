@@ -61,7 +61,7 @@
 	<properties>
     <commons-io.dependency>2.0.1</commons-io.dependency>
     <commons-lang.dependency>2.5</commons-lang.dependency>       
-    <slf4j.dependency>1.6.0</slf4j.dependency>    
+    <slf4j.dependency>1.6.1</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>
     <junit.dependency>4.8.2</junit.dependency>    
@@ -78,6 +78,7 @@
 		<module>wro4j-extensions</module>
     <module>wro4j-maven-plugin</module>  
     <module>wro4j-examples</module>        
+    <module>wro4j-runner</module>  
   </modules>
 
 	<dependencyManagement>
@@ -93,12 +94,11 @@
 				<artifactId>wro4j-extensions</artifactId>
 				<version>${project.version}</version>
 			</dependency>    
-			<dependency>
+      <dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-test-utils</artifactId>
+				<artifactId>wro4j-runner</artifactId>
 				<version>${project.version}</version>
-        <scope>test</scope>
-			</dependency>
+			</dependency>    
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>wro4j-maven-plugin</artifactId>
@@ -180,11 +180,6 @@
       </dependency>
 			<!-- Third Party Tools -->			
 			<dependency>
-				<groupId>com.yahoo.platform.yui</groupId>
-				<artifactId>yuicompressor</artifactId>
-				<version>2.4.2</version>
-			</dependency>			
-			<dependency>
 				<groupId>rhino</groupId>
 				<artifactId>js</artifactId>
 				<version>1.7R2</version>
@@ -200,6 +195,12 @@
         <version>${junit.dependency}</version>
         <scope>test</scope>
 		  </dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.dependency}</version>
+				<scope>test</scope>
+			</dependency>			      
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
@@ -226,8 +227,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-	  <scope>test</scope>
+      <artifactId>mockito-core</artifactId>
+	    <scope>test</scope>
       <version>${mockito.dependency}</version>
     </dependency>		
 	</dependencies>
@@ -294,7 +295,7 @@
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin>			
+			-->  
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -345,7 +346,7 @@
         </property>
       </activation>
 
-      <build>
+      <build>      
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

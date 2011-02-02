@@ -31,7 +31,7 @@ public class YUIServletContextAwareWroManagerFactory extends ServletContextAware
     factory.addPreProcessor(new BomStripperPreProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     factory.addPreProcessor(new YUICssCompressorProcessor());
-    factory.addPreProcessor(new YUIJsCompressorProcessor());
+    factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
 
     factory.addPostProcessor(new CssVariablesProcessor());
     return factory;
