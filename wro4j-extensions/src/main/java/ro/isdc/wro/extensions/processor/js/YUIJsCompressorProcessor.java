@@ -84,18 +84,19 @@ public class YUIJsCompressorProcessor
   boolean disableOptimizations = false;
 
   /**
-   * Default constructor. Perform munge by default.
-   */
-  public YUIJsCompressorProcessor() {
-    this(true);
-  }
-
-  /**
    * Allows creation of compressor specifying if the munge should apply or not.
    * @param munge
    */
-  public YUIJsCompressorProcessor(final boolean munge) {
+  private YUIJsCompressorProcessor(final boolean munge) {
     this.munge = munge;
+  }
+
+  public static YUIJsCompressorProcessor doMungeCompressor() {
+    return new YUIJsCompressorProcessor(true);
+  }
+
+  public static YUIJsCompressorProcessor noMungeCompressor() {
+    return new YUIJsCompressorProcessor(false);
   }
 
   /**

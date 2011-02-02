@@ -23,12 +23,12 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class TestYUIJsCompressorProcessor extends AbstractWroTest {
-  private final ResourcePostProcessor processor = new YUIJsCompressorProcessor();
+  private final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
 
   @Test
   public void testWithMungeFromFolder()
     throws IOException {
-    final ResourcePostProcessor processor = new YUIJsCompressorProcessor(true);
+    final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
 
     final URL url = getClass().getResource("yui");
     final File sourceFolder = new File(url.getFile());
@@ -38,7 +38,7 @@ public class TestYUIJsCompressorProcessor extends AbstractWroTest {
   @Test
   public void testWithNoMungeFromFolder()
     throws IOException {
-    final ResourcePostProcessor processor = new YUIJsCompressorProcessor(false);
+    final ResourcePostProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
 
     final URL url = getClass().getResource("yui");
     final File sourceFolder = new File(url.getFile());

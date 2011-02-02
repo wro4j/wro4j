@@ -27,7 +27,7 @@ public class YUIServletContextAwareWroManagerFactory extends ServletContextAware
     groupsProcessor.addPreProcessor(new CssImportPreProcessor());
     groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
     groupsProcessor.addPreProcessor(new YUICssCompressorProcessor());
-    groupsProcessor.addPreProcessor(new YUIJsCompressorProcessor());
+    groupsProcessor.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
 
     groupsProcessor.addPostProcessor(new CssVariablesProcessor());
   }
