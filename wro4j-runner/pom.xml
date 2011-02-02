@@ -6,7 +6,7 @@
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-runner</artifactId>
 	<packaging>jar</packaging>
-	<name>Web Resource Optimizer Extensions</name>
+	<name>wro4j CommandLineRunner</name>
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>

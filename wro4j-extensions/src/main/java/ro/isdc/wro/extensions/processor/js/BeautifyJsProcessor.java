@@ -47,7 +47,7 @@ public class BeautifyJsProcessor
    * @return new instance of {@link UglifyJs} engine.
    */
   protected UglifyJs newEngine() {
-    return new UglifyJs(false);
+    return UglifyJs.beautifyJs();
   }
 
   /**

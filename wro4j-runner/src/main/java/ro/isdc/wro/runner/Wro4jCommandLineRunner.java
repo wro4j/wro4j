@@ -88,10 +88,10 @@ public class Wro4jCommandLineRunner {
    */
   public void doMain(final String[] args) {
     final CmdLineParser parser = new CmdLineParser(this);
-    parser.setUsageWidth(120);
+    parser.setUsageWidth(80);
     try {
       parser.parseArgument(args);
-      System.out.println("Options: " + this);
+      LOG.debug("Options: " + this);
       process();
     } catch (final Exception e) {
       System.err.println(e.getMessage() + "\n\n");

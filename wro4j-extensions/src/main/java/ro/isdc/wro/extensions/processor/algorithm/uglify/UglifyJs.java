@@ -28,8 +28,22 @@ public class UglifyJs {
   /**
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice formatted).
    */
-  public UglifyJs(final boolean uglify) {
+  private UglifyJs(final boolean uglify) {
     this.uglify = uglify;
+  }
+
+  /**
+   * Factory method for creating the uglifyJs engine.
+   */
+  public static UglifyJs uglifyJs() {
+    return new UglifyJs(true);
+  }
+
+  /**
+   * Factory method for creating the beautifyJs engine.
+   */
+  public static UglifyJs beautifyJs() {
+    return new UglifyJs(false);
   }
 
   /**

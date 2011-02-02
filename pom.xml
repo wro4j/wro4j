@@ -61,7 +61,7 @@
 	<properties>
     <commons-io.dependency>2.0</commons-io.dependency>
     <commons-lang.dependency>2.5</commons-lang.dependency>       
-    <slf4j.dependency>1.6.0</slf4j.dependency>    
+    <slf4j.dependency>1.6.1</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>
     <junit.dependency>4.8.2</junit.dependency>    
@@ -78,6 +78,7 @@
 		<module>wro4j-extensions</module>
     <module>wro4j-maven-plugin</module>  
     <module>wro4j-examples</module>        
+    <module>wro4j-runner</module>  
   </modules>
 
 	<dependencyManagement>
@@ -93,12 +94,11 @@
 				<artifactId>wro4j-extensions</artifactId>
 				<version>${project.version}</version>
 			</dependency>    
-			<dependency>
+      <dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-test-utils</artifactId>
+				<artifactId>wro4j-runner</artifactId>
 				<version>${project.version}</version>
-        <scope>test</scope>
-			</dependency>
+			</dependency>    
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>wro4j-maven-plugin</artifactId>
@@ -296,19 +296,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!--
-			  <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<dependencies>
-				  <dependency>
-					<groupId>org.apache.maven.scm</groupId>
-					<artifactId>maven-scm-provider-gitexe</artifactId>
-					<version>1.1-db-1</version>
-				  </dependency>
-				</dependencies>
-			  </plugin>      
-			-->  
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -419,19 +406,4 @@
       <url>http://oss.sonatype.org/content/groups/public</url>
     </repository>
   </repositories>
-  
-  <!--
-	<distributionManagement>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <name>Nexus Release Repository</name>
-      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-	</distributionManagement>
-  -->
 </project>

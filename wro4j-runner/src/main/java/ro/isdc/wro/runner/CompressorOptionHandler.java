@@ -24,7 +24,9 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
 
+
 /**
+ * Handles -c or --compressor argument by checking if the value has an associated compressor.
  *
  * @author Alex Objelean
  */
@@ -41,8 +43,8 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put("jsMin", new JSMinProcessor());
-    map.put("yuiJsMin", new YUIJsCompressorProcessor(false));
-    map.put("yuiJsMinAdvanced", new YUIJsCompressorProcessor(true));
+    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
+    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
     map.put("uglifyJs", new UglifyJsProcessor());
     map.put("beautifyJs", new BeautifyJsProcessor());
     map.put("packerJs", new PackerJsProcessor());
