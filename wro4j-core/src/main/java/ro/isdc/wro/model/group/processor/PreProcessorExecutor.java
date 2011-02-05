@@ -77,7 +77,7 @@ public abstract class PreProcessorExecutor {
   private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
     throws IOException {
     //TODO: hold a list of processed resources in order to avoid duplicates
-
+    LOG.debug("preProcessing resource: " + resource);
     // merge preProcessorsBy type and anyPreProcessors
     final Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
     if (!minimize) {
