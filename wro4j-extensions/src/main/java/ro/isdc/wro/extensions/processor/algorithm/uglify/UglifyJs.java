@@ -25,12 +25,16 @@ import ro.isdc.wro.util.WroUtil;
 public class UglifyJs {
   private static final Logger LOG = LoggerFactory.getLogger(UglifyJs.class);
   private final boolean uglify;
+
+
   /**
-   * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice formatted).
+   * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
+   *        formatted).
    */
   private UglifyJs(final boolean uglify) {
     this.uglify = uglify;
   }
+
 
   /**
    * Factory method for creating the uglifyJs engine.
@@ -39,12 +43,14 @@ public class UglifyJs {
     return new UglifyJs(true);
   }
 
+
   /**
    * Factory method for creating the beautifyJs engine.
    */
   public static UglifyJs beautifyJs() {
     return new UglifyJs(false);
   }
+
 
   /**
    * Initialize script builder for evaluation.
@@ -62,11 +68,10 @@ public class UglifyJs {
       return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initScript").evaluateChain(jsonStream,
         SCRIPT_JSON).evaluateChain(parseStream, SCRIPT_PARSE).evaluateChain(processStream, SCRIPT_PROCESS);
     } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript less.js", ex);
-    } finally {
-
+      throw new IllegalStateException("Failed initializing js", ex);
     }
   }
+
 
   /**
    * @param data js content to process.
@@ -87,7 +92,7 @@ public class UglifyJs {
       sb.append("var ast = jsp.parse(orig_code);");
       sb.append("ast = exports.ast_mangle(ast);");
       sb.append("ast = exports.ast_squeeze(ast);");
-      //the second argument is true for uglify and false for beautify.
+      // the second argument is true for uglify and false for beautify.
       sb.append("return exports.gen_code(ast, " + !uglify + ");");
       sb.append("})();");
 

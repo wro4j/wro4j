@@ -46,7 +46,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,jsMin</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,uglifyJs</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>

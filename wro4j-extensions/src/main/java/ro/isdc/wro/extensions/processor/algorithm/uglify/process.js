@@ -569,28 +569,29 @@ function aborts(t) {
         }
 };
 
-function negate(c) {
-        var not_c = [ "unary-prefix", "!", c ];
-        switch (c[0]) {
-            case "unary-prefix":
-                return c[1] == "!" ? c[2] : not_c;
-            case "binary":
-                var op = c[1], left = c[2], right = c[3];
-                switch (op) {
-                    case "<=": return [ "binary", ">", left, right ];
-                    case "<": return [ "binary", ">=", left, right ];
-                    case ">=": return [ "binary", "<", left, right ];
-                    case ">": return [ "binary", "<=", left, right ];
-                    case "==": return [ "binary", "!=", left, right ];
-                    case "!=": return [ "binary", "==", left, right ];
-                    case "===": return [ "binary", "!==", left, right ];
-                    case "!==": return [ "binary", "===", left, right ];
-                    case "&&": return best_of(not_c, [ "binary", "||", negate(left), negate(right) ]);
-                    case "||": return best_of(not_c, [ "binary", "&&", negate(left), negate(right) ]);
-                }
-                break;
-        }
-        return not_c;
+function boolean_expr(expr) {
+        return ( (expr[0] == "unary-prefix"
+                  && member(expr[1], [ "!", "delete" ])) ||
+
+                 (expr[0] == "binary"
+                  && member(expr[1], [ "in", "instanceof", "==", "!=", "===", "!==", "<", "<=", ">=", ">" ])) ||
+
+                 (expr[0] == "binary"
+                  && member(expr[1], [ "&&", "||" ])
+                  && boolean_expr(expr[2])
+                  && boolean_expr(expr[3])) ||
+
+                 (expr[0] == "conditional"
+                  && boolean_expr(expr[2])
+                  && boolean_expr(expr[3])) ||
+
+                 (expr[0] == "assign"
+                  && expr[1] === true
+                  && boolean_expr(expr[3])) ||
+
+                 (expr[0] == "seq"
+                  && boolean_expr(expr[expr.length - 1]))
+               );
 };
 
 function make_conditional(c, t, e) {
@@ -609,11 +610,43 @@ function ast_squeeze(ast, options) {
         options = defaults(options, {
                 make_seqs   : true,
                 dead_code   : true,
-                no_warnings : false,
-                extra       : false
+                keep_comps  : true,
+                no_warnings : false
         });
 
         var w = ast_walker(), walk = w.walk, scope;
+
+        function negate(c) {
+                    var not_c = [ "unary-prefix", "!", c ];
+                switch (c[0]) {
+                    case "unary-prefix":
+                        return c[1] == "!" && boolean_expr(c[2]) ? c[2] : not_c;
+                    case "seq":
+                        c = slice(c);
+                        c[c.length - 1] = negate(c[c.length - 1]);
+                        return c;
+                    case "conditional":
+                        return best_of(not_c, [ "conditional", c[1], negate(c[2]), negate(c[3]) ]);
+                    case "binary":
+                        var op = c[1], left = c[2], right = c[3];
+                        if (!options.keep_comps) switch (op) {
+                            case "<="  : return [ "binary", ">", left, right ];
+                            case "<"   : return [ "binary", ">=", left, right ];
+                            case ">="  : return [ "binary", "<", left, right ];
+                            case ">"   : return [ "binary", "<=", left, right ];
+                        }
+                        switch (op) {
+                            case "=="  : return [ "binary", "!=", left, right ];
+                            case "!="  : return [ "binary", "==", left, right ];
+                            case "===" : return [ "binary", "!==", left, right ];
+                            case "!==" : return [ "binary", "===", left, right ];
+                            case "&&"  : return best_of(not_c, [ "binary", "||", negate(left), negate(right) ]);
+                            case "||"  : return best_of(not_c, [ "binary", "&&", negate(left), negate(right) ]);
+                        }
+                        break;
+                }
+                return not_c;
+        };
 
         function with_scope(s, cont) {
                 var _scope = scope;
@@ -628,85 +661,10 @@ function ast_squeeze(ast, options) {
                 return node[0] == "string" || node[0] == "num";
         };
 
-        function find_first_execute(node) {
-                if (!node)
-                        return false;
-
-                switch (node[0]) {
-                        case "num":
-                        case "string":
-                        case "name":
-                                return node;
-                        case "call":
-                        case "conditional":
-                        case "for":
-                        case "if":
-                        case "new":
-                        case "return":
-                        case "stat":
-                        case "switch":
-                        case "throw":
-                                return find_first_execute(node[1]);
-                        case "binary":
-                                return find_first_execute(node[2]);
-                        case "assign":
-                                if (node[1] === true)
-                                        return find_first_execute(node[3]);
-                                break;
-                        case "var":
-                                if (node[1][0].length > 1)
-                                        return find_first_execute(node[1][0][1]);
-                                break;
-                }
-                return null;
-        }
-
-        function find_assign_recursive(p, v) {
-                if (p[0] == "assign" && p[1] != true || p[0] == "unary-prefix") {
-                        if (p[2][0] == "name" && v[0] == "name" && p[2][1] == v[1])
-                                return true;
-                        return false;
-                }
-
-                if (p[0] != "assign" || p[1] !== true)
-                        return false;
-
-                if ((is_constant(p[3]) && p[3][0] == v[0] && p[3][1] == v[1]) ||
-                    (p[3][0] == "name" && v[0] == "name" && p[3][1] == v[1]) ||
-                    (p[2][0] == "name" && v[0] == "name" && p[2][1] == v[1]))
-                        return true;
-
-                return find_assign_recursive(p[3], v);
-        };
-
         function rmblock(block) {
                 if (block != null && block[0] == "block" && block[1] && block[1].length == 1)
                         block = block[1][0];
                 return block;
-        };
-
-        function clone(obj) {
-                if (obj && obj.constructor == Array)
-                        return MAP(obj, clone);
-                return obj;
-        };
-
-        function make_seq_to_statements(node) {
-                if (node[0] != "seq") {
-                        switch (node[0]) {
-                                case "var":
-                                case "const":
-                                        return [ node ];
-                                default:
-                                        return [ [ "stat", node ] ];
-                        }
-                }
-
-                var ret = [];
-                for (var i = 1; i < node.length; i++)
-                        ret.push.apply(ret, make_seq_to_statements(node[i]));
-
-                return ret;
         };
 
         function _lambda(name, args, body) {
@@ -733,64 +691,6 @@ function ast_squeeze(ast, options) {
                         }
                         return a;
                 }, []);
-
-                if (options.extra) {
-                        // Detightening things. We do this because then we can assume that the
-                        // statements are structured in a specific way.
-                        statements = (function(a, prev) {
-                                statements.forEach(function(cur) {
-                                        switch (cur[0]) {
-                                            case "for":
-                                                if (cur[1] != null) {
-                                                        a.push.apply(a, make_seq_to_statements(cur[1]));
-                                                        cur[1] = null;
-                                                }
-                                                a.push(cur);
-                                                break;
-                                            case "stat":
-                                                var stats = make_seq_to_statements(cur[1]);
-                                                stats.forEach(function(s) {
-                                                        if (s[1][0] == "unary-postfix")
-                                                                s[1][0] = "unary-prefix";
-                                                });
-                                                a.push.apply(a, stats);
-                                                break;
-                                            default:
-                                                a.push(cur);
-                                        }
-                                });
-                                return a;
-                        })([]);
-
-                        statements = (function(a, prev) {
-                                statements.forEach(function(cur) {
-                                        if (!(prev && prev[0] == "stat")) {
-                                                a.push(cur);
-                                                prev = cur;
-                                                return;
-                                        }
-
-                                        var p = prev[1];
-                                        var c = find_first_execute(cur);
-                                        if (c && find_assign_recursive(p, c)) {
-                                                var old_cur = clone(cur);
-                                                c.splice(0, c.length);
-                                                c.push.apply(c, p);
-                                                var tmp_cur = best_of(cur, [ "toplevel", [ prev, old_cur ] ]);
-                                                if (tmp_cur == cur) {
-                                                        a[a.length -1] = cur;
-                                                } else {
-                                                        cur = old_cur;
-                                                        a.push(cur);
-                                                }
-                                        } else {
-                                                a.push(cur);
-                                        }
-                                        prev = cur;
-                                });
-                                return a;
-                        })([]);
-                }
 
                 statements = (function(a, prev){
                         statements.forEach(function(cur){
@@ -834,22 +734,6 @@ function ast_squeeze(ast, options) {
                         });
                         return a;
                 })([]);
-
-                if (options.extra) {
-                        statements = (function(a, prev){
-                                statements.forEach(function(cur){
-                                        var replaced = false;
-                                        if (prev && cur[0] == "for" && cur[1] == null && (prev[0] == "var" || prev[0] == "const" || prev[0] == "stat")) {
-                                                cur[1] = prev;
-                                                a[a.length - 1] = cur;
-                                        } else {
-                                                a.push(cur);
-                                        }
-                                        prev = cur;
-                                });
-                                return a;
-                        })([]);
-                }
 
                 if (block_type == "lambda") statements = (function(i, a, stat){
                         while (i < statements.length) {
@@ -901,7 +785,10 @@ function ast_squeeze(ast, options) {
                 if (empty(e) && empty(t))
                         return [ "stat", c ];
                 var ret = [ "if", c, t, e ];
-                if (t[0] == "stat") {
+                if (t[0] == "if" && empty(t[3]) && empty(e)) {
+                        ret = best_of(ret, walk([ "if", [ "binary", "&&", c, t[1] ], t[2] ]));
+                }
+                else if (t[0] == "stat") {
                         if (e) {
                                 if (e[0] == "stat") {
                                         ret = best_of(ret, [ "stat", make_conditional(c, t[1], e[1]) ]);
@@ -972,23 +859,34 @@ function ast_squeeze(ast, options) {
                         left = walk(left);
                         right = walk(right);
                         var best = [ "binary", op, left, right ];
-                        if (is_constant(right)) {
-                                if (is_constant(left)) {
-                                        var val = null;
-                                        switch (op) {
-                                            case "+": val = left[1] + right[1]; break;
-                                            case "*": val = left[1] * right[1]; break;
-                                            case "/": val = left[1] / right[1]; break;
-                                            case "-": val = left[1] - right[1]; break;
-                                            case "<<": val = left[1] << right[1]; break;
-                                            case ">>": val = left[1] >> right[1]; break;
-                                            case ">>>": val = left[1] >>> right[1]; break;
+                        if (is_constant(right) && is_constant(left)) {
+                                var val = {};
+                                var orig = val;
+                                switch (op) {
+                                    case "+"   : val = left[1] +   right[1]; break;
+                                    case "*"   : val = left[1] *   right[1]; break;
+                                    case "/"   : val = left[1] /   right[1]; break;
+                                    case "-"   : val = left[1] -   right[1]; break;
+                                    case "<<"  : val = left[1] <<  right[1]; break;
+                                    case ">>"  : val = left[1] >>  right[1]; break;
+                                    case ">>>" : val = left[1] >>> right[1]; break;
+                                    case "=="  : val = left[1] ==  right[1]; break;
+                                    case "===" : val = left[1] === right[1]; break;
+                                    case "!="  : val = left[1] !=  right[1]; break;
+                                    case "!==" : val = left[1] !== right[1]; break;
+                                    case "<"   : val = left[1] <   right[1]; break;
+                                    case "<="  : val = left[1] <=  right[1]; break;
+                                    case ">"   : val = left[1] >   right[1]; break;
+                                    case ">="  : val = left[1] >=  right[1]; break;
+                                }
+                                if (val !== orig) {
+                                        switch (typeof val) {
+                                            case "string": val = [ "string", val ]; break;
+                                            case "boolean": val = [ "name", val+"" ]; break;
+                                            case "number": val = [ "num", val ]; break;
+                                            default: return best;
                                         }
-                                        if (val != null) {
-                                                best = best_of(best, [ typeof val == "string" ? "string" : "num", val ]);
-                                        }
-                                } else if (left[0] == "binary" && left[1] == "+" && left[3][0] == "string") {
-                                        best = best_of(best, [ "binary", "+", left[2], [ "string", left[3][1] + right[1] ] ]);
+                                        best = best_of(best, walk(val));
                                 }
                         }
                         return best;
@@ -1004,17 +902,12 @@ function ast_squeeze(ast, options) {
                                 f != null ? tighten(MAP(f, walk)) : null
                         ];
                 },
-                "unary-prefix": function(op, cond) {
-                        if (op == "!") {
-                                cond = walk(cond);
-                                if (cond[0] == "unary-prefix" && cond[1] == "!") {
-                                        var p = w.parent();
-                                        if (p[0] == "unary-prefix" && p[1] == "!")
-                                                return cond[2];
-                                        return [ "unary-prefix", "!", cond ];
-                                }
-                                return best_of(this, negate(cond));
-                        }
+                "unary-prefix": function(op, expr) {
+                        expr = walk(expr);
+                        var ret = [ "unary-prefix", op, expr ];
+                        if (op == "!")
+                                ret = best_of(ret, negate(expr));
+                        return ret;
                 },
                 "name": function(name) {
                         switch (name) {
@@ -1316,7 +1209,8 @@ function gen_code(ast, beautify) {
                                 left = "(" + left + ")";
                         }
                         if (member(rvalue[0], [ "assign", "conditional", "seq" ]) ||
-                            rvalue[0] == "binary" && PRECEDENCE[operator] >= PRECEDENCE[rvalue[1]]) {
+                            rvalue[0] == "binary" && PRECEDENCE[operator] >= PRECEDENCE[rvalue[1]] &&
+                            !(rvalue[1] == operator && member(operator, [ "&&", "||", "*" ]))) {
                                 right = "(" + right + ")";
                         }
                         return add_spaces([ left, operator, right ]);
@@ -1388,12 +1282,6 @@ function gen_code(ast, beautify) {
                 },
                 "atom": function(name) {
                         return make_name(name);
-                },
-                "comment1": function(text) {
-                        return "//" + text + "\n";
-                },
-                "comment2": function(text) {
-                        return "/*" + text + "*/";
                 }
         };
 
