@@ -1,0 +1,8 @@
+@import url("import/import-test-a.css");
+//@import url("import/import-test-a.css");
+
+#import-test {
+  .mixin;
+  width: 10px;
+  height: @a + 10%;
+}
