@@ -5,12 +5,17 @@ package ro.isdc.wro.runner;
 
 import java.io.File;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Alex Objelean
  */
 public class TestWro4jCommandLineRunner {
+  @Before
+  public void startUp() {
+    System.out.println("startup");
+  }
   @Test
   public void processWrongArgument() throws Exception {
     final String[] args = new String[] {"-wrongArgument"};
@@ -33,7 +38,7 @@ public class TestWro4jCommandLineRunner {
   public void processTestWroXml() throws Exception {
     final String wroFile = new File(getClass().getResource("").getFile()).getAbsolutePath() + "\\wro.xml";
     System.out.println(wroFile);
-    final String[] args = new String[] {"-m --wroFile " + wroFile};
+    final String[] args = new String("-m --wroFile " + wroFile).split(" ");
     Wro4jCommandLineRunner.main(args);
   }
 }

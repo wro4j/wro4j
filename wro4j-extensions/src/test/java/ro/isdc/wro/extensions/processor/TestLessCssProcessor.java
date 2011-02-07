@@ -36,7 +36,11 @@ public class TestLessCssProcessor extends AbstractWroTest {
   public void testFromFolder()
     throws IOException {
     final URL url = getClass().getResource("lesscss");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "less", "css", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
+      WroUtil.newResourceProcessor(processor));
+
   }
 }

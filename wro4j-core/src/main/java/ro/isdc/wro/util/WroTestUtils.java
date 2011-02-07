@@ -226,17 +226,18 @@ public class WroTestUtils {
 
   /**
    * Process and compare the files which a located in different folders.
-   *
-   * @param sourceFolder
-   * @param targetFolder
-   * @param fileFilter
-   * @param processor
-   * @throws IOException
    */
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final ResourceProcessor processor)
     throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
+  }
+
+  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
+    final String extension, final ResourceProcessor processor)
+    throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
+      Transformers.noOpTransformer(), processor);
   }
 
 
@@ -253,6 +254,8 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourceProcessor processor)
     throws IOException {
+    LOG.debug("sourceFolder: " + sourceFolder);
+    LOG.debug("targetFolder: " + targetFolder);
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {

@@ -75,8 +75,8 @@
   </group>
 
   <group name="jquery">
-    <!--<js>http://code.jquery.com/jquery-1.4.3.js</js> -->
-    <js>http://code.jquery.com/jquery-1.5b1.js</js>
+    <!--<js>http://code.jquery.com/jquery-1.4.3.js</js>--> 
+    <js>http://code.jquery.com/jquery-1.5.js</js>
     <group-ref>jquery-mobile</group-ref>
   </group>
   
