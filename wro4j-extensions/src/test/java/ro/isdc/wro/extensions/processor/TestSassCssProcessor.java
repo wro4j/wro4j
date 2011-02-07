@@ -26,8 +26,11 @@ public class TestSassCssProcessor {
   public void testSassCssFromFolder()
     throws IOException {
     final URL url = getClass().getResource("sasscss");
-    final File sourceFolder = new File(url.getFile());
     final ResourcePostProcessor processor = new SassCssProcessor();
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "sass", "css", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
+      WroUtil.newResourceProcessor(processor));
   }
 }

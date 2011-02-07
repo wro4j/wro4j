@@ -26,6 +26,7 @@ public class TestUglifyJsProcessor {
   public void testFromFolder() throws IOException {
     final ResourcePostProcessor processor = new UglifyJsProcessor();
     final URL url = getClass().getResource("uglify");
+
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
