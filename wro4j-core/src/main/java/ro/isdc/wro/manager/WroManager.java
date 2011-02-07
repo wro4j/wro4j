@@ -243,7 +243,7 @@ public class WroManager
     response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
     stopWatch.stop();
-    LOG.debug("WroManager process time: " + stopWatch.toString());
+    LOG.debug("WroManager process time: " + stopWatch.prettyPrint());
     return inputStream;
   }
 

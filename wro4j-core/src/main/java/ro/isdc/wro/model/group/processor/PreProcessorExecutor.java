@@ -21,6 +21,7 @@ import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
@@ -72,7 +73,6 @@ public final class PreProcessorExecutor {
   private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
     throws IOException {
     // TODO: hold a list of processed resources in order to avoid duplicates
-
     // merge preProcessorsBy type and anyPreProcessors
     Collection<ResourcePreProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
       processorsFactory.getPreProcessors());
@@ -100,7 +100,9 @@ public final class PreProcessorExecutor {
       return resourceContent;
     }
     Writer writer = null;
+    final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
+      stopWatch.start("Using " + processor.getClass().getSimpleName());
       writer = new StringWriter();
       // skip minimize validation if resource doesn't want to be minimized
       final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
@@ -114,7 +116,9 @@ public final class PreProcessorExecutor {
         LOG.debug("skipped processing on resource: " + resource);
       }
       resourceContent = writer.toString();
+      stopWatch.stop();
     }
+    LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
 

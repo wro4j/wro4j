@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
@@ -79,6 +78,7 @@ public class GoogleClosureCompressorProcessor
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
+    final String content = IOUtils.toString(reader);
     try {
       Compiler.setLoggingLevel(Level.SEVERE);
       final Compiler compiler = new Compiler();
@@ -91,15 +91,15 @@ public class GoogleClosureCompressorProcessor
       compiler.initOptions(options);
 
       final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
-      final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(IOUtils.toByteArray(reader)));
-
+      final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(content.getBytes()));
       final Result result = compiler.compile(extern, input, options);
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
-        LOG.debug("The JS to compress contains errors: " + Arrays.toString(result.errors));
+        writer.write(content);
       }
     } finally {
+      LOG.debug("finally");
       reader.close();
       writer.close();
     }

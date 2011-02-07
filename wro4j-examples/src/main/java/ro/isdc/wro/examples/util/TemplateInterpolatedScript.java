@@ -22,7 +22,7 @@ public abstract class TemplateInterpolatedScript implements IHeaderContributor {
   public void renderHead(final IHeaderResponse response) {
     try {
       final String scriptId = getScriptId();
-      response.renderJavascript(interpolateScript(), scriptId);
+      response.renderJavaScript(interpolateScript(), scriptId);
     } catch (final Exception e) {
       //should never happen
       throw new RuntimeException("Exception occured while rendering interpolated script", e);

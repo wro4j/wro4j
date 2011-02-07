@@ -1,11 +1,9 @@
 package ro.isdc.wro.examples;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.protocol.http.HttpSessionStore;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.request.target.coding.IndexedHybridUrlCodingStrategy;
-import org.apache.wicket.session.ISessionStore;
 
 import ro.isdc.wro.examples.page.HomePage;
 
@@ -16,8 +14,7 @@ import ro.isdc.wro.examples.page.HomePage;
  *
  * @see wicket.myproject.Start#main(String[])
  */
-public class WebResourceOptimizationApplication
-    extends WebApplication {
+public class WebResourceOptimizationApplication extends WebApplication {
   /**
    * @see wicket.Application#getHomePage()
    */
@@ -25,6 +22,7 @@ public class WebResourceOptimizationApplication
   public Class<? extends WebPage> getHomePage() {
     return HomePage.class;
   }
+
 
   /**
    * {@inheritDoc}
@@ -35,30 +33,31 @@ public class WebResourceOptimizationApplication
     if (isDeploy()) {
       getResourceSettings().setResourcePollFrequency(null);
     }
-    //settings
+    // settings
     getMarkupSettings().setStripWicketTags(true);
     getMarkupSettings().setStripComments(true);
     getMarkupSettings().setCompressWhitespace(true);
-    getPageSettings().setAutomaticMultiWindowSupport(false);
     getDebugSettings().setDevelopmentUtilitiesEnabled(true);
 
-    //mounts
-    mount(new IndexedHybridUrlCodingStrategy("/home", HomePage.class));
-//    mountBookmarkablePage("/home", HomePage.class);
+    // mounts
+    // mount(new IndexedHybridUrlCodingStrategy("/home", HomePage.class));
+    mountPage("/home", HomePage.class);
   }
 
 
   public static WebResourceOptimizationApplication get() {
-    return (WebResourceOptimizationApplication) Application.get();
+    return (WebResourceOptimizationApplication)Application.get();
   }
+
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String getConfigurationType() {
-    return isDeploy() ? DEPLOYMENT: DEVELOPMENT;
+  public RuntimeConfigurationType getConfigurationType() {
+    return isDeploy() ? RuntimeConfigurationType.DEPLOYMENT : RuntimeConfigurationType.DEVELOPMENT;
   }
+
 
   /**
    * @return true if application is to be deployed on GAE.
@@ -66,14 +65,4 @@ public class WebResourceOptimizationApplication
   public boolean isDeploy() {
     return false;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected ISessionStore newSessionStore() {
-    //wouldn't work with SecondLevelCacheSessionStore on GAE
-    return new HttpSessionStore(this);
-  }
 }
-

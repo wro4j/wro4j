@@ -76,7 +76,7 @@ public class Wro4jCommandLineRunner {
 
   public static void main(final String[] args)
     throws Exception {
-    new Wro4jCommandLineRunner().doMain(inputArguments());
+    new Wro4jCommandLineRunner().doMain(args);
   }
 
 
@@ -95,8 +95,9 @@ public class Wro4jCommandLineRunner {
    * @param args
    */
   public void doMain(final String[] args) {
+    LOG.debug("arguments: " + Arrays.toString(args));
     final CmdLineParser parser = new CmdLineParser(this);
-    parser.setUsageWidth(80);
+    parser.setUsageWidth(100);
     final StopWatch watch = new StopWatch();
     watch.start("processing");
     try {
@@ -106,7 +107,7 @@ public class Wro4jCommandLineRunner {
     } catch (final Exception e) {
       System.err.println(e.getMessage() + "\n\n");
       System.err.println("=======================================");
-      System.err.println("ARGUMENTS");
+      System.err.println("USAGE");
       System.err.println("=======================================");
       parser.printUsage(System.err);
     } finally {

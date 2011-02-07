@@ -122,12 +122,15 @@ public class GroupsProcessor {
     }
     Reader input = new StringReader(content.toString());
     Writer output = null;
+    final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
+      stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
-      LOG.debug("PostProcessing - " + processor.getClass().getSimpleName());
       processor.process(input, output);
       input = new StringReader(output.toString());
+      stopWatch.stop();
     }
+    LOG.debug(stopWatch.prettyPrint());
     return output.toString();
   }
 
