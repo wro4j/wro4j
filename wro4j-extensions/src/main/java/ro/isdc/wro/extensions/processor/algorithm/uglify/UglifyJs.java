@@ -57,11 +57,11 @@ public class UglifyJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_JSON = "json2.js";
+      final String SCRIPT_JSON = "json2.min.js";
       final InputStream jsonStream = getClass().getResourceAsStream(SCRIPT_JSON);
-      final String SCRIPT_PARSE = "parse-js.js";
+      final String SCRIPT_PARSE = "parse-js.min.js";
       final InputStream parseStream = getClass().getResourceAsStream(SCRIPT_PARSE);
-      final String SCRIPT_PROCESS = "process.js";
+      final String SCRIPT_PROCESS = "process.min.js";
       final InputStream processStream = getClass().getResourceAsStream(SCRIPT_PROCESS);
 
       final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";
