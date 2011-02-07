@@ -45,7 +45,7 @@ public class RhinoScriptBuilder {
     context.setLanguageVersion(Context.VERSION_1_7);
     scope = context.initStandardObjects();
     try {
-      final InputStream script = getClass().getResourceAsStream("commons.js");
+      final InputStream script = getClass().getResourceAsStream("commons.min.js");
       evaluateScript(script, "common.js");
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
@@ -59,7 +59,7 @@ public class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
-      final String SCRIPT_ENV = "env.rhino.js";
+      final String SCRIPT_ENV = "env.rhino.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
       evaluateScript(script, SCRIPT_ENV);
       return this;

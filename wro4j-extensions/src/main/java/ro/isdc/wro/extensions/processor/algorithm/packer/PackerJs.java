@@ -29,8 +29,8 @@ public class PackerJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForBase2(), "base2.js").evaluateChain(
-        getStreamForPacker(), "packer.js");
+      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForBase2(), "base2.min.js").evaluateChain(
+        getStreamForPacker(), "packer.min.js");
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
@@ -42,7 +42,7 @@ public class PackerJs {
    * @return Stream for base2.js
    */
   protected InputStream getStreamForBase2() {
-    return getClass().getResourceAsStream("base2.js");
+    return getClass().getResourceAsStream("base2.min.js");
   }
 
   /**
@@ -51,7 +51,7 @@ public class PackerJs {
    * @return Stream for packer.js
    */
   protected InputStream getStreamForPacker() {
-    return getClass().getResourceAsStream("packer.js");
+    return getClass().getResourceAsStream("packer.min.js");
   }
 
   /**
