@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -29,7 +28,7 @@ public class RhinoScriptBuilder {
   private Scriptable scope;
 
   /**
-   * Constroctor.
+   * Constructor.
    */
   private RhinoScriptBuilder() {
     initContext();
@@ -46,8 +45,8 @@ public class RhinoScriptBuilder {
     context.setLanguageVersion(Context.VERSION_1_7);
     scope = context.initStandardObjects();
     try {
-    final String common = IOUtils.toString(getClass().getResourceAsStream("commons.js"));
-      context.evaluateString(scope, common, "commons.js", 1, null);
+      final InputStream script = getClass().getResourceAsStream("commons.min.js");
+      evaluateScript(script, "common.js");
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
     }
@@ -60,8 +59,8 @@ public class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
-      final String SCRIPT_ENV = "env.rhino.js";
-      final InputStream script = RhinoScriptBuilder.class.getResourceAsStream(SCRIPT_ENV);
+      final String SCRIPT_ENV = "env.rhino.min.js";
+      final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
       evaluateScript(script, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
@@ -78,8 +77,12 @@ public class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final InputStream script, final String sourceName) throws IOException {
-    context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
-    return this;
+    try {
+      context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+      return this;
+    } finally {
+      script.close();
+    }
   }
 
   /**
@@ -116,14 +119,14 @@ public class RhinoScriptBuilder {
 
   /**
    * Evaluates the script without exiting the Context.
-   * @param script
-   * @param sourceName
-   * @return
-   * @throws IOException
    */
   private Object evaluateScript(final InputStream script, final String sourceName)
-    throws IOException {
-    return context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+      throws IOException {
+    try {
+      return context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+    } finally {
+      script.close();
+    }
   }
 
   /**
@@ -141,6 +144,7 @@ public class RhinoScriptBuilder {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
     } finally {
+      script.close();
       Context.exit();
     }
   }

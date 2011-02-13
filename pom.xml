@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
-  <version>1.3.3</version>
+  <version>1.3.4</version>
 	<packaging>pom</packaging>	
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
@@ -59,9 +59,9 @@
   </developers>
   
 	<properties>
-    <commons-io.dependency>2.0</commons-io.dependency>
+    <commons-io.dependency>2.0.1</commons-io.dependency>
     <commons-lang.dependency>2.5</commons-lang.dependency>       
-    <slf4j.dependency>1.6.0</slf4j.dependency>    
+    <slf4j.dependency>1.6.1</slf4j.dependency>    
 		<maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>
     <junit.dependency>4.8.2</junit.dependency>    
@@ -77,7 +77,11 @@
     <module>wro4j-core</module>
 		<module>wro4j-extensions</module>
     <module>wro4j-maven-plugin</module>  
-    <module>wro4j-examples</module>        
+    <!-- No need to add these to maven central repo -->
+    <!--
+    <module>wro4j-runner</module>  
+    <module>wro4j-examples</module>  
+    -->
   </modules>
 
 	<dependencyManagement>
@@ -93,12 +97,11 @@
 				<artifactId>wro4j-extensions</artifactId>
 				<version>${project.version}</version>
 			</dependency>    
-			<dependency>
+      <dependency>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-test-utils</artifactId>
+				<artifactId>wro4j-runner</artifactId>
 				<version>${project.version}</version>
-        <scope>test</scope>
-			</dependency>
+			</dependency>    
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>wro4j-maven-plugin</artifactId>
@@ -180,11 +183,6 @@
       </dependency>
 			<!-- Third Party Tools -->			
 			<dependency>
-				<groupId>com.yahoo.platform.yui</groupId>
-				<artifactId>yuicompressor</artifactId>
-				<version>2.4.2</version>
-			</dependency>			
-			<dependency>
 				<groupId>rhino</groupId>
 				<artifactId>js</artifactId>
 				<version>1.7R2</version>
@@ -195,16 +193,17 @@
         <version>r606</version>
       </dependency>
 		  <dependency>
-        <groupId>com.google.closure</groupId>
-        <artifactId>compiler</artifactId>
-        <version>r531</version>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.dependency}</version>
+        <scope>test</scope>
 		  </dependency>
-		  <dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.dependency}</version>
-			<scope>test</scope>
-		  </dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.dependency}</version>
+				<scope>test</scope>
+			</dependency>			      
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
@@ -231,8 +230,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-	  <scope>test</scope>
+      <artifactId>mockito-core</artifactId>
+	    <scope>test</scope>
       <version>${mockito.dependency}</version>
     </dependency>		
 	</dependencies>
@@ -300,19 +299,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!--
-			  <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<dependencies>
-				  <dependency>
-					<groupId>org.apache.maven.scm</groupId>
-					<artifactId>maven-scm-provider-gitexe</artifactId>
-					<version>1.1-db-1</version>
-				  </dependency>
-				</dependencies>
-			  </plugin>      
-			-->  
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -363,7 +349,7 @@
         </property>
       </activation>
 
-      <build>
+      <build>      
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -423,19 +409,4 @@
       <url>http://oss.sonatype.org/content/groups/public</url>
     </repository>
   </repositories>
-  
-  <!--
-	<distributionManagement>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <name>Nexus Release Repository</name>
-      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-	</distributionManagement>
-  -->
 </project>

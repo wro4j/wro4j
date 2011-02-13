@@ -77,6 +77,11 @@ public class WroFilter
    */
   static final String PARAM_GZIP_RESOURCES = "gzipResources";
   /**
+   * Disable cache configuration option. When true, the processed content won't be cached in DEVELOPMENT mode. In
+   * DEPLOYMENT mode changing this flag will have no effect.
+   */
+  static final String PARAM_DISABLE_CACHE = "disableCache";
+  /**
    * Parameter containing an integer value for specifying how often (in seconds) the cache should be refreshed.
    */
   static final String PARAM_CACHE_UPDATE_PERIOD = "cacheUpdatePeriod";
@@ -95,7 +100,7 @@ public class WroFilter
   /**
    * Default value used by Cache-control header.
    */
-  private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000, post-check=315360000, pre-check=315360000";
+  private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
   /**
    * Filter config.
    */
@@ -287,6 +292,7 @@ public class WroFilter
     config.setDebug(isDebug());
     config.setCacheUpdatePeriod(getCacheUpdatePeriod());
     config.setModelUpdatePeriod(getModelUpdatePeriod());
+    config.setDisableCache(isDisableCache());
   }
 
 
@@ -299,6 +305,15 @@ public class WroFilter
     final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
     final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
     return gzipResources;
+  }
+
+  /**
+   * @return flag value configured by filter config init parameter.
+   */
+  protected boolean isDisableCache() {
+    final String paramValue = filterConfig.getInitParameter(PARAM_DISABLE_CACHE);
+    final boolean flag = paramValue == null ? false : Boolean.valueOf(paramValue);
+    return flag;
   }
 
 
@@ -344,14 +359,14 @@ public class WroFilter
    */
   private void initHeaderValues() {
     // put defaults
-    final Long timestamp = new Date().getTime();
-    final Calendar cal = Calendar.getInstance();
-    cal.roll(Calendar.YEAR, 10);
-
-    headersMap.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-    headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
-    headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
-
+    if (!wroConfiguration.isDebug()) {
+      final Long timestamp = new Date().getTime();
+      final Calendar cal = Calendar.getInstance();
+      cal.roll(Calendar.YEAR, 1);
+      headersMap.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
+      headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
+      headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+    }
     final String headerParam = filterConfig.getInitParameter(PARAM_HEADER);
     if (headerParam != null) {
       try {
@@ -434,7 +449,7 @@ public class WroFilter
    */
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
     final FilterChain chain) {
-    LOG.debug("runtime exception occured", e);
+    LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);
@@ -455,6 +470,10 @@ public class WroFilter
     // Force resource caching as best as possible
     for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
       response.setHeader(entry.getKey(), entry.getValue());
+    }
+    //prevent caching when in development mode
+    if (wroConfiguration.isDebug()) {
+      WroUtil.addNoCacheHeaders(response);
     }
   }
 

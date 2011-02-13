@@ -5,18 +5,19 @@
 
   <group name="dynamicResource">
     <js>/resource/redirect.js</js>
+    <js>/external/resource.js</js>    
     <!-- <js>/resource/dynamic.js</js> -->
   </group>
   
   <group name="all">
     <group-ref>jquery</group-ref>
-  <!-- 
-    <group-ref>twitterBar</group-ref>
+    <!-- 
+    <group-ref>twitterBar</group-ref> 
     <group-ref>dynamicResource</group-ref>
-    <group-ref>WEBINF-css</group-ref>
     <group-ref>uniform</group-ref>
+    <group-ref>WEBINF-css</group-ref>
     <group-ref>dwr</group-ref>
-    -->
+     -->
 	</group>
 
   <group name="problem">
@@ -32,7 +33,6 @@
   </group>
   
   <group name="WEBINF-css">
-    <js>/external/resource.js</js>  
     <css>/WEB-INF/css/webinf.css</css>
   </group>
   
@@ -48,7 +48,7 @@
     <css>/static/css/css1.css</css>
     <css>/static/css/css2.css</css>
     <css>/static/css/NOTEXIST.css</css>
-    <css>classpath:ro/isdc/wro/resources/classpath.css</css>
+    <css>classpath:ro/isdc/wro/resources/*.css</css>
   </group>
 	
 	<group name="otherGroup">
@@ -74,35 +74,27 @@
     <js>/dwr/interface/DWRFacade.js</js>
   </group>
 
-  <group name="justJquery">
-    <js>/static/js/jquery-1.4.3.js</js>
-  </group>
-
   <group name="jquery">
-    <js>http://code.jquery.com/jquery-1.4.4.min.js</js>
+    <!--<js>http://code.jquery.com/jquery-1.4.3.js</js>--> 
+    <js>http://code.jquery.com/jquery-1.5.js</js>
     <group-ref>jquery-mobile</group-ref>
-    <!--
-    <js>/static/js/jquery.livequery.js</js>
-    <js>/static/js/jquery-validate.js</js>
-    <js>/static/js/jquery-ui-all.js</js>
-     -->
   </group>
   
   <group name="jquery-mobile">
-    <css>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.css</css>
-    <js> http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.min.js</js>
+    <css>http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css</css>
+    <js>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js</js>
   </group>
   
   <group name="syntaxHighlighter">
     <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
     <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
     <js>/static/module/syntaxHighlighter/scripts/*.js</js>
-    <!--
-    
-    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/shBrushJScript.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/shBrushAppleScript.js</js>  
-    -->
 	  <css>/static/module/syntaxHighlighter/styles/shCoreDefault.css</css>
   </group>
+  
+  <group name="classpath">
+    <css>classpath:com/mysite/myapplication/web/resources/*.css</css>
+    <js>classpath:com/mysite/myapplication/web/resources/*.js</js>
+	</group>
+  
 </groups>

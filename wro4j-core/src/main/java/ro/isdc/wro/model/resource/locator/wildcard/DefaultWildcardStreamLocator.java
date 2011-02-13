@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.resource.locator.wildcard;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -89,9 +90,9 @@ public class DefaultWildcardStreamLocator
     for (final File file : files) {
       final InputStream is = new FileInputStream(file);
       IOUtils.copy(is, out);
+      is.close();
     }
-    out.close();
-    return new ByteArrayInputStream(out.toByteArray());
+    return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
 
   /**

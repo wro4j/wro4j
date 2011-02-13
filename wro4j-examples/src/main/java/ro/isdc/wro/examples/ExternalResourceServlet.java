@@ -15,12 +15,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings("serial")
 public class ExternalResourceServlet extends HttpServlet {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
-    resp.sendRedirect("http://localhost/js/pngfix.js");
+    resp.sendRedirect("http://code.jquery.com/jquery-1.4.4.js");
   }
 }

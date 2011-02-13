@@ -118,7 +118,7 @@ public class DataUriGenerator {
 
     // output base64-encoding
     buffer.append(";base64,");
-    buffer.append(new String(Base64.encodeBytes(bytes)));
+    buffer.append(Base64.encodeBytes(bytes));
 
     // output to writer
     out.write(buffer.toString());

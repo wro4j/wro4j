@@ -1,9 +1,7 @@
 package ro.isdc.wro.model.group.processor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -20,6 +18,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
@@ -79,7 +78,6 @@ public abstract class PreProcessorExecutor {
   private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
     throws IOException {
     //TODO: hold a list of processed resources in order to avoid duplicates
-
     // merge preProcessorsBy type and anyPreProcessors
     final Collection<ResourcePreProcessor> processors = getPreProcessorsByType(resource.getType());
     if (!minimize) {
@@ -90,48 +88,43 @@ public abstract class PreProcessorExecutor {
 
 
   /**
+   * TODO: refactor this method.
+   * <p/>
    * Apply a list of preprocessors on a resource.
+   *
    * @param resource the {@link Resource} on which processors will be applied
-   * @param resources
-   *          the list of all resources to be processed in this context.
+   * @param resources the list of all resources to be processed in this context.
    * @param processors the list of processor to apply on the resource.
    */
   private String applyPreProcessors(final Resource resource, final List<Resource> resources, final Collection<ResourcePreProcessor> processors)
     throws IOException {
-    // get original content
-    Reader reader = null;
-    Writer writer = new StringWriter();
-    try {
-      reader = getResourceReader(resource, resources);
-    } catch (final IOException e) {
-      LOG.warn("Invalid resource found: " + resource);
-      if (ignoreMissingResources()) {
-        return writer.toString();
-      } else {
-        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
-        throw e;
-      }
-    }
+    String resourceContent = getResourceContent(resource, resources);
     if (processors.isEmpty()) {
-      IOUtils.copy(reader, writer);
-      return writer.toString();
+      return resourceContent;
     }
+    Writer writer = null;
+    final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
+      stopWatch.start("Using " + processor.getClass().getSimpleName());
       writer = new StringWriter();
-
-      //skip minimize validation if resource doesn't want to be minimized
+      // skip minimize validation if resource doesn't want to be minimized
       final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
       if (applyProcessor) {
         LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
+        final Reader reader = new StringReader(resourceContent);
         processor.process(resource, reader, writer);
+        reader.close();
       } else {
-        IOUtils.copy(reader, writer);
+        writer.write(resourceContent);
         LOG.debug("skipped processing on resource: " + resource);
       }
-      reader = new StringReader(writer.toString());
+      resourceContent = writer.toString();
+      stopWatch.stop();
     }
+    LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
+
 
   /**
    * @param resources
@@ -139,7 +132,7 @@ public abstract class PreProcessorExecutor {
    *          duplicates.
    * @return a Reader for the provided resource.
    */
-  private Reader getResourceReader(final Resource resource, final List<Resource> resources)
+  private String getResourceContent(final Resource resource, final List<Resource> resources)
       throws IOException {
     try {
       // populate duplicate Resource detector with known used resource uri's
@@ -147,8 +140,17 @@ public abstract class PreProcessorExecutor {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
       final InputStream is = uriLocatorFactory.locate(resource.getUri());
-      // wrap reader with bufferedReader for top efficiency
-      return new BufferedReader(new InputStreamReader(new SmartEncodingInputStream(is)));
+      final String result = IOUtils.toString(new SmartEncodingInputStream(is));
+      is.close();
+      return result;
+    } catch (final IOException e) {
+      LOG.warn("Invalid resource found: " + resource);
+      if (ignoreMissingResources()) {
+        return "";
+      } else {
+        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissingResources());
+        throw e;
+      }
     } finally {
       duplicateResourceDetector.reset();
     }

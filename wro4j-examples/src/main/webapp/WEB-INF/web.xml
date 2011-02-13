@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
 
   <display-name>WebResourceOptimizer Test Project</display-name>
 
@@ -13,6 +15,10 @@
     <init-param>
       <param-name>configuration</param-name>
       <param-value>development</param-value>
+    </init-param>
+    <init-param>
+      <param-name>disableCache</param-name>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>gzipResources</param-name>
@@ -40,7 +46,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,jsMin</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,googleClosureSimple</param-value>
     </init-param>
     <init-param>
       <param-name>postProcessors</param-name>
@@ -48,7 +54,7 @@
     </init-param>
   </filter>
   <filter-mapping>
-    <filter-name>WebResourceOptimizer</filter-name>
+    <filter-name>WebResourceOptimizer</filter-name> 
     <url-pattern>/wro/*</url-pattern>
     <dispatcher>FORWARD</dispatcher> 
     <dispatcher>REQUEST</dispatcher>
@@ -58,7 +64,6 @@
   <!-- DWR Servlet -->
   <servlet>
     <servlet-name>dwr-invoker</servlet-name>
-    <display-name>DWR Servlet</display-name>
     <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
     <init-param>
       <param-name>debug</param-name>
@@ -73,17 +78,14 @@
 
   <servlet>
     <servlet-name>resource.dynamic</servlet-name>
-    <display-name>Dynamic Resource Servlet</display-name>
     <servlet-class>ro.isdc.wro.examples.http.DynamicResourceServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>resource.redirect</servlet-name>
-    <display-name>Dynamic Resource Servlet</display-name>
     <servlet-class>ro.isdc.wro.examples.http.RedirectResourceServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>resource.dispatch</servlet-name>
-    <display-name>Dynamic Resource Servlet</display-name>
     <servlet-class>ro.isdc.wro.examples.http.DispatchResourceServlet</servlet-class>
   </servlet>
 
@@ -102,7 +104,6 @@
 
  <servlet>
     <servlet-name>externalResource</servlet-name>
-    <display-name>External Resource SerRvlet</display-name>
     <servlet-class>ro.isdc.wro.examples.ExternalResourceServlet</servlet-class>
   </servlet>
 

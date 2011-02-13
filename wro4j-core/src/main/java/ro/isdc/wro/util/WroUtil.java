@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -30,6 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -318,6 +320,15 @@ public final class WroUtil {
    */
   private static String stripWildcard(final String result) {
     return result.substring(1, result.length() - 1);
+  }
+
+  /**
+   * Add no-cache headers to response.
+   */
+  public static void addNoCacheHeaders(final HttpServletResponse response) {
+    response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
+    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
+    response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
   }
 
   /**

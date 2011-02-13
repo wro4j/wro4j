@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -90,6 +89,6 @@ public final class CacheEntry implements Serializable {
 	 */
 	@Override
   public String toString() {
-    return new ToStringBuilder("", ToStringStyle.MULTI_LINE_STYLE).append(getGroupName()).append(getType()).append(isMinimize()).toString();
+    return new ToStringBuilder("").append(getGroupName()).append(getType()).append(isMinimize()).toString();
   }
 }
