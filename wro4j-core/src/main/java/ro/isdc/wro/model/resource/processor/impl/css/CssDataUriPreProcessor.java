@@ -28,6 +28,10 @@ public class CssDataUriPreProcessor
   extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssDataUriPreProcessor.class);
   /**
+   * The size limit. Images larger than this limit won't be transformed (due to IE8 limitation).
+   */
+  private static final int SIZE_LIMIT = 32 * 1024;;
+  /**
    * Generates dataUri based on inputStream of the url's found inside the css resource.
    */
   private DataUriGenerator dataUriGenerator;
@@ -37,7 +41,6 @@ public class CssDataUriPreProcessor
   @Inject
   private UriLocatorFactory uriLocatorFactory;
 
-
   /**
    * Replace provided url with the new url if needed.
    *
@@ -46,7 +49,7 @@ public class CssDataUriPreProcessor
    * @return replaced url.
    */
   @Override
-  protected final String replaceImageUrl(final String cssUri, final String imageUrl) {
+  protected String replaceImageUrl(final String cssUri, final String imageUrl) {
     if (uriLocatorFactory == null) {
       throw new IllegalStateException("No UriLocatorFactory was injected!");
     }
@@ -82,8 +85,7 @@ public class CssDataUriPreProcessor
    */
   protected boolean replaceWithDataUri(final String dataUri) throws UnsupportedEncodingException {
     final byte[] bytes = dataUri.getBytes("UTF8");
-    final int limit = 32 * 1024;
-    final boolean exceedLimit = bytes.length >= limit;
+    final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
     LOG.debug("dataUri size: " + bytes.length/1024 + "KB, limit exceeded: " + exceedLimit);
     return !exceedLimit;
   }
