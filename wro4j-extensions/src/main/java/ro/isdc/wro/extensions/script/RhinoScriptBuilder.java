@@ -68,6 +68,17 @@ public class RhinoScriptBuilder {
     }
   }
 
+  public RhinoScriptBuilder addJSON() {
+    try {
+      final String SCRIPT_ENV = "json2.min.js";
+      final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
+      evaluateScript(script, SCRIPT_ENV);
+      return this;
+    } catch (final IOException e) {
+      throw new RuntimeException("Couldn't initialize json2.min.js script", e);
+    }
+  }
+
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
    *
@@ -120,7 +131,7 @@ public class RhinoScriptBuilder {
   /**
    * Evaluates the script without exiting the Context.
    */
-  private Object evaluateScript(final InputStream script, final String sourceName)
+  public Object evaluateScript(final InputStream script, final String sourceName)
       throws IOException {
     try {
       return context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
@@ -159,12 +170,21 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final String script, final String sourceName) {
     try {
+      return evaluateString(script, sourceName);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  /**
+   * Evaluates the string without exiting the context.
+   */
+  public Object evaluateString(final String script, final String sourceName) {
+    try {
       return context.evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
-    } finally {
-      Context.exit();
     }
   }
 
