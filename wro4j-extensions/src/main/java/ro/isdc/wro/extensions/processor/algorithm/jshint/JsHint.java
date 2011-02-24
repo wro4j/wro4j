@@ -55,7 +55,12 @@ public class JsHint {
       final String packIt = buildPackScript(WroUtil.toJSMultiLineString(data));
       final boolean result = Boolean.parseBoolean(builder.evaluateString(packIt, "check").toString());
       if (!result) {
-        LOG.error("" + builder.addJSON().evaluate("JSON.stringify(JSHINT.data());", "jsHint.data"));
+        //JSON.stringify()
+        final String json = builder.addJSON().evaluate("JSON.stringify(JSHINT.data())", "jsHint.data").toString();
+        LOG.debug("json {}", json);
+        //final Object gson = new Gson().fromJson(json, new HashMap<String, Object>().getClass());
+//        LOG.debug("gson {}", gson);
+        LOG.error("" + json);
       }
       LOG.debug("result: " + result);
       watch.stop();
