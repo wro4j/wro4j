@@ -97,6 +97,9 @@ public class TestWroUtil {
 
     request = mockRequestHeader("~~~~~~~~~~~~~~~", "~~~~~~~~~~~~~");
     Assert.assertTrue(WroUtil.isGzipSupported(request));
+
+    request = mockRequestHeader("Accept-Encoding", "gzip,deflate,sdch");
+    Assert.assertTrue(WroUtil.isGzipSupported(request));
   }
 
   /**

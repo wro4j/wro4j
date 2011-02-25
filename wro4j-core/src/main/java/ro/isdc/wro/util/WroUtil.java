@@ -58,9 +58,9 @@ public final class WroUtil {
    * Patterns used to search for mangled Accept-Encoding header.
    */
   private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(
-    "^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$", Pattern.CASE_INSENSITIVE);
+    "(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
   private static final Pattern PATTERN_GZIP = Pattern.compile(
-    "^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?|X{4,13}|~{4,13}|-{4,13})$", Pattern.CASE_INSENSITIVE);
+    "(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
 
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
