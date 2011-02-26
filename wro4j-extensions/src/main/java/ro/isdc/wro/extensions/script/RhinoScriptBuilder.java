@@ -22,10 +22,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alex Objelean
  */
+/**
+ * @author Admin
+ *
+ */
 public class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
   private Context context;
   private Scriptable scope;
+
 
   /**
    * Constructor.
@@ -34,26 +39,33 @@ public class RhinoScriptBuilder {
     initContext();
   }
 
+
   /**
    * Initialize the context.
    */
   private void initContext() {
+    // remove any existing context.
+    if (Context.getCurrentContext() != null) {
+      Context.exit();
+    }
     context = Context.enter();
     context.setOptimizationLevel(-1);
-    //TODO redirect errors from System.err to LOG.error()
+    // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
     context.setLanguageVersion(Context.VERSION_1_7);
     scope = context.initStandardObjects();
     try {
       final InputStream script = getClass().getResourceAsStream("commons.min.js");
-      evaluateScript(script, "common.js");
+      evaluate(script, "common.js");
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
     }
   }
 
+
   /**
    * Add a clinet side environment to the script context (client-side aware).
+   *
    * @return {@link RhinoScriptBuilder} used to chain evaluation of the scripts.
    * @throws IOException
    */
@@ -61,40 +73,44 @@ public class RhinoScriptBuilder {
     try {
       final String SCRIPT_ENV = "env.rhino.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluateScript(script, SCRIPT_ENV);
+      evaluate(script, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize env.rhino script", e);
     }
   }
 
+
   public RhinoScriptBuilder addJSON() {
     try {
       final String SCRIPT_ENV = "json2.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluateScript(script, SCRIPT_ENV);
+      evaluate(script, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);
     }
   }
 
+
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
    *
-   * @param script {@link InputStream} of the script to evaluate.
+   * @param stream {@link InputStream} of the script to evaluate.
    * @param sourceName the name of the evaluated script.
    * @return evaluated object.
    * @throws IOException if the script couldn't be retrieved.
    */
-  public RhinoScriptBuilder evaluateChain(final InputStream script, final String sourceName) throws IOException {
+  public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
+    throws IOException {
     try {
-      context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
+      context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
     } finally {
-      script.close();
+      stream.close();
     }
   }
+
 
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
@@ -109,6 +125,7 @@ public class RhinoScriptBuilder {
     return this;
   }
 
+
   /**
    * Evaluates a script from a stream.
    *
@@ -117,48 +134,39 @@ public class RhinoScriptBuilder {
    * @return evaluated object.
    * @throws IOException if the script couldn't be retrieved.
    */
-  public Object evaluate(final InputStream script, final String sourceName) throws IOException {
+  public Object evaluate(final InputStream stream, final String sourceName)
+    throws IOException {
     try {
-      return evaluateScript(script, sourceName);
+      return context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
     } catch (final JavaScriptException e) {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
     } finally {
-      Context.exit();
+      stream.close();
     }
   }
 
-  /**
-   * Evaluates the script without exiting the Context.
-   */
-  public Object evaluateScript(final InputStream script, final String sourceName)
-      throws IOException {
-    try {
-      return context.evaluateReader(scope, new InputStreamReader(script), sourceName, 1, null);
-    } finally {
-      script.close();
-    }
-  }
 
   /**
    * Evaluates a script from a reader.
    *
-   * @param script {@link Reader} of the script to evaluate.
+   * @param reader {@link Reader} of the script to evaluate.
    * @param sourceName the name of the evaluated script.
    * @return evaluated object.
    * @throws IOException if the script couldn't be retrieved.
    */
-  public Object evaluate(final Reader script, final String sourceName) throws IOException {
+  public Object evaluate(final Reader reader, final String sourceName)
+    throws IOException {
     try {
-      return context.evaluateReader(scope, script, sourceName, 1, null);
+      return context.evaluateReader(scope, reader, sourceName, 1, null);
     } catch (final JavaScriptException e) {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
     } finally {
-      script.close();
-      Context.exit();
+      reader.close();
     }
   }
+
 
   /**
    * Evaluates a script.
@@ -170,17 +178,6 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final String script, final String sourceName) {
     try {
-      return evaluateString(script, sourceName);
-    } finally {
-      Context.exit();
-    }
-  }
-
-  /**
-   * Evaluates the string without exiting the context.
-   */
-  public Object evaluateString(final String script, final String sourceName) {
-    try {
       return context.evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {
       LOG.error("JavaScriptException occured: " + e.getMessage());
@@ -188,12 +185,14 @@ public class RhinoScriptBuilder {
     }
   }
 
+
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.
    */
   public static RhinoScriptBuilder newChain() {
     return new RhinoScriptBuilder();
   }
+
 
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.

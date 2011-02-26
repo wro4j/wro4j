@@ -5,7 +5,10 @@ package ro.isdc.wro.extensions.processor.algorithm.jshint;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.List;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,9 @@ import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 
 /**
  * Apply Packer compressor script using scriptEngine.
@@ -23,6 +29,10 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class JsHint {
   private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);
+
+  public JsHint(final String... options) {
+
+  }
 
   /**
    * Initialize script builder for evaluation.
@@ -35,9 +45,11 @@ public class JsHint {
     }
   }
 
+
   private InputStream getStreamForJsHint() {
     return getClass().getResourceAsStream("jshint.js");
   }
+
 
   /**
    * @param data js content to process.
@@ -52,31 +64,42 @@ public class JsHint {
       watch.stop();
       watch.start("jsHint");
 
-      final String packIt = buildPackScript(WroUtil.toJSMultiLineString(data));
-      final boolean result = Boolean.parseBoolean(builder.evaluateString(packIt, "check").toString());
-      if (!result) {
-        //JSON.stringify()
-        final String json = builder.addJSON().evaluate("JSON.stringify(JSHINT.data())", "jsHint.data").toString();
+      final String packIt = buildJsHintScript(WroUtil.toJSMultiLineString(data));
+      final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
+      if (!valid) {
+        final Object o = builder.evaluate("JSHINT.errors", null);
+
+        LOG.debug("o {}", Context.jsToJava(o, String.class));
+        final String json = builder.addJSON().evaluate("JSON.stringify(JSHINT.errors)", "jsHint.errors").toString();
         LOG.debug("json {}", json);
-        //final Object gson = new Gson().fromJson(json, new HashMap<String, Object>().getClass());
-//        LOG.debug("gson {}", gson);
+        final Type type = new TypeToken<List<JsError>>() {}.getType();
+        final List<JsError> list = new Gson().fromJson(json, type);
+        LOG.debug("list {}", list);
         LOG.error("" + json);
       }
-      LOG.debug("result: " + result);
+      LOG.debug("result: " + valid);
       watch.stop();
       LOG.debug(watch.prettyPrint());
-      return result;
+      return valid;
     } catch (final RhinoException e) {
       throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
     }
   }
 
+
   /**
    * @param data script to pack.
+   * @param options options to set as true
    * @return Script used to pack and return the packed result.
    */
-  protected String buildPackScript(final String data) {
-    return "JSHINT(" + data + ", {});";
+  private String buildJsHintScript(final String data, final String ... options) {
+    final StringBuffer sb = new StringBuffer("{");
+    for (final String option : options) {
+      sb.append(option + ": true");
+    }
+    sb.append("}");
+    LOG.debug("sb {} ", sb);
+    final String optionArg = "{undef: false, passfail: false}";
+    return "JSHINT(" + data + ", " + sb.toString() + ");";
   }
 }
-

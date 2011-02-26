@@ -53,7 +53,6 @@ public class JsHintProcessor
     } catch (final WroRuntimeException e) {
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
     } finally {
-
       reader.close();
       writer.close();
     }

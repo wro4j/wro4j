@@ -10,7 +10,6 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -23,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Apr 21, 2010
  */
-public class TestJsHintProcessor extends AbstractWroTest {
+public class TestJsHintProcessor {
   private ResourcePostProcessor processor;
 
   @Before
