@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHint;
+import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -33,10 +34,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class JsHintProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
-  /**
-   * Engine.
-   */
-  private JsHint engine;
 
   /**
    * {@inheritDoc}
@@ -45,24 +42,17 @@ public class JsHintProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      if (getEngine().isValid(content)) {
-        writer.write(content);
-      } else {
-        LOG.error("The processed script has errors, the processed content will be empty.");
-      }
+      new JsHint().validate(content);
+      writer.write(content);
+    } catch (final JsHintException e) {
+      //TODO leave the script the same when error occurs?
+      LOG.error("The processed script has errors, the processed content will be empty.");
     } catch (final WroRuntimeException e) {
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
     }
-  }
-
-  private JsHint getEngine() {
-    if (engine == null) {
-      engine = new JsHint();
-    }
-    return engine;
   }
 
   /**
