@@ -10,24 +10,24 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintPreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Test packer js processor.
+ * Test {@link JsHintPreProcessor}.
  *
  * @author Alex Objelean
- * @created Created on Apr 21, 2010
+ * @created Created on Feb 27, 2011
  */
 public class TestJsHintProcessor {
-  private ResourcePostProcessor processor;
+  private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {
-    processor = new JsHintProcessor();
+    processor = new JsHintPreProcessor();
   }
 
   @Test

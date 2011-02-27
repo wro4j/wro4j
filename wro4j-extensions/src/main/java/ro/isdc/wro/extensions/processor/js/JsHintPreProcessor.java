@@ -15,11 +15,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHint;
 import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
-import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -29,11 +27,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @author Alex Objelean
  * @created 31 Jul 2010
  */
-@Minimize
 @SupportedResourceType(ResourceType.JS)
-public class JsHintProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
+public class JsHintPreProcessor
+  implements ResourcePreProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(JsHintPreProcessor.class);
 
   /**
    * {@inheritDoc}
@@ -45,6 +42,7 @@ public class JsHintProcessor
       new JsHint().validate(content);
       writer.write(content);
     } catch (final JsHintException e) {
+      onJsHintException(e, resource);
       //TODO leave the script the same when error occurs?
       LOG.error("The processed script has errors, the processed content will be empty.");
     } catch (final WroRuntimeException e) {
@@ -55,12 +53,13 @@ public class JsHintProcessor
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
-  }
 
+  /**
+   * Called when {@link JsHintException} is thrown. Allows subclasses to rethrow this exception as a
+   * {@link RuntimeException} or handle it differently.
+   *
+   * @param e {@link JsHintException} which has occurred.
+   * @param resource the processed resource which caused the exception.
+   */
+  protected void onJsHintException(final JsHintException e, final Resource resource) {}
 }

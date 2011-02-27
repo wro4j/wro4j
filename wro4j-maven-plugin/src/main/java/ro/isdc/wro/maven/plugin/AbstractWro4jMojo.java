@@ -10,4 +10,5 @@ import org.apache.maven.plugin.AbstractMojo;
  * @author Alex Objelean
  */
 public abstract class AbstractWro4jMojo extends AbstractMojo {
+
 }
