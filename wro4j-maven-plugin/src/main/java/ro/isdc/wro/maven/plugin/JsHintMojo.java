@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+
 
 
 /**
@@ -22,5 +24,14 @@ public class JsHintMojo extends AbstractWro4jMojo {
   public void doExecute()
     throws Exception {
 
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected StandaloneContextAwareManagerFactory getManagerFactory()
+    throws Exception {
+    return null;
   }
 }
