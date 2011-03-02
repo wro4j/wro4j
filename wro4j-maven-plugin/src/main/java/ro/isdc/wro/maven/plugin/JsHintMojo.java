@@ -10,6 +10,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
@@ -57,6 +58,9 @@ public class JsHintMojo extends AbstractWro4jMojo {
   @Override
   public void doExecute()
     throws Exception {
+    getLog().info("options: " + options);
+    getLog().info("failNever: " + failNever);
+
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
@@ -103,7 +107,8 @@ public class JsHintMojo extends AbstractWro4jMojo {
           protected void onJsHintException(final JsHintException e, final Resource resource)
             throws Exception {
             getLog().error(
-              "Errors found while processing resource: " + resource.getUri() + " Errors are: " + e.getErrors());
+              e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
+                + e.getErrors());
             if (!failNever) {
               throw new MojoExecutionException("Errors found when validating resource: " + resource);
             }
@@ -119,7 +124,7 @@ public class JsHintMojo extends AbstractWro4jMojo {
    * @return an array of options.
    */
   private String[] getOptions() {
-    return options == null ? new String[] {} : options.split(",");
+    return StringUtils.isEmpty(options) ? new String[] {} : options.split(",");
   }
 
   /**

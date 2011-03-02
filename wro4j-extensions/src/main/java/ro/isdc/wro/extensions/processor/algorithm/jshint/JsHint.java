@@ -77,7 +77,6 @@ public class JsHint {
         final Type type = new TypeToken<List<JsError>>() {}.getType();
         final List<JsError> errors = new Gson().fromJson(json, type);
         LOG.debug("errors {}", errors);
-        LOG.error("" + json);
         throw new JsHintException().setErrors(errors);
       }
       LOG.debug("result: " + valid);
