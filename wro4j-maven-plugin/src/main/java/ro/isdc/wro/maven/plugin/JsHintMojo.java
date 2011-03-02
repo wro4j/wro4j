@@ -44,6 +44,14 @@ public class JsHintMojo extends AbstractWro4jMojo {
    */
   private String options;
   /**
+   * When true, all the plugin won't stop its execution and will log all found errors.
+   *
+   * @parameter default-value="false" expression="${failNever}"
+   * @optional
+   */
+  private boolean failNever;
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -92,9 +100,13 @@ public class JsHintMojo extends AbstractWro4jMojo {
       protected void configureProcessors(final GroupsProcessor groupsProcessor) {
         final ResourcePreProcessor processor = new JsHintPreProcessor() {
           @Override
-          protected void onJsHintException(final JsHintException e, final Resource resource) throws Exception {
-            getLog().error("Errors found while processing resource: " + resource + " Errors are: " + e.getErrors());
-            throw new MojoExecutionException("Errors found when validating resource: " + resource);
+          protected void onJsHintException(final JsHintException e, final Resource resource)
+            throws Exception {
+            getLog().error(
+              "Errors found while processing resource: " + resource.getUri() + " Errors are: " + e.getErrors());
+            if (!failNever) {
+              throw new MojoExecutionException("Errors found when validating resource: " + resource);
+            }
           };
         }.setOptions(getOptions());
         groupsProcessor.addPreProcessor(processor);
@@ -115,5 +127,12 @@ public class JsHintMojo extends AbstractWro4jMojo {
    */
   public void setOptions(final String options) {
     this.options = options;
+  }
+
+  /**
+   * @param failNever the failFast to set
+   */
+  public void setFailNever(final boolean failNever) {
+    this.failNever = failNever;
   }
 }

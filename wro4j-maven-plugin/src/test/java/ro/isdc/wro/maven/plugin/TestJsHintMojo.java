@@ -86,6 +86,15 @@ public class TestJsHintMojo {
   }
 
   @Test
+  public void testErrorsWithNoFailFast()
+    throws Exception {
+    mojo.setFailNever(true);
+    mojo.setOptions("undef, browser");
+    mojo.setTargetGroups("undef");
+    mojo.execute();
+  }
+
+  @Test
   public void testResourceWithUndefVariables()
     throws Exception {
     mojo.setTargetGroups("undef");
