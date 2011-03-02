@@ -5,6 +5,7 @@ package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -16,8 +17,10 @@ import org.codehaus.classworlds.ClassWorld;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.model.WroModel;
 
 
 /**
@@ -60,6 +63,10 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * @parameter default-value="${project}"
    */
   private MavenProject mavenProject;
+  /**
+   * An instance of {@link StandaloneContextAwareManagerFactory}.
+   */
+  private StandaloneContextAwareManagerFactory managerFactory;
 
 
   /**
@@ -84,7 +91,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
 
-
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
@@ -103,14 +109,40 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    */
   protected abstract void doExecute() throws Exception;
 
-
   /**
    * This method will ensure that you have a right and initialized instance of
    * {@link StandaloneContextAwareManagerFactory}.
    *
    * @return {@link WroManagerFactory} implementation.
    */
-  protected abstract StandaloneContextAwareManagerFactory getManagerFactory() throws Exception;
+  protected final StandaloneContextAwareManagerFactory getManagerFactory()
+    throws Exception {
+    if (managerFactory == null) {
+      managerFactory = newWroManagerFactory();
+      // initialize before process.
+      managerFactory.initialize(createStandaloneContext());
+    }
+    return managerFactory;
+  }
+
+  /**
+   * @return
+   */
+  protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
+    return new DefaultStandaloneContextAwareManagerFactory();
+  }
+
+  /**
+   * @return a list containing all groups needs to be processed.
+   */
+  protected final List<String> getTargetGroupsAsList()
+    throws Exception {
+    if (getTargetGroups() == null) {
+      final WroModel model = getManagerFactory().getInstance().getModel();
+      return model.getGroupNames();
+    }
+    return Arrays.asList(getTargetGroups().split(","));
+  }
 
   /**
    * Checks if all required fields are configured.

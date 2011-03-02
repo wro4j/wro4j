@@ -8,9 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -24,9 +22,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -66,11 +62,17 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private String wroManagerFactory;
-  /**
-   * An instance of {@link StandaloneContextAwareManagerFactory}.
-   */
-  private StandaloneContextAwareManagerFactory managerFactory;
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
+    if (wroManagerFactory != null) {
+      return createCustomManagerFactory();
+    }
+    return super.newWroManagerFactory();
+  }
 
   /**
    * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
@@ -99,34 +101,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     if (destinationFolder == null) {
       throw new MojoExecutionException("destinationFolder was not set!");
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory()
-    throws Exception {
-    if (managerFactory == null) {
-      if (wroManagerFactory != null) {
-        managerFactory = createCustomManagerFactory();
-      } else {
-        managerFactory = createDefaultManagerFactory();
-      }
-
-      // initialize before process.
-      managerFactory.initialize(createStandaloneContext());
-    }
-    return managerFactory;
-  }
-
-
-
-  /**
-   * Creates default instance of {@link StandaloneContextAwareManagerFactory}.
-   */
-  private StandaloneContextAwareManagerFactory createDefaultManagerFactory() {
-    return new DefaultStandaloneContextAwareManagerFactory();
   }
 
   /**
@@ -198,20 +172,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
     return folder;
   }
-
-
-  /**
-   * @return a list containing all groups needs to be processed.
-   */
-  private List<String> getTargetGroupsAsList()
-    throws Exception {
-    if (getTargetGroups() == null) {
-      final WroModel model = getManagerFactory().getInstance().getModel();
-      return model.getGroupNames();
-    }
-    return Arrays.asList(getTargetGroups().split(","));
-  }
-
 
   /**
    * Process a single group.

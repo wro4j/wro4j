@@ -3,8 +3,9 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import java.util.Collection;
 
+import ro.isdc.wro.model.resource.ResourceType;
 
 
 /**
@@ -23,15 +24,20 @@ public class JsHintMojo extends AbstractWro4jMojo {
   @Override
   public void doExecute()
     throws Exception {
-
+    final Collection<String> groupsAsList = getTargetGroupsAsList();
+    for (final String group : groupsAsList) {
+      for (final ResourceType resourceType : ResourceType.values()) {
+        final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
+        processGroup(groupWithExtension);
+      }
+    }
   }
 
+
   /**
-   * {@inheritDoc}
+   * @param groupWithExtension
    */
-  @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory()
-    throws Exception {
-    return null;
+  private void processGroup(final String groupWithExtension) {
+
   }
 }
