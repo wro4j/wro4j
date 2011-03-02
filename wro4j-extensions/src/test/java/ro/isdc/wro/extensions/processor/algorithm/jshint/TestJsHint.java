@@ -20,8 +20,8 @@ public class TestJsHint {
   }
 
 
-  @Test(expected=IllegalArgumentException.class)
-  public void cannotSetNullOptions() throws Exception {
+  @Test
+  public void testSetNullOptions() throws Exception {
     jsHint.setOptions((String[])null);
     jsHint.validate("");
   }

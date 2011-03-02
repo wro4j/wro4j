@@ -32,6 +32,14 @@ public class JsHintPreProcessor
   implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsHintPreProcessor.class);
 
+  private String[] options;
+
+
+  public JsHintPreProcessor setOptions(final String[] options) {
+    this.options = options;
+    return this;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -39,12 +47,16 @@ public class JsHintPreProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      new JsHint().validate(content);
+      new JsHint().setOptions(options).validate(content);
       writer.write(content);
     } catch (final JsHintException e) {
-      onJsHintException(e, resource);
-      //TODO leave the script the same when error occurs?
-      LOG.error("The processed script has errors, the processed content will be empty.");
+      try {
+        LOG.error("The following resource: " + resource + " has errors.", e);
+        // TODO leave the script the same when error occurs?
+        onJsHintException(e, resource);
+      } catch (final Exception ex) {
+        throw new WroRuntimeException("", ex);
+      }
     } catch (final WroRuntimeException e) {
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
     } finally {
@@ -55,11 +67,11 @@ public class JsHintPreProcessor
 
 
   /**
-   * Called when {@link JsHintException} is thrown. Allows subclasses to rethrow this exception as a
+   * Called when {@link JsHintException} is thrown. Allows subclasses to re-throw this exception as a
    * {@link RuntimeException} or handle it differently.
    *
    * @param e {@link JsHintException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onJsHintException(final JsHintException e, final Resource resource) {}
+  protected void onJsHintException(final JsHintException e, final Resource resource) throws Exception {}
 }

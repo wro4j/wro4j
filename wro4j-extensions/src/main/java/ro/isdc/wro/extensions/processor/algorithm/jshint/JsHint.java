@@ -6,6 +6,7 @@ package ro.isdc.wro.extensions.processor.algorithm.jshint;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import org.mozilla.javascript.Context;
@@ -23,13 +24,13 @@ import com.google.gson.reflect.TypeToken;
 
 
 /**
- * Apply Packer compressor script using scriptEngine.
+ * Apply JsHint script checking utility.
  *
  * @author Alex Objelean
  */
 public class JsHint {
   private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);
-  private String[] options = new String[] {};
+  private String[] options;
 
 
   public JsHint() {}
@@ -65,7 +66,7 @@ public class JsHint {
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       watch.start("jsHint");
-      LOG.debug("options: " + this.options);
+      LOG.debug("options: " + Arrays.toString(this.options));
       final String packIt = buildJsHintScript(WroUtil.toJSMultiLineString(data), this.options);
       final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
       if (!valid) {
@@ -89,16 +90,18 @@ public class JsHint {
 
 
   /**
-   * @param data script to pack.
+   * @param data script to process.
    * @param options options to set as true
    * @return Script used to pack and return the packed result.
    */
   private String buildJsHintScript(final String data, final String... options) {
     final StringBuffer sb = new StringBuffer("{");
-    for (int i = 0; i < options.length; i++) {
-      sb.append(options[i] + ": true");
-      if (i < options.length - 1) {
-        sb.append(",");
+    if (options != null) {
+      for (int i = 0; i < options.length; i++) {
+        sb.append(options[i] + ": true");
+        if (i < options.length - 1) {
+          sb.append(",");
+        }
       }
     }
     sb.append("}");
@@ -110,10 +113,9 @@ public class JsHint {
   /**
    * @param options the options to set
    */
-  public void setOptions(final String ... options) {
-    if (options == null) {
-      throw new IllegalArgumentException("Options cannot be null!");
-    }
-    this.options = options;
+  public JsHint setOptions(final String ... options) {
+    LOG.debug("setOptions: {}", options);
+    this.options = options == null ? new String[] {} : options;
+    return this;
   }
 }
