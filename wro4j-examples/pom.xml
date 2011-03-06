@@ -190,6 +190,7 @@
 					<port>81</port>
 				</configuration>
 			</plugin>
+			<!-- 
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
@@ -205,8 +206,7 @@
           <failNever>false</failNever>
         </configuration>
       </plugin> 
-			
-			
+		 -->
 			<plugin>
 				<groupId>ro.isdc.wro4j</groupId>
 				<artifactId>wro4j-maven-plugin</artifactId>
