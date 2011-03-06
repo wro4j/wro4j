@@ -206,7 +206,7 @@
         </configuration>
       </plugin> 
 			
-			<!--
+			
 			<plugin>
 				<groupId>ro.isdc.wro4j</groupId>
 				<artifactId>wro4j-maven-plugin</artifactId>
@@ -218,14 +218,14 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
+				<configuration>					
 					<wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
 					<wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
-					<targetGroups>all</targetGroups>
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
+					<targetGroups></targetGroups>
 				</configuration>
 			</plugin> 
-				-->
+			<!--	-->
 		</plugins>
 	</build>
 	<repositories>

@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
-import ro.isdc.wro.extensions.processor.js.JsHintPreProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
@@ -102,7 +102,7 @@ public class JsHintMojo extends AbstractWro4jMojo {
     return new DefaultStandaloneContextAwareManagerFactory() {
       @Override
       protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-        final ResourcePreProcessor processor = new JsHintPreProcessor() {
+        final ResourcePreProcessor processor = new JsHintProcessor() {
           @Override
           protected void onJsHintException(final JsHintException e, final Resource resource)
             throws Exception {

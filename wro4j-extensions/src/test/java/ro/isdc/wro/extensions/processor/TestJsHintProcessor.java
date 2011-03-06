@@ -10,14 +10,14 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.js.JsHintPreProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Test {@link JsHintPreProcessor}.
+ * Test {@link JsHintProcessor}.
  *
  * @author Alex Objelean
  * @created Created on Feb 27, 2011
@@ -27,7 +27,7 @@ public class TestJsHintProcessor {
 
   @Before
   public void setUp() {
-    processor = new JsHintPreProcessor();
+    processor = new JsHintProcessor();
   }
 
   @Test

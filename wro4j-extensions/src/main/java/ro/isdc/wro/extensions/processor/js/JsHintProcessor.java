@@ -29,16 +29,16 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created 1 Mar 2011
  */
 @SupportedResourceType(ResourceType.JS)
-public class JsHintPreProcessor
+public class JsHintProcessor
   implements ResourcePreProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(JsHintPreProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
   /**
    * Options to use to configure jsHint.
    */
   private String[] options;
 
 
-  public JsHintPreProcessor setOptions(final String[] options) {
+  public JsHintProcessor setOptions(final String[] options) {
     this.options = options;
     return this;
   }
@@ -53,15 +53,15 @@ public class JsHintPreProcessor
       new JsHint().setOptions(options).validate(content);
     } catch (final JsHintException e) {
       try {
-        // TODO leave the script the same when error occurs?
         onJsHintException(e, resource);
       } catch (final Exception ex) {
         throw new WroRuntimeException("", ex);
       }
     } catch (final WroRuntimeException e) {
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
+      LOG.warn("Exception while applying " + getClass().getSimpleName()
+        + " processor on the resource, no processing applied...", e);
     } finally {
-      //don't change the processed content no matter what happens.
+      // don't change the processed content no matter what happens.
       writer.write(content);
       reader.close();
       writer.close();
@@ -76,7 +76,8 @@ public class JsHintPreProcessor
    * @param e {@link JsHintException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onJsHintException(final JsHintException e, final Resource resource) throws Exception {
+  protected void onJsHintException(final JsHintException e, final Resource resource)
+    throws Exception {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
 }
