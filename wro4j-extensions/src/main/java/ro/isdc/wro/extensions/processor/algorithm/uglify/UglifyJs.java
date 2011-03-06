@@ -93,7 +93,7 @@ public class UglifyJs {
       sb.append("ast = exports.ast_mangle(ast);");
       sb.append("ast = exports.ast_squeeze(ast);");
       // the second argument is true for uglify and false for beautify.
-      sb.append("return exports.gen_code(ast, " + !uglify + ");");
+      sb.append("return exports.gen_code(ast, {beautify: " + !uglify + " });");
       sb.append("})();");
 
       final Object result = builder.evaluate(sb.toString(), "uglifyIt");

@@ -11,7 +11,7 @@ new base2.Package(this, {
   imports: "Function2,Enumerable"
 });
 
-eval(this.imports);
+eval(this.imports);	
 
 var IGNORE = RegGrp.IGNORE;
 var KEYS   = "~";
