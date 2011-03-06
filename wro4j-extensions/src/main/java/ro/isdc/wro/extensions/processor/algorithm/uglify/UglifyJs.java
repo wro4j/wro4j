@@ -18,7 +18,9 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * Apply UglifyJs processing. A detailed documentation about how to use uglify-js can be found at this location:
- * {@link https://github.com/mishoo/UglifyJS}
+ * {@link https://github.com/mishoo/UglifyJS}.
+ * <p/>
+ * Using untagged uglifyJs version (commit 2011-02-28 22:37:53).
  *
  * @author Alex Objelean
  */
@@ -57,16 +59,14 @@ public class UglifyJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_JSON = "json2.min.js";
-      final InputStream jsonStream = getClass().getResourceAsStream(SCRIPT_JSON);
       final String SCRIPT_PARSE = "parse-js.min.js";
       final InputStream parseStream = getClass().getResourceAsStream(SCRIPT_PARSE);
       final String SCRIPT_PROCESS = "process.min.js";
       final InputStream processStream = getClass().getResourceAsStream(SCRIPT_PROCESS);
 
       final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";
-      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initScript").evaluateChain(jsonStream,
-        SCRIPT_JSON).evaluateChain(parseStream, SCRIPT_PARSE).evaluateChain(processStream, SCRIPT_PROCESS);
+      return RhinoScriptBuilder.newChain().addJSON().evaluateChain(scriptInit, "initScript").evaluateChain(parseStream,
+        SCRIPT_PARSE).evaluateChain(processStream, SCRIPT_PROCESS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed initializing js", ex);
     }
