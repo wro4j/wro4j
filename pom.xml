@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
-  <version>1.3.5-SNAPSHOT</version>
+  <version>1.3.5</version>
 	<packaging>pom</packaging>	
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
@@ -81,7 +81,7 @@
     <module>wro4j-runner</module>  
     <module>wro4j-examples</module>  
     -->    
-    <!---->
+    
   </modules>
 
 	<dependencyManagement>
