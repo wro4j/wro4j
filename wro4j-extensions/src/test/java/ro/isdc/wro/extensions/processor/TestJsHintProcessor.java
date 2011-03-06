@@ -25,13 +25,16 @@ import ro.isdc.wro.util.WroUtil;
 public class TestJsHintProcessor {
   private ResourcePreProcessor processor;
 
+
   @Before
   public void setUp() {
     processor = new JsHintProcessor();
   }
 
+
   @Test
-  public void testFromFolder() throws IOException {
+  public void testFromFolder()
+    throws IOException {
     final URL url = getClass().getResource("jsHint");
 
     final File testFolder = new File(url.getFile(), "test");
