@@ -21,10 +21,11 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 
 
 /**
@@ -101,7 +102,8 @@ public class JsHintMojo extends AbstractWro4jMojo {
     throws MojoExecutionException {
     return new DefaultStandaloneContextAwareManagerFactory() {
       @Override
-      protected void configureProcessors(final GroupsProcessor groupsProcessor) {
+      protected ProcessorsFactory newProcessorsFactory() {
+        final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
         final ResourcePreProcessor processor = new JsHintProcessor() {
           @Override
           protected void onJsHintException(final JsHintException e, final Resource resource)
@@ -114,7 +116,9 @@ public class JsHintMojo extends AbstractWro4jMojo {
             }
           };
         }.setOptions(getOptions());
-        groupsProcessor.addPreProcessor(processor);
+
+        factory.addPreProcessor(processor);
+        return factory;
       }
     };
   }
