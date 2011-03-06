@@ -25,6 +25,8 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * Apply JsHint script checking utility.
+ * <p/>
+ * Using untagged version (commit 2011-03-06 02:34:21)
  *
  * @author Alex Objelean
  */
@@ -49,7 +51,7 @@ public class JsHint {
 
 
   private InputStream getStreamForJsHint() {
-    return getClass().getResourceAsStream("jshint.js");
+    return getClass().getResourceAsStream("jshint.min.js");
   }
 
 
