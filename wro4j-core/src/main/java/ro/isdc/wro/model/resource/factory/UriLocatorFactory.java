@@ -82,7 +82,6 @@ public class UriLocatorFactory {
       throw new IllegalArgumentException("ResourceLocator cannot be null!");
     }
     processInjectAnnotation(uriLocator);
-    // inject duplicateResourceDetector
     uriLocators.add(uriLocator);
   }
 

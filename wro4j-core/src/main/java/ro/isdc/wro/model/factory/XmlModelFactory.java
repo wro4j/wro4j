@@ -41,8 +41,12 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -75,7 +79,10 @@ public class XmlModelFactory
    * Group tag used in xml.
    */
   private static final String TAG_GROUP = "group";
-
+  /**
+   * Import tag used in xml.
+   */
+  private static final String TAG_IMPORT = "import";
   /**
    * CSS tag used in xml.
    */
@@ -122,6 +129,11 @@ public class XmlModelFactory
    * Scheduled executors service, used to refresh the WroModel.
    */
   private ScheduledExecutorService scheduler;
+  /**
+   * Used to locate imports;
+   */
+  private UriLocatorFactory uriLocatorFactory;
+
 
   /**
    * {@inheritDoc}
@@ -168,16 +180,17 @@ public class XmlModelFactory
   private Runnable getSchedulerRunnable() {
     return new Runnable() {
       public void run() {
-    		try {
-    			model = newModel();
-    			//find a way to clear the cache
-    			LOG.info("Wro Model (wro.xml) updated!");
-    		} catch (final Exception e) {
-      		LOG.error("Exception occured", e);
-      	}
+        try {
+          model = newModel();
+          // find a way to clear the cache
+          LOG.info("Wro Model (wro.xml) updated!");
+        } catch (final Exception e) {
+          LOG.error("Exception occured", e);
+        }
       }
     };
   }
+
 
   /**
    * Build model from scratch after xml is parsed.
@@ -204,7 +217,8 @@ public class XmlModelFactory
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
-    initGroupMap(document);
+    processImports(document);
+    processGroups(document);
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
     final WroModel model = createModel();
     return model;
@@ -219,7 +233,6 @@ public class XmlModelFactory
     // create a SchemaFactory capable of understanding WXS schemas
     final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-    // load a WXS schema, represented by a Schema instance
     final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
@@ -241,12 +254,31 @@ public class XmlModelFactory
   /**
    * Initialize the map
    */
-  private void initGroupMap(final Document document) {
+  private void processGroups(final Document document) {
+    // handle imports
     final NodeList groupNodeList = document.getElementsByTagName(TAG_GROUP);
     for (int i = 0; i < groupNodeList.getLength(); i++) {
       final Element groupElement = (Element)groupNodeList.item(i);
       final String name = groupElement.getAttribute(ATTR_GROUP_NAME);
       allGroupElements.put(name, groupElement);
+    }
+  }
+
+
+  protected void processImports(final Document document) {
+    final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
+    LOG.debug("number of imports: {}", importsList.getLength());
+    for (int i = 0; i < importsList.getLength(); i++) {
+      final Element element = (Element)importsList.item(i);
+      final String name = element.getTextContent();
+      LOG.debug("processing import: " + name);
+      try {
+        final InputStream is = getUriLocatorFactory().locate(name);
+      } catch (final IOException e) {
+        final String message = "Invalid import found: " + name;
+        LOG.error(message);
+        throw new WroRuntimeException(message, e);
+      }
     }
   }
 
@@ -328,6 +360,7 @@ public class XmlModelFactory
     return null;
   }
 
+
   /**
    * Creates a resource from a given resourceElement. It can be css, js. If resource tag name is group-ref, the method
    * will start a recursive computation.
@@ -335,7 +368,8 @@ public class XmlModelFactory
    * @param resourceElement
    * @param resources list of parsed resources where the parsed resource is added.
    */
-  private void parseResource(final Element resourceElement, final Collection<Resource> resources, final Collection<Group> groups) {
+  private void parseResource(final Element resourceElement, final Collection<Resource> resources,
+    final Collection<Group> groups) {
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
@@ -353,7 +387,9 @@ public class XmlModelFactory
     }
     if (type != null) {
       final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
-      final boolean minimize = StringUtils.isEmpty(minimizeAsString) ? true : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
+      final boolean minimize = StringUtils.isEmpty(minimizeAsString)
+        ? true
+        : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
       final Resource resource = Resource.create(uri, type);
       resource.setMinimize(minimize);
       resources.add(resource);
@@ -384,31 +420,46 @@ public class XmlModelFactory
     validator.validate(new DOMSource(document));
   }
 
+
   /**
    * {@inheritDoc}
    */
-  public void onCachePeriodChanged() {
-  }
+  public void onCachePeriodChanged() {}
+
 
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-  	if (scheduler != null) {
-  	  scheduler.shutdown();
-  	  scheduler = null;
-  	}
-    //force scheduler to reload
-  	model = null;
+    if (scheduler != null) {
+      scheduler.shutdown();
+      scheduler = null;
+    }
+    // force scheduler to reload
+    model = null;
   }
+
 
   /**
    * {@inheritDoc}
    */
   public void destroy() {
-    //kill running threads
+    // kill running threads
     if (scheduler != null) {
       scheduler.shutdownNow();
     }
+  }
+
+
+  /**
+   * @return lazily instantiated {@link UriLocatorFactory}.
+   */
+  private UriLocatorFactory getUriLocatorFactory() {
+    if (uriLocatorFactory == null) {
+      uriLocatorFactory = new UriLocatorFactory(new DuplicateResourceDetector());
+      uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
+      uriLocatorFactory.addUriLocator(new UrlUriLocator());
+    }
+    return uriLocatorFactory;
   }
 }

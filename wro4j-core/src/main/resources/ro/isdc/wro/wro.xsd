@@ -6,24 +6,27 @@
 	<xsd:element name="groups" type="Groups" />
 
 	<xsd:complexType name="Groups">
-		<xsd:sequence>
+		<xsd:choice minOccurs="1" maxOccurs="unbounded">
+			<xsd:element name="import" type="xsd:string"/>
 			<xsd:element name="group" type="Group" minOccurs="1"
 				maxOccurs="unbounded" />
-		</xsd:sequence>
-	</xsd:complexType> 
+		</xsd:choice>
+	</xsd:complexType>
 
 	<xsd:complexType name="Group">
-		<xsd:choice maxOccurs="unbounded" minOccurs="1">
+		<xsd:choice  minOccurs="1" maxOccurs="unbounded">
 			<xsd:element name="css">
-        <xsd:complexType mixed="true">
-          <xsd:attribute name="minimize" type="xsd:boolean" use="optional" default="true"/>
-        </xsd:complexType>
+				<xsd:complexType mixed="true">
+					<xsd:attribute name="minimize" type="xsd:boolean"
+						use="optional" default="true" />
+				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="js">
-        <xsd:complexType mixed="true">
-          <xsd:attribute name="minimize" type="xsd:boolean" use="optional" default="true"/>
-        </xsd:complexType>
-      </xsd:element>		
+				<xsd:complexType mixed="true">
+					<xsd:attribute name="minimize" type="xsd:boolean"
+						use="optional" default="true" />
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="group-ref" type="xsd:IDREF" />
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:ID" use="required" />
