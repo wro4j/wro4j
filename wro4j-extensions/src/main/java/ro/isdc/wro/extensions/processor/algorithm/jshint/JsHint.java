@@ -76,8 +76,8 @@ public class JsHint {
         LOG.debug("o {}", Context.jsToJava(o, String.class));
         final String json = builder.addJSON().evaluate("JSON.stringify(JSHINT.errors)", "jsHint.errors").toString();
         LOG.debug("json {}", json);
-        final Type type = new TypeToken<List<JsError>>() {}.getType();
-        final List<JsError> errors = new Gson().fromJson(json, type);
+        final Type type = new TypeToken<List<JsHintError>>() {}.getType();
+        final List<JsHintError> errors = new Gson().fromJson(json, type);
         LOG.debug("errors {}", errors);
         throw new JsHintException().setErrors(errors);
       }
