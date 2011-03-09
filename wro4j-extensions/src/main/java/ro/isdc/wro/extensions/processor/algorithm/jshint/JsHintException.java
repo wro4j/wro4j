@@ -11,12 +11,12 @@ import java.util.Collections;
  * @author Alex Objelean
  */
 public class JsHintException extends Exception {
-  private Collection<JsError> errors;
+  private Collection<JsHintError> errors;
 
   /**
    * @return the errors
    */
-  public Collection<JsError> getErrors() {
+  public Collection<JsHintError> getErrors() {
     if (errors == null) {
       return Collections.EMPTY_LIST;
     }
@@ -27,7 +27,7 @@ public class JsHintException extends Exception {
   /**
    * @param errors the errors to set
    */
-  public JsHintException setErrors(final Collection<JsError> errors) {
+  public JsHintException setErrors(final Collection<JsHintError> errors) {
     this.errors = errors;
     return this;
   }
