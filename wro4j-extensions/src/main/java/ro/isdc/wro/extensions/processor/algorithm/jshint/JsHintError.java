@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * @author Alex Objelean
  */
 @SuppressWarnings("serial")
-public class JsError
+public class JsHintError
   implements Serializable {
   /**
    * The line (relative to 0) at which the lint was found
