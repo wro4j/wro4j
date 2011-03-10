@@ -7,26 +7,35 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
-import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * TestBeautifyJsProcessor.
+ * Test {@link JsHintProcessor}.
  *
  * @author Alex Objelean
- * @created Created on Apr 21, 2010
+ * @created Created on Feb 27, 2011
  */
-public class TestBeautifyJsProcessor extends AbstractWroTest {
+public class TestJsHintProcessor {
+  private ResourcePreProcessor processor;
+
+
+  @Before
+  public void setUp() {
+    processor = new JsHintProcessor();
+  }
+
+
   @Test
-  public void testFromFolder() throws IOException {
-    final ResourcePostProcessor processor = new BeautifyJsProcessor();
-    final URL url = getClass().getResource("beautify");
+  public void testFromFolder()
+    throws IOException {
+    final URL url = getClass().getResource("jsHint");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");

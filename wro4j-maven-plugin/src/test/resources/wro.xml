@@ -7,7 +7,15 @@
     <group-ref>g2</group-ref>
     <group-ref>g3</group-ref>
   </group>
-
+  
+  <group name="invalidResources">
+    <js>classpath:ro/isdc/wro/maven/plugin/js/invalid.js</js>
+  </group>
+  
+  <group name="undef">
+    <js>classpath:ro/isdc/wro/maven/plugin/js/undef.js</js>
+  </group>
+  
   <group name="g2">
     <js>classpath:ro/isdc/wro/maven/plugin/js/1.js</js>
   </group>

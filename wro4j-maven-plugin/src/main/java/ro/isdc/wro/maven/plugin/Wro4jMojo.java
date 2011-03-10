@@ -8,10 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -19,46 +16,30 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.classworlds.ClassWorld;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
 /**
+ * A build-time solution for organizing and minimizing static resources. By default uses the same configuration as the
+ * run-time solution. Additionally, allows you to change the processors used by changing the wroManagerFactory
+ * implementation used by the plugin.
+ *
  * @goal run
  * @phase process-resources
  * @requiresDependencyResolution runtime
  *
  * @author Alex Objelean
  */
-public class Wro4jMojo extends AbstractMojo {
-  /**
-   * File containing the groups definitions.
-   *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
-   */
-  private File wroFile;
-  /**
-   * The folder where web application context resides useful for locating resources relative to servletContext .
-   *
-   * @parameter default-value="${basedir}/src/main/webapp/"
-   */
-  private File contextFolder;
+public class Wro4jMojo extends AbstractWro4jMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
@@ -77,60 +58,21 @@ public class Wro4jMojo extends AbstractMojo {
    */
   private File jsDestinationFolder;
   /**
-   * Comma separated group names. This field is optional. If no value is provided, a file for each group will be
-   * created.
-   *
-   * @parameter expression="${targetGroups}"
-   * @optional
-   */
-  private String targetGroups;
-  /**
-   * @parameter default-value="true" expression="${minimize}"
-   * @optional
-   */
-  private boolean minimize;
-  /**
-   * @parameter default-value="true" expression="${ignoreMissingResources}"
-   * @optional
-   */
-  private boolean ignoreMissingResources;
-
-  /**
    * @parameter expression="${wroManagerFactory}"
    * @optional
    */
   private String wroManagerFactory;
 
   /**
-   * @parameter default-value="${project}"
+   * {@inheritDoc}
    */
-  private MavenProject mavenProject;
-  /**
-   * An instance of {@link StandaloneContextAwareManagerFactory}.
-   */
-  private StandaloneContextAwareManagerFactory managerFactory;
-
-
-  /**
-   * This method will ensure that you have a right and initialized instance of
-   * {@link StandaloneContextAwareManagerFactory}.
-   *
-   * @return {@link WroManagerFactory} implementation.
-   */
-  private StandaloneContextAwareManagerFactory getManagerFactory()
-    throws MojoExecutionException {
-    if (managerFactory == null) {
-      if (wroManagerFactory != null) {
-        managerFactory = createCustomManagerFactory();
-      } else {
-        managerFactory = createDefaultManagerFactory();
-      }
-      // initialize before process.
-      managerFactory.initialize(createStandaloneContext());
+  @Override
+  protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
+    if (wroManagerFactory != null) {
+      return createCustomManagerFactory();
     }
-    return managerFactory;
+    return super.newWroManagerFactory();
   }
-
 
   /**
    * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
@@ -148,55 +90,36 @@ public class Wro4jMojo extends AbstractMojo {
     return managerFactory;
   }
 
-
   /**
-   * Creates default instance of {@link StandaloneContextAwareManagerFactory}.
+   * {@inheritDoc}
    */
-  private StandaloneContextAwareManagerFactory createDefaultManagerFactory() {
-    return new DefaultStandaloneContextAwareManagerFactory();
+  @Override
+  protected void validate()
+    throws MojoExecutionException {
+    super.validate();
+    //additional validation requirements
+    if (destinationFolder == null) {
+      throw new MojoExecutionException("destinationFolder was not set!");
+    }
   }
-
-  /**
-   * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
-   */
-  private StandaloneContext createStandaloneContext() {
-    final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolder(contextFolder);
-    runContext.setMinimize(minimize);
-    runContext.setWroFile(wroFile);
-    runContext.setIgnoreMissingResources(ignoreMissingResources);
-    return runContext;
-  }
-
 
   /**
    * {@inheritDoc}
    */
-  public void execute()
-    throws MojoExecutionException {
-    validate();
-    extendPluginClasspath();
-    getLog().info("Executing the mojo: ");
-    getLog().info("Wro4j Model path: " + wroFile.getPath());
-    getLog().info("targetGroups: " + targetGroups);
-    getLog().info("minimize: " + minimize);
+  @Override
+  protected void doExecute()
+    throws Exception {
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
-    getLog().info("ignoreMissingResources: " + ignoreMissingResources);
 
-    Context.set(Context.standaloneContext());
-    try {
-      final Collection<String> groupsAsList = getTargetGroupsAsList();
-      for (final String group : groupsAsList) {
-        for (final ResourceType resourceType : ResourceType.values()) {
-          final File destinationFolder = computeDestinationFolder(resourceType);
-          final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-          processGroup(groupWithExtension, destinationFolder);
-        }
+    final Collection<String> groupsAsList = getTargetGroupsAsList();
+    for (final String group : groupsAsList) {
+      for (final ResourceType resourceType : ResourceType.values()) {
+        final File destinationFolder = computeDestinationFolder(resourceType);
+        final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
+        processGroup(groupWithExtension, destinationFolder);
       }
-    } catch (final Exception e) {
-      throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
     }
   }
 
@@ -209,7 +132,7 @@ public class Wro4jMojo extends AbstractMojo {
    * @return the name of the resource with the version encoded.
    */
   private String rename(final String group, final InputStream input)
-    throws MojoExecutionException {
+    throws Exception {
     try {
       return getManagerFactory().getNamingStrategy().rename(group, input);
     } catch (final IOException e) {
@@ -250,86 +173,11 @@ public class Wro4jMojo extends AbstractMojo {
     return folder;
   }
 
-
-  /**
-   * Checks if all required fields are configured.
-   */
-  private void validate()
-    throws MojoExecutionException {
-    if (wroFile == null) {
-      throw new MojoExecutionException("wroFile was not set!");
-    }
-    if (destinationFolder == null) {
-      throw new MojoExecutionException("destinationFolder was not set!");
-    }
-    if (contextFolder == null) {
-      throw new MojoExecutionException("contextFolder was not set!");
-    }
-  }
-
-
-  /**
-   * Update the classpath.
-   */
-  @SuppressWarnings("unchecked")
-  private void extendPluginClasspath()
-    throws MojoExecutionException {
-    // this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
-    List<String> classpathElements = null;
-    try {
-      classpathElements = mavenProject.getRuntimeClasspathElements();
-    } catch (final DependencyResolutionRequiredException e) {
-      throw new MojoExecutionException("Could not get compile classpath elements", e);
-    }
-    final ClassRealm realm = createRealm(classpathElements);
-    Thread.currentThread().setContextClassLoader(realm.getClassLoader());
-  }
-
-
-  /**
-   * @return {@link ClassRealm} based on project dependencies.
-   */
-  private ClassRealm createRealm(final List<String> classpathElements) {
-    final ClassWorld world = new ClassWorld();
-    getLog().debug("Classpath elements:");
-    ClassRealm realm;
-    try {
-      realm = world.newRealm("maven.plugin." + getClass().getSimpleName(),
-        Thread.currentThread().getContextClassLoader());
-      for (final String element : classpathElements) {
-        final File elementFile = new File(element);
-        getLog().debug("Adding element to plugin classpath: " + elementFile.getPath());
-        final URL url = new URL("file:///" + elementFile.getPath() + (elementFile.isDirectory() ? "/" : ""));
-        realm.addConstituent(url);
-      }
-    } catch (final Exception e) {
-      getLog().error("Error retreiving URL for artifact", e);
-      throw new RuntimeException(e);
-    }
-    return realm;
-  }
-
-
-  /**
-   * @return a list containing all groups needs to be processed.
-   */
-  private List<String> getTargetGroupsAsList()
-    throws MojoExecutionException {
-    if (targetGroups == null) {
-      final WroModel model = getManagerFactory().getInstance().getModel();
-      return model.getGroupNames();
-    }
-    return Arrays.asList(targetGroups.split(","));
-  }
-
-
   /**
    * Process a single group.
-   *
-   * @throws IOException if any IO related exception occurs.
    */
   private void processGroup(final String group, final File parentFoder)
-    throws IOException, MojoExecutionException {
+    throws Exception {
     ByteArrayOutputStream resultOutputStream = null;
     InputStream resultInputStream = null;
     try {
@@ -344,7 +192,8 @@ public class Wro4jMojo extends AbstractMojo {
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
       //init context
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      final WroConfiguration config = Context.get().getConfig();
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       //perform processing
       getManagerFactory().getInstance().process();
       //encode version & write result to file
@@ -380,14 +229,6 @@ public class Wro4jMojo extends AbstractMojo {
 
 
   /**
-   * @param wroFile the wroFile to set
-   */
-  public void setWroFile(final File wroFile) {
-    this.wroFile = wroFile;
-  }
-
-
-  /**
    * @param destinationFolder the destinationFolder to set
    */
   public void setDestinationFolder(final File destinationFolder) {
@@ -410,53 +251,10 @@ public class Wro4jMojo extends AbstractMojo {
     this.jsDestinationFolder = jsDestinationFolder;
   }
 
-
-  /**
-   * @param contextFolder the servletContextFolder to set
-   */
-  public void setContextFolder(final File contextFolder) {
-    this.contextFolder = contextFolder;
-  }
-
-
-  /**
-   * @param versionEncoder(targetGroups) comma separated group names.
-   */
-  public void setTargetGroups(final String targetGroups) {
-    this.targetGroups = targetGroups;
-  }
-
-
-  /**
-   * @param minimize flag for minimization.
-   */
-  public void setMinimize(final boolean minimize) {
-    this.minimize = minimize;
-  }
-
-
-  /**
-   * @param ignoreMissingResources the ignoreMissingResources to set
-   */
-  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
-    this.ignoreMissingResources = ignoreMissingResources;
-  }
-
-
   /**
    * @param versionEncoder(wroManagerFactory) the wroManagerFactory to set
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
-  }
-
-
-  /**
-   * Used for testing.
-   *
-   * @param mavenProject the mavenProject to set
-   */
-  void setMavenProject(final MavenProject mavenProject) {
-    this.mavenProject = mavenProject;
   }
 }

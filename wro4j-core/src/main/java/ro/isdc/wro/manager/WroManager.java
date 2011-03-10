@@ -214,8 +214,8 @@ public class WroManager
       return EMPTY_STREAM;
     }
     if (contentHashEntry.getContent() != null) {
-      //add content length
-      response.setContentLength(contentHashEntry.getContent().length());
+      // Do not set content length because we don't know the length in case it is gzipped. This could cause an
+      // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
       // make the input stream encoding aware.
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());
     }

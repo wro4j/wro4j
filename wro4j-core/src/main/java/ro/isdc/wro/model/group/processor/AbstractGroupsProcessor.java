@@ -5,6 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -144,7 +145,7 @@ public abstract class AbstractGroupsProcessor {
    */
   private void processInjectAnnotation(final Object processor) {
     try {
-      final Field[] fields = processor.getClass().getDeclaredFields();
+      final Collection<Field> fields = getAllFields(processor);
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
@@ -156,6 +157,21 @@ public abstract class AbstractGroupsProcessor {
     } catch (final Exception e) {
       throw new WroRuntimeException("Exception while trying to process Inject annotation", e);
     }
+  }
+
+
+  /**
+   * @param object
+   * @return
+   */
+  protected Collection<Field> getAllFields(final Object object) {
+    Class<?> rootClass = object.getClass();
+    final List<Field> fields = new ArrayList<Field>();
+    do {
+      fields.addAll(Arrays.asList(rootClass.getDeclaredFields()));
+      rootClass = rootClass.getSuperclass();
+    } while(rootClass.getSuperclass() != null);
+    return fields;
   }
 
 
