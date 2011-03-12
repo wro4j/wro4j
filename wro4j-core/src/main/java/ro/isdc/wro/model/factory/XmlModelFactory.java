@@ -133,7 +133,10 @@ public class XmlModelFactory
    * Used to locate imports;
    */
   private UriLocatorFactory uriLocatorFactory;
-
+  /**
+   * Used to detect recursive import processing.
+   */
+  private Set<String> processedImports = new HashSet<String>();
 
   /**
    * {@inheritDoc}
@@ -217,10 +220,10 @@ public class XmlModelFactory
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
-    processImports(document);
     processGroups(document);
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
     final WroModel model = createModel();
+    processImports(document, model);
     return model;
   }
 
@@ -265,20 +268,31 @@ public class XmlModelFactory
   }
 
 
-  protected void processImports(final Document document) {
+  private void processImports(final Document document, final WroModel model) {
     final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
     LOG.debug("number of imports: {}", importsList.getLength());
     for (int i = 0; i < importsList.getLength(); i++) {
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: " + name);
-      try {
-        final InputStream is = getUriLocatorFactory().locate(name);
-      } catch (final IOException e) {
-        final String message = "Invalid import found: " + name;
+      final XmlModelFactory importedModelFactory = new XmlModelFactory() {
+        @Override
+        protected InputStream getConfigResourceAsStream()
+          throws IOException {
+          LOG.debug("build model from import: " + name);
+          return getUriLocatorFactory().locate(name);
+        };
+      };
+
+      if (processedImports.contains(name)) {
+        final String message = "Recursive import detected: " + name;
         LOG.error(message);
-        throw new WroRuntimeException(message, e);
+        throw new RecursiveGroupDefinitionException(message);
       }
+
+      processedImports.add(name);
+      importedModelFactory.processedImports.addAll(this.processedImports);
+      model.merge(importedModelFactory.getInstance());
     }
   }
 
@@ -289,7 +303,7 @@ public class XmlModelFactory
    * @param document to parse.
    * @return {@link WroModel} object.
    */
-  private synchronized WroModel createModel() {
+  private WroModel createModel() {
     final WroModel model = new WroModel();
     final Set<Group> groups = new HashSet<Group>();
     for (final Element element : allGroupElements.values()) {

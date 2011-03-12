@@ -22,7 +22,7 @@ import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 
 /**
- * TestProcessor.java.
+ * TestXmlModelFactory.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -124,8 +124,32 @@ public class TestXmlModelFactory {
     };
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.getInstance();
-    Assert.assertEquals(1, model.getGroupNames().size());
+    Assert.assertEquals(2, model.getGroupNames().size());
     LOG.debug("model: " + model);
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testRecursiveImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/recursive.xml");
+      }
+    };
+    factory.getInstance();
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testCircularImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/circular1.xml");
+      }
+    };
+    factory.getInstance();
   }
 
   @Test(expected=WroRuntimeException.class)

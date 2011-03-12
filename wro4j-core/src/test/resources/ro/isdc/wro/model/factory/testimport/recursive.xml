@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
-  <import>classpath:ro/isdc/wro/model/factory/testimport/wro-1.xml</import> 
+  <import>classpath:ro/isdc/wro/model/factory/testimport/recursive.xml</import> 
   
   <group name="g1">
     <css>classpath:1.css</css>
