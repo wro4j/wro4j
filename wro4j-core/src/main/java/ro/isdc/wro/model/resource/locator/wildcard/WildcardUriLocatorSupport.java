@@ -23,12 +23,16 @@ public abstract class WildcardUriLocatorSupport
    */
   private WildcardStreamLocator wildcardStreamLocator;
 
-
   /**
    * @return default implementation of {@link WildcardStreamLocator}.
    */
   protected WildcardStreamLocator newWildcardStreamLocator() {
-    return new DefaultWildcardStreamLocator(duplicateResourceDetector);
+    return new DefaultWildcardStreamLocator(duplicateResourceDetector) {
+      @Override
+      public boolean hasWildcard(final String uri) {
+        return !disableWildcards() && super.hasWildcard(uri);
+      }
+    };
   }
 
 
@@ -40,5 +44,12 @@ public abstract class WildcardUriLocatorSupport
       wildcardStreamLocator = newWildcardStreamLocator();
     }
     return this.wildcardStreamLocator;
+  }
+
+  /**
+   * Allows disabling wildcard support. By default wildcard support is enabled.
+   */
+  protected boolean disableWildcards() {
+    return false;
   }
 }

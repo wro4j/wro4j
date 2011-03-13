@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.factory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -141,6 +142,18 @@ public class TestXmlModelFactory {
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testDeepRecursiveImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/deepRecursive.xml");
+      }
+    };
+    factory.getInstance();
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
   public void testCircularImports() {
     factory = new XmlModelFactory() {
       @Override
@@ -162,5 +175,21 @@ public class TestXmlModelFactory {
       }
     };
     factory.getInstance();
+  }
+
+  @Test(expected=IOException.class)
+  public void testWildcardImports() throws Throwable {
+    try {
+      factory = new XmlModelFactory() {
+        @Override
+        protected InputStream getConfigResourceAsStream() {
+          // get a class relative test resource
+          return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
+        }
+      };
+      factory.getInstance();
+    } catch(final WroRuntimeException e) {
+      throw e.getCause();
+    }
   }
 }

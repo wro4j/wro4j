@@ -200,7 +200,7 @@ public class XmlModelFactory
    *
    * @return new instance of model.
    */
-  private WroModel newModel() {
+  private synchronized WroModel newModel() {
     // TODO return a single instance based on some configuration?
     Document document = null;
     try {
@@ -224,6 +224,7 @@ public class XmlModelFactory
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
     final WroModel model = createModel();
     processImports(document, model);
+    processedImports.clear();
     return model;
   }
 
@@ -471,8 +472,19 @@ public class XmlModelFactory
   private UriLocatorFactory getUriLocatorFactory() {
     if (uriLocatorFactory == null) {
       uriLocatorFactory = new UriLocatorFactory(new DuplicateResourceDetector());
-      uriLocatorFactory.addUriLocator(new ClasspathUriLocator());
-      uriLocatorFactory.addUriLocator(new UrlUriLocator());
+      //use locators with wildcard disabled - to avoid invalid xml parsing error
+      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
+        @Override
+        protected boolean disableWildcards() {
+          return true;
+        }
+      });
+      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
+        @Override
+        protected boolean disableWildcards() {
+          return true;
+        }
+      });
     }
     return uriLocatorFactory;
   }
