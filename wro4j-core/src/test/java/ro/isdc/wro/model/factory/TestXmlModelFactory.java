@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model;
+package ro.isdc.wro.model.factory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -14,15 +15,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 
 /**
- * TestProcessor.java.
+ * TestXmlModelFactory.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -111,5 +112,84 @@ public class TestXmlModelFactory {
     Assert.assertEquals(true, resourceList.get(1).isMinimize());
     Assert.assertEquals(true, resourceList.get(2).isMinimize());
     LOG.debug("model: " + model);
+  }
+
+  @Test
+  public void testValidImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/validImports.xml");
+      }
+    };
+    //the uriLocator factory doesn't have any locators set...
+    final WroModel model = factory.getInstance();
+    Assert.assertEquals(2, model.getGroupNames().size());
+    LOG.debug("model: " + model);
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testRecursiveImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/recursive.xml");
+      }
+    };
+    factory.getInstance();
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testDeepRecursiveImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/deepRecursive.xml");
+      }
+    };
+    factory.getInstance();
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testCircularImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/circular1.xml");
+      }
+    };
+    factory.getInstance();
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testInvalidImports() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() {
+        //get a class relative test resource
+        return TestXmlModelFactory.class.getResourceAsStream("testimport/invalidImports.xml");
+      }
+    };
+    factory.getInstance();
+  }
+
+  @Test(expected=IOException.class)
+  public void testWildcardImports() throws Throwable {
+    try {
+      factory = new XmlModelFactory() {
+        @Override
+        protected InputStream getConfigResourceAsStream() {
+          // get a class relative test resource
+          return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
+        }
+      };
+      factory.getInstance();
+    } catch(final WroRuntimeException e) {
+      throw e.getCause();
+    }
   }
 }
