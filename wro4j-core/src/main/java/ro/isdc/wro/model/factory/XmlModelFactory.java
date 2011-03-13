@@ -12,9 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,8 +33,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
@@ -47,8 +42,6 @@ import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -59,7 +52,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory, WroConfigurationChangeListener {
+  implements WroModelFactory {
   /**
    * Logger for this class.
    */
@@ -121,15 +114,6 @@ public class XmlModelFactory
   final Collection<String> processingGroups = new HashSet<String>();
 
   /**
-   * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
-   */
-  private volatile WroModel model;
-
-  /**
-   * Scheduled executors service, used to refresh the WroModel.
-   */
-  private ScheduledExecutorService scheduler;
-  /**
    * Used to locate imports;
    */
   private SimpleUriLocatorFactory uriLocatorFactory;
@@ -138,70 +122,11 @@ public class XmlModelFactory
    */
   private Set<String> processedImports = new HashSet<String>();
 
+
   /**
    * {@inheritDoc}
    */
-  public synchronized WroModel getInstance() {
-    initScheduler();
-    // use double-check locking
-    if (model == null) {
-      synchronized (this) {
-        if (model == null) {
-          final StopWatch stopWatch = new StopWatch();
-          stopWatch.start("Create Model");
-          model = newModel();
-          stopWatch.stop();
-          LOG.debug(stopWatch.prettyPrint());
-        }
-      }
-    }
-    return model;
-  }
-
-
-  /**
-   * Initialize executor service & start the thread responsible for updating the model.
-   */
-  private void initScheduler() {
-    if (scheduler == null) {
-      final long period = Context.get().getConfig().getModelUpdatePeriod();
-      if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
-        // Run a scheduled task which updates the model.
-        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
-        // (thread tries to make up for lost time in some situations)
-        LOG.info("Schedule Model Update for " + period + " seconds period");
-        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
-      }
-    }
-  }
-
-
-  /**
-   * @return {@link Runnable} implementation which reloads the model when scheduled.
-   */
-  private Runnable getSchedulerRunnable() {
-    return new Runnable() {
-      public void run() {
-        try {
-          model = newModel();
-          // find a way to clear the cache
-          LOG.info("Wro Model (wro.xml) updated!");
-        } catch (final Exception e) {
-          LOG.error("Exception occured", e);
-        }
-      }
-    };
-  }
-
-
-  /**
-   * Build model from scratch after xml is parsed.
-   *
-   * @return new instance of model.
-   */
-  private synchronized WroModel newModel() {
-    // TODO return a single instance based on some configuration?
+  public WroModel getInstance() {
     Document document = null;
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -366,7 +291,7 @@ public class XmlModelFactory
    * @param groups list of parsed groups.
    * @return parsed Group by it's name.
    */
-  private static Group getGroupByName(final String name, final Collection<Group> groups) {
+  private Group getGroupByName(final String name, final Collection<Group> groups) {
     for (final Group group : groups) {
       if (name.equals(group.getName())) {
         return group;
@@ -439,31 +364,7 @@ public class XmlModelFactory
   /**
    * {@inheritDoc}
    */
-  public void onCachePeriodChanged() {}
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void onModelPeriodChanged() {
-    if (scheduler != null) {
-      scheduler.shutdown();
-      scheduler = null;
-    }
-    // force scheduler to reload
-    model = null;
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void destroy() {
-    // kill running threads
-    if (scheduler != null) {
-      scheduler.shutdownNow();
-    }
-  }
+  public void destroy() {}
 
 
   /**
@@ -472,7 +373,7 @@ public class XmlModelFactory
   private UriLocatorFactory getUriLocatorFactory() {
     if (uriLocatorFactory == null) {
       uriLocatorFactory = new SimpleUriLocatorFactory();
-      //use locators with wildcard disabled - to avoid invalid xml parsing error
+      // use locators with wildcard disabled - to avoid invalid xml parsing error
       uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
         @Override
         protected boolean disableWildcards() {

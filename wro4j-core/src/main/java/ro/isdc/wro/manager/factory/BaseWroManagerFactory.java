@@ -17,6 +17,7 @@ import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -63,7 +64,8 @@ public abstract class BaseWroManagerFactory
         if (this.manager == null) {
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
-          final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
+          //decorate with scheduler ability
+          final WroModelFactory modelFactory = new ScheduledWroModelFactory(newModelFactory(Context.get().getServletContext()));
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
           this.manager = new WroManager(injector);

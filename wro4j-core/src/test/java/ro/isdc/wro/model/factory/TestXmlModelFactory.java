@@ -63,13 +63,6 @@ public class TestXmlModelFactory {
     Context.get().getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
-//
-//
-//  @Test
-//  public void processResourceType() {
-//    factory = new XmlModelFactory();
-//    factory.getInstance();
-//  }
 
   //TODO use two concurrent calls
   @Test
