@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.WroConfigurationChangeListener;
 
 /**
  * Test class for {@link FallbackAwareXmlModelFactory}.
@@ -22,8 +23,8 @@ import ro.isdc.wro.config.Context;
  * @author Alex Objelean
  */
 public class TestFallbackAwareXmlModelFactory {
-  private XmlModelFactory xmlModelFactory;
-  private XmlModelFactory fallbackAwareModelFactory;
+  private WroModelFactory xmlModelFactory;
+  private WroModelFactory fallbackAwareModelFactory;
   /**
    * Used to simulate that a resource stream used to build the model is not available.
    */
@@ -32,7 +33,7 @@ public class TestFallbackAwareXmlModelFactory {
   public void setUp() {
     //initialize the context
     Context.set(Context.standaloneContext());
-    fallbackAwareModelFactory = new FallbackAwareXmlModelFactory() {
+    fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareXmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()
         throws IOException {
@@ -42,7 +43,7 @@ public class TestFallbackAwareXmlModelFactory {
         }
         return null;
       }
-    };
+    });
     xmlModelFactory = new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()
@@ -65,7 +66,7 @@ public class TestFallbackAwareXmlModelFactory {
   @Test
   public void testLastValidIsOK() {
     Assert.assertNotNull(fallbackAwareModelFactory.getInstance());
-    fallbackAwareModelFactory.onModelPeriodChanged();
+    ((WroConfigurationChangeListener) fallbackAwareModelFactory).onModelPeriodChanged();
     Assert.assertNotNull(fallbackAwareModelFactory.getInstance());
   }
 
