@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -14,10 +13,6 @@ import org.junit.Test;
  */
 public class TestJsonModelFactory {
   private JsonModelFactory factory;
-  @Before
-  public void setUp() {
-    factory = new JsonModelFactory();
-  }
 
   @Test
   public void test() {

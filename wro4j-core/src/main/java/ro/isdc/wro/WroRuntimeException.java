@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Base Wro Runtime exception. All exceptions will extend this runtime
@@ -16,6 +19,7 @@ public class WroRuntimeException extends RuntimeException {
    * serialVersionUID
    */
   private static final long serialVersionUID = 1L;
+  private static final Logger LOG = LoggerFactory.getLogger(WroRuntimeException.class);
 
   /**
    * @param message
@@ -30,5 +34,6 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message) {
     super(message);
+    LOG.debug(message);
   }
 }
