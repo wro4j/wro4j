@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 
 
 /**
- * Injector scans fields of an object instance and checks if a value can be provided to a field; Injector will ignore
+ * Injector scans some object fields and checks if a value can be provided to a field; Injector will ignore
  * all non-null fields.
  *
  * @author Alex Objelean
@@ -62,14 +62,7 @@ public final class Injector {
     if (object == null) {
       throw new IllegalArgumentException("Object cannot be null!");
     }
-//    LOG.debug("scanning @Inject in object of type: " + object.getClass());
-//    final StopWatch watch = new StopWatch();
-//    watch.start("scan pre processors");
-
     processInjectAnnotation(object);
-
-//    watch.stop();
-//    LOG.debug(watch.prettyPrint());
   }
 
 
@@ -124,28 +117,24 @@ public final class Injector {
    */
   private boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
-    try {
-      // accept even private modifiers
-      field.setAccessible(true);
-      if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
-        field.set(object, uriLocatorFactory);
-        return true;
-      }
-      if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
-        field.set(object, processorsFactory);
-        return true;
-      }
-      if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
-        field.set(object, getPreProcessorExecutor());
-        return true;
-      }
-      if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
-        field.set(object, duplicateResourceDetector);
-        return true;
-      }
-      return false;
-    } finally {
-//      LOG.debug("Injected field: " + field.getName());
+    // accept even private modifiers
+    field.setAccessible(true);
+    if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
+      field.set(object, uriLocatorFactory);
+      return true;
     }
+    if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
+      field.set(object, processorsFactory);
+      return true;
+    }
+    if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
+      field.set(object, getPreProcessorExecutor());
+      return true;
+    }
+    if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
+      field.set(object, duplicateResourceDetector);
+      return true;
+    }
+    return false;
   }
 }
