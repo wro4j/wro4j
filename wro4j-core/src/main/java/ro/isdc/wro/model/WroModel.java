@@ -54,6 +54,7 @@ public final class WroModel {
    */
   public final void setGroups(final Set<Group> groups) {
     this.groups = groups;
+    // TODO validate the model and ensure there is only one group with the same name.
   }
 
   /**

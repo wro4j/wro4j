@@ -16,11 +16,11 @@ public class Resource {
   /**
    * The type of resource.
    */
-  private final ResourceType type;
+  private ResourceType type;
   /**
    * Resource identifier.
    */
-  private final String uri;
+  private String uri;
   /**
    * Used to skip minimization during pre processing. Useful when you know that the resource is already minimized and no
    * minimization is needed. Default value is true.
@@ -28,12 +28,16 @@ public class Resource {
   private boolean minimize = true;
 
   /**
+   * Empty constructor.
+   */
+  public Resource() {
+  }
+
+  /**
    * Constructor.
    *
-   * @param uri
-   *          of the resource.
-   * @param type
-   *          of the resource.
+   * @param uri of the resource.
+   * @param type of the resource.
    */
   private Resource(final String uri, final ResourceType type) {
     if (uri == null) {
@@ -47,22 +51,21 @@ public class Resource {
   }
 
 
-	/**
-	 * Factory method for Resource creation. A factory method is preferred instead of public constructor, in order to
-	 * avoid possibilities for clients to extend Resource class.
-	 *
-	 * @return an instance of {@link Resource} object.
-	 */
+  /**
+   * Factory method for Resource creation. A factory method is preferred instead of public constructor, in order to
+   * avoid possibilities for clients to extend Resource class.
+   *
+   * @return an instance of {@link Resource} object.
+   */
   public static Resource create(final String uri, final ResourceType type) {
-  	return new Resource(uri, type);
+    return new Resource(uri, type);
   }
 
+
   /**
-   * Perform a cleaning of the uri by trimming it and removing last '/'
-   * character if exists.
+   * Perform a cleaning of the uri by trimming it and removing last '/' character if exists.
    *
-   * @param uri
-   *          to clean.
+   * @param uri to clean.
    * @return cleaned uri.
    */
   private static String cleanUri(final String uri) {
@@ -75,11 +78,34 @@ public class Resource {
   }
 
   /**
+   * @param type the type to set
+   */
+  public void setType(final ResourceType type) {
+    if (type == null) {
+      throw new IllegalArgumentException("ResourceType cannot be null!");
+    }
+    this.type = type;
+  }
+
+
+  /**
+   * @param uri the uri to set
+   */
+  public void setUri(final String uri) {
+    if (uri == null) {
+      throw new IllegalArgumentException("Uri cannot be null!");
+    }
+    this.uri = cleanUri(uri);
+  }
+
+
+  /**
    * @return the type
    */
   public ResourceType getType() {
     return type;
   }
+
 
   /**
    * @return the uri associated with this resource.
@@ -87,6 +113,7 @@ public class Resource {
   public String getUri() {
     return uri;
   }
+
 
   /**
    * @return the minimize
@@ -110,11 +137,12 @@ public class Resource {
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof Resource) {
-      final Resource resource = (Resource) obj;
+      final Resource resource = (Resource)obj;
       return getUri().equals(resource.getUri()) && getType().equals(resource.getType());
     }
     return false;
   }
+
 
   /**
    * {@inheritDoc}
@@ -126,6 +154,7 @@ public class Resource {
     hash = 31 * hash + getUri().hashCode();
     return hash;
   }
+
 
   /**
    * @see java.lang.Object#toString()
