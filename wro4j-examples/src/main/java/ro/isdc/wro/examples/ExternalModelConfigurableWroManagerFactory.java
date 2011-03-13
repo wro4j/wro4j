@@ -11,8 +11,8 @@ import java.io.InputStream;
 import javax.servlet.ServletContext;
 
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
-import ro.isdc.wro.model.factory.FallbackAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 
 /**
  * An example of how resources can be managed without restarting the server.
@@ -26,7 +26,7 @@ public class ExternalModelConfigurableWroManagerFactory
    */
   @Override
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
-    return new FallbackAwareXmlModelFactory() {
+    return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()
         throws IOException {
