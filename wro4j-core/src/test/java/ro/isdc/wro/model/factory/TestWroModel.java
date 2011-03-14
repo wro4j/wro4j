@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010. All rights reserved.
  */
-package ro.isdc.wro.model;
+package ro.isdc.wro.model.factory;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -15,11 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
-import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test class for WroModel..
@@ -71,7 +71,8 @@ public class TestWroModel {
     factory = new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() {
-        return WroTestUtils.getClassRelativeResource(TestWroModel.class, "wro.xml");
+        return TestWroModel.class.getResourceAsStream("wro.xml");
+        //return WroTestUtils.getClassRelativeResource(TestWroModel.class, "wro.xml");
       }
     };
     //the uriLocator factory doesn't have any locators set...

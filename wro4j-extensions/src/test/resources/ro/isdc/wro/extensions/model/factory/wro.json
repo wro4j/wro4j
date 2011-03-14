@@ -11,7 +11,7 @@
       minimize: true
     }]
   }, {
-    name: "g1",
+    name: "g2",
     resources: [{
       type: "JS",
       uri: "classpath:com/application/static/app.js",

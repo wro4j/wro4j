@@ -101,10 +101,7 @@ public final class Group {
    */
   @Override
   public int hashCode() {
-    int hash = 7;
-    hash = 31 * hash + getName().hashCode();
-    hash = 31 * hash + getResources().hashCode();
-    return hash;
+    return getName().hashCode();
   }
 
 

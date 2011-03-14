@@ -31,10 +31,6 @@ public final class WroModel {
    */
   private Set<Group> groups;
 
-  public WroModel() {
-    LOG.debug("WroModel constructor");
-  }
-
   /**
    * @return the groups
    */

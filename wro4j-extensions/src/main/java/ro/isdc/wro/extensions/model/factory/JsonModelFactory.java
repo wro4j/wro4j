@@ -43,6 +43,9 @@ public class JsonModelFactory
       }
       final WroModel model = new Gson().fromJson(new InputStreamReader(getWroModelStream()), type);
       LOG.debug("json model: {}", model);
+      if (model == null) {
+        throw new WroRuntimeException("Invalid content provided, cannot build model!");
+      }
       return model;
     } catch (final Exception e) {
       throw new WroRuntimeException("Invalid model found!", e);
