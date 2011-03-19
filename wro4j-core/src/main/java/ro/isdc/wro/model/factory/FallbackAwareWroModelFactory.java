@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010.
+ * Copyright (C) 2011.
  * All rights reserved.
  */
 package ro.isdc.wro.model.factory;
@@ -10,28 +10,39 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 
+
 /**
- * An {@link XmlModelFactory} that handles the situation when the wro model cannot be loaded at some point
- * (resource cannot be located or the model is invalid). It holds the last known good model and reuse it until a new valid
+ * An {@link XmlModelFactory} that handles the situation when the wro model cannot be loaded at some point (resource
+ * cannot be located or the model is invalid). It holds the last known good model and reuse it until a new valid
  * instance of model is available.
  *
  * @author Alex Objelean
+ * @created 13 Mar 2011
  */
-public class FallbackAwareXmlModelFactory
-  extends XmlModelFactory {
+public class FallbackAwareWroModelFactory extends WroModelFactoryDecorator {
   /**
    * Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(FallbackAwareXmlModelFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FallbackAwareWroModelFactory.class);
   /**
    * Last valid model instance..
    */
   private WroModel lastValidModel;
+
+
+  /**
+   * @param decorated {@link WroModelFactory} to decorated.
+   */
+  public FallbackAwareWroModelFactory(final WroModelFactory decorated) {
+    super(decorated);
+  }
+
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public synchronized WroModel getInstance() {
+  public WroModel getInstance() {
     WroModel newModel = null;
     try {
       newModel = super.getInstance();
