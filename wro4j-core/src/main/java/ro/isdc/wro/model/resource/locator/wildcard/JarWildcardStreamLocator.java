@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 
 
 /**
@@ -39,6 +40,7 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
  */
 public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(JarWildcardStreamLocator.class);
+
   public JarWildcardStreamLocator() {
   }
 
@@ -62,7 +64,6 @@ public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
         return locateStreamFromJar(uri, jarPath);
       }
     }
-
     return super.locateStream(uri, folder);
   }
 
@@ -128,8 +129,8 @@ public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
     String classPath = FilenameUtils.getPath(uri);
     final String wildcard = FilenameUtils.getName(uri);
 
-    if (classPath.startsWith("classpath:")) {
-      classPath = StringUtils.substringAfter(classPath, "classpath:");
+    if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
+      classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
     }
 
     final JarFile file = open(jarPath);

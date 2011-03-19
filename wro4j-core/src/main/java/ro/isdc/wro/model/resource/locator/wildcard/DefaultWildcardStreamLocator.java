@@ -37,9 +37,6 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
  */
 public class DefaultWildcardStreamLocator
     implements WildcardStreamLocator {
-  /**
-   * Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWildcardStreamLocator.class);
   /**
    * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?' character, it is considered
