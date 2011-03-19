@@ -14,14 +14,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.Resource;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -49,13 +43,6 @@ public class JsonModelFactory
       if (is == null) {
         throw new WroRuntimeException("Invalid model stream provided!");
       }
-      new GsonBuilder().registerTypeAdapter(Resource.class, new JsonDeserializer<Resource>() {
-        @Override
-        public Resource deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context)
-          throws JsonParseException {
-          return null;
-        }
-      });
       final WroModel model = new Gson().fromJson(new InputStreamReader(getWroModelStream()), type);
       LOG.debug("json model: {}", model);
       if (model == null) {
