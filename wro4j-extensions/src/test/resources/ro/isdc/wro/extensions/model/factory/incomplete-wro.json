@@ -1,0 +1,9 @@
+{
+  groups: [{
+    name: "g1",
+    resources: [{
+      uri: "/static/app.js",
+      minimize: true
+    }]
+  }]
+}

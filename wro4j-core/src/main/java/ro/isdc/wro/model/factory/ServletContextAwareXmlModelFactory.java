@@ -15,7 +15,7 @@ import ro.isdc.wro.config.Context;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public final class ServletContextAwareXmlModelFactory extends FallbackAwareXmlModelFactory {
+public final class ServletContextAwareXmlModelFactory extends XmlModelFactory {
   /**
    * This {@inheritDoc}
    */

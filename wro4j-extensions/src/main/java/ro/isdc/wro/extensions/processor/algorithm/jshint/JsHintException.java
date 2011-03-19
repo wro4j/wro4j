@@ -8,7 +8,10 @@ import java.util.Collections;
 
 
 /**
+ * Exception caused by JsHint processing.
+ *
  * @author Alex Objelean
+ * @since 1.3.5
  */
 public class JsHintException extends Exception {
   private Collection<JsHintError> errors;

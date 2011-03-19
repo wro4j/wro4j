@@ -171,7 +171,7 @@ public class XmlModelFactory
   /**
    * Override this method, in order to provide different xml definition file name.
    *
-   * @return name of the xml file containing group & resource definition.
+   * @return stream of the xml representation of the model.
    * @throws IOException if the stream couldn't be read.
    */
   protected InputStream getConfigResourceAsStream()
