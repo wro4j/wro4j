@@ -167,25 +167,6 @@ public class WroTestUtils {
     return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
   }
 
-
-  /**
-   * A convenient way to get {@link InputStream} of some resource relative to a java class. Usage: <code>
-   *   getClassRelativeResource(MyClass.class, "someFile.properties");
-   * </code> or <code>
-   * 	 getClassRelativeResource(MyClass.class, "subfolder/someFile.properties");
-   * </code>
-   *
-   * @param clazz relative to which the resource stream will be returned.
-   * @param relativePath path relative to the clazz. This one should not start with a '/'.
-   * @return {@link InputStream} for search resource.
-   */
-  public static InputStream getClassRelativeResource(final Class<?> clazz, final String relativePath) {
-    final String packageName = clazz.getPackage().getName().replace('.', '/');
-    final String finalPath = packageName + "/" + relativePath;
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(finalPath);
-  }
-
-
   /**
    * Process and compare files from the same folder. Use the extension to make distinction between the source files
    * (files to process) and target files (files to compare with).

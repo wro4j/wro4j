@@ -12,6 +12,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.DuplicateResourceDetector;
+import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.util.StringUtils;
 
@@ -28,7 +32,8 @@ public class ClasspathUriLocator
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
-
+  @Inject
+  private DuplicateResourceDetector duplicateResourceDetector;
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
@@ -91,5 +96,19 @@ public class ClasspathUriLocator
       throw new IOException(message);
     }
     return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+  }
+
+  /**
+   * Builds a {@link JarWildcardStreamLocator} in order to get resources from
+   * the full classpath.
+   */
+  @Override
+  protected WildcardStreamLocator newWildcardStreamLocator() {
+    return new JarWildcardStreamLocator(duplicateResourceDetector) {
+      @Override
+      public boolean hasWildcard(final String uri) {
+        return !disableWildcards() && super.hasWildcard(uri);
+      }
+    };
   }
 }

@@ -31,7 +31,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -75,7 +74,7 @@ public class TestWroFilter {
             return new XmlModelFactory() {
               @Override
               protected InputStream getConfigResourceAsStream() {
-                return WroTestUtils.getClassRelativeResource(TestWroFilter.class, "wro.xml");
+                return getClass().getResourceAsStream("wro.xml");
               }
             };
           }
