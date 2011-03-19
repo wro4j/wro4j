@@ -29,6 +29,7 @@ import com.google.gson.reflect.TypeToken;
  * Using untagged version (commit 2011-03-06 02:34:21)
  *
  * @author Alex Objelean
+ * @since 1.3.5
  */
 public class JsHint {
   private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);

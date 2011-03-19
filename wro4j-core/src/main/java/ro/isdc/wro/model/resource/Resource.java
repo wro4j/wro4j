@@ -28,7 +28,7 @@ public class Resource {
   private boolean minimize = true;
 
   /**
-   * Empty constructor.
+   * Empty constructor. Used by json deserializer.
    */
   public Resource() {
   }
@@ -150,8 +150,9 @@ public class Resource {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash = 31 * hash + getType().hashCode();
-    hash = 31 * hash + getUri().hashCode();
+    //handle null, it can happen when empty constructor is used.
+    hash = 31 * hash + (this.type != null ? this.type.hashCode() : 0);
+    hash = 31 * hash + (this.uri != null ? this.uri.hashCode() : 0);
     return hash;
   }
 
@@ -161,6 +162,6 @@ public class Resource {
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this).append("uri", uri).append("minimize", minimize).toString();
+    return ToStringBuilder.reflectionToString(this);
   }
 }
