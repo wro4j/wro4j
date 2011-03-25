@@ -95,6 +95,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * <p/>
  *
  * @author Alex Objelean
+ * @since 1.2.6
  * @created 21 Apr 2010
  */
 @SupportedResourceType(ResourceType.CSS)
@@ -115,12 +116,20 @@ public class LessCssProcessor
     try {
       writer.write(getEngine().less(content));
     } catch (final WroRuntimeException e) {
+      onException(e);
       writer.write(content);
       LOG.warn("Exception while  applying lessCss processor on the resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+
+  /**
+   * Invoked when a processing exception occurs.
+   */
+  protected void onException(final WroRuntimeException e) {
   }
 
 

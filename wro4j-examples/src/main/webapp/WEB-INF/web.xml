@@ -48,9 +48,10 @@
       <param-name>preProcessors</param-name>
       <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,googleClosureSimple</param-value>
     </init-param>
+    <!-- cssVariables, -->
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,yuiCssMin</param-value>
+      <param-value>lessCss,yuiCssMin</param-value>
     </init-param>
   </filter>
   <filter-mapping>
