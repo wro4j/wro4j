@@ -22,10 +22,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alex Objelean
  */
-/**
- * @author Admin
- *
- */
 public class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
   private Context context;
@@ -98,11 +94,14 @@ public class RhinoScriptBuilder {
    *
    * @param stream {@link InputStream} of the script to evaluate.
    * @param sourceName the name of the evaluated script.
-   * @return evaluated object.
+   * @return {@link RhinoScriptBuilder} chain with required script evaluated.
    * @throws IOException if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
     throws IOException {
+    if (stream == null) {
+      throw new IllegalArgumentException("stream cannot be null");
+    }
     try {
       context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
@@ -121,6 +120,9 @@ public class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
+    if (script == null) {
+      throw new IllegalArgumentException("script cannot be null");
+    }
     context.evaluateString(scope, script, sourceName, 1, null);
     return this;
   }
@@ -136,6 +138,9 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final InputStream stream, final String sourceName)
     throws IOException {
+    if (stream == null) {
+      throw new IllegalArgumentException("stream cannot be null");
+    }
     try {
       return context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
     } catch (final JavaScriptException e) {
@@ -157,6 +162,9 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final Reader reader, final String sourceName)
     throws IOException {
+    if (reader == null) {
+      throw new IllegalArgumentException("reader cannot be null");
+    }
     try {
       return context.evaluateReader(scope, reader, sourceName, 1, null);
     } catch (final JavaScriptException e) {
@@ -177,6 +185,9 @@ public class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public Object evaluate(final String script, final String sourceName) {
+    if (script == null) {
+      throw new IllegalArgumentException("script cannot be null");
+    }
     try {
       return context.evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {
