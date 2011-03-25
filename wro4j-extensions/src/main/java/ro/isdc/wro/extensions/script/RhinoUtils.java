@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.ScriptableObject;
@@ -18,8 +20,8 @@ import org.mozilla.javascript.ScriptableObject;
  * <p>
  * This class can be used directly in Rhino.
  * <p>
- * This class was inspired from
- * {@link http://mongodb-rhino.googlecode.com/svn/trunk/modules/com.mongodb.rhino/src/com/mongodb/rhino/JSON.java}
+ * This class was inspired from {@link http
+ * ://mongodb-rhino.googlecode.com/svn/trunk/modules/com.mongodb.rhino/src/com/mongodb/rhino/JSON.java}
  *
  * @author Alex Objelean
  */
@@ -251,15 +253,23 @@ public class RhinoUtils {
   }
 
   private static void indent(final StringBuilder s, final int depth) {
-    for (int i = 0; i < depth; i++)
+    for (int i = depth - 1; i >= 0; i--)
       s.append("  ");
   }
 
+  private static Pattern[] ESCAPE_PATTERNS = new Pattern[] {
+    Pattern.compile("\\\\"), Pattern.compile("\\n"), Pattern.compile("\\r"), Pattern.compile("\\t"),
+    Pattern.compile("\\f"), Pattern.compile("\\\"")
+  };
+
+  private static String[] ESCAPE_REPLACEMENTS = new String[] {
+    Matcher.quoteReplacement("\\\\"), Matcher.quoteReplacement("\\n"), Matcher.quoteReplacement("\\r"),
+    Matcher.quoteReplacement("\\t"), Matcher.quoteReplacement("\\f"), Matcher.quoteReplacement("\\\"")
+  };
+
   private static String escape(String string) {
-    string = string.replaceAll("\\\\", "\\\\\\");
-    string = string.replaceAll("\\n", "\\\\n");
-    string = string.replaceAll("\\r", "\\\\r");
-    string = string.replaceAll("\\\"", "\\\\\"");
+    for (int i = 0, length = ESCAPE_PATTERNS.length; i < length; i++)
+      string = ESCAPE_PATTERNS[i].matcher(string).replaceAll(ESCAPE_REPLACEMENTS[i]);
     return string;
   }
 }
