@@ -6,14 +6,13 @@ package ro.isdc.wro.extensions.processor.algorithm.less;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -65,13 +64,7 @@ public class LessCss {
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      String message = "Could not execute the script because: ";
-      if (e instanceof JavaScriptException) {
-        message += RhinoUtils.toJson(((JavaScriptException) e).getValue());
-      } else {
-        message += e.getMessage();
-      }
-      throw new WroRuntimeException(message, e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

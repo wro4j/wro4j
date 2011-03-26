@@ -11,8 +11,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
+
 
 
 /**
@@ -24,8 +27,27 @@ import org.mozilla.javascript.ScriptableObject;
  * ://mongodb-rhino.googlecode.com/svn/trunk/modules/com.mongodb.rhino/src/com/mongodb/rhino/JSON.java}
  *
  * @author Alex Objelean
+ * @since 1.3.6
  */
 public class RhinoUtils {
+
+  /**
+   * Creates a more detailed message based on {@link RhinoException} thrown by rhino execution. The message will contain
+   * a detailed description of the problem by inspecting the JSON value provided by exception.
+   *
+   * @param e {@link RhinoException} thrown by rhino execution.
+   * @return detailed string message.
+   */
+  public static String createExceptionMessage(final RhinoException e) {
+    String message = "Could not execute the script because: ";
+    if (e instanceof JavaScriptException) {
+      message += toJson(((JavaScriptException) e).getValue());
+    } else {
+      message += e.getMessage();
+    }
+    return message;
+  }
+
   /**
    * Recursively convert from native Rhino to JSON.
    * <p>
