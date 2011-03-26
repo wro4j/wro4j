@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -86,7 +87,7 @@ public class JsHint {
       watch.stop();
       LOG.debug(watch.prettyPrint());
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     }
   }
 

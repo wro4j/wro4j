@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -101,7 +102,7 @@ public class UglifyJs {
       LOG.debug(watch.prettyPrint());
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     }
   }
 }
