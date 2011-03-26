@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.CoffeScriptProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -27,8 +26,9 @@ import ro.isdc.wro.util.WroUtil;
  * @since 1.3.6
  * @created Created on Mar 26, 2011
  */
-public class TestCoffeeScriptProcessor extends AbstractWroTest {
+public class TestCoffeeScriptProcessor {
   private ResourcePostProcessor processor;
+
 
   @Before
   public void setUp() {
@@ -37,9 +37,13 @@ public class TestCoffeeScriptProcessor extends AbstractWroTest {
 
   private static class Counter {
     private int index;
+
+
     public void increment() {
       index++;
     }
+
+
     public int getIndex() {
       return this.index;
     }
@@ -50,7 +54,8 @@ public class TestCoffeeScriptProcessor extends AbstractWroTest {
    * Test that by default, failing to process a js with coffeeScript, will leave the result unchanged.
    */
   @Test
-  public void testExceptions() throws IOException {
+  public void testExceptions()
+    throws IOException {
     final URL url = getClass().getResource("coffeeScript/exceptions");
     final Counter counter = new Counter();
     processor = new CoffeScriptProcessor() {
@@ -70,7 +75,8 @@ public class TestCoffeeScriptProcessor extends AbstractWroTest {
 
 
   @Test
-  public void testSimple() throws IOException {
+  public void testSimple()
+    throws IOException {
     final URL url = getClass().getResource("coffeeScript/simple");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -79,8 +85,10 @@ public class TestCoffeeScriptProcessor extends AbstractWroTest {
       WroUtil.newResourceProcessor(processor));
   }
 
+
   @Test
-  public void testAdvanced() throws IOException {
+  public void testAdvanced()
+    throws IOException {
     final URL url = getClass().getResource("coffeeScript/advanced");
 
     final File testFolder = new File(url.getFile(), "test");
