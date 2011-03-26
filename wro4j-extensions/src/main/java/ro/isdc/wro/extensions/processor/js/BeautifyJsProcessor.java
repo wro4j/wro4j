@@ -59,12 +59,19 @@ public class BeautifyJsProcessor
     try {
       writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
+      onException(e);
       writer.write(content);
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * Invoked when a processing exception occurs.
+   */
+  protected void onException(final WroRuntimeException e) {
   }
 
 

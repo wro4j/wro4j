@@ -55,6 +55,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * Default command line runner. Interprets arguments and perform a processing.
  *
  * @author Alex Objelean
+ * @since 1.3.4
  */
 public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
