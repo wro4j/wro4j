@@ -168,6 +168,9 @@ public class XmlModelFactory
   }
 
 
+  public static void main(final String[] args) {
+  }
+
   /**
    * Override this method, in order to provide different xml definition file name.
    *
@@ -340,7 +343,7 @@ public class XmlModelFactory
   /**
    * @return InputStream of the local resource from classpath.
    */
-  protected static InputStream getResourceAsStream(final String fileName) {
+  private static InputStream getResourceAsStream(final String fileName) {
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
   }
 

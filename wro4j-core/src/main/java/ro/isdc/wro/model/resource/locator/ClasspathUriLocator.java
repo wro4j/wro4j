@@ -28,9 +28,6 @@ import ro.isdc.wro.util.StringUtils;
  */
 public class ClasspathUriLocator
     extends WildcardUriLocatorSupport {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
   @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
