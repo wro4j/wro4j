@@ -6,6 +6,8 @@ package ro.isdc.wro.model.factory;
 import java.io.InputStream;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 /**
  * ServletContext aware Model factory implementation. This factory will run
@@ -23,5 +25,13 @@ public final class ServletContextAwareXmlModelFactory extends XmlModelFactory {
   protected InputStream getConfigResourceAsStream() {
     return Context.get().getServletContext().getResourceAsStream(
         "/WEB-INF/" + XML_CONFIG_FILE);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected ResourceLocator getModelResourceLocator() {
+    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + XML_CONFIG_FILE);
   }
 }

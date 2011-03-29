@@ -1,13 +1,14 @@
 /**
  *
  */
-package ro.isdc.wro.model.resource.locator;
+package ro.isdc.wro.model.resource.locator.support;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -20,9 +21,13 @@ import org.apache.commons.lang.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 
 
 /**
@@ -30,77 +35,80 @@ import ro.isdc.wro.config.Context;
  *
  * @author Alex Objelean
  */
-public class TestServletContextUriLocator {
-  private UriLocator locator;
-
+public class TestServletContextResourceLocator {
+  private ResourceLocator locator;
+  @Mock
+  private ServletContext mockServletContext;
 
   @Before
   public void initContext() {
-    locator = new ServletContextUriLocator();
-    final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
-    Context.set(context);
+    MockitoAnnotations.initMocks(this);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotAcceptNullUri()
     throws Exception {
-    locator.locate(null);
+    locator = new ServletContextResourceLocator(mockServletContext, null);
   }
-
 
   @Test
   public void testWildcard1Resources() throws IOException {
-    locator.locate(createUri("/css/*.css"));
+    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.css"));
+    Assert.assertNotNull(locator.getInputStream());
   }
 
   @Test
   public void testWildcard2Resources() throws IOException {
-    locator.locate(createUri("/css/*.cs?"));
+    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.cs?"));
+    Assert.assertNotNull(locator.getInputStream());
   }
 
   @Test
   public void testWildcard3Resources() throws IOException {
-    locator.locate(createUri("/css/*.???"));
+    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.???"));
+    Assert.assertNotNull(locator.getInputStream());
   }
 
   @Test
   public void testRecursiveWildcardResources() throws IOException {
-    locator.locate(createUri("/css/**.css"));
+    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/**.css"));
+    Assert.assertNotNull(locator.getInputStream());
   }
 
   @Test
   public void testWildcardInexistentResources() throws IOException {
-    locator.locate(createUri("/css/**.NOTEXIST"));
+    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/**.NOTEXIST"));
+    Assert.assertNotNull(locator.getInputStream());
   }
 
   private String createUri(final String uri) throws IOException {
     final URL url = Thread.currentThread().getContextClassLoader().getResource("ro/isdc/wro/model/resource/locator/");
-    Mockito.when(Context.get().getServletContext().getRealPath(Mockito.anyString())).thenReturn(url.getPath());
+    Mockito.when(mockServletContext.getRealPath(Mockito.anyString())).thenReturn(url.getPath());
     //Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
     return uri;
   }
 
-  /**
-   * This should actually throw IOException. It behaves differently because of the mock issue
-   */
-  @Test
+  @Test(expected=IOException.class)
   public void testSomeUri()
     throws Exception {
-    final InputStream is = locator.locate("resourcePath");
-    Assert.assertNotNull(is);
+    locator = new ServletContextResourceLocator(mockServletContext, createUri("resourcePath"));
+    Assert.assertNotNull(locator.getInputStream());
   }
 
   /**
-   * Make this test method to follow a flow which throws IOException.
-   * This should actually throw IOException. It behaves differently because of the mock issue
+   * Make this test method to follow a flow which throws IOException
    */
-  @Test
+  @Test(expected=IOException.class)
   public void testInvalidUrl()
     throws Exception {
-    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
-    Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    Mockito.when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
+    Mockito.when(mockServletContext.getRequestDispatcher(Mockito.anyString())).thenReturn(null);
 
-    final InputStream is = locator.locate("/css/resourcePath.css");
+    //locator = new ServletContextResourceLocator(mockServletContext, "/css/resourcePath.css");
+    locator = new DynamicServletContextResourceLocator(
+      Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), mockServletContext,
+      "/css/resourcePath.css");
+    final InputStream is = locator.getInputStream();
     //the response should be empty
     Assert.assertEquals(-1, is.read());
   }
@@ -111,9 +119,9 @@ public class TestServletContextUriLocator {
   @Test
   public void testRedirectingResource()
     throws Exception {
-    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
-    Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
-    final InputStream is = simulateRedirectWithLocation("http://code.jquery.com/jquery-1.4.2.js");
+    Mockito.when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
+    Mockito.when(mockServletContext.getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    final InputStream is = simulateRedirectWithLocation("http://www.google.com");
     Assert.assertNotSame(-1, is.read());
   }
 
@@ -123,8 +131,8 @@ public class TestServletContextUriLocator {
   @Test(expected=IOException.class)
   public void testRedirectingResourceToInvalidLocation()
     throws Exception {
-    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
-    Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    Mockito.when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
+    Mockito.when(mockServletContext.getRequestDispatcher(Mockito.anyString())).thenReturn(null);
     simulateRedirectWithLocation("http://INVALID/");
   }
 
@@ -132,7 +140,6 @@ public class TestServletContextUriLocator {
   private InputStream simulateRedirectWithLocation(final String location)
       throws IOException {
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(Context.get().getResponse()).thenReturn(response);
 
     final RequestDispatcher requestDispatcher = new RequestDispatcher() {
       public void include(final ServletRequest request, final ServletResponse response)
@@ -149,10 +156,9 @@ public class TestServletContextUriLocator {
     };
 
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(Context.get().getRequest()).thenReturn(request);
     Mockito.when(request.getRequestDispatcher(Mockito.anyString())).thenReturn(requestDispatcher);
-    final InputStream is = locator.locate("/doesntMatter");
-    return is;
+    locator = new DynamicServletContextResourceLocator(request, response, mockServletContext, "/doesntMatter");
+    return locator.getInputStream();
   }
 
   @After

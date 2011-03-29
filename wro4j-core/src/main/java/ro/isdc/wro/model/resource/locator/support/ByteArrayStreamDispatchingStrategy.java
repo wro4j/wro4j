@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.locator;
+package ro.isdc.wro.model.resource.locator.support;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,12 +30,15 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
+ * DynamicStreamLocatorStrategy. Defines the way a inputStream is located using different types of streams after
+ * dispatching the request to provided location.
+ * <p/>
  * A strategy which use ByteArray IO Streams and dispatch the request to a given location.
+ *
  *
  * @author Alex Objelean
  */
-public final class ByteArrayStreamDispatchingStrategy
-    implements DynamicStreamLocatorStrategy {
+public final class ByteArrayStreamDispatchingStrategy {
   /**
    * Logger for this class.
    */

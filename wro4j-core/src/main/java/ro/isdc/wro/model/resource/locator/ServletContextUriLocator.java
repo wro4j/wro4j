@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.support.ByteArrayStreamDispatchingStrategy;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.util.WroUtil;
 
@@ -30,11 +31,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ServletContextUriLocator
   extends WildcardUriLocatorSupport {
-  /**
-   * Logger for this class.
-   */
-  static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
-
+  private static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
   /**
    * Prefix for url resources.
    */
@@ -47,7 +44,7 @@ public class ServletContextUriLocator
    * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
    * to see if performance change.
    */
-  private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
+  private final ByteArrayStreamDispatchingStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
 
   /**
    * {@inheritDoc}

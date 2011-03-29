@@ -41,7 +41,9 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 
 /**
@@ -167,8 +169,8 @@ public class XmlModelFactory
     return schema;
   }
 
-
-  public static void main(final String[] args) {
+  protected ResourceLocator getModelResourceLocator() {
+    return new ClasspathResourceLocator(XML_CONFIG_FILE);
   }
 
   /**
