@@ -18,6 +18,7 @@ import ro.isdc.wro.model.resource.Resource;
  *
  * @author Alex Objelean
  * @created 28 Mar 2011
+ * @since 1.4.0
  */
 public interface ResourceLocator {
   /**

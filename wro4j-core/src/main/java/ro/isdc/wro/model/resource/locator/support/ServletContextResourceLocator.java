@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.util.StringUtils;
 
 
@@ -21,15 +22,11 @@ import ro.isdc.wro.util.StringUtils;
  * interpreting relative paths within the web application root directory.
  *
  * @author Alex Objelean
+ * @since 1.4.0
  */
-public class ServletContextResourceLocator extends AbstractResourceLocator {
+public class ServletContextResourceLocator
+    extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ServletContextResourceLocator.class);
-  /**
-   * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
-   * to see if performance change.
-   */
-  private final ByteArrayStreamDispatchingStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
-
   private final ServletContext servletContext;
   private final String path;
 
@@ -52,7 +49,7 @@ public class ServletContextResourceLocator extends AbstractResourceLocator {
    * {@inheritDoc}
    */
   public InputStream getInputStream()
-    throws IOException {
+      throws IOException {
     LOG.debug("locating uri: " + path);
     if (path == null) {
       throw new IllegalArgumentException("URI cannot be NULL!");
@@ -71,7 +68,7 @@ public class ServletContextResourceLocator extends AbstractResourceLocator {
       }
     } catch (final IOException e) {
       LOG.warn("Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
-        + "\".\n Trying to locate the stream without the wildcard.");
+          + "\".\n Trying to locate the stream without the wildcard.");
     }
 
     // first attempt
@@ -90,4 +87,15 @@ public class ServletContextResourceLocator extends AbstractResourceLocator {
     return this.path;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ResourceLocator createRelative(final String relativePath)
+      throws IOException {
+    final String folder = FilenameUtils.getFullPath(path);
+    // remove '../' & normalize the path.
+    final String pathToUse = StringUtils.normalizePath(folder + relativePath);
+    return new ServletContextResourceLocator(servletContext, pathToUse);
+  }
 }

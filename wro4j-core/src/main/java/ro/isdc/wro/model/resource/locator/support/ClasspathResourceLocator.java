@@ -28,6 +28,7 @@ import ro.isdc.wro.util.StringUtils;
  *
  * @author Alex Objelean
  * @created 28 Mar 2011
+ * @since 1.4.0
  */
 public class ClasspathResourceLocator extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);

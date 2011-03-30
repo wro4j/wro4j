@@ -16,6 +16,7 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
  * Implements most of the {@link ResourceLocator} methods and provides basic wildcard support.
  *
  * @author Alex Objelean
+ * @since 1.4.0
  */
 public abstract class AbstractResourceLocator
   implements ResourceLocator {

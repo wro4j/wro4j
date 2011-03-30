@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 /**
  * {@link org.springframework.core.io.Resource} implementation for {@link javax.servlet.ServletContext} resources,
  * interpreting relative paths within the web application root directory.
@@ -23,14 +22,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DynamicServletContextResourceLocator extends ServletContextResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DynamicServletContextResourceLocator.class);
-  /**
-   * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
-   * to see if performance change.
-   */
-  private final ByteArrayStreamDispatchingStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
-  private HttpServletRequest request;
+  private final HttpServletRequest request;
   private final HttpServletResponse response;
-
 
   public DynamicServletContextResourceLocator(final HttpServletRequest request, final HttpServletResponse response,
     final ServletContext servletContext, final String path) {
@@ -55,7 +48,11 @@ public class DynamicServletContextResourceLocator extends ServletContextResource
     try {
       inputStream = super.getInputStream();
     } catch(final IOException e) {
-      inputStream = dynamicStreamLocator.getInputStream(request, response, getPath());
+      /**
+       * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
+       * to see if performance change.
+       */
+      inputStream = new ByteArrayStreamDispatchingStrategy().getInputStream(request, response, getPath());
     }
     if (inputStream == null) {
       LOG.error("Exception while reading resource from " + getPath());
