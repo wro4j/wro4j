@@ -6,7 +6,8 @@ package ro.isdc.wro.extensions.manager.standalone;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -24,14 +25,16 @@ public class YUIStandaloneManagerFactory extends DefaultStandaloneContextAwareMa
    * {@inheritDoc}
    */
   @Override
-  protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-    groupsProcessor.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
-    groupsProcessor.addPreProcessor(new YUICssCompressorProcessor());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
+    factory.addPreProcessor(new YUICssCompressorProcessor());
 
-    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+    factory.addPostProcessor(new CssVariablesProcessor());
+    return factory;
   }
 }

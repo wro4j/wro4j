@@ -10,11 +10,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-
 /**
- * Tests if {@link ClasspathUriLocator} works properly.
+ * Tests if {@link UrlUriLocator} works properly.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -28,13 +25,6 @@ public class TestUrlUriLocator {
   @Before
   public void init() {
     uriLocator = new UrlUriLocator();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
-      @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(uriLocator);
-      }
-    };
-    // it is important to add this locator to factory, in order to be sure it is initialized correctly.
   }
 
   @Test(expected=IllegalArgumentException.class)

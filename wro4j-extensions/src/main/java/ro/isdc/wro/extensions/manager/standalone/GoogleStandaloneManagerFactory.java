@@ -5,7 +5,8 @@ package ro.isdc.wro.extensions.manager.standalone;
 
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -26,14 +27,16 @@ public class GoogleStandaloneManagerFactory extends DefaultStandaloneContextAwar
    * {@inheritDoc}
    */
   @Override
-  protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-    groupsProcessor.addPreProcessor(new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
-    groupsProcessor.addPreProcessor(new JawrCssMinifierProcessor());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
+    factory.addPreProcessor(new JawrCssMinifierProcessor());
 
-    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+    factory.addPostProcessor(new CssVariablesProcessor());
+    return factory;
   }
 }

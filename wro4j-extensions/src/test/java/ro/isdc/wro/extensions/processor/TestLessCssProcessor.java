@@ -9,13 +9,11 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -28,19 +26,13 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Apr 21, 2010
  */
-public class TestLessCssProcessor
-    extends AbstractWroTest {
+public class TestLessCssProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(TestLessCssProcessor.class);
-  private ResourcePostProcessor processor;
-
-  @Before
-  public void setUp() {
-    processor = new LessCssProcessor();
-  }
 
   @Test
   public void testFromFolder()
       throws Exception {
+    final ResourcePostProcessor processor = new LessCssProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -52,7 +44,7 @@ public class TestLessCssProcessor
   @Test(expected=WroRuntimeException.class)
   public void testInvalidLessCss()
       throws Exception {
-    processor = new LessCssProcessor() {
+    final ResourcePostProcessor processor = new LessCssProcessor() {
       protected void onException(final WroRuntimeException e) {
         LOG.debug("Exception message is: " + e.getMessage());
         throw e;

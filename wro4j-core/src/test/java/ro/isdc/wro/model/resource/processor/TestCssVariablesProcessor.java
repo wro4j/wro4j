@@ -9,10 +9,10 @@ import java.io.Writer;
 
 import org.junit.Test;
 
-import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
+import ro.isdc.wro.util.WroTestUtils;
+
 
 /**
  * Test for css variables preprocessor.
@@ -22,15 +22,14 @@ import ro.isdc.wro.util.ResourceProcessor;
  * @date $Date: $
  * @created Created on Jul 05, 2009
  */
-public class TestCssVariablesProcessor extends AbstractWroTest {
+public class TestCssVariablesProcessor {
   private final ResourcePreProcessor processor = new CssVariablesProcessor();
 
   @Test
-  public void testValid() throws IOException {
-    compareProcessedResourceContents(
-        "classpath:ro/isdc/wro/processor/cssvariables/valid-input.css",
-        "classpath:ro/isdc/wro/processor/cssvariables/valid-output.css",
-        new ResourceProcessor() {
+  public void testValid()
+      throws IOException {
+    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/cssvariables/valid-input.css",
+        "classpath:ro/isdc/wro/processor/cssvariables/valid-output.css", new ResourceProcessor() {
           public void process(final Reader reader, final Writer writer)
               throws IOException {
             processor.process(null, reader, writer);

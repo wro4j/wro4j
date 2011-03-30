@@ -9,7 +9,6 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -24,7 +23,7 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @author Alex Objelean
  * @created Created on Apr 18, 2010
  */
-public class TestGoogleClosureCompressorProcessor extends AbstractWroTest {
+public class TestGoogleClosureCompressorProcessor {
   @Test
   public void testSimpleFromFolder()
     throws IOException {

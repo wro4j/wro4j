@@ -39,8 +39,13 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -80,12 +85,11 @@ public class WroManager
   /**
    * Groups processor.
    */
-  private GroupsProcessor groupsProcessor;
+  private final GroupsProcessor groupsProcessor;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
   private HashBuilder hashBuilder;
-
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
@@ -98,7 +102,17 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
+  @Inject
+  private ProcessorsFactory processorsFactory;
+  @Inject
+  private UriLocatorFactory uriLocatorFactory;
 
+
+  public WroManager(final Injector injector) {
+    groupsProcessor = new GroupsProcessor();
+    injector.inject(this);
+    injector.inject(groupsProcessor);
+  }
 
   /**
    * Perform processing of the uri.
@@ -151,6 +165,7 @@ public class WroManager
     return m.matches();
   }
 
+
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
@@ -201,16 +216,16 @@ public class WroManager
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
-    //TODO move ETag check in wroManagerFactory
+    // TODO move ETag check in wroManagerFactory
     final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
     //enclose etag value in quotes to be compliant with the RFC
     final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
 
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
       LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
-          + " status code");
+        + " status code");
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      //because we cannot return null, return a stream containing nothing.
+      // because we cannot return null, return a stream containing nothing.
       return EMPTY_STREAM;
     }
     if (contentHashEntry.getContent() != null) {
@@ -263,6 +278,7 @@ public class WroManager
   protected String formatVersionedResource(final String hash, final String resourcePath) {
     return String.format("%s/%s", hash, resourcePath);
   }
+
 
   /**
    * @return {@link ContentHashEntry} object.
@@ -366,7 +382,6 @@ public class WroManager
     };
   }
 
-
   /**
    * {@inheritDoc}
    */
@@ -376,11 +391,9 @@ public class WroManager
 
 
   /**
-   * Allow subclasses to turn off gzipping.
-   *
    * @return true if Gzip is Supported
    */
-  protected boolean isGzipSupported() {
+  private boolean isGzipSupported() {
     return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 
@@ -396,13 +409,13 @@ public class WroManager
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: " + resourceId);
-    final CssUrlRewritingProcessor processor = groupsProcessor.findPreProcessorByClass(CssUrlRewritingProcessor.class);
+    final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
+      processorsFactory.getPreProcessors());
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    return groupsProcessor.getUriLocatorFactory().locate(resourceId);
+    return uriLocatorFactory.locate(resourceId);
   }
-
 
   /**
    * {@inheritDoc}
@@ -454,9 +467,6 @@ public class WroManager
     if (this.modelFactory == null) {
       throw new WroRuntimeException("ModelFactory was not set!");
     }
-    if (this.groupsProcessor == null) {
-      throw new WroRuntimeException("GroupsProcessor was not set!");
-    }
     if (this.cacheStrategy == null) {
       throw new WroRuntimeException("cacheStrategy was not set!");
     }
@@ -471,14 +481,6 @@ public class WroManager
    */
   public final void setGroupExtractor(final GroupExtractor groupExtractor) {
     this.groupExtractor = groupExtractor;
-  }
-
-
-  /**
-   * @param groupsProcessor the groupsProcessor to set
-   */
-  public final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    this.groupsProcessor = groupsProcessor;
   }
 
 

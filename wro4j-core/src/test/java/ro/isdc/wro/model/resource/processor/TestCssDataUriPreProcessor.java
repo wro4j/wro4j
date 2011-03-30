@@ -11,15 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.util.ResourceProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -28,7 +23,7 @@ import ro.isdc.wro.util.ResourceProcessor;
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
-public class TestCssDataUriPreProcessor extends AbstractWroTest {
+public class TestCssDataUriPreProcessor {
   private ResourcePreProcessor processor;
   private static final String TEST_FOLDER = "ro/isdc/wro/processor/dataUri/";
   private static final String CSS_INPUT_NAME = TEST_FOLDER + "cssEmbed-input.css";
@@ -37,16 +32,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   @Before
   public void init() {
     processor = new CssDataUriPreProcessor();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
-      @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(new ServletContextUriLocator());
-        factory.addUriLocator(new UrlUriLocator());
-        factory.addUriLocator(new ClasspathUriLocator());
-      }
-    };
-
-    groupsProcessor.addPreProcessor(processor);
+    WroTestUtils.initProcessor(processor);
   }
 
 
@@ -57,7 +43,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   public void processClasspathResourceType()
     throws IOException {
     final String resourceUri = "classpath:" + CSS_INPUT_NAME;
-    compareProcessedResourceContents(resourceUri, "classpath:" + TEST_FOLDER + "cssEmbed-classpath-outcome.css",
+    WroTestUtils.compareProcessedResourceContents(resourceUri, "classpath:" + TEST_FOLDER + "cssEmbed-classpath-outcome.css",
       new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
@@ -73,7 +59,7 @@ public class TestCssDataUriPreProcessor extends AbstractWroTest {
   public void processLargeDataUri()
     throws IOException {
     final String resourceUri = "classpath:" + TEST_FOLDER + "cssEmbed-large-input.css";
-    compareProcessedResourceContents(resourceUri, resourceUri,
+    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri,
       new ResourceProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {

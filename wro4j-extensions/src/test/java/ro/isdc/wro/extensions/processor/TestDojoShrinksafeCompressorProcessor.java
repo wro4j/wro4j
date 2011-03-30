@@ -9,7 +9,6 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -22,7 +21,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 6, 2010
  */
-public class TestDojoShrinksafeCompressorProcessor extends AbstractWroTest {
+public class TestDojoShrinksafeCompressorProcessor {
   @Test
   public void testFromFolder()
     throws IOException {

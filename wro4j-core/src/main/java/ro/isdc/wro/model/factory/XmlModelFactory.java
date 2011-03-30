@@ -36,9 +36,9 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
@@ -116,7 +116,7 @@ public class XmlModelFactory
   /**
    * Used to locate imports;
    */
-  private UriLocatorFactory uriLocatorFactory;
+  private SimpleUriLocatorFactory uriLocatorFactory;
   /**
    * Used to detect recursive import processing.
    */
@@ -372,7 +372,7 @@ public class XmlModelFactory
    */
   private UriLocatorFactory getUriLocatorFactory() {
     if (uriLocatorFactory == null) {
-      uriLocatorFactory = new UriLocatorFactory(new DuplicateResourceDetector());
+      uriLocatorFactory = new SimpleUriLocatorFactory();
       // use locators with wildcard disabled - to avoid invalid xml parsing error
       uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
         @Override

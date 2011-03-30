@@ -11,13 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.AbstractWroTest;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -30,22 +24,14 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
-public class TestDuplicateAwareCssDataUriPreProcessor extends AbstractWroTest {
+public class TestDuplicateAwareCssDataUriPreProcessor {
   private ResourcePreProcessor processor;
 
 
   @Before
   public void init() {
     processor = new DuplicatesAwareCssDataUriPreProcessor();
-    final GroupsProcessor groupsProcessor = new GroupsProcessor() {
-      @Override
-      protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-        factory.addUriLocator(new ServletContextUriLocator());
-        factory.addUriLocator(new UrlUriLocator());
-        factory.addUriLocator(new ClasspathUriLocator());
-      }
-    };
-    groupsProcessor.addPreProcessor(processor);
+    WroTestUtils.initProcessor(processor);
   }
 
 

@@ -12,13 +12,15 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -50,6 +52,10 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   public void initialize(final StandaloneContext standaloneContext) {
     this.standaloneContext = standaloneContext;
+    //This is important in order to make plugin aware about ignoreMissingResources option.
+    Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
+    LOG.debug("initialize: " + standaloneContext);
+    LOG.debug("config: " + Context.get().getConfig());
   }
 
   @Override
@@ -74,33 +80,19 @@ public class DefaultStandaloneContextAwareManagerFactory
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    super.configureGroupsProcessor(groupsProcessor);
-    configureProcessors(groupsProcessor);
-    //This is important in order to make plugin aware about ignoreMissingResources option.
-    groupsProcessor.setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new JSMinProcessor());
+    factory.addPreProcessor(new JawrCssMinifierProcessor());
+
+    factory.addPostProcessor(new CssVariablesProcessor());
+    return factory;
   }
-
-  /**
-   * Configure the pre and post processors. Override this to specify your own processors.
-   *
-   * @param groupsProcessor
-   */
-  protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-    groupsProcessor.addPreProcessor(new JSMinProcessor());
-    groupsProcessor.addPreProcessor(new JawrCssMinifierProcessor());
-
-    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
-  }
-
 
   @Override
   protected ServletContextUriLocator newServletContextUriLocator() {
