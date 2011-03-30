@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Apr 21, 2010
  */
-public class TestPackerProcessor {
+public class TestPackerJsProcessor {
   private ResourcePostProcessor processor;
 
   @Before

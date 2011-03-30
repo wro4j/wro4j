@@ -122,7 +122,7 @@ class Selector {
       try {
         results[i] = new Property(parts[i]);
       } catch (final Exception e) {
-        LOG.error(e.getMessage(), e);
+        LOG.warn(e.getMessage(), e);
         results[i] = null;
       }
     }

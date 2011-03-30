@@ -308,7 +308,7 @@ public class WroTestUtils {
         LOG.debug("Compare ... [OK]");
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath(), e);
       }
     }
     logSuccess(processedNumber);
