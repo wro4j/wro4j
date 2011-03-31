@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.factory;
+package ro.isdc.wro.model.resource.locator.factory;
 
 import java.util.ArrayList;
 import java.util.List;

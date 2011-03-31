@@ -27,6 +27,10 @@ import ro.isdc.wro.util.StringUtils;
 public class ServletContextResourceLocator
     extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ServletContextResourceLocator.class);
+  /**
+   * Prefix used to identify if the path is a servlet context path.
+   */
+  public static final String PREFIX = "/";
   private final ServletContext servletContext;
   private final String path;
 
@@ -39,8 +43,8 @@ public class ServletContextResourceLocator
     }
     this.servletContext = servletContext;
     String pathToUse = StringUtils.cleanPath(path);
-    if (!pathToUse.startsWith("/")) {
-      pathToUse = "/" + pathToUse;
+    if (!pathToUse.startsWith(PREFIX)) {
+      pathToUse = PREFIX + pathToUse;
     }
     this.path = pathToUse;
   }

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
+import ro.isdc.wro.model.resource.locator.support.IOFileFilterDecorator;
 
 
 /**

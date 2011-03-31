@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.model.resource.locator.wildcard;
+package ro.isdc.wro.model.resource.locator.support;
 
 import java.io.File;
 
