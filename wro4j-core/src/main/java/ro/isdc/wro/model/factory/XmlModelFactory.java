@@ -38,11 +38,9 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 
@@ -114,11 +112,8 @@ public class XmlModelFactory
    * infinite recurse group reference.
    */
   final Collection<String> processingGroups = new HashSet<String>();
+  private ResourceLocatorFactory resourceLocatorFactory;
 
-  /**
-   * Used to locate imports;
-   */
-  private SimpleUriLocatorFactory uriLocatorFactory;
   /**
    * Used to detect recursive import processing.
    */
@@ -133,7 +128,7 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final InputStream configResource = getConfigResourceAsStream();
+      final InputStream configResource = getResourceLocator().getInputStream();
       if (configResource == null) {
         throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
       }
@@ -143,7 +138,7 @@ public class XmlModelFactory
     } catch (final IOException e) {
       throw new WroRuntimeException("Cannot find XML to parse", e);
     } catch (final SAXException e) {
-      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage());
+      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage(), e);
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
@@ -169,19 +164,13 @@ public class XmlModelFactory
     return schema;
   }
 
-  protected ResourceLocator getModelResourceLocator() {
-    return new ClasspathResourceLocator(XML_CONFIG_FILE);
-  }
-
   /**
    * Override this method, in order to provide different xml definition file name.
    *
    * @return stream of the xml representation of the model.
-   * @throws IOException if the stream couldn't be read.
    */
-  protected InputStream getConfigResourceAsStream()
-    throws IOException {
-    return getResourceAsStream(XML_CONFIG_FILE);
+  protected ResourceLocator getResourceLocator() {
+    return new ClasspathResourceLocator(XML_CONFIG_FILE);
   }
 
 
@@ -208,11 +197,10 @@ public class XmlModelFactory
       LOG.debug("processing import: " + name);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream()
-          throws IOException {
-          LOG.debug("build model from import: " + name);
-          return getUriLocatorFactory().locate(name);
-        };
+        protected ResourceLocator getResourceLocator() {
+          //TODO handle relative imports
+          return getResourceLocatorFactory().locate(name);
+        }
       };
 
       if (processedImports.contains(name)) {
@@ -373,25 +361,12 @@ public class XmlModelFactory
 
 
   /**
-   * @return lazily instantiated {@link UriLocatorFactory}.
+   * @return the resourceLocatorFactory
    */
-  private UriLocatorFactory getUriLocatorFactory() {
-    if (uriLocatorFactory == null) {
-      uriLocatorFactory = new SimpleUriLocatorFactory();
-      // use locators with wildcard disabled - to avoid invalid xml parsing error
-      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
-        @Override
-        protected boolean disableWildcards() {
-          return true;
-        }
-      });
-      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
-        @Override
-        protected boolean disableWildcards() {
-          return true;
-        }
-      });
+  public ResourceLocatorFactory getResourceLocatorFactory() {
+    if (resourceLocatorFactory == null) {
+      resourceLocatorFactory = new DefaultResourceLocatorFactory();
     }
-    return uriLocatorFactory;
+    return this.resourceLocatorFactory;
   }
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -50,7 +51,7 @@ public class UrlResourceLocator
     if (url == null) {
       throw new IllegalArgumentException("url cannot be NULL!");
     }
-    this.path = url.getPath();
+    this.path = url.toExternalForm();
   }
 
   /**
@@ -65,7 +66,10 @@ public class UrlResourceLocator
       return getWildcardStreamLocator().locateStream(path, new File(url.getFile()));
     }
     final URL url = new URL(path);
-    return new BufferedInputStream(url.openStream());
+    final URLConnection con = url.openConnection();
+    // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
+    con.setUseCaches(false);
+    return new BufferedInputStream(con.getInputStream());
   }
 
   /**

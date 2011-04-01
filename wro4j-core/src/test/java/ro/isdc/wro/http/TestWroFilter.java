@@ -4,7 +4,6 @@
 package ro.isdc.wro.http;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 
 import javax.servlet.FilterChain;
@@ -30,6 +29,8 @@ import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 
 
@@ -73,8 +74,8 @@ public class TestWroFilter {
           protected WroModelFactory newModelFactory(final ServletContext servletContext) {
             return new XmlModelFactory() {
               @Override
-              protected InputStream getConfigResourceAsStream() {
-                return getClass().getResourceAsStream("wro.xml");
+              protected ResourceLocator getResourceLocator() {
+                return new UrlResourceLocator(getClass().getResource("wro.xml"));
               }
             };
           }

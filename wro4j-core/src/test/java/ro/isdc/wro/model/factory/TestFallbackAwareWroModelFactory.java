@@ -16,6 +16,8 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ResourceLocatorDecorator;
 
 
 /**
@@ -38,24 +40,34 @@ public class TestFallbackAwareWroModelFactory {
     Context.set(Context.standaloneContext());
     fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        flag = !flag;
-        if (flag) {
-          return super.getConfigResourceAsStream();
-        }
-        return null;
+      protected ResourceLocator getResourceLocator() {
+        return new ResourceLocatorDecorator(super.getResourceLocator()) {
+          @Override
+          public InputStream getInputStream()
+            throws IOException {
+            flag = !flag;
+            if (flag) {
+              return super.getInputStream();
+            }
+            return null;
+          }
+        };
       }
     }));
     xmlModelFactory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        if (flag) {
-          return super.getConfigResourceAsStream();
-        }
-        flag = !flag;
-        return null;
+      protected ResourceLocator getResourceLocator() {
+        return new ResourceLocatorDecorator(super.getResourceLocator()) {
+          @Override
+          public InputStream getInputStream()
+            throws IOException {
+            if (flag) {
+              return super.getInputStream();
+            }
+            flag = !flag;
+            return null;
+          }
+        };
       }
     };
   }

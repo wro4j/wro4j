@@ -18,7 +18,9 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
@@ -73,9 +75,13 @@ public class DefaultStandaloneContextAwareManagerFactory
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        return new FileInputStream(standaloneContext.getWroFile());
+      protected ResourceLocator getResourceLocator() {
+        return new AbstractResourceLocator() {
+          public InputStream getInputStream()
+            throws IOException {
+            return new FileInputStream(standaloneContext.getWroFile());
+          }
+        };
       }
     };
   }

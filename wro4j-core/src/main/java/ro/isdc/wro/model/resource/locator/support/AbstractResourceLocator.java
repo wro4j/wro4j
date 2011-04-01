@@ -56,6 +56,7 @@ public abstract class AbstractResourceLocator
   protected boolean disableWildcards() {
     return false;
   }
+
   /**
    * {@inheritDoc}
    */
@@ -69,6 +70,6 @@ public abstract class AbstractResourceLocator
    */
   public ResourceLocator createRelative(final String relativePath)
     throws IOException {
-    throw new UnsupportedOperationException("Not Implemented");
+    return null;
   }
 }

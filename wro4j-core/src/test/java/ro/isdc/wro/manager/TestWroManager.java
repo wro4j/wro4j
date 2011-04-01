@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -37,6 +36,8 @@ import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
@@ -246,8 +247,8 @@ public class TestWroManager {
   private XmlModelFactory getValidModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        return TestWroManager.class.getResourceAsStream("wro.xml");
+      protected ResourceLocator getResourceLocator() {
+        return new UrlResourceLocator(TestWroManager.class.getResource("wro.xml"));
       }
     };
   }
