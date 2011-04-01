@@ -24,8 +24,8 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
@@ -98,8 +98,8 @@ public abstract class BaseWroManagerFactory
    *
    * @return {@link UriLocatorFactory} object.
    */
-  protected UriLocatorFactory newUriLocatorFactory() {
-    return new SimpleUriLocatorFactory();
+  protected ResourceLocatorFactory newUriLocatorFactory() {
+    return new DefaultResourceLocatorFactory();
   }
 
   /**

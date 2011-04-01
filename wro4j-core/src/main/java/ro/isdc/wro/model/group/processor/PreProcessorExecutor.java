@@ -17,7 +17,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -36,7 +36,7 @@ import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 public final class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
   @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
   @Inject
@@ -133,7 +133,7 @@ public final class PreProcessorExecutor {
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      final InputStream is = resourceLocatorFactory.locate(resource.getUri()).getInputStream();
       final String result = IOUtils.toString(new SmartEncodingInputStream(is));
       is.close();
       return result;

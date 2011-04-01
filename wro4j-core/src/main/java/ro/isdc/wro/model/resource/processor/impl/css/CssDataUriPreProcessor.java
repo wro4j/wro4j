@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
@@ -11,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 
 
@@ -36,10 +37,10 @@ public class CssDataUriPreProcessor
    */
   private DataUriGenerator dataUriGenerator;
   /**
-   * Contains a {@link UriLocatorFactory} reference injected externally.
+   * Injected by wro4j.
    */
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
 
   /**
    * Replace provided url with the new url if needed.
@@ -50,7 +51,7 @@ public class CssDataUriPreProcessor
    */
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
-    if (uriLocatorFactory == null) {
+    if (resourceLocatorFactory == null) {
       throw new IllegalStateException("No UriLocatorFactory was injected!");
     }
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
@@ -59,7 +60,8 @@ public class CssDataUriPreProcessor
     final String fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     String result = imageUrl;
     try {
-      final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
+      final InputStream inputStream = resourceLocatorFactory.locate(fullPath).getInputStream();
+      final String dataUri = getDataUriGenerator().generateDataURI(inputStream, fileName);
       if (replaceWithDataUri(dataUri)) {
         result = dataUri;
       }

@@ -43,7 +43,7 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -105,7 +105,7 @@ public class WroManager
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory uriLocatorFactory;
 
 
   public WroManager(final Injector injector) {
@@ -414,7 +414,7 @@ public class WroManager
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    return uriLocatorFactory.locate(resourceId);
+    return uriLocatorFactory.locate(resourceId).getInputStream();
   }
 
   /**

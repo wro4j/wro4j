@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
-import ro.isdc.wro.model.resource.locator.factory.InjectorUriLocatorFactoryDecorator;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.InjectorResourceLocatorFactoryDecorator;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 
 
@@ -29,19 +29,19 @@ import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
-  private final UriLocatorFactory uriLocatorFactory;
+  private final ResourceLocatorFactory resourceLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
   private final ProcessorsFactory processorsFactory;
 
 
-  public Injector(final UriLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
+  public Injector(final ResourceLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
     if (uriLocatorFactory == null) {
       throw new IllegalArgumentException("uriLocatorFactory cannot be null");
     }
     if (processorsFactory == null) {
       throw new IllegalArgumentException("processorsFactory cannot be null");
     }
-    this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(uriLocatorFactory, this);
+    this.resourceLocatorFactory = new InjectorResourceLocatorFactoryDecorator(uriLocatorFactory, this);
     this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, this);
   }
 
@@ -79,7 +79,7 @@ public final class Injector {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
             throw new WroRuntimeException("@Inject can be applied only on these types "
-              + UriLocatorFactory.class.getName() + " type");
+              + ResourceLocatorFactory.class.getName() + " type");
           }
         }
       }
@@ -119,8 +119,8 @@ public final class Injector {
     throws IllegalAccessException {
     // accept even private modifiers
     field.setAccessible(true);
-    if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
-      field.set(object, uriLocatorFactory);
+    if (ResourceLocatorFactory.class.isAssignableFrom(field.getType())) {
+      field.set(object, resourceLocatorFactory);
       return true;
     }
     if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {

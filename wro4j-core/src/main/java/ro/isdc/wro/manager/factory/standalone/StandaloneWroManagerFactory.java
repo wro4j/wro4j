@@ -11,8 +11,7 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 
@@ -48,8 +47,9 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
 //    };
 //  }
 
+
   @Override
-  protected UriLocatorFactory newUriLocatorFactory() {
+  protected ResourceLocatorFactory newUriLocatorFactory() {
     return new SimpleUriLocatorFactory().addUriLocator(newServletContextUriLocator()).addUriLocator(
         new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
   }
