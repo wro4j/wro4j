@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 
 
 /**

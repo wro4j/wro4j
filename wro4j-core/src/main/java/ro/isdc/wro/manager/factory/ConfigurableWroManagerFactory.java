@@ -15,10 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -61,7 +57,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   //Use LinkedHashMap to preserve the addition order
   private final Map<String, ResourcePreProcessor> preProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
   private final Map<String, ResourcePostProcessor> postProcessors = new LinkedHashMap<String, ResourcePostProcessor>();
-  private final Map<String, UriLocator> locators = new LinkedHashMap<String, UriLocator>();
 
 
   /**
@@ -69,19 +64,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   public ConfigurableWroManagerFactory() {
     initProcessors();
-    initLocators();
   }
-
-  /**
-   * Init locators with default values.
-   */
-  private void initLocators() {
-    locators.put("servletContext", new ServletContextUriLocator());
-    locators.put("classpath", new ClasspathUriLocator());
-    locators.put("url", new UrlUriLocator());
-    contributeLocators(locators);
-  }
-
 
   /**
    * Init processors with default values.
@@ -110,15 +93,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);
   }
-
-
-  /**
-   * Allow subclasses to contribute with it's own locators.
-   *
-   * @param map containing locator mappings.
-   */
-  protected void contributeLocators(final Map<String, UriLocator> map) {}
-
 
   /**
    * Allow subclasses to contribute with it's own pre processors.

@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 
 /**
@@ -147,17 +146,17 @@ public class CssUrlRewritingProcessor
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
-    if (ServletContextUriLocator.isValid(cssUri)) {
-      if (ServletContextUriLocator.isValid(imageUrl)) {
+    if (ServletContextResourceLocator.isValid(cssUri)) {
+      if (ServletContextResourceLocator.isValid(imageUrl)) {
         return imageUrl;
       }
       // Treat WEB-INF special case
-      if (ServletContextUriLocator.isProtectedResource(cssUri)) {
+      if (ServletContextResourceLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
       return computeNewImageLocation(".." + cssUri, imageUrl);
     }
-    if (UrlUriLocator.isValid(cssUri) || ClasspathUriLocator.isValid(cssUri)) {
+    if (UrlResourceLocator.isValid(cssUri) || ClasspathResourceLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
@@ -175,13 +174,13 @@ public class CssUrlRewritingProcessor
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     // TODO move to ServletContextUriLocator as a helper method?
     // for the following input: /a/b/c/1.css => /a/b/c/
-    int idxLastSeparator = cssUri.lastIndexOf(ServletContextUriLocator.PREFIX);
+    int idxLastSeparator = cssUri.lastIndexOf(ServletContextResourceLocator.PREFIX);
     if (idxLastSeparator == -1) {
-      if (ClasspathUriLocator.isValid(cssUri)) {
-        idxLastSeparator = cssUri.lastIndexOf(ClasspathUriLocator.PREFIX);
+      if (ClasspathResourceLocator.isValid(cssUri)) {
+        idxLastSeparator = cssUri.lastIndexOf(ClasspathResourceLocator.PREFIX);
         // find the index of ':' character used by classpath prefix
         if (idxLastSeparator >= 0) {
-          idxLastSeparator += ClasspathUriLocator.PREFIX.length() - 1;
+          idxLastSeparator += ClasspathResourceLocator.PREFIX.length() - 1;
         }
       }
       if (idxLastSeparator < 0) {
@@ -190,7 +189,7 @@ public class CssUrlRewritingProcessor
     }
     final String cssUriFolder = cssUri.substring(0, idxLastSeparator + 1);
     // remove '/' from imageUrl if it starts with one.
-    final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX)
+    final String processedImageUrl = cleanImageUrl.startsWith(ServletContextResourceLocator.PREFIX)
       ? cleanImageUrl.substring(1)
       : cleanImageUrl;
     return cssUriFolder + processedImageUrl;

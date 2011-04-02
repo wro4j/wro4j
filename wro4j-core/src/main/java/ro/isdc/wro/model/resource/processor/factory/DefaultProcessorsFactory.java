@@ -13,7 +13,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
 
 
 /**
- * A factory which contains a list of most used processors.
+ * A factory which contains most used processors.
  *
  * @author Alex Objelean
  * @created 2 apr 2011

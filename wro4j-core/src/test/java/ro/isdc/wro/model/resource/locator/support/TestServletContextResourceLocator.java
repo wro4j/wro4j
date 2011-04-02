@@ -27,7 +27,6 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 
 
 /**

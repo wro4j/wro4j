@@ -15,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.util.StringUtils;
@@ -31,7 +29,7 @@ import ro.isdc.wro.util.StringUtils;
  * @since 1.4.0
  */
 public class ClasspathResourceLocator extends AbstractResourceLocator {
-  private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClasspathResourceLocator.class);
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
@@ -55,6 +53,17 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     // replace prefix & clean path by removing '..' characters if exists and
     // normalizing the location to use.
     location = StringUtils.cleanPath(path.replaceFirst(PREFIX, "")).trim();
+  }
+
+  /**
+   * Check if a uri is a classpath resource.
+   *
+   * @param uri
+   *          to check.
+   * @return true if the uri is a classpath resource.
+   */
+  public static boolean isValid(final String uri) {
+    return uri.trim().startsWith(PREFIX);
   }
 
   /**

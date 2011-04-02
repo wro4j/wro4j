@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.util.StringUtils;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -31,6 +32,11 @@ public class ServletContextResourceLocator
    * Prefix used to identify if the path is a servlet context path.
    */
   public static final String PREFIX = "/";
+  /**
+   * Constant for WEB-INF folder.
+   */
+  private static final String PROTECTED_PREFIX = "/WEB-INF/";
+
   private final ServletContext servletContext;
   private final String path;
 
@@ -47,6 +53,27 @@ public class ServletContextResourceLocator
       pathToUse = PREFIX + pathToUse;
     }
     this.path = pathToUse;
+  }
+
+  /**
+   * Check if a uri is a servletContext resource.
+   *
+   * @param uri to check.
+   * @return true if the uri is a servletContext resource.
+   */
+  public static boolean isValid(final String uri) {
+    return uri.trim().startsWith(PREFIX);
+  }
+
+  /**
+   * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
+   * folder).
+   *
+   * @param uri the uri to check.
+   * @return true if the uri is a protected resource.
+   */
+  public static boolean isProtectedResource(final String uri) {
+    return WroUtil.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
   }
 
   /**

@@ -9,7 +9,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -27,7 +26,7 @@ public class TestClasspathResourceLocator {
 
 
   private String createUri(final String location) {
-    return ClasspathUriLocator.PREFIX + location;
+    return ClasspathResourceLocator.PREFIX + location;
   }
 
   @Test
