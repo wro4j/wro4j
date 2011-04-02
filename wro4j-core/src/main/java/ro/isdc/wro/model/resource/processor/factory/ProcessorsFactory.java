@@ -1,9 +1,12 @@
 /**
  * Copyright wro4j@2010
  */
-package ro.isdc.wro.model.resource.processor;
+package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.Collection;
+
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**

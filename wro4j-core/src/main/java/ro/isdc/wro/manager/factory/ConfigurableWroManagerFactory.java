@@ -19,12 +19,10 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -47,10 +45,6 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  */
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
-  /**
-   * Name of init param used to specify uri locators.
-   */
-  public static final String PARAM_URI_LOCATORS = "uriLocators";
   /**
    * Name of init param used to specify pre processors.
    */
@@ -145,19 +139,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
 
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected UriLocatorFactory newUriLocatorFactory() {
-    final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-    for (final UriLocator locator : getLocators()) {
-      factory.addUriLocator(locator);
-    }
-    return factory;
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -168,16 +149,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     factory.setResourcePostProcessors(getPostProcessors());
     return factory;
   }
-
-  /**
-   * This method has friendly modifier in order to be able to test it.
-   *
-   * @return a list of configured uriLocators.
-   */
-  List<UriLocator> getLocators() {
-    return getListOfItems(PARAM_URI_LOCATORS, locators);
-  }
-
 
   /**
    * @return a list of configured preProcessors.

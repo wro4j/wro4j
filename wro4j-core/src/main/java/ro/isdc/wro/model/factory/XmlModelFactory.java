@@ -365,7 +365,7 @@ public class XmlModelFactory
    */
   public ResourceLocatorFactory getResourceLocatorFactory() {
     if (resourceLocatorFactory == null) {
-      resourceLocatorFactory = new DefaultResourceLocatorFactory();
+      resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
     }
     return this.resourceLocatorFactory;
   }

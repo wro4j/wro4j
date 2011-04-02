@@ -20,10 +20,10 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public class TestDefaultResourceLocatorFactory {
-  private DefaultResourceLocatorFactory factory;
+  private ResourceLocatorFactory factory;
   @Before
   public void setUp() {
-    factory = new DefaultResourceLocatorFactory();
+    factory = DefaultResourceLocatorFactory.contextAwareFactory();
   }
 
   @Test(expected=IllegalArgumentException.class)

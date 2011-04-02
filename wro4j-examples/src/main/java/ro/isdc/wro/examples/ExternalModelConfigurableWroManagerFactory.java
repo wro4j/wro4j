@@ -4,8 +4,6 @@
  */
 package ro.isdc.wro.examples;
 
-import javax.servlet.ServletContext;
-
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -23,7 +21,7 @@ public class ExternalModelConfigurableWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+  protected WroModelFactory newModelFactory() {
     return new XmlModelFactory() {
       @Override
       public ResourceLocator getResourceLocator() {

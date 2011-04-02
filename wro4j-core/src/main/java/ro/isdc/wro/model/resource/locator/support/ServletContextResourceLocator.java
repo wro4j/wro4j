@@ -87,7 +87,7 @@ public class ServletContextResourceLocator
   /**
    * @return the path
    */
-  public String getPath() {
+  String getPath() {
     return this.path;
   }
 
