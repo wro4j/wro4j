@@ -41,10 +41,6 @@
       <param-value>ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory</param-value>
     </init-param>
     <init-param>
-      <param-name>uriLocators</param-name>
-      <param-value>servletContext,classpath,url</param-value>
-    </init-param>
-    <init-param>
       <param-name>preProcessors</param-name>
       <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,googleClosureSimple</param-value>
     </init-param>
