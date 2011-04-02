@@ -102,13 +102,13 @@ public class TestDefaultWildcardStreamLocator {
         }), Arrays.toString(filenameList.toArray()));
       };
     };
-    final ResourceLocator uriLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.js") {
+    final ResourceLocator classpathLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.js") {
       @Override
       protected WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };
-    Assert.assertNotNull(uriLocator.getInputStream());
+    Assert.assertNotNull(classpathLocator.getInputStream());
   }
 
   @Test
@@ -119,12 +119,12 @@ public class TestDefaultWildcardStreamLocator {
         Assert.assertEquals(2, files.size());
       };
     };
-    final ResourceLocator uriLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.css") {
+    final ResourceLocator classpathLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.css") {
       @Override
       protected WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };
-    uriLocator.getInputStream();
+    classpathLocator.getInputStream();
   }
 }
