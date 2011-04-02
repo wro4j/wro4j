@@ -32,7 +32,7 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
  * @created 31 Mar 2011
  * @since 1.4.0
  */
-public class DefaultResourceLocatorFactory
+public abstract class DefaultResourceLocatorFactory
     implements ResourceLocatorFactory {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultResourceLocatorFactory.class);
 
@@ -62,10 +62,7 @@ public class DefaultResourceLocatorFactory
    * @param uri
    * @return
    */
-  protected ResourceLocator newServletContextResourceLocator(final String uri) {
-    return null;
-    //return new ServletContextResourceLocator(servletContext, path)
-  }
+  protected abstract ResourceLocator newServletContextResourceLocator(final String uri);
 
 
   public static ResourceLocatorFactory standaloneFactory(final File contextFolder) {
@@ -91,15 +88,6 @@ public class DefaultResourceLocatorFactory
       }
     };
   }
-//
-//  public static ResourceLocatorFactory servletContextAwareFactory(final ServletContext servletContext) {
-//    return new DefaultResourceLocatorFactory() {
-//      @Override
-//      protected ResourceLocator newServletContextResourceLocator(final String uri) {
-//        return new ServletContextResourceLocator(servletContext, uri);
-//      }
-//    };
-//  }
 
   public static ResourceLocatorFactory contextAwareFactory() {
     return new DefaultResourceLocatorFactory() {

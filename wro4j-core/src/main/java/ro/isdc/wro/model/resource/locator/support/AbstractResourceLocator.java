@@ -70,6 +70,6 @@ public abstract class AbstractResourceLocator
    */
   public ResourceLocator createRelative(final String relativePath)
     throws IOException {
-    return null;
+    throw new IOException("Cannot find relative resource for: " + relativePath);
   }
 }
