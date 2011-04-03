@@ -247,7 +247,7 @@ public class TestWroManager {
   private XmlModelFactory getValidModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected ResourceLocator getResourceLocator() {
+      protected ResourceLocator getModelResourceLocator() {
         return new UrlResourceLocator(TestWroManager.class.getResource("wro.xml"));
       }
     };

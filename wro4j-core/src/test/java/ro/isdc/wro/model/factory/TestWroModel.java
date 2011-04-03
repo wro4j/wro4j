@@ -69,7 +69,7 @@ public class TestWroModel {
   private WroModel buildValidModel() {
     factory = new XmlModelFactory() {
       @Override
-      protected ResourceLocator getResourceLocator() {
+      protected ResourceLocator getModelResourceLocator() {
         return new UrlResourceLocator(getClass().getResource("wro.xml"));
       };
     };

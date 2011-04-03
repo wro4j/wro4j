@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +105,10 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 public class CssUrlRewritingProcessor
   extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
+  /**
+   * Constant for WEB-INF folder.
+   */
+  private static final String PROTECTED_PREFIX = "/WEB-INF/";
 
   /**
    * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
@@ -146,20 +151,42 @@ public class CssUrlRewritingProcessor
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
-    if (ServletContextResourceLocator.isValid(cssUri)) {
-      if (ServletContextResourceLocator.isValid(imageUrl)) {
+    if (isContextRelativeUri(cssUri)) {
+      if (isContextRelativeUri(imageUrl)) {
         return imageUrl;
       }
       // Treat WEB-INF special case
-      if (ServletContextResourceLocator.isProtectedResource(cssUri)) {
+      if (isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
       return computeNewImageLocation(".." + cssUri, imageUrl);
     }
-    if (UrlResourceLocator.isValid(cssUri) || ClasspathResourceLocator.isValid(cssUri)) {
+    if (classpathUriValid(cssUri) || UrlResourceLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
+  }
+
+  /**
+   * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
+   * folder).
+   *
+   * @param uri the uri to check.
+   * @return true if the uri is a protected resource.
+   */
+  private boolean isProtectedResource(final String uri) {
+    return StringUtils.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
+  }
+
+
+  /**
+   * Check if a uri is a context relative resource (if starts with /).
+   *
+   * @param uri to check.
+   * @return true if the uri is a servletContext resource.
+   */
+  private boolean isContextRelativeUri(final String uri) {
+    return uri.trim().startsWith(ServletContextResourceLocator.PREFIX);
   }
 
 
@@ -176,7 +203,7 @@ public class CssUrlRewritingProcessor
     // for the following input: /a/b/c/1.css => /a/b/c/
     int idxLastSeparator = cssUri.lastIndexOf(ServletContextResourceLocator.PREFIX);
     if (idxLastSeparator == -1) {
-      if (ClasspathResourceLocator.isValid(cssUri)) {
+      if (classpathUriValid(cssUri)) {
         idxLastSeparator = cssUri.lastIndexOf(ClasspathResourceLocator.PREFIX);
         // find the index of ':' character used by classpath prefix
         if (idxLastSeparator >= 0) {
@@ -195,6 +222,16 @@ public class CssUrlRewritingProcessor
     return cssUriFolder + processedImageUrl;
   }
 
+  /**
+   * Check if a uri is a classpath resource.
+   *
+   * @param uri
+   *          to check.
+   * @return true if the uri is a classpath resource.
+   */
+  private boolean classpathUriValid(final String uri) {
+    return uri.trim().startsWith(ClasspathResourceLocator.PREFIX);
+  }
 
   /**
    * @param uri to check if is allowed.

@@ -128,7 +128,7 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final InputStream configResource = getResourceLocator().getInputStream();
+      final InputStream configResource = getModelResourceLocator().getInputStream();
       if (configResource == null) {
         throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
       }
@@ -169,7 +169,7 @@ public class XmlModelFactory
    *
    * @return stream of the xml representation of the model.
    */
-  protected ResourceLocator getResourceLocator() {
+  protected ResourceLocator getModelResourceLocator() {
     return new ClasspathResourceLocator(XML_CONFIG_FILE);
   }
 
@@ -197,7 +197,7 @@ public class XmlModelFactory
       LOG.debug("processing import: " + name);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
-        protected ResourceLocator getResourceLocator() {
+        protected ResourceLocator getModelResourceLocator() {
           //TODO handle relative imports
           return getResourceLocatorFactory().locate(name);
         }

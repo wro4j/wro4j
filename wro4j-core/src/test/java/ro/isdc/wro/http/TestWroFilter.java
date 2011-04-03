@@ -74,7 +74,7 @@ public class TestWroFilter {
           protected WroModelFactory newModelFactory() {
             return new XmlModelFactory() {
               @Override
-              protected ResourceLocator getResourceLocator() {
+              protected ResourceLocator getModelResourceLocator() {
                 return new UrlResourceLocator(getClass().getResource("wro.xml"));
               }
             };

@@ -56,17 +56,6 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
   }
 
   /**
-   * Check if a uri is a classpath resource.
-   *
-   * @param uri
-   *          to check.
-   * @return true if the uri is a classpath resource.
-   */
-  public static boolean isValid(final String uri) {
-    return uri.trim().startsWith(PREFIX);
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override

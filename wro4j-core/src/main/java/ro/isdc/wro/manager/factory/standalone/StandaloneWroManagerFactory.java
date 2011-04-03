@@ -24,35 +24,10 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory();
   }
-//
-//  /**
-//   * {@inheritDoc}
-//   */
-//  @Override
-//  protected final WroManager newWroManager() {
-//    return new WroManager() {
-//      /**
-//       * Just return false, without checking the request headers.
-//       */
-//      @Override
-//      protected boolean isGzipSupported() {
-//        return false;
-//      }
-//    };
-//  }
 
 
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
     return new SimpleProcessorsFactory();
   }
-
-
-//  /**
-//   * @return {@link ServletContextUriLocator} or a derivate locator which will be responsible for locating resources
-//   *         starting with '/' character. Ex: /static/resource.js
-//   */
-//  protected ServletContextUriLocator newServletContextUriLocator() {
-//    return new ServletContextUriLocator();
-//  }
 }

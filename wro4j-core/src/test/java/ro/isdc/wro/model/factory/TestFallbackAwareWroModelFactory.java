@@ -40,8 +40,8 @@ public class TestFallbackAwareWroModelFactory {
     Context.set(Context.standaloneContext());
     fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
-      protected ResourceLocator getResourceLocator() {
-        return new ResourceLocatorDecorator(super.getResourceLocator()) {
+      protected ResourceLocator getModelResourceLocator() {
+        return new ResourceLocatorDecorator(super.getModelResourceLocator()) {
           @Override
           public InputStream getInputStream()
             throws IOException {
@@ -56,8 +56,8 @@ public class TestFallbackAwareWroModelFactory {
     }));
     xmlModelFactory = new XmlModelFactory() {
       @Override
-      protected ResourceLocator getResourceLocator() {
-        return new ResourceLocatorDecorator(super.getResourceLocator()) {
+      protected ResourceLocator getModelResourceLocator() {
+        return new ResourceLocatorDecorator(super.getModelResourceLocator()) {
           @Override
           public InputStream getInputStream()
             throws IOException {

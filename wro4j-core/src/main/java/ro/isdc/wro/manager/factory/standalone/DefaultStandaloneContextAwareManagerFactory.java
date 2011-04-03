@@ -12,8 +12,6 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.FileSystemResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -62,7 +60,7 @@ public class DefaultStandaloneContextAwareManagerFactory
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected ResourceLocator getResourceLocator() {
+      protected ResourceLocator getModelResourceLocator() {
         return new FileSystemResourceLocator(standaloneContext.getWroFile());
       }
     };
@@ -72,15 +70,6 @@ public class DefaultStandaloneContextAwareManagerFactory
   protected ProcessorsFactory newProcessorsFactory() {
     return new DefaultProcessorsFactory();
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected ResourceLocatorFactory newResourceLocatorFactory() {
-    return DefaultResourceLocatorFactory.standaloneFactory(standaloneContext.getContextFolder());
-  }
-
 
   /**
    * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.

@@ -138,6 +138,6 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected final boolean isReplaceNeeded(final String url) {
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
-    return !(UrlResourceLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
+    return !(DataUriGenerator.isDataUri(url.trim()) || UrlResourceLocator.isValid(url));
   }
 }

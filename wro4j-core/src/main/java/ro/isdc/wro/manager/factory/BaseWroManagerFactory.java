@@ -7,24 +7,27 @@ import java.beans.PropertyChangeListener;
 
 import javax.servlet.ServletContext;
 
+import ro.isdc.wro.cache.CacheChangeCallbackAware;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.MapCacheStrategy;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
-import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
@@ -156,7 +159,16 @@ public abstract class BaseWroManagerFactory
    * @return {@link WroModelFactory} implementation
    */
   protected WroModelFactory newModelFactory() {
-    return new ServletContextAwareXmlModelFactory();
+    return new XmlModelFactory() {
+      /**
+       * This factory will run properly only when is used inside a web application. The configuration xml file will be
+       * read from the following location: <code>/WEB-INF/wro.xml</code>
+       */
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + XML_CONFIG_FILE);
+      }
+    };
   }
 
   /**

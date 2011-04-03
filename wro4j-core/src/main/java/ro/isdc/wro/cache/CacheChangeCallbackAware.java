@@ -2,9 +2,11 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.manager;
+package ro.isdc.wro.cache;
 
 import java.beans.PropertyChangeListener;
+
+import ro.isdc.wro.manager.WroManagerFactory;
 
 
 /**

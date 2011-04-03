@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheChangeCallbackAware;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -105,7 +106,7 @@ public class WroManager
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private ResourceLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
 
 
   public WroManager(final Injector injector) {
@@ -414,7 +415,7 @@ public class WroManager
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    return uriLocatorFactory.locate(resourceId).getInputStream();
+    return resourceLocatorFactory.locate(resourceId).getInputStream();
   }
 
   /**

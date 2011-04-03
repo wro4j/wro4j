@@ -18,6 +18,10 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 /**
  * Test {@link JsonModelFactory}
@@ -34,9 +38,8 @@ public class TestJsonModelFactory {
   public void testInvalidStream() throws Exception {
     factory = new JsonModelFactory() {
       @Override
-      protected InputStream getWroModelStream()
-        throws IOException {
-        throw new IOException();
+      protected ResourceLocator getModelResourceLocator() {
+        return new ClasspathResourceLocator("INVALID.json");
       };
     };
     factory.getInstance();
@@ -46,8 +49,14 @@ public class TestJsonModelFactory {
   public void testInvalidContent() {
     factory = new JsonModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
-        return new ByteArrayInputStream("".getBytes());
+      protected ResourceLocator getModelResourceLocator() {
+        return new AbstractResourceLocator() {
+          @Override
+          public InputStream getInputStream()
+            throws IOException {
+            return new ByteArrayInputStream("".getBytes());
+          }
+        };
       };
     };
     Assert.assertNull(factory.getInstance());
@@ -55,7 +64,12 @@ public class TestJsonModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new JsonModelFactory();
+    factory = new JsonModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestJsonModelFactory.class.getResource("wro.json"));
+      };
+    };
     final WroModel model = factory.getInstance();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
@@ -71,8 +85,8 @@ public class TestJsonModelFactory {
   public void createIncompleteModel() {
     factory = new JsonModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
-        return getClass().getResourceAsStream("incomplete-wro.json");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestJsonModelFactory.class.getResource("incomplete-wro.json"));
       };
     };
     final WroModel model = factory.getInstance();

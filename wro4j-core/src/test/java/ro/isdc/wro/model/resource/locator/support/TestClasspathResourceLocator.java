@@ -87,13 +87,9 @@ public class TestClasspathResourceLocator {
   }
 
 
-  @Test
-  public void resourceUnavailable() {
-    try {
-      uriLocator = new ClasspathResourceLocator(createUri("123123.css"));
-      uriLocator.getInputStream();
-      Assert.fail("Should throw exception");
-    } catch (final IOException e) {
-    }
+  @Test(expected=IOException.class)
+  public void resourceUnavailable() throws Exception {
+    uriLocator = new ClasspathResourceLocator(createUri("123123.css"));
+    uriLocator.getInputStream();
   }
 }

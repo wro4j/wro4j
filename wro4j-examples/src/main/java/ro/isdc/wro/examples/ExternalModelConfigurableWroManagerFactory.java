@@ -24,7 +24,7 @@ public class ExternalModelConfigurableWroManagerFactory
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory() {
       @Override
-      public ResourceLocator getResourceLocator() {
+      public ResourceLocator getModelResourceLocator() {
         return new UrlResourceLocator("D:\\temp\\____wro\\wro.xml");
       }
     };
