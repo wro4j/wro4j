@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>ro.isdc.wro4j</groupId>
-	<artifactId>wro4j-parent</artifactId>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ro.isdc.wro4j</groupId>
+  <artifactId>wro4j-parent</artifactId>
   <version>1.3.5</version>
-	<packaging>pom</packaging>	
+  <packaging>pom</packaging>  
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
   <url>http://code.google.com/p/wro4j/</url>
@@ -58,24 +58,24 @@
     </developer>
   </developers>
   
-	<properties>
+  <properties>
     <commons-io.dependency>2.0.1</commons-io.dependency>
     <commons-lang.dependency>2.5</commons-lang.dependency>       
     <slf4j.dependency>1.6.1</slf4j.dependency>    
-		<maven.dependency>2.2.1</maven.dependency>    
+    <maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>
     <junit.dependency>4.8.2</junit.dependency>    
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>	
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  
     <maven.compile.encoding>UTF-8</maven.compile.encoding>
     <maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
-	</properties>
-	
+  </properties>
   
   
-	<modules>
+  
+  <modules>
     <module>wro4j-core</module>
-		<module>wro4j-extensions</module>
+    <module>wro4j-extensions</module>
     <module>wro4j-maven-plugin</module>  
     <!-- No need to add these to maven central repo -->    
     <module>wro4j-runner</module>  
@@ -84,60 +84,60 @@
     
   </modules>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- Project Dependencies -->
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-extensions</artifactId>
-				<version>${project.version}</version>
-			</dependency>    
+  <dependencyManagement>
+    <dependencies>
+      <!-- Project Dependencies -->
       <dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-runner</artifactId>
-				<version>${project.version}</version>
-			</dependency>    
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>wro4j-maven-plugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>      
-			<!-- Other Dependencies -->
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>${commons-io.dependency}</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>${commons-lang.dependency}</version>
-			</dependency>	
+        <groupId>${project.groupId}</groupId>
+        <artifactId>wro4j-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.dependency}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>${slf4j.dependency}</version>
-			</dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>wro4j-extensions</artifactId>
+        <version>${project.version}</version>
+      </dependency>    
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>wro4j-runner</artifactId>
+        <version>${project.version}</version>
+      </dependency>    
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>wro4j-maven-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>      
+      <!-- Other Dependencies -->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.dependency}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${commons-lang.dependency}</version>
+      </dependency>  
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.dependency}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.dependency}</version>
+      </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.dependency}</version>        
       </dependency>
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-plugin-api</artifactId>
-				<version>${maven.dependency}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-api</artifactId>
+        <version>${maven.dependency}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
@@ -148,19 +148,19 @@
         <artifactId>maven-core</artifactId>
         <version>${maven.dependency}</version>
         <exclusions>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-nop</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-jdk14</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>jcl-over-slf4j</artifactId>
-					</exclusion>
-				</exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
@@ -168,59 +168,59 @@
         <version>1.1</version>
         <scope>test</scope>
       </dependency>
-			<!-- Provided by container -->
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.3</version>
-				<scope>provided</scope>
-			</dependency>      
+      <!-- Provided by container -->
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.3</version>
+        <scope>provided</scope>
+      </dependency>      
       <dependency>
         <groupId>javax.servlet.jsp</groupId>
         <artifactId>jsp-api</artifactId>
         <version>2.0</version>
         <scope>provided</scope>
       </dependency>
-			<!-- Third Party Tools -->			
-			<dependency>
-				<groupId>rhino</groupId>
-				<artifactId>js</artifactId>
-				<version>1.7R2</version>
-			</dependency>
+      <!-- Third Party Tools -->      
+      <dependency>
+        <groupId>rhino</groupId>
+        <artifactId>js</artifactId>
+        <version>1.7R2</version>
+      </dependency>
       <dependency>
         <groupId>com.google.javascript</groupId> 
         <artifactId>closure-compiler</artifactId>
         <version>r606</version>
       </dependency>
-		  <dependency>
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.dependency}</version>
         <scope>test</scope>
-		  </dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>${mockito.dependency}</version>
-				<scope>test</scope>
-			</dependency>			      
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>${mockito.dependency}</version>
-				<scope>test</scope>
-			</dependency>			
-		</dependencies>				
-	</dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.dependency}</version>
+        <scope>test</scope>
+      </dependency>            
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>${mockito.dependency}</version>
+        <scope>test</scope>
+      </dependency>      
+    </dependencies>        
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
     <!-- For test -->
     <dependency>
       <groupId>junit</groupId>
@@ -231,90 +231,91 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-	    <scope>test</scope>
+      <scope>test</scope>
       <version>${mockito.dependency}</version>
-    </dependency>		
-	</dependencies>
+    </dependency>    
+  </dependencies>
 
-	<build>
-		<resources>
-			<resource>
-				<filtering>false</filtering>
-				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<filtering>false</filtering>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<pluginManagement> 	
-		  <plugins>
-			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
-			</plugin>		
-		  </plugins>
-		</pluginManagement>  
-		<plugins>				
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-        <version>2.1.2</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+  <build>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
+    <pluginManagement>   
+      <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<tagBase>http://github.com/alexo/wro4j/tree/</tagBase>
-				</configuration>
-			</plugin>
-		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav</artifactId>
-				<version>1.0-beta-2</version>
-			</extension>
+        <version>2.1</version>
+      </plugin>    
+      </plugins>
+    </pluginManagement>  
+    <plugins>        
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>http://github.com/alexo/wro4j/tree/</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav</artifactId>
+        <version>1.0-beta-2</version>
+      </extension>
     </extensions>
-	</build>
+  </build>
   <reporting>
     <outputDirectory>${basedir}/target/site</outputDirectory>
     <plugins>

@@ -10,7 +10,7 @@ import javax.servlet.ServletContext;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.cache.impl.MapCacheStrategy;
+import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
@@ -135,10 +135,10 @@ public abstract class BaseWroManagerFactory
   }
 
   /**
-   * @return {@link CacheStrategy} instance.
+   * @return {@link CacheStrategy} instance for resources' group caching.
    */
   protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
-    return new MapCacheStrategy<CacheEntry, ContentHashEntry>();
+    return new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
   }
 
   /**
