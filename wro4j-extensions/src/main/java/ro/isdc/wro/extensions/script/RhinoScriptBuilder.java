@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -50,11 +51,14 @@ public class RhinoScriptBuilder {
     context.setErrorReporter(new ToolErrorReporter(false));
     context.setLanguageVersion(Context.VERSION_1_7);
     scope = context.initStandardObjects();
+    InputStream script = null;
     try {
-      final InputStream script = getClass().getResourceAsStream("commons.min.js");
+      script = getClass().getResourceAsStream("commons.min.js");
       evaluate(script, "common.js");
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
+    } finally {
+      IOUtils.closeQuietly(script);
     }
   }
 

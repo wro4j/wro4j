@@ -22,31 +22,32 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class TestYUIJsCompressorProcessor {
-  private final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
-
   @Test
-  public void testWithMungeFromFolder()
-    throws IOException {
-    final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
-
+  public void testNoMunge() throws IOException {
+    final ResourcePostProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
     final URL url = getClass().getResource("yui");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "munge.js", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedNomunge");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+      WroUtil.newResourceProcessor(processor));
   }
 
   @Test
-  public void testWithNoMungeFromFolder()
-    throws IOException {
+  public void testMunge() throws IOException {
     final ResourcePostProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
-
     final URL url = getClass().getResource("yui");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "nomunge.js", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedMunge");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+      WroUtil.newResourceProcessor(processor));
   }
 
   @Test
   public void testInvalidJsShouldBeUnchanged()
     throws IOException {
+    final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
     final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
     WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, WroUtil.newResourceProcessor(processor));
   }

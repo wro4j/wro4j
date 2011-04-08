@@ -18,9 +18,11 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * This class is inspired from Richard Nichols visural project.
+ * The underlying implementation use the less.js version <code>1.0.41</code> project:
+ * {@link https://github.com/cloudhead/less.js}.
  *
  * @author Alex Objelean
+ * @since 1.3.0
  */
 public class LessCss {
   private static final Logger LOG = LoggerFactory.getLogger(LessCss.class);
