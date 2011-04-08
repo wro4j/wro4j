@@ -21,13 +21,14 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class TestYUICssCompressorProcessor {
-  private final ResourcePostProcessor processor = new YUICssCompressorProcessor();
   @Test
-  public void testFromFolder()
-    throws IOException {
+  public void testNoMunge() throws IOException {
+    final ResourcePostProcessor processor = new YUICssCompressorProcessor();
     final URL url = getClass().getResource("yui");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "yui.css",
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
       WroUtil.newResourceProcessor(processor));
   }
 }
