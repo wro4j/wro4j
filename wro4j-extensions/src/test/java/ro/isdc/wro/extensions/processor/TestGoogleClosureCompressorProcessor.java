@@ -24,23 +24,26 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor {
-  @Test
-  public void testSimpleFromFolder()
-    throws IOException {
-    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
 
+  @Test
+  public void testSimpleOptimization() throws IOException {
+    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "simple.js", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedSimple");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+      WroUtil.newResourceProcessor(processor));
   }
 
   @Test
-  public void testAdvancedFromFolder()
-    throws IOException {
-    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
-
+  public void testAdvancedOptimization() throws IOException {
+    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "advanced.js", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedAdvanced");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+      WroUtil.newResourceProcessor(processor));
   }
 }
