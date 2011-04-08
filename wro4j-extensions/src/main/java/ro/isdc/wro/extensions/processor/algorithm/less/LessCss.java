@@ -18,7 +18,8 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the less.js version <code>1.0.41</code> project: {@link https://github.com/cloudhead/less.js}.<br/>
+ * The underlying implementation use the less.js version <code>1.0.41</code> project:
+ * {@link https://github.com/cloudhead/less.js}.
  *
  * @author Alex Objelean
  * @since 1.3.0

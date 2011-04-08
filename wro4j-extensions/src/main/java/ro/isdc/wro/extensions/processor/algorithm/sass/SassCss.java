@@ -18,7 +18,8 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Sass implementation.
+ * The underlying implementation use the sass.js version <code>0.5.0</code> project:
+ * {@link https://github.com/visionmedia/sass.js}.
  *
  * @author Alex Objelean
  */
