@@ -18,7 +18,8 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Sass implementation.
+ * The underlying implementation use the sass.js version <code>0.5.0</code> project:
+ * {@link https://github.com/visionmedia/sass.js}.
  *
  * @author Alex Objelean
  */
@@ -33,10 +34,10 @@ public class SassCss {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_LESS = "sass-0.5.0.min.js";
-      final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
+      final String SCRIPT_NAME = "sass-0.5.0.min.js";
+      final InputStream sassStream = getClass().getResourceAsStream(SCRIPT_NAME);
       final String scriptInit = "var exports = {};";
-      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(lessStream, SCRIPT_LESS);
+      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(sassStream, SCRIPT_NAME);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript sass.js", ex);
     }

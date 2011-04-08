@@ -18,10 +18,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Apply UglifyJs processing. A detailed documentation about how to use uglify-js can be found at this location:
- * {@link https://github.com/mishoo/UglifyJS}.
- * <p/>
- * Using untagged uglifyJs version (commit 2011-02-28 22:37:53).
+ * The underlying implementation use the less.js version <code>1.0.1</code> project: {@link https://github.com/mishoo/UglifyJS}.
  *
  * @author Alex Objelean
  */
@@ -60,9 +57,9 @@ public class UglifyJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_PARSE = "parse-js.min.js";
+      final String SCRIPT_PARSE = "parse-js-1.0.1.min.js";
       final InputStream parseStream = getClass().getResourceAsStream(SCRIPT_PARSE);
-      final String SCRIPT_PROCESS = "process.min.js";
+      final String SCRIPT_PROCESS = "process-1.0.1.min.js";
       final InputStream processStream = getClass().getResourceAsStream(SCRIPT_PROCESS);
 
       final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";

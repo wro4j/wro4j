@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * Apply JsHint script checking utility.
  * <p/>
- * Using untagged version (commit 2011-03-06 02:34:21)
+ * Using untagged version (commit 2011-04-08 06:46:39)
  *
  * @author Alex Objelean
  * @since 1.3.5

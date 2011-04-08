@@ -21,8 +21,9 @@ import ro.isdc.wro.util.WroUtil;
  * CoffeeScript is a little language that compiles into JavaScript. Underneath all of those embarrassing braces and
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
- *
  * <p/>
+ * The underlying implementation use the coffee-script version <code>1.0.1</code> project:
+ * {@link https://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
  * @since 1.3.6
