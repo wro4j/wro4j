@@ -33,10 +33,10 @@ public class SassCss {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_LESS = "sass-0.5.0.min.js";
-      final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
+      final String SCRIPT_NAME = "sass-0.5.0.min.js";
+      final InputStream sassStream = getClass().getResourceAsStream(SCRIPT_NAME);
       final String scriptInit = "var exports = {};";
-      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(lessStream, SCRIPT_LESS);
+      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(sassStream, SCRIPT_NAME);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript sass.js", ex);
     }

@@ -60,9 +60,9 @@ public class UglifyJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_PARSE = "parse-js.min.js";
+      final String SCRIPT_PARSE = "parse-js-1.0.1.js";
       final InputStream parseStream = getClass().getResourceAsStream(SCRIPT_PARSE);
-      final String SCRIPT_PROCESS = "process.min.js";
+      final String SCRIPT_PROCESS = "process-1.0.1.js";
       final InputStream processStream = getClass().getResourceAsStream(SCRIPT_PROCESS);
 
       final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";
