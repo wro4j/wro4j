@@ -18,10 +18,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Apply UglifyJs processing. A detailed documentation about how to use uglify-js can be found at this location:
- * {@link https://github.com/mishoo/UglifyJS}.
- * <p/>
- * Using untagged uglifyJs version (commit 2011-02-28 22:37:53).
+ * The underlying implementation use the less.js version <code>1.0.1</code> project: {@link https://github.com/mishoo/UglifyJS}.
  *
  * @author Alex Objelean
  */
