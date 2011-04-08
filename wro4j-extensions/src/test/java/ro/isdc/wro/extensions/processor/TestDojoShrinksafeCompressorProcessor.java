@@ -23,11 +23,13 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestDojoShrinksafeCompressorProcessor {
   @Test
-  public void testFromFolder()
-    throws IOException {
+  public void testFromFolder() throws IOException {
     final ResourcePostProcessor processor = new DojoShrinksafeCompressorProcessor();
     final URL url = getClass().getResource("dojo");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "js", "pack.js", WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+      WroUtil.newResourceProcessor(processor));
   }
 }
