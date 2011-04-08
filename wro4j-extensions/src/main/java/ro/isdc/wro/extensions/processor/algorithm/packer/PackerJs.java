@@ -18,9 +18,10 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Apply Packer compressor script using scriptEngine.
+ *The underlying implementation use the packer.js version <code>3.1</code> utility from base2 project: {@link http://code.google.com/p/base2/}.<br/>
  *
  * @author Alex Objelean
+ * @since 1.3.0
  */
 public class PackerJs {
   private static final Logger LOG = LoggerFactory.getLogger(PackerJs.class);
