@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -72,6 +73,9 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
       return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
     }
     final URL url = new URL(uri);
-    return new BufferedInputStream(url.openStream());
+    final URLConnection con = url.openConnection();
+    // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
+    con.setUseCaches(false);
+    return new BufferedInputStream(con.getInputStream());
   }
 }
