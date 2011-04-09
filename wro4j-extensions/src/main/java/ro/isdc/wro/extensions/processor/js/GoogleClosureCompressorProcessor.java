@@ -87,7 +87,7 @@ public class GoogleClosureCompressorProcessor
       //make it play nice with GAE
       compiler.disableThreads();
       // Advanced mode is used here, but additional options could be set, too.
-      compilationLevel.setOptionsForCompilationLevel(options);
+//      compilationLevel.setOptionsForCompilationLevel(options);
       compiler.initOptions(options);
 
       final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
