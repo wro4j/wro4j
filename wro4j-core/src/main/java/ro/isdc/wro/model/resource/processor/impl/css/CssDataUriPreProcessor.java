@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +57,26 @@ public class CssDataUriPreProcessor
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     final String fileName = FilenameUtils.getName(imageUrl);
-    final String fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
+    String fullPath = cleanImageUrl;
+    /**
+     * Allow dataUri transformation of absolute url's using http(s) protocol. All url's protocola are intentionally not
+     * allowed, because it could be a potential security issue. For instance:
+     * <code>
+     * .class {
+     *   background: url(file:/path/to/secure/file.png);
+     * }
+     * <code>
+     * This should not be allowed.
+     */
+    if (!cleanImageUrl.startsWith("http")) {
+      fullPath =FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
+    }
     String result = imageUrl;
     try {
       final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
       if (replaceWithDataUri(dataUri)) {
         result = dataUri;
+        LOG.debug("dataUri replacement: " + StringUtils.abbreviate(dataUri, 30));
       }
     } catch (final IOException e) {
       LOG.warn("Couldn't extract dataUri from:" + fullPath + ", because: " + e.getMessage());
@@ -88,5 +103,14 @@ public class CssDataUriPreProcessor
     final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
     LOG.debug("dataUri size: " + bytes.length/1024 + "KB, limit exceeded: " + exceedLimit);
     return !exceedLimit;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean isReplaceNeeded(final String url) {
+    //the dataUri should replace also absolute url's
+    return !DataUriGenerator.isDataUri(url.trim());
   }
 }

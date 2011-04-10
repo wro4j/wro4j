@@ -274,12 +274,29 @@ public class WroTestUtils {
   }
 
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
+    final String extension, final ResourcePreProcessor processor)
+    throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
+      Transformers.noOpTransformer(), processor);
+  }
+
+  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourceProcessor processor)
     throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
       Transformers.noOpTransformer(), processor);
   }
 
+  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+    final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourceProcessor processor)
+    throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(reader, writer);
+      }
+    });
+  }
 
   /**
    * Process and compare the files which a located in different folders.
@@ -288,11 +305,11 @@ public class WroTestUtils {
    * @param targetFolder folder where the target files are located.
    * @param fileFilter filter used to select files to process.
    * @param toTargetFileName {@link Transformer} used to identify the target file name based on source file name.
-   * @param processor {@link Processor} used to process the source files.
+   * @param preProcessor {@link Processor} used to process the source files.
    * @throws IOException
    */
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
-    final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourceProcessor processor)
+    final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePreProcessor preProcessor)
     throws IOException {
     LOG.debug("sourceFolder: " + sourceFolder);
     LOG.debug("targetFolder: " + targetFolder);
@@ -304,7 +321,11 @@ public class WroTestUtils {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("processing: " + file.getName());
-        compare(new FileInputStream(file), targetFileStream, processor);
+        // ResourceType doesn't matter here
+        final ResourceProcessor resourceProcessor = WroUtil.newResourceProcessor(
+          Resource.create("file:" + file.getAbsolutePath(), ResourceType.CSS), preProcessor);
+
+        compare(new FileInputStream(file), targetFileStream, resourceProcessor);
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath(), e);
