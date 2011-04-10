@@ -305,7 +305,6 @@ public class WroTestUtils {
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("processing: " + file.getName());
         compare(new FileInputStream(file), targetFileStream, processor);
-        LOG.debug("Compare ... [OK]");
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath(), e);
