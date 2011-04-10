@@ -4,13 +4,10 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
-import ro.isdc.wro.util.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -27,12 +24,7 @@ public class TestSingleLineCommentStripperProcessor {
   public void test()
       throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/singleline-input.js",
-        "classpath:ro/isdc/wro/processor/singleline-output.js", new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(reader, writer);
-          }
-        });
+      "classpath:ro/isdc/wro/processor/singleline-output.js", processor);
   }
 
   // @Test
