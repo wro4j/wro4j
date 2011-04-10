@@ -3,17 +3,14 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.File;
+import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
-import ro.isdc.wro.util.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -23,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Aug 15, 2010
  */
 public class TestConformColorsCssProcessor {
-  private ResourcePostProcessor processor;
+  private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {
@@ -31,15 +28,12 @@ public class TestConformColorsCssProcessor {
   }
 
   @Test
-  public void testColorTransformer()
-      throws IOException {
-    WroTestUtils.compareProcessedResourceContents("classpath:" + WroUtil.toPackageAsFolder(getClass())
-        + "/conformColors-input.css", "classpath:" + WroUtil.toPackageAsFolder(getClass())
-        + "/conformColors-output.css", new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-          throws IOException {
-        processor.process(reader, writer);
-      }
-    });
+  public void testFromFolder()
+      throws Exception {
+    final URL url = getClass().getResource("conformColors");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 }

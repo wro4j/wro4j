@@ -3,9 +3,7 @@
  */
 package ro.isdc.wro.util;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 
 /**
  * ResourceProcessor.java.
@@ -13,16 +11,5 @@ import java.io.Writer;
  * @author Alex Objelean
  * @created Created on Mar 10, 2009
  */
-public interface ResourceProcessor {
-  /**
-   * Process resource content.
-   *
-   * @param reader
-   *          from where to read resource content.
-   * @param writer
-   *          where the processed result is written.
-   * @throws IOException
-   *           if IO errors occurs during resource processing
-   */
-  void process(Reader reader, Writer writer) throws IOException;
+public interface ResourceProcessor extends ResourcePostProcessor {
 }

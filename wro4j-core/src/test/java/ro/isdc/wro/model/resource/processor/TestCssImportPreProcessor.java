@@ -39,11 +39,4 @@ public class TestCssImportPreProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-
-//  @Test
-//  public void testFromFolder() throws IOException {
-//    final URL url = getClass().getResource("cssImport");
-//    final File sourceFolder = new File(url.getFile());
-//    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "out.css", processor);
-//  }
 }
