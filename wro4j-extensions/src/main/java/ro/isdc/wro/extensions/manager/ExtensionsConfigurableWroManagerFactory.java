@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
 
@@ -64,5 +65,6 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put("coffeeScript", new CoffeScriptProcessor());
+    map.put("cssDataUri", new CssDataUriPreProcessor());
   }
 }
