@@ -5,9 +5,9 @@ package ro.isdc.wro.model.group.processor;
 
 import java.util.Collection;
 
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 
 /**

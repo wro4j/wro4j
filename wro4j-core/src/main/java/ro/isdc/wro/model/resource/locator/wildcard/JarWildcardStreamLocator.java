@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 
 /**
@@ -129,8 +129,8 @@ public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
     String classPath = FilenameUtils.getPath(uri);
     final String wildcard = FilenameUtils.getName(uri);
 
-    if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
-      classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
+    if (classPath.startsWith(ClasspathResourceLocator.PREFIX)) {
+      classPath = StringUtils.substringAfter(classPath, ClasspathResourceLocator.PREFIX);
     }
 
     final JarFile file = open(jarPath);

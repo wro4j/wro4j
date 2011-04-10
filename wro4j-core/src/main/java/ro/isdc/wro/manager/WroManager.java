@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheChangeCallbackAware;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -43,9 +44,9 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -105,7 +106,7 @@ public class WroManager
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
 
 
   public WroManager(final Injector injector) {
@@ -414,7 +415,7 @@ public class WroManager
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    return uriLocatorFactory.locate(resourceId);
+    return resourceLocatorFactory.locate(resourceId).getInputStream();
   }
 
   /**

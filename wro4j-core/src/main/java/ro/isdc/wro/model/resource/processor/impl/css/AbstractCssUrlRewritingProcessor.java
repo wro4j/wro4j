@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 
@@ -138,6 +138,6 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected boolean isReplaceNeeded(final String url) {
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
-    return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
+    return !(DataUriGenerator.isDataUri(url.trim()) || UrlResourceLocator.isValid(url));
   }
 }

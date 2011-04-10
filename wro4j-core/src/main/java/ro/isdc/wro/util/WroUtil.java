@@ -93,33 +93,6 @@ public final class WroUtil {
   }
 
   /**
-   * <p>
-   * Case insensitive check if a String starts with a specified prefix.
-   * </p>
-   * <p>
-   * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal. The
-   * comparison is case insensitive.
-   * </p>
-   *
-   * <pre>
-   * StringUtils.startsWithIgnoreCase(null, null)      = true
-   * StringUtils.startsWithIgnoreCase(null, "abcdef")  = false
-   * StringUtils.startsWithIgnoreCase("abc", null)     = false
-   * StringUtils.startsWithIgnoreCase("abc", "abcdef") = true
-   * StringUtils.startsWithIgnoreCase("abc", "ABCDEF") = true
-   * </pre>
-   *
-   * @see java.lang.String#startsWith(String)
-   * @param str the String to check, may be null
-   * @param prefix the prefix to find, may be null
-   * @return <code>true</code> if the String starts with the prefix, case insensitive, or both <code>null</code>
-   * @since 2.4
-   */
-  public static boolean startsWithIgnoreCase(final String str, final String prefix) {
-    return startsWith(str, prefix, true);
-  }
-
-  /**
    * Creates a folder like implementation for a class. Ex: com.mycompany.MyClass -> com/mycompany/
    *
    * @param clazz
@@ -132,28 +105,6 @@ public final class WroUtil {
     }
     return clazz.getPackage().getName().replace('.', '/');
   }
-
-  /**
-   * <p>
-   * Check if a String starts with a specified prefix (optionally case insensitive).
-   * </p>
-   *
-   * @see java.lang.String#startsWith(String)
-   * @param str the String to check, may be null
-   * @param prefix the prefix to find, may be null
-   * @param ignoreCase inidicates whether the compare should ignore case (case insensitive) or not.
-   * @return <code>true</code> if the String starts with the prefix or both <code>null</code>
-   */
-  private static boolean startsWith(final String str, final String prefix, final boolean ignoreCase) {
-    if (str == null || prefix == null) {
-      return (str == null && prefix == null);
-    }
-    if (prefix.length() > str.length()) {
-      return false;
-    }
-    return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
-  }
-
 
   /**
    * Retrieve servletPath from a given location.
@@ -213,27 +164,6 @@ public final class WroUtil {
 //  public static String toJSMultiLineStringAsCDATA(final String data) {
 //    return "(<r><![CDATA[" + data + "]]></r>).toString()";
 //  }
-
-  /**
-   * Checks if request contains the header value with a given value.
-   *
-   * @param request to check
-   * @param header name of the header to check
-   * @param value of the header to check
-   */
-  @SuppressWarnings("unchecked")
-  private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
-    final Enumeration<String> headerValues = request.getHeaders(header);
-    if (headerValues != null) {
-      while (headerValues.hasMoreElements()) {
-        final String headerValue = headerValues.nextElement();
-        if (headerValue.indexOf(value) != -1) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
 
   /**
    * @return a {@link ThreadFactory} which produces only daemon threads.

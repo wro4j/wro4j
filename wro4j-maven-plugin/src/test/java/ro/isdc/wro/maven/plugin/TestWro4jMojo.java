@@ -23,9 +23,9 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**

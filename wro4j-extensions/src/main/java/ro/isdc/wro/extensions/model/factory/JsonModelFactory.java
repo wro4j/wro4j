@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -14,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -39,11 +40,11 @@ public class JsonModelFactory
   public WroModel getInstance() {
     try {
       final Type type = new TypeToken<WroModel>() {}.getType();
-      final InputStream is = getWroModelStream();
+      final InputStream is = getModelResourceLocator().getInputStream();
       if (is == null) {
         throw new WroRuntimeException("Invalid model stream provided!");
       }
-      final WroModel model = new Gson().fromJson(new InputStreamReader(getWroModelStream()), type);
+      final WroModel model = new Gson().fromJson(new InputStreamReader(is), type);
       LOG.debug("json model: {}", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -54,14 +55,8 @@ public class JsonModelFactory
     }
   }
 
-  /**
-   * Override this method, in order to provide different json model location.
-   *
-   * @return stream of the json representation of the model.
-   * @throws IOException if the stream couldn't be read.
-   */
-  protected InputStream getWroModelStream() throws IOException {
-    return getClass().getResourceAsStream("wro.json");
+  protected ResourceLocator getModelResourceLocator() {
+    return new ClasspathResourceLocator("wro.json");
   }
 
   /**

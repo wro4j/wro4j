@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.factory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -14,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
@@ -21,6 +20,8 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 /**
  * TestXmlModelFactory.
@@ -49,10 +50,9 @@ public class TestXmlModelFactory {
   public void recursiveGroupThrowsException() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        return Thread.currentThread().getContextClassLoader()
-            .getResourceAsStream("recursive.xml");
-      }
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(Thread.currentThread().getContextClassLoader().getResource("recursive.xml"));
+      };
 		};
 		factory.getInstance();
 	}
@@ -75,11 +75,9 @@ public class TestXmlModelFactory {
   public void testSuccessfulCreation() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        return Thread.currentThread()
-          .getContextClassLoader()
-          .getResourceAsStream("wro1.xml");
-      }
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(Thread.currentThread().getContextClassLoader().getResource("wro1.xml"));
+      };
     };
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.getInstance();
@@ -91,9 +89,8 @@ public class TestXmlModelFactory {
   public void testMinimizeAttributePresence() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        //get a class relative test resource
-        return TestXmlModelFactory.class.getResourceAsStream("wro-minimizeAttribute.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("wro-minimizeAttribute.xml"));
       }
     };
     //the uriLocator factory doesn't have any locators set...
@@ -111,9 +108,8 @@ public class TestXmlModelFactory {
   public void testValidImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        //get a class relative test resource
-        return TestXmlModelFactory.class.getResourceAsStream("testimport/validImports.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/validImports.xml"));
       }
     };
     //the uriLocator factory doesn't have any locators set...
@@ -126,9 +122,8 @@ public class TestXmlModelFactory {
   public void testRecursiveImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        //get a class relative test resource
-        return TestXmlModelFactory.class.getResourceAsStream("testimport/recursive.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/recursive.xml"));
       }
     };
     factory.getInstance();
@@ -138,9 +133,8 @@ public class TestXmlModelFactory {
   public void testDeepRecursiveImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        //get a class relative test resource
-        return TestXmlModelFactory.class.getResourceAsStream("testimport/deepRecursive.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/deepRecursive.xml"));
       }
     };
     factory.getInstance();
@@ -150,9 +144,8 @@ public class TestXmlModelFactory {
   public void testCircularImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        //get a class relative test resource
-        return TestXmlModelFactory.class.getResourceAsStream("testimport/circular1.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/circular1.xml"));
       }
     };
     factory.getInstance();
@@ -162,26 +155,30 @@ public class TestXmlModelFactory {
   public void testInvalidImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        //get a class relative test resource
-        return TestXmlModelFactory.class.getResourceAsStream("testimport/invalidImports.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/invalidImports.xml"));
       }
     };
     factory.getInstance();
   }
 
-  @Test(expected=IOException.class)
+
+  /**
+   * When a wildcard uri is used to import wro.xml, the resulted xml to parse won't be valid, because it will contain
+   * merged content.
+   */
+  @Test(expected=SAXException.class)
   public void testWildcardImports() throws Throwable {
     try {
       factory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream() {
-          // get a class relative test resource
-          return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
+        protected ResourceLocator getModelResourceLocator() {
+          return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/wildcard.xml"));
         }
       };
       factory.getInstance();
     } catch(final WroRuntimeException e) {
+      LOG.debug("exception caught", e);
       throw e.getCause();
     }
   }

@@ -7,7 +7,6 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,16 +16,10 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.FileSystemResourceLocator;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 
@@ -72,49 +65,16 @@ public class DefaultStandaloneContextAwareManagerFactory
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        return new FileInputStream(standaloneContext.getWroFile());
+      protected ResourceLocator getModelResourceLocator() {
+        return new FileSystemResourceLocator(standaloneContext.getWroFile());
       }
     };
   }
 
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
-    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-    factory.addPreProcessor(new BomStripperPreProcessor());
-    factory.addPreProcessor(new CssImportPreProcessor());
-    factory.addPreProcessor(new CssUrlRewritingProcessor());
-    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
-    factory.addPreProcessor(new JSMinProcessor());
-    factory.addPreProcessor(new JawrCssMinifierProcessor());
-
-    factory.addPostProcessor(new CssVariablesProcessor());
-    return factory;
+    return new DefaultProcessorsFactory();
   }
-
-  @Override
-  protected ServletContextUriLocator newServletContextUriLocator() {
-    return new ServletContextUriLocator() {
-      @Override
-      public InputStream locate(final String uri)
-        throws IOException {
-        //TODO this is duplicated code (from super) -> find a way to reuse it.
-        if (getWildcardStreamLocator().hasWildcard(uri)) {
-          final String fullPath = FilenameUtils.getFullPath(uri);
-          final String realPath = standaloneContext.getContextFolder().getPath() + fullPath;
-          return getWildcardStreamLocator().locateStream(uri, new File(realPath));
-        }
-
-        LOG.debug("locating uri: " + uri);
-        final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
-        final File file = new File(standaloneContext.getContextFolder(), uriWithoutPrefix);
-        LOG.debug("Opening file: " + file.getPath());
-        return new FileInputStream(file);
-      }
-    };
-  }
-
 
   /**
    * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.

@@ -54,46 +54,9 @@ public class TestConfigurableWroManagerFactory {
   	Context.unset();
   }
 
-  @Test
-  public void testWhenNoUriLocatorsParamSet() {
-  	initFactory(filterConfig);
-    factory.getInstance();
-  	Assert.assertTrue(factory.getLocators().isEmpty());
-  }
-
-  @Test
-  public void testWithEmptyUriLocators() {
-  	Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("");
-  	initFactory(filterConfig);
-  	factory.getLocators();
-    Assert.assertTrue(factory.getLocators().isEmpty());
-  }
-
-  @Test(expected=WroRuntimeException.class)
-  public void cannotUseInvalidUriLocatorsSet() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("INVALID1,INVALID2");
-    initFactory(filterConfig);
-    factory.getLocators();
-  }
-
-  @Test
-  public void testWhenValidLocatorsSet() {
-    configureValidUriLocators(filterConfig);
-    Assert.assertEquals(3, factory.getLocators().size());
-  }
-
-  /**
-   * @param filterConfig
-   */
-  private void configureValidUriLocators(final FilterConfig filterConfig) {
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("servletContext, url, classpath");
-    initFactory(filterConfig);
-  }
 
   @Test
   public void testProcessorsExecutionOrder() {
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("bomStripper, cssImport, cssVariables");
     initFactory(filterConfig);
     final List<ResourcePreProcessor> list = factory.getPreProcessors();
@@ -104,7 +67,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWithEmptyPreProcessors() {
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("");
     initFactory(filterConfig);
     Assert.assertTrue(factory.getPreProcessors().isEmpty());
@@ -113,7 +75,6 @@ public class TestConfigurableWroManagerFactory {
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInvalidPreProcessorsSet() {
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("INVALID1,INVALID2");
     initFactory(filterConfig);
     factory.getPreProcessors();
@@ -121,7 +82,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWhenValidPreProcessorsSet() {
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("cssUrlRewriting");
     initFactory(filterConfig);
     Assert.assertEquals(1, factory.getPreProcessors().size());
@@ -129,7 +89,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWithEmptyPostProcessors() {
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("");
     initFactory(filterConfig);
     Assert.assertTrue(factory.getPostProcessors().isEmpty());
@@ -137,7 +96,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInvalidPostProcessorsSet() {
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("INVALID1,INVALID2");
     initFactory(filterConfig);
     factory.getPostProcessors();
@@ -145,7 +103,6 @@ public class TestConfigurableWroManagerFactory {
 
   @Test
   public void testWhenValidPostProcessorsSet() {
-    configureValidUriLocators(filterConfig);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("cssMinJawr, jsMin, cssVariables");
     initFactory(filterConfig);
     Assert.assertEquals(3, factory.getPostProcessors().size());

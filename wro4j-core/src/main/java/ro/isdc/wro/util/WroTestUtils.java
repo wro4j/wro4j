@@ -30,14 +30,11 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**
@@ -69,19 +66,17 @@ public class WroTestUtils {
   private static Reader getReaderFromUri(final String uri)
     throws IOException {
     // wrap reader with bufferedReader for top efficiency
-    return new BufferedReader(new InputStreamReader(createDefaultUriLocatorFactory().locate(uri)));
+    return new BufferedReader(new InputStreamReader(createDefaultUriLocatorFactory().locate(uri).getInputStream()));
   }
 
-
-  private static UriLocatorFactory createDefaultUriLocatorFactory() {
-    return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
-      new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+  private static ResourceLocatorFactory createDefaultUriLocatorFactory() {
+    return DefaultResourceLocatorFactory.contextAwareFactory();
   }
 
 
   public static InputStream getInputStream(final String uri)
     throws IOException {
-    return createDefaultUriLocatorFactory().locate(uri);
+    return createDefaultUriLocatorFactory().locate(uri).getInputStream();
   }
 
 

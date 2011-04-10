@@ -21,7 +21,7 @@ import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StringUtils;
 
@@ -41,7 +41,7 @@ public class CssImportPreProcessor
    * Contains a {@link UriLocatorFactory} reference injected externally.
    */
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
   /**
@@ -71,7 +71,7 @@ public class CssImportPreProcessor
    * Checks if required fields were injected.
    */
   private void validate() {
-    if (uriLocatorFactory == null) {
+    if (resourceLocatorFactory == null) {
       throw new IllegalStateException("No UriLocator was injected");
     }
     if (preProcessorExecutor == null) {
@@ -128,7 +128,7 @@ public class CssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()));
+    final String css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()).getInputStream());
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));
