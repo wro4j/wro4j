@@ -13,7 +13,6 @@ import org.junit.Test;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -36,7 +35,6 @@ public class TestPackerJsProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

@@ -336,34 +336,11 @@ public final class WroUtil {
    * @param preProcessor {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
    * @return instance of {@link ResourceProcessor}.
    */
-  public static ResourceProcessor newResourceProcessor(final ResourcePreProcessor preProcessor) {
-    return newResourceProcessor(null, preProcessor);
-  }
-
-  /**
-   * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
-   * @param preProcessor {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
-   * @return instance of {@link ResourceProcessor}.
-   */
-  public static ResourceProcessor newResourceProcessor(final Resource resource, final ResourcePreProcessor preProcessor) {
-    return new ResourceProcessor() {
+  public static ResourcePostProcessor newResourceProcessor(final Resource resource, final ResourcePreProcessor preProcessor) {
+    return new ResourcePostProcessor() {
       public void process(final Reader reader, final Writer writer)
         throws IOException {
         preProcessor.process(resource, reader, writer);
-      }
-    };
-  }
-
-  /**
-   * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePostProcessor}.
-   * @param postProcessor {@link ResourcePostProcessor} to use as a {@link ResourceProcessor}.
-   * @return instance of {@link ResourceProcessor}.
-   */
-  public static ResourceProcessor newResourceProcessor(final ResourcePostProcessor postProcessor) {
-    return new ResourceProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        postProcessor.process(reader, writer);
       }
     };
   }

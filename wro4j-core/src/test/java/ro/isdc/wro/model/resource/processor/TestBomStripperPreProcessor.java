@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -21,14 +20,14 @@ import ro.isdc.wro.util.WroUtil;
 public class TestBomStripperPreProcessor {
   private final ResourcePreProcessor processor = new BomStripperPreProcessor();
 
+
   @Test
   public void testFromFolder()
-      throws Exception {
+    throws Exception {
     final URL url = getClass().getResource("bom");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-        WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

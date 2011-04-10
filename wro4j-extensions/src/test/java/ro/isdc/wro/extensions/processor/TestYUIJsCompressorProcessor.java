@@ -30,25 +30,27 @@ public class TestYUIJsCompressorProcessor {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedNomunge");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      WroUtil.newResourceProcessor(processor));
+      processor);
   }
 
+
   @Test
-  public void testMunge() throws IOException {
+  public void testMunge()
+    throws IOException {
     final ResourcePostProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
     final URL url = getClass().getResource("yui");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedMunge");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
+
 
   @Test
   public void testInvalidJsShouldBeUnchanged()
     throws IOException {
     final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
     final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
-    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, processor);
   }
 }

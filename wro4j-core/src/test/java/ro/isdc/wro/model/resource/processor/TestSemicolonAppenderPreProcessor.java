@@ -4,13 +4,10 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
-import ro.isdc.wro.util.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -27,11 +24,6 @@ public class TestSemicolonAppenderPreProcessor {
   public void test()
       throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsSemicolonAppender-input.js",
-        "classpath:ro/isdc/wro/processor/jsSemicolonAppender-output.js", new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(null, reader, writer);
-          }
-        });
+        "classpath:ro/isdc/wro/processor/jsSemicolonAppender-output.js", processor);
   }
 }

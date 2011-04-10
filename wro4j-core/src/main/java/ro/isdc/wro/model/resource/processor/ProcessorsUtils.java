@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -59,6 +62,20 @@ public class ProcessorsUtils {
     return found;
   }
 
+
+  /**
+   * Transforms a preProcessor into a postProcessor.
+   *
+   * @param preProcessor {@link ResourcePreProcessor} to transform.
+   */
+  public static ResourcePostProcessor transform(final ResourcePreProcessor preProcessor) {
+    return new ResourcePostProcessor() {
+      public void process(final Reader reader, final Writer writer)
+        throws IOException {
+        preProcessor.process(null, reader, writer);
+      }
+    };
+  }
 
   /**
    * @return preProcessor of type processorClass if any found or null otherwise.
