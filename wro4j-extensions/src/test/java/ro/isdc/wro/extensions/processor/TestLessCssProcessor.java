@@ -17,7 +17,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -37,14 +36,14 @@ public class TestLessCssProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
-        WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidLessCss()
       throws Exception {
     final ResourcePostProcessor processor = new LessCssProcessor() {
+      @Override
       protected void onException(final WroRuntimeException e) {
         LOG.debug("Exception message is: " + e.getMessage());
         throw e;

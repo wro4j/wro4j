@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.util.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -30,6 +29,7 @@ public class TestCssUrlRewritingProcessor {
 
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
 
+
   @Before
   public void init() {
     processor = new CssUrlRewritingProcessor() {
@@ -40,40 +40,42 @@ public class TestCssUrlRewritingProcessor {
     };
   }
 
+
   /**
    * When background url contains a dataUri, the rewriting should have no effect.
    */
   @Test
   public void processResourceWithDataUriEncodedValue()
-      throws IOException {
+    throws IOException {
     final String resourceUri = "classpath:cssUrlRewriting-dataUri.css";
-    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, new ResourceProcessor() {
+    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, new ResourcePostProcessor() {
       public void process(final Reader reader, final Writer writer)
-          throws IOException {
+        throws IOException {
         processor.process(createMockResource(resourceUri), reader, writer);
       }
     });
   }
+
 
   /**
    * Test a classpath css resource.
    */
   @Test
   public void processClasspathResourceType()
-      throws IOException {
+    throws IOException {
     final String resourceUri = "classpath:" + CSS_INPUT_NAME;
     WroTestUtils.compareProcessedResourceContents(resourceUri, "classpath:cssUrlRewriting-classpath-outcome.css",
-        new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(createMockResource(resourceUri), reader, writer);
-          }
-        });
+      new ResourcePostProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource(resourceUri), reader, writer);
+        }
+      });
   }
 
+
   /**
-   * @param resourceUri
-   *          the resource should return.
+   * @param resourceUri the resource should return.
    * @return mocked {@link Resource} object.
    */
   private Resource createMockResource(final String resourceUri) {
@@ -82,48 +84,51 @@ public class TestCssUrlRewritingProcessor {
     return resource;
   }
 
+
   /**
    * Test a servletContext css resource.
    */
   @Test
   public void processServletContextResourceType()
-      throws IOException {
+    throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
-        "classpath:cssUrlRewriting-servletContext-outcome.css", new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(createMockResource("/static/img/" + CSS_INPUT_NAME), reader, writer);
-          }
-        });
+      "classpath:cssUrlRewriting-servletContext-outcome.css", new ResourcePostProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource("/static/img/" + CSS_INPUT_NAME), reader, writer);
+        }
+      });
   }
+
 
   /**
    * Test a resource which is located inside WEB-INF protected folder.
    */
   @Test
   public void processWEBINFServletContextResourceType()
-      throws IOException {
+    throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
-        "classpath:cssUrlRewriting-WEBINFservletContext-outcome.css", new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(createMockResource("/WEB-INF/" + CSS_INPUT_NAME), reader, writer);
-          }
-        });
+      "classpath:cssUrlRewriting-WEBINFservletContext-outcome.css", new ResourcePostProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource("/WEB-INF/" + CSS_INPUT_NAME), reader, writer);
+        }
+      });
   }
+
 
   /**
    * Test a url css resource.
    */
   @Test
   public void processUrlResourceType()
-      throws IOException {
+    throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
-        "classpath:cssUrlRewriting-url-outcome.css", new ResourceProcessor() {
-          public void process(final Reader reader, final Writer writer)
-              throws IOException {
-            processor.process(createMockResource("http://www.site.com/static/css/" + CSS_INPUT_NAME), reader, writer);
-          }
-        });
+      "classpath:cssUrlRewriting-url-outcome.css", new ResourcePostProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource("http://www.site.com/static/css/" + CSS_INPUT_NAME), reader, writer);
+        }
+      });
   }
 }

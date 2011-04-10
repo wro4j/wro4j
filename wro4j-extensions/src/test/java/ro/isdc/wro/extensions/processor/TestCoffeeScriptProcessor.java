@@ -16,7 +16,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.CoffeScriptProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -68,8 +67,7 @@ public class TestCoffeeScriptProcessor {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee",
-      WroUtil.newResourceProcessor(processor));
-
+      processor);
     Assert.assertEquals(2, counter.getIndex());
   }
 
@@ -81,8 +79,7 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee",
-      WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee", processor);
   }
 
 
@@ -93,7 +90,6 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee",
-      WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee", processor);
   }
 }

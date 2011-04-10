@@ -12,7 +12,7 @@ import org.junit.Test;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
+
 
 /**
  * Test YUI css compressor processor.
@@ -22,13 +22,13 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestYUICssCompressorProcessor {
   @Test
-  public void testNoMunge() throws IOException {
+  public void testNoMunge()
+    throws IOException {
     final ResourcePostProcessor processor = new YUICssCompressorProcessor();
     final URL url = getClass().getResource("yui");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
-      WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 }

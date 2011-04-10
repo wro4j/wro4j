@@ -4,7 +4,6 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import org.junit.Before;
@@ -30,10 +29,14 @@ public class TestCssImportPreProcessor {
     WroTestUtils.initProcessor(processor);
   }
 
+
   @Test
-  public void testFromFolder() throws IOException {
+  public void testFromFolder()
+      throws Exception {
     final URL url = getClass().getResource("cssImport");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "out.css", processor);
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 }
