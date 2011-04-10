@@ -49,56 +49,61 @@ import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
+
   /**
-   * Compare contents of two resources (files) by performing some sort of
-   * processing on input resource.
+   * Compare contents of two resources (files) by performing some sort of processing on input resource.
    *
-   * @param inputResourceUri
-   *          uri of the resource to process.
-   * @param expectedContentResourceUri
-   *          uri of the resource to compare with processed content.
-   * @param processor
-   *          a closure used to process somehow the input content.
+   * @param inputResourceUri uri of the resource to process.
+   * @param expectedContentResourceUri uri of the resource to compare with processed content.
+   * @param processor a closure used to process somehow the input content.
    */
-  public static void compareProcessedResourceContents(
-      final String inputResourceUri, final String expectedContentResourceUri,
-      final ResourceProcessor processor) throws IOException {
+  public static void compareProcessedResourceContents(final String inputResourceUri,
+    final String expectedContentResourceUri, final ResourceProcessor processor)
+    throws IOException {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
-    WroTestUtils.compare(resultReader, expectedReader,
-        processor);
+    WroTestUtils.compare(resultReader, expectedReader, processor);
   }
 
-  private static Reader getReaderFromUri(final String uri) throws IOException {
+
+  private static Reader getReaderFromUri(final String uri)
+    throws IOException {
     // wrap reader with bufferedReader for top efficiency
     return new BufferedReader(new InputStreamReader(createDefaultUriLocatorFactory().locate(uri)));
   }
 
+
   private static UriLocatorFactory createDefaultUriLocatorFactory() {
     return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
-        new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+      new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
   }
 
 
-  public static InputStream getInputStream(final String uri) throws IOException {
+  public static InputStream getInputStream(final String uri)
+    throws IOException {
     return createDefaultUriLocatorFactory().locate(uri);
   }
+
 
   /**
    * @return the injector
    */
   public static void initProcessor(final ResourcePreProcessor processor) {
-    final Injector injector = new Injector(createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPreProcessor(processor));
+    final Injector injector = new Injector(
+      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPreProcessor(processor));
     injector.inject(processor);
   }
+
 
   /**
    * @return the injector
    */
   public static void initProcessor(final ResourcePostProcessor processor) {
-    final Injector injector = new Injector(createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPostProcessor(processor));
+    final Injector injector = new Injector(
+      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPostProcessor(processor));
     injector.inject(processor);
   }
+
 
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
@@ -167,6 +172,7 @@ public class WroTestUtils {
     return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
   }
 
+
   /**
    * Process and compare files from the same folder. Use the extension to make distinction between the source files
    * (files to process) and target files (files to compare with).
@@ -184,12 +190,14 @@ public class WroTestUtils {
       Transformers.extensionTransformer(targetFileExtension), processor);
   }
 
+
   public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
     final String targetFileExtension, final ResourcePreProcessor processor)
     throws IOException {
     compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension),
       Transformers.extensionTransformer(targetFileExtension), processor);
   }
+
 
   /**
    * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourceProcessor) Same as
@@ -222,7 +230,7 @@ public class WroTestUtils {
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
     final Transformer<String> toTargetFileName, final ResourceProcessor processor)
     throws IOException {
-    //TODO create adaptor and use it
+    // TODO create adaptor and use it
     final ResourcePreProcessor preProcessor = new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -231,6 +239,7 @@ public class WroTestUtils {
     };
     compareFromSameFolder(sourceFolder, sourceFileFilter, toTargetFileName, preProcessor);
   }
+
 
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
     final Transformer<String> toTargetFileName, final ResourcePreProcessor processor)
@@ -273,19 +282,14 @@ public class WroTestUtils {
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
   }
 
+
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
-
-
-
-
-
-
-
     final String extension, final ResourceProcessor processor)
     throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
       Transformers.noOpTransformer(), processor);
   }
+
 
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourceProcessor processor)
@@ -297,6 +301,7 @@ public class WroTestUtils {
       }
     });
   }
+
 
   /**
    * Process and compare the files which a located in different folders.
