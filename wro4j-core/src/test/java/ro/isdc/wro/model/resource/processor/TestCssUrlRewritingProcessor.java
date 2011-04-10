@@ -18,7 +18,9 @@ import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
- * Test for CssUrlRewritingProcessor class.
+ * Test for {@link CssUrlRewritingProcessor} class.
+ * <p/>
+ * TODO improve unit tests.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008

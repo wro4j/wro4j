@@ -135,7 +135,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @param url to check.
    * @return true if url needs to be replaced or remain unchanged.
    */
-  protected final boolean isReplaceNeeded(final String url) {
+  protected boolean isReplaceNeeded(final String url) {
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));

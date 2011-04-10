@@ -157,7 +157,10 @@ public class CssUrlRewritingProcessor
       }
       return computeNewImageLocation(".." + cssUri, imageUrl);
     }
-    if (UrlUriLocator.isValid(cssUri) || ClasspathUriLocator.isValid(cssUri)) {
+    if (UrlUriLocator.isValid(cssUri)) {
+      return computeNewImageLocation(cssUri, imageUrl);
+    }
+    if (ClasspathUriLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
