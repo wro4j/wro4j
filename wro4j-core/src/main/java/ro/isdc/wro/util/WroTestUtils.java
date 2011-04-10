@@ -282,6 +282,13 @@ public class WroTestUtils {
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
   }
 
+  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
+    final String extension, final ResourcePreProcessor processor)
+    throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
+      Transformers.noOpTransformer(), processor);
+  }
+
 
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourceProcessor processor)
