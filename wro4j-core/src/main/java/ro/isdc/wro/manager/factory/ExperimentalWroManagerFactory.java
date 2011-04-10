@@ -26,7 +26,10 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  * @created May 9, 2010
+ * @deprecated (Will be removed in 1.4.0) Use {@link ConfigurableWroManagerFactory} instead with <code>cssDataUri</code>
+ *             preProcessor set.
  */
+@Deprecated
 public class ExperimentalWroManagerFactory extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
