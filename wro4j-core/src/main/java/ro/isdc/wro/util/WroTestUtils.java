@@ -261,6 +261,9 @@ public class WroTestUtils {
     LOG.debug("===============");
     LOG.debug("Successfully compared: " + size + " files.");
     LOG.debug("===============");
+    if (size == 0) {
+      throw new IllegalStateException("No files compared. Check if there is at least one resource to compare");
+    }
   }
 
 
