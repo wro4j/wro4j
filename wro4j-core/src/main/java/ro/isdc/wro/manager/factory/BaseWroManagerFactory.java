@@ -11,7 +11,6 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
@@ -67,7 +66,7 @@ public abstract class BaseWroManagerFactory
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           //decorate with scheduler ability
           final WroModelFactory modelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
-            newModelFactory(Context.get().getServletContext())));
+            newModelFactory()));
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
           this.manager = new WroManager(injector);
@@ -155,7 +154,7 @@ public abstract class BaseWroManagerFactory
    * @param servletContext {@link ServletContext} which could be useful for creating dynamic {@link WroModel}.
    * @return {@link WroModelFactory} implementation
    */
-  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+  protected WroModelFactory newModelFactory() {
     return new ServletContextAwareXmlModelFactory();
   }
 

@@ -70,7 +70,7 @@ public class TestWroFilter {
       protected WroManagerFactory getWroManagerFactory() {
         return new ServletContextAwareWroManagerFactory() {
           @Override
-          protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+          protected WroModelFactory newModelFactory() {
             return new XmlModelFactory() {
               @Override
               protected InputStream getConfigResourceAsStream() {

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
@@ -70,7 +69,7 @@ public class DefaultStandaloneContextAwareManagerFactory
 
 
   @Override
-  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+  protected WroModelFactory newModelFactory() {
     return new XmlModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()

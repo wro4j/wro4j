@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.manager.factory.standalone;
 
-import javax.servlet.ServletContext;
-
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -28,7 +26,7 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+  protected WroModelFactory newModelFactory() {
     return new XmlModelFactory();
   }
 //
