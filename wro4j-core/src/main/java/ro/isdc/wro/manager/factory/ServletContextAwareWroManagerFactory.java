@@ -14,7 +14,9 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
+ * @deprecated TODO remove
  */
+@Deprecated
 public class ServletContextAwareWroManagerFactory
     extends BaseWroManagerFactory {
   /**
