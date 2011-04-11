@@ -16,6 +16,10 @@
     <js>classpath:ro/isdc/wro/maven/plugin/js/undef.js</js>
   </group>
   
+  <group name="wildcard">
+    <js>classpath:ro/isdc/wro/maven/plugin/js/**</js>
+  </group>
+
   <group name="g2">
     <js>classpath:ro/isdc/wro/maven/plugin/js/1.js</js>
   </group>

@@ -3,11 +3,13 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -24,32 +26,34 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
+ * @deprecated this class will be removed in 1.4.0
  */
+@Deprecated
 public class ServletContextAwareWroManagerFactory
     extends BaseWroManagerFactory {
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
-    // this one must be before the CssUrlRewritingProcessor
-    groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-    groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-    groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-    groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-    groupsProcessor.addPreProcessor(new JSMinProcessor());
-    groupsProcessor.addPreProcessor(new JawrCssMinifierProcessor());
-
-    groupsProcessor.addPostProcessor(new CssVariablesProcessor());
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory().addUriLocator(
+        new ServletContextUriLocator()).addUriLocator(new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-    factory.addUriLocator(new ServletContextUriLocator());
-    factory.addUriLocator(new ClasspathUriLocator());
-    factory.addUriLocator(new UrlUriLocator());
+  protected ProcessorsFactory newProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new BomStripperPreProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new JSMinProcessor());
+    factory.addPreProcessor(new JawrCssMinifierProcessor());
+
+    factory.addPostProcessor(new CssVariablesProcessor());
+    return factory;
   }
 }

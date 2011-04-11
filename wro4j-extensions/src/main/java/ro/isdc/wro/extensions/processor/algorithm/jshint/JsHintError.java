@@ -10,7 +10,10 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 
 /**
+ * Encapsulates an error reported by JsHint.
+ *
  * @author Alex Objelean
+ * @since 1.3.5
  */
 @SuppressWarnings("serial")
 public class JsHintError

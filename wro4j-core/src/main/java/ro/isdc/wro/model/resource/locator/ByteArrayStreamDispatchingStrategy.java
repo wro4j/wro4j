@@ -179,6 +179,8 @@ public final class ByteArrayStreamDispatchingStrategy
           LOG.debug("redirecting to: " + location);
           final URL url = new URL(location);
           final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+          // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
+          connection.setUseCaches(false);
           final InputStream is = connection.getInputStream();
           IOUtils.copy(is, sos);
           is.close();

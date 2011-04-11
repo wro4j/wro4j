@@ -47,6 +47,7 @@ public class PackerJsProcessor
     try {
       writer.write(getEngine().pack(content));
     } catch (final WroRuntimeException e) {
+      onException(e);
       writer.write(content);
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
     } finally {
@@ -55,6 +56,11 @@ public class PackerJsProcessor
     }
   }
 
+  /**
+   * Invoked when a processing exception occurs.
+   */
+  protected void onException(final WroRuntimeException e) {
+  }
 
   /**
    * @return PackerJs engine.

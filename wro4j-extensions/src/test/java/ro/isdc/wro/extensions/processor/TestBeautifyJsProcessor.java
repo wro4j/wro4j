@@ -9,11 +9,9 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -22,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Apr 21, 2010
  */
-public class TestBeautifyJsProcessor extends AbstractWroTest {
+public class TestBeautifyJsProcessor {
   @Test
   public void testFromFolder() throws IOException {
     final ResourcePostProcessor processor = new BeautifyJsProcessor();
@@ -30,7 +28,6 @@ public class TestBeautifyJsProcessor extends AbstractWroTest {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      WroUtil.newResourceProcessor(processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

@@ -36,9 +36,10 @@ import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManag
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -54,6 +55,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * Default command line runner. Interprets arguments and perform a processing.
  *
  * @author Alex Objelean
+ * @since 1.3.4
  */
 public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
@@ -228,13 +230,15 @@ public class Wro4jCommandLineRunner {
   private StandaloneContextAwareManagerFactory getManagerFactory() {
     final StandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
       @Override
-      protected void configureProcessors(final GroupsProcessor groupsProcessor) {
-        groupsProcessor.addPreProcessor(new BomStripperPreProcessor());
-        groupsProcessor.addPreProcessor(new CssImportPreProcessor());
-        groupsProcessor.addPreProcessor(new CssUrlRewritingProcessor());
-        groupsProcessor.addPreProcessor(new SemicolonAppenderPreProcessor());
-        groupsProcessor.addPreProcessor(new JawrCssMinifierProcessor());
-        groupsProcessor.addPreProcessor(compressor);
+      protected ProcessorsFactory newProcessorsFactory() {
+        final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+        factory.addPreProcessor(new BomStripperPreProcessor());
+        factory.addPreProcessor(new CssImportPreProcessor());
+        factory.addPreProcessor(new CssUrlRewritingProcessor());
+        factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+        factory.addPreProcessor(new JawrCssMinifierProcessor());
+        factory.addPreProcessor(compressor);
+        return factory;
       }
     };
     // initialize before process.

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	version="2.5">
+  xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  version="2.5">
 
   <display-name>WebResourceOptimizer Test Project</display-name>
 
@@ -46,11 +46,12 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,googleClosureSimple</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,googleClosureSimple,cssDataUri</param-value>
     </init-param>
+    <!-- cssVariables, -->
     <init-param>
       <param-name>postProcessors</param-name>
-      <param-value>cssVariables,yuiCssMin</param-value>
+      <param-value>yuiCssMin</param-value>
     </init-param>
   </filter>
   <filter-mapping>
@@ -130,4 +131,4 @@
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
-</web-app>
+</web-app> 

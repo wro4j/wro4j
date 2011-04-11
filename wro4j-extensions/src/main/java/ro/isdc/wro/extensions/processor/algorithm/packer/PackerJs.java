@@ -12,14 +12,16 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Apply Packer compressor script using scriptEngine.
+ *The underlying implementation use the packer.js version <code>3.1</code> utility from base2 project: {@link http://code.google.com/p/base2/}.<br/>
  *
  * @author Alex Objelean
+ * @since 1.3.0
  */
 public class PackerJs {
   private static final Logger LOG = LoggerFactory.getLogger(PackerJs.class);
@@ -73,7 +75,7 @@ public class PackerJs {
       LOG.debug(watch.prettyPrint());
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     }
   }
 

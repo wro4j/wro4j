@@ -28,7 +28,6 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.AbstractWroTest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
@@ -42,7 +41,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.encoding.CharsetToolkit;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -52,8 +50,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class TestWroManager
-    extends AbstractWroTest {
+public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
   private WroManager manager;
 
@@ -90,7 +87,7 @@ public class TestWroManager
 
     manager.process();
     // compare written bytes to output stream with the content from specified css.
-    WroTestUtils.compare(getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
+    WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
         new ByteArrayInputStream(out.toByteArray()));
   }
 
@@ -147,6 +144,13 @@ public class TestWroManager
     genericProcessAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
   }
 
+
+  /**
+   * Perform a processing on a group extracted from requestUri and compares with the expectedResourceUri content.
+   *
+   * @param requestUri contains the group name to process.
+   * @param expectedResourceUri the uri of the resource which has the expected content.
+   */
   private void genericProcessAndCompare(final String requestUri, final String expectedResourceUri)
       throws IOException, FileNotFoundException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -159,12 +163,13 @@ public class TestWroManager
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
     manager.process();
+
     // compare written bytes to output stream with the content from specified css.
-    final InputStream expectedInputStream = new UnclosableBufferedInputStream(getInputStream(expectedResourceUri));
+    final InputStream expectedInputStream = new UnclosableBufferedInputStream(
+        WroTestUtils.getInputStream(expectedResourceUri));
     final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
-    final String encoding = CharsetToolkit.guessEncoding(expectedInputStream).toString();
     expectedInputStream.reset();
-    WroTestUtils.compare(IOUtils.toString(expectedInputStream, encoding), IOUtils.toString(actualInputStream, encoding));
+    WroTestUtils.compare(expectedInputStream, actualInputStream);
     expectedInputStream.close();
     actualInputStream.close();
   }
@@ -191,12 +196,14 @@ public class TestWroManager
     }).when(response).setHeader(Mockito.anyString(), Mockito.anyString());
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
     manager.process();
 
   }
 
   @Test
-  public void testReloadCacheCall() throws IOException {
+  public void testReloadCacheCall()
+      throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
 
@@ -206,23 +213,25 @@ public class TestWroManager
   }
 
   @Test
-  public void testManagerWithSchedulerAndUpdatePeriodSet() throws Exception {
+  public void testManagerWithSchedulerAndUpdatePeriodSet()
+      throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    final Context context = Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-        Mockito.mock(FilterConfig.class));
+    final Context context = Context.webContext(request,
+        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     final WroConfiguration config = new WroConfiguration();
-    //make it run each 10 millisecond
+    // make it run each 10 millisecond
     config.setModelUpdatePeriod(10);
     config.setCacheUpdatePeriod(10);
     Context.set(context, config);
     manager.process();
-    //let scheduler run a while
+    // let scheduler run a while
     Thread.sleep(100);
   }
 
   @Test
-  public void testReloadModelCall() throws IOException {
+  public void testReloadModelCall()
+      throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_MODEL);
 
@@ -263,8 +272,9 @@ public class TestWroManager
     Thread.sleep(500);
   }
 
-  @Test(expected=UnauthorizedRequestException.class)
-  public void testProxyUnauthorizedRequest() throws Exception {
+  @Test(expected = UnauthorizedRequestException.class)
+  public void testProxyUnauthorizedRequest()
+      throws Exception {
     processProxyWithResourceId("test");
   }
 

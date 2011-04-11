@@ -12,9 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,15 +33,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 
 
 /**
@@ -55,7 +52,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory, WroConfigurationChangeListener {
+  implements WroModelFactory {
   /**
    * Logger for this class.
    */
@@ -75,7 +72,10 @@ public class XmlModelFactory
    * Group tag used in xml.
    */
   private static final String TAG_GROUP = "group";
-
+  /**
+   * Import tag used in xml.
+   */
+  private static final String TAG_IMPORT = "import";
   /**
    * CSS tag used in xml.
    */
@@ -114,78 +114,19 @@ public class XmlModelFactory
   final Collection<String> processingGroups = new HashSet<String>();
 
   /**
-   * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
+   * Used to locate imports;
    */
-  private volatile WroModel model;
-
+  private SimpleUriLocatorFactory uriLocatorFactory;
   /**
-   * Scheduled executors service, used to refresh the WroModel.
+   * Used to detect recursive import processing.
    */
-  private ScheduledExecutorService scheduler;
+  private Set<String> processedImports = new HashSet<String>();
+
 
   /**
    * {@inheritDoc}
    */
-  public synchronized WroModel getInstance() {
-    initScheduler();
-    // use double-check locking
-    if (model == null) {
-      synchronized (this) {
-        if (model == null) {
-          final StopWatch stopWatch = new StopWatch();
-          stopWatch.start("Create Model");
-          model = newModel();
-          stopWatch.stop();
-          LOG.debug(stopWatch.prettyPrint());
-        }
-      }
-    }
-    return model;
-  }
-
-
-  /**
-   * Initialize executor service & start the thread responsible for updating the model.
-   */
-  private void initScheduler() {
-    if (scheduler == null) {
-      final long period = Context.get().getConfig().getModelUpdatePeriod();
-      if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
-        // Run a scheduled task which updates the model.
-        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
-        // (thread tries to make up for lost time in some situations)
-        LOG.info("Schedule Model Update for " + period + " seconds period");
-        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
-      }
-    }
-  }
-
-
-  /**
-   * @return {@link Runnable} implementation which reloads the model when scheduled.
-   */
-  private Runnable getSchedulerRunnable() {
-    return new Runnable() {
-      public void run() {
-    		try {
-    			model = newModel();
-    			//find a way to clear the cache
-    			LOG.info("Wro Model (wro.xml) updated!");
-    		} catch (final Exception e) {
-      		LOG.error("Exception occured", e);
-      	}
-      }
-    };
-  }
-
-  /**
-   * Build model from scratch after xml is parsed.
-   *
-   * @return new instance of model.
-   */
-  private WroModel newModel() {
-    // TODO return a single instance based on some configuration?
+  public WroModel getInstance() {
     Document document = null;
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -204,9 +145,11 @@ public class XmlModelFactory
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
-    initGroupMap(document);
+    processGroups(document);
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
     final WroModel model = createModel();
+    processImports(document, model);
+    processedImports.clear();
     return model;
   }
 
@@ -219,7 +162,6 @@ public class XmlModelFactory
     // create a SchemaFactory capable of understanding WXS schemas
     final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-    // load a WXS schema, represented by a Schema instance
     final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
@@ -229,7 +171,7 @@ public class XmlModelFactory
   /**
    * Override this method, in order to provide different xml definition file name.
    *
-   * @return name of the xml file containing group & resource definition.
+   * @return stream of the xml representation of the model.
    * @throws IOException if the stream couldn't be read.
    */
   protected InputStream getConfigResourceAsStream()
@@ -241,12 +183,42 @@ public class XmlModelFactory
   /**
    * Initialize the map
    */
-  private void initGroupMap(final Document document) {
+  private void processGroups(final Document document) {
+    // handle imports
     final NodeList groupNodeList = document.getElementsByTagName(TAG_GROUP);
     for (int i = 0; i < groupNodeList.getLength(); i++) {
       final Element groupElement = (Element)groupNodeList.item(i);
       final String name = groupElement.getAttribute(ATTR_GROUP_NAME);
       allGroupElements.put(name, groupElement);
+    }
+  }
+
+
+  private void processImports(final Document document, final WroModel model) {
+    final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
+    LOG.debug("number of imports: {}", importsList.getLength());
+    for (int i = 0; i < importsList.getLength(); i++) {
+      final Element element = (Element)importsList.item(i);
+      final String name = element.getTextContent();
+      LOG.debug("processing import: " + name);
+      final XmlModelFactory importedModelFactory = new XmlModelFactory() {
+        @Override
+        protected InputStream getConfigResourceAsStream()
+          throws IOException {
+          LOG.debug("build model from import: " + name);
+          return getUriLocatorFactory().locate(name);
+        };
+      };
+
+      if (processedImports.contains(name)) {
+        final String message = "Recursive import detected: " + name;
+        LOG.error(message);
+        throw new RecursiveGroupDefinitionException(message);
+      }
+
+      processedImports.add(name);
+      importedModelFactory.processedImports.addAll(this.processedImports);
+      model.merge(importedModelFactory.getInstance());
     }
   }
 
@@ -257,7 +229,7 @@ public class XmlModelFactory
    * @param document to parse.
    * @return {@link WroModel} object.
    */
-  private synchronized WroModel createModel() {
+  private WroModel createModel() {
     final WroModel model = new WroModel();
     final Set<Group> groups = new HashSet<Group>();
     for (final Element element : allGroupElements.values()) {
@@ -319,7 +291,7 @@ public class XmlModelFactory
    * @param groups list of parsed groups.
    * @return parsed Group by it's name.
    */
-  private static Group getGroupByName(final String name, final Collection<Group> groups) {
+  private Group getGroupByName(final String name, final Collection<Group> groups) {
     for (final Group group : groups) {
       if (name.equals(group.getName())) {
         return group;
@@ -328,6 +300,7 @@ public class XmlModelFactory
     return null;
   }
 
+
   /**
    * Creates a resource from a given resourceElement. It can be css, js. If resource tag name is group-ref, the method
    * will start a recursive computation.
@@ -335,7 +308,8 @@ public class XmlModelFactory
    * @param resourceElement
    * @param resources list of parsed resources where the parsed resource is added.
    */
-  private void parseResource(final Element resourceElement, final Collection<Resource> resources, final Collection<Group> groups) {
+  private void parseResource(final Element resourceElement, final Collection<Resource> resources,
+    final Collection<Group> groups) {
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
@@ -353,7 +327,9 @@ public class XmlModelFactory
     }
     if (type != null) {
       final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
-      final boolean minimize = StringUtils.isEmpty(minimizeAsString) ? true : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
+      final boolean minimize = StringUtils.isEmpty(minimizeAsString)
+        ? true
+        : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
       final Resource resource = Resource.create(uri, type);
       resource.setMinimize(minimize);
       resources.add(resource);
@@ -384,31 +360,33 @@ public class XmlModelFactory
     validator.validate(new DOMSource(document));
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void onCachePeriodChanged() {
-  }
 
   /**
    * {@inheritDoc}
    */
-  public void onModelPeriodChanged() {
-  	if (scheduler != null) {
-  	  scheduler.shutdown();
-  	  scheduler = null;
-  	}
-    //force scheduler to reload
-  	model = null;
-  }
+  public void destroy() {}
+
 
   /**
-   * {@inheritDoc}
+   * @return lazily instantiated {@link UriLocatorFactory}.
    */
-  public void destroy() {
-    //kill running threads
-    if (scheduler != null) {
-      scheduler.shutdownNow();
+  private UriLocatorFactory getUriLocatorFactory() {
+    if (uriLocatorFactory == null) {
+      uriLocatorFactory = new SimpleUriLocatorFactory();
+      // use locators with wildcard disabled - to avoid invalid xml parsing error
+      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
+        @Override
+        protected boolean disableWildcards() {
+          return true;
+        }
+      });
+      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
+        @Override
+        protected boolean disableWildcards() {
+          return true;
+        }
+      });
     }
+    return uriLocatorFactory;
   }
 }

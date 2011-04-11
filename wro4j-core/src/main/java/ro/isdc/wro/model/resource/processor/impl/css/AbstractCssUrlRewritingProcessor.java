@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +89,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       }
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [" + urlGroup + "] with: [" + replacedUrl + "].");
+        LOG.debug("replaced old Url: [" + urlGroup + "] with: [" + StringUtils.abbreviate(replacedUrl, 30) + "].");
         final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
         onUrlReplaced(replacedUrl);
         // update allowedUrls list
@@ -135,7 +136,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @param url to check.
    * @return true if url needs to be replaced or remain unchanged.
    */
-  protected final boolean isReplaceNeeded(final String url) {
+  protected boolean isReplaceNeeded(final String url) {
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));

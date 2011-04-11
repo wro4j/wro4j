@@ -6,6 +6,9 @@ package ro.isdc.wro.model.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -98,10 +101,7 @@ public final class Group {
    */
   @Override
   public int hashCode() {
-    int hash = 7;
-    hash = 31 * hash + getName().hashCode();
-    hash = 31 * hash + getResources().hashCode();
-    return hash;
+    return getName().hashCode();
   }
 
 
@@ -110,6 +110,6 @@ public final class Group {
    */
   @Override
   public String toString() {
-    return getName();
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }

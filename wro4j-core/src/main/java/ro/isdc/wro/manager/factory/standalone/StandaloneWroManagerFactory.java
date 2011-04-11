@@ -5,14 +5,16 @@ package ro.isdc.wro.manager.factory.standalone;
 
 import javax.servlet.ServletContext;
 
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 
 /**
  * This factory will create a WroManager which is able to run itself outside of
@@ -29,32 +31,34 @@ public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new XmlModelFactory();
   }
+//
+//  /**
+//   * {@inheritDoc}
+//   */
+//  @Override
+//  protected final WroManager newWroManager() {
+//    return new WroManager() {
+//      /**
+//       * Just return false, without checking the request headers.
+//       */
+//      @Override
+//      protected boolean isGzipSupported() {
+//        return false;
+//      }
+//    };
+//  }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  protected WroManager newManager() {
-    return new WroManager() {
-      /**
-       * Just return false, without checking the request headers.
-       */
-      @Override
-      protected boolean isGzipSupported() {
-        return false;
-      }
-    };
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory().addUriLocator(newServletContextUriLocator()).addUriLocator(
+        new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
-    factory.addUriLocator(newServletContextUriLocator());
-    factory.addUriLocator(new ClasspathUriLocator());
-    factory.addUriLocator(new UrlUriLocator());
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new SimpleProcessorsFactory();
   }
+
 
   /**
    * @return {@link ServletContextUriLocator} or a derivate locator which will be responsible for locating resources

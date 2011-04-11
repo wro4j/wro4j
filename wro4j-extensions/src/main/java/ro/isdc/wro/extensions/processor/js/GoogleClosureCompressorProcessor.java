@@ -83,6 +83,10 @@ public class GoogleClosureCompressorProcessor
       Compiler.setLoggingLevel(Level.SEVERE);
       final Compiler compiler = new Compiler();
       final CompilerOptions options = new CompilerOptions();
+      /**
+       * According to John Lenz from the Closure Compiler project, if you are using the Compiler API directly, you
+       * should specify a CodingConvention. {@link http://code.google.com/p/wro4j/issues/detail?id=155}
+       */
       options.setCodingConvention(new DefaultCodingConvention());
       //make it play nice with GAE
       compiler.disableThreads();

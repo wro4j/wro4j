@@ -9,11 +9,10 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.AbstractWroTest;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
+
 
 /**
  * Test YUI css compressor processor.
@@ -21,14 +20,15 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
  */
-public class TestYUICssCompressorProcessor extends AbstractWroTest {
-  private final ResourcePostProcessor processor = new YUICssCompressorProcessor();
+public class TestYUICssCompressorProcessor {
   @Test
-  public void testFromFolder()
+  public void testNoMunge()
     throws IOException {
+    final ResourcePostProcessor processor = new YUICssCompressorProcessor();
     final URL url = getClass().getResource("yui");
-    final File sourceFolder = new File(url.getFile());
-    WroTestUtils.compareSameFolderByExtension(sourceFolder, "css", "yui.css",
-      WroUtil.newResourceProcessor(processor));
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 }

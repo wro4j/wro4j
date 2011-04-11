@@ -1,25 +1,25 @@
 .class1 {
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/img.gif);
-  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=http://www.site.com/static/css/../images/tabs/tabContent.png',sizingMethod='scale');
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/folder/img.gif);
-  background: url('[WRO-PREFIX]?id=http://www.site.com/static/css/folder/img.gif');
-  background: url("[WRO-PREFIX]?id=http://www.site.com/static/css/folder/img.gif");
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/folder/folder/img.gif) top left;
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/../img.gif) repeat-x;
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/../../img.gif) no-repeat right;
-  BACKGROUND-IMAGE: url([WRO-PREFIX]?id=http://www.site.com/static/css/../img1.gif);
-  background-image: url([WRO-PREFIX]?id=http://www.site.com/static/css/../img.gif);
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
+  background: url(http://www.site.com/static/css/img.gif);
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.site.com/static/css/../images/tabs/tabContent.png',sizingMethod='scale');
+  background: url(http://www.site.com/static/css/folder/img.gif);
+  background: url('http://www.site.com/static/css/folder/img.gif');
+  background: url("http://www.site.com/static/css/folder/img.gif");
+  background: url(http://www.site.com/static/css/folder/folder/img.gif) top left;
+  background: url(http://www.site.com/static/css/../img.gif) repeat-x;
+  background: url(http://www.site.com/static/css/../../img.gif) no-repeat right;
+  BACKGROUND-IMAGE: url(http://www.site.com/static/css/../img1.gif);
+  background-image: url(http://www.site.com/static/css/../img.gif);
+  background: url(http://www.site.com/static/css/../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
 .class2 {
-  background-IMAGE: URL([WRO-PREFIX]?id=http://www.site.com/static/css/img.gif);
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/img.gif) red;
-  background: url([WRO-PREFIX]?id=http://www.site.com/static/css/folder/img.gif) no-repeat right;
+  background-IMAGE: URL(http://www.site.com/static/css/img.gif);
+  background: url(http://www.site.com/static/css/img.gif) red;
+  background: url(http://www.site.com/static/css/folder/img.gif) no-repeat right;
   background: url(http://www.google.com/);
 }
 
 .inlineHelp {
-  background:#B3B3B3 url("[WRO-PREFIX]?id=http://www.site.com/static/css/images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
-  background:#B3B3B3 url('[WRO-PREFIX]?id=http://www.site.com/static/css/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
-  background:#B3B3B3 url([WRO-PREFIX]?id=http://www.site.com/static/css/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
+  background:#B3B3B3 url("http://www.site.com/static/css/images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
+  background:#B3B3B3 url('http://www.site.com/static/css/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
+  background:#B3B3B3 url(http://www.site.com/static/css/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
 }

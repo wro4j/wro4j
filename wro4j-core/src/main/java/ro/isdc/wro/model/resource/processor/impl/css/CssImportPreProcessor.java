@@ -84,7 +84,6 @@ public class CssImportPreProcessor
    * @param resource {@link Resource} to process.
    * @param reader Reader for processed resource.
    * @return css content with all imports processed.
-   * @throws IOException
    */
   private String parseCss(final Resource resource, final Reader reader)
     throws IOException {
@@ -149,8 +148,7 @@ public class CssImportPreProcessor
    */
   private Resource buildImportedResource(final Resource resource, final String importUrl) {
     final String absoluteUrl = computeAbsoluteUrl(resource, importUrl);
-    final Resource importResource = Resource.create(absoluteUrl, ResourceType.CSS);
-    return importResource;
+    return Resource.create(absoluteUrl, ResourceType.CSS);
   }
 
 

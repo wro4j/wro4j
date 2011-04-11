@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -26,17 +27,14 @@ import com.google.gson.reflect.TypeToken;
 /**
  * Apply JsHint script checking utility.
  * <p/>
- * Using untagged version (commit 2011-03-06 02:34:21)
+ * Using untagged version (commited: 2011-04-11 09:09:04)
  *
  * @author Alex Objelean
+ * @since 1.3.5
  */
 public class JsHint {
   private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);
   private String[] options;
-
-
-  public JsHint() {}
-
 
   /**
    * Initialize script builder for evaluation.
@@ -51,6 +49,7 @@ public class JsHint {
 
 
   private InputStream getStreamForJsHint() {
+    //this resource is packed with packerJs compressor
     return getClass().getResourceAsStream("jshint.min.js");
   }
 
@@ -85,7 +84,7 @@ public class JsHint {
       watch.stop();
       LOG.debug(watch.prettyPrint());
     } catch (final RhinoException e) {
-      throw new WroRuntimeException("Unable to evaluate the script because: " + e.getMessage(), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     }
   }
 

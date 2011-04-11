@@ -10,19 +10,24 @@ import javax.servlet.ServletContext;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.cache.impl.MapCacheStrategy;
+import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 
@@ -60,21 +65,14 @@ public abstract class BaseWroManagerFactory
         if (this.manager == null) {
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
-          final WroModelFactory modelFactory = newModelFactory(Context.get().getServletContext());
-          final GroupsProcessor groupsProcessor = new GroupsProcessor() {
-            @Override
-            protected void configureUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-              BaseWroManagerFactory.this.configureUriLocatorFactory(uriLocatorFactory);
-            }
-          };
-          configureGroupsProcessor(groupsProcessor);
+          //decorate with scheduler ability
+          final WroModelFactory modelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
+            newModelFactory(Context.get().getServletContext())));
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
-          // it is important to instantiate dependencies first, otherwise another thread can start working with
-          // uninitialized manager.
-          this.manager = newManager();
+          final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+          this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
           manager.setModelFactory(modelFactory);
-          manager.setGroupsProcessor(groupsProcessor);
           manager.setCacheStrategy(cacheStrategy);
           manager.setHashBuilder(newHashBuilder());
           manager.registerCallback(cacheChangeCallback);
@@ -86,11 +84,22 @@ public abstract class BaseWroManagerFactory
 
 
   /**
-   * Override this method if you want to add new uri locators.
+   * Override to provide a different or modified factory.
    *
-   * @param factory {@link UriLocatorFactory} to configure.
+   * @return {@link ProcessorsFactory} object.
    */
-  protected void configureUriLocatorFactory(final UriLocatorFactory factory) {
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new SimpleProcessorsFactory();
+  }
+
+
+  /**
+   * Override to provide a different or modified factory.
+   *
+   * @return {@link UriLocatorFactory} object.
+   */
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new SimpleUriLocatorFactory();
   }
 
   /**
@@ -105,13 +114,6 @@ public abstract class BaseWroManagerFactory
    */
   public void registerCallback(final PropertyChangeListener callback) {
     this.cacheChangeCallback = callback;
-  }
-
-  /**
-   * @return {@link WroManager}
-   */
-  protected WroManager newManager() {
-    return new WroManager();
   }
 
   /**
@@ -135,10 +137,10 @@ public abstract class BaseWroManagerFactory
   }
 
   /**
-   * @return {@link CacheStrategy} instance.
+   * @return {@link CacheStrategy} instance for resources' group caching.
    */
   protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
-    return new MapCacheStrategy<CacheEntry, ContentHashEntry>();
+    return new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
   }
 
   /**
@@ -155,12 +157,6 @@ public abstract class BaseWroManagerFactory
    */
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new ServletContextAwareXmlModelFactory();
-  }
-
-  /**
-   * @return {@link GroupsProcessor} configured processor.
-   */
-  protected void configureGroupsProcessor(final GroupsProcessor groupsProcessor) {
   }
 
   /**
