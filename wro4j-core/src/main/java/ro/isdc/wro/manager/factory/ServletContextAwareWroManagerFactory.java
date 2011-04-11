@@ -26,7 +26,9 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
+ * @deprecated this class will be removed in 1.4.0
  */
+@Deprecated
 public class ServletContextAwareWroManagerFactory
     extends BaseWroManagerFactory {
   /**
