@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * Apply JsHint script checking utility.
  * <p/>
- * Using untagged version (commit 2011-04-08 06:46:39)
+ * Using untagged version (commited: 2011-04-11 09:09:04)
  *
  * @author Alex Objelean
  * @since 1.3.5
@@ -35,10 +35,6 @@ import com.google.gson.reflect.TypeToken;
 public class JsHint {
   private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);
   private String[] options;
-
-
-  public JsHint() {}
-
 
   /**
    * Initialize script builder for evaluation.
@@ -53,6 +49,7 @@ public class JsHint {
 
 
   private InputStream getStreamForJsHint() {
+    //this resource is packed with packerJs compressor
     return getClass().getResourceAsStream("jshint.min.js");
   }
 
