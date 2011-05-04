@@ -85,7 +85,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         wroManagerFactory.trim());
       managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
-      throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
+      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
+      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
     return managerFactory;
   }

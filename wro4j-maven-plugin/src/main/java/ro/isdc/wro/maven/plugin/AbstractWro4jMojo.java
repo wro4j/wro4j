@@ -171,7 +171,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     } catch (final DependencyResolutionRequiredException e) {
       throw new MojoExecutionException("Could not get compile classpath elements", e);
     }
-    final ClassLoader classLoader = createRealm(classpathElements);
+    final ClassLoader classLoader = createClassLoader(classpathElements);
     Thread.currentThread().setContextClassLoader(classLoader);
   }
 
@@ -179,15 +179,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * @return {@link ClassRealm} based on project dependencies.
    */
-  private ClassLoader createRealm(final List<String> classpathElements) {
+  private ClassLoader createClassLoader(final List<String> classpathElements) {
     getLog().debug("Classpath elements:");
     final List<URL> urls = new ArrayList<URL>();
     try {
       for (final String element : classpathElements) {
         final File elementFile = new File(element);
         getLog().debug("Adding element to plugin classpath: " + elementFile.getPath());
-        final URL url = new URL("file:///" + elementFile.getPath() + (elementFile.isDirectory() ? "/" : ""));
-        urls.add(url);
+        urls.add(elementFile.toURI().toURL());
       }
     } catch (final Exception e) {
       getLog().error("Error retreiving URL for artifact", e);
@@ -195,7 +194,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     }
     return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
   }
-
 
   /**
    * @param contextFolder the servletContextFolder to set
