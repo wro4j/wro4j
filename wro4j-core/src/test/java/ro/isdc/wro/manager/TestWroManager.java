@@ -19,7 +19,6 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -95,7 +94,6 @@ public class TestWroManager {
    * encoding in pom.xml).
    */
   @Test
-  @Ignore
   public void testProcessingResourceWithChineseEncoding()
       throws IOException {
     genericProcessAndCompare("/chinese.js", "classpath:ro/isdc/wro/manager/chinese-output.js");

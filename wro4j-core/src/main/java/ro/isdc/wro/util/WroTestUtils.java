@@ -27,6 +27,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -150,7 +151,8 @@ public class WroTestUtils {
     throws IOException {
     Assert.assertNotNull(expected);
     Assert.assertNotNull(actual);
-    compare(IOUtils.toString(expected), IOUtils.toString(actual));
+    final String encoding = Context.get().getConfig().getEncoding();
+    compare(IOUtils.toString(expected, encoding), IOUtils.toString(actual, encoding));
     expected.close();
     actual.close();
   }
