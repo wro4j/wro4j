@@ -21,6 +21,8 @@ public class ConfigurableWroFilter extends WroFilter {
   private long cacheUpdatePeriod = 0;
   private long modelUpdatePeriod = 0;
   private boolean disableCache;
+  private String encoding;
+
   /**
    * {@inheritDoc}
    */
@@ -43,8 +45,6 @@ public class ConfigurableWroFilter extends WroFilter {
   public void setDisableCache(final boolean disableCache) {
     this.disableCache = disableCache;
   }
-
-
 
   /**
    * {@inheritDoc}
@@ -129,5 +129,19 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   public final void setModelUpdatePeriod(final long modelUpdatePeriod) {
     this.modelUpdatePeriod = modelUpdatePeriod;
+  }
+
+  /**
+   * @return the encoding
+   */
+  public String getEncoding() {
+    return this.encoding;
+  }
+
+  /**
+   * @param encoding the encoding to set
+   */
+  public void setEncoding(final String encoding) {
+    this.encoding = encoding;
   }
 }

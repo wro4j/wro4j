@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -95,8 +94,8 @@ public class TestWroManager {
    * This test actually works, but it is ignored because of encoding issues (I was unable to find a way to specify the
    * encoding in pom.xml).
    */
-  @Ignore
   @Test
+  @Ignore
   public void testProcessingResourceWithChineseEncoding()
       throws IOException {
     genericProcessAndCompare("/chinese.js", "classpath:ro/isdc/wro/manager/chinese-output.js");

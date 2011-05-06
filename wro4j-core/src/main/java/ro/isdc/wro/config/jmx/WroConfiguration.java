@@ -24,6 +24,10 @@ public final class WroConfiguration
   implements WroConfigurationMBean {
   private static final Logger LOG = LoggerFactory.getLogger(WroConfiguration.class);
   /**
+   * Default encoding to use.
+   */
+  private static final String DEFAULT_ENCODING = "UTF-8";
+  /**
 	 * How often to run a thread responsible for refreshing the cache.
 	 */
   private long cacheUpdatePeriod;
@@ -48,12 +52,15 @@ public final class WroConfiguration
    * this flag will have no effect.
    */
   private boolean disableCache;
-
+  /**
+   * Encoding to use when reading resources.
+   */
+  private String encoding;
   /**
    * Listeners for the change of cache & model period properties.
    */
-  private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
-  private final List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
+  private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
+  private final transient List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
   /**
    * @return the name of the object used to register the MBean.
    */
@@ -231,12 +238,24 @@ public final class WroConfiguration
   }
 
   /**
+   * @return the encoding
+   */
+  public String getEncoding() {
+    return this.encoding == null ? DEFAULT_ENCODING : this.encoding;
+  }
+
+  /**
+   * @param encoding the encoding to set
+   */
+  public void setEncoding(final String encoding) {
+    this.encoding = encoding;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("debug", isDebug()).append("gzipEnabled",
-      isGzipEnabled()).append("cacheUpdatePeriod", getCacheUpdatePeriod()).append("modelUpdatePeriod",
-      getModelUpdatePeriod()).append("disableCache", isDisableCache()).toString();
+    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).toString();
   }
 }
