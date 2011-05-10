@@ -48,7 +48,10 @@ public final class WroConfiguration
    * this flag will have no effect.
    */
   private boolean disableCache;
-
+  /**
+   * Allow to turn jmx on or off.
+   */
+  private boolean jmxEnabled;
   /**
    * Listeners for the change of cache & model period properties.
    */
@@ -220,6 +223,20 @@ public final class WroConfiguration
    */
   public void setDisableCache(final boolean disableCache) {
     this.disableCache = disableCache;
+  }
+
+  /**
+   * @return the jmxEnabled
+   */
+  public boolean isJmxEnabled() {
+    return jmxEnabled;
+  }
+
+  /**
+   * @param jmxEnabled the jmxEnabled to set
+   */
+  public void setJmxEnabled(final boolean jmxEnabled) {
+    this.jmxEnabled = jmxEnabled;
   }
 
   /**
