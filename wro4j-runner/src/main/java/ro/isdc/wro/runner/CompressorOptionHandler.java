@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
+import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
@@ -35,7 +36,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor> {
   private static final Logger LOG = LoggerFactory.getLogger(CompressorOptionHandler.class);
 
-  private Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+  private final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
 
   public CompressorOptionHandler(final CmdLineParser parser, final OptionDef option,
     final Setter<? super ResourcePreProcessor> setter) {
@@ -53,6 +54,7 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
     map.put("beautifyJs", new BeautifyJsProcessor());
     map.put("packerJs", new PackerJsProcessor());
     map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
+    map.put("coffeeScript", new CoffeeScriptProcessor());
   }
 
 
@@ -69,7 +71,7 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
     LOG.debug("compressor argument: " + value);
     final ResourcePreProcessor processor = map.get(value);
     if (processor == null) {
-      throw new CmdLineException("No compressor defined for alias: " + value + ". Available alias are: " + map.keySet());
+      throw new CmdLineException("No processor defined for alias: " + value + ". Available alias are: " + map.keySet());
     }
     setter.addValue(processor);
     return 1;
