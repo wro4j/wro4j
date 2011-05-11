@@ -9,12 +9,10 @@ package ro.isdc.wro.config.jmx;
  * @author Alex Objelean
  */
 public interface WroConfigurationMBean {
-
   /**
 	 * @return period in seconds when the wro model (by default read from wro.xml) is updated.
 	 */
 	long getModelUpdatePeriod();
-
 
 	/**
 	 * Set after how many seconds the wro model should be updated.
@@ -23,12 +21,10 @@ public interface WroConfigurationMBean {
 	 */
 	void setModelUpdatePeriod(final long period);
 
-
 	/**
 	 * @return period in seconds when the cache containing merged resources by group should be updated.
 	 */
 	long getCacheUpdatePeriod();
-
 
 	/**
 	 * Set after how many seconds the cache containing merged resources by group name should be updated.
@@ -37,12 +33,10 @@ public interface WroConfigurationMBean {
 	 */
 	void setCacheUpdatePeriod(final long period);
 
-
 	/**
 	 * @return true if Gzip is Enabled.
 	 */
 	boolean isGzipEnabled();
-
 
 	/**
 	 * @param enable if true, gzip will be enabled, otherwise will be disabled.
@@ -53,7 +47,6 @@ public interface WroConfigurationMBean {
 	 * @return the state of debug flag.
 	 */
 	boolean isDebug();
-
 
   /**
    * Set the debug mode.
@@ -66,7 +59,6 @@ public interface WroConfigurationMBean {
 	 * Force reload of the cache.
 	 */
 	void reloadCache();
-
 
 	/**
 	 * Force reload of the model.
