@@ -37,8 +37,8 @@ public class PropertyWroConfigurationFactory
       config.setDebug(valueAsBoolean(properties.get(ConfigConstants.debug.name()), true));
       config.setGzipEnabled(valueAsBoolean(properties.get(ConfigConstants.gzipResources.name()), true));
       config.setJmxEnabled(valueAsBoolean(properties.get(ConfigConstants.jmxEnabled.name()), true));
-      config.setCacheUpdatePeriod(valueAsLong(ConfigConstants.cacheUpdatePeriod.name(), 0));
-      config.setModelUpdatePeriod(valueAsLong(ConfigConstants.modelUpdatePeriod.name(), 0));
+      config.setCacheUpdatePeriod(valueAsLong(properties.get(ConfigConstants.cacheUpdatePeriod.name()), 0));
+      config.setModelUpdatePeriod(valueAsLong(properties.get(ConfigConstants.modelUpdatePeriod.name()), 0));
       config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
       config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     }

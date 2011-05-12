@@ -45,11 +45,26 @@ public class TestPropertyWroConfigurationFactory {
   @Test
   public void testConfigWithProperties() {
     final Properties props = new Properties();
-    props.put(ConfigConstants.cacheUpdatePeriod.name(), "10");
-//    props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
+    props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
+    props.setProperty(ConfigConstants.modelUpdatePeriod.name(), "20");
+    props.setProperty(ConfigConstants.disableCache.name(), "true");
     factory.setProperties(props);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
+    Assert.assertEquals(20, config.getModelUpdatePeriod());
+    Assert.assertEquals(true, config.isDisableCache());
+  }
+
+  @Test
+  public void testConfigWithInvalidProperties() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "INVALID_LONG");
+    props.setProperty(ConfigConstants.disableCache.name(), "INVALID_BOOLEAN");
+    factory.setProperties(props);
+    final WroConfiguration config = factory.create();
+    LOG.debug("config: {}", config);
+    Assert.assertEquals(0, config.getCacheUpdatePeriod());
+    Assert.assertEquals(false, config.isDisableCache());
   }
 }
