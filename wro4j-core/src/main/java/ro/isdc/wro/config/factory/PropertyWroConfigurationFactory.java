@@ -10,6 +10,7 @@ import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
@@ -42,15 +43,20 @@ public class PropertyWroConfigurationFactory
       config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
       config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     }
+    LOG.debug("WroConfiguration created: {}", config);
     return config;
   }
 
   private long valueAsLong(final Object object, final long defaultValue) {
+    if (object == null) {
+      return defaultValue;
+    }
     try {
       return Long.valueOf(valueAsString(object));
     } catch (final NumberFormatException e) {
-      LOG.warn("Invalid long value: " + object + ". Using defaultValue: " + defaultValue);
-      return defaultValue;
+      final String message = "Invalid long value: " + object + ". Using defaultValue: " + defaultValue;
+      LOG.error(message);
+      throw new WroRuntimeException(message);
     }
   }
 

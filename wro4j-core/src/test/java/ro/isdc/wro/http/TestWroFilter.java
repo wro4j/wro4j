@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -90,8 +92,8 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testFilterInitParamsAreWrong()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("InvalidNumber");
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
+    Mockito.when(config.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("InvalidNumber");
+    Mockito.when(config.getInitParameter(ConfigConstants.modelUpdatePeriod.name())).thenReturn("100");
     filter.init(config);
   }
 
@@ -170,10 +172,6 @@ public class TestWroFilter {
       protected WroManagerFactory getWroManagerFactory() {
         return factory;
       }
-      @Override
-      protected boolean isDebug() {
-        return true;
-      }
     };
   }
 
@@ -190,7 +188,7 @@ public class TestWroFilter {
   @Test
   public void testJmxDisabled()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_JMX_ENABLED)).thenReturn("false");
+    Mockito.when(config.getInitParameter(ConfigConstants.jmxEnabled.name())).thenReturn("false");
     filter.init(config);
   }
 
@@ -201,10 +199,10 @@ public class TestWroFilter {
   @Test
   public void testFilterInitParamsAreSetProperly()
     throws Exception {
-    setConfigurationMode(WroFilter.PARAM_VALUE_DEPLOYMENT);
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_GZIP_RESOURCES)).thenReturn(Boolean.FALSE.toString());
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CACHE_UPDATE_PERIOD)).thenReturn("10");
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_MODEL_UPDATE_PERIOD)).thenReturn("100");
+    setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    Mockito.when(config.getInitParameter(ConfigConstants.gzipResources.name())).thenReturn("false");
+    Mockito.when(config.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("10");
+    Mockito.when(config.getInitParameter(ConfigConstants.modelUpdatePeriod.name())).thenReturn("100");
     filter.init(config);
     final WroConfiguration config = filter.getWroConfiguration();
     Assert.assertEquals(false, config.isDebug());
@@ -245,7 +243,7 @@ public class TestWroFilter {
   @Test
   public void testConfigurationInitParam()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
+    Mockito.when(config.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn("anyOtherString");
     filter.init(config);
     Assert.assertEquals(true, filter.getWroConfiguration().isDebug());
   }
@@ -253,8 +251,8 @@ public class TestWroFilter {
   @Test
   public void testDisableCacheInitParamInDeploymentMode()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(WroFilter.PARAM_VALUE_DEPLOYMENT);
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_DISABLE_CACHE)).thenReturn("true");
+    Mockito.when(config.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    Mockito.when(config.getInitParameter(ConfigConstants.disableCache.name())).thenReturn("true");
     filter.init(config);
     Assert.assertEquals(false, filter.getWroConfiguration().isDebug());
     Assert.assertEquals(false, filter.getWroConfiguration().isDisableCache());
@@ -263,7 +261,7 @@ public class TestWroFilter {
   @Test
   public void testDisableCacheInitParamInDevelopmentMode()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_DISABLE_CACHE)).thenReturn("true");
+    Mockito.when(config.getInitParameter(ConfigConstants.disableCache.name())).thenReturn("true");
     filter.init(config);
     Assert.assertEquals(true, filter.getWroConfiguration().isDebug());
     Assert.assertEquals(true, filter.getWroConfiguration().isDisableCache());
@@ -387,7 +385,7 @@ public class TestWroFilter {
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
     Mockito.when(response.getOutputStream()).thenReturn(sos);
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    setConfigurationMode(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
     filter.doFilter(request, response, chain);
   }
@@ -426,7 +424,7 @@ public class TestWroFilter {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/someMethod");
     final FilterChain chain = Mockito.mock(FilterChain.class);
-    setConfigurationMode(WroFilter.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
     filter.doFilter(request, Mockito.mock(HttpServletResponse.class), chain);
     //No api method exposed -> proceed with chain
@@ -476,7 +474,7 @@ public class TestWroFilter {
    * Mocks the WroFilter.PARAM_CONFIGURATION init param with passed value.
    */
   private void setConfigurationMode(final String value) {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_CONFIGURATION)).thenReturn(value);
+    Mockito.when(config.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(value);
   }
 
   class RequestBuilder {

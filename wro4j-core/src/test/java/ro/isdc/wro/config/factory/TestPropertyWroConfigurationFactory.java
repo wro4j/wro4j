@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
@@ -56,15 +57,13 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(true, config.isDisableCache());
   }
 
-  @Test
+  @Test(expected = WroRuntimeException.class)
   public void testConfigWithInvalidProperties() {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "INVALID_LONG");
-    props.setProperty(ConfigConstants.disableCache.name(), "INVALID_BOOLEAN");
     factory.setProperties(props);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertEquals(0, config.getCacheUpdatePeriod());
-    Assert.assertEquals(false, config.isDisableCache());
   }
 }
