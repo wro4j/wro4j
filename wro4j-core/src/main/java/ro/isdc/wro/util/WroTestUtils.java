@@ -70,7 +70,7 @@ public class WroTestUtils {
   public static void compareProcessedResourceContents(final String inputResourceUri,
     final String expectedContentResourceUri, final ResourcePreProcessor processor)
     throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri, ProcessorsUtils.transform(processor));
+    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri, ProcessorsUtils.toPostProcessor(processor));
   }
 
 
