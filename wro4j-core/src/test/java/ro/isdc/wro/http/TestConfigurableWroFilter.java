@@ -3,40 +3,57 @@
  */
 package ro.isdc.wro.http;
 
-import java.io.IOException;
+import java.util.Properties;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import junit.framework.Assert;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.ConfigConstants;
 
 /**
  * @author Alex Objelean
  * @created Created on Jul 25, 2010
  */
 public class TestConfigurableWroFilter {
-  @Test
-  public void testFilterWithoutInitParam() throws Exception {
-    final Filter filter = new ConfigurableWroFilter();
-    filter.init(Mockito.mock(FilterConfig.class));
-    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), new FilterChain() {
-      public void doFilter(final ServletRequest arg0, final ServletResponse arg1)
-        throws IOException, ServletException {
+  @Mock
+  private HttpServletRequest request;
+  @Mock
+  private HttpServletResponse response;
+  @Mock
+  private FilterChain filterChain;
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-      }
-    });
-    //TODO update configuration
-//    final ApplicationContext ctx = new ClassPathXmlApplicationContext(
-//        "wro4j-extensions-applicationContext.xml");
-//    final WroManagerFactory factory = (WroManagerFactory) ctx.getBean(
-//        "wro4j.wroManagerFactory", WroManagerFactory.class);
-//    factory.getInstance();
+  @Test
+  public void testFilterWithPropertiesSet() throws Exception {
+    final ConfigurableWroFilter filter = new ConfigurableWroFilter();
+    final Properties properties = new Properties();
+    properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
+    filter.setProperties(properties);
+    filter.init(Mockito.mock(FilterConfig.class));
+    filter.doFilter(request, response, filterChain);
+    Assert.assertEquals(10, Context.get().getConfig().getCacheUpdatePeriod());
+  }
+
+  @Test
+  public void testFilterWithCacheUpdatePeriodSet() throws Exception {
+    final ConfigurableWroFilter filter = new ConfigurableWroFilter();
+    filter.setCacheUpdatePeriod(20);
+    filter.init(Mockito.mock(FilterConfig.class));
+    filter.doFilter(request, response, filterChain);
+    Assert.assertEquals(20, Context.get().getConfig().getCacheUpdatePeriod());
   }
 }
