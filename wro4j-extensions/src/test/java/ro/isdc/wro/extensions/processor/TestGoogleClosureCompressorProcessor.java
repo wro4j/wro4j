@@ -31,7 +31,7 @@ public class TestGoogleClosureCompressorProcessor {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      WroUtil.newResourceProcessor(processor));
+      processor);
   }
 
   @Test
