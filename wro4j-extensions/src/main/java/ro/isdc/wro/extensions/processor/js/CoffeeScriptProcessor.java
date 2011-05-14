@@ -29,9 +29,9 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.3.6
  */
 @SupportedResourceType(ResourceType.JS)
-public class CoffeScriptProcessor
+public class CoffeeScriptProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(CoffeScriptProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
   /**
    * Engine.
    */

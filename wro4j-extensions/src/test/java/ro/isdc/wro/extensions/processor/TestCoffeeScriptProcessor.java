@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.js.CoffeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -31,7 +31,7 @@ public class TestCoffeeScriptProcessor {
 
   @Before
   public void setUp() {
-    processor = new CoffeScriptProcessor();
+    processor = new CoffeeScriptProcessor();
   }
 
   private static class Counter {
@@ -57,7 +57,7 @@ public class TestCoffeeScriptProcessor {
     throws IOException {
     final URL url = getClass().getResource("coffeeScript/exceptions");
     final Counter counter = new Counter();
-    processor = new CoffeScriptProcessor() {
+    processor = new CoffeeScriptProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
         counter.increment();
