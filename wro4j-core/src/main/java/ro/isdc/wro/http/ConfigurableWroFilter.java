@@ -3,6 +3,12 @@
  */
 package ro.isdc.wro.http;
 
+import java.util.Properties;
+
+import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
+import ro.isdc.wro.config.factory.WroConfigurationFactory;
+import ro.isdc.wro.config.jmx.ConfigConstants;
+
 /**
  * An extension of {@link WroFilter} which allows configuration by injecting some of the properties. This class can be
  * very useful when using DelegatingFilterProxy (spring extension of Filter) and configuring the fields with values from
@@ -12,29 +18,45 @@ package ro.isdc.wro.http;
  */
 public class ConfigurableWroFilter extends WroFilter {
   /**
-   * Properties to be injected with default values set.
+   * Properties to be injected with default values set. These values are deprecated. Prefer setting the "properties"
+   * field instead.
    */
+  @Deprecated
   private boolean debug = true;
+  @Deprecated
   private boolean gzipEnabled = true;
+  @Deprecated
   private boolean jmxEnabled = true;
+  @Deprecated
   private String mbeanName;
+  @Deprecated
   private long cacheUpdatePeriod = 0;
+  @Deprecated
   private long modelUpdatePeriod = 0;
+  @Deprecated
   private boolean disableCache;
+  /**
+   * This {@link Properties} object will hold the configurations and it will replace all other fields.
+   */
+  private Properties properties;
   /**
    * {@inheritDoc}
    */
   @Override
-  protected boolean isDebug() {
-    return debug;
-  }
-
-  /**
-   * @return the disableCache
-   */
-  @Override
-  public boolean isDisableCache() {
-    return this.disableCache;
+  protected WroConfigurationFactory newWroConfigurationFactory() {
+    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
+    if (properties == null) {
+      //when no
+      properties = new Properties();
+      properties.setProperty(ConfigConstants.debug.name(), String.valueOf(debug));
+      properties.setProperty(ConfigConstants.gzipResources.name(), String.valueOf(gzipEnabled));
+      properties.setProperty(ConfigConstants.jmxEnabled.name(), String.valueOf(jmxEnabled));
+      properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), String.valueOf(cacheUpdatePeriod));
+      properties.setProperty(ConfigConstants.modelUpdatePeriod.name(), String.valueOf(modelUpdatePeriod));
+      properties.setProperty(ConfigConstants.disableCache.name(), String.valueOf(disableCache));
+    }
+    factory.setProperties(properties);
+    return factory;
   }
 
   /**
@@ -42,16 +64,6 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   public void setDisableCache(final boolean disableCache) {
     this.disableCache = disableCache;
-  }
-
-
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected boolean isGzipResources() {
-    return gzipEnabled;
   }
 
   /**
@@ -70,30 +82,6 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   public void setMbeanName(final String mbeanName) {
     this.mbeanName = mbeanName;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected long getCacheUpdatePeriod() {
-    return cacheUpdatePeriod;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected long getModelUpdatePeriod() {
-    return modelUpdatePeriod;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected boolean getJmxEnabled() {
-    return jmxEnabled;
   }
 
   /**
@@ -129,5 +117,12 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   public final void setModelUpdatePeriod(final long modelUpdatePeriod) {
     this.modelUpdatePeriod = modelUpdatePeriod;
+  }
+
+  /**
+   * @param properties the properties to set
+   */
+  public void setProperties(final Properties properties) {
+    this.properties = properties;
   }
 }

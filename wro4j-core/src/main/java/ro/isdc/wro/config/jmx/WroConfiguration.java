@@ -36,24 +36,28 @@ public final class WroConfiguration
    */
   private boolean gzipEnabled = true;
   /**
-   * If true, we are running in DEVELOPMENT mode.
+   * If true, we are running in DEVELOPMENT mode. By default this value is true.
    */
-  private boolean debug;
+  private boolean debug = true;
   /**
    * If true, missing resources are ignored. By default this value is true.
    */
   private boolean ignoreMissingResources = true;
   /**
    * Flag which will force no caching of the processed content only in DEVELOPMENT mode. In DEPLOYMENT mode changing
-   * this flag will have no effect.
+   * this flag will have no effect. By default this value is false.
    */
-  private boolean disableCache;
-
+  private boolean disableCache = false;
+  /**
+   * Allow to turn jmx on or off. By default thsi value is true.
+   */
+  private boolean jmxEnabled = true;
   /**
    * Listeners for the change of cache & model period properties.
    */
-  private final List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
-  private final List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
+  private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
+  private final transient List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(1);
+
   /**
    * @return the name of the object used to register the MBean.
    */
@@ -223,6 +227,20 @@ public final class WroConfiguration
   }
 
   /**
+   * @return the jmxEnabled
+   */
+  public boolean isJmxEnabled() {
+    return jmxEnabled;
+  }
+
+  /**
+   * @param jmxEnabled the jmxEnabled to set
+   */
+  public void setJmxEnabled(final boolean jmxEnabled) {
+    this.jmxEnabled = jmxEnabled;
+  }
+
+  /**
    * Perform the cleanup, clear the listeners.
    */
   public void destroy() {
@@ -235,8 +253,6 @@ public final class WroConfiguration
    */
   @Override
   public String toString() {
-    return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).append("debug", isDebug()).append("gzipEnabled",
-      isGzipEnabled()).append("cacheUpdatePeriod", getCacheUpdatePeriod()).append("modelUpdatePeriod",
-      getModelUpdatePeriod()).append("disableCache", isDisableCache()).toString();
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE).toString();
   }
 }
