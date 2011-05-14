@@ -49,12 +49,14 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
     props.setProperty(ConfigConstants.modelUpdatePeriod.name(), "20");
     props.setProperty(ConfigConstants.disableCache.name(), "true");
+    props.setProperty(ConfigConstants.gzipResources.name(), "false");
     factory.setProperties(props);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(20, config.getModelUpdatePeriod());
     Assert.assertEquals(true, config.isDisableCache());
+    Assert.assertEquals(false, config.isGzipEnabled());
   }
 
   @Test(expected = WroRuntimeException.class)
