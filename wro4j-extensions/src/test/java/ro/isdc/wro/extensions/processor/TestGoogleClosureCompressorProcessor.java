@@ -23,6 +23,16 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor {
+  @Test
+  public void testWhiteSpaceOnly() throws IOException {
+    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
+    final URL url = getClass().getResource("google");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+      WroUtil.newResourceProcessor(processor));
+  }
 
   @Test
   public void testSimpleOptimization()
