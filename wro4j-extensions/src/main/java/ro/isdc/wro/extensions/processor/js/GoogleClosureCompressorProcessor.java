@@ -20,10 +20,12 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
+import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DefaultCodingConvention;
+import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
 
@@ -70,28 +72,25 @@ public class GoogleClosureCompressorProcessor
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    process(reader, writer);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
     final String content = IOUtils.toString(reader);
     try {
       Compiler.setLoggingLevel(Level.SEVERE);
       final Compiler compiler = new Compiler();
       final CompilerOptions options = new CompilerOptions();
-      options.setCodingConvention(new DefaultCodingConvention());
+      compilationLevel.setOptionsForCompilationLevel(options);
+      //This is important in order to avoid INTERNAL_ERROR (@see https://groups.google.com/forum/#!topic/closure-compiler-discuss/TDPtHU503Xk}
+      options.foldConstants = false;
       //make it play nice with GAE
       compiler.disableThreads();
-      // Advanced mode is used here, but additional options could be set, too.
-//      compilationLevel.setOptionsForCompilationLevel(options);
       compiler.initOptions(options);
+      options.setCodingConvention(new DefaultCodingConvention());
+      //set it to warning, otherwise compiler will fail
+      options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES,
+        CheckLevel.WARNING);
 
       final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
-      final JSSourceFile input = JSSourceFile.fromInputStream("", new ByteArrayInputStream(content.getBytes()));
+      final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
+      final JSSourceFile input = JSSourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes()));
       final Result result = compiler.compile(extern, input, options);
       if (result.success) {
         writer.write(compiler.toSource());
@@ -103,5 +102,13 @@ public class GoogleClosureCompressorProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
   }
 }

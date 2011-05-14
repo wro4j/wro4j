@@ -187,7 +187,7 @@
       <dependency>
         <groupId>com.google.javascript</groupId> 
         <artifactId>closure-compiler</artifactId>
-        <version>r946</version>
+        <version>r1043</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
