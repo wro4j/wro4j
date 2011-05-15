@@ -5,8 +5,8 @@ package ro.isdc.wro.extensions.manager.standalone;
 
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;

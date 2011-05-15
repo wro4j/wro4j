@@ -24,21 +24,21 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 
 
 /**
- * A simple implementation of {@link WroManagerFactory} which doesn't define any processors or uriLocators.
+ * A simple implementation of {@link WroManagerFactory} which uses default processors and uriLocators.
  *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public abstract class BaseWroManagerFactory
+public class BaseWroManagerFactory
   implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
@@ -89,7 +89,7 @@ public abstract class BaseWroManagerFactory
    * @return {@link ProcessorsFactory} object.
    */
   protected ProcessorsFactory newProcessorsFactory() {
-    return new SimpleProcessorsFactory();
+    return new DefaultProcesorsFactory();
   }
 
 
@@ -99,7 +99,7 @@ public abstract class BaseWroManagerFactory
    * @return {@link UriLocatorFactory} object.
    */
   protected UriLocatorFactory newUriLocatorFactory() {
-    return new SimpleUriLocatorFactory();
+    return new DefaultUriLocatorFactory();
   }
 
   /**

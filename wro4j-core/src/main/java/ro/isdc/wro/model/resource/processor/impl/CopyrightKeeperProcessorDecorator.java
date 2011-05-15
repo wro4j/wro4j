@@ -28,25 +28,24 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created 14 May 2011
  * @since 1.3.7
  */
-public class CopyrightKeeperProcessor
+public class CopyrightKeeperProcessorDecorator
   implements ResourcePreProcessor, ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
 
   /** The url pattern */
   private static final Pattern PATTERN_COPYRIGHT = Pattern.compile("(?ims)/\\*!.*?\\*/");
 
-//
   /**
    * A processor which does the compression logic and probably removes copyright comments. If copyright comments are
    * removed, our processor will put them back.
    */
   private ResourcePreProcessor decoratedProcessor;
 
-  public CopyrightKeeperProcessor(final ResourcePreProcessor preProcessor) {
+  public CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
     this.decoratedProcessor = preProcessor;
   }
 
-  public CopyrightKeeperProcessor(final ResourcePostProcessor postProcessor) {
+  public CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
     this.decoratedProcessor = ProcessorsUtils.toPreProcessor(postProcessor);
   }
 
