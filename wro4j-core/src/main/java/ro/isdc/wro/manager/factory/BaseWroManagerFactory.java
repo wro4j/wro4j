@@ -28,19 +28,19 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
 
 
 /**
- * A simple implementation of {@link WroManagerFactory} which doesn't define any processors or uriLocators.
+ * A simple implementation of {@link WroManagerFactory} which uses default processors and uriLocators.
  *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
-public abstract class BaseWroManagerFactory
+public class BaseWroManagerFactory
   implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
   /**
    * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
@@ -92,9 +92,8 @@ public abstract class BaseWroManagerFactory
    * @return {@link ProcessorsFactory} object.
    */
   protected ProcessorsFactory newProcessorsFactory() {
-    return new SimpleProcessorsFactory();
+    return new DefaultProcesorsFactory();
   }
-
 
   /**
    * Override to provide a different or modified factory.

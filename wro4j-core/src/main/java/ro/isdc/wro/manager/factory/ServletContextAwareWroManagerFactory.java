@@ -3,27 +3,16 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 
 /**
- * A WroManagerFactory implementation aware of running inside a web application and capable to access a ServletContext
- * reference. Use several predefined processors (like jsMin, cssMin, etc) & 3 most used uriLocators (like
- * servletContext, classpath & urlUri)
+ * This class will be removed, since all the logic was moved to BaseWroManagerFactory.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
- * @deprecated TODO remove
+ * @deprecated this class will be removed in 1.4.0
  */
 @Deprecated
 public class ServletContextAwareWroManagerFactory
     extends BaseWroManagerFactory {
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected ProcessorsFactory newProcessorsFactory() {
-    return new DefaultProcessorsFactory();
-  }
 }

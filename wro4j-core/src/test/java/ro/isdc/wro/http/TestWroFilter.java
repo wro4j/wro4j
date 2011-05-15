@@ -27,6 +27,7 @@ import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -71,7 +72,7 @@ public class TestWroFilter {
     filter = new WroFilter() {
       @Override
       protected WroManagerFactory getWroManagerFactory() {
-        return new ServletContextAwareWroManagerFactory() {
+        return new BaseWroManagerFactory() {
           @Override
           protected WroModelFactory newModelFactory() {
             return new XmlModelFactory() {

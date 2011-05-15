@@ -10,27 +10,22 @@ import java.io.Writer;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * @author Alex Objelean
  */
-public class TestCopyrightKeeperProcessor {
-  @Before
-  public void setUp() {
-
-  }
+public class TestCopyrightKeeperProcessorDecorator {
   @Test
   public void testCopyrightStripperProcessor()
       throws Exception {
     final ResourcePreProcessor decoratedProcessor = new CssMinProcessor();
-    final ResourcePreProcessor processor = new CopyrightKeeperProcessor(decoratedProcessor);
+    final ResourcePreProcessor processor = new CopyrightKeeperProcessorDecorator(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -48,7 +43,7 @@ public class TestCopyrightKeeperProcessor {
         IOUtils.copy(reader, writer);
       }
     };
-    final ResourcePreProcessor processor = new CopyrightKeeperProcessor(decoratedProcessor);
+    final ResourcePreProcessor processor = new CopyrightKeeperProcessorDecorator(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");

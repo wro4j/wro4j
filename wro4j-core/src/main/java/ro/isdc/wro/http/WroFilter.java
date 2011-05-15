@@ -37,7 +37,9 @@ import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.WroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -357,7 +359,12 @@ public class WroFilter
     final String appFactoryClassName = filterConfig.getInitParameter(PARAM_MANAGER_FACTORY);
     if (appFactoryClassName == null) {
       // If no context param was specified we return the default factory
-      return new ServletContextAwareWroManagerFactory();
+      return new BaseWroManagerFactory() {
+        @Override
+        protected ProcessorsFactory newProcessorsFactory() {
+          return new DefaultProcesorsFactory();
+        }
+      };
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;
