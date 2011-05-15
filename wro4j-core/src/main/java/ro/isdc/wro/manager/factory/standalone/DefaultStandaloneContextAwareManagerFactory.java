@@ -12,9 +12,9 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.FileSystemResourceLocator;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 
@@ -66,9 +66,13 @@ public class DefaultStandaloneContextAwareManagerFactory
     };
   }
 
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected ProcessorsFactory newProcessorsFactory() {
-    return new DefaultProcessorsFactory();
+  protected ResourceLocatorFactory newResourceLocatorFactory() {
+    return DefaultResourceLocatorFactory.standaloneFactory(standaloneContext.getContextFolder());
   }
 
   /**
