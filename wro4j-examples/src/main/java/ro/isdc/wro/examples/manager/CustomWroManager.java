@@ -5,7 +5,7 @@
 package ro.isdc.wro.examples.manager;
 
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 /**
  * @author Alex Objelean

@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.util.WroUtil;
 
 

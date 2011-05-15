@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.factory;
+package ro.isdc.wro.model.resource.locator.factory;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.factory;
+package ro.isdc.wro.model.resource.locator.factory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * @author Alex Objelean
  * @created Created on Nov 4, 2008
  */
-public final class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
+public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
   private final List<UriLocator> uriLocators = new ArrayList<UriLocator>();
 
   /**

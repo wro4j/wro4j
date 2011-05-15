@@ -3,11 +3,8 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 /**
  * An implementation with no processors set.
@@ -20,9 +17,7 @@ public final class NoProcessorsWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected UriLocatorFactory newUriLocatorFactory() {
-    final UriLocatorFactory factory = new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
-        new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
-    return factory;
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new SimpleProcessorsFactory();
   }
 }
