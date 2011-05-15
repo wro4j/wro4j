@@ -50,11 +50,6 @@ public class BaseWroManagerFactory
    * A callback to be notified about the cache change.
    */
   private PropertyChangeListener cacheChangeCallback;
-  /**
-   * Prevent instantiation. Use factory method.
-   */
-  protected BaseWroManagerFactory() {
-  }
 
   /**
    * Creates default singleton instance of manager, by initializing manager

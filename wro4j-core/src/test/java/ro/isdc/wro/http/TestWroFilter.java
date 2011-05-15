@@ -28,7 +28,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
@@ -182,7 +181,7 @@ public class TestWroFilter {
   public void testValidAppFactoryClassNameIsSet()
     throws Exception {
     Mockito.when(config.getInitParameter(WroFilter.PARAM_MANAGER_FACTORY)).thenReturn(
-      ServletContextAwareWroManagerFactory.class.getName());
+      BaseWroManagerFactory.class.getName());
     filter.init(config);
   }
 
