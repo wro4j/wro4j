@@ -227,7 +227,7 @@ public class TestWroManager {
     Context.set(context, config);
     manager.process();
     // let scheduler run a while
-    Thread.sleep(100);
+    Thread.sleep(150);
   }
 
   @Test
