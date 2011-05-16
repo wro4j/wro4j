@@ -39,7 +39,7 @@ public class CopyrightKeeperProcessorDecorator
    * A processor which does the compression logic and probably removes copyright comments. If copyright comments are
    * removed, our processor will put them back.
    */
-  private ResourcePreProcessor decoratedProcessor;
+  private final ResourcePreProcessor decoratedProcessor;
 
   public CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
     this.decoratedProcessor = preProcessor;
@@ -66,24 +66,23 @@ public class CopyrightKeeperProcessorDecorator
     try {
       final String content = IOUtils.toString(reader);
       final Matcher originalMatcher = PATTERN_COPYRIGHT.matcher(content);
-      final StringBuffer sb = new StringBuffer();
+      final StringBuffer copyrightBuffer = new StringBuffer();
       while (originalMatcher.find()) {
         LOG.debug("found copyright comment");
         // add copyright header to the buffer.
-        sb.append(originalMatcher.group());
+        copyrightBuffer.append(originalMatcher.group());
       }
 
-      LOG.debug("buffer: {}", sb);
+      LOG.debug("buffer: {}", copyrightBuffer);
       final Writer processedWriter = new StringWriter();
       decoratedProcessor.process(resource, new StringReader(content), processedWriter);
 
       final Matcher processedMatcher = PATTERN_COPYRIGHT.matcher(processedWriter.toString());
 
       if (!processedMatcher.find()) {
-        writer.write(sb.toString());
+        writer.write(copyrightBuffer.toString());
       }
       writer.write(processedWriter.toString());
-      writer.close();
     } finally {
       reader.close();
       writer.close();
