@@ -163,14 +163,22 @@ public class WroTestUtils {
    */
   public static void compare(final String expected, final String actual) {
     try {
-      Assert.assertEquals(replaceTabsWithSpaces(expected.trim()), replaceTabsWithSpaces(actual.trim()));
+      final String in = replaceTabsWithSpaces(expected.trim());
+      final String out = replaceTabsWithSpaces(actual.trim());
+
+
+      LOG.info(in.length() + "bytes vs " + out.length() + "bytes");
+      LOG.info("in: {}", in.getBytes());
+      LOG.info("out: {}", out.getBytes());
+      LOG.info("equals: " + in.equals(out));
+
+      Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
     } catch (final ComparisonFailure e) {
-      LOG.debug("Compare.... [FAIL]");
+      LOG.debug("Compare.... [FAIL]", e.getMessage());
       throw e;
     }
   }
-
 
   /**
    * Replace tabs with spaces.
@@ -180,7 +188,7 @@ public class WroTestUtils {
    */
   private static String replaceTabsWithSpaces(final String input) {
     // replace tabs with spaces
-    return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
+    return input.replaceAll("\\t", "  ").replaceAll("\\r", "").replaceAll("\n", "");
   }
 
 

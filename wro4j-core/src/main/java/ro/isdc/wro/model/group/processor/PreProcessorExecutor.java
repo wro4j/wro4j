@@ -134,6 +134,7 @@ public final class PreProcessorExecutor {
       }
       final InputStream is = uriLocatorFactory.locate(resource.getUri());
       final String result = IOUtils.toString(is, Context.get().getConfig().getEncoding());
+      LOG.debug("result first byte: {}", result.getBytes());
       is.close();
       return result;
     } catch (final IOException e) {
