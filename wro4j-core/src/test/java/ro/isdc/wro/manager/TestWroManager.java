@@ -85,14 +85,11 @@ public class TestWroManager {
       // we don't need caching here, otherwise we'll have clashing during unit tests.
       config.setDebug(true);
       config.setDisableCache(true);
-
-      LOG.debug("set Config: {}", config);
-
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
+      //create a groupExtractor which always return the same group name.
       final String groupName = "group";
-
-      final GroupExtractor groupExtractor = Mockito.spy(new DefaultGroupExtractor() {
+      final GroupExtractor groupExtractor = new DefaultGroupExtractor() {
         @Override
         public String getGroupName(final HttpServletRequest request) {
           return groupName;
@@ -102,8 +99,8 @@ public class TestWroManager {
         public ResourceType getResourceType(final HttpServletRequest request) {
           return resource.getType();
         }
-      });
-      Mockito.when(groupExtractor.getResourceType(Mockito.any(HttpServletRequest.class))).thenReturn(resource.getType());
+      };
+      //this manager will make sure that we always process a model holding one group which has only one resource.
       manager.setModelFactory(new WroModelFactoryDecorator(getValidModelFactory()) {
         @Override
         public WroModel getInstance() {
