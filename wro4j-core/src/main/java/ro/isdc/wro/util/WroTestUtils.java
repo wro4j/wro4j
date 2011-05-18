@@ -166,12 +166,6 @@ public class WroTestUtils {
       final String in = replaceTabsWithSpaces(expected.trim());
       final String out = replaceTabsWithSpaces(actual.trim());
 
-
-      LOG.info(in.length() + "bytes vs " + out.length() + "bytes");
-      LOG.info("in: {}", in.getBytes());
-      LOG.info("out: {}", out.getBytes());
-      LOG.info("equals: " + in.equals(out));
-
       Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
     } catch (final ComparisonFailure e) {
@@ -327,6 +321,7 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
     throws IOException {
+    //TODO use ProcessorsUtils
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {

@@ -91,11 +91,10 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      System.out.println("BOM:");
       // using ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
-      final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader)));
-      IOUtils.copy(is, writer, Context.get().getConfig().getEncoding());
-      System.out.println("END BOM");
+      final String encoding = Context.get().getConfig().getEncoding();
+      final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader, encoding)));
+      IOUtils.copy(is, writer, encoding);
     } finally {
       reader.close();
       writer.close();

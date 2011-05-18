@@ -6,7 +6,6 @@ package ro.isdc.wro.manager;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.FilterConfig;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
@@ -53,8 +51,7 @@ public class TestWroManager {
     final WroManagerFactory factory = new ServletContextAwareWroManagerFactory() {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
-        return new SimpleProcessorsFactory().addPostProcessor(new BomStripperPreProcessor()).addPostProcessor(
-          new JSMinProcessor());
+        return new SimpleProcessorsFactory().addPostProcessor(new BomStripperPreProcessor()).addPostProcessor(new JSMinProcessor());
       }
     };
     manager = factory.getInstance();
@@ -73,13 +70,7 @@ public class TestWroManager {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
 
-    final ByteArrayOutputStream out = new ByteArrayOutputStream() {
-      @Override
-      public synchronized void write(final int b) {
-        System.out.print((char)b);
-        super.write(b);
-      }
-    };
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
     Mockito.when(request.getRequestURI()).thenReturn(requestUri);
 
@@ -96,7 +87,6 @@ public class TestWroManager {
     expectedInputStream.close();
     actualInputStream.close();
   }
-
 
   /**
    * @return a {@link XmlModelFactory} pointing to a valid config resource.
@@ -128,27 +118,27 @@ public class TestWroManager {
     Context.unset();
   }
 
-
-  @Test
-  public void testNoProcessorWroManagerFactory()
-    throws IOException {
-    final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
-    manager = factory.getInstance();
-    manager.setModelFactory(getValidModelFactory());
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
-
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
-    Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-
-    manager.process();
-    // compare written bytes to output stream with the content from specified css.
-    WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
-      new ByteArrayInputStream(out.toByteArray()));
-  }
+//
+//  @Test
+//  public void testNoProcessorWroManagerFactory()
+//    throws IOException {
+//    final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
+//    manager = factory.getInstance();
+//    manager.setModelFactory(getValidModelFactory());
+//    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+//    final HttpServletResponse response = Context.get().getResponse();
+//
+//    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+//    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
+//    Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
+//
+//    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+//
+//    manager.process();
+//    // compare written bytes to output stream with the content from specified css.
+//    WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
+//      new ByteArrayInputStream(out.toByteArray()));
+//  }
 
 
   /**
@@ -156,13 +146,11 @@ public class TestWroManager {
    * encoding in pom.xml).
    */
   @Test
-  public void atestProcessingResourceWithChineseEncoding()
+  public void testProcessingResourceWithChineseEncoding()
     throws Exception {
-    Thread.sleep(1000);
-    LOG.info("======================testProcessingResourceWithChineseEncoding======================");
     genericProcessAndCompare("/chinese.js", "classpath:ro/isdc/wro/manager/chinese-output.js");
-    Thread.sleep(1000);
   }
+
 
   // @Test
   // public void testProcessingResourceWithSpecialCharacters()
