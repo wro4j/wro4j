@@ -68,7 +68,7 @@ public class TestWroManager {
    */
   private static final class WroManagerProcessor
       implements ResourcePreProcessor {
-    private final WroManager manager = newManagerFactory().getInstance();
+    private final WroManager manager = new ServletContextAwareWroManagerFactory().getInstance();
 
     public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -119,13 +119,6 @@ public class TestWroManager {
       manager.setGroupExtractor(groupExtractor);
 
       manager.process();
-    }
-
-    /**
-     * @return
-     */
-    protected WroManagerFactory newManagerFactory() {
-      return new ServletContextAwareWroManagerFactory();
     }
   }
 

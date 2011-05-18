@@ -9,10 +9,12 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.CoffeScriptProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -28,10 +30,16 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestCoffeeScriptProcessor {
   private ResourcePostProcessor processor;
 
-
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     processor = new CoffeScriptProcessor();
+  }
+
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   private static class Counter {
