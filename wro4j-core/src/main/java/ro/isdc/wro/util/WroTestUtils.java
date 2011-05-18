@@ -20,6 +20,7 @@ import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -182,7 +183,7 @@ public class WroTestUtils {
    */
   private static String replaceTabsWithSpaces(final String input) {
     // replace tabs with spaces
-    return input.replaceAll("\\t", "  ").replaceAll("\\r", "").replaceAll("\n", "");
+    return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
   }
 
 
@@ -359,7 +360,9 @@ public class WroTestUtils {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
-            preProcessor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
+
+            final ResourceType resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
           }
         });
         processedNumber++;

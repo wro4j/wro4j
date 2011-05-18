@@ -112,6 +112,7 @@ public class Context {
     if (config == null) {
       throw new IllegalArgumentException("Config cannot be NULL!");
     }
+    System.out.println("###################Config: " + config);
     CURRENT.set(context);
     CURRENT.get().setConfig(config);
   }

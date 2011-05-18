@@ -226,6 +226,9 @@ public final class WroConfiguration
    * @param disableCache the disableCache to set
    */
   public void setDisableCache(final boolean disableCache) {
+    if (!debug) {
+      LOG.warn("You cannot disable cache in DEPLOYMENT mode");
+    }
     this.disableCache = disableCache;
   }
 
