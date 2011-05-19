@@ -11,18 +11,23 @@ import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
 
+
 /**
+ * TODO add some tests.
+ *
  * @author Alex Objelean
  */
 public class TestProcessorsUtils {
 
-  private static class PreProcessor1 implements ResourcePreProcessor {
+  private static class PreProcessor1
+    implements ResourcePreProcessor {
     public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {}
   }
 
+
   @Test
   public void test() {
-//    ProcessorsUtils.findPreProcessorByClass(processorClass, preProcessors)
+    // ProcessorsUtils.findPreProcessorByClass(processorClass, preProcessors)
   }
 }

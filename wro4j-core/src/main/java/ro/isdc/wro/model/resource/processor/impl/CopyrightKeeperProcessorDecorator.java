@@ -37,7 +37,7 @@ public class CopyrightKeeperProcessorDecorator
 
   /**
    * A processor which does the compression logic and probably removes copyright comments. If copyright comments are
-   * removed, our processor will put them back.
+   * removed, our processor will put them back`.
    */
   private final ResourcePreProcessor decoratedProcessor;
 
