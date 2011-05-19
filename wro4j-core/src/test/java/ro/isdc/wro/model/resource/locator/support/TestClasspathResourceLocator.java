@@ -7,8 +7,11 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -24,6 +27,15 @@ public class TestClasspathResourceLocator {
    */
   private ClasspathResourceLocator uriLocator;
 
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
 
   private String createUri(final String location) {
     return ClasspathResourceLocator.PREFIX + location;

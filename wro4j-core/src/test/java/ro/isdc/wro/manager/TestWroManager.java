@@ -45,7 +45,11 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
@@ -68,7 +72,12 @@ public class TestWroManager {
    */
   private static final class WroManagerProcessor
       implements ResourcePreProcessor {
-    private final WroManager manager = new ServletContextAwareWroManagerFactory().getInstance();
+    private final WroManager manager = new BaseWroManagerFactory() {
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return new DefaultProcesorsFactory();
+      };
+    }.getInstance();
 
     public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -87,7 +96,7 @@ public class TestWroManager {
       config.setDisableCache(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
-      //create a groupExtractor which always return the same group name.
+      // create a groupExtractor which always return the same group name.
       final String groupName = "group";
       final GroupExtractor groupExtractor = new DefaultGroupExtractor() {
         @Override
@@ -100,7 +109,7 @@ public class TestWroManager {
           return resource.getType();
         }
       };
-      //this manager will make sure that we always process a model holding one group which has only one resource.
+      // this manager will make sure that we always process a model holding one group which has only one resource.
       manager.setModelFactory(new WroModelFactoryDecorator(getValidModelFactory()) {
         @Override
         public WroModel getInstance() {
@@ -171,8 +180,8 @@ public class TestWroManager {
   private static XmlModelFactory getValidModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
-        return TestWroManager.class.getResourceAsStream("wro.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestWroManager.class.getResource("wro.xml"));
       }
     };
   }
@@ -355,12 +364,13 @@ public class TestWroManager {
     Mockito.when(request.getRequestURI()).thenReturn(
         CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
 
-     final WroConfiguration config = new WroConfiguration();
-     //we don't need caching here, otherwise we'll have clashing during unit tests.
-     config.setDisableCache(true);
+    final WroConfiguration config = new WroConfiguration();
+    // we don't need caching here, otherwise we'll have clashing during unit tests.
+    config.setDisableCache(true);
 
-     Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-     Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
+    Context.set(
+        Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+            Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
     manager.process();
   }
 

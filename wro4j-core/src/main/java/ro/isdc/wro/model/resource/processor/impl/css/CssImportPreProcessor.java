@@ -129,8 +129,8 @@ public class CssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()),
-      Context.get().getConfig().getEncoding());
+    final String css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()).getInputStream(),
+        Context.get().getConfig().getEncoding());
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));
