@@ -46,7 +46,7 @@ public class CopyrightKeeperProcessorDecorator
   }
 
   public CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
-    this.decoratedProcessor = ProcessorsUtils.toPreProcessor(postProcessor);
+    this(ProcessorsUtils.toPreProcessor(postProcessor));
   }
 
   /**
