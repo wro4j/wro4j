@@ -35,6 +35,7 @@ public class ConfigurableWroFilter extends WroFilter {
   private long modelUpdatePeriod = 0;
   @Deprecated
   private boolean disableCache;
+  @Deprecated
   private String encoding;
 
   /**
@@ -56,6 +57,7 @@ public class ConfigurableWroFilter extends WroFilter {
       properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), String.valueOf(cacheUpdatePeriod));
       properties.setProperty(ConfigConstants.modelUpdatePeriod.name(), String.valueOf(modelUpdatePeriod));
       properties.setProperty(ConfigConstants.disableCache.name(), String.valueOf(disableCache));
+      properties.setProperty(ConfigConstants.encoding.name(), String.valueOf(encoding));
     }
     factory.setProperties(properties);
     return factory;

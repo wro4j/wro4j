@@ -42,6 +42,7 @@ public class PropertyWroConfigurationFactory
       config.setModelUpdatePeriod(valueAsLong(properties.get(ConfigConstants.modelUpdatePeriod.name()), 0));
       config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
       config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
+      config.setEncoding(valueAsString(properties.get(ConfigConstants.encoding.name())));
     }
     LOG.debug("WroConfiguration created: {}", config);
     return config;
