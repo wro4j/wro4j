@@ -41,12 +41,16 @@ public class CopyrightKeeperProcessorDecorator
    */
   private final ResourcePreProcessor decoratedProcessor;
 
-  public CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
+  private CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
     this.decoratedProcessor = preProcessor;
   }
 
-  public CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
+  private CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
     this(ProcessorsUtils.toPreProcessor(postProcessor));
+  }
+
+  public static CopyrightKeeperProcessorDecorator decorate(final ResourcePreProcessor preProcessor) {
+    return new CopyrightKeeperProcessorDecorator(preProcessor);
   }
 
   /**

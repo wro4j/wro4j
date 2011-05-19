@@ -24,7 +24,7 @@ public class TestCopyrightKeeperProcessorDecorator {
   public void testWithUglifyJs()
       throws Exception {
     final ResourcePreProcessor decoratedProcessor = new UglifyJsProcessor();
-    final ResourcePreProcessor processor = new CopyrightKeeperProcessorDecorator(decoratedProcessor);
+    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
