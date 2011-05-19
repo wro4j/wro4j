@@ -187,10 +187,10 @@ public class WroManager
       // add gzip header and gzip response
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
       response.setHeader("Vary", "Accept-Encoding");
+      LOG.debug("Gziping outputStream response");
       // Create a gzip stream
       return new GZIPOutputStream(response.getOutputStream());
     }
-    LOG.debug("Gziping outputStream response");
     return response.getOutputStream();
   }
 
@@ -233,7 +233,7 @@ public class WroManager
       // Do not set content length because we don't know the length in case it is gzipped. This could cause an
       // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
       // make the input stream encoding aware.
-      inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes());
+      inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes(Context.get().getConfig().getEncoding()));
     }
     if (type != null) {
       // TODO add also the charset?

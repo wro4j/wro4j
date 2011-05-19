@@ -35,6 +35,8 @@ public class ConfigurableWroFilter extends WroFilter {
   private long modelUpdatePeriod = 0;
   @Deprecated
   private boolean disableCache;
+  private String encoding;
+
   /**
    * This {@link Properties} object will hold the configurations and it will replace all other fields.
    */
@@ -117,6 +119,19 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   public final void setModelUpdatePeriod(final long modelUpdatePeriod) {
     this.modelUpdatePeriod = modelUpdatePeriod;
+  }
+  /**
+   * @return the encoding
+   */
+  public String getEncoding() {
+    return this.encoding;
+  }
+
+  /**
+   * @param encoding the encoding to set
+   */
+  public void setEncoding(final String encoding) {
+    this.encoding = encoding;
   }
 
   /**

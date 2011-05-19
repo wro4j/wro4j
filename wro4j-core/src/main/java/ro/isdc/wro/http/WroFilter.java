@@ -69,10 +69,12 @@ public class WroFilter
    * A preferred name of the MBean object.
    */
   static final String PARAM_MBEAN_NAME = "mbeanName";
+  static final String PARAM_ENCODING = "encoding";
   /**
    * Default value used by Cache-control header.
    */
   private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
+
   /**
    * Filter config.
    */

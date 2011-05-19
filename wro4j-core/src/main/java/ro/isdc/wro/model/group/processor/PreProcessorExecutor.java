@@ -22,7 +22,6 @@ import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
 /**
@@ -134,7 +133,7 @@ public final class PreProcessorExecutor {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
       final InputStream is = resourceLocatorFactory.locate(resource.getUri()).getInputStream();
-      final String result = IOUtils.toString(new SmartEncodingInputStream(is));
+      final String result = IOUtils.toString(is, Context.get().getConfig().getEncoding());
       is.close();
       return result;
     } catch (final IOException e) {

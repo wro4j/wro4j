@@ -38,7 +38,7 @@ public class DefaultGroupExtractor
    */
   public String getGroupName(final HttpServletRequest request) {
     if (request == null) {
-      throw new IllegalArgumentException("Uri cannot be NULL!");
+      throw new IllegalArgumentException("Request cannot be NULL!");
     }
     final String includeUriPath = (String)request.getAttribute(ATTR_INCLUDE_PATH);
     String uri = request.getRequestURI();

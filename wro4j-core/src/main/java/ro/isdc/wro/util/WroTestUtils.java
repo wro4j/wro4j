@@ -20,6 +20,7 @@ import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -27,6 +28,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -145,7 +147,8 @@ public class WroTestUtils {
     throws IOException {
     Assert.assertNotNull(expected);
     Assert.assertNotNull(actual);
-    compare(IOUtils.toString(expected), IOUtils.toString(actual));
+    final String encoding = Context.get().getConfig().getEncoding();
+    compare(IOUtils.toString(expected, encoding), IOUtils.toString(actual, encoding));
     expected.close();
     actual.close();
   }
@@ -156,14 +159,16 @@ public class WroTestUtils {
    */
   public static void compare(final String expected, final String actual) {
     try {
-      Assert.assertEquals(replaceTabsWithSpaces(expected.trim()), replaceTabsWithSpaces(actual.trim()));
+      final String in = replaceTabsWithSpaces(expected.trim());
+      final String out = replaceTabsWithSpaces(actual.trim());
+
+      Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
     } catch (final ComparisonFailure e) {
-      LOG.debug("Compare.... [FAIL]");
+      LOG.debug("Compare.... [FAIL]", e.getMessage());
       throw e;
     }
   }
-
 
   /**
    * Replace tabs with spaces.
@@ -312,6 +317,7 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
     throws IOException {
+    //TODO use ProcessorsUtils
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -349,7 +355,9 @@ public class WroTestUtils {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
-            preProcessor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
+
+            final ResourceType resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
           }
         });
         processedNumber++;

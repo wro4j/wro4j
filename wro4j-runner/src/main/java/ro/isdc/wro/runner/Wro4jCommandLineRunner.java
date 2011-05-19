@@ -47,7 +47,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -187,7 +186,7 @@ public class Wro4jCommandLineRunner {
 
       final OutputStream fos = new FileOutputStream(destinationFile);
       // use reader to detect encoding
-      IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
+      IOUtils.copy(resultInputStream, fos);
       fos.close();
       LOG.info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
       // delete empty files
