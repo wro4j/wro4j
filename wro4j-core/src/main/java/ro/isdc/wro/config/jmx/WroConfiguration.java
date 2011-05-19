@@ -24,6 +24,10 @@ public final class WroConfiguration
   implements WroConfigurationMBean {
   private static final Logger LOG = LoggerFactory.getLogger(WroConfiguration.class);
   /**
+   * Default encoding to use.
+   */
+  private static final String DEFAULT_ENCODING = "UTF-8";
+  /**
 	 * How often to run a thread responsible for refreshing the cache.
 	 */
   private long cacheUpdatePeriod;
@@ -52,6 +56,10 @@ public final class WroConfiguration
    * Allow to turn jmx on or off. By default thsi value is true.
    */
   private boolean jmxEnabled = true;
+  /**
+   * Encoding to use when reading resources.
+   */
+  private String encoding;
   /**
    * Listeners for the change of cache & model period properties.
    */
@@ -223,6 +231,9 @@ public final class WroConfiguration
    * @param disableCache the disableCache to set
    */
   public void setDisableCache(final boolean disableCache) {
+    if (!debug) {
+      LOG.warn("You cannot disable cache in DEPLOYMENT mode");
+    }
     this.disableCache = disableCache;
   }
 
@@ -246,6 +257,20 @@ public final class WroConfiguration
   public void destroy() {
     cacheUpdatePeriodListeners.clear();
     modelUpdatePeriodListeners.clear();
+  }
+
+  /**
+   * @return the encoding
+   */
+  public String getEncoding() {
+    return this.encoding == null ? DEFAULT_ENCODING : this.encoding;
+  }
+
+  /**
+   * @param encoding the encoding to set
+   */
+  public void setEncoding(final String encoding) {
+    this.encoding = encoding;
   }
 
   /**

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -42,12 +43,13 @@ public class JSMinProcessor implements ResourcePreProcessor,
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     try {
+      final String encoding = Context.get().getConfig().getEncoding();
       final InputStream is = new ByteArrayInputStream(IOUtils
-          .toByteArray(reader));
+          .toByteArray(reader, encoding));
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
       final JSMin jsmin = new JSMin(is, os);
       jsmin.jsmin();
-      IOUtils.write(os.toByteArray(), writer);
+      IOUtils.write(os.toByteArray(), writer, encoding);
       is.close();
       os.close();
     } catch (final IOException e) {

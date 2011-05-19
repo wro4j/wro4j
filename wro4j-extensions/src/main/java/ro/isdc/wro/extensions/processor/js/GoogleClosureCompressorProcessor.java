@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -94,7 +95,7 @@ public class GoogleClosureCompressorProcessor
 
       final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
-      final JSSourceFile input = JSSourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes()));
+      final JSSourceFile input = JSSourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())));
       final Result result = compiler.compile(extern, input, options);
       if (result.success) {
         writer.write(compiler.toSource());

@@ -7,8 +7,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -23,10 +26,19 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor {
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
   @Test
   public void testWhiteSpaceOnly() throws IOException {
     final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
     final URL url = getClass().getResource("google");
+
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");

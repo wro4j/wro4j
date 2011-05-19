@@ -24,7 +24,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -207,7 +206,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
       final OutputStream fos = new FileOutputStream(destinationFile);
       //use reader to detect encoding
-      IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
+      IOUtils.copy(resultInputStream, fos);
       fos.close();
       getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
       // delete empty files

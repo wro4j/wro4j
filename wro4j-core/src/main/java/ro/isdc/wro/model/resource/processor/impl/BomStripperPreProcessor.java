@@ -12,7 +12,9 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -25,7 +27,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Feb 20, 2010
  */
 public final class BomStripperPreProcessor
-    implements ResourcePreProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * A stream which removes BOM characters.
    */
@@ -75,6 +77,13 @@ public final class BomStripperPreProcessor
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
+  }
 
   /**
    * {@inheritDoc}
@@ -82,8 +91,10 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      //using ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
-      IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
+      // using ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
+      final String encoding = Context.get().getConfig().getEncoding();
+      final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader, encoding)));
+      IOUtils.copy(is, writer, encoding);
     } finally {
       reader.close();
       writer.close();

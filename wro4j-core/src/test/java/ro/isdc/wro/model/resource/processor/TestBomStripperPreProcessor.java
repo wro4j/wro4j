@@ -6,8 +6,11 @@ package ro.isdc.wro.model.resource.processor;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -20,6 +23,15 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestBomStripperPreProcessor {
   private final ResourcePreProcessor processor = new BomStripperPreProcessor();
 
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
 
   @Test
   public void testFromFolder()

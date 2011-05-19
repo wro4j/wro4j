@@ -26,4 +26,11 @@ public enum ResourceType {
    * @return the content type of the resource type.
    */
   public abstract String getContentType();
+
+  /**
+   * @return {@link ResourceType} associated to the string representation of the type.
+   */
+  public static ResourceType get(final String typeAsString) {
+    return ResourceType.valueOf(typeAsString.toUpperCase());
+  }
 }
