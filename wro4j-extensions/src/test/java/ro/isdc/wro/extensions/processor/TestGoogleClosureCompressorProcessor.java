@@ -30,25 +30,26 @@ public class TestGoogleClosureCompressorProcessor {
   public void setUp() {
     Context.set(Context.standaloneContext());
   }
-  @Test
-  public void testWhiteSpaceOnly() throws IOException {
-    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
-    final URL url = getClass().getResource("google");
 
   @After
   public void tearDown() {
     Context.unset();
   }
 
+  @Test
+  public void testWhiteSpaceOnly()
+      throws IOException {
+    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
+    final URL url = getClass().getResource("google");
+
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
   @Test
   public void testSimpleOptimization()
-    throws IOException {
+      throws IOException {
     final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
@@ -57,12 +58,11 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void testAdvancedOptimization()
-    throws IOException {
+      throws IOException {
     final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(
-      CompilationLevel.ADVANCED_OPTIMIZATIONS);
+        CompilationLevel.ADVANCED_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
     final File testFolder = new File(url.getFile(), "test");

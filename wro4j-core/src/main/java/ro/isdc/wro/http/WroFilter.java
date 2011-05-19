@@ -71,7 +71,6 @@ public class WroFilter
    * A preferred name of the MBean object.
    */
   static final String PARAM_MBEAN_NAME = "mbeanName";
-  static final String PARAM_ENCODING = "encoding";
   /**
    * Default value used by Cache-control header.
    */

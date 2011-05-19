@@ -36,5 +36,9 @@ public enum ConfigConstants {
   /**
    * Instructs wro4j to not throw an exception when a resource is missing.
    */
-  ignoreMissingResources
+  ignoreMissingResources,
+  /**
+   * Encoding to use when reading and writing bytes from/to stream
+   */
+  encoding
 }
