@@ -74,7 +74,7 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee",
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
       processor);
     Assert.assertEquals(2, counter.getIndex());
   }
@@ -87,7 +87,7 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
 
@@ -98,6 +98,6 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }
