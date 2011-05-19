@@ -34,8 +34,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
@@ -58,20 +56,12 @@ public class WroTestUtils {
    * @param processor a closure used to process somehow the input content.
    */
   public static void compareProcessedResourceContents(final String inputResourceUri,
-    final String expectedContentResourceUri, final ResourcePostProcessor processor)
+    final String expectedContentResourceUri, final ResourcePreProcessor processor)
     throws IOException {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
     WroTestUtils.compare(resultReader, expectedReader, processor);
   }
-
-
-  public static void compareProcessedResourceContents(final String inputResourceUri,
-    final String expectedContentResourceUri, final ResourcePreProcessor processor)
-    throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri, ProcessorsUtils.toPostProcessor(processor));
-  }
-
 
   private static Reader getReaderFromUri(final String uri)
     throws IOException {
@@ -99,17 +89,6 @@ public class WroTestUtils {
     injector.inject(processor);
   }
 
-
-  /**
-   * @return the injector
-   */
-  public static void initProcessor(final ResourcePostProcessor processor) {
-    final Injector injector = new Injector(
-      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPostProcessor(processor));
-    injector.inject(processor);
-  }
-
-
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
    *
@@ -118,10 +97,10 @@ public class WroTestUtils {
    * @param processor a closure used to process somehow the input content.
    */
   public static void compare(final Reader resultReader, final Reader expectedReader,
-    final ResourcePostProcessor processor)
+    final ResourcePreProcessor processor)
     throws IOException {
     final Writer resultWriter = new StringWriter();
-    processor.process(resultReader, resultWriter);
+    processor.process(null, resultReader, resultWriter);
     final Writer expectedWriter = new StringWriter();
     IOUtils.copy(expectedReader, expectedWriter);
     compare(expectedWriter.toString(), resultWriter.toString());
@@ -130,7 +109,7 @@ public class WroTestUtils {
   }
 
 
-  public static void compare(final InputStream input, final InputStream expected, final ResourcePostProcessor processor)
+  public static void compare(final InputStream input, final InputStream expected, final ResourcePreProcessor processor)
     throws IOException {
     compare(new InputStreamReader(input), new InputStreamReader(expected), processor);
   }
@@ -193,20 +172,11 @@ public class WroTestUtils {
    * @throws IOException
    */
   public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
-    final String targetFileExtension, final ResourcePostProcessor processor)
-    throws IOException {
-    compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension),
-      Transformers.extensionTransformer(targetFileExtension), processor);
-  }
-
-
-  public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
     final String targetFileExtension, final ResourcePreProcessor processor)
     throws IOException {
     compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension),
       Transformers.extensionTransformer(targetFileExtension), processor);
   }
-
 
   /**
    * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourcePostProcessor) Same as
@@ -220,7 +190,7 @@ public class WroTestUtils {
    * @throws IOException
    */
   public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
-    final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
+    final Transformer<String> toTargetFileName, final ResourcePreProcessor processor)
     throws IOException {
     compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension), toTargetFileName, processor);
   }
@@ -233,23 +203,9 @@ public class WroTestUtils {
    * @param sourceFileFilter the {@link IOFileFilter} used to select source files (files to be processed).
    * @param toTargetFileName the {@link Transformer} which creates the name of the target file used to compare with the
    *        source processed content.
-   * @param processor {@link ResourcePostProcessor} to apply on source files.
+   * @param processor {@link ResourcePreProcessor} to apply on source files.
    * @throws IOException
    */
-  public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
-    final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
-    throws IOException {
-    // TODO create adaptor and use it
-    final ResourcePreProcessor preProcessor = new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    };
-    compareFromSameFolder(sourceFolder, sourceFileFilter, toTargetFileName, preProcessor);
-  }
-
-
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
     final Transformer<String> toTargetFileName, final ResourcePreProcessor processor)
     throws IOException {
@@ -262,8 +218,8 @@ public class WroTestUtils {
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("comparing with: " + targetFile.getName());
-        compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
-          public void process(final Reader reader, final Writer writer)
+        compare(new FileInputStream(file), targetFileStream, new ResourcePreProcessor() {
+          public void process(final Resource resource, final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
             processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
@@ -292,7 +248,7 @@ public class WroTestUtils {
    * Process and compare the files which a located in different folders.
    */
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
-    final IOFileFilter fileFilter, final ResourcePostProcessor processor)
+    final IOFileFilter fileFilter, final ResourcePreProcessor processor)
     throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
   }
@@ -304,28 +260,6 @@ public class WroTestUtils {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
       Transformers.noOpTransformer(), processor);
   }
-
-
-  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
-    final String extension, final ResourcePostProcessor processor)
-    throws IOException {
-    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
-      Transformers.noOpTransformer(), processor);
-  }
-
-
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
-    final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
-    throws IOException {
-    //TODO use ProcessorsUtils
-    compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    });
-  }
-
 
   /**
    * Process and compare the files which a located in different folders.
@@ -351,8 +285,8 @@ public class WroTestUtils {
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("processing: " + file.getName());
         // ResourceType doesn't matter here
-        compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
-          public void process(final Reader reader, final Writer writer)
+        compare(new FileInputStream(file), targetFileStream, new ResourcePreProcessor() {
+          public void process(final Resource resource, final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
 

@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroUtil;
 
@@ -23,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class MultiLineCommentStripperProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   /**
    * Pattern containing a regex matching multiline comments & empty new lines.
    */
@@ -33,26 +32,16 @@ public class MultiLineCommentStripperProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader source, final Writer destination)
-    throws IOException {
-    try {
-      final String content = IOUtils.toString(source);
-      String result = PATTERN.matcher(content).replaceAll("");
-      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
-      destination.write(result);
-    } finally {
-      source.close();
-      destination.close();
-    }
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    // resourceUri doesn't matter
-    process(reader, writer);
+    try {
+      final String content = IOUtils.toString(reader);
+      String result = PATTERN.matcher(content).replaceAll("");
+      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
+      writer.write(result);
+    } finally {
+      reader.close();
+      writer.close();
+    }
   }
 }

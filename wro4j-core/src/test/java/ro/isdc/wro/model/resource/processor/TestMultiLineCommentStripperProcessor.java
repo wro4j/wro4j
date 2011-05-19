@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestMultiLineCommentStripperProcessor {
-  private final ResourcePostProcessor processor = new MultiLineCommentStripperProcessor();
+  private final ResourcePreProcessor processor = new MultiLineCommentStripperProcessor();
 
 
   @Test

@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -33,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssVariablesProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssVariablesProcessor.class);
   /**
    * Pattern used to find variables definition. For instance:<br/>
@@ -95,20 +94,10 @@ public class CssVariablesProcessor
     return map;
   }
 
-
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String css = IOUtils.toString(reader);

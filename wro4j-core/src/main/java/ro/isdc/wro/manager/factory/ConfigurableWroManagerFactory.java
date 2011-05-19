@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -56,7 +55,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final String TOKEN_DELIMITER = ",";
   //Use LinkedHashMap to preserve the addition order
   private final Map<String, ResourcePreProcessor> preProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
-  private final Map<String, ResourcePostProcessor> postProcessors = new LinkedHashMap<String, ResourcePostProcessor>();
+  private final Map<String, ResourcePreProcessor> postProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
 
 
   /**
@@ -111,7 +110,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
+  protected void contributePostProcessors(final Map<String, ResourcePreProcessor> map) {}
 
   /**
    * {@inheritDoc}
@@ -135,7 +134,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * @return a list of configured preProcessors.
    */
-  List<ResourcePostProcessor> getPostProcessors() {
+  List<ResourcePreProcessor> getPostProcessors() {
     return getListOfItems(PARAM_POST_PROCESSORS, postProcessors);
   }
 

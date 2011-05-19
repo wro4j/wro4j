@@ -14,7 +14,6 @@ import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -27,7 +26,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Feb 20, 2010
  */
 public final class BomStripperPreProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor {
   /**
    * A stream which removes BOM characters.
    */
@@ -75,14 +74,6 @@ public final class BomStripperPreProcessor
       }
       return bom.length;
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
   }
 
   /**

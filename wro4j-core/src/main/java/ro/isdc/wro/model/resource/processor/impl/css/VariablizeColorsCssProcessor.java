@@ -12,7 +12,6 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
 
@@ -21,11 +20,11 @@ import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class VariablizeColorsCssProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String result = new Lessify().variablizeColors(IOUtils.toString(reader));
@@ -35,14 +34,4 @@ public class VariablizeColorsCssProcessor
       writer.close();
     }
   }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
-
 }

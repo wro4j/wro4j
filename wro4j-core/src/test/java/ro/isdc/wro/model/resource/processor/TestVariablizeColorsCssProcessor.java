@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Aug 15, 2010
  */
 public class TestVariablizeColorsCssProcessor {
-  private ResourcePostProcessor processor;
+  private ResourcePreProcessor processor;
 
 
   @Before

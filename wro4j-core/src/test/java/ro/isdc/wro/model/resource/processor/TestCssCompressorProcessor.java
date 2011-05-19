@@ -15,7 +15,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssCompressorProcessor {
-  private final ResourcePostProcessor processor = new CssCompressorProcessor();
+  private final ResourcePreProcessor processor = new CssCompressorProcessor();
 
 
   @Test

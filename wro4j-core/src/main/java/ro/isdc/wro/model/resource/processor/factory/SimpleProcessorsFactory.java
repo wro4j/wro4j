@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.processor.Minimize;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -31,7 +30,7 @@ public class SimpleProcessorsFactory
   /**
    * a list of post processors.
    */
-  private final Collection<ResourcePostProcessor> postProcessors = new ArrayList<ResourcePostProcessor>();
+  private final Collection<ResourcePreProcessor> postProcessors = new ArrayList<ResourcePreProcessor>();
 
 
   /**
@@ -45,7 +44,7 @@ public class SimpleProcessorsFactory
   /**
    * {@inheritDoc}
    */
-  public Collection<ResourcePostProcessor> getPostProcessors() {
+  public Collection<ResourcePreProcessor> getPostProcessors() {
     return postProcessors;
   }
 
@@ -64,7 +63,7 @@ public class SimpleProcessorsFactory
   /**
    * {@inheritDoc}
    */
-  public void setResourcePostProcessors(final Collection<ResourcePostProcessor> processors) {
+  public void setResourcePostProcessors(final Collection<ResourcePreProcessor> processors) {
     postProcessors.clear();
     if (processors != null) {
       postProcessors.addAll(processors);
@@ -84,7 +83,7 @@ public class SimpleProcessorsFactory
   /**
    * Add a {@link ResourcePostProcessor}.
    */
-  public SimpleProcessorsFactory addPostProcessor(final ResourcePostProcessor processor) {
+  public SimpleProcessorsFactory addPostProcessor(final ResourcePreProcessor processor) {
     if (processor.getClass().isAnnotationPresent(Minimize.class)) {
       //TODO move large messages to properties file
       LOG.warn("It is recommended to add minimize aware processors to " +

@@ -5,7 +5,6 @@ package ro.isdc.wro.model.group.processor;
 
 import java.util.Collection;
 
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
@@ -37,7 +36,7 @@ public class ProcessorsFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  public Collection<ResourcePostProcessor> getPostProcessors() {
+  public Collection<ResourcePreProcessor> getPostProcessors() {
     return decorated.getPostProcessors();
   }
 }
