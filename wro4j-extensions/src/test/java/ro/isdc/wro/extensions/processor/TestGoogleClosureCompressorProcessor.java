@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -39,7 +39,7 @@ public class TestGoogleClosureCompressorProcessor {
   @Test
   public void testWhiteSpaceOnly()
       throws IOException {
-    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
+    final ResourcePreProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
     final URL url = getClass().getResource("google");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -50,7 +50,7 @@ public class TestGoogleClosureCompressorProcessor {
   @Test
   public void testSimpleOptimization()
       throws IOException {
-    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
+    final ResourcePreProcessor processor = new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -61,7 +61,7 @@ public class TestGoogleClosureCompressorProcessor {
   @Test
   public void testAdvancedOptimization()
       throws IOException {
-    final ResourcePostProcessor processor = new GoogleClosureCompressorProcessor(
+    final ResourcePreProcessor processor = new GoogleClosureCompressorProcessor(
         CompilationLevel.ADVANCED_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 

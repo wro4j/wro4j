@@ -16,7 +16,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -27,11 +27,11 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Mar 26, 2011
  */
 public class TestCoffeeScriptProcessor {
-  private ResourcePostProcessor processor;
+  private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext()); 
+    Context.set(Context.standaloneContext());
     processor = new CoffeeScriptProcessor();
   }
 

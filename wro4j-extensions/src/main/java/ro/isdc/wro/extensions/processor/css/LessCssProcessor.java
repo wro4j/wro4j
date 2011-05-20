@@ -17,7 +17,6 @@ import ro.isdc.wro.extensions.processor.algorithm.less.LessCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -100,7 +99,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class LessCssProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   /**
    * Engine.
@@ -142,14 +141,4 @@ public class LessCssProcessor
     }
     return engine;
   }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
-  }
-
 }

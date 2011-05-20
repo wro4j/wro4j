@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,9 @@ public class CssImportPreProcessor
    */
   public synchronized void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    validate();
+    Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
+    Validate.notNull(resourceLocatorFactory, "No UriLocator was injected");
+    Validate.notNull(preProcessorExecutor, "No preProcessorExecutor was injected");
     try {
       final String result = parseCss(resource, reader);
       writer.write(result);
@@ -65,18 +68,6 @@ public class CssImportPreProcessor
     } finally {
       reader.close();
       writer.close();
-    }
-  }
-
-  /**
-   * Checks if required fields were injected.
-   */
-  private void validate() {
-    if (resourceLocatorFactory == null) {
-      throw new IllegalStateException("No UriLocator was injected");
-    }
-    if (preProcessorExecutor == null) {
-      throw new IllegalStateException("No preProcessorExecutor was injected");
     }
   }
 

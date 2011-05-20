@@ -4,6 +4,7 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,28 +70,34 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Init processors with default values.
    */
   private void initProcessors() {
+    preProcessors.putAll(createCommonProcessors());
     preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
-    preProcessors.put("bomStripper", new BomStripperPreProcessor());
     preProcessors.put("cssImport", new CssImportPreProcessor());
-    preProcessors.put("cssVariables", new CssVariablesProcessor());
     preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
     preProcessors.put("cssDataUri", new CssDataUriPreProcessor());
     preProcessors.put("duplicateAwareCssDataUri", new DuplicatesAwareCssDataUriPreProcessor());
-    preProcessors.put("cssCompressor", new CssCompressorProcessor());
-    preProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
-    preProcessors.put("jsMin", new JSMinProcessor());
-    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
-    preProcessors.put("conformColors", new ConformColorsCssProcessor());
-
-    postProcessors.put("cssVariables", new CssVariablesProcessor());
-    postProcessors.put("cssCompressor", new CssCompressorProcessor());
-    postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
-    postProcessors.put("jsMin", new JSMinProcessor());
-    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
-    preProcessors.put("conformColors", new ConformColorsCssProcessor());
+    postProcessors.putAll(createCommonProcessors());
 
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);
+  }
+
+
+  /**
+   * @return a map of processors to be used as both: pre & post processor.
+   */
+  private Map<String, ResourcePreProcessor> createCommonProcessors() {
+    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+    map.put("bomStripper", new BomStripperPreProcessor());
+    map.put("cssVariables", new CssVariablesProcessor());
+    map.put("cssCompressor", new CssCompressorProcessor());
+    map.put("cssMinJawr", new JawrCssMinifierProcessor());
+    map.put("jsMin", new JSMinProcessor());
+    map.put("variablizeColors", new VariablizeColorsCssProcessor());
+    map.put("conformColors", new ConformColorsCssProcessor());
+    map.put("cssVariables", new CssVariablesProcessor());
+    return map;
+
   }
 
   /**

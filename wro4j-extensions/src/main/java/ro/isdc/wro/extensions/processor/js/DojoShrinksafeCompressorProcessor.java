@@ -18,7 +18,6 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
@@ -32,21 +31,13 @@ import ro.isdc.wro.util.StopWatch;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class DojoShrinksafeCompressorProcessor
-  implements ResourcePostProcessor, ResourcePreProcessor {
+  implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(DojoShrinksafeCompressorProcessor.class);
 
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
     throws IOException {
     final StopWatch watch = new StopWatch();
     watch.start("pack");
