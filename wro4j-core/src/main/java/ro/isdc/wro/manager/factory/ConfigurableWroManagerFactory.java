@@ -4,6 +4,7 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -56,7 +56,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final String TOKEN_DELIMITER = ",";
   //Use LinkedHashMap to preserve the addition order
   private final Map<String, ResourcePreProcessor> preProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
-  private final Map<String, ResourcePostProcessor> postProcessors = new LinkedHashMap<String, ResourcePostProcessor>();
+  private final Map<String, ResourcePreProcessor> postProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
 
 
   /**
@@ -70,28 +70,34 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Init processors with default values.
    */
   private void initProcessors() {
+    preProcessors.putAll(createCommonProcessors());
     preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
-    preProcessors.put("bomStripper", new BomStripperPreProcessor());
     preProcessors.put("cssImport", new CssImportPreProcessor());
-    preProcessors.put("cssVariables", new CssVariablesProcessor());
     preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
     preProcessors.put("cssDataUri", new CssDataUriPreProcessor());
     preProcessors.put("duplicateAwareCssDataUri", new DuplicatesAwareCssDataUriPreProcessor());
-    preProcessors.put("cssCompressor", new CssCompressorProcessor());
-    preProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
-    preProcessors.put("jsMin", new JSMinProcessor());
-    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
-    preProcessors.put("conformColors", new ConformColorsCssProcessor());
-
-    postProcessors.put("cssVariables", new CssVariablesProcessor());
-    postProcessors.put("cssCompressor", new CssCompressorProcessor());
-    postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
-    postProcessors.put("jsMin", new JSMinProcessor());
-    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
-    preProcessors.put("conformColors", new ConformColorsCssProcessor());
+    postProcessors.putAll(createCommonProcessors());
 
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);
+  }
+
+
+  /**
+   * @return a map of processors to be used as both: pre & post processor.
+   */
+  private Map<String, ResourcePreProcessor> createCommonProcessors() {
+    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+    map.put("bomStripper", new BomStripperPreProcessor());
+    map.put("cssVariables", new CssVariablesProcessor());
+    map.put("cssCompressor", new CssCompressorProcessor());
+    map.put("cssMinJawr", new JawrCssMinifierProcessor());
+    map.put("jsMin", new JSMinProcessor());
+    map.put("variablizeColors", new VariablizeColorsCssProcessor());
+    map.put("conformColors", new ConformColorsCssProcessor());
+    map.put("cssVariables", new CssVariablesProcessor());
+    return map;
+
   }
 
   /**
@@ -111,7 +117,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
+  protected void contributePostProcessors(final Map<String, ResourcePreProcessor> map) {}
 
   /**
    * {@inheritDoc}
@@ -135,7 +141,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * @return a list of configured preProcessors.
    */
-  List<ResourcePostProcessor> getPostProcessors() {
+  List<ResourcePreProcessor> getPostProcessors() {
     return getListOfItems(PARAM_POST_PROCESSORS, postProcessors);
   }
 

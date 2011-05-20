@@ -10,7 +10,6 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroUtil;
 
@@ -22,11 +21,11 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class CommentStripperProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
@@ -40,15 +39,5 @@ public class CommentStripperProcessor
       reader.close();
       writer.close();
     }
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    // resource Uri doesn't matter.
-    process(reader, writer);
   }
 }

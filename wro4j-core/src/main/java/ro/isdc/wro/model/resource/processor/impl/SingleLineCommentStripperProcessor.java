@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroUtil;
 
@@ -24,17 +23,16 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class SingleLineCommentStripperProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   /**
    * Pattern containing a regex matching singleline comments & preceding empty spaces & tabs.
    */
   public static Pattern PATTERN = Pattern.compile("[\\t ]*//.*?$", Pattern.MULTILINE);
 
-
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
@@ -45,15 +43,5 @@ public class SingleLineCommentStripperProcessor
       reader.close();
       writer.close();
     }
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    // resource Uri doesn't matter.
-    process(reader, writer);
   }
 }

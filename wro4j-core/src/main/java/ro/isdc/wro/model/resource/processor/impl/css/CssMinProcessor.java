@@ -13,7 +13,6 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.CSSMin;
 
@@ -28,20 +27,12 @@ import ro.isdc.wro.model.resource.processor.algorithm.CSSMin;
 @Minimize
 @SupportedResourceType(ResourceType.CSS)
 public class CssMinProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
+
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);

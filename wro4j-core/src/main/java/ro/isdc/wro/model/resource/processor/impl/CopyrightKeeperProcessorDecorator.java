@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeProvider;
 
@@ -31,7 +30,7 @@ import ro.isdc.wro.model.resource.processor.SupportedResourceTypeProvider;
  * @since 1.3.7
  */
 public class CopyrightKeeperProcessorDecorator
-  implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeProvider {
+  implements ResourcePreProcessor, SupportedResourceTypeProvider {
   private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
 
   /** The url pattern */
@@ -45,10 +44,6 @@ public class CopyrightKeeperProcessorDecorator
 
   private CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
     this.decoratedProcessor = preProcessor;
-  }
-
-  private CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
-    this(ProcessorsUtils.toPreProcessor(postProcessor));
   }
 
   public static CopyrightKeeperProcessorDecorator decorate(final ResourcePreProcessor preProcessor) {

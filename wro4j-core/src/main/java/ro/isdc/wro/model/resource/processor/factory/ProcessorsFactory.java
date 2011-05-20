@@ -5,7 +5,6 @@ package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.Collection;
 
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -22,5 +21,5 @@ public interface ProcessorsFactory {
   /**
    * @return a collection of post processors to apply.
    */
-  Collection<ResourcePostProcessor> getPostProcessors();
+  Collection<ResourcePreProcessor> getPostProcessors();
 }

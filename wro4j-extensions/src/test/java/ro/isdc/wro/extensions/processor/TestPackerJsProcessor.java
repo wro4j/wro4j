@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Apr 21, 2010
  */
 public class TestPackerJsProcessor {
-  private ResourcePostProcessor processor;
+  private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {

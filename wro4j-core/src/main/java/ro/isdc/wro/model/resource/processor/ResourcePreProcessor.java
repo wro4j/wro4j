@@ -23,7 +23,9 @@ public interface ResourcePreProcessor {
    * this way you can ignore the other preProcessors from the chain.
    *
    * @param resource
-   *          the original resource as it found in the model.
+   *          the currently processed resource. It can be null if the processor is a Post-Processor. Implementations
+   *          which explicetly require Pre-Processor may throw runtime exception when this field is null, to prevent unproper
+   *          usage.
    * @param reader
    *          {@link Reader} used to read processed resource content.
    * @param writer

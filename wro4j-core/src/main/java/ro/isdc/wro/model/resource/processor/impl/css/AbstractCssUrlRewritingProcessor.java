@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
+    Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
     try {
       LOG.debug("<process>");
       final String cssUri = resource.getUri();

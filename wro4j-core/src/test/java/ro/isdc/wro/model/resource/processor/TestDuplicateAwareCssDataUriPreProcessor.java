@@ -5,6 +5,8 @@ package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 
 import org.junit.Before;
@@ -15,7 +17,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -45,8 +46,12 @@ public class TestDuplicateAwareCssDataUriPreProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
-      WroUtil.newResourceProcessor(createMockResource("file:" + testFolder.getPath() + "/test.css"), processor));
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+        throws IOException {
+        processor.process(createMockResource("file:" + testFolder.getPath() + "/test.css"), reader, writer);
+      }
+    });
   }
 
 

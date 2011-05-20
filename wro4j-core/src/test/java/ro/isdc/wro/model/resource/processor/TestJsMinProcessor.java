@@ -21,7 +21,7 @@ public class TestJsMinProcessor {
   @Test
   public void testAsPostProcessor()
       throws IOException {
-    final ResourcePostProcessor processor = new JSMinProcessor();
+    final ResourcePreProcessor processor = new JSMinProcessor();
     WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
         "classpath:ro/isdc/wro/processor/jsmin-output.js", processor);
   }

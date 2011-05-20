@@ -20,7 +20,6 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.JSMin;
 
@@ -34,14 +33,14 @@ import ro.isdc.wro.model.resource.processor.algorithm.JSMin;
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)
-public class JSMinProcessor implements ResourcePreProcessor,
-    ResourcePostProcessor {
+public class JSMinProcessor
+  implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
-      throws IOException {
+  public void process(final Resource resource, final Reader reader,
+    final Writer writer) throws IOException {
     try {
       final String encoding = Context.get().getConfig().getEncoding();
       final InputStream is = new ByteArrayInputStream(IOUtils
@@ -61,14 +60,5 @@ public class JSMinProcessor implements ResourcePreProcessor,
       reader.close();
       writer.close();
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader,
-      final Writer writer) throws IOException {
-    // resource Uri doesn't matter.
-    process(reader, writer);
   }
 }

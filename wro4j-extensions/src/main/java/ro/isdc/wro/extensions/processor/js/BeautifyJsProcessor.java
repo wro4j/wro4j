@@ -17,7 +17,6 @@ import ro.isdc.wro.extensions.processor.algorithm.uglify.UglifyJs;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -29,7 +28,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.JS)
 public class BeautifyJsProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(BeautifyJsProcessor.class);
   /**
    * Engine.
@@ -72,14 +71,5 @@ public class BeautifyJsProcessor
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
   }
 }

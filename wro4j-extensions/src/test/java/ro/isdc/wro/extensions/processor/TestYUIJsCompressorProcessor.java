@@ -10,7 +10,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
@@ -24,7 +24,7 @@ import ro.isdc.wro.util.WroUtil;
 public class TestYUIJsCompressorProcessor {
   @Test
   public void testNoMunge() throws IOException {
-    final ResourcePostProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
+    final ResourcePreProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
     final URL url = getClass().getResource("yui");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -37,7 +37,7 @@ public class TestYUIJsCompressorProcessor {
   @Test
   public void testMunge()
     throws IOException {
-    final ResourcePostProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
+    final ResourcePreProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
     final URL url = getClass().getResource("yui");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -49,7 +49,7 @@ public class TestYUIJsCompressorProcessor {
   @Test
   public void testInvalidJsShouldBeUnchanged()
     throws IOException {
-    final ResourcePostProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
+    final ResourcePreProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
     final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
     WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, processor);
   }

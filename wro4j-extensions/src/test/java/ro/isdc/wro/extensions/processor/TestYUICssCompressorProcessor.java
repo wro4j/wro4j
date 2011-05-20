@@ -10,7 +10,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -24,7 +24,7 @@ public class TestYUICssCompressorProcessor {
   @Test
   public void testNoMunge()
     throws IOException {
-    final ResourcePostProcessor processor = new YUICssCompressorProcessor();
+    final ResourcePreProcessor processor = new YUICssCompressorProcessor();
     final URL url = getClass().getResource("yui");
 
     final File testFolder = new File(url.getFile(), "test");

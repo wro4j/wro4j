@@ -42,7 +42,7 @@ import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
@@ -69,7 +69,7 @@ public class ResourceTransformerPanel extends Panel {
   private String originalSize = VALUE_NOT_AVAILABLE;
   private String compressedSize = VALUE_NOT_AVAILABLE;
   private String processingTime = VALUE_NOT_AVAILABLE;
-  private transient ResourcePostProcessor processor;
+  private transient ResourcePreProcessor processor;
 
 
   public ResourceTransformerPanel(final String id) {
@@ -114,7 +114,7 @@ public class ResourceTransformerPanel extends Panel {
           output = null;
           if (input != null) {
             final Writer writer = new StringWriter();
-            processor.process(new StringReader(input), writer);
+            processor.process(null, new StringReader(input), writer);
             // output = input.toUpperCase();
             output = writer.toString();
             final DecimalFormat format = new DecimalFormat("0.00");
@@ -142,8 +142,8 @@ public class ResourceTransformerPanel extends Panel {
   /**
    * @return a list of resource post processors
    */
-  private static List<? extends ResourcePostProcessor> getProcessors() {
-    final List<ResourcePostProcessor> list = new ArrayList<ResourcePostProcessor>();
+  private static List<? extends ResourcePreProcessor> getProcessors() {
+    final List<ResourcePreProcessor> list = new ArrayList<ResourcePreProcessor>();
     //hardcode the list:
     if (true) {
       list.add(new CommentStripperProcessor());
@@ -175,9 +175,9 @@ public class ResourceTransformerPanel extends Panel {
     try {
       final Class<?>[] classes = getClasses(WroRuntimeException.class.getPackage().getName());
       for (final Class<?> clazz : classes) {
-        if (ResourcePostProcessor.class.isAssignableFrom(clazz)) {
+        if (ResourcePreProcessor.class.isAssignableFrom(clazz)) {
           try {
-            final ResourcePostProcessor processor = (ResourcePostProcessor)clazz.newInstance();
+            final ResourcePreProcessor processor = (ResourcePreProcessor)clazz.newInstance();
             list.add(processor);
           } catch (final Exception e) {
             LOG.warn("Could not instantiate class: " + clazz);
@@ -193,20 +193,20 @@ public class ResourceTransformerPanel extends Panel {
 
 
   private Component getProcessorSelect() {
-    final IModel<List<? extends ResourcePostProcessor>> listModel = new LoadableDetachableModel<List<? extends ResourcePostProcessor>>() {
+    final IModel<List<? extends ResourcePreProcessor>> listModel = new LoadableDetachableModel<List<? extends ResourcePreProcessor>>() {
       @Override
-      protected List<? extends ResourcePostProcessor> load() {
+      protected List<? extends ResourcePreProcessor> load() {
         return getProcessors();
       }
     };
-    final IChoiceRenderer<ResourcePostProcessor> renderer = new ChoiceRenderer<ResourcePostProcessor>() {
+    final IChoiceRenderer<ResourcePreProcessor> renderer = new ChoiceRenderer<ResourcePreProcessor>() {
       @Override
-      public Object getDisplayValue(final ResourcePostProcessor object) {
+      public Object getDisplayValue(final ResourcePreProcessor object) {
         return object.getClass().getSimpleName();
       }
     };
-    final Component component = new DropDownChoice<ResourcePostProcessor>(
-      "selectProcessor", new PropertyModel<ResourcePostProcessor>(this, "processor"), listModel, renderer);
+    final Component component = new DropDownChoice<ResourcePreProcessor>(
+      "selectProcessor", new PropertyModel<ResourcePreProcessor>(this, "processor"), listModel, renderer);
     return component;
   }
 

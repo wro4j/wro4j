@@ -11,7 +11,6 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.CssCompressor;
 
@@ -26,19 +25,12 @@ import ro.isdc.wro.model.resource.processor.algorithm.CssCompressor;
 @Minimize
 @SupportedResourceType(ResourceType.CSS)
 public class CssCompressorProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
+  implements ResourcePreProcessor {
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       new CssCompressor(reader).compress(writer, -1);

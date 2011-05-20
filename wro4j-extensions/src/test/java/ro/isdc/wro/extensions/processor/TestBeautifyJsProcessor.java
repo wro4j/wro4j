@@ -10,7 +10,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -23,7 +23,7 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestBeautifyJsProcessor {
   @Test
   public void testFromFolder() throws IOException {
-    final ResourcePostProcessor processor = new BeautifyJsProcessor();
+    final ResourcePreProcessor processor = new BeautifyJsProcessor();
     final URL url = getClass().getResource("beautify");
 
     final File testFolder = new File(url.getFile(), "test");

@@ -18,7 +18,6 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
@@ -34,7 +33,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class YUIJsCompressorProcessor
-  implements ResourcePostProcessor, ResourcePreProcessor {
+  implements ResourcePreProcessor {
   /**
    * Logger for this class.
    */
@@ -101,27 +100,20 @@ public class YUIJsCompressorProcessor
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     final StopWatch watch = new StopWatch();
     watch.start("pack");
     final String content = IOUtils.toString(reader);
     try {
-      final JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(content), new YUIErrorReporter());
+      final JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(content),
+          new YUIErrorReporter());
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
     } catch (final RuntimeException e) {
       LOG.error("Problem while applying YUI compressor", e);
-      //keep js unchanged if it contains errors -> this should be configurable
+      // keep js unchanged if it contains errors -> this should be configurable
       LOG.debug("Leave resource unchanged...");
       IOUtils.copy(new StringReader(content), writer);
-      //throw new WroRuntimeException("Problem while applying YUI compressor", e);
+      // throw new WroRuntimeException("Problem while applying YUI compressor", e);
     } finally {
       reader.close();
       writer.close();
