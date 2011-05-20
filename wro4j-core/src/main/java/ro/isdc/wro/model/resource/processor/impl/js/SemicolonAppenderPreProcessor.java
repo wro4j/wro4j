@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.Validate;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -30,7 +29,6 @@ public class SemicolonAppenderPreProcessor
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    Validate.notNull(resource, "Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
     try {
       final String content = IOUtils.toString(reader);
       writer.write(content);
