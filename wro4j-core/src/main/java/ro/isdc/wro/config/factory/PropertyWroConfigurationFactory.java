@@ -23,7 +23,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
  */
 public class PropertyWroConfigurationFactory
     implements WroConfigurationFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(TestPropertyWroConfigurationFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PropertyWroConfigurationFactory.class);
   /**
    * Holds configuration options. If no properties are set, the default values will be used instead.
    */
