@@ -23,6 +23,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -147,8 +148,8 @@ public class TestWro4jMojo {
       final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
       final ResourcePreProcessor postProcessor = Mockito.mock(ResourcePreProcessor.class);
       try {
-        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(null, Mockito.any(Reader.class),
-            Mockito.any(Writer.class));
+        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Resource.class),
+            Mockito.any(Reader.class), Mockito.any(Writer.class));
       } catch (final IOException e) {
         Assert.fail("never happen");
       }
