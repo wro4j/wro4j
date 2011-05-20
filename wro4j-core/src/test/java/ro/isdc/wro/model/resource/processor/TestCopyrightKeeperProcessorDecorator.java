@@ -25,7 +25,7 @@ public class TestCopyrightKeeperProcessorDecorator {
   public void testCopyrightStripperProcessor()
       throws Exception {
     final ResourcePreProcessor decoratedProcessor = new CssMinProcessor();
-    final ResourcePreProcessor processor = new CopyrightKeeperProcessorDecorator(decoratedProcessor);
+    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -43,7 +43,7 @@ public class TestCopyrightKeeperProcessorDecorator {
         IOUtils.copy(reader, writer);
       }
     };
-    final ResourcePreProcessor processor = new CopyrightKeeperProcessorDecorator(decoratedProcessor);
+    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");

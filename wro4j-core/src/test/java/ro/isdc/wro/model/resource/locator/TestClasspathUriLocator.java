@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -26,6 +27,7 @@ public class TestClasspathUriLocator {
 
   @Before
   public void init() {
+    Context.set(Context.standaloneContext());
     uriLocator = new ClasspathUriLocator();
   }
 

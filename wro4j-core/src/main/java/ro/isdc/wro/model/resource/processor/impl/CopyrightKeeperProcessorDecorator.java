@@ -16,9 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SupportedResourceTypeProvider;
 
 
 /**
@@ -29,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.3.7
  */
 public class CopyrightKeeperProcessorDecorator
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeProvider {
   private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
 
   /** The url pattern */
@@ -37,16 +39,27 @@ public class CopyrightKeeperProcessorDecorator
 
   /**
    * A processor which does the compression logic and probably removes copyright comments. If copyright comments are
-   * removed, our processor will put them back.
+   * removed, our processor will put them back`.
    */
   private final ResourcePreProcessor decoratedProcessor;
 
-  public CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
+  private CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
     this.decoratedProcessor = preProcessor;
   }
 
-  public CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
-    this.decoratedProcessor = ProcessorsUtils.toPreProcessor(postProcessor);
+  private CopyrightKeeperProcessorDecorator(final ResourcePostProcessor postProcessor) {
+    this(ProcessorsUtils.toPreProcessor(postProcessor));
+  }
+
+  public static CopyrightKeeperProcessorDecorator decorate(final ResourcePreProcessor preProcessor) {
+    return new CopyrightKeeperProcessorDecorator(preProcessor);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public SupportedResourceType getSupportedResourceType() {
+    return decoratedProcessor.getClass().getAnnotation(SupportedResourceType.class);
   }
 
   /**
