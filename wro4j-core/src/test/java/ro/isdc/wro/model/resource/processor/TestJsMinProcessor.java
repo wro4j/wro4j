@@ -5,8 +5,11 @@ package ro.isdc.wro.model.resource.processor;
 
 import java.io.IOException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -18,6 +21,16 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestJsMinProcessor {
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
   public void testAsPostProcessor()
       throws IOException {

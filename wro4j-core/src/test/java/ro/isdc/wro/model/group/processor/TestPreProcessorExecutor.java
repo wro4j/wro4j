@@ -3,11 +3,14 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import org.junit.Test;
+
 /**
- * TODO add some tests.
- *
  * @author Alex Objelean
  */
 public class TestPreProcessorExecutor {
-
+  @Test
+  public void test() {
+    //TODO create tests.
+  }
 }
