@@ -128,7 +128,10 @@ public class WroTestUtils {
     final Writer resultWriter = new StringWriter();
     processor.process(resultReader, resultWriter);
     final Writer expectedWriter = new StringWriter();
+
     IOUtils.copy(expectedReader, expectedWriter);
+    LOG.info("expected: " + expectedWriter.toString());
+    LOG.info("actual: " + resultWriter.toString());
     compare(expectedWriter.toString(), resultWriter.toString());
     expectedReader.close();
     expectedWriter.close();

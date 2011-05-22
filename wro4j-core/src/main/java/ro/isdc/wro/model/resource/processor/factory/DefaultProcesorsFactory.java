@@ -3,13 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
+
 
 
 /**
@@ -22,12 +17,12 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
 public final class DefaultProcesorsFactory
   extends SimpleProcessorsFactory {
   public DefaultProcesorsFactory() {
-    addPreProcessor(new CssUrlRewritingProcessor());
-    addPreProcessor(new CssImportPreProcessor());
-    addPreProcessor(new BomStripperPreProcessor());
-    addPreProcessor(new SemicolonAppenderPreProcessor());
+//    addPreProcessor(new CssUrlRewritingProcessor());
+//    addPreProcessor(new CssImportPreProcessor());
+//    addPreProcessor(new BomStripperPreProcessor());
+//    addPreProcessor(new SemicolonAppenderPreProcessor());
     addPreProcessor(new JSMinProcessor());
-    addPreProcessor(new JawrCssMinifierProcessor());
-    addPostProcessor(new CssVariablesProcessor());
+//    addPreProcessor(new JawrCssMinifierProcessor());
+//    addPostProcessor(new CssVariablesProcessor());
   }
 }
