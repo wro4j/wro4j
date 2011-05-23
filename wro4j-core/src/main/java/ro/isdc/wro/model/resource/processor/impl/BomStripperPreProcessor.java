@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
@@ -91,9 +92,9 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      // using ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
       final String encoding = Context.get().getConfig().getEncoding();
-      final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader, encoding)));
+      final InputStream is = new BOMInputStream(new ByteArrayInputStream(
+          IOUtils.toByteArray(reader, encoding)));
       IOUtils.copy(is, writer, encoding);
     } finally {
       reader.close();

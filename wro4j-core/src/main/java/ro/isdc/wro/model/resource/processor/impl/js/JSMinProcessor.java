@@ -3,14 +3,16 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.js;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ProxyInputStream;
+import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.commons.io.output.ProxyOutputStream;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +46,10 @@ public class JSMinProcessor implements ResourcePreProcessor,
       throws IOException {
     try {
       final String encoding = Context.get().getConfig().getEncoding();
-      final InputStream is = new ByteArrayInputStream(IOUtils
-          .toByteArray(reader, encoding));
-      final ByteArrayOutputStream os = new ByteArrayOutputStream();
+      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, encoding)) {};
+      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, encoding));
       final JSMin jsmin = new JSMin(is, os);
       jsmin.jsmin();
-      IOUtils.write(os.toByteArray(), writer, encoding);
       is.close();
       os.close();
     } catch (final IOException e) {
