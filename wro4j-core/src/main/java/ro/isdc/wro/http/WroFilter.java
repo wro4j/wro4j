@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -75,6 +77,18 @@ public class WroFilter
    * Default value used by Cache-control header.
    */
   private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
+  /**
+   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
+   */
+  public static final String PATH_API = "wroAPI";
+  /**
+   * API - reload cache method call
+   */
+  public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
+  /**
+   * API - reload model method call
+   */
+  public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
 
   /**
    * Filter config.
@@ -297,12 +311,33 @@ public class WroFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-      processRequest(request, response);
+
+      // TODO move API related checks into separate class and determine filter mapping for better mapping
+      if (matchesUrl(request, API_RELOAD_CACHE)) {
+        Context.get().getConfig().reloadCache();
+        WroUtil.addNoCacheHeaders(response);
+      } else if (matchesUrl(request, API_RELOAD_MODEL)) {
+        Context.get().getConfig().reloadModel();
+        WroUtil.addNoCacheHeaders(response);
+      } else {
+        processRequest(request, response);
+      }
       Context.unset();
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     }
   }
+
+
+  /**
+   * Check if the request path matches the provided api path.
+   */
+  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
+    final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
+    final Matcher m = pattern.matcher(request.getRequestURI());
+    return m.matches();
+  }
+
 
 
   /**
