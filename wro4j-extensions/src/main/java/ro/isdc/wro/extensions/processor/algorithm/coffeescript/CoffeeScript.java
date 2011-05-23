@@ -36,8 +36,8 @@ public class CoffeeScript {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getClass().getResourceAsStream("coffee-script-1.0.1.js"),
-        "coffee-script-1.0.1.js");
+      return RhinoScriptBuilder.newChain().evaluateChain(getClass().getResourceAsStream("coffee-script-1.1.1.js"),
+        "coffee-script-1.1.1.js");
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
