@@ -77,7 +77,7 @@
     <module>wro4j-core</module>
     <module>wro4j-extensions</module>
     <module>wro4j-maven-plugin</module>  
-
+    <module>wro4j-examples</module>  
     <module>wro4j-runner</module>  
   </modules>
 
