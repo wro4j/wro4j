@@ -13,7 +13,6 @@ import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -92,9 +91,8 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      final String encoding = Context.get().getConfig().getEncoding();
-      //BomStripperInputStream
-      //BOMInputStream
+//      final String encoding = Context.get().getCon  fig().getEncoding();
+      //using encoding doesn't remove BOM characters
       final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(
           IOUtils.toString(reader).getBytes()));
       IOUtils.copy(new InputStreamReader(is), writer);

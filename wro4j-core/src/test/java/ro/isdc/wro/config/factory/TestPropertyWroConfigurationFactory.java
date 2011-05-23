@@ -17,16 +17,20 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
+
 /**
  * @author Alex Objelean
  */
 public class TestPropertyWroConfigurationFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestPropertyWroConfigurationFactory.class);
   private PropertyWroConfigurationFactory factory;
+
+
   @Before
   public void setUp() {
     factory = new PropertyWroConfigurationFactory();
   }
+
 
   @Test
   public void testCreateDefaultConfig() {
@@ -43,6 +47,7 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(true, config.isJmxEnabled());
   }
 
+
   @Test
   public void testConfigWithProperties() {
     final Properties props = new Properties();
@@ -58,6 +63,7 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(true, config.isDisableCache());
     Assert.assertEquals(false, config.isGzipEnabled());
   }
+
 
   @Test(expected = WroRuntimeException.class)
   public void testConfigWithInvalidProperties() {

@@ -167,6 +167,7 @@ public class WroTestUtils {
     try {
       final String in = replaceTabsWithSpaces(expected.trim());
       final String out = replaceTabsWithSpaces(actual.trim());
+
       Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
     } catch (final ComparisonFailure e) {

@@ -8,7 +8,6 @@ import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -39,7 +38,6 @@ public class TestBomStripperPreProcessor {
    *
    * @throws Exception
    */
-  @Ignore
   @Test
   public void testFromFolder()
     throws Exception {

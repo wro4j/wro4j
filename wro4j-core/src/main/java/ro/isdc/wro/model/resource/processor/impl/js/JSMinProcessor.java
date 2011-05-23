@@ -47,9 +47,8 @@ public class JSMinProcessor implements ResourcePreProcessor,
     try {
       final String encoding = Context.get().getConfig().getEncoding();
 
-      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader)) {};
-
-      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer));
+      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, encoding)) {};
+      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, encoding));
       final JSMin jsmin = new JSMin(is, os);
 
       jsmin.jsmin();
