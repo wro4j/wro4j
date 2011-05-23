@@ -34,6 +34,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.http.HttpHeader;
+import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -176,6 +177,11 @@ public class TestWroManager {
     };
   }
 
+  /**
+   * Ignored because it fails when running the test from command line.
+   *
+   * @throws Exception
+   */
   @Test
   public void testFromFolder()
       throws Exception {
@@ -205,7 +211,7 @@ public class TestWroManager {
     Context.unset();
   }
 
-  //@Test
+  @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
     final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
@@ -226,37 +232,37 @@ public class TestWroManager {
         new ByteArrayInputStream(out.toByteArray()));
   }
 
-  //@Test
+  @Test
   public void testDuplicatedResourcesShouldBeSkipped()
       throws Exception {
     genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
 
-  //@Test
+  @Test
   public void testWildcardDuplicatedResourcesShouldBeSkiped()
       throws Exception {
     genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
   }
 
-  //@Test
+  @Test
   public void testMinimizeAttributeIsFalseOnResource()
       throws Exception {
     genericProcessAndCompare("/resourceMinimizeFalse.js", "classpath:ro/isdc/wro/manager/sample.js");
   }
 
-  //@Test
+  @Test
   public void testMinimizeAttributeIsTrueOnResource()
       throws Exception {
     genericProcessAndCompare("/resourceMinimizeTrue.js", "classpath:ro/isdc/wro/manager/sample.min.js");
   }
 
-  //@Test
+  @Test
   public void testWildcardGroupResources()
       throws Exception {
     genericProcessAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
   }
 
-  //@Test
+  @Test
   public void processValidModel()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -282,7 +288,7 @@ public class TestWroManager {
     manager.process();
   }
 
-  //@Test
+  @Test
   public void testReloadCacheCall()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -293,7 +299,7 @@ public class TestWroManager {
     manager.process();
   }
 
-  //@Test
+  @Test
   public void testManagerWithSchedulerAndUpdatePeriodSet()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -310,7 +316,7 @@ public class TestWroManager {
     Thread.sleep(100);
   }
 
-  //@Test
+  @Test
   public void testReloadModelCall()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -326,7 +332,7 @@ public class TestWroManager {
    *
    * @throws Exception
    */
-  //@Test
+  @Test
   public void testManagerWhenSchedulerIsStarted()
       throws Exception {
     newConfigWithUpdatePeriodValue(1);
@@ -341,7 +347,7 @@ public class TestWroManager {
     Thread.sleep(500);
   }
 
-  //@Test(expected = UnauthorizedRequestException.class)
+  @Test(expected = UnauthorizedRequestException.class)
   public void testProxyUnauthorizedRequest()
       throws Exception {
     processProxyWithResourceId("test");
@@ -363,7 +369,7 @@ public class TestWroManager {
     manager.process();
   }
 
-  //@Test
+  @Test
   public void testCRC32Fingerprint()
       throws Exception {
     manager.setHashBuilder(new CRC32HashBuilder());
@@ -371,7 +377,7 @@ public class TestWroManager {
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
 
-  //@Test
+  @Test
   public void testMD5Fingerprint()
       throws Exception {
     manager.setHashBuilder(new MD5HashBuilder());
