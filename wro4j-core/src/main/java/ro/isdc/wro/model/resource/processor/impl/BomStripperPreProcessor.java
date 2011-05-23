@@ -6,12 +6,12 @@ package ro.isdc.wro.model.resource.processor.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.BOMInputStream;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
@@ -93,9 +93,11 @@ public final class BomStripperPreProcessor
       throws IOException {
     try {
       final String encoding = Context.get().getConfig().getEncoding();
-      final InputStream is = new BOMInputStream(new ByteArrayInputStream(
-          IOUtils.toByteArray(reader, encoding)));
-      IOUtils.copy(is, writer, encoding);
+      //BomStripperInputStream
+      //BOMInputStream
+      final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(
+          IOUtils.toString(reader).getBytes()));
+      IOUtils.copy(new InputStreamReader(is), writer);
     } finally {
       reader.close();
       writer.close();

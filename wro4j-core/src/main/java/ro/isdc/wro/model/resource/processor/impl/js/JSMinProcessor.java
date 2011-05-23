@@ -46,9 +46,12 @@ public class JSMinProcessor implements ResourcePreProcessor,
       throws IOException {
     try {
       final String encoding = Context.get().getConfig().getEncoding();
-      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, encoding)) {};
-      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, encoding));
+
+      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader)) {};
+
+      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer));
       final JSMin jsmin = new JSMin(is, os);
+
       jsmin.jsmin();
       is.close();
       os.close();
