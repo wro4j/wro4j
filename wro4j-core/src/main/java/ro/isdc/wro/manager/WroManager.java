@@ -235,8 +235,7 @@ public class WroManager
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes(Context.get().getConfig().getEncoding()));
     }
     if (type != null) {
-      // TODO add also the charset?
-      response.setContentType(type.getContentType());
+      response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
     }
 
     // set ETag header

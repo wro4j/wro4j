@@ -27,7 +27,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
  * @since 1.3.7
  */
 public class FilterConfigWroConfigurationFactory
-    implements WroConfigurationFactory {
+  implements WroConfigurationFactory {
   private static final Logger LOG = LoggerFactory.getLogger(FilterConfigWroConfigurationFactory.class);
   /**
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode is used.
@@ -45,11 +45,13 @@ public class FilterConfigWroConfigurationFactory
    */
   private final PropertyWroConfigurationFactory factory;
 
+
   public FilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
     Validate.notNull(filterConfig);
     factory = new PropertyWroConfigurationFactory();
     factory.setProperties(createProps(filterConfig));
   }
+
 
   /**
    * @return initialized {@link Properties} object based init params found in {@link FilterConfig}.
@@ -63,7 +65,7 @@ public class FilterConfigWroConfigurationFactory
         props.setProperty(config.name(), value);
       }
     }
-    //add support for "configuration" init-param for backward compatibility.
+    // add support for "configuration" init-param for backward compatibility.
     final String configurationType = filterConfig.getInitParameter(PARAM_CONFIGURATION);
     if (!StringUtils.isEmpty(configurationType)) {
       props.setProperty(ConfigConstants.debug.name(), String.valueOf(isDebug(configurationType)));
@@ -71,12 +73,14 @@ public class FilterConfigWroConfigurationFactory
     return props;
   }
 
+
   /**
    * @return true if the "configuration" init-param is not "DEPLOYMENT"
    */
   private boolean isDebug(final String configurationType) {
     return !PARAM_VALUE_DEPLOYMENT.equalsIgnoreCase(configurationType);
   }
+
 
   /**
    * {@inheritDoc}

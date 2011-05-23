@@ -12,6 +12,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 
+
 /**
  * Default {@link ProcessorsFactory} which provides most commons processors.
  *
