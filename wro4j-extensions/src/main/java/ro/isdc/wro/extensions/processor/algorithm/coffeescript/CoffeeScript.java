@@ -4,6 +4,7 @@
 package ro.isdc.wro.extensions.processor.algorithm.coffeescript;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.0.1</code> project:
+ * The underlying implementation use the coffee-script version <code>1.1.1</code> project:
  * {@link https://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
@@ -36,13 +37,23 @@ public class CoffeeScript {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getClass().getResourceAsStream("coffee-script-1.1.1.js"),
-        "coffee-script-1.1.1.js");
+      return RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptStream(),
+        "coffee-script.js");
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
   }
 
+
+  /**
+   * Override this method to use a different version of CoffeeScript. This method is useful for upgrading coffeeScript
+   * processor independently of wro4j.
+   *
+   * @return The stream of the CoffeeScript.
+   */
+  protected InputStream getCoffeeScriptStream() {
+    return getClass().getResourceAsStream("coffee-script-1.1.1.js");
+  }
 
 
   /**
