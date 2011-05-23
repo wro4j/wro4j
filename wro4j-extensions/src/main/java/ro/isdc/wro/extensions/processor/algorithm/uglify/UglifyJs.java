@@ -18,7 +18,12 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the less.js version <code>1.0.2</code> project: {@link https://github.com/mishoo/UglifyJS}.
+ * The underlying implementation use the less.js version <code>1.0.2</code> project:
+ * <p/>
+ * {@link https://github.com/mishoo/UglifyJS}.
+ * <p/>
+ * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
+ * is compressed with packerJs compressor, because it seems to be most efficient for this situation.
  *
  * @author Alex Objelean
  */
@@ -57,14 +62,13 @@ public class UglifyJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_PARSE = "parse-js-1.0.2.min.js";
-      final InputStream parseStream = getClass().getResourceAsStream(SCRIPT_PARSE);
-      final String SCRIPT_PROCESS = "process-1.0.2.min.js";
-      final InputStream processStream = getClass().getResourceAsStream(SCRIPT_PROCESS);
+      final String SCRIPT_UGLIFY = "uglify-1.0.2.min.js";
+      final InputStream uglifyStream = getClass().getResourceAsStream(SCRIPT_UGLIFY);
+
 
       final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";
-      return RhinoScriptBuilder.newChain().addJSON().evaluateChain(scriptInit, "initScript").evaluateChain(parseStream,
-        SCRIPT_PARSE).evaluateChain(processStream, SCRIPT_PROCESS);
+      return RhinoScriptBuilder.newChain().addJSON().evaluateChain(scriptInit, "initScript").evaluateChain(uglifyStream,
+        SCRIPT_UGLIFY);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed initializing js", ex);
     }
