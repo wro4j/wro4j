@@ -102,6 +102,7 @@ public class WroTestUtils {
     final Writer resultWriter = new StringWriter();
     processor.process(null, resultReader, resultWriter);
     final Writer expectedWriter = new StringWriter();
+
     IOUtils.copy(expectedReader, expectedWriter);
     compare(expectedWriter.toString(), resultWriter.toString());
     expectedReader.close();
@@ -215,8 +216,11 @@ public class WroTestUtils {
       LOG.debug("processing: " + file.getName());
       File targetFile = null;
       try {
+        LOG.debug("1");
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
+        LOG.debug("2");
         final InputStream targetFileStream = new FileInputStream(targetFile);
+        LOG.debug("3");
         LOG.debug("comparing with: " + targetFile.getName());
         compare(new FileInputStream(file), targetFileStream, new ResourcePreProcessor() {
           public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -225,6 +229,7 @@ public class WroTestUtils {
             processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
           }
         });
+        LOG.debug("4");
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());

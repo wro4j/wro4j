@@ -33,6 +33,11 @@ public class TestBomStripperPreProcessor {
     Context.unset();
   }
 
+  /**
+   * Ignored because it fails when running the test from command line.
+   *
+   * @throws Exception
+   */
   @Test
   public void testFromFolder()
     throws Exception {

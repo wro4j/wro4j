@@ -14,7 +14,7 @@
     </filter-class>
     <init-param>
       <param-name>configuration</param-name>
-      <param-value>development</param-value>
+      <param-value>deployment</param-value>
     </init-param>
     <init-param>
       <param-name>disableCache</param-name>
@@ -42,7 +42,7 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,googleClosureSimple,cssDataUri</param-value>
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,jsMin, googleClosureSimple,cssDataUri</param-value>
     </init-param>
     <!-- cssVariables, -->
     <init-param>
