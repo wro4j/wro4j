@@ -18,10 +18,10 @@
     return Animal;
   })();
   Snake = (function() {
+    __extends(Snake, Animal);
     function Snake() {
       Snake.__super__.constructor.apply(this, arguments);
     }
-    __extends(Snake, Animal);
     Snake.prototype.move = function() {
       alert("Slithering...");
       return Snake.__super__.move.call(this, 5);
@@ -29,10 +29,10 @@
     return Snake;
   })();
   Horse = (function() {
+    __extends(Horse, Animal);
     function Horse() {
       Horse.__super__.constructor.apply(this, arguments);
     }
-    __extends(Horse, Animal);
     Horse.prototype.move = function() {
       alert("Galloping...");
       return Horse.__super__.move.call(this, 45);
