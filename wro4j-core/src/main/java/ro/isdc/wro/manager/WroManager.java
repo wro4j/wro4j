@@ -197,7 +197,8 @@ public class WroManager
       // Do not set content length because we don't know the length in case it is gzipped. This could cause an
       // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
       // make the input stream encoding aware.
-      inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes(Context.get().getConfig().getEncoding()));
+      inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes(
+        Context.get().getConfig().getEncoding()));
     }
     if (type != null) {
       response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());

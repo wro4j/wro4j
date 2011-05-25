@@ -125,9 +125,7 @@ public class TestWroManager {
           return model;
         }
       });
-
       manager.setGroupExtractor(groupExtractor);
-
       manager.process();
     }
   }

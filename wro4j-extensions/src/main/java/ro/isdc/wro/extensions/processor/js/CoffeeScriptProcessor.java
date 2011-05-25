@@ -66,8 +66,16 @@ public class CoffeeScriptProcessor
    */
   private CoffeeScript getEngine() {
     if (engine == null) {
-      engine = new CoffeeScript();
+      engine = newCoffeeScript();
     }
     return engine;
+  }
+
+  /**
+   * @return the {@link CoffeeScript} engine implementation. Override it to provide a different version of the coffeeScript.js
+   *         library. Useful for upgrading the processor outside the wro4j release.
+   */
+  protected CoffeeScript newCoffeeScript() {
+    return new CoffeeScript();
   }
 }
