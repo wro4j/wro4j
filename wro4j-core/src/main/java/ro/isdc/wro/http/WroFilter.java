@@ -313,21 +313,35 @@ public class WroFilter
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
       // TODO move API related checks into separate class and determine filter mapping for better mapping
-      if (matchesUrl(request, API_RELOAD_CACHE)) {
+      if (shouldReloadCache(request)) {
         Context.get().getConfig().reloadCache();
         WroUtil.addNoCacheHeaders(response);
-      } else if (matchesUrl(request, API_RELOAD_MODEL)) {
+      } else if (shouldReloadModel(request)) {
         Context.get().getConfig().reloadModel();
         WroUtil.addNoCacheHeaders(response);
       } else {
         processRequest(request, response);
       }
-      Context.unset();
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
+    } finally {
+      Context.unset();
     }
   }
 
+  /**
+   * @return true if reload model must be triggered.
+   */
+  private boolean shouldReloadModel(final HttpServletRequest request) {
+    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_MODEL);
+  }
+
+  /**
+   * @return true if reload cache must be triggered.
+   */
+  private boolean shouldReloadCache(final HttpServletRequest request) {
+    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_CACHE);
+  }
 
   /**
    * Check if the request path matches the provided api path.
@@ -337,8 +351,6 @@ public class WroFilter
     final Matcher m = pattern.matcher(request.getRequestURI());
     return m.matches();
   }
-
-
 
   /**
    * Perform actual processing.

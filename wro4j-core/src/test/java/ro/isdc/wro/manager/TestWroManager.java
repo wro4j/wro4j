@@ -291,17 +291,6 @@ public class TestWroManager {
   }
 
   @Test
-  public void testReloadCacheCall()
-      throws IOException {
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
-
-    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-        Mockito.mock(FilterConfig.class)));
-    manager.process();
-  }
-
-  @Test
   public void testManagerWithSchedulerAndUpdatePeriodSet()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -318,16 +307,6 @@ public class TestWroManager {
     Thread.sleep(100);
   }
 
-  @Test
-  public void testReloadModelCall()
-      throws IOException {
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_MODEL);
-
-    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-        Mockito.mock(FilterConfig.class)));
-    manager.process();
-  }
 
   /**
    * Test how manager behaves when the update period value is greater than zero and the scheduler starts.
