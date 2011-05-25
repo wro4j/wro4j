@@ -37,7 +37,7 @@ public class CoffeeScript {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptStream(),
+      return RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(),
         "coffee-script.js");
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
@@ -51,7 +51,7 @@ public class CoffeeScript {
    *
    * @return The stream of the CoffeeScript.
    */
-  protected InputStream getCoffeeScriptStream() {
+  protected InputStream getCoffeeScriptAsStream() {
     return getClass().getResourceAsStream("coffee-script-1.1.1.js");
   }
 

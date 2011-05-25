@@ -35,18 +35,25 @@ public class LessCss {
     try {
       final String SCRIPT_INIT = "init.js";
       final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
-      final String SCRIPT_LESS = "less-1.0.41.min.js";
-      final InputStream lessStream = getClass().getResourceAsStream(SCRIPT_LESS);
+      final InputStream lessStream = getLessScriptAsStream();
       final String SCRIPT_RUN = "run.js";
       final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
       return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
-          lessStream, SCRIPT_LESS).evaluateChain(runStream, SCRIPT_RUN);
+          lessStream, "less.js").evaluateChain(runStream, SCRIPT_RUN);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
     } catch (final Exception e) {
       LOG.error("Processing error:" + e.getMessage(), e);
       throw new WroRuntimeException("Processing error", e);
     }
+  }
+
+
+  /**
+   * @return stream of the less.js script.
+   */
+  protected InputStream getLessScriptAsStream() {
+    return getClass().getResourceAsStream("less-1.1.2.js");
   }
 
 
