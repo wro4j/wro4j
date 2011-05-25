@@ -6,6 +6,7 @@ package ro.isdc.wro.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,9 +25,10 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
+import ro.isdc.wro.config.factory.WroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
@@ -48,7 +50,7 @@ public class TestWroFilter {
 
 
   @Before
-  public void initFilter()
+  public void setUp()
     throws Exception {
     filter = new WroFilter();
     config = Mockito.mock(FilterConfig.class);
@@ -60,14 +62,22 @@ public class TestWroFilter {
 
   @After
   public void tearDown() {
-    filter.destroy();
+    if (filter != null) {
+      filter.destroy();
+    }
   }
-
 
   /**
    * Initialize filter field with properly configured wro.xml.
    */
   private void initFilterWithValidConfig() {
+    initFilterWithValidConfig(filter);
+  }
+
+  /**
+   * Initialize filter field with properly configured wro.xml.
+   */
+  private void initFilterWithValidConfig(WroFilter filter) {
     filter = new WroFilter() {
       @Override
       protected WroManagerFactory getWroManagerFactory() {
@@ -423,7 +433,7 @@ public class TestWroFilter {
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/someMethod");
+    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.PATH_API + "/someMethod");
     final FilterChain chain = Mockito.mock(FilterChain.class);
     setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
     filter.init(config);
@@ -440,7 +450,7 @@ public class TestWroFilter {
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroManager.PATH_API + "/someMethod");
+    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.PATH_API + "/someMethod");
     final FilterChain chain = Mockito.mock(FilterChain.class);
     //by default configuration is development
     filter.init(config);
@@ -451,25 +461,82 @@ public class TestWroFilter {
 
 
   /**
-   * Tests that in DEPLOYMENT mode the API is not exposed.
+   * Tests that in DEVELOPMENT mode the API is exposed.
    */
   @Test
   public void testApiCallInDEVELOPMENTModeAndReloadCacheCall()
     throws Exception {
+
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
+    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_CACHE);
 
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
     final FilterChain chain = Mockito.mock(FilterChain.class);
     //by default configuration is development
     filter.init(config);
+
     filter.doFilter(request, response, chain);
-    //No api method exposed -> proceed with chain
+    //api method exposed -> chain is not called
     verifyChainIsNotCalled(chain);
   }
 
+
+  /**
+   * Tests that in DEPLOYMENT mode the API is NOT exposed.
+   */
+  @Test
+  public void apiCallInDeploymentMode()
+    throws Exception {
+    final Properties props = new Properties();
+    //init WroConfig properties
+    props.setProperty(ConfigConstants.debug.name(), Boolean.FALSE.toString());
+    final WroFilter theFilter = new WroFilter() {
+      @Override
+      protected WroConfigurationFactory newWroConfigurationFactory() {
+        final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
+        factory.setProperties(props);
+        return factory;
+      }
+    };
+    initFilterWithValidConfig(theFilter);
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_CACHE);
+
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
+    final FilterChain chain = Mockito.mock(FilterChain.class);
+    //by default configuration is development
+    theFilter.init(config);
+
+    theFilter.doFilter(request, response, chain);
+    //No api method exposed -> proceed with chain
+    verifyChainIsCalled(chain);
+  }
+
+//
+//  @Test
+//  public void testReloadCacheCall()
+//      throws IOException {
+//    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+//    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
+//
+//    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+//        Mockito.mock(FilterConfig.class)));
+//    manager.process();
+//  }
+//
+//  @Test
+//  public void testReloadModelCall()
+//      throws IOException {
+//    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+//    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_MODEL);
+//
+//    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+//        Mockito.mock(FilterConfig.class)));
+//    manager.process();
+//  }
 
   /**
    * Mocks the WroFilter.PARAM_CONFIGURATION init param with passed value.
