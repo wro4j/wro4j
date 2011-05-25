@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,25 +36,39 @@ public class TestConfigurableWroFilter {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Context.set(Context.standaloneContext());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test
   public void testFilterWithPropertiesSet() throws Exception {
-    final ConfigurableWroFilter filter = new ConfigurableWroFilter();
+    final ConfigurableWroFilter filter = new ConfigurableWroFilter() {
+      @Override
+      protected void onRequestProcessed() {
+        Assert.assertEquals(10, Context.get().getConfig().getCacheUpdatePeriod());
+      }
+    };
     final Properties properties = new Properties();
     properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
     filter.setProperties(properties);
     filter.init(Mockito.mock(FilterConfig.class));
     filter.doFilter(request, response, filterChain);
-    Assert.assertEquals(10, Context.get().getConfig().getCacheUpdatePeriod());
   }
 
   @Test
   public void testFilterWithCacheUpdatePeriodSet() throws Exception {
-    final ConfigurableWroFilter filter = new ConfigurableWroFilter();
+    final ConfigurableWroFilter filter = new ConfigurableWroFilter() {
+      @Override
+      protected void onRequestProcessed() {
+        Assert.assertEquals(20, Context.get().getConfig().getCacheUpdatePeriod());
+      }
+    };
     filter.setCacheUpdatePeriod(20);
     filter.init(Mockito.mock(FilterConfig.class));
     filter.doFilter(request, response, filterChain);
-    Assert.assertEquals(20, Context.get().getConfig().getCacheUpdatePeriod());
   }
 }

@@ -321,12 +321,19 @@ public class WroFilter
         WroUtil.addNoCacheHeaders(response);
       } else {
         processRequest(request, response);
+        onRequestProcessed();
       }
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
       Context.unset();
     }
+  }
+
+  /**
+   * Useful for unit tests to check the post processing.
+   */
+  protected void onRequestProcessed() {
   }
 
   /**
