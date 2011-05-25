@@ -32,7 +32,6 @@ public class DefaultGroupExtractor
    */
   public static final String PARAM_MINIMIZE = "minimize";
 
-
   /**
    * {@inheritDoc}
    */
@@ -40,14 +39,13 @@ public class DefaultGroupExtractor
     if (request == null) {
       throw new IllegalArgumentException("Request cannot be NULL!");
     }
-    final String includeUriPath = (String)request.getAttribute(ATTR_INCLUDE_PATH);
+    final String includeUriPath = (String) request.getAttribute(ATTR_INCLUDE_PATH);
     String uri = request.getRequestURI();
     // check if include or uri path are present and use one of these as request uri.
     uri = includeUriPath != null ? includeUriPath : uri;
     final String groupName = FilenameUtils.getBaseName(uri);
     return StringUtils.isEmpty(groupName) ? null : groupName;
   }
-
 
   /**
    * Extracts the resource type, by parsing the uri & finds the extension. If extension is valid ('css' or 'js'),

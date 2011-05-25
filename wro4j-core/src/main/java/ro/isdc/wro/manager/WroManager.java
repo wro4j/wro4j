@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,18 +61,6 @@ public class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
-  /**
-   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
-   */
-  public static final String PATH_API = "wroAPI";
-  /**
-   * API - reload cache method call
-   */
-  public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
-  /**
-   * API - reload model method call
-   */
-  public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
   /**
    * ResourcesModel factory.
    */
@@ -130,18 +116,6 @@ public class WroManager
     LOG.debug("processing: " + request.getRequestURI());
     validate();
     InputStream is = null;
-    // create model
-    // TODO move API related checks into separate class and determine filter mapping for better mapping
-    if (matchesUrl(request, API_RELOAD_CACHE)) {
-      Context.get().getConfig().reloadCache();
-      WroUtil.addNoCacheHeaders(response);
-      return;
-    }
-    if (matchesUrl(request, API_RELOAD_MODEL)) {
-      Context.get().getConfig().reloadModel();
-      WroUtil.addNoCacheHeaders(response);
-      return;
-    }
     if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
     } else {
@@ -156,16 +130,6 @@ public class WroManager
     is.close();
     os.close();
   }
-
-  /**
-   * Check if the request path matches the provided api path.
-   */
-  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
-    final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
-    final Matcher m = pattern.matcher(request.getRequestURI());
-    return m.matches();
-  }
-
 
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
