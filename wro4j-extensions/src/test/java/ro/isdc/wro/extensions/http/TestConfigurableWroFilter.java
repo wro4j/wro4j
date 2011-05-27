@@ -1,7 +1,7 @@
 /**
  * Copyright@2011
  */
-package ro.isdc.wro.http;
+package ro.isdc.wro.extensions.http;
 
 import javax.servlet.FilterConfig;
 
@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.ConfigurableWroFilter;
 
 /**
  * This test normally should live in wro4j-core module, but since we need spring dependency to test it, the test will
