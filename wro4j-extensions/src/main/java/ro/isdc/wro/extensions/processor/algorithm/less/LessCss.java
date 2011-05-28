@@ -53,7 +53,7 @@ public class LessCss {
    * @return stream of the less.js script.
    */
   protected InputStream getLessScriptAsStream() {
-    return getClass().getResourceAsStream("less-1.1.2.js");
+    return getClass().getResourceAsStream("less-1.1.3.min.js");
   }
 
 
