@@ -11,7 +11,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 
 
 /**
- * Compress js using packer utility.
+ * Compress js using uglifyJs utility.
  *
  * @author Alex Objelean
  * @created 7 Nov 2010
