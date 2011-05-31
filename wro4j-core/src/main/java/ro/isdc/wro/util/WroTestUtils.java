@@ -20,6 +20,7 @@ import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -27,18 +28,19 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**
@@ -70,7 +72,7 @@ public class WroTestUtils {
   public static void compareProcessedResourceContents(final String inputResourceUri,
     final String expectedContentResourceUri, final ResourcePreProcessor processor)
     throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri, ProcessorsUtils.transform(processor));
+    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri, ProcessorsUtils.toPostProcessor(processor));
   }
 
 
@@ -126,6 +128,7 @@ public class WroTestUtils {
     final Writer resultWriter = new StringWriter();
     processor.process(resultReader, resultWriter);
     final Writer expectedWriter = new StringWriter();
+
     IOUtils.copy(expectedReader, expectedWriter);
     compare(expectedWriter.toString(), resultWriter.toString());
     expectedReader.close();
@@ -150,7 +153,8 @@ public class WroTestUtils {
     throws IOException {
     Assert.assertNotNull(expected);
     Assert.assertNotNull(actual);
-    compare(IOUtils.toString(expected), IOUtils.toString(actual));
+    final String encoding = Context.get().getConfig().getEncoding();
+    compare(IOUtils.toString(expected, encoding), IOUtils.toString(actual, encoding));
     expected.close();
     actual.close();
   }
@@ -161,14 +165,16 @@ public class WroTestUtils {
    */
   public static void compare(final String expected, final String actual) {
     try {
-      Assert.assertEquals(replaceTabsWithSpaces(expected.trim()), replaceTabsWithSpaces(actual.trim()));
+      final String in = replaceTabsWithSpaces(expected.trim());
+      final String out = replaceTabsWithSpaces(actual.trim());
+
+      Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
     } catch (final ComparisonFailure e) {
-      LOG.debug("Compare.... [FAIL]");
+      LOG.debug("Compare.... [FAIL]", e.getMessage());
       throw e;
     }
   }
-
 
   /**
    * Replace tabs with spaces.
@@ -259,8 +265,11 @@ public class WroTestUtils {
       LOG.debug("processing: " + file.getName());
       File targetFile = null;
       try {
+        LOG.debug("1");
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
+        LOG.debug("2");
         final InputStream targetFileStream = new FileInputStream(targetFile);
+        LOG.debug("3");
         LOG.debug("comparing with: " + targetFile.getName());
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)
@@ -269,6 +278,7 @@ public class WroTestUtils {
             processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
           }
         });
+        LOG.debug("4");
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
@@ -317,6 +327,7 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
     throws IOException {
+    //TODO use ProcessorsUtils
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -354,7 +365,9 @@ public class WroTestUtils {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
-            preProcessor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
+
+            final ResourceType resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
           }
         });
         processedNumber++;

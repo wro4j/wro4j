@@ -9,7 +9,10 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.lang.Validate;
+
 import ro.isdc.wro.model.group.processor.Minimize;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 
@@ -51,9 +54,18 @@ public class ProcessorsUtils {
    *        </ul>
    */
   public static <T> Collection<T> getProcessorsByType(final ResourceType type, final Collection<T> availableProcessors) {
+    Validate.notNull(availableProcessors);
     final Collection<T> found = new ArrayList<T>();
     for (final T processor : availableProcessors) {
-      final SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
+      SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
+      /**
+       * This is a special case for processors which implement {@link SupportedResourceTypeProvider} interface. This is
+       * useful for decorator processors which needs to "inherit" the {@link SupportedResourceType} of the decorated
+       * processor.
+       */
+      if (processor instanceof SupportedResourceTypeProvider) {
+        supportedType = ((SupportedResourceTypeProvider) processor).getSupportedResourceType();
+      }
       final boolean isTypeSatisfied = supportedType == null || (supportedType != null && type == supportedType.value());
       if (isTypeSatisfied) {
         found.add(processor);
@@ -68,11 +80,25 @@ public class ProcessorsUtils {
    *
    * @param preProcessor {@link ResourcePreProcessor} to transform.
    */
-  public static ResourcePostProcessor transform(final ResourcePreProcessor preProcessor) {
+  public static ResourcePostProcessor toPostProcessor(final ResourcePreProcessor preProcessor) {
     return new ResourcePostProcessor() {
       public void process(final Reader reader, final Writer writer)
         throws IOException {
         preProcessor.process(null, reader, writer);
+      }
+    };
+  }
+
+  /**
+   * Transforms a postProcessor into a preProcessor.
+   *
+   * @param postProcessor {@link ResourcePostProcessor} to transform.
+   */
+  public static ResourcePreProcessor toPreProcessor(final ResourcePostProcessor postProcessor) {
+    return new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+        throws IOException {
+        postProcessor.process(reader, writer);
       }
     };
   }

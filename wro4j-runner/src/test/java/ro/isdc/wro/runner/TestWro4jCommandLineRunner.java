@@ -7,14 +7,18 @@ import java.io.File;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alex Objelean
  */
 public class TestWro4jCommandLineRunner {
+  private static final Logger LOG = LoggerFactory.getLogger(TestWro4jCommandLineRunner.class);
+
   @Before
   public void startUp() {
-    System.out.println("startup");
+    LOG.debug("startup");
   }
   @Test
   public void processWrongArgument() throws Exception {
@@ -37,7 +41,7 @@ public class TestWro4jCommandLineRunner {
   @Test
   public void processTestWroXml() throws Exception {
     final String wroFile = new File(getClass().getResource("").getFile()).getAbsolutePath() + "\\wro.xml";
-    System.out.println(wroFile);
+    LOG.debug(wroFile);
     final String[] args = new String("-m --wroFile " + wroFile).split(" ");
     Wro4jCommandLineRunner.main(args);
   }

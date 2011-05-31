@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -25,7 +27,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +34,16 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.WroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -63,37 +70,6 @@ public class WroFilter
    */
   static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
   /**
-   * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode is used.
-   */
-  static final String PARAM_CONFIGURATION = "configuration";
-  /**
-   * Replace with a boolean used for debug Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is
-   * assumed.
-   */
-  // TODO deprecate and use a boolean value init-param
-  static final String PARAM_VALUE_DEPLOYMENT = "DEPLOYMENT";
-  /**
-   * Gzip resources configuration option.
-   */
-  static final String PARAM_GZIP_RESOURCES = "gzipResources";
-  /**
-   * Disable cache configuration option. When true, the processed content won't be cached in DEVELOPMENT mode. In
-   * DEPLOYMENT mode changing this flag will have no effect.
-   */
-  static final String PARAM_DISABLE_CACHE = "disableCache";
-  /**
-   * Parameter containing an integer value for specifying how often (in seconds) the cache should be refreshed.
-   */
-  static final String PARAM_CACHE_UPDATE_PERIOD = "cacheUpdatePeriod";
-  /**
-   * Parameter containing an integer value for specifying how often (in seconds) the model should be refreshed.
-   */
-  static final String PARAM_MODEL_UPDATE_PERIOD = "modelUpdatePeriod";
-  /**
-   * Parameter allowing to turn jmx on or off.
-   */
-  static final String PARAM_JMX_ENABLED = "jmxEnabled";
-  /**
    * A preferred name of the MBean object.
    */
   static final String PARAM_MBEAN_NAME = "mbeanName";
@@ -101,6 +77,19 @@ public class WroFilter
    * Default value used by Cache-control header.
    */
   private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
+  /**
+   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
+   */
+  public static final String PATH_API = "wroAPI";
+  /**
+   * API - reload cache method call
+   */
+  public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
+  /**
+   * API - reload model method call
+   */
+  public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
+
   /**
    * Filter config.
    */
@@ -113,6 +102,7 @@ public class WroFilter
    * WroManagerFactory. The brain of the optimizer.
    */
   private WroManagerFactory wroManagerFactory;
+
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
    * put, in order to avoid duplicate keys. This is done, because according to RFC 2616 Message Headers field names are
@@ -132,6 +122,12 @@ public class WroFilter
     }
   };
 
+  /**
+   * @return implementation of {@link WroConfigurationFactory} used to create a {@link WroConfiguration} object.
+   */
+  protected WroConfigurationFactory newWroConfigurationFactory() {
+    return new FilterConfigWroConfigurationFactory(filterConfig);
+  }
 
   /**
    * {@inheritDoc}
@@ -139,8 +135,7 @@ public class WroFilter
   public final void init(final FilterConfig config)
     throws ServletException {
     this.filterConfig = config;
-    wroConfiguration = new WroConfiguration();
-    initConfiguration(wroConfiguration);
+    wroConfiguration = newWroConfigurationFactory().create();
     initWroManagerFactory();
     initHeaderValues();
     initJMX();
@@ -162,7 +157,6 @@ public class WroFilter
         }
       });
     }
-//    filterConfig.getServletContext().setAttribute("wro4j:wroManagerFactory", wroManagerFactory);
   }
 
   /**
@@ -170,13 +164,8 @@ public class WroFilter
    */
   private void initJMX() {
     try {
-      /**
-       * Flag for enable/disable jmx. By default this value is true.
-       */
-      final boolean jmxEnabled = getJmxEnabled();
-      LOG.info("jmxEnabled: " + jmxEnabled);
       registerChangeListeners();
-      if (jmxEnabled) {
+      if (wroConfiguration.isJmxEnabled()) {
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
         if (!mbeanServer.isRegistered(name)) {
@@ -188,19 +177,6 @@ public class WroFilter
       LOG.error("Exception occured while registering MBean", e);
     }
   }
-
-
-  /**
-   * Override this method for enabling JMX by other means. Treat null value as true.
-   *
-   * @return flag for enabling JMX.
-   */
-  protected boolean getJmxEnabled() {
-    // TODO do not use BooleanUtils -> create your utility method
-    return BooleanUtils.toBooleanDefaultIfNull(
-      BooleanUtils.toBooleanObject(filterConfig.getInitParameter(PARAM_JMX_ENABLED)), true);
-  }
-
 
   /**
    * @return the name of MBean to be used by JMX to configure wro4j.
@@ -266,93 +242,6 @@ public class WroFilter
     });
     LOG.debug("Cache & Model change listeners were registered");
   }
-
-
-  /**
-   * Extracts long value from provided init param name configuration.
-   */
-  private long getUpdatePeriodByName(final String paramName) {
-    final String valueAsString = filterConfig.getInitParameter(paramName);
-    if (valueAsString == null) {
-      return 0;
-    }
-    try {
-      return Long.valueOf(valueAsString);
-    } catch (final NumberFormatException e) {
-      throw new WroRuntimeException(paramName + " init-param must be a number, but was: " + valueAsString);
-    }
-  }
-
-
-  /**
-   * @return {@link WroConfiguration} configured object with default values set.
-   */
-  private void initConfiguration(final WroConfiguration config) {
-    config.setGzipEnabled(isGzipResources());
-    config.setDebug(isDebug());
-    config.setCacheUpdatePeriod(getCacheUpdatePeriod());
-    config.setModelUpdatePeriod(getModelUpdatePeriod());
-    config.setDisableCache(isDisableCache());
-  }
-
-
-  /**
-   * This method can be overriden to set this value differently.
-   *
-   * @return true if the resources response should be gziped.
-   */
-  protected boolean isGzipResources() {
-    final String gzipParam = filterConfig.getInitParameter(PARAM_GZIP_RESOURCES);
-    final boolean gzipResources = gzipParam == null ? true : Boolean.valueOf(gzipParam);
-    return gzipResources;
-  }
-
-  /**
-   * @return flag value configured by filter config init parameter.
-   */
-  protected boolean isDisableCache() {
-    final String paramValue = filterConfig.getInitParameter(PARAM_DISABLE_CACHE);
-    final boolean flag = paramValue == null ? false : Boolean.valueOf(paramValue);
-    return flag;
-  }
-
-
-  /**
-   * This method can be overriden to set this value differently.
-   *
-   * @return true if the wro4j is run in DEVELOPMENT mode.
-   */
-  protected boolean isDebug() {
-    boolean debug = true;
-    final String configParam = filterConfig.getInitParameter(PARAM_CONFIGURATION);
-    if (configParam != null) {
-      if (PARAM_VALUE_DEPLOYMENT.equalsIgnoreCase(configParam)) {
-        debug = false;
-      }
-    }
-    return debug;
-  }
-
-
-  /**
-   * This method can be overriden to set this value differently.
-   *
-   * @return model update period. By default it performs check of init-param.
-   */
-  protected long getModelUpdatePeriod() {
-    return getUpdatePeriodByName(PARAM_MODEL_UPDATE_PERIOD);
-  }
-
-
-  /**
-   * This method can be overriden to set this value differently.
-   *
-   * @return cache update period. By default it performs check of init-param.
-   */
-  protected long getCacheUpdatePeriod() {
-    return getUpdatePeriodByName(PARAM_CACHE_UPDATE_PERIOD);
-  }
-
 
   /**
    * Initialize header values.
@@ -422,13 +311,53 @@ public class WroFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-      processRequest(request, response);
-      Context.unset();
+
+      // TODO move API related checks into separate class and determine filter mapping for better mapping
+      if (shouldReloadCache(request)) {
+        Context.get().getConfig().reloadCache();
+        WroUtil.addNoCacheHeaders(response);
+      } else if (shouldReloadModel(request)) {
+        Context.get().getConfig().reloadModel();
+        WroUtil.addNoCacheHeaders(response);
+      } else {
+        processRequest(request, response);
+        onRequestProcessed();
+      }
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
+    } finally {
+      Context.unset();
     }
   }
 
+  /**
+   * Useful for unit tests to check the post processing.
+   */
+  protected void onRequestProcessed() {
+  }
+
+  /**
+   * @return true if reload model must be triggered.
+   */
+  private boolean shouldReloadModel(final HttpServletRequest request) {
+    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_MODEL);
+  }
+
+  /**
+   * @return true if reload cache must be triggered.
+   */
+  private boolean shouldReloadCache(final HttpServletRequest request) {
+    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_CACHE);
+  }
+
+  /**
+   * Check if the request path matches the provided api path.
+   */
+  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
+    final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
+    final Matcher m = pattern.matcher(request.getRequestURI());
+    return m.matches();
+  }
 
   /**
    * Perform actual processing.
@@ -487,7 +416,16 @@ public class WroFilter
     final String appFactoryClassName = filterConfig.getInitParameter(PARAM_MANAGER_FACTORY);
     if (appFactoryClassName == null) {
       // If no context param was specified we return the default factory
-      return new ServletContextAwareWroManagerFactory();
+      return new BaseWroManagerFactory() {
+        @Override
+        protected UriLocatorFactory newUriLocatorFactory() {
+          return new DefaultUriLocatorFactory();
+        }
+        @Override
+        protected ProcessorsFactory newProcessorsFactory() {
+          return new DefaultProcesorsFactory();
+        }
+      };
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;

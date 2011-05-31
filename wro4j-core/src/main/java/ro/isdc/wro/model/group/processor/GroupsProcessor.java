@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +22,9 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -53,12 +54,8 @@ public class GroupsProcessor {
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
   public String process(final Collection<Group> groups, final ResourceType type, final boolean minimize) {
-    if (groups == null) {
-      throw new IllegalArgumentException("List of groups cannot be null!");
-    }
-    if (type == null) {
-      throw new IllegalArgumentException("ResourceType cannot be null!");
-    }
+    Validate.notNull(groups);
+    Validate.notNull(type);
 
     //Supress spurious duplicate resource detection on reload
     duplicateResourceDetector.reset();
