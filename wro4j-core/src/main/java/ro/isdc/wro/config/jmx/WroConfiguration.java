@@ -59,7 +59,7 @@ public final class WroConfiguration
   /**
    * Encoding to use when reading resources.
    */
-  private String encoding;
+  private String encoding = DEFAULT_ENCODING;
   /**
    * Listeners for the change of cache & model period properties.
    */
