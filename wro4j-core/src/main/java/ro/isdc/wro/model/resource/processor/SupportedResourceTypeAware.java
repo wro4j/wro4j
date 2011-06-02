@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
  * @created 20 May 2011
  * @since 1.3.7
  */
-public interface SupportedResourceTypeProvider {
+public interface SupportedResourceTypeAware {
   /**
    * @return {@link SupportedResourceType} to be used by processor.
    */
