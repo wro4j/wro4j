@@ -41,6 +41,25 @@ public class ProcessorsUtils {
     return result;
   }
 
+  public static <T> boolean isMinimizeAwareProcessor(final T processor) {
+    if (processor instanceof MinimizeAware) {
+      return ((MinimizeAware)processor).isMinimize();
+    }
+    return processor.getClass().isAnnotationPresent(Minimize.class);
+  }
+
+  public static <T> SupportedResourceType getSupportedResourceType(final T processor) {
+    SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
+    /**
+     * This is a special case for processors which implement {@link SupportedResourceTypeProvider} interface. This is
+     * useful for decorator processors which needs to "inherit" the {@link SupportedResourceType} of the decorated
+     * processor.
+     */
+    if (processor instanceof SupportedResourceTypeAware) {
+      supportedType = ((SupportedResourceTypeAware) processor).getSupportedResourceType();
+    }
+    return supportedType;
+  }
 
   /**
    * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor} or null (any).
@@ -57,15 +76,7 @@ public class ProcessorsUtils {
     Validate.notNull(availableProcessors);
     final Collection<T> found = new ArrayList<T>();
     for (final T processor : availableProcessors) {
-      SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
-      /**
-       * This is a special case for processors which implement {@link SupportedResourceTypeProvider} interface. This is
-       * useful for decorator processors which needs to "inherit" the {@link SupportedResourceType} of the decorated
-       * processor.
-       */
-      if (processor instanceof SupportedResourceTypeProvider) {
-        supportedType = ((SupportedResourceTypeProvider) processor).getSupportedResourceType();
-      }
+      final SupportedResourceType supportedType = getSupportedResourceType(processor);
       final boolean isTypeSatisfied = supportedType == null || (supportedType != null && type == supportedType.value());
       if (isTypeSatisfied) {
         found.add(processor);

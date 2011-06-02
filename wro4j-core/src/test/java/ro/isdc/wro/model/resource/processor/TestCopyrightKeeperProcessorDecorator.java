@@ -9,12 +9,16 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 
+import junit.framework.Assert;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -49,5 +53,19 @@ public class TestCopyrightKeeperProcessorDecorator {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedCopyrightAware");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+
+  @Test
+  public void testMinimizeAwareDecorator1() {
+    final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
+    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    Assert.assertTrue(ProcessorsUtils.isMinimizeAwareProcessor(processor));
+  }
+
+  @Test
+  public void testMinimizeAwareDecorator2() {
+    final ResourcePreProcessor decoratedProcessor = new CssUrlRewritingProcessor();
+    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    Assert.assertFalse(ProcessorsUtils.isMinimizeAwareProcessor(processor));
   }
 }
