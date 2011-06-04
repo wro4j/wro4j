@@ -10,19 +10,20 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 
 
 /**
@@ -128,22 +129,22 @@ public final class PreProcessorExecutor {
    */
   private String getResourceContent(final Resource resource, final List<Resource> resources)
     throws IOException {
+    final WroConfiguration config = Context.get().getConfig();
     try {
       // populate duplicate Resource detector with known used resource uri's
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
       final InputStream is = uriLocatorFactory.locate(resource.getUri());
-      final String result = IOUtils.toString(new SmartEncodingInputStream(is));
+      final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       return result;
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: " + resource);
-      final boolean ignoreMissintResources = Context.get().getConfig().isIgnoreMissingResources();
-      if (ignoreMissintResources) {
-        return "";
+      if (config.isIgnoreMissingResources()) {
+        return StringUtils.EMPTY;
       } else {
-        LOG.warn("Cannot continue processing. IgnoreMissingResources is + " + ignoreMissintResources);
+        LOG.error("Cannot ignore the missing resource:  " + resource);
         throw e;
       }
     } finally {

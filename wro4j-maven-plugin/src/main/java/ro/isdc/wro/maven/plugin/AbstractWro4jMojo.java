@@ -5,6 +5,8 @@ package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,7 +15,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.classworlds.ClassWorld;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -164,40 +165,35 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected final void extendPluginClasspath()
     throws MojoExecutionException {
     // this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
-    List<String> classpathElements = null;
+    final List<String> classpathElements = new ArrayList<String>();
     try {
-      classpathElements = mavenProject.getRuntimeClasspathElements();
+      classpathElements.addAll(mavenProject.getRuntimeClasspathElements());
     } catch (final DependencyResolutionRequiredException e) {
       throw new MojoExecutionException("Could not get compile classpath elements", e);
     }
-    final ClassRealm realm = createRealm(classpathElements);
-    Thread.currentThread().setContextClassLoader(realm.getClassLoader());
+    final ClassLoader classLoader = createClassLoader(classpathElements);
+    Thread.currentThread().setContextClassLoader(classLoader);
   }
 
 
   /**
    * @return {@link ClassRealm} based on project dependencies.
    */
-  private ClassRealm createRealm(final List<String> classpathElements) {
-    final ClassWorld world = new ClassWorld();
+  private ClassLoader createClassLoader(final List<String> classpathElements) {
     getLog().debug("Classpath elements:");
-    ClassRealm realm;
+    final List<URL> urls = new ArrayList<URL>();
     try {
-      realm = world.newRealm("maven.plugin." + getClass().getSimpleName(),
-        Thread.currentThread().getContextClassLoader());
       for (final String element : classpathElements) {
         final File elementFile = new File(element);
         getLog().debug("Adding element to plugin classpath: " + elementFile.getPath());
-        final URL url = new URL("file:///" + elementFile.getPath() + (elementFile.isDirectory() ? "/" : ""));
-        realm.addConstituent(url);
+        urls.add(elementFile.toURI().toURL());
       }
     } catch (final Exception e) {
       getLog().error("Error retreiving URL for artifact", e);
       throw new RuntimeException(e);
     }
-    return realm;
+    return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
   }
-
 
   /**
    * @param contextFolder the servletContextFolder to set

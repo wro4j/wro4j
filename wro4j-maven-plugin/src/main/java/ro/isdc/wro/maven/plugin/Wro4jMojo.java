@@ -24,7 +24,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.util.encoding.SmartEncodingInputStream;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -85,7 +84,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         wroManagerFactory.trim());
       managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
-      throw new MojoExecutionException("Invalid wroManagerFactory class named: " + wroManagerFactory);
+      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
+      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
     return managerFactory;
   }
@@ -206,7 +206,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
       final OutputStream fos = new FileOutputStream(destinationFile);
       //use reader to detect encoding
-      IOUtils.copy(new SmartEncodingInputStream(resultInputStream), fos);
+      IOUtils.copy(resultInputStream, fos);
       fos.close();
       getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
       // delete empty files

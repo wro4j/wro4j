@@ -6,6 +6,7 @@ package ro.isdc.wro.model.resource.processor.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -13,6 +14,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -25,7 +27,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Feb 20, 2010
  */
 public final class BomStripperPreProcessor
-    implements ResourcePreProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor {
   /**
    * A stream which removes BOM characters.
    */
@@ -75,6 +77,13 @@ public final class BomStripperPreProcessor
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
+  }
 
   /**
    * {@inheritDoc}
@@ -82,8 +91,11 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      //using ReaderInputStream instead of ByteArrayInputStream, cause processing to freeze
-      IOUtils.copy(new BomStripperInputStream(new ByteArrayInputStream(IOUtils.toByteArray(reader))), writer);
+//      final String encoding = Context.get().getCon  fig().getEncoding();
+      //using encoding doesn't remove BOM characters
+      final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(
+          IOUtils.toString(reader).getBytes()));
+      IOUtils.copy(new InputStreamReader(is), writer);
     } finally {
       reader.close();
       writer.close();

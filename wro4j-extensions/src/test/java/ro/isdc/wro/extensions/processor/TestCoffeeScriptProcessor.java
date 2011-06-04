@@ -9,14 +9,15 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.js.CoffeScriptProcessor;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
-
 
 /**
  * Test CoffeeScript processor.
@@ -28,10 +29,16 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestCoffeeScriptProcessor {
   private ResourcePostProcessor processor;
 
-
   @Before
   public void setUp() {
-    processor = new CoffeScriptProcessor();
+    Context.set(Context.standaloneContext());
+    processor = new CoffeeScriptProcessor();
+  }
+
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   private static class Counter {
@@ -57,7 +64,7 @@ public class TestCoffeeScriptProcessor {
     throws IOException {
     final URL url = getClass().getResource("coffeeScript/exceptions");
     final Counter counter = new Counter();
-    processor = new CoffeScriptProcessor() {
+    processor = new CoffeeScriptProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
         counter.increment();
@@ -66,7 +73,7 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee",
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
       processor);
     Assert.assertEquals(2, counter.getIndex());
   }
@@ -79,7 +86,7 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
 
@@ -90,6 +97,6 @@ public class TestCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "coffee", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

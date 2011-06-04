@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
@@ -106,12 +107,8 @@ public class Context {
    * @param context {@link Context} to set.
    */
   public static void set(final Context context, final WroConfiguration config) {
-    if (context == null) {
-      throw new IllegalArgumentException("Context cannot be NULL!");
-    }
-    if (config == null) {
-      throw new IllegalArgumentException("Config cannot be NULL!");
-    }
+    Validate.notNull(context);
+    Validate.notNull(config);
     CURRENT.set(context);
     CURRENT.get().setConfig(config);
   }

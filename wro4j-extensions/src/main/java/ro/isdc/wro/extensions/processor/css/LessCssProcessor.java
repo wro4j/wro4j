@@ -138,9 +138,18 @@ public class LessCssProcessor
    */
   private LessCss getEngine() {
     if (engine == null) {
-      engine = new LessCss();
+      engine = newLessCss();
     }
     return engine;
+  }
+
+
+  /**
+   * @return the {@link LessCss} engine implementation. Override it to provide a different version of the less.js
+   *         library. Useful for upgrading the processor outside the wro4j release.
+   */
+  protected LessCss newLessCss() {
+    return new LessCss();
   }
 
 
