@@ -46,7 +46,8 @@
     </init-param>
     <init-param>
       <param-name>preProcessors</param-name>
-      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,jsMin,cssDataUri</param-value>
+      <!-- jsonhpack, -->
+      <param-value>cssUrlRewriting,cssImport,bomStripper,semicolonAppender,cssDataUri, jsMin</param-value>
     </init-param>
     <!-- cssVariables, -->
     <init-param>

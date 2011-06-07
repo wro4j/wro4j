@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010.
- * All rights reserved.
+ * Copyright (C) 2010. All rights reserved.
  */
 package ro.isdc.wro.extensions.processor.js;
 
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.algorithm.jsonhpack.JsonHPack;
-import ro.isdc.wro.extensions.processor.algorithm.less.LessCss;
+import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -27,11 +26,12 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  *
  * @author Alex Objelean
  * @since 1.2.6
- * @created 21 Apr 2010
+ * @created 7 Jun 2011
  */
+@Minimize
 @SupportedResourceType(ResourceType.JS)
-public class JsonHPackProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+public abstract class JsonHPackProcessor
+    implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPackProcessor.class);
   /**
    * Engine.
@@ -39,13 +39,37 @@ public class JsonHPackProcessor
   private JsonHPack engine;
 
   /**
+   * Private constructor, prevent instantiation.
+   */
+  private JsonHPackProcessor() {
+  }
+
+  public static JsonHPackProcessor packProcessor() {
+    return new JsonHPackProcessor() {
+      @Override
+      protected String doProcess(final String content) {
+        return getEngine().pack(content);
+      }
+    };
+  }
+
+  public static JsonHPackProcessor unpackProcessor() {
+    return new JsonHPackProcessor() {
+      @Override
+      protected String doProcess(final String content) {
+        return getEngine().unpack(content);
+      }
+    };
+  }
+
+  /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      writer.write(getEngine().less(content));
+      writer.write(doProcess(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
@@ -57,38 +81,37 @@ public class JsonHPackProcessor
   }
 
 
+  protected abstract String doProcess(final String content);
+
   /**
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {
   }
 
-
   /**
    * A getter used for lazy loading.
    */
-  private JsonHPack getEngine() {
+  JsonHPack getEngine() {
     if (engine == null) {
       engine = newEngine();
     }
     return engine;
   }
 
-
   /**
-   * @return the {@link LessCss} engine implementation. Override it to provide a different version of the less.js
-   *         library. Useful for upgrading the processor outside the wro4j release.
+   * @return the {@link JsonHPack} engine implementation. Override it to provide a different version of the
+   *         json.hpack.js library. Useful for upgrading the processor outside the wro4j release.
    */
   protected JsonHPack newEngine() {
     return new JsonHPack();
   }
 
-
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     process(null, reader, writer);
   }
 

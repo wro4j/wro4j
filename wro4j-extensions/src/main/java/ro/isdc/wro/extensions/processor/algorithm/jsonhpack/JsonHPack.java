@@ -52,11 +52,30 @@ public class JsonHPack {
   }
 
 
+  public String unpack(final String data) {
+    final StopWatch stopWatch = new StopWatch();
+    stopWatch.start("initContext");
+    final RhinoScriptBuilder builder = initScriptBuilder();
+    stopWatch.stop();
+
+    stopWatch.start("json.hunpack");
+    try {
+      final String execute = "JSON.stringify(JSON.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
+      final Object result = builder.evaluate(execute, "unpack");
+      return String.valueOf(result);
+    } catch (final RhinoException e) {
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+    } finally {
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
+    }
+  }
+
   /**
    * @param data css content to process.
    * @return processed css content.
    */
-  public String less(final String data) {
+  public String pack(final String data) {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("initContext");
     final RhinoScriptBuilder builder = initScriptBuilder();
@@ -64,7 +83,7 @@ public class JsonHPack {
 
     stopWatch.start("json.hpack");
     try {
-      final String execute = "JSON.stringify(JSON.hpack(" + WroUtil.toJSMultiLineString(data) + ", 4));";
+      final String execute = "JSON.stringify(JSON.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
       final Object result = builder.evaluate(execute, "packIt");
       return String.valueOf(result);
     } catch (final RhinoException e) {
