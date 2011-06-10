@@ -1,7 +1,7 @@
 /*
  *  Copyright 2010.
  */
-package ro.isdc.wro.extensions.processor.algorithm.jsonhpack;
+package ro.isdc.wro.extensions.processor.algorithm.cjson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,13 +18,13 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the json.hpack project: {@link https://github.com/WebReflection/json.hpack}.
+ * The underlying implementation use the cjson project: {@link http://stevehanov.ca/blog/index.php?id=104}.
  *
  * @author Alex Objelean
  * @since 1.3.8
  */
-public class JsonHPack {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonHPack.class);
+public class CJson {
+  private static final Logger LOG = LoggerFactory.getLogger(CJson.class);
 
 
   /**
@@ -48,9 +48,8 @@ public class JsonHPack {
    * @return stream of the less.js script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream("json.hpack.js");
+    return getClass().getResourceAsStream("cjson.js");
   }
-
 
   public String unpack(final String data) {
     final StopWatch stopWatch = new StopWatch();
@@ -58,9 +57,9 @@ public class JsonHPack {
     final RhinoScriptBuilder builder = initScriptBuilder();
     stopWatch.stop();
 
-    stopWatch.start("json.hunpack");
+    stopWatch.start("json.unpack");
     try {
-      final String execute = "JSON.stringify(JSON.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
+      final String execute = "CJSON.parse('" + WroUtil.toJSMultiLineString(data) + "');";
       final Object result = builder.evaluate(execute, "unpack");
       return String.valueOf(result);
     } catch (final RhinoException e) {
@@ -81,9 +80,9 @@ public class JsonHPack {
     final RhinoScriptBuilder builder = initScriptBuilder();
     stopWatch.stop();
 
-    stopWatch.start("json.hpack");
+    stopWatch.start("cjson.pack");
     try {
-      final String execute = "JSON.stringify(JSON.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
+      final String execute = "CJSON.stringify(JSON.parse(" + WroUtil.toJSMultiLineString(data) + "));";
       final Object result = builder.evaluate(execute, "pack");
       return String.valueOf(result);
     } catch (final RhinoException e) {

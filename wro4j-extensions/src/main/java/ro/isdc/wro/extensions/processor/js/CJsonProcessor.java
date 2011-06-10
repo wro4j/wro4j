@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.jsonhpack.JsonHPack;
+import ro.isdc.wro.extensions.processor.algorithm.cjson.CJson;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -22,7 +22,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * A processor using json.hpack compression algorithm: @see https://github.com/WebReflection/json.hpack
+ * A processor using cjson compression algorithm: {@link http://stevehanov.ca/blog/index.php?id=104}.
  *
  * @author Alex Objelean
  * @since 1.3.8
@@ -30,22 +30,23 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)
-public abstract class JsonHPackProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonHPackProcessor.class);
+public abstract class CJsonProcessor
+  implements ResourcePreProcessor, ResourcePostProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(CJsonProcessor.class);
   /**
    * Engine.
    */
-  private JsonHPack engine;
+  private CJson engine;
+
 
   /**
    * Private constructor, prevent instantiation.
    */
-  private JsonHPackProcessor() {
-  }
+  private CJsonProcessor() {}
 
-  public static JsonHPackProcessor packProcessor() {
-    return new JsonHPackProcessor() {
+
+  public static CJsonProcessor packProcessor() {
+    return new CJsonProcessor() {
       @Override
       protected String doProcess(final String content) {
         return getEngine().pack(content);
@@ -53,8 +54,9 @@ public abstract class JsonHPackProcessor
     };
   }
 
-  public static JsonHPackProcessor unpackProcessor() {
-    return new JsonHPackProcessor() {
+
+  public static CJsonProcessor unpackProcessor() {
+    return new CJsonProcessor() {
       @Override
       protected String doProcess(final String content) {
         return getEngine().unpack(content);
@@ -62,11 +64,12 @@ public abstract class JsonHPackProcessor
     };
   }
 
+
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
+    throws IOException {
     final String content = IOUtils.toString(reader);
     try {
       writer.write(doProcess(content));
@@ -83,35 +86,38 @@ public abstract class JsonHPackProcessor
 
   protected abstract String doProcess(final String content);
 
+
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final WroRuntimeException e) {
-  }
+  protected void onException(final WroRuntimeException e) {}
+
 
   /**
    * A getter used for lazy loading.
    */
-  JsonHPack getEngine() {
+  CJson getEngine() {
     if (engine == null) {
       engine = newEngine();
     }
     return engine;
   }
 
+
   /**
-   * @return the {@link JsonHPack} engine implementation. Override it to provide a different version of the
-   *         json.hpack.js library. Useful for upgrading the processor outside the wro4j release.
+   * @return the {@link CJson} engine implementation. Override it to provide a different version of the json.hpack.js
+   *         library. Useful for upgrading the processor outside the wro4j release.
    */
-  protected JsonHPack newEngine() {
-    return new JsonHPack();
+  protected CJson newEngine() {
+    return new CJson();
   }
+
 
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
-      throws IOException {
+    throws IOException {
     process(null, reader, writer);
   }
 

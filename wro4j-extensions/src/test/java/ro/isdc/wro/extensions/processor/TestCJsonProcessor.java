@@ -8,24 +8,24 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
+import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
- * Test json hpack processor.
+ * Test cjson processor.
  *
  * @author Alex Objelean
  * @created Created on June 07, 2011
  */
-public class TestJsonHPackProcessor {
+public class TestCJsonProcessor {
 
   @Test
   public void testPackFromFolder()
       throws Exception {
-    final ResourcePostProcessor processor = JsonHPackProcessor.packProcessor();
-    final URL url = getClass().getResource("jsonhpack");
+    final ResourcePostProcessor processor = CJsonProcessor.packProcessor();
+    final URL url = getClass().getResource("cjson");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "pack");
@@ -35,8 +35,8 @@ public class TestJsonHPackProcessor {
   @Test
   public void testUnpackFromFolder()
       throws Exception {
-    final ResourcePostProcessor processor = JsonHPackProcessor.unpackProcessor();
-    final URL url = getClass().getResource("jsonhpack");
+    final ResourcePostProcessor processor = CJsonProcessor.unpackProcessor();
+    final URL url = getClass().getResource("cjson");
 
     final File testFolder = new File(url.getFile(), "pack");
     final File expectedFolder = new File(url.getFile(), "unpack");
