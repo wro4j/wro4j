@@ -59,13 +59,13 @@ public class TestCopyrightKeeperProcessorDecorator {
   public void testMinimizeAwareDecorator1() {
     final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
     final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    Assert.assertTrue(ProcessorsUtils.isMinimizeAwareProcessor(processor));
+    Assert.assertEquals(true, ProcessorsUtils.isMinimizeAwareProcessor(processor));
   }
 
   @Test
   public void testMinimizeAwareDecorator2() {
     final ResourcePreProcessor decoratedProcessor = new CssUrlRewritingProcessor();
     final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    Assert.assertFalse(ProcessorsUtils.isMinimizeAwareProcessor(processor));
+    Assert.assertEquals(false, ProcessorsUtils.isMinimizeAwareProcessor(processor));
   }
 }

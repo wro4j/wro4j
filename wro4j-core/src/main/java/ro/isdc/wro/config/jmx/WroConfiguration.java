@@ -263,14 +263,14 @@ public final class WroConfiguration
    * @return the encoding
    */
   public String getEncoding() {
-    return this.encoding == null ? DEFAULT_ENCODING : this.encoding;
+    return this.encoding;
   }
 
   /**
    * @param encoding the encoding to set
    */
   public void setEncoding(final String encoding) {
-    this.encoding = encoding;
+    this.encoding = encoding == null ? DEFAULT_ENCODING : encoding;
   }
 
   /**

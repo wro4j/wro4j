@@ -44,15 +44,14 @@ public class DynamicServletContextResourceLocator extends ServletContextResource
   @Override
   public InputStream getInputStream()
     throws IOException {
-    InputStream inputStream = null;
-    try {
+    /**
+     * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
+     * to see if performance change.
+     */
+    InputStream inputStream = new DispatcherStreamLocator().getInputStream(request, response, getPath());
+    if (inputStream == null) {
+      //second attempt
       inputStream = super.getInputStream();
-    } catch(final IOException e) {
-      /**
-       * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
-       * to see if performance change.
-       */
-      inputStream = new ByteArrayStreamDispatchingStrategy().getInputStream(request, response, getPath());
     }
     if (inputStream == null) {
       LOG.error("Exception while reading resource from " + getPath());
