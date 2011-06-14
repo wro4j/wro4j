@@ -34,12 +34,11 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  */
-public final class ByteArrayStreamDispatchingStrategy
-    implements DynamicStreamLocatorStrategy {
+public final class DispatcherStreamLocator {
   /**
    * Logger for this class.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(ByteArrayStreamDispatchingStrategy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
 
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
@@ -80,7 +79,8 @@ public final class ByteArrayStreamDispatchingStrategy
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
-      throw new IOException("Error while dispatching the request for location " + location, e);
+      LOG.debug("Error while dispatching the request for location " + location, e);
+      return null;
     }
     if (os.size() == 0) {
       LOG.warn("Wrong or empty resource with location : " + location);

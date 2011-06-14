@@ -4,6 +4,10 @@
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
   
+  <group name="jsp">
+    <css>/WEB-INF/jsp/css.jsp</css>
+  </group>
+  
   <group name="dynamicResource">
     <js>/resource/redirect.js</js>
     <js>/external/resource.js</js>    
