@@ -51,25 +51,6 @@ public class CJson {
     return getClass().getResourceAsStream("cjson.js");
   }
 
-  public String unpack(final String data) {
-    final StopWatch stopWatch = new StopWatch();
-    stopWatch.start("initContext");
-    final RhinoScriptBuilder builder = initScriptBuilder();
-    stopWatch.stop();
-
-    stopWatch.start("json.unpack");
-    try {
-      final String execute = "CJSON.parse('" + WroUtil.toJSMultiLineString(data) + "');";
-      final Object result = builder.evaluate(execute, "unpack");
-      return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
-    } finally {
-      stopWatch.stop();
-      LOG.debug(stopWatch.prettyPrint());
-    }
-  }
-
   /**
    * @param data css content to process.
    * @return processed css content.
@@ -84,6 +65,25 @@ public class CJson {
     try {
       final String execute = "CJSON.stringify(JSON.parse(" + WroUtil.toJSMultiLineString(data) + "));";
       final Object result = builder.evaluate(execute, "pack");
+      return String.valueOf(result);
+    } catch (final RhinoException e) {
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+    } finally {
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
+    }
+  }
+
+  public String unpack(final String data) {
+    final StopWatch stopWatch = new StopWatch();
+    stopWatch.start("initContext");
+    final RhinoScriptBuilder builder = initScriptBuilder();
+    stopWatch.stop();
+
+    stopWatch.start("json.unpack");
+    try {
+      final String execute = "JSON.stringify(CJSON.parse(" + WroUtil.toJSMultiLineString(data) + "));";
+      final Object result = builder.evaluate(execute, "unpack");
       return String.valueOf(result);
     } catch (final RhinoException e) {
       throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);

@@ -151,13 +151,13 @@
 	function getKeys(templates, index) {
 		var keys = [];
 
-		console.log(templates);
+		//console.log(templates);
 		while (index > 0) {
 			keys = templates[index - 1].slice(1).concat(keys);
 			index = templates[index - 1][0];
 		}
 
-		console.log(keys);
+		//console.log(keys);
 		return keys;
 	}
 
