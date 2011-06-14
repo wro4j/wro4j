@@ -44,10 +44,9 @@ public class ServletContextUriLocator
    */
   private static final String PROTECTED_PREFIX = "/WEB-INF/";
   /**
-   * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
-   * to see if performance change.
+   * Locates a stream using request dispatcher.
    */
-  private final DynamicStreamLocatorStrategy dynamicStreamLocator = new ByteArrayStreamDispatchingStrategy();
+  private final DispatcherStreamLocator dynamicStreamLocator = new DispatcherStreamLocator();
 
   /**
    * {@inheritDoc}
@@ -107,11 +106,11 @@ public class ServletContextUriLocator
     }
 
     // first attempt
-    InputStream inputStream = servletContext.getResourceAsStream(uri);
+    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletResponse response = Context.get().getResponse();
+    InputStream inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
     if (inputStream == null) {
-      final HttpServletRequest request = Context.get().getRequest();
-      final HttpServletResponse response = Context.get().getResponse();
-      inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
+      inputStream = servletContext.getResourceAsStream(uri);
     }
     if (inputStream == null) {
       LOG.error("Exception while reading resource from " + uri);
