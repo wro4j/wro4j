@@ -61,17 +61,18 @@ public class CopyrightKeeperProcessorDecorator
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
+  public boolean isMinimize() {
+    return ProcessorsUtils.isMinimizeAwareProcessor(decoratedProcessor);
   }
 
   /**
    * {@inheritDoc}
    */
-  public boolean isMinimize() {
-    return ProcessorsUtils.isMinimizeAwareProcessor(decoratedProcessor);
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
   }
+
 
   /**
    * {@inheritDoc}
