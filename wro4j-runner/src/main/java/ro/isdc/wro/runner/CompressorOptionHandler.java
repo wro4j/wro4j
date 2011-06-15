@@ -22,7 +22,7 @@ import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -33,13 +33,13 @@ import com.google.javascript.jscomp.CompilationLevel;
  *
  * @author Alex Objelean
  */
-public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor> {
+public class CompressorOptionHandler extends OptionHandler<ResourceProcessor> {
   private static final Logger LOG = LoggerFactory.getLogger(CompressorOptionHandler.class);
 
-  private final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+  private final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
 
   public CompressorOptionHandler(final CmdLineParser parser, final OptionDef option,
-    final Setter<? super ResourcePreProcessor> setter) {
+    final Setter<? super ResourceProcessor> setter) {
     super(parser, option, setter);
     initMap();
   }
@@ -69,7 +69,7 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
     throws CmdLineException {
     final String value = params.getParameter(0);
     LOG.debug("compressor argument: " + value);
-    final ResourcePreProcessor processor = map.get(value);
+    final ResourceProcessor processor = map.get(value);
     if (processor == null) {
       throw new CmdLineException("No processor defined for alias: " + value + ". Available alias are: " + map.keySet());
     }

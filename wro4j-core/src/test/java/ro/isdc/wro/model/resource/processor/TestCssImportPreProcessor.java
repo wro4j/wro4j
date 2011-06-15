@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssImportPreProcessor {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
 
   @Before
   public void setUp() {

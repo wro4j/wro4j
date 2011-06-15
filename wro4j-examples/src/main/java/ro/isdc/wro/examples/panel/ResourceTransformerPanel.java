@@ -42,7 +42,7 @@ import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
@@ -69,7 +69,7 @@ public class ResourceTransformerPanel extends Panel {
   private String originalSize = VALUE_NOT_AVAILABLE;
   private String compressedSize = VALUE_NOT_AVAILABLE;
   private String processingTime = VALUE_NOT_AVAILABLE;
-  private transient ResourcePreProcessor processor;
+  private transient ResourceProcessor processor;
 
 
   public ResourceTransformerPanel(final String id) {
@@ -142,8 +142,8 @@ public class ResourceTransformerPanel extends Panel {
   /**
    * @return a list of resource post processors
    */
-  private static List<? extends ResourcePreProcessor> getProcessors() {
-    final List<ResourcePreProcessor> list = new ArrayList<ResourcePreProcessor>();
+  private static List<? extends ResourceProcessor> getProcessors() {
+    final List<ResourceProcessor> list = new ArrayList<ResourceProcessor>();
     //hardcode the list:
     if (true) {
       list.add(new CommentStripperProcessor());
@@ -175,9 +175,9 @@ public class ResourceTransformerPanel extends Panel {
     try {
       final Class<?>[] classes = getClasses(WroRuntimeException.class.getPackage().getName());
       for (final Class<?> clazz : classes) {
-        if (ResourcePreProcessor.class.isAssignableFrom(clazz)) {
+        if (ResourceProcessor.class.isAssignableFrom(clazz)) {
           try {
-            final ResourcePreProcessor processor = (ResourcePreProcessor)clazz.newInstance();
+            final ResourceProcessor processor = (ResourceProcessor)clazz.newInstance();
             list.add(processor);
           } catch (final Exception e) {
             LOG.warn("Could not instantiate class: " + clazz);
@@ -193,20 +193,20 @@ public class ResourceTransformerPanel extends Panel {
 
 
   private Component getProcessorSelect() {
-    final IModel<List<? extends ResourcePreProcessor>> listModel = new LoadableDetachableModel<List<? extends ResourcePreProcessor>>() {
+    final IModel<List<? extends ResourceProcessor>> listModel = new LoadableDetachableModel<List<? extends ResourceProcessor>>() {
       @Override
-      protected List<? extends ResourcePreProcessor> load() {
+      protected List<? extends ResourceProcessor> load() {
         return getProcessors();
       }
     };
-    final IChoiceRenderer<ResourcePreProcessor> renderer = new ChoiceRenderer<ResourcePreProcessor>() {
+    final IChoiceRenderer<ResourceProcessor> renderer = new ChoiceRenderer<ResourceProcessor>() {
       @Override
-      public Object getDisplayValue(final ResourcePreProcessor object) {
+      public Object getDisplayValue(final ResourceProcessor object) {
         return object.getClass().getSimpleName();
       }
     };
-    final Component component = new DropDownChoice<ResourcePreProcessor>(
-      "selectProcessor", new PropertyModel<ResourcePreProcessor>(this, "processor"), listModel, renderer);
+    final Component component = new DropDownChoice<ResourceProcessor>(
+      "selectProcessor", new PropertyModel<ResourceProcessor>(this, "processor"), listModel, renderer);
     return component;
   }
 

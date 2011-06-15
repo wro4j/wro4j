@@ -18,7 +18,7 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
@@ -33,7 +33,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class YUIJsCompressorProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   /**
    * Logger for this class.
    */

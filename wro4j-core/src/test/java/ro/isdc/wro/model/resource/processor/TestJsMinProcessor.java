@@ -34,7 +34,7 @@ public class TestJsMinProcessor {
   @Test
   public void testAsPostProcessor()
       throws IOException {
-    final ResourcePreProcessor processor = new JSMinProcessor();
+    final ResourceProcessor processor = new JSMinProcessor();
     WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
         "classpath:ro/isdc/wro/processor/jsmin-output.js", processor);
   }
@@ -42,7 +42,7 @@ public class TestJsMinProcessor {
   @Test
   public void testAsPreProcessor()
       throws IOException {
-    final ResourcePreProcessor processor = new JSMinProcessor();
+    final ResourceProcessor processor = new JSMinProcessor();
     WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
         "classpath:ro/isdc/wro/processor/jsmin-output.js", processor);
   }

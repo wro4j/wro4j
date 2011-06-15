@@ -18,7 +18,7 @@ import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**
@@ -30,7 +30,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.JS)
 public class JsHintProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
   /**
    * Options to use to configure jsHint.

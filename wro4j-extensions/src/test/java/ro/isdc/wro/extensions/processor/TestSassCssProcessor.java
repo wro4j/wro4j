@@ -10,7 +10,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -25,7 +25,7 @@ public class TestSassCssProcessor {
   public void testFromFolder()
     throws IOException {
     final URL url = getClass().getResource("sasscss");
-    final ResourcePreProcessor processor = new SassCssProcessor();
+    final ResourceProcessor processor = new SassCssProcessor();
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");

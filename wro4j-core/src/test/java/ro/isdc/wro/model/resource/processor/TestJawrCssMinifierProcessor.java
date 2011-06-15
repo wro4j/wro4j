@@ -19,7 +19,7 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestJawrCssMinifierProcessor {
   @Test
   public void testFromFolder() throws IOException {
-    final ResourcePreProcessor processor = new JawrCssMinifierProcessor();
+    final ResourceProcessor processor = new JawrCssMinifierProcessor();
 
     final URL url = getClass().getResource("jawrcss");
 

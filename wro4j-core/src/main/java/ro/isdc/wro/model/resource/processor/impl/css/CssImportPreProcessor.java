@@ -24,7 +24,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.StringUtils;
 
 
@@ -37,7 +37,7 @@ import ro.isdc.wro.util.StringUtils;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssImportPreProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.

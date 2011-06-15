@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestSingleLineCommentStripperProcessor {
-  private final ResourcePreProcessor processor = new SingleLineCommentStripperProcessor();
+  private final ResourceProcessor processor = new SingleLineCommentStripperProcessor();
 
   @Test
   public void test()

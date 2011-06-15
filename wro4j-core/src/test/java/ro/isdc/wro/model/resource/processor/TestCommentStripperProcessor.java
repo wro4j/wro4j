@@ -17,7 +17,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCommentStripperProcessor {
-  private final ResourcePreProcessor processor = new CommentStripperProcessor();
+  private final ResourceProcessor processor = new CommentStripperProcessor();
 
   @Test
   public void test()

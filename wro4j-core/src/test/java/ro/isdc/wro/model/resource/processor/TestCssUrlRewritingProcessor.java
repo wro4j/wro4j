@@ -25,7 +25,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 3, 2008
  */
 public class TestCssUrlRewritingProcessor {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
 
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
 
@@ -48,7 +48,7 @@ public class TestCssUrlRewritingProcessor {
   public void processResourceWithDataUriEncodedValue()
     throws IOException {
     final String resourceUri = "classpath:cssUrlRewriting-dataUri.css";
-    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, new ResourcePreProcessor() {
+    WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
         processor.process(createMockResource(resourceUri), reader, writer);
@@ -65,7 +65,7 @@ public class TestCssUrlRewritingProcessor {
     throws IOException {
     final String resourceUri = "classpath:" + CSS_INPUT_NAME;
     WroTestUtils.compareProcessedResourceContents(resourceUri, "classpath:cssUrlRewriting-classpath-outcome.css",
-      new ResourcePreProcessor() {
+      new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
           processor.process(createMockResource(resourceUri), reader, writer);
@@ -92,7 +92,7 @@ public class TestCssUrlRewritingProcessor {
   public void processServletContextResourceType()
     throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
-      "classpath:cssUrlRewriting-servletContext-outcome.css", new ResourcePreProcessor() {
+      "classpath:cssUrlRewriting-servletContext-outcome.css", new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
           processor.process(createMockResource("/static/img/" + CSS_INPUT_NAME), reader, writer);
@@ -108,7 +108,7 @@ public class TestCssUrlRewritingProcessor {
   public void processWEBINFServletContextResourceType()
     throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
-      "classpath:cssUrlRewriting-WEBINFservletContext-outcome.css", new ResourcePreProcessor() {
+      "classpath:cssUrlRewriting-WEBINFservletContext-outcome.css", new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
           processor.process(createMockResource("/WEB-INF/" + CSS_INPUT_NAME), reader, writer);
@@ -124,7 +124,7 @@ public class TestCssUrlRewritingProcessor {
   public void processUrlResourceType()
     throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
-      "classpath:cssUrlRewriting-url-outcome.css", new ResourcePreProcessor() {
+      "classpath:cssUrlRewriting-url-outcome.css", new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
           processor.process(createMockResource("http://www.site.com/static/css/" + CSS_INPUT_NAME), reader, writer);

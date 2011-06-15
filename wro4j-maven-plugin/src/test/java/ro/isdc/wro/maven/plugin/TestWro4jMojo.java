@@ -24,7 +24,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
@@ -146,7 +146,7 @@ public class TestWro4jMojo {
     @Override
     protected ProcessorsFactory newProcessorsFactory() {
       final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-      final ResourcePreProcessor postProcessor = Mockito.mock(ResourcePreProcessor.class);
+      final ResourceProcessor postProcessor = Mockito.mock(ResourceProcessor.class);
       try {
         Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Resource.class),
             Mockito.any(Reader.class), Mockito.any(Writer.class));

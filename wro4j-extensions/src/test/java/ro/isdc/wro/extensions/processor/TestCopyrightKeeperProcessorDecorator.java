@@ -9,7 +9,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -23,8 +23,8 @@ public class TestCopyrightKeeperProcessorDecorator {
   @Test
   public void testWithUglifyJs()
       throws Exception {
-    final ResourcePreProcessor decoratedProcessor = new UglifyJsProcessor();
-    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    final ResourceProcessor decoratedProcessor = new UglifyJsProcessor();
+    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");

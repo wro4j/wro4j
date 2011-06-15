@@ -8,7 +8,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 
@@ -37,7 +37,7 @@ public class InjectorProcessorsFactoryDecorator
    * {@inheritDoc}
    */
   @Override
-  public Collection<ResourcePreProcessor> getPreProcessors() {
+  public Collection<ResourceProcessor> getPreProcessors() {
     scanPreProcessors();
     return super.getPreProcessors();
   }
@@ -48,7 +48,7 @@ public class InjectorProcessorsFactoryDecorator
    */
   protected void scanPreProcessors() {
     // TODO ensure that it is not called to often
-    for (final ResourcePreProcessor processor : super.getPreProcessors()) {
+    for (final ResourceProcessor processor : super.getPreProcessors()) {
       injector.inject(processor);
     }
   }
@@ -58,7 +58,7 @@ public class InjectorProcessorsFactoryDecorator
    * {@inheritDoc}
    */
   @Override
-  public Collection<ResourcePreProcessor> getPostProcessors() {
+  public Collection<ResourceProcessor> getPostProcessors() {
     scanPostProcessors();
     return super.getPostProcessors();
   }
@@ -68,7 +68,7 @@ public class InjectorProcessorsFactoryDecorator
     final StopWatch watch = new StopWatch();
     watch.start("scan post processors");
     // TODO ensure that it is not called to often
-    for (final ResourcePreProcessor processor : super.getPostProcessors()) {
+    for (final ResourceProcessor processor : super.getPostProcessors()) {
       injector.inject(processor);
     }
     watch.stop();

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
@@ -55,8 +55,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private static final String TOKEN_DELIMITER = ",";
   //Use LinkedHashMap to preserve the addition order
-  private final Map<String, ResourcePreProcessor> preProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
-  private final Map<String, ResourcePreProcessor> postProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
+  private final Map<String, ResourceProcessor> preProcessors = new LinkedHashMap<String, ResourceProcessor>();
+  private final Map<String, ResourceProcessor> postProcessors = new LinkedHashMap<String, ResourceProcessor>();
 
 
   /**
@@ -86,8 +86,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * @return a map of processors to be used as both: pre & post processor.
    */
-  private Map<String, ResourcePreProcessor> createCommonProcessors() {
-    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+  private Map<String, ResourceProcessor> createCommonProcessors() {
+    final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
     map.put("bomStripper", new BomStripperPreProcessor());
     map.put("cssVariables", new CssVariablesProcessor());
     map.put("cssCompressor", new CssCompressorProcessor());
@@ -103,11 +103,11 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * Allow subclasses to contribute with it's own pre processors.
    * <p>
-   * It is implementor responsibility to add a {@link ResourcePreProcessor} instance.
+   * It is implementor responsibility to add a {@link ResourceProcessor} instance.
    *
    * @param map containing processor mappings.
    */
-  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {}
+  protected void contributePreProcessors(final Map<String, ResourceProcessor> map) {}
 
 
   /**
@@ -117,7 +117,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePostProcessors(final Map<String, ResourcePreProcessor> map) {}
+  protected void contributePostProcessors(final Map<String, ResourceProcessor> map) {}
 
   /**
    * {@inheritDoc}
@@ -133,7 +133,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * @return a list of configured preProcessors.
    */
-  List<ResourcePreProcessor> getPreProcessors() {
+  List<ResourceProcessor> getPreProcessors() {
     return getListOfItems(PARAM_PRE_PROCESSORS, preProcessors);
   }
 
@@ -141,7 +141,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * @return a list of configured preProcessors.
    */
-  List<ResourcePreProcessor> getPostProcessors() {
+  List<ResourceProcessor> getPostProcessors() {
     return getListOfItems(PARAM_POST_PROCESSORS, postProcessors);
   }
 

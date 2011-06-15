@@ -27,7 +27,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 public class TestProcessorsUtils {
 
   private static class AnyTypeProcessor
-    implements ResourcePreProcessor {
+    implements ResourceProcessor {
     public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {}
   }
@@ -41,17 +41,17 @@ public class TestProcessorsUtils {
   @SuppressWarnings("unchecked")
   @Test
   public void testGetProcessorsByTypeWithEmptyCollection() {
-    final Collection<ResourcePreProcessor> input = Collections.EMPTY_LIST;
-    final Collection<ResourcePreProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
+    final Collection<ResourceProcessor> input = Collections.EMPTY_LIST;
+    final Collection<ResourceProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
     Assert.assertEquals(0, output.size());
   }
 
   @Test
   public void testGetProcessorsByType1() {
-    final Collection<ResourcePreProcessor> input = Arrays.asList(new ResourcePreProcessor[] {
+    final Collection<ResourceProcessor> input = Arrays.asList(new ResourceProcessor[] {
       new JSMinProcessor(), new CssMinProcessor()
     });
-    Collection<ResourcePreProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
+    Collection<ResourceProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
     Assert.assertEquals(1, output.size());
     output = ProcessorsUtils.getProcessorsByType(ResourceType.JS, input);
     Assert.assertEquals(1, output.size());
@@ -62,10 +62,10 @@ public class TestProcessorsUtils {
 
   @Test
   public void testGetProcessorsByType2() {
-    final Collection<ResourcePreProcessor> input = Arrays.asList(new ResourcePreProcessor[] {
+    final Collection<ResourceProcessor> input = Arrays.asList(new ResourceProcessor[] {
       new CssMinProcessor(), new AnyTypeProcessor()
     });
-    Collection<ResourcePreProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
+    Collection<ResourceProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
     Assert.assertEquals(2, output.size());
     output = ProcessorsUtils.getProcessorsByType(ResourceType.JS, input);
     Assert.assertEquals(1, output.size());
@@ -76,10 +76,10 @@ public class TestProcessorsUtils {
 
   @Test
   public void testGetProcessorsByTypeWithDecorator1() {
-    final Collection<ResourcePreProcessor> input = Arrays.asList(new ResourcePreProcessor[] {
+    final Collection<ResourceProcessor> input = Arrays.asList(new ResourceProcessor[] {
       CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor())
     });
-    Collection<ResourcePreProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
+    Collection<ResourceProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
     Assert.assertEquals(0, output.size());
     output = ProcessorsUtils.getProcessorsByType(ResourceType.JS, input);
     Assert.assertEquals(1, output.size());
@@ -89,10 +89,10 @@ public class TestProcessorsUtils {
 
   @Test
   public void testGetProcessorsByTypeWithDecorator2() {
-    final Collection<ResourcePreProcessor> input = Arrays.asList(new ResourcePreProcessor[] {
+    final Collection<ResourceProcessor> input = Arrays.asList(new ResourceProcessor[] {
       CopyrightKeeperProcessorDecorator.decorate(new CssMinProcessor())
     });
-    Collection<ResourcePreProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
+    Collection<ResourceProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
     Assert.assertEquals(1, output.size());
     output = ProcessorsUtils.getProcessorsByType(ResourceType.JS, input);
     Assert.assertEquals(0, output.size());
@@ -103,11 +103,11 @@ public class TestProcessorsUtils {
 
   @Test
   public void testGetProcessorsByTypeWithDecorator3() {
-    final Collection<ResourcePreProcessor> input = Arrays.asList(new ResourcePreProcessor[] {
+    final Collection<ResourceProcessor> input = Arrays.asList(new ResourceProcessor[] {
       CopyrightKeeperProcessorDecorator.decorate(new AnyTypeProcessor()),
       CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor())
     });
-    Collection<ResourcePreProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
+    Collection<ResourceProcessor> output = ProcessorsUtils.getProcessorsByType(ResourceType.CSS, input);
     Assert.assertEquals(1, output.size());
     output = ProcessorsUtils.getProcessorsByType(ResourceType.JS, input);
     Assert.assertEquals(2, output.size());

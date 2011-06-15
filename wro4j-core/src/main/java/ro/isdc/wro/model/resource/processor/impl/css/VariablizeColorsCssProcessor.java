@@ -12,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
 
 /**
@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class VariablizeColorsCssProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   /**
    * {@inheritDoc}
    */

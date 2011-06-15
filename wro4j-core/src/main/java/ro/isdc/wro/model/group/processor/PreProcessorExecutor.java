@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 
@@ -75,7 +75,7 @@ public final class PreProcessorExecutor {
     throws IOException {
     // TODO: hold a list of processed resources in order to avoid duplicates
     // merge preProcessorsBy type and anyPreProcessors
-    Collection<ResourcePreProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
+    Collection<ResourceProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
       processorsFactory.getPreProcessors());
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
@@ -94,7 +94,7 @@ public final class PreProcessorExecutor {
    * @param processors the list of processor to apply on the resource.
    */
   private String applyPreProcessors(final Resource resource, final List<Resource> resources,
-    final Collection<ResourcePreProcessor> processors)
+    final Collection<ResourceProcessor> processors)
     throws IOException {
     String resourceContent = getResourceContent(resource, resources);
     if (processors.isEmpty()) {
@@ -102,7 +102,7 @@ public final class PreProcessorExecutor {
     }
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
-    for (final ResourcePreProcessor processor : processors) {
+    for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       writer = new StringWriter();
       // skip minimize validation if resource doesn't want to be minimized

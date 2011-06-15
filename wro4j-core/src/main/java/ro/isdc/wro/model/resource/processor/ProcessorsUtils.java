@@ -58,7 +58,7 @@ public class ProcessorsUtils {
   }
 
   /**
-   * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor} or null (any).
+   * @param <T> processor type. Can be {@link ResourceProcessor}, {@link ResourcePostProcessor} or null (any).
    * @param type {@link ResourceType} to apply for searching on available processors.
    * @param availableProcessors a list where to perform the search.
    * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:
@@ -85,10 +85,10 @@ public class ProcessorsUtils {
    * @return preProcessor of type processorClass if any found or null otherwise.
    */
   @SuppressWarnings("unchecked")
-  public static final <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass,
-    final Collection<ResourcePreProcessor> preProcessors) {
+  public static final <T extends ResourceProcessor> T findPreProcessorByClass(final Class<T> processorClass,
+    final Collection<ResourceProcessor> preProcessors) {
     T found = null;
-    for (final ResourcePreProcessor processor : preProcessors) {
+    for (final ResourceProcessor processor : preProcessors) {
       if (processorClass.isInstance(processor)) {
         found = (T)processor;
         return found;

@@ -21,7 +21,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestBomStripperPreProcessor {
-  private final ResourcePreProcessor processor = new BomStripperPreProcessor();
+  private final ResourceProcessor processor = new BomStripperPreProcessor();
 
   @Before
   public void setUp() {

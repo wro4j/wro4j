@@ -17,7 +17,7 @@ import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -33,7 +33,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    * {@inheritDoc}
    */
   @Override
-  protected void contributePostProcessors(final Map<String, ResourcePreProcessor> map) {
+  protected void contributePostProcessors(final Map<String, ResourceProcessor> map) {
     map.putAll(createCommonProcessors());
   }
 
@@ -41,7 +41,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    * {@inheritDoc}
    */
   @Override
-  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
+  protected void contributePreProcessors(final Map<String, ResourceProcessor> map) {
     map.putAll(createCommonProcessors());
     map.put("cssDataUri", new CssDataUriPreProcessor());
   }
@@ -49,8 +49,8 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
   /**
    * @return a map of processors to be used as both: pre & post processor.
    */
-  private Map<String, ResourcePreProcessor> createCommonProcessors() {
-    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+  private Map<String, ResourceProcessor> createCommonProcessors() {
+    final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
     map.put("yuiCssMin", new YUICssCompressorProcessor());
     map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
     map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());

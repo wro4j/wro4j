@@ -17,7 +17,7 @@ import ro.isdc.wro.extensions.processor.algorithm.coffeescript.CoffeeScript;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**
@@ -29,7 +29,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.JS)
 public class CoffeeScriptProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
   /**
    * Engine.

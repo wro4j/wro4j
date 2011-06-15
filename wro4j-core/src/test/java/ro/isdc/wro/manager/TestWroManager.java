@@ -48,7 +48,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -72,7 +72,7 @@ public class TestWroManager {
    * resource is the pre processed resource of this processor.
    */
   private static final class WroManagerProcessor
-      implements ResourcePreProcessor {
+      implements ResourceProcessor {
     private final WroManager manager = new BaseWroManagerFactory() {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
@@ -194,7 +194,7 @@ public class TestWroManager {
   @Test
   public void testFromFolder()
       throws Exception {
-    final ResourcePreProcessor processor = new WroManagerProcessor();
+    final ResourceProcessor processor = new WroManagerProcessor();
     final URL url = getClass().getResource("wroManager");
 
     final File testFolder = new File(url.getFile(), "test");

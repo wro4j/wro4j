@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 
 
@@ -31,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
  * @since 1.3.7
  */
 public class CopyrightKeeperProcessorDecorator
-  implements ResourcePreProcessor, SupportedResourceTypeAware, MinimizeAware {
+  implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware {
   private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
 
   /** The url pattern */
@@ -41,13 +41,13 @@ public class CopyrightKeeperProcessorDecorator
    * A processor which does the compression logic and probably removes copyright comments. If copyright comments are
    * removed, our processor will put them back`.
    */
-  private final ResourcePreProcessor decoratedProcessor;
+  private final ResourceProcessor decoratedProcessor;
 
-  private CopyrightKeeperProcessorDecorator(final ResourcePreProcessor preProcessor) {
+  private CopyrightKeeperProcessorDecorator(final ResourceProcessor preProcessor) {
     this.decoratedProcessor = preProcessor;
   }
 
-  public static CopyrightKeeperProcessorDecorator decorate(final ResourcePreProcessor preProcessor) {
+  public static CopyrightKeeperProcessorDecorator decorate(final ResourceProcessor preProcessor) {
     return new CopyrightKeeperProcessorDecorator(preProcessor);
   }
 

@@ -23,7 +23,7 @@ import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 
@@ -94,8 +94,8 @@ public class GroupsProcessor {
     if (content == null) {
       throw new IllegalArgumentException("content cannot be null!");
     }
-    final Collection<ResourcePreProcessor> allPostProcessors = processorsFactory.getPostProcessors();
-    Collection<ResourcePreProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
+    final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
+    Collection<ResourceProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
     processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
@@ -112,7 +112,7 @@ public class GroupsProcessor {
    * @param content to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourcePreProcessor> processors, final String content)
+  private String applyPostProcessors(final Collection<ResourceProcessor> processors, final String content)
     throws IOException {
     if (processors.isEmpty()) {
       return content;
@@ -120,7 +120,7 @@ public class GroupsProcessor {
     Reader input = new StringReader(content.toString());
     Writer output = null;
     final StopWatch stopWatch = new StopWatch();
-    for (final ResourcePreProcessor processor : processors) {
+    for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
       processor.process(null, input, output);

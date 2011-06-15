@@ -19,7 +19,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Jul 05, 2009
  */
 public class TestCssVariablesProcessor {
-  private final ResourcePreProcessor processor = new CssVariablesProcessor();
+  private final ResourceProcessor processor = new CssVariablesProcessor();
 
   @Test
   public void testFromFolder()

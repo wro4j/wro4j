@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class MultiLineCommentStripperProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   /**
    * Pattern containing a regex matching multiline comments & empty new lines.
    */

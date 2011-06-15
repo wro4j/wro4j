@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 
 
@@ -31,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
  */
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssUrlRewritingProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
 
   /**

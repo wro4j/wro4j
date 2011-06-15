@@ -20,7 +20,7 @@ public class TestCssMinProcessor {
   @Test
   public void testFromFolder()
     throws IOException {
-    final ResourcePreProcessor processor = new CssMinProcessor();
+    final ResourceProcessor processor = new CssMinProcessor();
 
     final URL url = getClass().getResource("cssmin");
 

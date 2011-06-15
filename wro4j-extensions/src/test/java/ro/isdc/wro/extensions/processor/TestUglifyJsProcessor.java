@@ -10,7 +10,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -23,7 +23,7 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestUglifyJsProcessor {
   @Test
   public void testFromFolder() throws IOException {
-    final ResourcePreProcessor processor = new UglifyJsProcessor();
+    final ResourceProcessor processor = new UglifyJsProcessor();
     final URL url = getClass().getResource("uglify");
 
     final File testFolder = new File(url.getFile(), "test");

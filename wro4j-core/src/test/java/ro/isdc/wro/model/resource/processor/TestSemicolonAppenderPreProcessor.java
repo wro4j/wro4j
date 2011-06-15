@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on March 21, 2010
  */
 public class TestSemicolonAppenderPreProcessor {
-  private final ResourcePreProcessor processor = new SemicolonAppenderPreProcessor();
+  private final ResourceProcessor processor = new SemicolonAppenderPreProcessor();
 
   @Test
   public void test()

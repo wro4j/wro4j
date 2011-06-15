@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.processor.Minimize;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**
@@ -26,17 +26,17 @@ public class SimpleProcessorsFactory
   /**
    * a list of pre processors.
    */
-  private final Collection<ResourcePreProcessor> preProcessors = new ArrayList<ResourcePreProcessor>();
+  private final Collection<ResourceProcessor> preProcessors = new ArrayList<ResourceProcessor>();
   /**
    * a list of post processors.
    */
-  private final Collection<ResourcePreProcessor> postProcessors = new ArrayList<ResourcePreProcessor>();
+  private final Collection<ResourceProcessor> postProcessors = new ArrayList<ResourceProcessor>();
 
 
   /**
    * {@inheritDoc}
    */
-  public Collection<ResourcePreProcessor> getPreProcessors() {
+  public Collection<ResourceProcessor> getPreProcessors() {
     return preProcessors;
   }
 
@@ -44,7 +44,7 @@ public class SimpleProcessorsFactory
   /**
    * {@inheritDoc}
    */
-  public Collection<ResourcePreProcessor> getPostProcessors() {
+  public Collection<ResourceProcessor> getPostProcessors() {
     return postProcessors;
   }
 
@@ -52,7 +52,7 @@ public class SimpleProcessorsFactory
   /**
    * {@inheritDoc}
    */
-  public void setResourcePreProcessors(final Collection<ResourcePreProcessor> processors) {
+  public void setResourcePreProcessors(final Collection<ResourceProcessor> processors) {
     preProcessors.clear();
     if (processors != null) {
       preProcessors.addAll(processors);
@@ -63,7 +63,7 @@ public class SimpleProcessorsFactory
   /**
    * {@inheritDoc}
    */
-  public void setResourcePostProcessors(final Collection<ResourcePreProcessor> processors) {
+  public void setResourcePostProcessors(final Collection<ResourceProcessor> processors) {
     postProcessors.clear();
     if (processors != null) {
       postProcessors.addAll(processors);
@@ -72,9 +72,9 @@ public class SimpleProcessorsFactory
 
 
   /**
-   * Add a {@link ResourcePreProcessor}.
+   * Add a {@link ResourceProcessor}.
    */
-  public SimpleProcessorsFactory addPreProcessor(final ResourcePreProcessor processor) {
+  public SimpleProcessorsFactory addPreProcessor(final ResourceProcessor processor) {
     preProcessors.add(processor);
     return this;
   }
@@ -83,7 +83,7 @@ public class SimpleProcessorsFactory
   /**
    * Add a {@link ResourcePostProcessor}.
    */
-  public SimpleProcessorsFactory addPostProcessor(final ResourcePreProcessor processor) {
+  public SimpleProcessorsFactory addPostProcessor(final ResourceProcessor processor) {
     if (processor.getClass().isAnnotationPresent(Minimize.class)) {
       //TODO move large messages to properties file
       LOG.warn("It is recommended to add minimize aware processors to " +

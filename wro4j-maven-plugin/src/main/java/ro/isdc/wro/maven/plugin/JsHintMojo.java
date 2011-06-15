@@ -23,7 +23,7 @@ import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManag
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
@@ -104,7 +104,7 @@ public class JsHintMojo extends AbstractWro4jMojo {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
         final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-        final ResourcePreProcessor processor = new JsHintProcessor() {
+        final ResourceProcessor processor = new JsHintProcessor() {
           @Override
           protected void onJsHintException(final JsHintException e, final Resource resource)
             throws Exception {

@@ -17,8 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**
@@ -30,7 +29,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created 15 Jun 2011
  */
 public class PlaceholderInterpolationProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(PlaceholderInterpolationProcessor.class);
 
   /** The url pattern */
@@ -44,15 +43,6 @@ public class PlaceholderInterpolationProcessor
    * missing variables will be replaced with empty value.
    */
   private boolean ignoreMissingVariables = true;
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
-  }
-
 
   /**
    * {@inheritDoc}

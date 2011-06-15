@@ -18,7 +18,7 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilationLevel;
@@ -39,7 +39,7 @@ import com.google.javascript.jscomp.Result;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GoogleClosureCompressorProcessor.class);
   /**
    * {@link CompilationLevel} to use for compression.

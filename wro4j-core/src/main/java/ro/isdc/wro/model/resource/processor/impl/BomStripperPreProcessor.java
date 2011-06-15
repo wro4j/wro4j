@@ -14,7 +14,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**
@@ -26,7 +26,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Feb 20, 2010
  */
 public final class BomStripperPreProcessor
-    implements ResourcePreProcessor {
+    implements ResourceProcessor {
   /**
    * A stream which removes BOM characters.
    */

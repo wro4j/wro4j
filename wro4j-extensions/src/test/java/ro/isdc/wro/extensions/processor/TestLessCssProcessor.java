@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -31,7 +31,7 @@ public class TestLessCssProcessor {
   @Test
   public void testFromFolder()
       throws Exception {
-    final ResourcePreProcessor processor = new LessCssProcessor();
+    final ResourceProcessor processor = new LessCssProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -42,7 +42,7 @@ public class TestLessCssProcessor {
   @Test(expected=WroRuntimeException.class)
   public void testInvalidLessCss()
       throws Exception {
-    final ResourcePreProcessor processor = new LessCssProcessor() {
+    final ResourceProcessor processor = new LessCssProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
         LOG.debug("Exception message is: " + e.getMessage());

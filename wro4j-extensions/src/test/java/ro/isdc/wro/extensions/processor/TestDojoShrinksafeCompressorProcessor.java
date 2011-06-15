@@ -10,7 +10,7 @@ import java.net.URL;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -23,7 +23,7 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestDojoShrinksafeCompressorProcessor {
   @Test
   public void testFromFolder() throws IOException {
-    final ResourcePreProcessor processor = new DojoShrinksafeCompressorProcessor();
+    final ResourceProcessor processor = new DojoShrinksafeCompressorProcessor();
     final URL url = getClass().getResource("dojo");
 
     final File testFolder = new File(url.getFile(), "test");

@@ -10,7 +10,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -21,7 +21,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class CommentStripperProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   /**
    * {@inheritDoc}
    */

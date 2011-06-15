@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Aug 15, 2010
  */
 public class TestConformColorsCssProcessor {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
 
   @Before
   public void setUp() {

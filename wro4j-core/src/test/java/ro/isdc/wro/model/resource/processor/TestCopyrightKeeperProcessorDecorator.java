@@ -28,8 +28,8 @@ public class TestCopyrightKeeperProcessorDecorator {
   @Test
   public void testCopyrightStripperProcessor()
       throws Exception {
-    final ResourcePreProcessor decoratedProcessor = new CssMinProcessor();
-    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    final ResourceProcessor decoratedProcessor = new CssMinProcessor();
+    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -41,13 +41,13 @@ public class TestCopyrightKeeperProcessorDecorator {
   public void testCopyrightAwareProcessor()
       throws Exception {
     //This procesor won't remove copyright headers.
-    final ResourcePreProcessor decoratedProcessor = new ResourcePreProcessor() {
+    final ResourceProcessor decoratedProcessor = new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
         IOUtils.copy(reader, writer);
       }
     };
-    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -57,15 +57,15 @@ public class TestCopyrightKeeperProcessorDecorator {
 
   @Test
   public void testMinimizeAwareDecorator1() {
-    final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
-    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    final ResourceProcessor decoratedProcessor = new JSMinProcessor();
+    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     Assert.assertEquals(true, ProcessorsUtils.isMinimizeAwareProcessor(processor));
   }
 
   @Test
   public void testMinimizeAwareDecorator2() {
-    final ResourcePreProcessor decoratedProcessor = new CssUrlRewritingProcessor();
-    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
+    final ResourceProcessor decoratedProcessor = new CssUrlRewritingProcessor();
+    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     Assert.assertEquals(false, ProcessorsUtils.isMinimizeAwareProcessor(processor));
   }
 }

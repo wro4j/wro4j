@@ -26,7 +26,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Mat 09, 2010
  */
 public class TestDuplicateAwareCssDataUriPreProcessor {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
 
 
   @Before
@@ -46,7 +46,7 @@ public class TestDuplicateAwareCssDataUriPreProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", new ResourcePreProcessor() {
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
         processor.process(createMockResource("file:" + testFolder.getPath() + "/test.css"), reader, writer);
