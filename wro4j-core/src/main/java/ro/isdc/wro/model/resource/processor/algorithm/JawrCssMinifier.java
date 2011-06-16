@@ -46,7 +46,16 @@ public class JawrCssMinifier {
   // brackets, parentheses,colons and semicolons and any spaces around them (except spaces AFTER a parentheses closing
   // symbol),
   // and ( +) occurrences of one or more spaces.
-  private static final String SPACES_REGEX = "(\\s*\\{\\s*)|(\\s*\\}\\s*)|(\\s*\\(\\s*)|(\\s*;\\s*)|(\\s*:\\s*)|(\\s*\\))|( +)";
+  /**
+   * There is a special case when the space should not be removed when preceeded by and keyword. Ex:
+   * <code>
+   * @media only screen and (max-width:767px){
+   * }
+   * </code>
+   * <p/>
+   * More details about this issue, here: {@link http://code.google.com/p/wro4j/issues/detail?id=231#makechanges}
+   */
+  private static final String SPACES_REGEX = "(?ims)(\\s*\\{\\s*)|(\\s*\\}\\s*)|((?<!\\sand)\\s*\\(\\s*)|(\\s*;\\s*)|(\\s*:\\s*)|(\\s*\\))|( +)";
 
   private static final Pattern COMMENTS_PATTERN = Pattern.compile(COMMENT_REGEX, Pattern.DOTALL);
   private static final Pattern SPACES_PATTERN = Pattern.compile(SPACES_REGEX, Pattern.DOTALL);
