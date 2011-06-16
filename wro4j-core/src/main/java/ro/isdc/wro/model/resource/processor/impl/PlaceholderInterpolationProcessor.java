@@ -19,6 +19,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -35,10 +36,13 @@ public class PlaceholderInterpolationProcessor
 
   /** The url pattern */
   private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?ims)\\$\\{((.*?))}");
+  private static final Properties EMPTY_PROPERTIES = new Properties();
+
   /**
-   * Properties containing values of the variables to substitute. By default use an empty properties object.
+   * Factory used to build Properties object containing values of the variables to substitute.
    */
-  private Properties properties = new Properties();
+  private ObjectFactory<Properties> propertiesFactory;
+
   /**
    * If false, when a variable is not defined, a runtime exception will be thrown. Default value is true - meaning that
    * missing variables will be replaced with empty value.
@@ -62,10 +66,19 @@ public class PlaceholderInterpolationProcessor
     final String content = IOUtils.toString(reader);
     final Matcher matcher = PATTERN_PLACEHOLDER.matcher(content);
     final StringBuffer sb = new StringBuffer();
+
+    Properties properties = null;
+    if (propertiesFactory != null) {
+      properties = propertiesFactory.create();
+    }
+    //be sure that properties will never be null;
+    if (properties == null) {
+      properties = EMPTY_PROPERTIES;
+    }
     while (matcher.find()) {
       final String variableName = matcher.group(1);
       LOG.debug("found placeholder: {}", variableName);
-      matcher.appendReplacement(sb, replaceVariable(variableName));
+      matcher.appendReplacement(sb, replaceVariable(properties, variableName));
     }
     matcher.appendTail(sb);
     writer.write(sb.toString());
@@ -76,7 +89,7 @@ public class PlaceholderInterpolationProcessor
    * @param variableName
    * @return
    */
-  private String replaceVariable(final String variableName) {
+  private String replaceVariable(final Properties properties, final String variableName) {
     final String variableValue = properties.getProperty(variableName);
     if (!ignoreMissingVariables && variableValue == null) {
       throw new WroRuntimeException("No value defind for variable called: [" + variableName + "]");
@@ -98,14 +111,10 @@ public class PlaceholderInterpolationProcessor
 
 
   /**
-   * @param properties the properties to set
+   * @param propertiesFactory the propertiesFactory to set
    */
-  public PlaceholderInterpolationProcessor setProperties(final Properties properties) {
-    LOG.debug("setting properties: {}", properties);
-    //be sure that properties will never be null;
-    if (properties != null) {
-      this.properties = properties;
-    }
+  public PlaceholderInterpolationProcessor setPropertiesFactory(final ObjectFactory<Properties> propertiesFactory) {
+    this.propertiesFactory = propertiesFactory;
     return this;
   }
 }

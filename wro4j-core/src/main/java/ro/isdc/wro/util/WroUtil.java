@@ -344,4 +344,12 @@ public final class WroUtil {
       }
     };
   }
+
+  public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
+    return new ObjectFactory<T>() {
+      public T create() {
+        return object;
+      }
+    };
+  }
 }
