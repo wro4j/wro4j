@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +17,7 @@ import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
- * TestMultiLineCommentStripperPostProcessor.java.
+ * TestJsMinProcessor.
  *
  * @author Alex Objelean
  * @created Created on Nov 28, 2008
@@ -32,18 +34,14 @@ public class TestJsMinProcessor {
   }
 
   @Test
-  public void testAsPostProcessor()
-      throws IOException {
+  public void testFromFolder()
+    throws IOException {
     final ResourceProcessor processor = new JSMinProcessor();
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
-        "classpath:ro/isdc/wro/processor/jsmin-output.js", processor);
-  }
 
-  @Test
-  public void testAsPreProcessor()
-      throws IOException {
-    final ResourceProcessor processor = new JSMinProcessor();
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsmin-input.js",
-        "classpath:ro/isdc/wro/processor/jsmin-output.js", processor);
+    final URL url = getClass().getResource("jsmin");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

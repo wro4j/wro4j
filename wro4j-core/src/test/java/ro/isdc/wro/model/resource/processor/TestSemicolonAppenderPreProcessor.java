@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2008 ISDC! Romania. All rights reserved.
+ * Copyright (c) 2008. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.junit.Test;
 
@@ -18,12 +20,15 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on March 21, 2010
  */
 public class TestSemicolonAppenderPreProcessor {
-  private final ResourceProcessor processor = new SemicolonAppenderPreProcessor();
-
   @Test
-  public void test()
-      throws IOException {
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/jsSemicolonAppender-input.js",
-        "classpath:ro/isdc/wro/processor/jsSemicolonAppender-output.js", processor);
+  public void testFromFolder()
+    throws IOException {
+    final ResourceProcessor processor = new SemicolonAppenderPreProcessor();
+
+    final URL url = getClass().getResource("semicolonAppender");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

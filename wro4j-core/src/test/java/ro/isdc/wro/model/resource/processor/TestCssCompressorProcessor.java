@@ -3,7 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.junit.Test;
 
@@ -15,13 +17,15 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssCompressorProcessor {
-  private final ResourceProcessor processor = new CssCompressorProcessor();
-
-
   @Test
-  public void test()
-    throws IOException {
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/cssCompressor-input.css",
-      "classpath:ro/isdc/wro/processor/cssCompressor-output.css", processor);
+  public void testFromFolder() throws IOException {
+    final ResourceProcessor processor = new CssCompressorProcessor();
+
+    final URL url = getClass().getResource("cssCompressor");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
+      processor);
   }
 }

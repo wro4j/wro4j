@@ -295,7 +295,7 @@ public class WroTestUtils {
             throws IOException {
             // ResourceType doesn't matter here
 
-            final ResourceType resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            final ResourceType resourceType = ResourceType.getSafe(FilenameUtils.getExtension(file.getPath()));
             preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
           }
         });
