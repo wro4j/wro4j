@@ -4,13 +4,14 @@
  */
 package ro.isdc.wro.examples.manager;
 
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
@@ -31,9 +32,9 @@ public class CustomWroManager
     factory.addPreProcessor(new CssUrlRewritingProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     factory.addPreProcessor(new JSMinProcessor());
-    factory.addPreProcessor(new CssMinProcessor());
+    factory.addPreProcessor(new YUICssCompressorProcessor());
 
-    //factory.addPostProcessor(new CssVariablesProcessor());
+    factory.addPostProcessor(new CssVariablesProcessor());
     return factory;
   }
 }
