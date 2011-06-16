@@ -1,0 +1,5 @@
+@media only screen and (max-width: 767px) {
+  .container { width: 768px; }
+  .container .column, 
+  .container .columns { margin-left: 10px; margin-right: 10px;  }	  	
+}
