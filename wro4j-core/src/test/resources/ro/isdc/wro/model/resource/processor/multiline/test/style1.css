@@ -1,0 +1,20 @@
+/* First comment
+ first comment—line two*/
+/* Second comment */
+/****
+ * multiline comment
+ ****/
+.element {
+	border: solid black 1px;
+}
+/**
+ * This is another comment.
+ */
+/****
+ * Common multi-line comment style.
+ ****/
+.uniform {
+  background: yellow;/* example */
+	color: red;
+}
+

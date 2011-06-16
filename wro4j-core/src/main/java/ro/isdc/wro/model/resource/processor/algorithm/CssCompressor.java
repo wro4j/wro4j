@@ -41,7 +41,6 @@
  *
  * This code is a port of Isaac Schlueter's cssmin utility.
  */
-
 package ro.isdc.wro.model.resource.processor.algorithm;
 
 import java.io.IOException;
@@ -59,7 +58,7 @@ import java.util.regex.Pattern;
 
 public class CssCompressor {
 
-  private StringBuffer srcsb = new StringBuffer();
+  private final StringBuffer srcsb = new StringBuffer();
 
 
   public CssCompressor(final Reader in) throws IOException {

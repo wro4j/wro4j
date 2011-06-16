@@ -3,7 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.junit.Test;
 
@@ -18,21 +20,16 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestMultiLineCommentStripperProcessor {
-  private final ResourcePostProcessor processor = new MultiLineCommentStripperProcessor();
-
 
   @Test
-  public void test1()
-    throws IOException {
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/multiline-input.css",
-      "classpath:ro/isdc/wro/processor/multiline-output.css", processor);
-  }
+  public void testFromFolder() throws IOException {
+    final ResourcePostProcessor processor = new MultiLineCommentStripperProcessor();
 
+    final URL url = getClass().getResource("multiline");
 
-  @Test
-  public void test2()
-    throws IOException {
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/multiline2-input.js",
-      "classpath:ro/isdc/wro/processor/multiline2-output.js", processor);
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "*",
+      processor);
   }
 }
