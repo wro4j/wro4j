@@ -254,4 +254,12 @@ public final class WroUtil {
     response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
     response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
   }
+
+  public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
+    return new ObjectFactory<T>() {
+      public T create() {
+        return object;
+      }
+    };
+  }
 }

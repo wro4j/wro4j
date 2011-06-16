@@ -12,6 +12,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.impl.PlaceholderInterpolationProcessor;
 import ro.isdc.wro.util.WroTestUtils;
+import ro.isdc.wro.util.WroUtil;
 
 /**
  * @author Alex Objelean
@@ -25,8 +26,7 @@ public class TestPlaceholderInterpolationProcessor {
     properties.setProperty("prop2", "value2");
     properties.setProperty("prop3", "value3");
     properties.setProperty("prop4", "value4");
-
-    final ResourceProcessor processor = new PlaceholderInterpolationProcessor().setProperties(properties);
+    final ResourceProcessor processor = new PlaceholderInterpolationProcessor().setPropertiesFactory(WroUtil.simpleObjectFactory(properties));
     final URL url = getClass().getResource("placeholderInterpolation");
 
     final File testFolder = new File(url.getFile(), "test");
