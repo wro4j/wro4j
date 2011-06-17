@@ -2,9 +2,48 @@
 <groups xmlns="http://www.isdc.ro/wro"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
-
 <group name="skeleton">
     <css>/static/css/skeleton/*.css</css>
+  </group>
+  
+  <group name="comp1">
+    <js>/static/js/json/comp1.js</js>
+  </group>
+  
+  <group name="comp2">
+    <js>/static/js/json/comp2.js</js>
+  </group>
+  
+  <group name="comp3">
+    <js>/static/js/json/comp3.js</js>
+  </group>
+  
+  <group name="comp4">
+    <js>/static/js/json/comp4.js</js>
+  </group>
+  
+  <group name="comp5">
+    <js>/static/js/json/comp5.js</js>
+  </group>
+  
+  <group name="json1">
+    <js>/static/js/json/json1.js</js>
+  </group>
+  
+  <group name="json2">
+    <js>/static/js/json/json2.js</js>
+  </group>
+  
+  <group name="json3">
+    <js>/static/js/json/json3.js</js>
+  </group>
+  
+  <group name="json4">
+    <js>/static/js/json/json4.js</js>
+  </group>
+  
+  <group name="json5">
+    <js>/static/js/json/json5.js</js>
   </group>
   
   
