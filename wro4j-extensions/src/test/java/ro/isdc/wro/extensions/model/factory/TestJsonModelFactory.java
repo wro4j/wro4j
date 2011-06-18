@@ -42,7 +42,7 @@ public class TestJsonModelFactory {
         return new ClasspathResourceLocator("INVALID.json");
       };
     };
-    factory.getInstance();
+    factory.create();
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -59,7 +59,7 @@ public class TestJsonModelFactory {
         };
       };
     };
-    Assert.assertNull(factory.getInstance());
+    Assert.assertNull(factory.create());
   }
 
   @Test
@@ -70,7 +70,7 @@ public class TestJsonModelFactory {
         return new UrlResourceLocator(TestJsonModelFactory.class.getResource("wro.json"));
       };
     };
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
     LOG.debug("model: {}", model);
@@ -89,7 +89,7 @@ public class TestJsonModelFactory {
         return new UrlResourceLocator(TestJsonModelFactory.class.getResource("incomplete-wro.json"));
       };
     };
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(1, model.getGroups().size());
     final Group group = new ArrayList<Group>(model.getGroups()).get(0);

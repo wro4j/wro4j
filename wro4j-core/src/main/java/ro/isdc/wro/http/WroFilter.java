@@ -35,13 +35,13 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheChangeCallbackAware;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
-import ro.isdc.wro.config.factory.WroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -123,8 +123,8 @@ public class WroFilter
   /**
    * @return implementation of {@link WroConfigurationFactory} used to create a {@link WroConfiguration} object.
    */
-  protected WroConfigurationFactory newWroConfigurationFactory() {
-    return new FilterConfigWroConfigurationFactory(filterConfig);
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+    return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
 
   /**

@@ -74,7 +74,7 @@ public class TestWroModel {
       };
     };
     //the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     return model;
   }
 }

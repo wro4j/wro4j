@@ -25,8 +25,8 @@ public class WroModelFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  public WroModel getInstance() {
-    return decorated.getInstance();
+  public WroModel create() {
+    return decorated.create();
   }
 
 

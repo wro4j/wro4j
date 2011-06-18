@@ -54,7 +54,7 @@ public class TestXmlModelFactory {
         return new UrlResourceLocator(Thread.currentThread().getContextClassLoader().getResource("recursive.xml"));
       };
 		};
-		factory.getInstance();
+		factory.create();
 	}
 
   @Test
@@ -68,7 +68,7 @@ public class TestXmlModelFactory {
   @Test
   public void testTwoConcurrentCreationCalls() {
     testSuccessfulCreation();
-    factory.getInstance();
+    factory.create();
   }
 
   @Test
@@ -80,7 +80,7 @@ public class TestXmlModelFactory {
       };
     };
     //the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     LOG.debug("model: " + model);
   }
 
@@ -94,7 +94,7 @@ public class TestXmlModelFactory {
       }
     };
     //the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     final Group group = model.getGroupByName(model.getGroupNames().get(0));
     final List<Resource> resourceList = group.getResources();
     LOG.debug("resources: " + resourceList);
@@ -113,7 +113,7 @@ public class TestXmlModelFactory {
       }
     };
     //the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     Assert.assertEquals(2, model.getGroupNames().size());
     LOG.debug("model: " + model);
   }
@@ -126,7 +126,7 @@ public class TestXmlModelFactory {
         return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/recursive.xml"));
       }
     };
-    factory.getInstance();
+    factory.create();
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)
@@ -137,7 +137,7 @@ public class TestXmlModelFactory {
         return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/deepRecursive.xml"));
       }
     };
-    factory.getInstance();
+    factory.create();
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)
@@ -148,7 +148,7 @@ public class TestXmlModelFactory {
         return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/circular1.xml"));
       }
     };
-    factory.getInstance();
+    factory.create();
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -159,7 +159,7 @@ public class TestXmlModelFactory {
         return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/invalidImports.xml"));
       }
     };
-    factory.getInstance();
+    factory.create();
   }
 
 
@@ -176,7 +176,7 @@ public class TestXmlModelFactory {
           return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/wildcard.xml"));
         }
       };
-      factory.getInstance();
+      factory.create();
     } catch(final WroRuntimeException e) {
       LOG.debug("exception caught", e);
       throw e.getCause();

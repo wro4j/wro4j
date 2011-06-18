@@ -3,25 +3,17 @@
  */
 package ro.isdc.wro.model.factory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
- * Factory responsible for creation of {@link WroModel} object.
+ * Creates a {@link WroModel} object. The concrete implementation must synchronize the instantiation of the model.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public interface WroModelFactory {
-  /**
-   * Creates a {@link WroModel} object. The concrete implementation must synchronize the instantiation of the model.
-   *
-   * @return an instance of {@link WroModel}.
-   * @throws WroRuntimeException if model cannot be created.
-   */
-  WroModel getInstance();
-
+public interface WroModelFactory extends ObjectFactory<WroModel> {
   /**
    * Called to indicate that the factory is being taken out of service.
    */

@@ -82,14 +82,14 @@ public class TestFallbackAwareWroModelFactory {
 
   @Test
   public void testLastValidIsOK() {
-    Assert.assertNotNull(fallbackAwareModelFactory.getInstance());
+    Assert.assertNotNull(fallbackAwareModelFactory.create());
     ((WroConfigurationChangeListener)fallbackAwareModelFactory).onModelPeriodChanged();
-    Assert.assertNotNull(fallbackAwareModelFactory.getInstance());
+    Assert.assertNotNull(fallbackAwareModelFactory.create());
   }
 
 
   @Test(expected = WroRuntimeException.class)
   public void testWithoutLastValidThrowsException() {
-    Assert.assertNotNull(xmlModelFactory.getInstance());
+    Assert.assertNotNull(xmlModelFactory.create());
   }
 }

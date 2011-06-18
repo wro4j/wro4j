@@ -123,7 +123,7 @@ public class XmlModelFactory
   /**
    * {@inheritDoc}
    */
-  public WroModel getInstance() {
+  public WroModel create() {
     Document document = null;
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -211,7 +211,7 @@ public class XmlModelFactory
 
       processedImports.add(name);
       importedModelFactory.processedImports.addAll(this.processedImports);
-      model.merge(importedModelFactory.getInstance());
+      model.merge(importedModelFactory.create());
     }
   }
 

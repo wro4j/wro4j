@@ -259,7 +259,7 @@ public class WroManager
       // process groups & put result in the cache
       // find processed result for a group
       final List<Group> groupAsList = new ArrayList<Group>();
-      final Group group = modelFactory.getInstance().getGroupByName(groupName);
+      final Group group = modelFactory.create().getGroupByName(groupName);
       groupAsList.add(group);
 
       final String content = groupsProcessor.process(groupAsList, type, minimize);
@@ -318,7 +318,7 @@ public class WroManager
             cacheChangeCallback.propertyChange(null);
           }
           LOG.info("reloading cache");
-          final WroModel model = modelFactory.getInstance();
+          final WroModel model = modelFactory.create();
           // process groups & put update cache
           final Collection<Group> groups = model.getGroups();
           // update cache for all resources
@@ -477,6 +477,6 @@ public class WroManager
    * @return the modelFactory
    */
   public final WroModel getModel() {
-    return this.modelFactory.getInstance();
+    return this.modelFactory.create();
   }
 }

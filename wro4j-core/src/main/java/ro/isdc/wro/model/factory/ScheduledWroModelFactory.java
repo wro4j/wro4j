@@ -45,7 +45,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator
    * {@inheritDoc}
    */
   @Override
-  public WroModel getInstance() {
+  public WroModel create() {
     initScheduler();
     // use double-check locking
     if (model == null) {
@@ -53,7 +53,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator
         if (model == null) {
           final StopWatch stopWatch = new StopWatch();
           stopWatch.start("Create Model");
-          model = super.getInstance();
+          model = super.create();
           stopWatch.stop();
           LOG.debug(stopWatch.prettyPrint());
         }
@@ -86,7 +86,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator
     return new Runnable() {
       public void run() {
         try {
-          model = ScheduledWroModelFactory.this.getInstance();
+          model = ScheduledWroModelFactory.this.create();
           // find a way to clear the cache
           LOG.info("Wro Model (wro.xml) updated!");
         } catch (final Exception e) {
