@@ -36,7 +36,7 @@ public class JsonModelFactory
    * {@inheritDoc}
    */
   @Override
-  public WroModel getInstance() {
+  public WroModel create() {
     try {
       final Type type = new TypeToken<WroModel>() {}.getType();
       final InputStream is = getWroModelStream();

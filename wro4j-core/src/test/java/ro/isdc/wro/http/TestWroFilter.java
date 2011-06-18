@@ -26,7 +26,6 @@ import org.mockito.Mockito;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
-import ro.isdc.wro.config.factory.WroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -36,6 +35,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -494,7 +494,7 @@ public class TestWroFilter {
     props.setProperty(ConfigConstants.debug.name(), Boolean.FALSE.toString());
     final WroFilter theFilter = new WroFilter() {
       @Override
-      protected WroConfigurationFactory newWroConfigurationFactory() {
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
         final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
         factory.setProperties(props);
         return factory;

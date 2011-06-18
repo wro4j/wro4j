@@ -4,15 +4,18 @@
 package ro.isdc.wro.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Properties;
 
 import javax.annotation.processing.Processor;
 
@@ -52,6 +55,15 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
+  /**
+   * @param properties {@link Properties} object to get stream from.
+   * @return {@link InputStream} of the provided properties object.
+   */
+  public static InputStream getPropertiesStream(final Properties properties) {
+    final StringWriter propsAsString = new StringWriter();
+    properties.list(new PrintWriter(propsAsString));
+    return new ByteArrayInputStream(propsAsString.toString().getBytes());
+  }
 
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.

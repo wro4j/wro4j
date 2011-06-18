@@ -42,10 +42,10 @@ public class FallbackAwareWroModelFactory extends WroModelFactoryDecorator {
    * {@inheritDoc}
    */
   @Override
-  public WroModel getInstance() {
+  public WroModel create() {
     WroModel newModel = null;
     try {
-      newModel = super.getInstance();
+      newModel = super.create();
     } catch (final WroRuntimeException e) {
       LOG.error("Error while creating the model", e);
     }
