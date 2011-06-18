@@ -104,14 +104,14 @@ public class TestWroManager {
       //this manager will make sure that we always process a model holding one group which has only one resource.
       manager.setModelFactory(new WroModelFactoryDecorator(getValidModelFactory()) {
         @Override
-        public WroModel getInstance() {
+        public WroModel create() {
 
           final Group group = new Group();
           group.setName("group");
           group.setResources(Arrays.asList(new Resource[] {
             resource
           }));
-          final WroModel model = super.getInstance();
+          final WroModel model = super.create();
           model.setGroups(Arrays.asList(group));
           return model;
         }

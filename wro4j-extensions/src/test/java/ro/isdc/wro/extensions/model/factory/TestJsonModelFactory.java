@@ -39,7 +39,7 @@ public class TestJsonModelFactory {
         throw new IOException();
       };
     };
-    factory.getInstance();
+    factory.create();
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -50,13 +50,13 @@ public class TestJsonModelFactory {
         return new ByteArrayInputStream("".getBytes());
       };
     };
-    Assert.assertNull(factory.getInstance());
+    Assert.assertNull(factory.create());
   }
 
   @Test
   public void createValidModel() {
     factory = new JsonModelFactory();
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
     LOG.debug("model: {}", model);
@@ -75,7 +75,7 @@ public class TestJsonModelFactory {
         return getClass().getResourceAsStream("incomplete-wro.json");
       };
     };
-    final WroModel model = factory.getInstance();
+    final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(1, model.getGroups().size());
     final Group group = new ArrayList<Group>(model.getGroups()).get(0);

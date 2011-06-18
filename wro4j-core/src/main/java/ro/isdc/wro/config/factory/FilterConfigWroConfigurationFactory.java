@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -27,7 +28,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
  * @since 1.3.7
  */
 public class FilterConfigWroConfigurationFactory
-  implements WroConfigurationFactory {
+  implements ObjectFactory<WroConfiguration> {
   private static final Logger LOG = LoggerFactory.getLogger(FilterConfigWroConfigurationFactory.class);
   /**
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode is used.

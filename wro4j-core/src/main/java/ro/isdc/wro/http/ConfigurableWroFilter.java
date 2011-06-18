@@ -6,8 +6,9 @@ package ro.isdc.wro.http;
 import java.util.Properties;
 
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
-import ro.isdc.wro.config.factory.WroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.util.ObjectFactory;
 
 /**
  * An extension of {@link WroFilter} which allows configuration by injecting some of the properties. This class can be
@@ -46,7 +47,7 @@ public class ConfigurableWroFilter extends WroFilter {
    * {@inheritDoc}
    */
   @Override
-  protected WroConfigurationFactory newWroConfigurationFactory() {
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
     final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
     if (properties == null) {
       //when no
