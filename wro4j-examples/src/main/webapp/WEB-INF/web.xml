@@ -13,30 +13,6 @@
       ro.isdc.wro.http.WroFilter
     </filter-class>
     <init-param>
-      <param-name>configuration</param-name>
-      <param-value>development</param-value>
-    </init-param>
-    <init-param>
-      <param-name>disableCache</param-name>
-      <param-value>false</param-value>
-    </init-param>
-    <init-param>
-      <param-name>gzipResources</param-name>
-      <param-value>TRUE</param-value>
-    </init-param>
-    <init-param>
-      <param-name>jmxEnabled</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <init-param>
-      <param-name>cacheUpdatePeriod</param-name>
-      <param-value>0</param-value>
-    </init-param>
-    <init-param>
-      <param-name>modelUpdatePeriod</param-name>
-      <param-value>0</param-value>
-    </init-param>
-    <init-param>
       <param-name>managerFactoryClassName</param-name>
       <param-value>ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory</param-value>
     </init-param>

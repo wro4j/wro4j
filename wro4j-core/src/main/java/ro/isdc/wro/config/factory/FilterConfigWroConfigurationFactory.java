@@ -42,22 +42,30 @@ public class FilterConfigWroConfigurationFactory
   @Deprecated
   public static final String PARAM_VALUE_DEPLOYMENT = "DEPLOYMENT";
   /**
-   * Decorated factory.
+   * Filter configuration from where init-params will be read in order to create {@link WroConfiguration} object.
    */
-  private final PropertyWroConfigurationFactory factory;
-
+  FilterConfig filterConfig;
 
   public FilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
     Validate.notNull(filterConfig);
-    factory = new PropertyWroConfigurationFactory();
-    factory.setProperties(createProps(filterConfig));
+    this.filterConfig = filterConfig;
+  }
+
+
+  /**
+   * Prepares the {@link Properties} object before it is used by the {@link PropertyWroConfigurationFactory}.
+   * @return {@link Properties} object used by {@link PropertyWroConfigurationFactory} to create
+   *         {@link WroConfiguration}
+   */
+  protected Properties initProperties() {
+    return createPropertiesFromFilterConfig();
   }
 
 
   /**
    * @return initialized {@link Properties} object based init params found in {@link FilterConfig}.
    */
-  private Properties createProps(final FilterConfig filterConfig) {
+  protected final Properties createPropertiesFromFilterConfig() {
     final Properties props = new Properties();
     for (final ConfigConstants config : ConfigConstants.values()) {
       final String value = filterConfig.getInitParameter(config.name());
@@ -87,6 +95,9 @@ public class FilterConfigWroConfigurationFactory
    * {@inheritDoc}
    */
   public WroConfiguration create() {
+    //decorated factory
+    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
+    factory.setProperties(initProperties());
     return factory.create();
   }
 }

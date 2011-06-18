@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -126,7 +126,7 @@ public class WroFilter
    * @return implementation of {@link WroConfigurationFactory} used to create a {@link WroConfiguration} object.
    */
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
-    return new FilterConfigWroConfigurationFactory(filterConfig);
+    return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
 
   /**
