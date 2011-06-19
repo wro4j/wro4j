@@ -75,11 +75,11 @@ public class TestCssLint {
     jsHint.setOptions("regex-selectors");
     jsHint.validate("li[class*=foo]{ color: red; }");
   }
-
+  
   @Test(expected=CssLintException.class)
   public void testOperaGradient() throws Exception {
     jsHint.setOptions("gradients");
     jsHint.validate(".foo { background: -o-linear-gradient(top, #1e5799 , #2989d8 , #207cca , #7db9e8 ); }");
   }
-
+  
 }

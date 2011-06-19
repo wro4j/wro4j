@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010.
+ * Copyright (C) 2011.
  * All rights reserved.
  */
 package ro.isdc.wro.extensions.processor.css;

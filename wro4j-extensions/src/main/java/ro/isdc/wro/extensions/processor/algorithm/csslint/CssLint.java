@@ -109,7 +109,6 @@ public class CssLint {
       }
     }
     sb.append("}");
-    LOG.debug("sb {} ", sb);
     return "var result = CSSLint.verify(" + data + ", " + sb.toString() + ").messages;";
   }
 
