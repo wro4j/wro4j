@@ -102,14 +102,17 @@ public class CssLint {
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {
-        sb.append("\"" + options[i] + "\": true");
+        sb.append("\"" + options[i] + "\": 1");
         if (i < options.length - 1) {
           sb.append(",");
         }
       }
     }
     sb.append("}");
-    return "var result = CSSLint.verify(" + data + ", " + sb.toString() + ").messages;";
+    final boolean noOptions = options == null || options.length == 0;
+    final String optionsAsString = noOptions ? "" : "," + sb.toString();
+    System.out.println("optionsAsString: " + optionsAsString);
+    return "var result = CSSLint.verify(" + data + optionsAsString + ").messages;";
   }
 
 
