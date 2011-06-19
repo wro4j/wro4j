@@ -1,5 +1,5 @@
 /*
- *  Copyright 2010 Alex Objelean.
+ *  Copyright 2011 Alex Objelean.
  */
 package ro.isdc.wro.extensions.processor.algorithm.jshint;
 

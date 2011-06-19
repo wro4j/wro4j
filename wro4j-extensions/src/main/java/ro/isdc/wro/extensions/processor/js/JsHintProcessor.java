@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010.
+ * Copyright (C) 2011.
  * All rights reserved.
  */
 package ro.isdc.wro.extensions.processor.js;
@@ -26,6 +26,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * if the processed script contains errors or not.
  *
  * @author Alex Objelean
+ * @since 1.3.5
  * @created 1 Mar 2011
  */
 @SupportedResourceType(ResourceType.JS)
