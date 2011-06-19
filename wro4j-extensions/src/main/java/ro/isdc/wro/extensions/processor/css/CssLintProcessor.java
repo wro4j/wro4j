@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -32,7 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssLintProcessor
-  implements ResourcePreProcessor {
+  implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
   /**
    * Options to use to configure jsHint.
@@ -71,6 +72,12 @@ public class CssLintProcessor
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer) throws IOException {
+    process(null, reader, writer);
+  }
 
   /**
    * Called when {@link CssLintException} is thrown. Allows subclasses to re-throw this exception as a

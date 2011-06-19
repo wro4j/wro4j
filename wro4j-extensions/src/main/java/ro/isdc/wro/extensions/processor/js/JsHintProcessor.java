@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -31,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.JS)
 public class JsHintProcessor
-  implements ResourcePreProcessor {
+  implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
   /**
    * Options to use to configure jsHint.
@@ -69,6 +70,12 @@ public class JsHintProcessor
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer) throws IOException {
+    process(null, reader, writer);
+  }
 
   /**
    * Called when {@link JsHintException} is thrown. Allows subclasses to re-throw this exception as a
