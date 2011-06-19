@@ -1,7 +1,7 @@
 /*
- *  Copyright 2010 Alex Objelean.
+ *  Copyright wro4j@2011.
  */
-package ro.isdc.wro.extensions.processor.algorithm.jshint;
+package ro.isdc.wro.extensions.processor.algorithm.csslint;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,15 +24,15 @@ import com.google.gson.reflect.TypeToken;
 
 
 /**
- * Apply JsHint script checking utility.
- * <p/>
- * Using untagged version (commited: 2011-04-11 09:09:04)
+ * CssLint script engine utility. The underlying implementation uses CSSLint script utility {@link https
+ * ://github.com/stubbornella/csslint}.
  *
  * @author Alex Objelean
- * @since 1.3.5
+ * @since 1.3.8
+ * @created 19 Jun 2011
  */
-public class JsHint {
-  private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);
+public class CssLint {
+  private static final Logger LOG = LoggerFactory.getLogger(CssLint.class);
   private String[] options;
 
   /**
@@ -40,46 +40,51 @@ public class JsHint {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForJsHint(), "jshint.js");
+      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForCssLint(), "csslint.js");
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
   }
 
+
   /**
-   * @return the stream of the jshint script. Override this method to provide a different script version.
+   * @return the stream of the csslint script. Override this method to provide a different script version.
    */
-  protected InputStream getStreamForJsHint() {
-    //this resource is packed with packerJs compressor
-    return getClass().getResourceAsStream("jshint.min.js");
+  protected InputStream getStreamForCssLint() {
+    return getClass().getResourceAsStream("csslint.js");
   }
 
 
   /**
-   * Validates a js using jsHint and throws {@link JsHintException} if the js is invalid. If no exception is thrown, the
+   * Validates a js using jsHint and throws {@link CssLintException} if the js is invalid. If no exception is thrown, the
    * js is valid.
    *
    * @param data js content to process.
+   * @throws CssLintException when parsed css has some kind of problems.
    */
-  public void validate(final String data) throws JsHintException {
+  public void validate(final String data) throws CssLintException {
     try {
       final StopWatch watch = new StopWatch();
       watch.start("init");
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
-      watch.start("jsHint");
+      watch.start("cssLint");
       LOG.debug("options: " + Arrays.toString(this.options));
-      final String packIt = buildJsHintScript(WroUtil.toJSMultiLineString(data), this.options);
-      final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
+      final String script = buildCssLintScript(WroUtil.toJSMultiLineString(data), this.options);
+      builder.evaluate(script, "CSSLint.verify").toString();
+      LOG.debug("" + builder.addJSON().evaluate("JSON.stringify(result)", ""));
+      final boolean valid = Boolean.parseBoolean(builder.evaluate("result.length == 0", "checkNoErrors").toString());
       if (!valid) {
-        final String json = builder.addJSON().evaluate("JSON.stringify(JSHINT.errors)", "jsHint.errors").toString();
+        final String json = builder.addJSON().evaluate("JSON.stringify(result)", "CssLint messages").toString();
         LOG.debug("json {}", json);
-        final Type type = new TypeToken<List<JsHintError>>() {}.getType();
-        final List<JsHintError> errors = new Gson().fromJson(json, type);
+        final Type type = new TypeToken<List<CssLintError>>() {}.getType();
+        final List<CssLintError> errors = new Gson().fromJson(json, type);
         LOG.debug("errors {}", errors);
-        throw new JsHintException().setErrors(errors);
+        throw new CssLintException().setErrors(errors);
       }
-      LOG.debug("result: " + valid);
+      LOG.debug("isValid: " + valid);
+
+//      LOG.debug("result: " + result);
       watch.stop();
       LOG.debug(watch.prettyPrint());
     } catch (final RhinoException e) {
@@ -93,7 +98,7 @@ public class JsHint {
    * @param options options to set as true
    * @return Script used to pack and return the packed result.
    */
-  private String buildJsHintScript(final String data, final String... options) {
+  private String buildCssLintScript(final String data, final String... options) {
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {
@@ -105,14 +110,14 @@ public class JsHint {
     }
     sb.append("}");
     LOG.debug("sb {} ", sb);
-    return "JSHINT(" + data + ", " + sb.toString() + ");";
+    return "var result = CSSLint.verify(" + data + ", " + sb.toString() + ").messages;";
   }
 
 
   /**
    * @param options the options to set
    */
-  public JsHint setOptions(final String ... options) {
+  public CssLint setOptions(final String ... options) {
     LOG.debug("setOptions: {}", options);
     this.options = options == null ? new String[] {} : options;
     return this;
