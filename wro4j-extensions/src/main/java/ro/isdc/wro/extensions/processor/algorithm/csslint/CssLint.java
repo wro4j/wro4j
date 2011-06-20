@@ -83,8 +83,6 @@ public class CssLint {
         throw new CssLintException().setErrors(errors);
       }
       LOG.debug("isValid: " + valid);
-
-//      LOG.debug("result: " + result);
       watch.stop();
       LOG.debug(watch.prettyPrint());
     } catch (final RhinoException e) {
@@ -109,9 +107,12 @@ public class CssLint {
       }
     }
     sb.append("}");
+    /**
+     * Handle the following <a href="https://github.com/stubbornella/csslint/issues/79">issue</a>.
+     */
     final boolean noOptions = options == null || options.length == 0;
     final String optionsAsString = noOptions ? "" : "," + sb.toString();
-    System.out.println("optionsAsString: " + optionsAsString);
+    //return "var result = CSSLint.verify(" + data + "," + sb.toString() + ").messages;";
     return "var result = CSSLint.verify(" + data + optionsAsString + ").messages;";
   }
 
