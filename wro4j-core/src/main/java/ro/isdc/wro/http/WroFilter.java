@@ -62,18 +62,6 @@ public class WroFilter
    */
   private static final String MBEAN_PREFIX = "wro4j-";
   /**
-   * The parameter used to specify headers to put into the response, used mainly for caching.
-   */
-  static final String PARAM_HEADER = "header";
-  /**
-   * The name of the context parameter that specifies wroManager factory class.
-   */
-  static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
-  /**
-   * A preferred name of the MBean object.
-   */
-  static final String PARAM_MBEAN_NAME = "mbeanName";
-  /**
    * Default value used by Cache-control header.
    */
   private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
@@ -182,7 +170,7 @@ public class WroFilter
    * @return the name of MBean to be used by JMX to configure wro4j.
    */
   protected String newMBeanName() {
-    String mbeanName = filterConfig.getInitParameter(PARAM_MBEAN_NAME);
+    String mbeanName = wroConfiguration.getMbeanName();
     if (StringUtils.isEmpty(mbeanName)) {
       final String contextPath = getContextPath();
       mbeanName = StringUtils.isEmpty(contextPath) ? "ROOT" : contextPath;
@@ -256,8 +244,8 @@ public class WroFilter
       headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
       headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
     }
-    final String headerParam = filterConfig.getInitParameter(PARAM_HEADER);
-    if (headerParam != null) {
+    final String headerParam = wroConfiguration.getHeader();
+    if (!StringUtils.isEmpty(headerParam)) {
       try {
         if (headerParam.contains("|")) {
           final String[] headers = headerParam.split("[|]");
@@ -413,8 +401,7 @@ public class WroFilter
    * @return {@link WroManagerFactory} object.
    */
   protected WroManagerFactory getWroManagerFactory() {
-    final String appFactoryClassName = filterConfig.getInitParameter(PARAM_MANAGER_FACTORY);
-    if (appFactoryClassName == null) {
+    if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
       // If no context param was specified we return the default factory
       return new BaseWroManagerFactory() {
         @Override
@@ -430,7 +417,8 @@ public class WroFilter
       // Try to find the specified factory class
       Class<?> factoryClass = null;
       try {
-        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(appFactoryClassName);
+        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+          wroConfiguration.getWroManagerClassName());
         // Instantiate the factory
         return (WroManagerFactory)factoryClass.newInstance();
       } catch (final Exception e) {
