@@ -10,6 +10,7 @@ import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
+import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
@@ -49,6 +50,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put("coffeeScript", new CoffeeScriptProcessor());
+    map.put("cjson", CJsonProcessor.packProcessor());
     map.put("jsonhpack", JsonHPackProcessor.packProcessor());
     map.put("jsHint", new JsHintProcessor());
     map.put("cssLint", new CssLintProcessor());
@@ -72,6 +74,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put("coffeeScript", new CoffeeScriptProcessor());
     map.put("cssDataUri", new CssDataUriPreProcessor());
+    map.put("cjson", CJsonProcessor.packProcessor());
     map.put("jsonhpack", JsonHPackProcessor.packProcessor());
     map.put("jsHint", new JsHintProcessor());
     map.put("cssLint", new CssLintProcessor());
