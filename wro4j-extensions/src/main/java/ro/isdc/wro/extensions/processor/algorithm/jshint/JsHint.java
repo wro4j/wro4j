@@ -1,5 +1,5 @@
 /*
- *  Copyright 2010 Alex Objelean.
+ *  Copyright 2011 Alex Objelean.
  */
 package ro.isdc.wro.extensions.processor.algorithm.jshint;
 
@@ -9,7 +9,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +46,10 @@ public class JsHint {
     }
   }
 
-
-  private InputStream getStreamForJsHint() {
+  /**
+   * @return the stream of the jshint script. Override this method to provide a different script version.
+   */
+  protected InputStream getStreamForJsHint() {
     //this resource is packed with packerJs compressor
     return getClass().getResourceAsStream("jshint.min.js");
   }
@@ -71,8 +72,6 @@ public class JsHint {
       final String packIt = buildJsHintScript(WroUtil.toJSMultiLineString(data), this.options);
       final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
       if (!valid) {
-        final Object o = builder.evaluate("JSHINT.errors", null);
-        LOG.debug("o {}", Context.jsToJava(o, String.class));
         final String json = builder.addJSON().evaluate("JSON.stringify(JSHINT.errors)", "jsHint.errors").toString();
         LOG.debug("json {}", json);
         final Type type = new TypeToken<List<JsHintError>>() {}.getType();
@@ -98,7 +97,7 @@ public class JsHint {
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {
-        sb.append(options[i] + ": true");
+        sb.append("\"" + options[i] + "\": true");
         if (i < options.length - 1) {
           sb.append(",");
         }

@@ -2,7 +2,7 @@
  * Copyright (C) 2011.
  * All rights reserved.
  */
-package ro.isdc.wro.extensions.processor.js;
+package ro.isdc.wro.extensions.processor.css;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHint;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLint;
+import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -23,27 +23,29 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Processor which analyze the js code and warns you about any problems. The processing result won't change no matter
- * if the processed script contains errors or not.
+ * Processor which analyze the css code and warns you found problems. The processing result won't change no matter if
+ * the processed script contains errors or not. The underlying implementation uses CSSLint script utility {@link https
+ * ://github.com/stubbornella/csslint}.
  *
  * @author Alex Objelean
- * @since 1.3.5
- * @created 1 Mar 2011
+ * @since 1.3.8
+ * @created 19 Jun 2011
  */
-@SupportedResourceType(ResourceType.JS)
-public class JsHintProcessor
+@SupportedResourceType(ResourceType.CSS)
+public class CssLintProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
   /**
    * Options to use to configure jsHint.
    */
   private String[] options;
 
 
-  public JsHintProcessor setOptions(final String[] options) {
+  public CssLintProcessor setOptions(final String[] options) {
     this.options = options;
     return this;
   }
+
 
   /**
    * {@inheritDoc}
@@ -52,10 +54,10 @@ public class JsHintProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      new JsHint().setOptions(options).validate(content);
-    } catch (final JsHintException e) {
+      new CssLint().setOptions(options).validate(content);
+    } catch (final CssLintException e) {
       try {
-        onJsHintException(e, resource);
+        onCssLintException(e, resource);
       } catch (final Exception ex) {
         throw new WroRuntimeException("", ex);
       }
@@ -78,13 +80,13 @@ public class JsHintProcessor
   }
 
   /**
-   * Called when {@link JsHintException} is thrown. Allows subclasses to re-throw this exception as a
+   * Called when {@link CssLintException} is thrown. Allows subclasses to re-throw this exception as a
    * {@link RuntimeException} or handle it differently. The default implementation simply logs the errors.
    *
-   * @param e {@link JsHintException} which has occurred.
+   * @param e {@link CssLintException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onJsHintException(final JsHintException e, final Resource resource)
+  protected void onCssLintException(final CssLintException e, final Resource resource)
     throws Exception {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }

@@ -4,8 +4,13 @@
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
   <group name="g1">
+    <css>classpath:ro/isdc/wro/maven/plugin/css/*.css</css>
     <group-ref>g2</group-ref>
     <group-ref>g3</group-ref>
+  </group>
+
+  <group name="valid">
+    <css>classpath:ro/isdc/wro/maven/plugin/css/valid.css</css>
   </group>
   
   <group name="invalidResources">
