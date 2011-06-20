@@ -29,6 +29,8 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  * Maven plugin used to validate css code defined in wro model.
  *
  * @author Alex Objelean
+ * @since 1.3.8
+ * @created 20 Jun 2011
  */
 public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   /**
