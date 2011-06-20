@@ -6,13 +6,16 @@ package ro.isdc.wro.extensions.manager;
 import java.util.HashMap;
 import java.util.Map;
 
+import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
+import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
@@ -36,7 +39,6 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
   @Override
   protected void contributePostProcessors(final Map<String, ResourceProcessor> map) {
     map.putAll(createCommonProcessors());
-    map.put("jsonhpack", JsonHPackProcessor.packProcessor());
   }
 
   /**
@@ -67,6 +69,11 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("coffeeScript", new CoffeeScriptProcessor());
     map.put("cssDataUri", new CssDataUriPreProcessor());
     map.put("jsonhpack", JsonHPackProcessor.packProcessor());
+    map.put("cjson", CJsonProcessor.packProcessor());
+    map.put("jsHint", new JsHintProcessor());
+    map.put("cssLint", new CssLintProcessor());
+
     return map;
   }
 }
+
