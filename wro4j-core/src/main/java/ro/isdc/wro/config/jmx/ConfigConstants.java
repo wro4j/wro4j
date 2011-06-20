@@ -4,6 +4,8 @@
  */
 package ro.isdc.wro.config.jmx;
 
+import ro.isdc.wro.manager.WroManagerFactory;
+
 /**
  * Hold the name of the properties.
  * @author Alex Objelean
@@ -40,5 +42,17 @@ public enum ConfigConstants {
   /**
    * Encoding to use when reading and writing bytes from/to stream
    */
-  encoding
+  encoding,
+  /**
+   * The fully qualified class name of the {@link WroManagerFactory} implementation.
+   */
+  managerFactoryClassName,
+  /**
+   * the name of MBean to be used by JMX to configure wro4j.
+   */
+  mbeanName,
+  /**
+   * The parameter used to specify headers to put into the response, used mainly for caching.
+   */
+  header
 }
