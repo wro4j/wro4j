@@ -97,6 +97,15 @@ public class CssVariablesProcessor
   /**
    * {@inheritDoc}
    */
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {

@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
@@ -109,9 +110,10 @@ public class YUIJsCompressorProcessor
           new YUIErrorReporter());
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
     } catch (final RuntimeException e) {
-      LOG.error("Problem while applying YUI compressor", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       // keep js unchanged if it contains errors -> this should be configurable
-      LOG.debug("Leave resource unchanged...");
+      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
       IOUtils.copy(new StringReader(content), writer);
       // throw new WroRuntimeException("Problem while applying YUI compressor", e);
     } finally {

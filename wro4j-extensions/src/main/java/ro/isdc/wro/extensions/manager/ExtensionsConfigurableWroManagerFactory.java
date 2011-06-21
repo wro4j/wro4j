@@ -68,6 +68,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put("coffeeScript", new CoffeeScriptProcessor());
     map.put("cssDataUri", new CssDataUriPreProcessor());
+    map.put("cjson", CJsonProcessor.packProcessor());
     map.put("jsonhpack", JsonHPackProcessor.packProcessor());
     map.put("cjson", CJsonProcessor.packProcessor());
     map.put("jsHint", new JsHintProcessor());

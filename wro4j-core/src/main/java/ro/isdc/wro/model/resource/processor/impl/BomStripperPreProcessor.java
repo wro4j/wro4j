@@ -82,7 +82,7 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-//      final String encoding = Context.get().getCon  fig().getEncoding();
+      //final String encoding = Context.get().getConfig().getEncoding();
       //using encoding doesn't remove BOM characters
       final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(
           IOUtils.toString(reader).getBytes()));

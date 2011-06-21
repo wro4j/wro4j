@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * Maven plugin used to validate css code defined in wro model.
  *
  * @goal csslint
- * @phase process-resources
+ * @phase compile
  * @requiresDependencyResolution runtime
  *
  * @author Alex Objelean

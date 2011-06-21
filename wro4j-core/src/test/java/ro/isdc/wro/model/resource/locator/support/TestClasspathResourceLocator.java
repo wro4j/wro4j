@@ -93,10 +93,18 @@ public class TestClasspathResourceLocator {
   }
 
   @Test
+  public void testWildcard4Resources() throws IOException {
+    uriLocator = new ClasspathResourceLocator(createUri("ro/isdc/wro/http/**.cs?"));
+    uriLocator.getInputStream();
+  }
+
+
+  @Test
   public void testRecursiveWildcardResources() throws IOException {
     uriLocator = new ClasspathResourceLocator(createUri("**.css"));
     uriLocator.getInputStream();
   }
+
 
 
   @Test(expected=IOException.class)

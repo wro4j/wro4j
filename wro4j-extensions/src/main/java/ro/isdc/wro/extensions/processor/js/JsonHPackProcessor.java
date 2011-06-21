@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +73,9 @@ public abstract class JsonHPackProcessor
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
-      LOG.warn("Exception while  applying lessCss processor on the resource, no processing applied...", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.warn("Exception while  applying lessCss processor on the " + resourceUri
+          + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();

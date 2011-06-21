@@ -13,10 +13,10 @@ import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
@@ -54,10 +54,14 @@ public class JSMinProcessor
       is.close();
       os.close();
     } catch (final IOException e) {
+      LOG.error("Error occured", e);
       throw e;
 		} catch (final Exception e) {
-		  LOG.error("Exception wile processing js using JSMin", e);
-			throw new WroRuntimeException("Exception wile processing js using JSMin", e);
+		  final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+		  final String errorMessage = "Exception while applying " + getClass().getSimpleName() + " processor on the "
+      + resourceUri + " resource";
+		  LOG.error(errorMessage);
+      throw new IOException(errorMessage, e);
     } finally {
       reader.close();
       writer.close();
