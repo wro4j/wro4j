@@ -53,4 +53,8 @@
   <group name="resourceMinimizeTrue">
     <js>classpath:ro/isdc/wro/manager/sample.js</js>
   </group>  
+  
+  <group name="invalidImport">
+    <css>classpath:ro/isdc/wro/manager/invalidImport.css</css>
+  </group>
 </groups>

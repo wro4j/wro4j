@@ -31,7 +31,7 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
-import ro.isdc.wro.model.resource.util.MD5HashBuilder;
+import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 
 
 /**
@@ -103,7 +103,7 @@ public class BaseWroManagerFactory
    * @return {@link HashBuilder} instance.
    */
   protected HashBuilder newHashBuilder() {
-    return new MD5HashBuilder();
+    return new SHA1HashBuilder();
   }
 
   /**
