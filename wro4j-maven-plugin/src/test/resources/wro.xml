@@ -23,6 +23,7 @@
   
   <group name="wildcard">
     <js>classpath:ro/isdc/wro/maven/plugin/js/**</js>
+    <css>classpath:ro/isdc/wro/maven/**.cs?</css>    
   </group>
 
   <group name="g2">

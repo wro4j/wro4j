@@ -72,6 +72,11 @@ public class TestClasspathUriLocator {
 
 
   @Test
+  public void testRecursiveWildcard4Resources() throws IOException {
+    uriLocator.locate(createUri("ro/isdc/wro/**.cs?"));
+  }
+
+  @Test
   public void resourceUnavailable() {
     try {
       uriLocator.locate(createUri("123123.css"));
