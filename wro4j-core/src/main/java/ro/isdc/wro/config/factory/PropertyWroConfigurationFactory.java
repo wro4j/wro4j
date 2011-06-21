@@ -44,6 +44,9 @@ public class PropertyWroConfigurationFactory
       config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
       config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
       config.setEncoding(valueAsString(properties.get(ConfigConstants.encoding.name())));
+      config.setWroManagerClassName(valueAsString(properties.get(ConfigConstants.managerFactoryClassName.name())));
+      config.setMbeanName(valueAsString(properties.get(ConfigConstants.mbeanName.name())));
+      config.setHeader(valueAsString(properties.get(ConfigConstants.header.name())));
     }
     LOG.debug("WroConfiguration created: {}", config);
     return config;
