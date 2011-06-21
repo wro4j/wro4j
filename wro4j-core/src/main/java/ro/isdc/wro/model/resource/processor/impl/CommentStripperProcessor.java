@@ -26,7 +26,7 @@ public class CommentStripperProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
@@ -46,9 +46,9 @@ public class CommentStripperProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
     // resource Uri doesn't matter.
-    process(reader, writer);
+    process(null, reader, writer);
   }
 }
