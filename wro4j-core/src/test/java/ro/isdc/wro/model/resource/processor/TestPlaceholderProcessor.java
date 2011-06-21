@@ -10,14 +10,14 @@ import java.util.Properties;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.processor.impl.PlaceholderInterpolationProcessor;
+import ro.isdc.wro.model.resource.processor.impl.PlaceholderProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**
  * @author Alex Objelean
  */
-public class TestPlaceholderInterpolationProcessor {
+public class TestPlaceholderProcessor {
   @Test
   public void testProcessor()
       throws Exception {
@@ -26,8 +26,8 @@ public class TestPlaceholderInterpolationProcessor {
     properties.setProperty("prop2", "value2");
     properties.setProperty("prop3", "value3");
     properties.setProperty("prop4", "value4");
-    final ResourcePreProcessor processor = new PlaceholderInterpolationProcessor().setPropertiesFactory(WroUtil.simpleObjectFactory(properties));
-    final URL url = getClass().getResource("placeholderInterpolation");
+    final ResourcePreProcessor processor = new PlaceholderProcessor().setPropertiesFactory(WroUtil.simpleObjectFactory(properties));
+    final URL url = getClass().getResource("placeholder");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -37,8 +37,8 @@ public class TestPlaceholderInterpolationProcessor {
   @Test(expected=WroRuntimeException.class)
   public void noIgnoreForMissingVariables()
       throws Exception {
-    final ResourcePreProcessor processor = new PlaceholderInterpolationProcessor().setIgnoreMissingVariables(false);
-    final URL url = getClass().getResource("placeholderInterpolation");
+    final ResourcePreProcessor processor = new PlaceholderProcessor().setIgnoreMissingVariables(false);
+    final URL url = getClass().getResource("placeholder");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
