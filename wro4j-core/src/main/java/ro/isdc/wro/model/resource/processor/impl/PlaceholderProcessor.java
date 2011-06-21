@@ -29,9 +29,9 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.3.8
  * @created 15 Jun 2011
  */
-public class PlaceholderInterpolationProcessor
+public class PlaceholderProcessor
   implements ResourceProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(PlaceholderInterpolationProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PlaceholderProcessor.class);
 
   /** The url pattern */
   private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?ims)\\$\\{((.*?))}");
@@ -103,7 +103,7 @@ public class PlaceholderInterpolationProcessor
   /**
    * @param ignoreMissingVariables the ignoreMissingVariables to set
    */
-  public PlaceholderInterpolationProcessor setIgnoreMissingVariables(final boolean ignoreMissingVariables) {
+  public PlaceholderProcessor setIgnoreMissingVariables(final boolean ignoreMissingVariables) {
     this.ignoreMissingVariables = ignoreMissingVariables;
     return this;
   }
@@ -112,7 +112,7 @@ public class PlaceholderInterpolationProcessor
   /**
    * @param propertiesFactory the propertiesFactory to set
    */
-  public PlaceholderInterpolationProcessor setPropertiesFactory(final ObjectFactory<Properties> propertiesFactory) {
+  public PlaceholderProcessor setPropertiesFactory(final ObjectFactory<Properties> propertiesFactory) {
     this.propertiesFactory = propertiesFactory;
     return this;
   }

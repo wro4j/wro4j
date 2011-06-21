@@ -27,7 +27,7 @@ public class TestPlaceholderInterpolationProcessor {
     properties.setProperty("prop3", "value3");
     properties.setProperty("prop4", "value4");
     final ResourceProcessor processor = new PlaceholderInterpolationProcessor().setPropertiesFactory(WroUtil.simpleObjectFactory(properties));
-    final URL url = getClass().getResource("placeholderInterpolation");
+    final URL url = getClass().getResource("placeholder");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -38,7 +38,7 @@ public class TestPlaceholderInterpolationProcessor {
   public void noIgnoreForMissingVariables()
       throws Exception {
     final ResourceProcessor processor = new PlaceholderInterpolationProcessor().setIgnoreMissingVariables(false);
-    final URL url = getClass().getResource("placeholderInterpolation");
+    final URL url = getClass().getResource("placeholder");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
