@@ -51,7 +51,7 @@ public class JsHint {
    */
   protected InputStream getStreamForJsHint() {
     //this resource is packed with packerJs compressor
-    return getClass().getResourceAsStream("jshint.min.js");
+    return getClass().getResourceAsStream("jshint.js");
   }
 
 
