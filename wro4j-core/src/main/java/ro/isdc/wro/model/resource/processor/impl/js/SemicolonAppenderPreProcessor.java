@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -25,20 +26,32 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class SemicolonAppenderPreProcessor
   implements ResourcePreProcessor {
   /**
+   * check if the last character is a semicolon and append only if one is missing.
+   */
+  private static final String PATTERN = "(?is).*;[\\s\\r\\n]*$";
+
+  /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
-      final String content = IOUtils.toString(reader);
-      writer.write(content);
-      // check if the last character is a semicolon and append only if one is missing.
-      if (!content.matches("(?is).*;[\\s\\r\\n]*$")) {
+      final String script = IOUtils.toString(reader);
+      writer.write(script);
+      if (isSemicolonNeeded(script)) {
         writer.write(';');
       }
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * @param script script to process.
+   * @return true if the processed content requires semicolon.
+   */
+  private boolean isSemicolonNeeded(final String script) {
+    return !(script.matches(PATTERN) || StringUtils.isEmpty(script));
   }
 }
