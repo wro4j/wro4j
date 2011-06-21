@@ -141,6 +141,7 @@
   </group>
   
   <group name="classpath">
+    <css>classpath:com/mysite/myapplication/web/resources/grids.css</css>
     <css>classpath:com/mysite/myapplication/web/resources/*.css</css>
     <js>classpath:com/mysite/myapplication/web/resources/*.js</js>
 	</group>
