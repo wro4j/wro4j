@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * Maven plugin used to validate js scripts defined in wro model.
  *
  * @goal jshint
- * @phase process-resources
+ * @phase compile
  * @requiresDependencyResolution runtime
  *
  * @author Alex Objelean

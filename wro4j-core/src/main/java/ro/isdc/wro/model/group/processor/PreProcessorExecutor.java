@@ -110,8 +110,13 @@ public final class PreProcessorExecutor {
       if (applyProcessor) {
         LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
         final Reader reader = new StringReader(resourceContent);
-        processor.process(resource, reader, writer);
-        reader.close();
+        try {
+          processor.process(resource, reader, writer);
+        } catch (final IOException e) {
+          if (!Context.get().getConfig().isIgnoreMissingResources()) {
+            throw e;
+          }
+        }
       } else {
         writer.write(resourceContent);
         LOG.debug("skipped processing on resource: " + resource);
@@ -123,9 +128,12 @@ public final class PreProcessorExecutor {
     return writer.toString();
   }
 
-
   /**
    * @return a Reader for the provided resource.
+   * @param resource
+   *          {@link Resource} which content to return.
+   * @param resources
+   *          the list of all resources processed in this context, used for duplicate resource detection.
    */
   private String getResourceContent(final Resource resource, final List<Resource> resources)
     throws IOException {

@@ -31,6 +31,7 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
@@ -133,35 +134,45 @@ public class TestWroManager {
     manager.setModelFactory(getValidModelFactory());
   }
 
-  /**
-   * Perform a processing on a group extracted from requestUri and compares with the expectedResourceUri content.
-   *
-   * @param requestUri
-   *          contains the group name to process.
-   * @param expectedResourceUri
-   *          the uri of the resource which has the expected content.
-   */
-  private void genericProcessAndCompare(final String requestUri, final String expectedResourceUri)
-      throws Exception {
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
+  private class GenericTestBuilder {
+    /**
+     * Perform a processing on a group extracted from requestUri and compares with the expectedResourceUri content.
+     *
+     * @param requestUri
+     *          contains the group name to process.
+     * @param expectedResourceUri
+     *          the uri of the resource which has the expected content.
+     */
+    public void processAndCompare(final String requestUri, final String expectedResourceUri)
+        throws Exception {
+      final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+      final HttpServletResponse response = Context.get().getResponse();
 
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
-    Mockito.when(request.getRequestURI()).thenReturn(requestUri);
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
+      Mockito.when(request.getRequestURI()).thenReturn(requestUri);
 
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-    manager.process();
+      onBeforeProcess();
 
-    // compare written bytes to output stream with the content from specified css.
-    final InputStream expectedInputStream = new UnclosableBufferedInputStream(
-        WroTestUtils.getInputStream(expectedResourceUri));
-    final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
-    expectedInputStream.reset();
-    WroTestUtils.compare(expectedInputStream, actualInputStream);
-    expectedInputStream.close();
-    actualInputStream.close();
+      manager.process();
+
+      // compare written bytes to output stream with the content from specified css.
+      final InputStream expectedInputStream = new UnclosableBufferedInputStream(
+          WroTestUtils.getInputStream(expectedResourceUri));
+      final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
+      expectedInputStream.reset();
+      WroTestUtils.compare(expectedInputStream, actualInputStream);
+      expectedInputStream.close();
+      actualInputStream.close();
+    }
+
+    /**
+     * Allow to execute custom logic before the actual processing is done.
+     */
+    protected void onBeforeProcess() {
+    }
   }
 
   /**
@@ -235,32 +246,54 @@ public class TestWroManager {
   @Test
   public void testDuplicatedResourcesShouldBeSkipped()
       throws Exception {
-    genericProcessAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
+    new GenericTestBuilder().processAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
 
   @Test
   public void testWildcardDuplicatedResourcesShouldBeSkiped()
       throws Exception {
-    genericProcessAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
+    new GenericTestBuilder().processAndCompare("/wildcardRepeatedResources.js", "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
   }
 
   @Test
   public void testMinimizeAttributeIsFalseOnResource()
       throws Exception {
-    genericProcessAndCompare("/resourceMinimizeFalse.js", "classpath:ro/isdc/wro/manager/sample.js");
+    new GenericTestBuilder().processAndCompare("/resourceMinimizeFalse.js", "classpath:ro/isdc/wro/manager/sample.js");
   }
 
   @Test
   public void testMinimizeAttributeIsTrueOnResource()
       throws Exception {
-    genericProcessAndCompare("/resourceMinimizeTrue.js", "classpath:ro/isdc/wro/manager/sample.min.js");
+    new GenericTestBuilder().processAndCompare("/resourceMinimizeTrue.js", "classpath:ro/isdc/wro/manager/sample.min.js");
   }
 
   @Test
   public void testWildcardGroupResources()
       throws Exception {
-    genericProcessAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
+    new GenericTestBuilder().processAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
   }
+
+  /**
+   * Test that when ignoreMissingResource is true and IOException is thrown by a processor, no exception is thrown.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testCssWithInvalidImport()
+      throws Exception {
+    new GenericTestBuilder().processAndCompare("/invalidImport.css", "classpath:ro/isdc/wro/manager/invalidImport-out.css");
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testCssWithInvalidImportAndIgnoreFalse()
+      throws Exception {
+    new GenericTestBuilder() {
+      protected void onBeforeProcess() {
+        Context.get().getConfig().setIgnoreMissingResources(false);
+      };
+    }.processAndCompare("/invalidImport.css", "classpath:ro/isdc/wro/manager/invalidImport-out.css");
+  }
+
 
   @Test
   public void processValidModel()
@@ -362,5 +395,12 @@ public class TestWroManager {
     manager.setHashBuilder(new MD5HashBuilder());
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
+  }
+
+  @Test
+  public void testSHA1DefaultHashBuilder()
+      throws Exception {
+    final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
+    Assert.assertEquals("51e6de8dde498cb0bf082b2cd80323fca19eef5/g3.css?minimize=true", path);
   }
 }

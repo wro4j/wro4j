@@ -33,7 +33,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * implementation used by the plugin.
  *
  * @goal run
- * @phase process-resources
+ * @phase compile
  * @requiresDependencyResolution runtime
  *
  * @author Alex Objelean

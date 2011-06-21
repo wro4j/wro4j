@@ -83,6 +83,7 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
+
   @Test
   public void testMojoWithPropertiesSet()
       throws Exception {
