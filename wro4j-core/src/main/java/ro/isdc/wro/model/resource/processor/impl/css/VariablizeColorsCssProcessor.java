@@ -21,6 +21,8 @@ import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
 @SupportedResourceType(ResourceType.CSS)
 public class VariablizeColorsCssProcessor
   implements ResourceProcessor {
+  public static final String ALIAS = "variablizeColors";
+
   /**
    * {@inheritDoc}
    */

@@ -26,6 +26,7 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 @SupportedResourceType(ResourceType.CSS)
 public class YUICssCompressorProcessor
   implements ResourceProcessor {
+  public static final String ALIAS = "yuiCssMin";
   /**
    * An option of CssCompressor.
    */

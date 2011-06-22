@@ -34,6 +34,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 public class CssVariablesProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssVariablesProcessor.class);
+  public static final String ALIAS = "cssVariables";
   /**
    * Pattern used to find variables definition. For instance:<br/>
    * <code>

@@ -25,22 +25,27 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class SassCss {
   private static final Logger LOG = LoggerFactory.getLogger(SassCss.class);
-
-  public SassCss() {}
-
-
+  /**
+   * The name of the sass script to be used by default.
+   */
+  private static final String DEFAULT_SASS_JS = "sass-0.5.0.min.js";
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_NAME = "sass-0.5.0.min.js";
-      final InputStream sassStream = getClass().getResourceAsStream(SCRIPT_NAME);
       final String scriptInit = "var exports = {};";
-      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(sassStream, SCRIPT_NAME);
+      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(getScriptAsStream(), DEFAULT_SASS_JS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript sass.js", ex);
     }
+  }
+
+  /**
+   * @return the stream of the uglify script. Override this method to provide a different script version.
+   */
+  protected InputStream getScriptAsStream() {
+    return getClass().getResourceAsStream(DEFAULT_SASS_JS);
   }
 
   /**

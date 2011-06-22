@@ -39,6 +39,9 @@ public class YUIJsCompressorProcessor
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(YUIJsCompressorProcessor.class);
+  public static final String ALIAS_NO_MUNGE = "yuiJsMin";
+  public static final String ALIAS_MUNGE = "yuiJsMinAdvanced";
+
   /**
    * Error reporter.
    */

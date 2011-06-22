@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Alex Objelean.
+ *  Copyright wro4j@2011
  */
 package ro.isdc.wro.extensions.processor.algorithm.jshint;
 
@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLint;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
@@ -33,6 +34,13 @@ import com.google.gson.reflect.TypeToken;
  */
 public class JsHint {
   private static final Logger LOG = LoggerFactory.getLogger(JsHint.class);
+  /**
+   * The name of the jshint script to be used by default.
+   */
+  private static final String DEFAULT_JSHINT_JS = "jshint.min.js";
+  /**
+   * Options to apply to js hint processing
+   */
   private String[] options;
 
   /**
@@ -40,7 +48,7 @@ public class JsHint {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForJsHint(), "jshint.js");
+      return RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), DEFAULT_JSHINT_JS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
@@ -49,9 +57,9 @@ public class JsHint {
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.
    */
-  protected InputStream getStreamForJsHint() {
+  protected InputStream getScriptAsStream() {
     //this resource is packed with packerJs compressor
-    return getClass().getResourceAsStream("jshint.min.js");
+    return getClass().getResourceAsStream(DEFAULT_JSHINT_JS);
   }
 
 
@@ -87,10 +95,13 @@ public class JsHint {
     }
   }
 
-
   /**
-   * @param data script to process.
-   * @param options options to set as true
+   * TODO this method is duplicated in {@link CssLint}. Extract and reuse it.
+   *
+   * @param data
+   *          script to process.
+   * @param options
+   *          options to set as true
    * @return Script used to pack and return the packed result.
    */
   private String buildJsHintScript(final String data, final String... options) {
@@ -104,7 +115,6 @@ public class JsHint {
       }
     }
     sb.append("}");
-    LOG.debug("sb {} ", sb);
     return "JSHINT(" + data + ", " + sb.toString() + ");";
   }
 

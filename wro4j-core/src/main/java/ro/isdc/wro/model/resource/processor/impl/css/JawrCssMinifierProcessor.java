@@ -29,6 +29,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.JawrCssMinifier;
 @SupportedResourceType(ResourceType.CSS)
 public class JawrCssMinifierProcessor
   implements ResourceProcessor {
+  public static final String ALIAS = "cssMinJawr";
 
   /**
    * {@inheritDoc}

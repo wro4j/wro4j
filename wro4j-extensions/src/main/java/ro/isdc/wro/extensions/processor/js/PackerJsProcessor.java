@@ -33,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 public class PackerJsProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(PackerJsProcessor.class);
+  public static final String ALIAS = "packerJs";
   /**
    * Engine.
    */

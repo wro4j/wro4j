@@ -71,11 +71,11 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private void initProcessors() {
     preProcessors.putAll(createCommonProcessors());
-    preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
-    preProcessors.put("cssImport", new CssImportPreProcessor());
-    preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
-    preProcessors.put("cssDataUri", new CssDataUriPreProcessor());
-    preProcessors.put("duplicateAwareCssDataUri", new DuplicatesAwareCssDataUriPreProcessor());
+    preProcessors.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
+    preProcessors.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    preProcessors.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
+    preProcessors.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
+    preProcessors.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, new DuplicatesAwareCssDataUriPreProcessor());
     postProcessors.putAll(createCommonProcessors());
 
     contributePreProcessors(preProcessors);
@@ -88,14 +88,14 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private Map<String, ResourceProcessor> createCommonProcessors() {
     final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
-    map.put("bomStripper", new BomStripperPreProcessor());
-    map.put("cssVariables", new CssVariablesProcessor());
-    map.put("cssCompressor", new CssCompressorProcessor());
-    map.put("cssMinJawr", new JawrCssMinifierProcessor());
-    map.put("jsMin", new JSMinProcessor());
-    map.put("variablizeColors", new VariablizeColorsCssProcessor());
-    map.put("conformColors", new ConformColorsCssProcessor());
-    map.put("cssVariables", new CssVariablesProcessor());
+    map.put(BomStripperPreProcessor.ALIAS, new BomStripperPreProcessor());
+    map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
+    map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
+    map.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
+    map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
+    map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
+    map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     return map;
 
   }

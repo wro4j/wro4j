@@ -41,6 +41,8 @@ import com.google.javascript.jscomp.Result;
 public class GoogleClosureCompressorProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GoogleClosureCompressorProcessor.class);
+  public static final String ALIAS_SIMPLE = "googleClosureSimple";
+  public static final String ALIAS_ADVANCED = "googleClosureAdvanced";
   /**
    * {@link CompilationLevel} to use for compression.
    */

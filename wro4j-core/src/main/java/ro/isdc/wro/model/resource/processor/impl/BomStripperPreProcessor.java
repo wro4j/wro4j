@@ -27,6 +27,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  */
 public final class BomStripperPreProcessor
     implements ResourceProcessor {
+  public static final String ALIAS = "bomStripper";
   /**
    * A stream which removes BOM characters.
    */

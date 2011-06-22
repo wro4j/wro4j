@@ -28,6 +28,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.CssCompressor;
 @SupportedResourceType(ResourceType.CSS)
 public class CssCompressorProcessor
   implements ResourceProcessor {
+  public static final String ALIAS = "cssCompressor";
 
   /**
    * {@inheritDoc}

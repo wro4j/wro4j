@@ -33,6 +33,8 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 public abstract class CJsonProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CJsonProcessor.class);
+  public static final String ALIAS_PACK = "cjson-pack";
+  public static final String ALIAS_UNPACK = "cjson-unpack";
   /**
    * Engine.
    */

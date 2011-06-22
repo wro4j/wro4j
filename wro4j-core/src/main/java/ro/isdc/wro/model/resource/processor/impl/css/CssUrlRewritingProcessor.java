@@ -105,6 +105,7 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 public class CssUrlRewritingProcessor
   extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
+  public static final String ALIAS = "cssUrlRewriting";
   /**
    * Constant for WEB-INF folder.
    */

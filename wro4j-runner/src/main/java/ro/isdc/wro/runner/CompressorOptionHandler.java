@@ -15,10 +15,13 @@ import org.kohsuke.args4j.spi.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
@@ -45,16 +48,19 @@ public class CompressorOptionHandler extends OptionHandler<ResourceProcessor> {
   }
 
   private void initMap() {
-    map.put("googleClosureSimple", new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
-    map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-    map.put("jsMin", new JSMinProcessor());
-    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
-    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
-    map.put("uglifyJs", new UglifyJsProcessor());
-    map.put("beautifyJs", new BeautifyJsProcessor());
-    map.put("packerJs", new PackerJsProcessor());
-    map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
-    map.put("coffeeScript", new CoffeeScriptProcessor());
+    map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
+    map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
+    map.put(YUICssCompressorProcessor.ALIAS, new YUICssCompressorProcessor());
+    map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, YUIJsCompressorProcessor.noMungeCompressor());
+    map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, YUIJsCompressorProcessor.doMungeCompressor());
+    map.put(UglifyJsProcessor.ALIAS_UGLIFY, new UglifyJsProcessor());
+    map.put(BeautifyJsProcessor.ALIAS_BEAUTIFY, new BeautifyJsProcessor());
+    map.put(PackerJsProcessor.ALIAS, new PackerJsProcessor());
+    map.put(DojoShrinksafeCompressorProcessor.ALIAS, new DojoShrinksafeCompressorProcessor());
+    map.put(CoffeeScriptProcessor.ALIAS, new CoffeeScriptProcessor());
+    map.put(CssLintProcessor.ALIAS, new CssLintProcessor());
+    map.put(JsHintProcessor.ALIAS, new JsHintProcessor());
   }
 
 
