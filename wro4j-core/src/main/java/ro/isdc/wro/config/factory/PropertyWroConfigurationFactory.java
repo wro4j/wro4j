@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.util.ObjectFactory;
 
 /**
  * Loads configurations from a {@link Properties} object.
@@ -22,7 +23,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
  * @since 1.3.7
  */
 public class PropertyWroConfigurationFactory
-    implements WroConfigurationFactory {
+  implements ObjectFactory<WroConfiguration> {
   private static final Logger LOG = LoggerFactory.getLogger(PropertyWroConfigurationFactory.class);
   /**
    * Holds configuration options. If no properties are set, the default values will be used instead.
@@ -43,6 +44,9 @@ public class PropertyWroConfigurationFactory
       config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
       config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
       config.setEncoding(valueAsString(properties.get(ConfigConstants.encoding.name())));
+      config.setWroManagerClassName(valueAsString(properties.get(ConfigConstants.managerFactoryClassName.name())));
+      config.setMbeanName(valueAsString(properties.get(ConfigConstants.mbeanName.name())));
+      config.setHeader(valueAsString(properties.get(ConfigConstants.header.name())));
     }
     LOG.debug("WroConfiguration created: {}", config);
     return config;

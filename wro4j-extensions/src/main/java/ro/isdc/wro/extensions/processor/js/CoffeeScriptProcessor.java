@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class CoffeeScriptProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
+  public static final String ALIAS = "coffeeScript";
   /**
    * Engine.
    */
@@ -48,7 +50,9 @@ public class CoffeeScriptProcessor
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();

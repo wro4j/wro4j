@@ -34,8 +34,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
-import ro.isdc.wro.config.factory.WroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -44,6 +43,7 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -61,18 +61,6 @@ public class WroFilter
    * The prefix to use for default mbean name.
    */
   private static final String MBEAN_PREFIX = "wro4j-";
-  /**
-   * The parameter used to specify headers to put into the response, used mainly for caching.
-   */
-  static final String PARAM_HEADER = "header";
-  /**
-   * The name of the context parameter that specifies wroManager factory class.
-   */
-  static final String PARAM_MANAGER_FACTORY = "managerFactoryClassName";
-  /**
-   * A preferred name of the MBean object.
-   */
-  static final String PARAM_MBEAN_NAME = "mbeanName";
   /**
    * Default value used by Cache-control header.
    */
@@ -125,8 +113,8 @@ public class WroFilter
   /**
    * @return implementation of {@link WroConfigurationFactory} used to create a {@link WroConfiguration} object.
    */
-  protected WroConfigurationFactory newWroConfigurationFactory() {
-    return new FilterConfigWroConfigurationFactory(filterConfig);
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+    return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
 
   /**
@@ -182,7 +170,7 @@ public class WroFilter
    * @return the name of MBean to be used by JMX to configure wro4j.
    */
   protected String newMBeanName() {
-    String mbeanName = filterConfig.getInitParameter(PARAM_MBEAN_NAME);
+    String mbeanName = wroConfiguration.getMbeanName();
     if (StringUtils.isEmpty(mbeanName)) {
       final String contextPath = getContextPath();
       mbeanName = StringUtils.isEmpty(contextPath) ? "ROOT" : contextPath;
@@ -256,8 +244,8 @@ public class WroFilter
       headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
       headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
     }
-    final String headerParam = filterConfig.getInitParameter(PARAM_HEADER);
-    if (headerParam != null) {
+    final String headerParam = wroConfiguration.getHeader();
+    if (!StringUtils.isEmpty(headerParam)) {
       try {
         if (headerParam.contains("|")) {
           final String[] headers = headerParam.split("[|]");
@@ -413,8 +401,7 @@ public class WroFilter
    * @return {@link WroManagerFactory} object.
    */
   protected WroManagerFactory getWroManagerFactory() {
-    final String appFactoryClassName = filterConfig.getInitParameter(PARAM_MANAGER_FACTORY);
-    if (appFactoryClassName == null) {
+    if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
       // If no context param was specified we return the default factory
       return new BaseWroManagerFactory() {
         @Override
@@ -430,7 +417,8 @@ public class WroFilter
       // Try to find the specified factory class
       Class<?> factoryClass = null;
       try {
-        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(appFactoryClassName);
+        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+          wroConfiguration.getWroManagerClassName());
         // Instantiate the factory
         return (WroManagerFactory)factoryClass.newInstance();
       } catch (final Exception e) {

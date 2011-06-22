@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.lang.StringUtils;
+
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -27,24 +29,28 @@ import ro.isdc.wro.model.resource.processor.algorithm.CssCompressor;
 @SupportedResourceType(ResourceType.CSS)
 public class CssCompressorProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
+  public static final String ALIAS = "cssCompressor";
 
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
+    process(null, reader, writer);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+    throws IOException {
     try {
       new CssCompressor(reader).compress(writer, -1);
       writer.flush();
     } catch (final Exception e) {
-      throw new IOException("Exception occured while formatting the css");
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      throw new IOException("Exception while applying " + getClass().getSimpleName() + " processor on the "
+          + resourceUri + " resource", e);
     } finally {
       reader.close();
       writer.close();

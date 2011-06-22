@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
@@ -29,19 +30,19 @@ import ro.isdc.wro.model.resource.processor.algorithm.JawrCssMinifier;
 @SupportedResourceType(ResourceType.CSS)
 public class JawrCssMinifierProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  /**
+  public static final String ALIAS = "cssMinJawr";  /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
-    process(reader, writer);
+    process(null, reader, writer);
   }
 
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
@@ -49,7 +50,9 @@ public class JawrCssMinifierProcessor
       writer.write(result.toString());
       writer.flush();
     } catch (final Exception e) {
-      throw new IOException("Exception occured while minimizing the css", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      throw new IOException("Exception while applying " + getClass().getSimpleName() + " processor on the "
+          + resourceUri + " resource", e);
     } finally {
       reader.close();
       writer.close();

@@ -2,12 +2,31 @@
 <groups xmlns="http://www.isdc.ro/wro"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
-
+  
+  <group name="skeleton">
+    <css>/static/css/skeleton/*.css</css>
+  </group>
+  
+  <group name="json1">
+    <js>/static/js/json/json1.js</js>
+  </group>
+  
+  <group name="json2">
+    <js>/static/js/json/json2.js</js>
+  </group>
+  
+  <group name="jsp">
+    <css>/WEB-INF/jsp/css.jsp</css>
+  </group>
   
   <group name="dynamicResource">
     <js>/resource/redirect.js</js>
     <js>/external/resource.js</js>    
     <!-- <js>/resource/dynamic.js</js> -->
+  </group>
+  
+  <group name="placeholder">
+    <css>/static/css/placeholder/*.css</css>
   </group>
   
   <group name="all">
@@ -94,6 +113,7 @@
   </group>
   
   <group name="classpath">
+    <css>classpath:com/mysite/myapplication/web/resources/grids.css</css>
     <css>classpath:com/mysite/myapplication/web/resources/*.css</css>
     <js>classpath:com/mysite/myapplication/web/resources/*.js</js>
 	</group>

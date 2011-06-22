@@ -34,19 +34,20 @@ import ro.isdc.wro.util.StopWatch;
 public class DojoShrinksafeCompressorProcessor
   implements ResourcePostProcessor, ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(DojoShrinksafeCompressorProcessor.class);
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    process(reader, writer);
-  }
+  public static final String ALIAS = "dojoShrinksafe";
 
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final StopWatch watch = new StopWatch();
     watch.start("pack");

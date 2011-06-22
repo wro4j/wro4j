@@ -28,6 +28,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 public final class BomStripperPreProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
+  public static final String ALIAS = "bomStripper";
   /**
    * A stream which removes BOM characters.
    */
@@ -91,7 +92,7 @@ public final class BomStripperPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-//      final String encoding = Context.get().getCon  fig().getEncoding();
+      //final String encoding = Context.get().getConfig().getEncoding();
       //using encoding doesn't remove BOM characters
       final InputStream is = new BomStripperInputStream(new ByteArrayInputStream(
           IOUtils.toString(reader).getBytes()));

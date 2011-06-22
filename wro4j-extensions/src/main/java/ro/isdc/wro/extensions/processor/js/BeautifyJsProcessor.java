@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +26,14 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * Perform a beautify operation on javascript by nicely formatting it.
  *
  * @author Alex Objelean
+ * @since 1.3.1
  * @created 7 Nov 2010
  */
 @SupportedResourceType(ResourceType.JS)
 public class BeautifyJsProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(BeautifyJsProcessor.class);
+  public static final String ALIAS_BEAUTIFY = "beautifyJs";
   /**
    * Engine.
    */
@@ -61,7 +64,9 @@ public class BeautifyJsProcessor
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the resource, no processing applied...", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();

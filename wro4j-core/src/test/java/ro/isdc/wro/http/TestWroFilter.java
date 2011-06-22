@@ -26,7 +26,6 @@ import org.mockito.Mockito;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
-import ro.isdc.wro.config.factory.WroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -36,6 +35,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -112,7 +112,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidAppFactoryClassNameIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_MANAGER_FACTORY)).thenReturn("Invalid value");
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
     filter.init(config);
   }
 
@@ -190,7 +190,7 @@ public class TestWroFilter {
   @Test
   public void testValidAppFactoryClassNameIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_MANAGER_FACTORY)).thenReturn(
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
       ServletContextAwareWroManagerFactory.class.getName());
     filter.init(config);
   }
@@ -226,7 +226,7 @@ public class TestWroFilter {
   @Test
   public void testValidHeaderParamIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag: 998989");
+    Mockito.when(config.getInitParameter(ConfigConstants.header.name())).thenReturn("ETag: 998989");
     filter.init(config);
   }
 
@@ -234,7 +234,7 @@ public class TestWroFilter {
   @Test
   public void testValidHeaderParamsAreSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn(
+    Mockito.when(config.getInitParameter(ConfigConstants.header.name())).thenReturn(
       "ETag: 998989 | Expires: Thu, 15 Apr 2010 20:00:00 GMT");
     filter.init(config);
   }
@@ -243,7 +243,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet()
     throws Exception {
-    Mockito.when(config.getInitParameter(WroFilter.PARAM_HEADER)).thenReturn("ETag 998989 expires 1");
+    Mockito.when(config.getInitParameter(ConfigConstants.header.name())).thenReturn("ETag 998989 expires 1");
     filter.init(config);
   }
 
@@ -494,7 +494,7 @@ public class TestWroFilter {
     props.setProperty(ConfigConstants.debug.name(), Boolean.FALSE.toString());
     final WroFilter theFilter = new WroFilter() {
       @Override
-      protected WroConfigurationFactory newWroConfigurationFactory() {
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
         final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
         factory.setProperties(props);
         return factory;

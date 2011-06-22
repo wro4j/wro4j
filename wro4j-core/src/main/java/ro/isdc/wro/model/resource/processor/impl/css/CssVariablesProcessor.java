@@ -35,6 +35,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class CssVariablesProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssVariablesProcessor.class);
+  public static final String ALIAS = "cssVariables";
   /**
    * Pattern used to find variables definition. For instance:<br/>
    * <code>
@@ -99,16 +100,16 @@ public class CssVariablesProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
-    process(reader, writer);
+    process(null, reader, writer);
   }
 
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String css = IOUtils.toString(reader);

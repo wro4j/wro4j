@@ -30,6 +30,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
@@ -93,25 +94,24 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * Init processors with default values.
    */
   private void initProcessors() {
-    preProcessors.put("cssUrlRewriting", new CssUrlRewritingProcessor());
-    preProcessors.put("bomStripper", new BomStripperPreProcessor());
-    preProcessors.put("cssImport", new CssImportPreProcessor());
-    preProcessors.put("cssVariables", new CssVariablesProcessor());
-    preProcessors.put("semicolonAppender", new SemicolonAppenderPreProcessor());
-    preProcessors.put("cssDataUri", new CssDataUriPreProcessor());
-    preProcessors.put("duplicateAwareCssDataUri", new DuplicatesAwareCssDataUriPreProcessor());
-    preProcessors.put("cssCompressor", new CssCompressorProcessor());
-    preProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
-    preProcessors.put("jsMin", new JSMinProcessor());
-    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
-    preProcessors.put("conformColors", new ConformColorsCssProcessor());
+    preProcessors.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
+    preProcessors.put(BomStripperPreProcessor.ALIAS, new BomStripperPreProcessor());
+    preProcessors.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    preProcessors.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
+    preProcessors.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
+    preProcessors.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
+    preProcessors.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, new DuplicatesAwareCssDataUriPreProcessor());
+    preProcessors.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
+    preProcessors.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    preProcessors.put(CssMinProcessor.ALIAS, new CssMinProcessor());
+    preProcessors.put(JSMinProcessor.ALIAS, new JSMinProcessor());
+    preProcessors.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
+    preProcessors.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
 
-    postProcessors.put("cssVariables", new CssVariablesProcessor());
-    postProcessors.put("cssCompressor", new CssCompressorProcessor());
-    postProcessors.put("cssMinJawr", new JawrCssMinifierProcessor());
-    postProcessors.put("jsMin", new JSMinProcessor());
-    preProcessors.put("variablizeColors", new VariablizeColorsCssProcessor());
-    preProcessors.put("conformColors", new ConformColorsCssProcessor());
+    postProcessors.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
+    postProcessors.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
+    postProcessors.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    postProcessors.put(JSMinProcessor.ALIAS, new JSMinProcessor());
 
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);

@@ -33,7 +33,7 @@ public class MultiLineCommentStripperProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader source, final Writer destination)
+  public void process(final Resource resource, final Reader source, final Writer destination)
     throws IOException {
     try {
       final String content = IOUtils.toString(source);
@@ -50,9 +50,9 @@ public class MultiLineCommentStripperProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
     // resourceUri doesn't matter
-    process(reader, writer);
+    process(null, reader, writer);
   }
 }

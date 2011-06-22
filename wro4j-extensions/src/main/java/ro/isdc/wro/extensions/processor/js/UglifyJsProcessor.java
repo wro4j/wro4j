@@ -14,11 +14,13 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
  * Compress js using uglifyJs utility.
  *
  * @author Alex Objelean
+ * @since 1.3.1
  * @created 7 Nov 2010
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class UglifyJsProcessor extends BeautifyJsProcessor {
+  public static final String ALIAS_UGLIFY = "uglifyJs";
   /**
    * @return new instance of {@link UglifyJs} engine.
    */

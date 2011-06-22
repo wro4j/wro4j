@@ -22,10 +22,12 @@ import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
 @SupportedResourceType(ResourceType.CSS)
 public class VariablizeColorsCssProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
+  public static final String ALIAS = "variablizeColors";
+
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String result = new Lessify().variablizeColors(IOUtils.toString(reader));
@@ -40,9 +42,9 @@ public class VariablizeColorsCssProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
-    process(reader, writer);
+    process(null, reader, writer);
   }
 
 }

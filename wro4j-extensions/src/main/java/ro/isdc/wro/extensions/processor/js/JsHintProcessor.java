@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010.
+ * Copyright (C) 2011.
  * All rights reserved.
  */
 package ro.isdc.wro.extensions.processor.js;
@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -26,12 +28,14 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * if the processed script contains errors or not.
  *
  * @author Alex Objelean
+ * @since 1.3.5
  * @created 1 Mar 2011
  */
 @SupportedResourceType(ResourceType.JS)
 public class JsHintProcessor
-  implements ResourcePreProcessor {
+  implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsHintProcessor.class);
+  public static final String ALIAS = "jsHint";
   /**
    * Options to use to configure jsHint.
    */
@@ -58,8 +62,9 @@ public class JsHintProcessor
         throw new WroRuntimeException("", ex);
       }
     } catch (final WroRuntimeException e) {
-      LOG.warn("Exception while applying " + getClass().getSimpleName()
-        + " processor on the resource, no processing applied...", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
     } finally {
       // don't change the processed content no matter what happens.
       writer.write(content);
@@ -68,6 +73,12 @@ public class JsHintProcessor
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer) throws IOException {
+    process(null, reader, writer);
+  }
 
   /**
    * Called when {@link JsHintException} is thrown. Allows subclasses to re-throw this exception as a

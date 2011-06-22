@@ -1,0 +1,12 @@
+.variables {
+  width: value1;
+}
+#value2 .class1 {
+  height: 24px;
+  color: #888888;
+  font-family: value3;
+}
+.class2 {
+  color: #888888 !important;
+  background: url('value4');
+}

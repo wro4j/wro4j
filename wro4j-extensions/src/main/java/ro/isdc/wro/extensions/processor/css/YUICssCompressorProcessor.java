@@ -27,6 +27,7 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 @SupportedResourceType(ResourceType.CSS)
 public class YUICssCompressorProcessor
   implements ResourcePostProcessor, ResourcePreProcessor {
+  public static final String ALIAS = "yuiCssMin";
   /**
    * An option of CssCompressor.
    */
@@ -35,15 +36,15 @@ public class YUICssCompressorProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Reader reader, final Writer writer)
     throws IOException {
-    process(reader, writer);
+    process(null, reader, writer);
   }
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final CssCompressor compressor = new CssCompressor(reader);
