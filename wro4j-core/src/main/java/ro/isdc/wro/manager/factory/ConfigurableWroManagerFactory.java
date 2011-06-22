@@ -30,6 +30,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
@@ -102,6 +103,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     preProcessors.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, new DuplicatesAwareCssDataUriPreProcessor());
     preProcessors.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     preProcessors.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    preProcessors.put(CssMinProcessor.ALIAS, new CssMinProcessor());
     preProcessors.put(JSMinProcessor.ALIAS, new JSMinProcessor());
     preProcessors.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
     preProcessors.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
@@ -110,7 +112,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     postProcessors.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     postProcessors.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
     postProcessors.put(JSMinProcessor.ALIAS, new JSMinProcessor());
-    preProcessors.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
 
     contributePreProcessors(preProcessors);
     contributePostProcessors(postProcessors);
