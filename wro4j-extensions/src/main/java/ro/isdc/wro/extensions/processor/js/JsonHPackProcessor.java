@@ -34,6 +34,8 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public abstract class JsonHPackProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPackProcessor.class);
+  public static final String ALIAS_PACK = "jsonh-pack";
+  public static final String ALIAS_UNPACK = "jsonh-unpack";
   /**
    * Engine.
    */

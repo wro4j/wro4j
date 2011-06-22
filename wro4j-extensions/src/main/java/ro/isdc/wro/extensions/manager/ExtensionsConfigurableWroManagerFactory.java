@@ -22,7 +22,6 @@ import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
 
@@ -38,22 +37,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   @Override
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
-    map.put("yuiCssMin", new YUICssCompressorProcessor());
-    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
-    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
-    map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
-    map.put("uglifyJs", new UglifyJsProcessor());
-    map.put("beautifyJs", new BeautifyJsProcessor());
-    map.put("packerJs", new PackerJsProcessor());
-    map.put("lessCss", new LessCssProcessor());
-    map.put("sassCss", new SassCssProcessor());
-    map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
-    map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-    map.put("coffeeScript", new CoffeeScriptProcessor());
-    map.put("cjson", CJsonProcessor.packProcessor());
-    map.put("jsonhpack", JsonHPackProcessor.packProcessor());
-    map.put("jsHint", new JsHintProcessor());
-    map.put("cssLint", new CssLintProcessor());
+    pupulateMap(map);
   }
 
   /**
@@ -61,22 +45,28 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   @Override
   protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
-    map.put("yuiCssMin", new YUICssCompressorProcessor());
-    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
-    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
-    map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
-    map.put("uglifyJs", new UglifyJsProcessor());
-    map.put("beautifyJs", new BeautifyJsProcessor());
-    map.put("packerJs", new PackerJsProcessor());
-    map.put("lessCss", new LessCssProcessor());
-    map.put("sassCss", new SassCssProcessor());
-    map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
-    map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-    map.put("coffeeScript", new CoffeeScriptProcessor());
-    map.put("cssDataUri", new CssDataUriPreProcessor());
-    map.put("cjson", CJsonProcessor.packProcessor());
-    map.put("jsonhpack", JsonHPackProcessor.packProcessor());
-    map.put("jsHint", new JsHintProcessor());
-    map.put("cssLint", new CssLintProcessor());
+    pupulateMap(map);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> void pupulateMap(final Map<String, T> map) {
+    map.put(YUICssCompressorProcessor.ALIAS, (T) new YUICssCompressorProcessor());
+    map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, (T) YUIJsCompressorProcessor.noMungeCompressor());
+    map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, (T) YUIJsCompressorProcessor.doMungeCompressor());
+    map.put(DojoShrinksafeCompressorProcessor.ALIAS, (T) new DojoShrinksafeCompressorProcessor());
+    map.put(UglifyJsProcessor.ALIAS_UGLIFY, (T) new UglifyJsProcessor());
+    map.put(BeautifyJsProcessor.ALIAS_BEAUTIFY, (T) new BeautifyJsProcessor());
+    map.put(PackerJsProcessor.ALIAS, (T) new PackerJsProcessor());
+    map.put(LessCssProcessor.ALIAS, (T) new LessCssProcessor());
+    map.put(SassCssProcessor.ALIAS, (T) new SassCssProcessor());
+    map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, (T) new GoogleClosureCompressorProcessor());
+    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
+    map.put(CoffeeScriptProcessor.ALIAS, (T) new CoffeeScriptProcessor());
+    map.put(CJsonProcessor.ALIAS_PACK, (T) CJsonProcessor.packProcessor());
+    map.put(CJsonProcessor.ALIAS_UNPACK, (T) CJsonProcessor.unpackProcessor());
+    map.put(JsonHPackProcessor.ALIAS_PACK, (T) JsonHPackProcessor.packProcessor());
+    map.put(JsonHPackProcessor.ALIAS_UNPACK, (T) JsonHPackProcessor.unpackProcessor());
+    map.put(JsHintProcessor.ALIAS, (T) new JsHintProcessor());
+    map.put(CssLintProcessor.ALIAS, (T) new CssLintProcessor());
   }
 }

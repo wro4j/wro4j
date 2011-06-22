@@ -25,6 +25,8 @@ import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
 @SupportedResourceType(ResourceType.CSS)
 public class ConformColorsCssProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
+  public static final String ALIAS = "conformColors";
+
   /**
    * {@inheritDoc}
    */

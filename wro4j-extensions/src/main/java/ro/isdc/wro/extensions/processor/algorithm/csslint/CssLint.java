@@ -33,6 +33,13 @@ import com.google.gson.reflect.TypeToken;
  */
 public class CssLint {
   private static final Logger LOG = LoggerFactory.getLogger(CssLint.class);
+  /**
+   * The name of the csslint script to be used by default.
+   */
+  private static final String DEFAULT_CSSLINT_JS = "csslint.js";
+  /**
+   * Options to apply to js hint processing
+   */
   private String[] options;
 
   /**
@@ -40,7 +47,7 @@ public class CssLint {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getStreamForCssLint(), "csslint.js");
+      return RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), DEFAULT_CSSLINT_JS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }
@@ -50,8 +57,8 @@ public class CssLint {
   /**
    * @return the stream of the csslint script. Override this method to provide a different script version.
    */
-  protected InputStream getStreamForCssLint() {
-    return getClass().getResourceAsStream("csslint.js");
+  protected InputStream getScriptAsStream() {
+    return getClass().getResourceAsStream(DEFAULT_CSSLINT_JS);
   }
 
 

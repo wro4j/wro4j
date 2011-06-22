@@ -33,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class CoffeeScriptProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
+  public static final String ALIAS = "coffeeScript";
   /**
    * Engine.
    */

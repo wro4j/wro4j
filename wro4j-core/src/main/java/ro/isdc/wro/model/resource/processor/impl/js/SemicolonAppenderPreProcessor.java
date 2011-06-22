@@ -25,6 +25,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 @SupportedResourceType(ResourceType.JS)
 public class SemicolonAppenderPreProcessor
   implements ResourcePreProcessor {
+  public static final String ALIAS = "semicolonAppender";
   /**
    * check if the last character is a semicolon and append only if one is missing.
    */

@@ -105,8 +105,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 public class CssUrlRewritingProcessor
   extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
-
-  /**
+  public static final String ALIAS = "cssUrlRewriting";  /**
    * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
    */
   public static final String PATH_RESOURCES = "wroResources";
