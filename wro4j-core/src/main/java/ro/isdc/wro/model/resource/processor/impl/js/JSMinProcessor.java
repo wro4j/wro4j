@@ -39,6 +39,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.JSMin;
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
+  public static final String ALIAS = "jsMin";
   /**
    * {@inheritDoc}
    */

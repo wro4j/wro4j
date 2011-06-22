@@ -34,6 +34,7 @@ import ro.isdc.wro.util.StopWatch;
 public class DojoShrinksafeCompressorProcessor
   implements ResourcePostProcessor, ResourcePreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(DojoShrinksafeCompressorProcessor.class);
+  public static final String ALIAS = "dojoShrinksafe";
 
   /**
    * {@inheritDoc}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2010.
+ *  Copyright wro4j@2011.
  */
 package ro.isdc.wro.extensions.processor.algorithm.less;
 
@@ -26,7 +26,10 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class LessCss {
   private static final Logger LOG = LoggerFactory.getLogger(LessCss.class);
-
+  /**
+   * The name of the sass script to be used by default.
+   */
+  private static final String DEFAULT_LESS_JS = "less-1.1.3.min.js";
 
   /**
    * Initialize script builder for evaluation.
@@ -35,11 +38,10 @@ public class LessCss {
     try {
       final String SCRIPT_INIT = "init.js";
       final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
-      final InputStream lessStream = getLessScriptAsStream();
       final String SCRIPT_RUN = "run.js";
       final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
       return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
-          lessStream, "less.js").evaluateChain(runStream, SCRIPT_RUN);
+          getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
     } catch (final Exception e) {
@@ -52,8 +54,8 @@ public class LessCss {
   /**
    * @return stream of the less.js script.
    */
-  protected InputStream getLessScriptAsStream() {
-    return getClass().getResourceAsStream("less-1.1.3.min.js");
+  protected InputStream getScriptAsStream() {
+    return getClass().getResourceAsStream(DEFAULT_LESS_JS);
   }
 
 

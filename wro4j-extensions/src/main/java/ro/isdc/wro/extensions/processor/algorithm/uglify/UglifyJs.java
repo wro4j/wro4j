@@ -1,5 +1,5 @@
 /*
- *  Copyright 2010 Alex Objelean.
+ *  Copyright wro4j@2011.
  */
 package ro.isdc.wro.extensions.processor.algorithm.uglify;
 
@@ -26,9 +26,17 @@ import ro.isdc.wro.util.WroUtil;
  * is compressed with packerJs compressor, because it seems to be most efficient for this situation.
  *
  * @author Alex Objelean
+ * @since 1.3.1
  */
 public class UglifyJs {
   private static final Logger LOG = LoggerFactory.getLogger(UglifyJs.class);
+  /**
+   * The name of the uglify script to be used by default.
+   */
+  private static final String DEFAULT_UGLIFY_JS = "uglify-1.0.2.min.js";
+  /**
+   * If true, the script is uglified, otherwise it is beautified.
+   */
   private final boolean uglify;
 
 
@@ -36,7 +44,7 @@ public class UglifyJs {
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
    *        formatted).
    */
-  private UglifyJs(final boolean uglify) {
+  public UglifyJs(final boolean uglify) {
     this.uglify = uglify;
   }
 
@@ -62,16 +70,19 @@ public class UglifyJs {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_UGLIFY = "uglify-1.0.2.min.js";
-      final InputStream uglifyStream = getClass().getResourceAsStream(SCRIPT_UGLIFY);
-
-
       final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";
-      return RhinoScriptBuilder.newChain().addJSON().evaluateChain(scriptInit, "initScript").evaluateChain(uglifyStream,
-        SCRIPT_UGLIFY);
+      return RhinoScriptBuilder.newChain().addJSON().evaluateChain(scriptInit, "initScript").evaluateChain(getScriptAsStream(),
+        DEFAULT_UGLIFY_JS);
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed initializing js", ex);
     }
+  }
+
+  /**
+   * @return the stream of the uglify script. Override this method to provide a different script version.
+   */
+  protected InputStream getScriptAsStream() {
+    return getClass().getResourceAsStream(DEFAULT_UGLIFY_JS);
   }
 
 

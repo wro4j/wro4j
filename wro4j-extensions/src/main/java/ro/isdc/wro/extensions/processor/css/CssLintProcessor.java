@@ -36,6 +36,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class CssLintProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
+  public static final String ALIAS = "cssLint";
   /**
    * Options to use to configure jsHint.
    */
