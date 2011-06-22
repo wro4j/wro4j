@@ -212,7 +212,7 @@
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
           -->
-           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomWroManager</wroManagerFactory>
+           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManager</wroManagerFactory>
         </configuration>
       </plugin>
       <!--  -->
