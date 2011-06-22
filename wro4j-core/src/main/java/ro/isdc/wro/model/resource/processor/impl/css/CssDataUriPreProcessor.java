@@ -29,6 +29,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 public class CssDataUriPreProcessor
   extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssDataUriPreProcessor.class);
+  public static final String ALIAS = "cssDataUri";
   /**
    * The size limit. Images larger than this limit won't be transformed (due to IE8 limitation).
    */

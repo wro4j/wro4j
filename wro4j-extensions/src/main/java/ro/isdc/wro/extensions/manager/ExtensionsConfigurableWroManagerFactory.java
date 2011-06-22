@@ -55,24 +55,25 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   private Map<String, ResourceProcessor> createCommonProcessors() {
     final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
-    map.put("yuiCssMin", new YUICssCompressorProcessor());
-    map.put("yuiJsMin", YUIJsCompressorProcessor.noMungeCompressor());
-    map.put("yuiJsMinAdvanced", YUIJsCompressorProcessor.doMungeCompressor());
-    map.put("dojoShrinksafe", new DojoShrinksafeCompressorProcessor());
-    map.put("uglifyJs", new UglifyJsProcessor());
-    map.put("beautifyJs", new BeautifyJsProcessor());
-    map.put("packerJs", new PackerJsProcessor());
-    map.put("lessCss", new LessCssProcessor());
-    map.put("sassCss", new SassCssProcessor());
-    map.put("googleClosureSimple", new GoogleClosureCompressorProcessor());
-    map.put("googleClosureAdvanced", new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-    map.put("coffeeScript", new CoffeeScriptProcessor());
-    map.put("cssDataUri", new CssDataUriPreProcessor());
-    map.put("cjson", CJsonProcessor.packProcessor());
-    map.put("jsonhpack", JsonHPackProcessor.packProcessor());
-    map.put("cjson", CJsonProcessor.packProcessor());
-    map.put("jsHint", new JsHintProcessor());
-    map.put("cssLint", new CssLintProcessor());
+    map.put(YUICssCompressorProcessor.ALIAS, new YUICssCompressorProcessor());
+    map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, YUIJsCompressorProcessor.noMungeCompressor());
+    map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, YUIJsCompressorProcessor.doMungeCompressor());
+    map.put(DojoShrinksafeCompressorProcessor.ALIAS, new DojoShrinksafeCompressorProcessor());
+    map.put(UglifyJsProcessor.ALIAS_UGLIFY, new UglifyJsProcessor());
+    map.put(UglifyJsProcessor.ALIAS_BEAUTIFY, new BeautifyJsProcessor());
+    map.put(PackerJsProcessor.ALIAS, new PackerJsProcessor());
+    map.put(PackerJsProcessor.ALIAS, new LessCssProcessor());
+    map.put(SassCssProcessor.ALIAS, new SassCssProcessor());
+    map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new GoogleClosureCompressorProcessor());
+    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
+    map.put(CoffeeScriptProcessor.ALIAS, new CoffeeScriptProcessor());
+    map.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
+    map.put(CJsonProcessor.ALIAS_PACK, CJsonProcessor.packProcessor());
+    map.put(CJsonProcessor.ALIAS_UNPACK, CJsonProcessor.unpackProcessor());
+    map.put(JsonHPackProcessor.ALIAS_PACK, JsonHPackProcessor.packProcessor());
+    map.put(JsonHPackProcessor.ALIAS_UNPACK, JsonHPackProcessor.unpackProcessor());
+    map.put(JsHintProcessor.ALIAS, new JsHintProcessor());
+    map.put(CssLintProcessor.ALIAS, new CssLintProcessor());
 
     return map;
   }

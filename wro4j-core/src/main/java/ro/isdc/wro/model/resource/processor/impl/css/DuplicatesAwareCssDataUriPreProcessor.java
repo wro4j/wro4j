@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
 public class DuplicatesAwareCssDataUriPreProcessor
   extends CssDataUriPreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(DuplicatesAwareCssDataUriPreProcessor.class);
-  private List<String> imageUrls = new ArrayList<String>();
+  public static final String ALIAS_DUPLICATE = "duplicateAwareCssDataUri";
+  private final List<String> imageUrls = new ArrayList<String>();
 
   /**
    * Replace provided url with the new url if needed.

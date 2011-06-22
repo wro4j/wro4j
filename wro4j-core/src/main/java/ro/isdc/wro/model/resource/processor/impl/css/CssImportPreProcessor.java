@@ -39,6 +39,7 @@ import ro.isdc.wro.util.StringUtils;
 public class CssImportPreProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
+  public static final String ALIAS = "cssImport";
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.
    */

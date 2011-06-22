@@ -25,12 +25,14 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * Perform a beautify operation on javascript by nicely formatting it.
  *
  * @author Alex Objelean
+ * @since 1.3.1
  * @created 7 Nov 2010
  */
 @SupportedResourceType(ResourceType.JS)
 public class BeautifyJsProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(BeautifyJsProcessor.class);
+  public static final String ALIAS_BEAUTIFY = "beautifyJs";
   /**
    * Engine.
    */

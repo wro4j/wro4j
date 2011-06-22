@@ -31,6 +31,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 public class SassCssProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
+  public static final String ALIAS = "sassCss";
   /**
    * Engine.
    */
