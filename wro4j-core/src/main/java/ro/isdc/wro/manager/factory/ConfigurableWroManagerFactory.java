@@ -24,6 +24,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
@@ -92,6 +93,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     map.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    map.put(CssMinProcessor.ALIAS, new CssMinProcessor());
     map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
     map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
     map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());

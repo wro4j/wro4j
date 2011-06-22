@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
@@ -44,7 +44,7 @@ public class CustomWroManager
     return factory;
   }
 
-  private ResourcePreProcessor getPlaceholderProcessor() {
+  private ResourceProcessor getPlaceholderProcessor() {
     return new PlaceholderProcessor().setPropertiesFactory(new ObjectFactory<Properties>() {
       @Override
       public Properties create() {

@@ -30,6 +30,8 @@ import ro.isdc.wro.model.resource.processor.algorithm.CSSMin;
 public class CssMinProcessor
   implements ResourceProcessor {
 
+  public static final String ALIAS = "cssMin";
+
   /**
    * {@inheritDoc}
    */

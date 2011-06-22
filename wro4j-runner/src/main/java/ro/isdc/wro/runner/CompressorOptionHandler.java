@@ -16,16 +16,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
+import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -51,16 +62,29 @@ public class CompressorOptionHandler extends OptionHandler<ResourceProcessor> {
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
     map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
-    map.put(YUICssCompressorProcessor.ALIAS, new YUICssCompressorProcessor());
     map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, YUIJsCompressorProcessor.noMungeCompressor());
     map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, YUIJsCompressorProcessor.doMungeCompressor());
+    map.put(YUICssCompressorProcessor.ALIAS, new YUICssCompressorProcessor());
+    map.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    map.put(CssMinProcessor.ALIAS, new CssMinProcessor());
+    map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     map.put(UglifyJsProcessor.ALIAS_UGLIFY, new UglifyJsProcessor());
     map.put(BeautifyJsProcessor.ALIAS_BEAUTIFY, new BeautifyJsProcessor());
     map.put(PackerJsProcessor.ALIAS, new PackerJsProcessor());
     map.put(DojoShrinksafeCompressorProcessor.ALIAS, new DojoShrinksafeCompressorProcessor());
-    map.put(CoffeeScriptProcessor.ALIAS, new CoffeeScriptProcessor());
     map.put(CssLintProcessor.ALIAS, new CssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new JsHintProcessor());
+    map.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
+    map.put(CJsonProcessor.ALIAS_PACK, CJsonProcessor.packProcessor());
+    map.put(CJsonProcessor.ALIAS_UNPACK, CJsonProcessor.unpackProcessor());
+    map.put(JsonHPackProcessor.ALIAS_PACK, JsonHPackProcessor.packProcessor());
+    map.put(JsonHPackProcessor.ALIAS_UNPACK, JsonHPackProcessor.unpackProcessor());
+    map.put(LessCssProcessor.ALIAS, new LessCssProcessor());
+    map.put(SassCssProcessor.ALIAS, new SassCssProcessor());
+    map.put(CoffeeScriptProcessor.ALIAS, new CoffeeScriptProcessor());
+    map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
+    map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
+    map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
   }
 
 

@@ -102,6 +102,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 public class LessCssProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
+  public static final String ALIAS = "lessCss";
   /**
    * Engine.
    */
