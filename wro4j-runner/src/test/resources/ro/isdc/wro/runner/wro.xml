@@ -5,6 +5,7 @@
 
   <group name="all">
     <js>/js/*.js</js>
+    <css>/css/*.css</css>
   </group>
-   
+  
 </groups>
