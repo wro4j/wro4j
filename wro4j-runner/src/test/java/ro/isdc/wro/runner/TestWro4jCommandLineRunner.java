@@ -22,6 +22,7 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 public class TestWro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(TestWro4jCommandLineRunner.class);
   private File destinationFolder;
+
   @Before
   public void setUp() {
     destinationFolder = new File("wroTemp-" + new Date().getTime());
@@ -55,33 +56,37 @@ public class TestWro4jCommandLineRunner {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
 
-    final String[] args = String.format("--wroFile %s --contextFolder %s -m -c " + CssLintProcessor.ALIAS,
+    final String[] args = String.format("--wroFile %s --contextFolder %s destinationFolder %s -m -c " + CssLintProcessor.ALIAS,
         new Object[] {
-          wroFile, contextFolder
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
     Wro4jCommandLineRunner.main(args);
   }
 
 
   @Test
-  public void useJsHint() throws Exception {
+  public void useJsHint()
+      throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
 
-    final String[] args = String.format("--wroFile %s --contextFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
-      wroFile, contextFolder
-    }).split(" ");
+    final String[] args = String.format(
+        "--wroFile %s --contextFolder %s destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+        }).split(" ");
     Wro4jCommandLineRunner.main(args);
   }
 
   @Test
-  public void processTestWroXml() throws Exception {
+  public void processTestWroXml()
+      throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
 
     LOG.debug(wroFile);
-    final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s",
-      new Object[] { wroFile, contextFolder, destinationFolder.getAbsolutePath() }).split(" ");
+    final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
+      wroFile, contextFolder, destinationFolder.getAbsolutePath()
+    }).split(" ");
     Wro4jCommandLineRunner.main(args);
   }
 }
