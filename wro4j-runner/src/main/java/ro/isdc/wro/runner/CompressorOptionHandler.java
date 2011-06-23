@@ -15,6 +15,8 @@ import org.kohsuke.args4j.spi.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
+import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
@@ -72,8 +74,27 @@ public class CompressorOptionHandler extends OptionHandler<ResourceProcessor> {
     map.put(BeautifyJsProcessor.ALIAS_BEAUTIFY, new BeautifyJsProcessor());
     map.put(PackerJsProcessor.ALIAS, new PackerJsProcessor());
     map.put(DojoShrinksafeCompressorProcessor.ALIAS, new DojoShrinksafeCompressorProcessor());
-    map.put(CssLintProcessor.ALIAS, new CssLintProcessor());
-    map.put(JsHintProcessor.ALIAS, new JsHintProcessor());
+    map.put(CssLintProcessor.ALIAS, new CssLintProcessor() {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected void onCssLintException(final CssLintException e, final Resource resource)
+          throws Exception {
+        super.onCssLintException(e, resource);
+        System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
+        System.err.println(e.getErrors());
+      }
+    });
+    map.put(JsHintProcessor.ALIAS, new JsHintProcessor() {
+      @Override
+      protected void onJsHintException(final JsHintException e, final Resource resource)
+          throws Exception {
+        super.onJsHintException(e, resource);
+        System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
+        System.err.println(e.getErrors());
+      }
+    });
     map.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
     map.put(CJsonProcessor.ALIAS_PACK, CJsonProcessor.packProcessor());
     map.put(CJsonProcessor.ALIAS_UNPACK, CJsonProcessor.unpackProcessor());
