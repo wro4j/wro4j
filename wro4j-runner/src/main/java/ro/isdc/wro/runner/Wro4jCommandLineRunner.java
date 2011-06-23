@@ -41,11 +41,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -65,13 +61,13 @@ public class Wro4jCommandLineRunner {
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
   @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro.xml. By default this is the user current folder.")
-  private File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
+  private final File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
-  private File contextFolder = new File(System.getProperty("user.dir"));
+  private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
-  private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
+  private final File destinationFolder = new File(System.getProperty("user.dir"), "wro");
   @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Name of the compressor to process scripts")
-  private ResourcePreProcessor compressor = new JSMinProcessor();
+  private final ResourcePreProcessor compressor = new JSMinProcessor();
 
 
   public static void main(final String[] args)
@@ -232,10 +228,6 @@ public class Wro4jCommandLineRunner {
       protected ProcessorsFactory newProcessorsFactory() {
         final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
         factory.addPreProcessor(new BomStripperPreProcessor());
-        factory.addPreProcessor(new CssImportPreProcessor());
-        factory.addPreProcessor(new CssUrlRewritingProcessor());
-        factory.addPreProcessor(new SemicolonAppenderPreProcessor());
-        factory.addPreProcessor(new JawrCssMinifierProcessor());
         factory.addPreProcessor(compressor);
         return factory;
       }

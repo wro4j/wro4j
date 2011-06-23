@@ -13,12 +13,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+
 /**
  * @author Alex Objelean
  */
 public class TestWro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(TestWro4jCommandLineRunner.class);
   private File destinationFolder;
+
   @Before
   public void setUp() {
     destinationFolder = new File("wroTemp-" + new Date().getTime());
@@ -38,24 +42,51 @@ public class TestWro4jCommandLineRunner {
 
   @Test
   public void processNoArguments() throws Exception {
-    final String[] args = new String[] {};
-    Wro4jCommandLineRunner.main(args);
+    Wro4jCommandLineRunner.main("".split(" "));
   }
 
   @Test
   public void processCorrectArguments() throws Exception {
-    final String[] args = new String[] {"-m"};
+    Wro4jCommandLineRunner.main("-m".split(" "));
+  }
+
+
+  @Test
+  public void useCssLint() throws Exception {
+    final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
+    final String wroFile = contextFolder + "\\wro.xml";
+
+    final String[] args = String.format("--wroFile %s --contextFolder %s destinationFolder %s -m -c " + CssLintProcessor.ALIAS,
+        new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+    }).split(" ");
+    Wro4jCommandLineRunner.main(args);
+  }
+
+
+  @Test
+  public void useJsHint()
+      throws Exception {
+    final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
+    final String wroFile = contextFolder + "\\wro.xml";
+
+    final String[] args = String.format(
+        "--wroFile %s --contextFolder %s destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+        }).split(" ");
     Wro4jCommandLineRunner.main(args);
   }
 
   @Test
-  public void processTestWroXml() throws Exception {
+  public void processTestWroXml()
+      throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
 
     LOG.debug(wroFile);
-    final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s",
-      new Object[] { wroFile, contextFolder, destinationFolder.getAbsolutePath() }).split(" ");
+    final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
+      wroFile, contextFolder, destinationFolder.getAbsolutePath()
+    }).split(" ");
     Wro4jCommandLineRunner.main(args);
   }
 }
