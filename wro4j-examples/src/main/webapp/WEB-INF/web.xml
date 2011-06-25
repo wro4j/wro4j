@@ -6,7 +6,21 @@
 
   <display-name>WebResourceOptimizer Test Project</display-name>
 
-  <!-- Web Resource Optimizer filter and listener -->
+	<listener>
+	  <listener-class>ro.isdc.wro.examples.guice.WroGuiceListener</listener-class>
+	</listener>
+	
+	<filter>
+    <filter-name>guiceFilter</filter-name>
+    <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>guiceFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- Web Resource Optimizer filter and listener
   <filter>
     <filter-name>WebResourceOptimizer</filter-name>
     <filter-class>
@@ -20,21 +34,7 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
-
-  <!-- DWR Servlet -->
-  <servlet>
-    <servlet-name>dwr-invoker</servlet-name>
-    <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
-    <init-param>
-      <param-name>debug</param-name>
-      <param-value>true</param-value>
-    </init-param>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>dwr-invoker</servlet-name>
-    <url-pattern>/dwr/*</url-pattern>
-  </servlet-mapping>
+   -->
 
   <servlet>
     <servlet-name>resource.dynamic</servlet-name>
@@ -71,20 +71,6 @@
     <servlet-name>externalResource</servlet-name>
     <url-pattern>/external/*</url-pattern>
   </servlet-mapping>
-
-  <filter>
-    <filter-name>WicketApplication</filter-name>
-    <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
-    <init-param>
-      <param-name>applicationClassName</param-name>
-      <param-value>ro.isdc.wro.examples.WebResourceOptimizationApplication</param-value>
-    </init-param>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>WicketApplication</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
