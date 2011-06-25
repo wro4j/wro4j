@@ -40,6 +40,7 @@ public class WroGuiceListener extends GuiceServletContextListener {
         bind(DwrServlet.class).in(Singleton.class);
 
         //filters
+        //find out how to add dispatchers to the filter mapping configuration
         filter("/wro/*").through(WroFilter.class);
 
 
