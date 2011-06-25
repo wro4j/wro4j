@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   version="2.5">
 
-  <display-name>WebResourceOptimizer Test Project</display-name>
+  <display-name>WebResourceOptimizer Examples Project</display-name>
 
 	<listener>
 	  <listener-class>ro.isdc.wro.examples.guice.WroGuiceListener</listener-class>
@@ -19,42 +19,6 @@
     <filter-name>guiceFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-
-  <servlet>
-    <servlet-name>resource.dynamic</servlet-name>
-    <servlet-class>ro.isdc.wro.examples.http.DynamicResourceServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>resource.redirect</servlet-name>
-    <servlet-class>ro.isdc.wro.examples.http.RedirectResourceServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>resource.dispatch</servlet-name>
-    <servlet-class>ro.isdc.wro.examples.http.DispatchResourceServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>resource.dynamic</servlet-name>
-    <url-pattern>/resource/dynamic.js</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>resource.redirect</servlet-name>
-    <url-pattern>/resource/redirect.js</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>resource.dispatch</servlet-name>
-    <url-pattern>/resource/dispatch.js</url-pattern>
-  </servlet-mapping>
-
- <servlet>
-    <servlet-name>externalResource</servlet-name>
-    <servlet-class>ro.isdc.wro.examples.ExternalResourceServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>externalResource</servlet-name>
-    <url-pattern>/external/*</url-pattern>
-  </servlet-mapping>
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
