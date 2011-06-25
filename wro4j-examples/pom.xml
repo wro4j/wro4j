@@ -14,8 +14,10 @@
 
 	<properties>
 		<wro4j.version>1.3.8</wro4j.version>
-		<wicket.version>1.5-RC4.2</wicket.version>
-		<gae.version>1.3.2</gae.version>
+		<wicket.version>1.5-RC5.1</wicket.version>
+		<gae.version>1.5.1</gae.version>
+    <dwr.version>3.0.M1</dwr.version>
+    <guice.version>3.0</guice.version>
 		<project_charset>UTF-8</project_charset>
 	</properties>
 
@@ -52,8 +54,7 @@
     <dependency>
       <groupId>org.directwebremoting</groupId>
       <artifactId>dwr</artifactId>
-      <version>2.0.1</version>
-      <!--<version>3.0.M1</version> -->
+      <version>${dwr.version}</version>
     </dependency>
     <!-- Required by dwr -->
     <dependency>
@@ -73,27 +74,19 @@
       <version>${wicket.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>${guice.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-servlet</artifactId>
+      <version>${guice.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jcl</artifactId>
       <version>1.6.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-1.0-labs</artifactId>
-      <version>${gae.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-1.0-stubs</artifactId>
-      <version>${gae.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-1.0-runtime</artifactId>
-      <version>${gae.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.appengine</groupId>
@@ -193,10 +186,11 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <!-- 
+         
         <version>${wro4j.version}</version>
-         -->
+        <!-- 
          <version>1.3.8-SNAPSHOT</version>
+         -->
         <executions>
           <execution>
             <phase>compile</phase>
