@@ -4,14 +4,21 @@
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
 
   <group name="all">
-  	<js>/asset/js/**.js</js>
-    <css>/asset/**.css</css>
+  	<js>/asset/common/**.js</js>
+    <css>/asset/common/**.css</css>
     <group-ref>syntaxHighlighter</group-ref>
   </group>
   
   <group name="syntaxHighlighter">
-  	<js>/asset/syntaxHighlighter/**.js</js>
+    <!--
+    <js>http://wro4j.googlecode.com/svn/wiki/static/syntaxHighlighter/3.0.83/syntaxHighlighter.js</js>
+    <css>http://wro4j.googlecode.com/svn/wiki/static/syntaxHighlighter/3.0.83/syntaxHighlighter.css</css>
+  	-->
+    <js>/asset/syntaxHighlighter/src/shCore.js</js>
+    <js>/asset/syntaxHighlighter/src/**.js</js>
+    <js>/asset/syntaxHighlighter/*.js</js>
     <css>/asset/syntaxHighlighter/styles/shCore.css</css>
     <css>/asset/syntaxHighlighter/styles/shCoreDefault.css</css>
+    
   </group>
 </groups>
