@@ -597,25 +597,7 @@ return this.each(function(){win=getWindow(this);if(win){win.scrollTo(!i?val:jQue
 jQuery.each(["Height","Width"],function(i,name){var type=name.toLowerCase();jQuery.fn["inner"+name]=function(){var elem=this[0];return elem&&elem.style?parseFloat(jQuery.css(elem,type,"padding")):null;};jQuery.fn["outer"+name]=function(margin){var elem=this[0];return elem&&elem.style?parseFloat(jQuery.css(elem,type,margin?"margin":"border")):null;};jQuery.fn[type]=function(size){var elem=this[0];if(!elem){return size==null?null:this;}
 if(jQuery.isFunction(size)){return this.each(function(i){var self=jQuery(this);self[type](size.call(this,i,self[type]()));});}
 if(jQuery.isWindow(elem)){var docElemProp=elem.document.documentElement["client"+name];return elem.document.compatMode==="CSS1Compat"&&docElemProp||elem.document.body["client"+name]||docElemProp;}else if(elem.nodeType===9){return Math.max(elem.documentElement["client"+name],elem.body["scroll"+name],elem.documentElement["scroll"+name],elem.body["offset"+name],elem.documentElement["offset"+name]);}else if(size===undefined){var orig=jQuery.css(elem,type),ret=parseFloat(orig);return jQuery.isNaN(ret)?orig:ret;}else{return this.css(type,typeof size==="string"?size:size+"px");}};});window.jQuery=window.$=jQuery;})(window);
-(function(){var sh=SyntaxHighlighter;sh.autoloader=function()
-{var list=arguments,elements=sh.findElements(),brushes={},scripts={},all=SyntaxHighlighter.all,allCalled=false,allParams=null,i;SyntaxHighlighter.all=function(params)
-{allParams=params;allCalled=true;};function addBrush(aliases,url)
-{for(var i=0;i<aliases.length;i++)
-brushes[aliases[i]]=url;};function getAliases(item)
-{return item.pop?item:item.split(/\s+/);}
-for(i=0;i<list.length;i++)
-{var aliases=getAliases(list[i]),url=aliases.pop();addBrush(aliases,url);}
-for(i=0;i<elements.length;i++)
-{var url=brushes[elements[i].params.brush];if(!url)
-continue;scripts[url]=false;loadScript(url);}
-function loadScript(url)
-{var script=document.createElement('script'),done=false;script.src=url;script.type='text/javascript';script.language='javascript';script.onload=script.onreadystatechange=function()
-{if(!done&&(!this.readyState||this.readyState=='loaded'||this.readyState=='complete'))
-{done=true;scripts[url]=true;checkAll();script.onload=script.onreadystatechange=null;script.parentNode.removeChild(script);}};document.body.appendChild(script);};function checkAll()
-{for(var url in scripts)
-if(scripts[url]==false)
-return;if(allCalled)
-SyntaxHighlighter.highlight(allParams);};};})();var SyntaxHighlighter=function(){if(typeof(require)!='undefined'&&typeof(XRegExp)=='undefined')
+var SyntaxHighlighter=function(){if(typeof(require)!='undefined'&&typeof(XRegExp)=='undefined')
 {XRegExp=require('XRegExp').XRegExp;}
 var sh={defaults:{'class-name':'','first-line':1,'pad-line-numbers':false,'highlight':null,'title':null,'smart-tabs':true,'tab-size':4,'gutter':true,'toolbar':true,'quick-code':true,'collapse':false,'auto-links':true,'light':false,'html-script':false},config:{space:'&nbsp;',useScriptTags:true,bloggerMode:false,stripBrs:false,tagName:'pre',strings:{expandSource:'expand source',help:'?',alert:'SyntaxHighlighter\n\n',noBrush:'Can\'t find brush for: ',brushNotHtmlScript:'Brush wasn\'t configured for html-script option: ',aboutDialog:'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>About SyntaxHighlighter</title></head><body style="font-family:Geneva,Arial,Helvetica,sans-serif;background-color:#fff;color:#000;font-size:1em;text-align:center;"><div style="text-align:center;margin-top:1.5em;"><div style="font-size:xx-large;">SyntaxHighlighter</div><div style="font-size:.75em;margin-bottom:3em;"><div>version 3.0.83 (July 02 2010)</div><div><a href="http://alexgorbatchev.com/SyntaxHighlighter" target="_blank" style="color:#005896">http://alexgorbatchev.com/SyntaxHighlighter</a></div><div>JavaScript code syntax highlighter.</div><div>Copyright 2004-2010 Alex Gorbatchev.</div></div><div>If you like this script, please <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2930402" style="color:#005896">donate</a> to <br/>keep development active!</div></div></body></html>'}},vars:{discoveredBrushes:null,highlighters:{}},brushes:{},regexLib:{multiLineCComments:/\/\*[\s\S]*?\*\//gm,singleLineCComments:/\/\/.*$/gm,singleLinePerlComments:/#.*$/gm,doubleQuotedString:/"([^\\"\n]|\\.)*"/g,singleQuotedString:/'([^\\'\n]|\\.)*'/g,multiLineDoubleQuotedString:new XRegExp('"([^\\\\"]|\\\\.)*"','gs'),multiLineSingleQuotedString:new XRegExp("'([^\\\\']|\\\\.)*'",'gs'),xmlComments:/(&lt;|<)!--[\s\S]*?--(&gt;|>)/gm,url:/\w+:\/\/[\w-.\/?%&=:@;]*/g,phpScriptTags:{left:/(&lt;|<)\?=?/g,right:/\?(&gt;|>)/g},aspScriptTags:{left:/(&lt;|<)%=?/g,right:/%(&gt;|>)/g},scriptScriptTags:{left:/(&lt;|<)\s*script.*?(&gt;|>)/gi,right:/(&lt;|<)\/\s*script\s*(&gt;|>)/gi}},toolbar:{getHtml:function(highlighter)
 {var html='<div class="toolbar">',items=sh.toolbar.items,list=items.list;function defaultGetHtml(highlighter,name)
@@ -854,4 +836,22 @@ attachEvent(findElement(div,'.code'),'dblclick',quickCodeHandler);return div;},i
 if(this.getParam('light')==true)
 this.params.toolbar=this.params.gutter=false;},getKeywords:function(str)
 {str=str.replace(/^\s+|\s+$/g,'').replace(/\s+/g,'|');return'\\b(?:'+str+')\\b';},forHtmlScript:function(regexGroup)
-{this.htmlScript={left:{regex:regexGroup.left,css:'script'},right:{regex:regexGroup.right,css:'script'},code:new XRegExp("(?<left>"+regexGroup.left.source+")"+"(?<code>.*?)"+"(?<right>"+regexGroup.right.source+")","sgi")};}};return sh;}();typeof(exports)!='undefined'?exports['SyntaxHighlighter']=SyntaxHighlighter:null;
+{this.htmlScript={left:{regex:regexGroup.left,css:'script'},right:{regex:regexGroup.right,css:'script'},code:new XRegExp("(?<left>"+regexGroup.left.source+")"+"(?<code>.*?)"+"(?<right>"+regexGroup.right.source+")","sgi")};}};return sh;}();typeof(exports)!='undefined'?exports['SyntaxHighlighter']=SyntaxHighlighter:null;(function(){var sh=SyntaxHighlighter;sh.autoloader=function()
+{var list=arguments,elements=sh.findElements(),brushes={},scripts={},all=SyntaxHighlighter.all,allCalled=false,allParams=null,i;SyntaxHighlighter.all=function(params)
+{allParams=params;allCalled=true;};function addBrush(aliases,url)
+{for(var i=0;i<aliases.length;i++)
+brushes[aliases[i]]=url;};function getAliases(item)
+{return item.pop?item:item.split(/\s+/);}
+for(i=0;i<list.length;i++)
+{var aliases=getAliases(list[i]),url=aliases.pop();addBrush(aliases,url);}
+for(i=0;i<elements.length;i++)
+{var url=brushes[elements[i].params.brush];if(!url)
+continue;scripts[url]=false;loadScript(url);}
+function loadScript(url)
+{var script=document.createElement('script'),done=false;script.src=url;script.type='text/javascript';script.language='javascript';script.onload=script.onreadystatechange=function()
+{if(!done&&(!this.readyState||this.readyState=='loaded'||this.readyState=='complete'))
+{done=true;scripts[url]=true;checkAll();script.onload=script.onreadystatechange=null;script.parentNode.removeChild(script);}};document.body.appendChild(script);};function checkAll()
+{for(var url in scripts)
+if(scripts[url]==false)
+return;if(allCalled)
+SyntaxHighlighter.highlight(allParams);};};})();
