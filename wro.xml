@@ -15,7 +15,7 @@
     <js>/asset/syntaxHighlighter/*.js</js>
     <css>/asset/syntaxHighlighter/styles/shCore.css</css>
     
-    <group-ref>theme-fadeToGrey</group-ref>
+    <group-ref>theme-django</group-ref>
   </group>
   
   <group name="theme-django">
@@ -37,4 +37,25 @@
     <css>/asset/syntaxHighlighter/styles/shCoreFadeToGrey.css</css>
     <css>/asset/syntaxHighlighter/styles/shThemeFadeToGrey.css</css>
   </group>
+  
+  <group name="theme-MDUltra">
+    <css>/asset/syntaxHighlighter/styles/shCoreMDUltra.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeMDUltra.css</css>
+  </group>
+  
+  <group name="theme-RDark">
+    <css>/asset/syntaxHighlighter/styles/shCoreRDark.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeRDark.css</css>
+  </group>
+  
+  <group name="theme-midnight">
+    <css>/asset/syntaxHighlighter/styles/shCoreMidnight.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeMidnight.css</css>
+  </group>
+  
+  <group name="theme-default">
+    <css>/asset/syntaxHighlighter/styles/shCoreDefault.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeDefault.css</css>
+  </group>
+  
 </groups>
