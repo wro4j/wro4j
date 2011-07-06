@@ -6,18 +6,49 @@
   <link rel="stylesheet" type="text/css" href="wro/all.css" /> 
 </head> 
 <body> 
-  <script type="syntaxhighlighter" class="brush: js"><![CDATA[
-    /**
-     * SyntaxHighlighter
-     */
-    function foo() {
-      if (counter <= 10) {
-        return;
-      }
-      // it works!
-    }
+  <h1>Getting Started with wro4j</h1>
+  <p>
+    In order to get started with wro4j, you have to follow 3 simple steps.
+  </p>
+  <h2>Step 1: Add WroFilter to web.xml</h2>
+  <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
+    <filter>
+      <filter-name>WebResourceOptimizer</filter-name>
+      <filter-class>
+        ro.isdc.wro.http.WroFilter
+      </filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>WebResourceOptimizer</filter-name>
+      <url-pattern>/wro/*</url-pattern>
+    </filter-mapping>
   ]]></script>
-  <script src="wro/all.js" type="text/javascript"></script>   
+  
+  <h2>Step 2: Create wro.xml</h2>
+  <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
+    <groups xmlns="http://www.isdc.ro/wro">
+      <group name="all">
+        <css>/asset/*.css</css>
+        <js>/asset/*.js</js>
+      </group>
+    </groups>  
+  ]]></script>
+  
+
+  <h2>Step 3: Use optimized resource</h2>
+  <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
+    <html>
+      <head>
+        <title>Web Frameworks Comparison</title>
+        <link rel="stylesheet" type="text/css" href="/wro/all.css" />
+        <script type="text/javascript" src="/wro/all.js"/>
+      </head>
+      <body>
+       
+      </body>
+    </html>
+  ]]></script>
+  <script src="wro/all.js" type="text/javascript"></script>     
 </body>
 </html>
  
