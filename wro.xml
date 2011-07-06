@@ -10,15 +10,31 @@
   </group>
   
   <group name="syntaxHighlighter">
-    <!--
-    <js>http://wro4j.googlecode.com/svn/wiki/static/syntaxHighlighter/3.0.83/syntaxHighlighter.js</js>
-    <css>http://wro4j.googlecode.com/svn/wiki/static/syntaxHighlighter/3.0.83/syntaxHighlighter.css</css>
-  	-->
     <js>/asset/syntaxHighlighter/src/shCore.js</js>
     <js>/asset/syntaxHighlighter/src/**.js</js>
     <js>/asset/syntaxHighlighter/*.js</js>
     <css>/asset/syntaxHighlighter/styles/shCore.css</css>
-    <css>/asset/syntaxHighlighter/styles/shCoreDefault.css</css>
     
+    <group-ref>theme-fadeToGrey</group-ref>
+  </group>
+  
+  <group name="theme-django">
+    <css>/asset/syntaxHighlighter/styles/shCoreDjango.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeDjango.css</css>
+  </group>
+  
+  <group name="theme-eclipse">
+    <css>/asset/syntaxHighlighter/styles/shCoreEclipse.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeEclipse.css</css>
+  </group>
+  
+  <group name="theme-emacs">
+    <css>/asset/syntaxHighlighter/styles/shCoreEmacs.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeEmacs.css</css>
+  </group>
+  
+  <group name="theme-fadeToGrey">
+    <css>/asset/syntaxHighlighter/styles/shCoreFadeToGrey.css</css>
+    <css>/asset/syntaxHighlighter/styles/shThemeFadeToGrey.css</css>
   </group>
 </groups>
