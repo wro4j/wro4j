@@ -4,3 +4,7 @@ body {
   background: -webkit-gradient(linear, left top, left bottom, from(#eaeaea), to(#fff));  
   background: -moz-linear-gradient(top,  #eaeaea,  #fff);
 }
+.wro4j-logo {
+  background: url(http://code.google.com/p/wro4j/logo?cct=1300688354) no-repeat;
+  padding-left: 80px;
+}
