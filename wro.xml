@@ -16,7 +16,7 @@
     <js>/asset/syntaxHighlighter/*.js</js>
     <css>/asset/syntaxHighlighter/styles/shCore.css</css>
     
-    <group-ref>theme-django</group-ref>
+    <group-ref>theme-RDark</group-ref>
   </group>
   
   <group name="theme-django">

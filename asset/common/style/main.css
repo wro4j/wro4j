@@ -1,0 +1,6 @@
+body {
+  background: #eaeaea;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eaeaea', endColorstr='#fff');
+  background: -webkit-gradient(linear, left top, left bottom, from(#eaeaea), to(#fff));  
+  background: -moz-linear-gradient(top,  #eaeaea,  #fff);
+}

@@ -6,52 +6,54 @@
   <link rel="stylesheet" type="text/css" href="wro/all.css" /> 
 </head> 
 <body> 
-  <div>
-    <a href="http://github.com/alexo/wro4j"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://gs1.wac.edgecastcdn.net/80460E/assets/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>  
-  </div>
+  <div id="main">
+    <div>
+      <a href="http://github.com/alexo/wro4j"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://gs1.wac.edgecastcdn.net/80460E/assets/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>  
+    </div>
 
-  <h1>Getting Started with wro4j</h1>
-  <p>
-    In order to get started with wro4j, you have to follow 3 simple steps.
-  </p>
-  <h2>Step 1: Add WroFilter to web.xml</h2>
-  <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
-    <filter>
-      <filter-name>WebResourceOptimizer</filter-name>
-      <filter-class>
-        ro.isdc.wro.http.WroFilter
-      </filter-class>
-    </filter>
-    <filter-mapping>
-      <filter-name>WebResourceOptimizer</filter-name>
-      <url-pattern>/wro/*</url-pattern>
-    </filter-mapping>
-  ]]></script>
-  
-  <h2>Step 2: Create wro.xml</h2>
-  <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
-    <groups xmlns="http://www.isdc.ro/wro">
-      <group name="all">
-        <css>/asset/*.css</css>
-        <js>/asset/*.js</js>
-      </group>
-    </groups>  
-  ]]></script>
-  
+    <h1>Getting Started with wro4j</h1>
+    <p>
+      In order to get started with wro4j, you have to follow 3 simple steps.
+    </p>
+    <h2>Step 1: Add WroFilter to web.xml</h2>
+    <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
+      <filter>
+        <filter-name>WebResourceOptimizer</filter-name>
+        <filter-class>
+          ro.isdc.wro.http.WroFilter
+        </filter-class>
+      </filter>
+      <filter-mapping>
+        <filter-name>WebResourceOptimizer</filter-name>
+        <url-pattern>/wro/*</url-pattern>
+      </filter-mapping>
+    ]]></script>
+    
+    <h2>Step 2: Create wro.xml</h2>
+    <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
+      <groups xmlns="http://www.isdc.ro/wro">
+        <group name="all">
+          <css>/asset/*.css</css>
+          <js>/asset/*.js</js>
+        </group>
+      </groups>  
+    ]]></script>
+    
 
-  <h2>Step 3: Use optimized resource</h2>
-  <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
-    <html>
-      <head>
-        <title>Web Frameworks Comparison</title>
-        <link rel="stylesheet" type="text/css" href="/wro/all.css" />
-        <script type="text/javascript" src="/wro/all.js"/>
-      </head>
-      <body>
-       
-      </body>
-    </html>
-  ]]></script>
+    <h2>Step 3: Use optimized resource</h2>
+    <script type="syntaxhighlighter" class="brush: xml"><![CDATA[
+      <html>
+        <head>
+          <title>Web Frameworks Comparison</title>
+          <link rel="stylesheet" type="text/css" href="/wro/all.css" />
+          <script type="text/javascript" src="/wro/all.js"/>
+        </head>
+        <body>
+         
+        </body>
+      </html>
+    ]]></script>
+  </div>  
   <script src="wro/all.js" type="text/javascript"></script>     
 </body>
 </html>
