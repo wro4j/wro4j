@@ -1,0 +1,19 @@
+<plugin name='wro4j' version='1.3.8' grailsVersion='1.3.7 &gt; *'>
+  <author>Romain Philibert</author>
+  <authorEmail>filirom1@gmail.com</authorEmail>
+  <title>Wro4j Grails Plugin</title>
+  <description>\
+Web Resource Optimizer for Grails
+</description>
+  <documentation>http://code.google.com/p/wro4j/wiki/GrailsPlugin</documentation>
+  <resources>
+    <resource>BootStrap</resource>
+    <resource>BuildConfig</resource>
+    <resource>Config</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>spring.resources</resource>
+  </resources>
+  <dependencies />
+  <behavior />
+</plugin>
