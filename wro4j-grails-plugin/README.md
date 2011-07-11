@@ -7,10 +7,6 @@ This version is a working SNAPSHOT. You will have to install the plugin using th
     grails install-plugin grails-wro4j-1.3.8.zip
 
 
-TODO : create tag-lib <wro:css group="all"/> instead of <link rel="stylesheet" type="text/css" href="wro/all.css" />
-
-TODO : create tag-lib <wro:js group="all"/> instead of <script type="text/javascript" src="wro/all.js"/>
-
 TODO : create a grails-app/conf/Wro.groovy file in order to configure via a ConfigSlurper or a DSL the wro.xml
 
 TODO : make Wro4J configurable via grails-app/conf/Config.groovy

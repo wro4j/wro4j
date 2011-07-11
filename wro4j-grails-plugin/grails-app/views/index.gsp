@@ -3,8 +3,8 @@
 <html>
 <head>
   <title>Simple Wro4j GSP page</title>
-  <link rel="stylesheet" type="text/css" href="wro/all.css"/>
-  <script type="text/javascript" src="wro/all.js"></script>
+  <wro:css group="all"/>
+  <wro:js group="all"/>
 </head>
 
 <body>
