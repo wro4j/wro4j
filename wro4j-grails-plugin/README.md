@@ -40,8 +40,8 @@ Step 3: Use optimized resource
     <html>
       <head>
         <title>Web Page using wro4j</title>
-        <link rel="stylesheet" type="text/css" href="wro/all.css" />
-        <script type="text/javascript" src="wro/all.js"/>
+        <wro:css group="all"/>
+        <wro:js group="all"/>
       </head>
       <body>
 
