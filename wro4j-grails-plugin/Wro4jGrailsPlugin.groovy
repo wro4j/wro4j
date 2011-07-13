@@ -1,6 +1,7 @@
 import org.springframework.web.filter.DelegatingFilterProxy
 import ro.isdc.wro.http.ConfigurableWroFilter
-import wro4j.grails.plugin.WroUtils
+import wro4j.grails.plugin.WroConfigHandler
+import wro4j.grails.plugin.WroConfigHandler
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
@@ -51,8 +52,8 @@ Web Resource Optimizer for Grails
   }
 
   def doWithSpring = {
-    WroUtils.application = application
-    def config = WroUtils.config
+    WroConfigHandler.application = application
+    def config = WroConfigHandler.config
     wroFilter(ConfigurableWroFilter) {
       properties = config.toProperties()
     }

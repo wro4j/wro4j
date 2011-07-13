@@ -3,7 +3,7 @@ package wro4j.grails.plugin
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
-class WroUtils {
+class WroConfigHandler {
   static GrailsApplication application;
   private static ConfigObject config
   private static final String CONFIG_PREFIX = "wro"
@@ -33,7 +33,7 @@ class WroUtils {
    * @param className the name of the config class to load
    */
   private static void mergeConfig(final ConfigObject currentConfig, final String className) {
-    GroovyClassLoader classLoader = new GroovyClassLoader(WroUtils.class.getClassLoader());
+    GroovyClassLoader classLoader = new GroovyClassLoader(WroConfigHandler.class.getClassLoader());
     ConfigSlurper slurper = new ConfigSlurper(Environment.getCurrent().getName());
     ConfigObject secondaryConfig;
     try {
