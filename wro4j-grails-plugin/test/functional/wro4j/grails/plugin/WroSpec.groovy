@@ -1,3 +1,5 @@
+package wro4j.grails.plugin
+
 import grails.plugin.geb.GebSpec
 
 class WroSpec extends GebSpec {

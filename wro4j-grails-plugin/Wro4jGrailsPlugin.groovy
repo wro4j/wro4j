@@ -1,8 +1,10 @@
-import ro.isdc.wro.http.WroFilter
+import org.springframework.web.filter.DelegatingFilterProxy
+import ro.isdc.wro.http.ConfigurableWroFilter
+import wro4j.grails.plugin.WroUtils
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
-  def version = "1.3.8"
+  def version = "1.3.8-SNAPSHOT"
   // the version or versions of Grails the plugin is designed for
   def grailsVersion = "1.3.7 > *"
   // the other plugins this plugin depends on
@@ -31,21 +33,29 @@ Web Resource Optimizer for Grails
     def contextParam = xml.'context-param'
     contextParam[contextParam.size() - 1] + {
       'filter' {
-        'filter-name'('WebResourceOptimizer')
-        'filter-class'(WroFilter.name)
+        'filter-name'('wroFilter')
+        'filter-class'(DelegatingFilterProxy.name)
+        'init-param' {
+          'param-name'('targetFilterLifecycle')
+          'param-value'(true)
+        }
       }
     }
     def filter = xml.'filter'
     filter[filter.size() - 1] + {
       'filter-mapping' {
-        'filter-name'('WebResourceOptimizer')
+        'filter-name'('wroFilter')
         'url-pattern'('/wro/*')
       }
     }
   }
 
   def doWithSpring = {
-    // TODO Implement runtime spring config (optional)
+    WroUtils.application = application
+    def config = WroUtils.config
+    wroFilter(ConfigurableWroFilter) {
+      properties = config.toProperties()
+    }
   }
 
   def doWithDynamicMethods = { ctx ->
