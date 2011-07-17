@@ -89,7 +89,11 @@ public class ClasspathUriLocator
     // prefix with '/' because we use class relative resource retrieval. Using ClassLoader.getSystemResource doesn't
     // work well.
     final String fullPath = "/" + FilenameUtils.getFullPathNoEndSeparator(location);
-    final URL url = getClass().getResource(fullPath);
+    URL url = getClass().getResource(fullPath);
+    if (url == null) {
+      // try once more, in order to treat classpath resources located in the currently built project.
+      url = getClass().getResource("");
+    }
     if (url == null) {
       final String message = "Couldn't get URL for the following path: " + fullPath;
       LOG.warn(message);
