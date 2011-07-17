@@ -39,7 +39,7 @@ public abstract class WildcardUriLocatorSupport
   /**
    * @return the wildcardStreamLocator
    */
-  protected final WildcardStreamLocator getWildcardStreamLocator() {
+  public final WildcardStreamLocator getWildcardStreamLocator() {
     if (wildcardStreamLocator == null) {
       wildcardStreamLocator = newWildcardStreamLocator();
     }

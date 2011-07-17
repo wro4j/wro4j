@@ -22,6 +22,7 @@ public class WroModelFactoryDecorator
     }
     this.decorated = decorated;
   }
+
   /**
    * {@inheritDoc}
    */

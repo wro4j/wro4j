@@ -20,6 +20,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
+import ro.isdc.wro.model.factory.WildcardExploderWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -33,7 +34,7 @@ import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 
 
 /**
- * A simple implementation of {@link WroManagerFactory} which uses default processors and uriLocators.
+ * Default implementation of {@link WroManagerFactory} which uses default processors and uriLocators.
  *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
@@ -66,10 +67,11 @@ public class BaseWroManagerFactory
           final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           //decorate with scheduler ability
-          final WroModelFactory modelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
-            newModelFactory(Context.get().getServletContext())));
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+
+          final WroModelFactory modelFactory = new WildcardExploderWroModelFactory(new ScheduledWroModelFactory(
+            new FallbackAwareWroModelFactory(newModelFactory(Context.get().getServletContext()))));
           this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
           manager.setModelFactory(modelFactory);
