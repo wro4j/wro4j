@@ -186,10 +186,9 @@
       
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
-        <artifactId>wro4j-maven-plugin</artifactId>
-         
+        <artifactId>wro4j-maven-plugin</artifactId>         
         <version>${wro4j.version}</version>
-         -->
+         
         <executions>
           <execution>
             <goals>
