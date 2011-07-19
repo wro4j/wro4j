@@ -6,7 +6,6 @@ package ro.isdc.wro.model.resource.locator.wildcard;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 
 import ro.isdc.wro.model.resource.Resource;
 
@@ -37,12 +36,4 @@ public interface WildcardStreamLocator {
    */
   InputStream locateStream(final String uri, final File folder)
     throws IOException;
-
-  /**
-   * Allow to do something with the files found by wildcardStreamLocator. This can be useful when wildcard should be
-   * replaced with the 'exploded' version of resources or for unit testing.
-   *
-   * @param files
-   */
-  void handleFoundFiles(Collection<File> files);
 }

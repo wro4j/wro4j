@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +36,8 @@ public final class Injector {
 
 
   public Injector(final UriLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalArgumentException("uriLocatorFactory cannot be null");
-    }
-    if (processorsFactory == null) {
-      throw new IllegalArgumentException("processorsFactory cannot be null");
-    }
+    Validate.notNull(uriLocatorFactory, "uriLocatorFactory cannot be null");
+    Validate.notNull(processorsFactory, "processorsFactory cannot be null");
     this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(uriLocatorFactory, this);
     this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, this);
   }
@@ -59,9 +56,7 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
-    if (object == null) {
-      throw new IllegalArgumentException("Object cannot be null!");
-    }
+    Validate.notNull(object, "Object cannot be null!");
     processInjectAnnotation(object);
   }
 
@@ -78,8 +73,8 @@ public final class Injector {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject can be applied only on these types "
-              + UriLocatorFactory.class.getName() + " type");
+            throw new WroRuntimeException("@Inject cannot be applied field of type: "
+              + field.getType());
           }
         }
       }

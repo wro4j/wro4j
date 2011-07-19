@@ -20,7 +20,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
-import ro.isdc.wro.model.factory.WildcardExploderWroModelFactory;
+import ro.isdc.wro.model.factory.WildcardExpanderWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -70,8 +70,11 @@ public class BaseWroManagerFactory
           final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
 
-          final WroModelFactory modelFactory = new WildcardExploderWroModelFactory(new ScheduledWroModelFactory(
+          final WroModelFactory modelFactory = new WildcardExpanderWroModelFactory(new ScheduledWroModelFactory(
             new FallbackAwareWroModelFactory(newModelFactory(Context.get().getServletContext()))));
+
+          injector.inject(modelFactory);
+
           this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
           manager.setModelFactory(modelFactory);

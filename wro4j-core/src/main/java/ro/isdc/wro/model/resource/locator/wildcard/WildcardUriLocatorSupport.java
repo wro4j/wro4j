@@ -35,7 +35,6 @@ public abstract class WildcardUriLocatorSupport
     };
   }
 
-
   /**
    * @return the wildcardStreamLocator
    */
