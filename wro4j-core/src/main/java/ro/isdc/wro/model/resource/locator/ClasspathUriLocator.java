@@ -107,7 +107,7 @@ public class ClasspathUriLocator
    * the full classpath.
    */
   @Override
-  protected WildcardStreamLocator newWildcardStreamLocator() {
+  public WildcardStreamLocator newWildcardStreamLocator() {
     return new JarWildcardStreamLocator(duplicateResourceDetector) {
       @Override
       public boolean hasWildcard(final String uri) {

@@ -167,7 +167,7 @@ public class DefaultWildcardStreamLocator
    *
    * @param files a collection of found files after the wildcard has beed applied on searched folder.
    */
-  protected void handleFoundFiles(final Collection<File> files) {
+  public void handleFoundFiles(final Collection<File> files) {
     //do nothing
   }
 
