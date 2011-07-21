@@ -30,7 +30,7 @@ wro.encoding = null
 /**
  * The fully qualified class name of the {@link ro.isdc.wro.manager.WroManagerFactory} implementation.
  */
-wro.managerFactoryClassName = null
+wro.managerFactoryClassName = "wro4j.grails.plugin.GrailsWroManagerFactory"
 /**
  * the name of MBean to be used by JMX to configure wro4j.
  */

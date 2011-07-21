@@ -1,7 +1,0 @@
-<groups xmlns="http://www.isdc.ro/wro">
-    <group name="all">
-        <!-- TODO remove grails dir reference -->
-        <css>/css/*.css</css>
-        <js>/js/*.js</js>
-    </group>
-</groups>

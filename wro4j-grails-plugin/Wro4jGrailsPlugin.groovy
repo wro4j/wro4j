@@ -5,7 +5,7 @@ import wro4j.grails.plugin.WroConfigHandler
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
-  def version = "1.3.8-SNAPSHOT"
+  def version = "1.3.9-SNAPSHOT"
   // the version or versions of Grails the plugin is designed for
   def grailsVersion = "1.3.7 > *"
   // the other plugins this plugin depends on
@@ -14,6 +14,7 @@ class Wro4jGrailsPlugin {
   def pluginExcludes = [
       "grails-app/views/error.gsp",
       "grails-app/views/index.gsp",
+      "grails-app/conf/Wro.groovy",
       "web-app/css/style.css",
       "web-app/js/script.js",
       "web-app/js/jquery.js",
@@ -53,7 +54,7 @@ Web Resource Optimizer for Grails
 
   def doWithSpring = {
     WroConfigHandler.application = application
-    def config = WroConfigHandler.config
+    def config = WroConfigHandler.getConfig()
     wroFilter(ConfigurableWroFilter) {
       properties = config.toProperties()
     }

@@ -3,11 +3,8 @@ Wro4j Grails Plugin
 
 This version is a working SNAPSHOT. You will have to install the plugin using the ZIP archive full path:
 
-    wget http://xxx/grails-wro4j-1.3.8-SNAPSHOT.zip
-    grails install-plugin grails-wro4j-1.3.8-SNAPSHOT.zip
-
-
-TODO : create a grails-app/conf/Wro.groovy file in order to configure via a ConfigSlurper or a DSL the wro.xml
+    wget http://xxx/grails-wro4j-1.3.9-SNAPSHOT.zip
+    grails install-plugin grails-wro4j-1.3.9-SNAPSHOT.zip
 
 
 Web Resource Optimizer for Grails
@@ -23,14 +20,14 @@ Step 1: Install plugin wro4j
 
 
 
-Step 2: Create web-app/WEB-INF/wro.xml
+Step 2: Create grails-app/conf/Wro.groovy
 
-    <groups xmlns="http://www.isdc.ro/wro">
-      <group name="all">
-        <css>/css/*.css</css>
-        <js>/js/*.js</js>
-      </group>
-    </groups>
+    groups{
+      all{
+        css(minimize: false, "/css/*.css")
+        js "/js/*.js"
+      }
+    }
 
 
 
@@ -83,7 +80,7 @@ Step 4: (Optional) Configure Wro in Config.groovy :
     /**
      * The fully qualified class name of the {@link ro.isdc.wro.manager.WroManagerFactory} implementation.
      */
-    wro.managerFactoryClassName = null
+    wro.managerFactoryClassName = "wro4j.grails.plugin.GrailsWroManagerFactory"
     /**
      * the name of MBean to be used by JMX to configure wro4j.
      */
@@ -104,3 +101,16 @@ Step 4: (Optional) Configure Wro in Config.groovy :
         wro.debug = true
       }
     }
+
+
+
+FAQ 
+---
+
+**I want to use wro.xml to define my model.**
+
+In Config.groovy, just set the Wro4J default ManagerFactory like this :
+
+    wro.managerFactoryClassName = null
+
+

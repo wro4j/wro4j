@@ -32,5 +32,6 @@ class WroConfigHandlerTests extends GrailsUnitTestCase {
     //expect
     Assert.assertEquals(60, WroConfigHandler.config.cacheUpdatePeriod) //Config.groovy
     Assert.assertEquals(0, WroConfigHandler.config.modelUpdatePeriod) //DefaultWroConfig.groovy
+    Assert.assertEquals(GrailsWroManagerFactory.name, WroConfigHandler.config.managerFactoryClassName) //default WroManagerFactory
   }
 }
