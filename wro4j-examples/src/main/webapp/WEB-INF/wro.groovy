@@ -1,0 +1,110 @@
+groups {
+  skeleton {
+    css("/static/css/skeleton/*.css")
+  }
+  classpath {
+    css("classpath:com/mysite/myapplication/web/resources/grids.css")
+    css("classpath:com/mysite/myapplication/web/resources/*.css")
+    js("classpath:com/mysite/myapplication/web/resources/*.js")
+  }
+  jsp {
+    css("/WEB-INF/jsp/css.jsp")
+  }
+  dynamicResource {
+    js("/resource/redirect.js")
+    js("/external/resource.js")
+  }
+  placeholder {
+    css("/static/css/placeholder/*.css")
+  }
+}
+/*
+<groups xmlns="http://www.isdc.ro/wro"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
+  
+  <group name="all">
+    <group-ref>jquery</group-ref>
+    <!-- 
+    <group-ref>twitterBar</group-ref> 
+    <group-ref>dynamicResource</group-ref>
+    <group-ref>uniform</group-ref>
+    <group-ref>WEBINF-css</group-ref>
+    <group-ref>dwr</group-ref>
+     -->
+  </group>
+
+  <group name="problem">
+    <js>/static/js/problem.js</js>
+  </group>
+  
+  <group name="invalid">
+    <js>/invalid/resource.js</js>
+  </group>
+  
+  <group name="twitterBar">
+    <js>http://widgets.twimg.com/j/2/widget.js</js>
+  </group>
+  
+  <group name="WEBINF-css">
+    <css>/WEB-INF/css/webinf.css</css>
+  </group>
+  
+  <group name="wildcard">
+    <css>/static/**.css</css>
+    <js>/static/js/*.js</js>
+    <css>/WEB-INF/css/*.css</css>
+    <css>classpath:ro/isdc/wro/resources/**.cs?</css>
+  </group>
+
+  <group name="uniform">
+    <css>/static/css/webapp.css</css>
+    <css>/static/css/css1.css</css>
+    <css>/static/css/css2.css</css>
+    <css>/static/css/NOTEXIST.css</css>
+    <css>classpath:ro/isdc/wro/resources/*.css</css>
+  </group>
+  
+  <group name="otherGroup">
+    <css>/static/css/variablesSupport.css</css>
+  </group>
+  
+  <group name="wicket">
+    <js>classpath:org/apache/wicket/ajax/wicket-ajax-debug.js</js>
+  </group>
+  
+  <group name="dwr">
+    <js>/dwr/engine.js</js>
+    <js>/dwr/interface/DWRFacade.js</js>
+  </group>
+  
+  <group name="chineseEncoding">
+    <js>http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js</js>
+     <!--<js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js> -->
+  </group>
+
+  <group name="JSGroup">
+    <js>/dwr/engine.js</js>
+    <js>/dwr/interface/DWRFacade.js</js>
+  </group>
+
+  <group name="jquery">
+    <!--<js>http://code.jquery.com/jquery-1.4.3.js</js>--> 
+    <js>http://code.jquery.com/jquery-1.5.js</js>
+    <group-ref>jquery-mobile</group-ref>
+  </group>
+  
+  <group name="jquery-mobile">
+    <css>http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css</css>
+    <js>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js</js>
+  </group>
+  
+  <group name="syntaxHighlighter">
+    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
+    <js>/static/module/syntaxHighlighter/scripts/*.js</js>
+    <css>/static/module/syntaxHighlighter/styles/shCoreRDark.css</css>
+  </group>
+  
+</groups>
+*/
