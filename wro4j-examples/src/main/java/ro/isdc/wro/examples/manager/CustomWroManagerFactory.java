@@ -23,7 +23,7 @@ import ro.isdc.wro.util.ObjectFactory;
 /**
  * @author Alex Objelean
  */
-public class CustomWroManager
+public class CustomWroManagerFactory
     extends BaseWroManagerFactory {
 
   /**
