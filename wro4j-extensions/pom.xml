@@ -50,10 +50,6 @@
 			<artifactId>js</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.codehaus.groovy.maven.runtime</groupId>
 			<artifactId>gmaven-runtime-1.6</artifactId>
 			<version>1.0</version>

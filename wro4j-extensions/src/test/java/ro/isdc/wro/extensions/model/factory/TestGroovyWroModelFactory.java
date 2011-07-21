@@ -15,6 +15,8 @@
 */
 package ro.isdc.wro.extensions.model.factory;
 
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -45,23 +47,12 @@ public class TestGroovyWroModelFactory {
   public void testInvalidStream() throws Exception {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected InputStream getWroModelStream()
+      protected Script getWroModelScript()
           throws IOException {
         throw new IOException();
       }
     };
     factory.create();
-  }
-
-  @Test(expected = WroRuntimeException.class)
-  public void testInvalidContent() {
-    factory = new GroovyWroModelFactory() {
-      @Override
-      protected InputStream getWroModelStream() throws IOException {
-        return new ByteArrayInputStream("".getBytes());
-      }
-    };
-    Assert.assertNull(factory.create());
   }
 
   @Test
@@ -91,8 +82,8 @@ public class TestGroovyWroModelFactory {
   public void createIncompleteModel() {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
-        return getClass().getResourceAsStream("IncompleteWro.groovy");
+      protected Script getWroModelScript() throws IOException {
+        return new GroovyShell().parse(getClass().getResourceAsStream("IncompleteWro.groovy"));
       }
     };
     factory.create();

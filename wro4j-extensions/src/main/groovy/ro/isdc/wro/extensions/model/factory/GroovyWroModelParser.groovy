@@ -29,13 +29,23 @@ import ro.isdc.wro.model.resource.ResourceType
 class GroovyWroModelParser {
 
   /** Parse a groovy DSL into a {@link WroModel} */
+  static WroModel parse(Script dslScript) {
+    if (!dslScript) throw new RuntimeException("DSL is invalid : $dslScript")
+    try {
+      dslScript.metaClass.mixin(WroModelDelegate)
+      dslScript.run()
+      return (WroModel) dslScript.getProperty("wroModel");
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to parse DSL : $dslScript")
+    }
+  }
+
+  /** Parse a groovy DSL into a {@link WroModel} */
   static WroModel parse(String dsl) {
     if (!dsl) throw new RuntimeException("DSL is invalid : $dsl")
     try {
       Script dslScript = new GroovyShell().parse(dsl)
-      dslScript.metaClass.mixin(WroModelDelegate)
-      dslScript.run()
-      return (WroModel) dslScript.getProperty("wroModel");
+      parse(dslScript);
     } catch (Exception e) {
       throw new RuntimeException("Unable to parse DSL : $dsl")
     }
