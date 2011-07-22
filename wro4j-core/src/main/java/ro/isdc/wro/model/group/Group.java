@@ -28,12 +28,18 @@ public final class Group {
   /**
    * Group name.
    */
-  private final String name;
+  private String name;
 
   /**
    * Resources of the group.
    */
   private List<Resource> resources = new ArrayList<Resource>();
+
+  /**
+   * To be used by JSON serializer.
+   */
+  public Group() {
+  }
 
   /**
    * Creates a group with a name.
