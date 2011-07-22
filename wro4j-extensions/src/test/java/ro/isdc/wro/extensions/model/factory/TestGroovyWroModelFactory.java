@@ -108,6 +108,17 @@ public class TestGroovyWroModelFactory {
     factory.create();
   }
 
+  @Test(expected=WroRuntimeException.class)
+  public void testDuplicateGroupName() {
+    factory = new GroovyWroModelFactory() {
+      @Override
+      protected Script getWroModelScript() throws IOException {
+        return new GroovyShell().parse(getClass().getResourceAsStream("wroDuplicateGroupName.groovy"));
+      }
+    };
+    factory.create();
+  }
+
   /**
    * Test the usecase when the resource has no URI.
    */
