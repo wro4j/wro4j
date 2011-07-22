@@ -17,20 +17,19 @@ package ro.isdc.wro.extensions.model.factory;
 
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+
+import java.io.IOException;
+import java.util.Arrays;
+
 import junit.framework.Assert;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.ResourceType;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Test {@link GroovyWroModelFactory}
@@ -74,6 +73,17 @@ public class TestGroovyWroModelFactory {
     LOG.debug("model: ", model);
   }
 
+  @Test
+  public void createValidModel1() {
+    factory = new GroovyWroModelFactory() {
+      @Override
+      protected Script getWroModelScript() throws IOException {
+        return new GroovyShell().parse(getClass().getResourceAsStream("wro1.groovy"));
+      }
+    };
+    final WroModel model = factory.create();
+
+  }
 
   /**
    * Test the usecase when the resource has no URI.

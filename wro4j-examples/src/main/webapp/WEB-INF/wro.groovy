@@ -17,38 +17,32 @@ groups {
   placeholder {
     css("/static/css/placeholder/*.css")
   }
+  all {
+    css("/static/css/placeholder/*.css")
+    jquery()
+    twitterBar()
+    dynamicResource()
+    uniform()
+    groupRef('WEBINF-css')
+    dwr()
+  }
+  problem {
+    js("/static/js/problem.js")
+  }
+  invalid {
+    js("/invalid/resource.js")
+  }
+  twitterBar {
+    js("http://widgets.twimg.com/j/2/widget.js")
+  }
+  WEBINF-css {
+    css("/WEB-INF/css/webinf.css")
+  }
 }
 /*
 <groups xmlns="http://www.isdc.ro/wro"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
-  
-  <group name="all">
-    <group-ref>jquery</group-ref>
-    <!-- 
-    <group-ref>twitterBar</group-ref> 
-    <group-ref>dynamicResource</group-ref>
-    <group-ref>uniform</group-ref>
-    <group-ref>WEBINF-css</group-ref>
-    <group-ref>dwr</group-ref>
-     -->
-  </group>
-
-  <group name="problem">
-    <js>/static/js/problem.js</js>
-  </group>
-  
-  <group name="invalid">
-    <js>/invalid/resource.js</js>
-  </group>
-  
-  <group name="twitterBar">
-    <js>http://widgets.twimg.com/j/2/widget.js</js>
-  </group>
-  
-  <group name="WEBINF-css">
-    <css>/WEB-INF/css/webinf.css</css>
-  </group>
   
   <group name="wildcard">
     <css>/static/**.css</css>
