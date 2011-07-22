@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -40,12 +42,8 @@ public class Resource {
    * @param type of the resource.
    */
   private Resource(final String uri, final ResourceType type) {
-    if (uri == null) {
-      throw new IllegalArgumentException("URI cannot be null!");
-    }
-    if (type == null) {
-      throw new IllegalArgumentException("ResourceType cannot be null!");
-    }
+    Validate.notNull(uri, "URI cannot be null!");
+    Validate.notNull(type, "ResourceType cannot be null!");
     this.uri = cleanUri(uri);
     this.type = type;
   }
@@ -70,9 +68,12 @@ public class Resource {
    */
   private static String cleanUri(final String uri) {
     String result = uri.trim();
-    final int endIndex = result.length() - 1;
-    if (result.lastIndexOf('/') == endIndex) {
-      result = result.substring(0, endIndex);
+    //handle empty uri
+    if (!StringUtils.isEmpty(uri)) {
+      final int endIndex = result.length() - 1;
+      if (result.lastIndexOf('/') == endIndex) {
+        result = result.substring(0, endIndex);
+      }
     }
     return result;
   }
@@ -81,9 +82,7 @@ public class Resource {
    * @param type the type to set
    */
   public void setType(final ResourceType type) {
-    if (type == null) {
-      throw new IllegalArgumentException("ResourceType cannot be null!");
-    }
+    Validate.notNull(type, "ResourceType cannot be null!");
     this.type = type;
   }
 
@@ -92,9 +91,7 @@ public class Resource {
    * @param uri the uri to set
    */
   public void setUri(final String uri) {
-    if (uri == null) {
-      throw new IllegalArgumentException("Uri cannot be null!");
-    }
+    Validate.notNull(uri, "Uri cannot be null!");
     this.uri = cleanUri(uri);
   }
 

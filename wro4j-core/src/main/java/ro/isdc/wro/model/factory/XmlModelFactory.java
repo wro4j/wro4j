@@ -120,7 +120,7 @@ public class XmlModelFactory
   /**
    * Used to detect recursive import processing.
    */
-  private Set<String> processedImports = new HashSet<String>();
+  private final Set<String> processedImports = new HashSet<String>();
 
 
   /**
@@ -264,8 +264,7 @@ public class XmlModelFactory
       processingGroups.remove(name);
       return parsedGroup.getResources();
     }
-    final Group group = new Group();
-    group.setName(name);
+    final Group group = new Group(name);
     final List<Resource> resources = new ArrayList<Resource>();
     final NodeList resourceNodeList = element.getChildNodes();
     for (int i = 0; i < resourceNodeList.getLength(); i++) {

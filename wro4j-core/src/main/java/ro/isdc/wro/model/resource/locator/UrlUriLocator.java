@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +64,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    */
   public InputStream locate(final String uri)
     throws IOException {
-    if (uri == null) {
-      throw new IllegalArgumentException("uri cannot be NULL!");
-    }
+    Validate.notNull(uri, "uri cannot be NULL!");
     LOG.debug("Reading uri: " + uri);
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);

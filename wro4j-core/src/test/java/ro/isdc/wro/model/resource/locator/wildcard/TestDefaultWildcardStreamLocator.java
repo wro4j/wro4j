@@ -104,7 +104,7 @@ public class TestDefaultWildcardStreamLocator {
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
       @Override
-      protected WildcardStreamLocator newWildcardStreamLocator() {
+      public WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };
@@ -121,7 +121,7 @@ public class TestDefaultWildcardStreamLocator {
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
       @Override
-      protected WildcardStreamLocator newWildcardStreamLocator() {
+      public WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };

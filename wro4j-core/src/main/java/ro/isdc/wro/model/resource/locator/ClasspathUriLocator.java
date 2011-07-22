@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +63,7 @@ public class ClasspathUriLocator
    */
   public InputStream locate(final String uri)
       throws IOException {
-    if (uri == null) {
-      throw new IllegalArgumentException("URI cannot be NULL!");
-    }
+    Validate.notNull(uri, "URI cannot be NULL!");
     LOG.debug("Reading uri: " + uri);
     // replace prefix & clean path by removing '..' characters if exists and
     // normalizing the location to use.
@@ -107,7 +106,7 @@ public class ClasspathUriLocator
    * the full classpath.
    */
   @Override
-  protected WildcardStreamLocator newWildcardStreamLocator() {
+  public WildcardStreamLocator newWildcardStreamLocator() {
     return new JarWildcardStreamLocator(duplicateResourceDetector) {
       @Override
       public boolean hasWildcard(final String uri) {

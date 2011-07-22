@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,10 +83,7 @@ public class ServletContextUriLocator
    */
   public InputStream locate(final String uri)
     throws IOException {
-    LOG.debug("locating uri: " + uri);
-    if (uri == null) {
-      throw new IllegalArgumentException("URI cannot be NULL!");
-    }
+    Validate.notNull(uri, "URI cannot be NULL!");
     LOG.debug("uri resource: " + uri);
     final ServletContext servletContext = Context.get().getServletContext();
 
