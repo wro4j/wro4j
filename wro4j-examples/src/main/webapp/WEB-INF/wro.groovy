@@ -26,7 +26,7 @@ groups {
   twitterBar {
     js("http://widgets.twimg.com/j/2/widget.js")
   }
-  "WEBINF-css {
+  "WEBINF-css" {
     css("/WEB-INF/css/webinf.css")
   }
   wildcard {
@@ -70,12 +70,13 @@ groups {
     css("/static/module/syntaxHighlighter/styles/shCoreRDark.css")
   }
   all {
-    css("/static/css/placeholder/*.css")
     jquery()
+    /*
     twitterBar()
     dynamicResource()
     uniform()
     groupRef('WEBINF-css')
     dwr()
+    */
   }
 }

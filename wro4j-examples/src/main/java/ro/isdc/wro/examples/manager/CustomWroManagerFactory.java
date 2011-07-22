@@ -4,10 +4,17 @@
  */
 package ro.isdc.wro.examples.manager;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.model.factory.GroovyWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -25,6 +32,20 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 public class CustomWroManagerFactory
     extends BaseWroManagerFactory {
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+    return new GroovyWroModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream()
+        throws IOException {
+        return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
+      }
+    };
+  }
 
   /**
    * {@inheritDoc}

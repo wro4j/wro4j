@@ -15,10 +15,8 @@
 */
 package ro.isdc.wro.extensions.model.factory;
 
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import junit.framework.Assert;
@@ -47,8 +45,7 @@ public class TestGroovyWroModelFactory {
   public void testInvalidStream() throws Exception {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected Script getWroModelScript()
-          throws IOException {
+      protected InputStream getConfigResourceAsStream() throws IOException {
         throw new IOException();
       }
     };
@@ -78,8 +75,8 @@ public class TestGroovyWroModelFactory {
   public void createValidModelContainingHiphen() {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected Script getWroModelScript() throws IOException {
-        return new GroovyShell().parse(getClass().getResourceAsStream("wroWithHiphen.groovy"));
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return getClass().getResourceAsStream("wroWithHiphen.groovy");
       }
     };
     final WroModel model = factory.create();
@@ -90,8 +87,8 @@ public class TestGroovyWroModelFactory {
   public void createGroupReferenceOrderShouldNotMatter() {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected Script getWroModelScript() throws IOException {
-        return new GroovyShell().parse(getClass().getResourceAsStream("wroGroupRefOrder.groovy"));
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return getClass().getResourceAsStream("wroGroupRefOrder.groovy");
       }
     };
     final WroModel model = factory.create();
@@ -101,8 +98,8 @@ public class TestGroovyWroModelFactory {
   public void testRecursiveGroupReference() {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected Script getWroModelScript() throws IOException {
-        return new GroovyShell().parse(getClass().getResourceAsStream("wroRecursiveReference.groovy"));
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return getClass().getResourceAsStream("wroRecursiveReference.groovy");
       }
     };
     factory.create();
@@ -112,8 +109,8 @@ public class TestGroovyWroModelFactory {
   public void testDuplicateGroupName() {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected Script getWroModelScript() throws IOException {
-        return new GroovyShell().parse(getClass().getResourceAsStream("wroDuplicateGroupName.groovy"));
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return getClass().getResourceAsStream("wroDuplicateGroupName.groovy");
       }
     };
     factory.create();
@@ -126,8 +123,8 @@ public class TestGroovyWroModelFactory {
   public void createIncompleteModel() {
     factory = new GroovyWroModelFactory() {
       @Override
-      protected Script getWroModelScript() throws IOException {
-        return new GroovyShell().parse(getClass().getResourceAsStream("IncompleteWro.groovy"));
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return getClass().getResourceAsStream("IncompleteWro.groovy");
       }
     };
     factory.create();

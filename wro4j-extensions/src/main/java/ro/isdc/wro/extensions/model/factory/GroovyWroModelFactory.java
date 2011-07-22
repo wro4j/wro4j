@@ -17,16 +17,17 @@ package ro.isdc.wro.extensions.model.factory;
 
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 
 /**
  * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
@@ -44,7 +45,8 @@ public class GroovyWroModelFactory
   @Override
   public WroModel create() {
     try {
-      final WroModel model = GroovyWroModelParser.parse(getWroModelScript());
+      final Script script = new GroovyShell().parse(new InputStreamReader(getConfigResourceAsStream()));
+      final WroModel model = GroovyWroModelParser.parse(script);
       LOG.debug("groovy model: ", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -55,14 +57,15 @@ public class GroovyWroModelFactory
     }
   }
 
+
   /**
-   * Override this method, in order to provide different json model location.
+   * Override this method, in order to provide different groovy model location.
    *
    * @return stream of the json representation of the model.
    * @throws java.io.IOException if the stream couldn't be read.
    */
-  protected Script getWroModelScript() throws IOException {
-    return new GroovyShell().parse(getClass().getResourceAsStream("Wro.groovy"));
+  protected InputStream getConfigResourceAsStream() throws IOException {
+    return getClass().getResourceAsStream("Wro.groovy");
   }
 
   /**
