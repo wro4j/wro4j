@@ -110,7 +110,7 @@ public final class WroModel {
       if (getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);
       }
-      getGroups().add(importedModel.getGroupByName(groupName));
+      addGroup(importedModel.getGroupByName(groupName));
     }
   }
 
