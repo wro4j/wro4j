@@ -30,7 +30,7 @@ public abstract class AbstractResourceLocator
   /**
    * @return default implementation of {@link WildcardStreamLocator}.
    */
-  protected WildcardStreamLocator newWildcardStreamLocator() {
+  public WildcardStreamLocator newWildcardStreamLocator() {
     return new DefaultWildcardStreamLocator(duplicateResourceDetector) {
       @Override
       public boolean hasWildcard(final String uri) {
@@ -39,11 +39,10 @@ public abstract class AbstractResourceLocator
     };
   }
 
-
   /**
    * @return the wildcardStreamLocator
    */
-  protected final WildcardStreamLocator getWildcardStreamLocator() {
+  public final WildcardStreamLocator getWildcardStreamLocator() {
     if (wildcardStreamLocator == null) {
       wildcardStreamLocator = newWildcardStreamLocator();
     }

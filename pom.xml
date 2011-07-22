@@ -60,7 +60,7 @@
   
   <properties>
     <commons-io.dependency>2.0.1</commons-io.dependency>
-    <commons-lang.dependency>2.5</commons-lang.dependency>       
+    <commons-lang.dependency>2.6</commons-lang.dependency>       
     <slf4j.dependency>1.6.1</slf4j.dependency>    
     <maven.dependency>2.2.1</maven.dependency>    
     <mockito.dependency>1.8.5</mockito.dependency>

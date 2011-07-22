@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.support.IOFileFilterDecorator;
+import ro.isdc.wro.util.Transformer;
 
 
 /**
@@ -37,7 +38,7 @@ import ro.isdc.wro.model.resource.locator.support.IOFileFilterDecorator;
  * @created May 8, 2010
  */
 public class DefaultWildcardStreamLocator
-    implements WildcardStreamLocator {
+    implements WildcardStreamLocator, WildcardExpandedHandlerAware {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWildcardStreamLocator.class);
   /**
    * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?' character, it is considered
@@ -55,7 +56,7 @@ public class DefaultWildcardStreamLocator
    * Responsible for detecting duplicated resources.
    */
   private DuplicateResourceDetector duplicateResourceDetector;
-
+  private Transformer<Collection<File>> wildcardExpanderHandler;
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
    */
@@ -157,6 +158,9 @@ public class DefaultWildcardStreamLocator
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
+    if (wildcardExpanderHandler != null) {
+      wildcardExpanderHandler.transform(files);
+    }
     handleFoundFiles(files);
     return files;
   }
@@ -196,5 +200,12 @@ public class DefaultWildcardStreamLocator
   private IOFileFilter getFolderFilter(final String wildcard) {
     final boolean recursive = wildcard.contains(RECURSIVE_WILDCARD);
     return recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setWildcardExpanderHandler(final Transformer<Collection<File>> handler) {
+    this.wildcardExpanderHandler = handler;
   }
 }

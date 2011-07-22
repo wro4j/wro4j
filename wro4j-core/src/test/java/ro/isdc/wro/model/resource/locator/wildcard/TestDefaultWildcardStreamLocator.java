@@ -104,7 +104,7 @@ public class TestDefaultWildcardStreamLocator {
     };
     final ResourceLocator classpathLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.js") {
       @Override
-      protected WildcardStreamLocator newWildcardStreamLocator() {
+      public WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };
@@ -121,7 +121,7 @@ public class TestDefaultWildcardStreamLocator {
     };
     final ResourceLocator classpathLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.css") {
       @Override
-      protected WildcardStreamLocator newWildcardStreamLocator() {
+      public WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };

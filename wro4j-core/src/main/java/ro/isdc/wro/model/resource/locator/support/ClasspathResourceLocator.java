@@ -10,6 +10,7 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
    * Builds a {@link JarWildcardStreamLocator} in order to get resources from the full classpath.
    */
   @Override
-  protected WildcardStreamLocator newWildcardStreamLocator() {
+  public WildcardStreamLocator newWildcardStreamLocator() {
     return new JarWildcardStreamLocator(duplicateResourceDetector) {
       @Override
       public boolean hasWildcard(final String uri) {

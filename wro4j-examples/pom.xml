@@ -14,7 +14,7 @@
   </parent>
 
 	<properties>
-		<wro4j.version>1.3.8</wro4j.version>
+		<wro4j.version>1.3.9-SNAPSHOT</wro4j.version>
 		<wicket.version>1.5-RC5.1</wicket.version>
 		<gae.version>1.5.1</gae.version>
     <dwr.version>3.0.M1</dwr.version>

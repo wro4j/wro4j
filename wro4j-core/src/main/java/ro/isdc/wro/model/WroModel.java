@@ -5,6 +5,7 @@ package ro.isdc.wro.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,13 +30,13 @@ public final class WroModel {
   /**
    * Set of groups.
    */
-  private Set<Group> groups;
+  private Set<Group> groups = new HashSet<Group>();
 
   /**
-   * @return the groups
+   * @return the readonly collection of groups.
    */
   public final Collection<Group> getGroups() {
-    return groups;
+    return Collections.unmodifiableSet(groups);
   }
 
   /**
@@ -95,7 +96,6 @@ public final class WroModel {
     throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + groups);
   }
 
-
   /**
    * Merge this model with another model. This is useful for supporting model imports.
    *
@@ -110,8 +110,12 @@ public final class WroModel {
       if (getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);
       }
-      getGroups().add(importedModel.getGroupByName(groupName));
+      addGroup(importedModel.getGroupByName(groupName));
     }
+  }
+
+  public void addGroup(final Group group) {
+    groups.add(group);
   }
 
   /**

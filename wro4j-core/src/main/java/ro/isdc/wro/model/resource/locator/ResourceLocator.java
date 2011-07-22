@@ -24,7 +24,7 @@ public interface ResourceLocator {
   /**
    * Return an {@link InputStream}.
    * <p>
-   * It is expected that each call creates a <i>fresh</i> stream.
+   * It is expected each call to create a <i>fresh</i> stream.
    * <p>
    * This requirement is particularly important when you consider an API such as JavaMail, which needs to be able to
    * read the stream multiple times when creating mail attachments. For such a use case, it is <i>required</i> that each

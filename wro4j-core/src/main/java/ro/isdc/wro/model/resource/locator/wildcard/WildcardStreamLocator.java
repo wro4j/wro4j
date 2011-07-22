@@ -23,7 +23,6 @@ public interface WildcardStreamLocator {
    */
   boolean hasWildcard(final String uri);
 
-
   /**
    * Locates the stream based on the fileName containing the wildcard and the folder where to search.
    *

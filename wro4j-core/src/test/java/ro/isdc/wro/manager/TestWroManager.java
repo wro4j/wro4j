@@ -116,8 +116,7 @@ public class TestWroManager {
         @Override
         public WroModel create() {
 
-          final Group group = new Group();
-          group.setName("group");
+          final Group group = new Group("group");
           group.setResources(Arrays.asList(new Resource[] {
             resource
           }));
