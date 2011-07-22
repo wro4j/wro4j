@@ -19,6 +19,7 @@ import ro.isdc.wro.model.WroModel
 import ro.isdc.wro.model.group.Group
 import ro.isdc.wro.model.resource.Resource
 import ro.isdc.wro.model.resource.ResourceType
+import ro.isdc.wro.WroRuntimeException
 
 /**
  * Parse a Groovy DSL String into a {@link WroModel}.
@@ -69,7 +70,7 @@ class GroupDelegate {
 
   def methodMissing(String name, args) {
     def cl = args[0]
-    cl.delegate = new ResourceDelegate()
+    cl.delegate = new ResourceDelegate(groupDelegate: this)
     cl.resolveStrategy = Closure.DELEGATE_FIRST
     cl()
     groups.add(new Group(name: name, resources: cl.resources))
@@ -77,6 +78,7 @@ class GroupDelegate {
 }
 
 class ResourceDelegate {
+  GroupDelegate groupDelegate
   List<Resource> resources = new ArrayList<Resource>()
 
   void css(Map params = [:], String name) {
@@ -89,6 +91,16 @@ class ResourceDelegate {
     def resource = Resource.create(name, ResourceType.JS)
     if (params.get("minimize") == false) resource.minimize = false
     resources.add(resource)
+  }
+
+  void groupRef(String name) {
+    Group group = (Group) groupDelegate.groups.find {it.name == name}
+    if (!group) { throw new WroRuntimeException("Reference to un unknown group : $name") }
+    resources.addAll(group.resources)
+  }
+
+  def methodMissing(String name, args) {
+    this.groupRef(name);
   }
 }
 
