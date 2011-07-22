@@ -17,15 +17,6 @@ groups {
   placeholder {
     css("/static/css/placeholder/*.css")
   }
-  all {
-    css("/static/css/placeholder/*.css")
-    jquery()
-    twitterBar()
-    dynamicResource()
-    uniform()
-    groupRef('WEBINF-css')
-    dwr()
-  }
   problem {
     js("/static/js/problem.js")
   }
@@ -35,70 +26,56 @@ groups {
   twitterBar {
     js("http://widgets.twimg.com/j/2/widget.js")
   }
-  WEBINF-css {
+  "WEBINF-css {
     css("/WEB-INF/css/webinf.css")
   }
+  wildcard {
+    css("/static/**.css")
+    js("/static/js/*.js")
+    css("/WEB-INF/css/*.css")
+    css("classpath:ro/isdc/wro/resources/**.cs?")
+  }
+  uniform {
+    css("/static/css/webapp.css")
+    css("/static/css/css1.css")
+    css("/static/css/css2.css")
+    css("/static/css/NOTEXIST.css")
+    css("classpath:ro/isdc/wro/resources/*.css")
+  }
+  otherGroup {
+    css("/static/css/variablesSupport.css")
+  }
+  wicket {
+    js("classpath:org/apache/wicket/ajax/wicket-ajax-debug.js")
+  }
+  dwr {
+    js("/dwr/engine.js")
+    js("/dwr/interface/DWRFacade.js")
+  }
+  chineseEncoding {
+    js("http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js")
+  }
+  "jquery-mobile" {
+    css("http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css")
+    js("http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js")
+  }
+  jquery {
+    js("http://code.jquery.com/jquery-1.5.js")
+    groupRef("jquery-mobile")
+  }
+  syntaxHighlighter {
+    js("/static/module/syntaxHighlighter/scripts/shCore.js")
+    js("/static/module/syntaxHighlighter/scripts/bootstrap.js")
+    js("/static/module/syntaxHighlighter/scripts/*.js")
+    css("/static/module/syntaxHighlighter/styles/shCoreRDark.css")
+  }
+  all {
+    css("/static/css/placeholder/*.css")
+    jquery()
+    twitterBar()
+    dynamicResource()
+    uniform()
+    groupRef('WEBINF-css')
+    dwr()
+  }
 }
-/*
-<groups xmlns="http://www.isdc.ro/wro"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
-  
-  <group name="wildcard">
-    <css>/static/**.css</css>
-    <js>/static/js/*.js</js>
-    <css>/WEB-INF/css/*.css</css>
-    <css>classpath:ro/isdc/wro/resources/**.cs?</css>
-  </group>
-
-  <group name="uniform">
-    <css>/static/css/webapp.css</css>
-    <css>/static/css/css1.css</css>
-    <css>/static/css/css2.css</css>
-    <css>/static/css/NOTEXIST.css</css>
-    <css>classpath:ro/isdc/wro/resources/*.css</css>
-  </group>
-  
-  <group name="otherGroup">
-    <css>/static/css/variablesSupport.css</css>
-  </group>
-  
-  <group name="wicket">
-    <js>classpath:org/apache/wicket/ajax/wicket-ajax-debug.js</js>
-  </group>
-  
-  <group name="dwr">
-    <js>/dwr/engine.js</js>
-    <js>/dwr/interface/DWRFacade.js</js>
-  </group>
-  
-  <group name="chineseEncoding">
-    <js>http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js</js>
-     <!--<js>http://search.trade2cn.com/js/vsp.com/rct_keyword.js</js> -->
-  </group>
-
-  <group name="JSGroup">
-    <js>/dwr/engine.js</js>
-    <js>/dwr/interface/DWRFacade.js</js>
-  </group>
-
-  <group name="jquery">
-    <!--<js>http://code.jquery.com/jquery-1.4.3.js</js>--> 
-    <js>http://code.jquery.com/jquery-1.5.js</js>
-    <group-ref>jquery-mobile</group-ref>
-  </group>
-  
-  <group name="jquery-mobile">
-    <css>http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css</css>
-    <js>http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js</js>
-  </group>
-  
-  <group name="syntaxHighlighter">
-    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/*.js</js>
-    <css>/static/module/syntaxHighlighter/styles/shCoreRDark.css</css>
-  </group>
-  
-</groups>
-*/

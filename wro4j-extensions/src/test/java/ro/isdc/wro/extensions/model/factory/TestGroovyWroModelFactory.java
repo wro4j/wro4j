@@ -105,7 +105,7 @@ public class TestGroovyWroModelFactory {
         return new GroovyShell().parse(getClass().getResourceAsStream("wroRecursiveReference.groovy"));
       }
     };
-    final WroModel model = factory.create();
+    factory.create();
   }
 
   /**
