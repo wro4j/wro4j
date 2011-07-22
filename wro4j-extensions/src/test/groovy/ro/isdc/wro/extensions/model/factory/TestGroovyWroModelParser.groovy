@@ -18,6 +18,7 @@ package ro.isdc.wro.extensions.model.factory
 import org.junit.Test
 import ro.isdc.wro.model.WroModel
 import ro.isdc.wro.model.resource.ResourceType
+import ro.isdc.wro.WroRuntimeException
 
 /**
  * Test Wro Groovy DSL
@@ -73,6 +74,64 @@ class TestGroovyWroModelParser {
     assert 2 == groupDelegate.groups[0].resources.size()
     assert "g2" == groupDelegate.groups[1].name
     assert 1 == groupDelegate.groups[1].resources.size()
+  }
+
+  @Test
+  public void testGroupWithGroupRef() {
+    //setup:
+    def groupDelegate = new GroupDelegate()
+
+    //when:
+    groupDelegate.g1 {
+      js("/js/script.js")
+      css("/css/style.css")
+    }
+    groupDelegate.g2 {
+      groupRef('g1')
+      js("/js/script2.js")
+    }
+
+    //then:
+    assert 2 == groupDelegate.groups.size()
+    assert "g2" == groupDelegate.groups[1].name
+    assert 3 == groupDelegate.groups[1].resources.size()
+  }
+
+  @Test
+  public void testGroupWithGroupRefImplicit() {
+    //setup:
+    def groupDelegate = new GroupDelegate()
+
+    //when:
+    groupDelegate.g1 {
+      js("/js/script.js")
+      css("/css/style.css")
+    }
+    groupDelegate.g2 {
+      g1()
+      js("/js/script2.js")
+    }
+
+    //then:
+    assert 2 == groupDelegate.groups.size()
+    assert "g2" == groupDelegate.groups[1].name
+    assert 3 == groupDelegate.groups[1].resources.size()
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void testGroupWithUnknownGroupRef() {
+    //setup:
+    def groupDelegate = new GroupDelegate()
+
+    //when:
+    groupDelegate.g1 {
+      js("/js/script.js")
+      css("/css/style.css")
+    }
+    groupDelegate.g2 {
+      groupRef('unknwon')
+      js("/js/script2.js")
+    }
   }
 
   @Test
