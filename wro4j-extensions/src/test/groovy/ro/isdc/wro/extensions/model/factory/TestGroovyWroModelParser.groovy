@@ -90,11 +90,38 @@ class TestGroovyWroModelParser {
       groupRef('g1')
       js("/js/script2.js")
     }
+    groupDelegate.executeCallbacks()
 
     //then:
     assert 2 == groupDelegate.groups.size()
     assert "g2" == groupDelegate.groups[1].name
     assert 3 == groupDelegate.groups[1].resources.size()
+  }
+
+  @Test
+  public void testGroupWithGroupRefWithoutOrder() {
+    //setup:
+    def groupDelegate = new GroupDelegate()
+
+    //when:
+    groupDelegate.g1 {
+      groupRef('g2')
+      js("/js/script.js")
+      css("/css/style.css")
+    }
+
+    groupDelegate.g2 {
+      js("/js/script2.js")
+    }
+
+    groupDelegate.executeCallbacks()
+
+    //then:
+    assert 2 == groupDelegate.groups.size()
+    assert "g1" == groupDelegate.groups[0].name
+    assert 3 == groupDelegate.groups[0].resources.size()
+    assert "g2" == groupDelegate.groups[1].name
+    assert 1 == groupDelegate.groups[1].resources.size()
   }
 
   @Test
@@ -111,6 +138,7 @@ class TestGroovyWroModelParser {
       g1()
       js("/js/script2.js")
     }
+    groupDelegate.executeCallbacks()
 
     //then:
     assert 2 == groupDelegate.groups.size()
@@ -132,6 +160,8 @@ class TestGroovyWroModelParser {
       groupRef('unknwon')
       js("/js/script2.js")
     }
+    groupDelegate.executeCallbacks()
+
   }
 
   @Test
@@ -142,6 +172,7 @@ class TestGroovyWroModelParser {
     //when:
     wroModelDelegate.groups {
       g1 {
+        g2()
         js("/js/script.js")
         css("/css/style.css")
       }
@@ -152,7 +183,7 @@ class TestGroovyWroModelParser {
 
     //then:
     assert 2 == wroModelDelegate.wroModel.groups.size()
-    assert 2 == wroModelDelegate.wroModel.groups.find {it.name == "g1"}.resources.size()
+    assert 3 == wroModelDelegate.wroModel.groups.find {it.name == "g1"}.resources.size()
     assert 1 == wroModelDelegate.wroModel.groups.find {it.name == "g2"}.resources.size()
   }
 

@@ -57,9 +57,11 @@ class WroModelDelegate {
   WroModel wroModel = new WroModel()
 
   void groups(Closure cl) {
-    cl.delegate = new GroupDelegate()
+    def groupDelegate = new GroupDelegate()
+    cl.delegate = groupDelegate
     cl.resolveStrategy = Closure.DELEGATE_FIRST
     cl()
+    groupDelegate.executeCallbacks()
     wroModel = new WroModel(groups: (Collection<Group>) cl.getProperty("groups"))
   }
 
@@ -68,12 +70,24 @@ class WroModelDelegate {
 class GroupDelegate {
   List<Group> groups = new ArrayList<Group>()
 
+  private List<Closure> callbacks = []
+
   def methodMissing(String name, args) {
     def cl = args[0]
     cl.delegate = new ResourceDelegate(groupDelegate: this)
     cl.resolveStrategy = Closure.DELEGATE_FIRST
     cl()
     groups.add(new Group(name: name, resources: cl.resources))
+  }
+
+  /** Add callback to be executed later */
+  void addCallBack(Closure cl) {
+    callbacks.add(cl)
+  }
+
+  /** Execute callbacks when every groups are known (for groupRef) */
+  void executeCallbacks() {
+    callbacks.each { it() }
   }
 }
 
@@ -83,20 +97,23 @@ class ResourceDelegate {
 
   void css(Map params = [:], String name) {
     def resource = Resource.create(name, ResourceType.CSS)
-    if (params.get("minimize") == false) resource.minimize = false
+    if (params.minimize == false) resource.minimize = false
     resources.add(resource)
   }
 
   void js(Map params = [:], String name) {
     def resource = Resource.create(name, ResourceType.JS)
-    if (params.get("minimize") == false) resource.minimize = false
+    if (params.minimize == false) resource.minimize = false
     resources.add(resource)
   }
 
   void groupRef(String name) {
-    Group group = (Group) groupDelegate.groups.find {it.name == name}
-    if (!group) { throw new WroRuntimeException("Reference to un unknown group : $name") }
-    resources.addAll(group.resources)
+    //execute the groupRef code only when every groups are known
+    groupDelegate.addCallBack {
+      Group group = (Group) groupDelegate.groups.find {it.name == name}
+      if (!group) { throw new WroRuntimeException("Reference to an unknown group : $name") }
+      resources.addAll(group.resources)
+    }
   }
 
   def methodMissing(String name, args) {
