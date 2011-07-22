@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.ResourceType;
 
 /**
@@ -74,15 +75,37 @@ public class TestGroovyWroModelFactory {
   }
 
   @Test
-  public void createValidModel1() {
+  public void createValidModelContainingHiphen() {
     factory = new GroovyWroModelFactory() {
       @Override
       protected Script getWroModelScript() throws IOException {
-        return new GroovyShell().parse(getClass().getResourceAsStream("wro1.groovy"));
+        return new GroovyShell().parse(getClass().getResourceAsStream("wroWithHiphen.groovy"));
       }
     };
     final WroModel model = factory.create();
+    Assert.assertNotNull(model.getGroupByName("group-with-hiphen"));
+  }
 
+  @Test
+  public void createGroupReferenceOrderShouldNotMatter() {
+    factory = new GroovyWroModelFactory() {
+      @Override
+      protected Script getWroModelScript() throws IOException {
+        return new GroovyShell().parse(getClass().getResourceAsStream("wroGroupRefOrder.groovy"));
+      }
+    };
+    final WroModel model = factory.create();
+  }
+
+  @Test(expected=RecursiveGroupDefinitionException.class)
+  public void testRecursiveGroupReference() {
+    factory = new GroovyWroModelFactory() {
+      @Override
+      protected Script getWroModelScript() throws IOException {
+        return new GroovyShell().parse(getClass().getResourceAsStream("wroRecursiveReference.groovy"));
+      }
+    };
+    final WroModel model = factory.create();
   }
 
   /**
