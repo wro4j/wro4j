@@ -52,17 +52,30 @@ public class JsonHPack {
   }
 
 
-  public String unpack(final String data) {
+  public String unpack(final String rawData) {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("initContext");
     final RhinoScriptBuilder builder = initScriptBuilder();
     stopWatch.stop();
 
     stopWatch.start("json.hunpack");
+
+    final boolean isEnclosedInDoubleArray = isEnclosedInDoubleArray(rawData);
+    String data = rawData;
+    if (!isEnclosedInDoubleArray) {
+      data = "[" + data + "]";
+    }
+
     try {
       final String execute = "JSON.stringify(JSON.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
       final Object result = builder.evaluate(execute, "unpack");
-      return String.valueOf(result);
+
+      String resultAsString = String.valueOf(result);
+      if (!isEnclosedInDoubleArray) {
+        //remove [] characters in which the json is enclosed
+        resultAsString = removeEnclosedArray(resultAsString);
+      }
+      return resultAsString;
     } catch (final RhinoException e) {
       throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
@@ -75,22 +88,63 @@ public class JsonHPack {
    * @param data css content to process.
    * @return processed css content.
    */
-  public String pack(final String data) {
+  public String pack(final String rawData) {
+
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("initContext");
     final RhinoScriptBuilder builder = initScriptBuilder();
     stopWatch.stop();
 
     stopWatch.start("json.hpack");
+
+    final boolean isEnclosedInArray = isEnclosedInArray(rawData);
+    String data = rawData;
+    if (!isEnclosedInArray) {
+      data = "[" + data + "]";
+    }
+
     try {
       final String execute = "JSON.stringify(JSON.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
       final Object result = builder.evaluate(execute, "pack");
-      return String.valueOf(result);
+      String resultAsString = String.valueOf(result);
+      if (!isEnclosedInArray) {
+        //remove [] characters in which the json is enclosed
+        resultAsString = removeEnclosedArray(resultAsString);
+      }
+      return resultAsString;
     } catch (final RhinoException e) {
       throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
     }
+  }
+
+
+  /**
+   * Remove first and last occurrence of '[' and ']' characters.
+   * @param resultAsString
+   * @return
+   */
+  private String removeEnclosedArray(String resultAsString) {
+    resultAsString = resultAsString.replaceFirst("(?ims)\\[", "").replaceFirst("(?ims)\\](?!.*\\])", "");
+    return resultAsString;
+  }
+
+
+  /**
+   * Check if the string is enclosed with [] (array).
+   * @param rawData string to test.
+   */
+  private boolean isEnclosedInArray(final String rawData) {
+    return rawData.matches("(?ims)^\\s*\\[.*\\]");
+  }
+
+  /**
+   * Check if the string is enclosed with [[]] (double array).
+   * @param rawData string to test.
+   */
+  private boolean isEnclosedInDoubleArray(final String rawData) {
+    return rawData.matches("(?ims)^\\s*\\[\\[.*\\]\\]");
   }
 }
