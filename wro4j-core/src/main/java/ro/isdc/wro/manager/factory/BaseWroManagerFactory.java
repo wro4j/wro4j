@@ -62,8 +62,6 @@ public class BaseWroManagerFactory
     if (this.manager == null) {
       synchronized (this) {
         if (this.manager == null) {
-          //TODO pass servletContext to this method - it could be useful to access it when creating model.
-          //decorate with scheduler ability
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
 
           this.manager = new WroManager(injector);
@@ -77,7 +75,7 @@ public class BaseWroManagerFactory
         }
       }
     }
-    return this.manager;
+    return manager;
   }
 
 

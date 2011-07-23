@@ -107,6 +107,7 @@ public class WroManager
   public WroManager(final Injector injector) {
     Validate.notNull(injector);
     groupsProcessor = new GroupsProcessor();
+    this.injector = injector;
     injector.inject(this);
     injector.inject(groupsProcessor);
   }
@@ -499,6 +500,7 @@ public class WroManager
     this.modelTransformers = modelTransformers;
     //allow model transformers to be aware of injected properties
     for (final Transformer<WroModel> transformer : modelTransformers) {
+      LOG.debug("injecting: " + transformer);
       injector.inject(transformer);
     }
   }
