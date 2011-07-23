@@ -4,6 +4,7 @@
 package ro.isdc.wro.manager.factory;
 
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 
 import javax.servlet.ServletContext;
 
@@ -11,16 +12,13 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
-import ro.isdc.wro.model.factory.WildcardExpanderWroModelFactory;
+import ro.isdc.wro.model.factory.WildcardExpanderWroModelTransformer;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -64,23 +62,18 @@ public class BaseWroManagerFactory
     if (this.manager == null) {
       synchronized (this) {
         if (this.manager == null) {
-          final GroupExtractor groupExtractor = newGroupExtractor();
           //TODO pass servletContext to this method - it could be useful to access it when creating model.
           //decorate with scheduler ability
-          final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
 
-          final WroModelFactory modelFactory = new WildcardExpanderWroModelFactory(new ScheduledWroModelFactory(
-            new FallbackAwareWroModelFactory(newModelFactory(Context.get().getServletContext()))));
-
-          injector.inject(modelFactory);
-
           this.manager = new WroManager(injector);
-          manager.setGroupExtractor(groupExtractor);
-          manager.setModelFactory(modelFactory);
-          manager.setCacheStrategy(cacheStrategy);
+          manager.setGroupExtractor(newGroupExtractor());
+          manager.setModelFactory(newModelFactory());
+          manager.setCacheStrategy(newCacheStrategy());
           manager.setHashBuilder(newHashBuilder());
           manager.registerCallback(cacheChangeCallback);
+          //TODO configure this list
+          manager.setModelTransformers(Arrays.asList(new WildcardExpanderWroModelTransformer()));
         }
       }
     }
@@ -160,7 +153,7 @@ public class BaseWroManagerFactory
    * @param servletContext {@link ServletContext} which could be useful for creating dynamic {@link WroModel}.
    * @return {@link WroModelFactory} implementation
    */
-  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+  protected WroModelFactory newModelFactory() {
     return new ServletContextAwareXmlModelFactory();
   }
 
