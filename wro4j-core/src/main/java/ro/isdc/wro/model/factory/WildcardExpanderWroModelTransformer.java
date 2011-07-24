@@ -50,7 +50,7 @@ import ro.isdc.wro.util.Transformer;
  *
  * @author Alex Objelean
  * @created 18 Jul 2011
- * @since 1.3.9
+ * @since 1.4.0
  */
 public class WildcardExpanderWroModelTransformer implements Transformer<WroModel> {
   private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderWroModelTransformer.class);
