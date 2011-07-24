@@ -23,14 +23,15 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.transformer.WildcardExpanderWroModelTransformer;
 import ro.isdc.wro.util.WroUtil;
 
 /**
  * @author Alex Objelean
  */
-public class TestWildcardExpanderWroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(TestWildcardExpanderWroModelFactory.class);
-  private WildcardExpanderWroModelFactory factory;
+public class TestWildcardExpanderWroModelTransformer {
+  private static final Logger LOG = LoggerFactory.getLogger(TestWildcardExpanderWroModelTransformer.class);
+  private WildcardExpanderWroModelTransformer factory;
   @Mock
   private WroModelFactory decoratedFactory;
   @Mock
@@ -42,7 +43,7 @@ public class TestWildcardExpanderWroModelFactory {
     final ResourceLocatorFactory resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
     final Injector injector = new Injector(resourceLocatorFactory, processorsFactory);
 
-    factory = new WildcardExpanderWroModelFactory(decoratedFactory);
+    factory = new WildcardExpanderWroModelTransformer();
 
     injector.inject(factory);
   }
@@ -51,7 +52,7 @@ public class TestWildcardExpanderWroModelFactory {
   public void testEmptyModel() {
     final WroModel model = new WroModel();
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    final WroModel changedModel = factory.create();
+    final WroModel changedModel = factory.transform(model);
     Assert.assertEquals(model.getGroups().size(), changedModel.getGroups().size());
   }
 
@@ -61,7 +62,7 @@ public class TestWildcardExpanderWroModelFactory {
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/exploder/file1.js", WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    final WroModel changedModel = factory.create();
+    final WroModel changedModel = factory.transform(model);
     Assert.assertEquals(1, changedModel.getGroups().size());
   }
 
@@ -74,7 +75,7 @@ public class TestWildcardExpanderWroModelFactory {
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/exploder/INVALID.*", WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    final WroModel changedModel = factory.create();
+    final WroModel changedModel = factory.transform(model);
     Assert.assertEquals(1, changedModel.getGroups().size());
   }
 
@@ -85,7 +86,7 @@ public class TestWildcardExpanderWroModelFactory {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
-    final WroModel changedModel = factory.create();
+    final WroModel changedModel = factory.transform(model);
     LOG.debug("model: " + changedModel);
     Assert.assertEquals(1, changedModel.getGroupByName("group").getResources().size());
   }
@@ -97,7 +98,7 @@ public class TestWildcardExpanderWroModelFactory {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
-    final WroModel changedModel = factory.create();
+    final WroModel changedModel = factory.transform(model);
     LOG.debug("model: " + changedModel);
     Assert.assertEquals(3, changedModel.getGroupByName("group").getResources().size());
   }

@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -112,8 +113,11 @@ public class XmlModelFactory
    * infinite recurse group reference.
    */
   final Collection<String> processingGroups = new HashSet<String>();
+  /**
+   * Used to locate imports;
+   */
+  @Inject
   private ResourceLocatorFactory resourceLocatorFactory;
-
   /**
    * Used to detect recursive import processing.
    */
@@ -195,6 +199,7 @@ public class XmlModelFactory
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: " + name);
+      LOG.debug("processImports#uriLocatorFactory: " + resourceLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected ResourceLocator getModelResourceLocator() {
@@ -202,7 +207,8 @@ public class XmlModelFactory
           return getResourceLocatorFactory().locate(name);
         }
       };
-
+      //pass the reference of the uriLocatorFactory to the anonymously created factory.
+      importedModelFactory.resourceLocatorFactory = this.resourceLocatorFactory;
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
         LOG.error(message);

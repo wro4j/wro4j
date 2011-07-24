@@ -79,7 +79,7 @@ public class TestWroManager {
       protected ProcessorsFactory newProcessorsFactory() {
         return new DefaultProcesorsFactory();
       };
-    }.getInstance();
+    }.create();
 
     public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -138,7 +138,7 @@ public class TestWroManager {
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
     final WroManagerFactory factory = new BaseWroManagerFactory();
-    manager = factory.getInstance();
+    manager = factory.create();
     manager.setModelFactory(getValidModelFactory());
   }
 
@@ -234,7 +234,7 @@ public class TestWroManager {
   public void testNoProcessorWroManagerFactory()
       throws IOException {
     final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
-    manager = factory.getInstance();
+    manager = factory.create();
     manager.setModelFactory(getValidModelFactory());
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -296,6 +296,7 @@ public class TestWroManager {
   public void testCssWithInvalidImportAndIgnoreFalse()
       throws Exception {
     new GenericTestBuilder() {
+      @Override
       protected void onBeforeProcess() {
         Context.get().getConfig().setIgnoreMissingResources(false);
       };

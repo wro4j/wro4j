@@ -4,6 +4,12 @@
  */
 package ro.isdc.wro.examples;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.servlet.ServletContext;
+
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;

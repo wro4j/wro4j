@@ -29,7 +29,6 @@ import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -81,17 +80,12 @@ public class TestWroFilter {
     filter = new WroFilter() {
       @Override
       protected WroManagerFactory getWroManagerFactory() {
-        return new BaseWroManagerFactory() {
+        return new BaseWroManagerFactory().setModelFactory(new XmlModelFactory() {
           @Override
-          protected WroModelFactory newModelFactory() {
-            return new XmlModelFactory() {
-              @Override
-              protected ResourceLocator getModelResourceLocator() {
-                return new UrlResourceLocator(getClass().getResource("wro.xml"));
-              }
-            };
+          protected ResourceLocator getModelResourceLocator() {
+            return new UrlResourceLocator(getClass().getResource("wro.xml"));
           }
-        };
+        });
       }
     };
   }
@@ -143,7 +137,7 @@ public class TestWroFilter {
   public void testChainContinueWhenSpecificExceptionThrown(final Throwable e)
     throws Exception {
     final WroManagerFactory factory = Mockito.mock(WroManagerFactory.class);
-    Mockito.when(factory.getInstance()).thenThrow(e);
+    Mockito.when(factory.create()).thenThrow(e);
     filter = createTestFilter(factory, false);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     filter.init(config);

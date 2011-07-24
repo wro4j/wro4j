@@ -41,7 +41,7 @@ public class TestConfigurableWroManagerFactory {
 
     factory = new ConfigurableWroManagerFactory();
     //create one instance for test
-    factory.getInstance();
+    factory.create();
   }
 
   @Before
