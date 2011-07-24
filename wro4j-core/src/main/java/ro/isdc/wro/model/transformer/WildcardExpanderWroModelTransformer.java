@@ -1,7 +1,7 @@
 /**
  * Copyright@2011 wro4j
  */
-package ro.isdc.wro.model.factory;
+package ro.isdc.wro.model.transformer;
 
 import java.io.File;
 import java.io.IOException;

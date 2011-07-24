@@ -19,7 +19,6 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
-import ro.isdc.wro.model.factory.WildcardExpanderWroModelTransformer;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -30,6 +29,7 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
+import ro.isdc.wro.model.transformer.WildcardExpanderWroModelTransformer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 

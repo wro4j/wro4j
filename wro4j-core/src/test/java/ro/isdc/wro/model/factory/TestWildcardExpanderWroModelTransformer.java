@@ -23,6 +23,7 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.transformer.WildcardExpanderWroModelTransformer;
 import ro.isdc.wro.util.WroUtil;
 
 /**
