@@ -35,12 +35,10 @@ import org.xml.sax.SAXException;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
 
@@ -116,7 +114,8 @@ public class XmlModelFactory
   /**
    * Used to locate imports;
    */
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  @Inject
+  private UriLocatorFactory uriLocatorFactory;
   /**
    * Used to detect recursive import processing.
    */
@@ -141,7 +140,7 @@ public class XmlModelFactory
     } catch (final IOException e) {
       throw new WroRuntimeException("Cannot find XML to parse", e);
     } catch (final SAXException e) {
-      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage());
+      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage(), e);
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
@@ -201,15 +200,18 @@ public class XmlModelFactory
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: " + name);
+      LOG.debug("processImports#uriLocatorFactory: " + uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected InputStream getConfigResourceAsStream()
           throws IOException {
           LOG.debug("build model from import: " + name);
-          return getUriLocatorFactory().locate(name);
+          LOG.debug("uriLocatorFactory: " + uriLocatorFactory);
+          return uriLocatorFactory.locate(name);
         };
       };
-
+      //pass the reference of the uriLocatorFactory to the anonymously created factory.
+      importedModelFactory.uriLocatorFactory = this.uriLocatorFactory;
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
         LOG.error(message);
@@ -365,27 +367,27 @@ public class XmlModelFactory
    */
   public void destroy() {}
 
-
-  /**
-   * @return lazily instantiated {@link UriLocatorFactory}.
-   */
-  private UriLocatorFactory getUriLocatorFactory() {
-    if (uriLocatorFactory == null) {
-      uriLocatorFactory = new SimpleUriLocatorFactory();
-      // use locators with wildcard disabled - to avoid invalid xml parsing error
-      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
-        @Override
-        protected boolean disableWildcards() {
-          return true;
-        }
-      });
-      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
-        @Override
-        protected boolean disableWildcards() {
-          return true;
-        }
-      });
-    }
-    return uriLocatorFactory;
-  }
+//
+//  /**
+//   * @return lazily instantiated {@link UriLocatorFactory}.
+//   */
+//  private UriLocatorFactory getUriLocatorFactory() {
+//    if (uriLocatorFactory == null) {
+//      uriLocatorFactory = new SimpleUriLocatorFactory();
+//      // use locators with wildcard disabled - to avoid invalid xml parsing error
+//      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
+//        @Override
+//        protected boolean disableWildcards() {
+//          return true;
+//        }
+//      });
+//      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
+//        @Override
+//        protected boolean disableWildcards() {
+//          return true;
+//        }
+//      });
+//    }
+//    return uriLocatorFactory;
+//  }
 }
