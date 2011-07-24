@@ -5,6 +5,7 @@ package ro.isdc.wro.manager.factory;
 
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -29,6 +30,8 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
+import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.Transformer;
 
 
 /**
@@ -38,26 +41,27 @@ import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
-  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware {
+  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, ObjectFactory<WroManager> {
   /**
    * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
    */
-  protected volatile WroManager manager;
+  private volatile WroManager manager;
   /**
    * A callback to be notified about the cache change.
    */
   private PropertyChangeListener cacheChangeCallback;
-  /**
-   * Prevent instantiation. Use factory method.
-   */
-  protected BaseWroManagerFactory() {
-  }
+
+  private GroupExtractor groupExtractor = newGroupExtractor();
+  private WroModelFactory modelFactory = newModelFactory();
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
+  private HashBuilder hashBuilder = newHashBuilder();
+  private List<? extends Transformer<WroModel>> modelTransformers = newModelTransformers();
 
   /**
    * Creates default singleton instance of manager, by initializing manager
    * dependencies with default values (processors).
    */
-  public final WroManager getInstance() {
+  public final WroManager create() {
     // use double-check locking
     if (this.manager == null) {
       synchronized (this) {
@@ -65,22 +69,27 @@ public class BaseWroManagerFactory
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
 
           this.manager = new WroManager(injector);
-          manager.setGroupExtractor(newGroupExtractor());
-          manager.setModelFactory(newModelFactory());
-          manager.setCacheStrategy(newCacheStrategy());
-          manager.setHashBuilder(newHashBuilder());
+          manager.setGroupExtractor(groupExtractor);
+          manager.setModelFactory(modelFactory);
+          manager.setCacheStrategy(cacheStrategy);
+          manager.setHashBuilder(hashBuilder);
           manager.registerCallback(cacheChangeCallback);
-          //TODO configure this list
-          manager.setModelTransformers(Arrays.asList(new WildcardExpanderWroModelTransformer()));
+          manager.setModelTransformers(modelTransformers);
         }
       }
     }
     return manager;
   }
 
+  /**
+   * @return default implementation of modelTransformers.
+   */
+  protected List<? extends Transformer<WroModel>> newModelTransformers() {
+    return Arrays.asList(new WildcardExpanderWroModelTransformer());
+  }
 
   /**
-   * Override to provide a different or modified factory.
+   * Override to provide a different or modified default factory implementation.
    *
    * @return {@link ProcessorsFactory} object.
    */
@@ -153,6 +162,46 @@ public class BaseWroManagerFactory
    */
   protected WroModelFactory newModelFactory() {
     return new ServletContextAwareXmlModelFactory();
+  }
+
+  /**
+   * @param groupExtractor the groupExtractor to set
+   */
+  public BaseWroManagerFactory setGroupExtractor(final GroupExtractor groupExtractor) {
+    this.groupExtractor = groupExtractor;
+    return this;
+  }
+
+  /**
+   * @param modelFactory the modelFactory to set
+   */
+  public BaseWroManagerFactory setModelFactory(final WroModelFactory modelFactory) {
+    this.modelFactory = modelFactory;
+    return this;
+  }
+
+  /**
+   * @param hashBuilder the hashBuilder to set
+   */
+  public BaseWroManagerFactory setHashBuilder(final HashBuilder hashBuilder) {
+    this.hashBuilder = hashBuilder;
+    return this;
+  }
+
+  /**
+   * @param modelTransformers the modelTransformers to set
+   */
+  public BaseWroManagerFactory setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
+    this.modelTransformers = modelTransformers;
+    return this;
+  }
+
+  /**
+   * @param cacheStrategy the cacheStrategy to set
+   */
+  public BaseWroManagerFactory setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+    this.cacheStrategy = cacheStrategy;
+    return this;
   }
 
   /**

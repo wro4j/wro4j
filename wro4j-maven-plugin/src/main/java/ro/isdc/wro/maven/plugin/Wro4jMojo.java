@@ -195,7 +195,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       final WroConfiguration config = Context.get().getConfig();
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       //perform processing
-      getManagerFactory().getInstance().process();
+      getManagerFactory().create().process();
       //encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));

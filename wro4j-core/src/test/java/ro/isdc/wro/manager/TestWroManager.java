@@ -37,8 +37,8 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
-import ro.isdc.wro.manager.factory.ServletContextAwareWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -70,7 +70,7 @@ public class TestWroManager {
    */
   private static final class WroManagerProcessor
       implements ResourcePreProcessor {
-    private final WroManager manager = new ServletContextAwareWroManagerFactory().getInstance();
+    private final WroManager manager = new BaseWroManagerFactory().create();
 
     public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -128,8 +128,8 @@ public class TestWroManager {
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    final WroManagerFactory factory = new ServletContextAwareWroManagerFactory();
-    manager = factory.getInstance();
+    final WroManagerFactory factory = new BaseWroManagerFactory();
+    manager = factory.create();
     manager.setModelFactory(getValidModelFactory());
   }
 
@@ -225,7 +225,7 @@ public class TestWroManager {
   public void testNoProcessorWroManagerFactory()
       throws IOException {
     final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
-    manager = factory.getInstance();
+    manager = factory.create();
     manager.setModelFactory(getValidModelFactory());
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -287,6 +287,7 @@ public class TestWroManager {
   public void testCssWithInvalidImportAndIgnoreFalse()
       throws Exception {
     new GenericTestBuilder() {
+      @Override
       protected void onBeforeProcess() {
         Context.get().getConfig().setIgnoreMissingResources(false);
       };
