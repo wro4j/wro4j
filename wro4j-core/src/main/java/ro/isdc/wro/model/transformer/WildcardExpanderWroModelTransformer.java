@@ -1,7 +1,7 @@
 /**
  * Copyright@2011 wro4j
  */
-package ro.isdc.wro.model.factory;
+package ro.isdc.wro.model.transformer;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,27 +50,21 @@ import ro.isdc.wro.util.Transformer;
  *
  * @author Alex Objelean
  * @created 18 Jul 2011
- * @since 1.3.9
+ * @since 1.4.0
  */
-public class WildcardExpanderWroModelFactory extends WroModelFactoryDecorator {
-  private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderWroModelFactory.class);
+public class WildcardExpanderWroModelTransformer implements Transformer<WroModel> {
+  private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderWroModelTransformer.class);
 
   @Inject
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private DuplicateResourceDetector duplicateResourceDetector;
 
-  public WildcardExpanderWroModelFactory(final WroModelFactory decorated) {
-    super(decorated);
-  }
-
-
   /**
    * {@inheritDoc}
    */
-  @Override
-  public WroModel create() {
-    final WroModel model = super.create();
+  public WroModel transform(final WroModel input) {
+    final WroModel model = input;
 
     for (final Group group : model.getGroups()) {
       for (final Resource resource : group.getResources()) {

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,8 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -47,6 +51,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -92,10 +97,17 @@ public class WroManager
   private ProcessorsFactory processorsFactory;
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-
+  /**
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
+   * processed.
+   */
+  private List<? extends Transformer<WroModel>> modelTransformers = Collections.EMPTY_LIST;
+  private Injector injector;
 
   public WroManager(final Injector injector) {
+    Validate.notNull(injector);
     groupsProcessor = new GroupsProcessor();
+    this.injector = injector;
     injector.inject(this);
     injector.inject(groupsProcessor);
   }
@@ -425,18 +437,10 @@ public class WroManager
    * Check if all dependencies are set.
    */
   private void validate() {
-    if (this.groupExtractor == null) {
-      throw new WroRuntimeException("GroupExtractor was not set!");
-    }
-    if (this.modelFactory == null) {
-      throw new WroRuntimeException("ModelFactory was not set!");
-    }
-    if (this.cacheStrategy == null) {
-      throw new WroRuntimeException("cacheStrategy was not set!");
-    }
-    if (this.hashBuilder == null) {
-      throw new WroRuntimeException("hashBuilder was not set!");
-    }
+    Validate.notNull(groupExtractor, "GroupExtractor was not set!");
+    Validate.notNull(modelFactory, "ModelFactory was not set!");
+    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
+    Validate.notNull(hashBuilder, "HashBuilder was not set!");
   }
 
 
@@ -444,6 +448,7 @@ public class WroManager
    * @param groupExtractor the uriProcessor to set
    */
   public final void setGroupExtractor(final GroupExtractor groupExtractor) {
+    Validate.notNull(groupExtractor);
     this.groupExtractor = groupExtractor;
   }
 
@@ -452,7 +457,9 @@ public class WroManager
    * @param modelFactory the modelFactory to set
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
-    this.modelFactory = modelFactory;
+    Validate.notNull(modelFactory);
+    //decorate with useful features
+    this.modelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(modelFactory));
   }
 
 
@@ -460,6 +467,7 @@ public class WroManager
    * @param cacheStrategy the cache to set
    */
   public final void setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+    Validate.notNull(cacheStrategy);
     this.cacheStrategy = cacheStrategy;
   }
 
@@ -468,6 +476,7 @@ public class WroManager
    * @param contentDigester the contentDigester to set
    */
   public void setHashBuilder(final HashBuilder contentDigester) {
+    Validate.notNull(modelTransformers);
     this.hashBuilder = contentDigester;
   }
 
@@ -476,6 +485,23 @@ public class WroManager
    * @return the modelFactory
    */
   public final WroModel getModel() {
-    return this.modelFactory.create();
+    WroModel model = modelFactory.create();
+    for (final Transformer<WroModel> transformer : modelTransformers) {
+      model = transformer.transform(model);
+    }
+    return model;
+  }
+
+  /**
+   * @param modelTransformers the modelTransformers to set
+   */
+  public void setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
+    Validate.notNull(modelTransformers);
+    this.modelTransformers = modelTransformers;
+    //allow model transformers to be aware of injected properties
+    for (final Transformer<WroModel> transformer : modelTransformers) {
+      LOG.debug("injecting: " + transformer);
+      injector.inject(transformer);
+    }
   }
 }

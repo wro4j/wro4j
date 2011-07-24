@@ -141,7 +141,7 @@ public class Wro4jCommandLineRunner {
    */
   private List<String> getTargetGroupsAsList() {
     if (targetGroups == null) {
-      final WroModel model = getManagerFactory().getInstance().getModel();
+      final WroModel model = getManagerFactory().create().getModel();
       return model.getGroupNames();
     }
     return Arrays.asList(targetGroups.split(","));
@@ -171,7 +171,7 @@ public class Wro4jCommandLineRunner {
       // init context
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
       // perform processing
-      getManagerFactory().getInstance().process();
+      getManagerFactory().create().process();
       // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));

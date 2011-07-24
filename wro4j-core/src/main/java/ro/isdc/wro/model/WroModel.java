@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -55,9 +56,7 @@ public final class WroModel {
    *          the groups to set
    */
   public final void setGroups(final Collection<Group> groups) {
-    if (groups == null) {
-      throw new IllegalArgumentException("groups cannot be null!");
-    }
+    Validate.notNull(groups, "groups cannot be null!");
     LOG.debug("setGroups: " + groups);
     identifyDuplicateGroupNames(groups);
     this.groups = new HashSet<Group>(groups);
@@ -102,9 +101,7 @@ public final class WroModel {
    * @param importedModel model to import.
    */
   public void merge(final WroModel importedModel) {
-    if (importedModel == null) {
-      throw new IllegalArgumentException("imported model cannot be null!");
-    }
+    Validate.notNull(importedModel, "imported model cannot be null!");
     LOG.debug("merging importedModel: " + importedModel);
     for (final String groupName : importedModel.getGroupNames()) {
       if (getGroupNames().contains(groupName)) {
@@ -114,7 +111,12 @@ public final class WroModel {
     }
   }
 
+  /**
+   * Add a single group to the model.
+   * @param group a not null {@link Group}.
+   */
   public void addGroup(final Group group) {
+    Validate.notNull(group);
     groups.add(group);
   }
 

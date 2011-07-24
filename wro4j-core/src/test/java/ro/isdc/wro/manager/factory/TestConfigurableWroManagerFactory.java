@@ -41,7 +41,7 @@ public class TestConfigurableWroManagerFactory {
 
     factory = new ConfigurableWroManagerFactory();
     //create one instance for test
-    factory.getInstance();
+    factory.create();
   }
 
   @Before
@@ -57,7 +57,7 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testWhenNoUriLocatorsParamSet() {
   	initFactory(filterConfig);
-    factory.getInstance();
+    factory.create();
   	Assert.assertTrue(factory.getLocators().isEmpty());
   }
 
