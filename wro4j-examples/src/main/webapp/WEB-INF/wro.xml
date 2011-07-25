@@ -3,6 +3,10 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
   
+  <group name="encoding">
+    <js>https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js</js>
+  </group>
+  
   <group name="skeleton">
     <css>/static/css/skeleton/*.css</css>
   </group>
