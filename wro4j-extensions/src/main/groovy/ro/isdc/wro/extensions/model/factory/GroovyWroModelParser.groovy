@@ -19,36 +19,35 @@ import ro.isdc.wro.model.WroModel
 import ro.isdc.wro.model.group.Group
 import ro.isdc.wro.model.resource.Resource
 import ro.isdc.wro.model.resource.ResourceType
+import ro.isdc.wro.WroRuntimeException
+import ro.isdc.wro.model.group.RecursiveGroupDefinitionException
 
 /**
  * Parse a Groovy DSL String into a {@link WroModel}.
  *
- * @author Filirom1
+ * @author Romain Philibert
  * @created 19 Jul 2011
+ * @since 1.4.0
  */
 class GroovyWroModelParser {
 
   /** Parse a groovy DSL into a {@link WroModel} */
   static WroModel parse(Script dslScript) {
-    if (!dslScript) throw new RuntimeException("DSL is invalid : $dslScript")
+    if (!dslScript) throw new WroRuntimeException("DSL is invalid : $dslScript")
     try {
       dslScript.metaClass.mixin(WroModelDelegate)
       dslScript.run()
       return (WroModel) dslScript.getProperty("wroModel");
-    } catch (Exception e) {
-      throw new RuntimeException("Unable to parse DSL : $dslScript")
+    } catch (GroovyRuntimeException e) {
+      throw new WroRuntimeException("Unable to parse DSL : $dslScript", e)
     }
   }
 
   /** Parse a groovy DSL into a {@link WroModel} */
   static WroModel parse(String dsl) {
-    if (!dsl) throw new RuntimeException("DSL is invalid : $dsl")
-    try {
-      Script dslScript = new GroovyShell().parse(dsl)
-      parse(dslScript);
-    } catch (Exception e) {
-      throw new RuntimeException("Unable to parse DSL : $dsl")
-    }
+    if (!dsl) throw new WroRuntimeException("DSL is invalid : $dsl")
+    Script dslScript = new GroovyShell().parse(dsl)
+    parse(dslScript);
   }
 }
 
@@ -56,39 +55,68 @@ class WroModelDelegate {
   WroModel wroModel = new WroModel()
 
   void groups(Closure cl) {
-    cl.delegate = new GroupDelegate()
-    cl.resolveStrategy = Closure.DELEGATE_FIRST
+    def groupDelegate = new GroupDelegate()
+    cl.delegate = groupDelegate
     cl()
-    wroModel = new WroModel(groups: (Collection<Group>) cl.getProperty("groups"))
+    wroModel = new WroModel(groups: (Collection<Group>) cl.resolveGroupResources())
   }
 
 }
 
 class GroupDelegate {
-  List<Group> groups = new ArrayList<Group>()
+  Map<String, Closure> closures = [:]
 
   def methodMissing(String name, args) {
-    def cl = args[0]
-    cl.delegate = new ResourceDelegate()
-    cl.resolveStrategy = Closure.DELEGATE_FIRST
-    cl()
-    groups.add(new Group(name: name, resources: cl.resources))
+    if (closures.containsKey(name)) throw new WroRuntimeException("This group is already defined : $name")
+    closures.put(name, args[0])
+  }
+
+  List<Group> resolveGroupResources() {
+    List<Group> groups = new ArrayList<Group>()
+    closures.each { name, cl ->
+      cl.delegate = new ResourceDelegate(groupDelegate: this)
+      cl.resolveStrategy = Closure.DELEGATE_ONLY
+      cl()
+      groups.add(new Group(name: name, resources: cl.resources))
+    }
+    groups
   }
 }
 
 class ResourceDelegate {
+  GroupDelegate groupDelegate
   List<Resource> resources = new ArrayList<Resource>()
+  /** List of groups which are currently processing and are partially parsed. This list is useful in order to catch
+   * infinite recurse group reference.       */
+  private List<String> processingGroups = []
 
   void css(Map params = [:], String name) {
     def resource = Resource.create(name, ResourceType.CSS)
-    if (params.get("minimize") == false) resource.minimize = false
+    if (params.minimize == false) resource.minimize = false
     resources.add(resource)
   }
 
   void js(Map params = [:], String name) {
     def resource = Resource.create(name, ResourceType.JS)
-    if (params.get("minimize") == false) resource.minimize = false
+    if (params.minimize == false) resource.minimize = false
     resources.add(resource)
+  }
+
+  void groupRef(String name) {
+    if (processingGroups.contains(name)) {
+      throw new RecursiveGroupDefinitionException("Infinite Recursion detected for the group: " + name
+          + ". Recursion path: " + processingGroups)
+    }
+    processingGroups.add(name)
+    def cl = groupDelegate.closures.get(name)
+    if (!cl) { throw new WroRuntimeException("Reference to an unknown group : $name") }
+    cl.delegate = this
+    cl.resolveStrategy = Closure.DELEGATE_ONLY
+    cl?.call()
+  }
+
+  def methodMissing(String name, args) {
+    this.groupRef(name);
   }
 }
 
