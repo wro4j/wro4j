@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.model.factory.GroovyWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
@@ -38,7 +36,7 @@ public class CustomWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected WroModelFactory newModelFactory(final ServletContext servletContext) {
+  protected WroModelFactory newModelFactory() {
     return new GroovyWroModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()
