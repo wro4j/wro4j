@@ -33,7 +33,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 /**
  * Test {@link GroovyWroModelFactory}
  *
- * @author Filirom1
+ * @author Romain Philibert
  * @created 19 Jul 2011
  */
 public class TestGroovyWroModelFactory {

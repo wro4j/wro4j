@@ -69,11 +69,12 @@ class TestGroovyWroModelParser {
     }
 
     //then:
-    assert 2 == groupDelegate.groups.size()
-    assert "g1" == groupDelegate.groups[0].name
-    assert 2 == groupDelegate.groups[0].resources.size()
-    assert "g2" == groupDelegate.groups[1].name
-    assert 1 == groupDelegate.groups[1].resources.size()
+    def groups = groupDelegate.resolveGroupResources()
+    assert 2 == groups.size()
+    assert "g1" == groups[0].name
+    assert 2 == groups[0].resources.size()
+    assert "g2" == groups[1].name
+    assert 1 == groups[1].resources.size()
   }
 
   @Test
@@ -90,12 +91,38 @@ class TestGroovyWroModelParser {
       groupRef('g1')
       js("/js/script2.js")
     }
-    groupDelegate.executeCallbacks()
 
     //then:
-    assert 2 == groupDelegate.groups.size()
-    assert "g2" == groupDelegate.groups[1].name
-    assert 3 == groupDelegate.groups[1].resources.size()
+    def groups = groupDelegate.resolveGroupResources()
+    assert 2 == groups.size()
+    assert "g2" == groups[1].name
+    assert 3 == groups[1].resources.size()
+  }
+
+  @Test
+  public void testMultipleGroupWithGroupRef() {
+    //setup:
+    def groupDelegate = new GroupDelegate()
+
+    //when:
+    groupDelegate.g1 {
+      js("/js/script.js")
+      css("/css/style.css")
+    }
+    groupDelegate.g2 {
+      groupRef('g1')
+      js("/js/script2.js")
+    }
+    groupDelegate.g3 {
+      groupRef('g2')
+      js("/js/script3.js")
+    }
+
+    //then:
+    def groups = groupDelegate.resolveGroupResources()
+    assert 3 == groups.size()
+    assert "g3" == groups[2].name
+    assert 4 == groups[2].resources.size()
   }
 
   @Test
@@ -114,14 +141,13 @@ class TestGroovyWroModelParser {
       js("/js/script2.js")
     }
 
-    groupDelegate.executeCallbacks()
-
     //then:
-    assert 2 == groupDelegate.groups.size()
-    assert "g1" == groupDelegate.groups[0].name
-    assert 3 == groupDelegate.groups[0].resources.size()
-    assert "g2" == groupDelegate.groups[1].name
-    assert 1 == groupDelegate.groups[1].resources.size()
+    def groups = groupDelegate.resolveGroupResources()
+    assert 2 == groups.size()
+    assert "g1" == groups[0].name
+    assert 3 == groups[0].resources.size()
+    assert "g2" == groups[1].name
+    assert 1 == groups[1].resources.size()
   }
 
   @Test
@@ -138,12 +164,12 @@ class TestGroovyWroModelParser {
       g1()
       js("/js/script2.js")
     }
-    groupDelegate.executeCallbacks()
 
     //then:
-    assert 2 == groupDelegate.groups.size()
-    assert "g2" == groupDelegate.groups[1].name
-    assert 3 == groupDelegate.groups[1].resources.size()
+    def groups = groupDelegate.resolveGroupResources()
+    assert 2 == groups.size()
+    assert "g2" == groups[1].name
+    assert 3 == groups[1].resources.size()
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -160,7 +186,7 @@ class TestGroovyWroModelParser {
       groupRef('unknwon')
       js("/js/script2.js")
     }
-    groupDelegate.executeCallbacks()
+    groupDelegate.resolveGroupResources()
 
   }
 

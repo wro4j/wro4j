@@ -32,8 +32,9 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 /**
  * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
  *
- * @author Filirom1
+ * @author Romain Philibert
  * @created 19 Jul 2011
+ * @since 1.4.0
  */
 public class GroovyWroModelFactory
     implements WroModelFactory {
@@ -44,15 +45,17 @@ public class GroovyWroModelFactory
    */
   @Override
   public WroModel create() {
+    final Script script;
     try {
-      final Script script = new GroovyShell().parse(new InputStreamReader(getConfigResourceAsStream()));
+      script = new GroovyShell().parse(new InputStreamReader(getConfigResourceAsStream()));
+
       final WroModel model = GroovyWroModelParser.parse(script);
       LOG.debug("groovy model: ", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
       }
       return model;
-    } catch (final Exception e) {
+    } catch (final IOException e) {
       throw new WroRuntimeException("Invalid model found!", e);
     }
   }
@@ -65,7 +68,7 @@ public class GroovyWroModelFactory
    * @throws java.io.IOException if the stream couldn't be read.
    */
   protected InputStream getConfigResourceAsStream() throws IOException {
-    return getClass().getResourceAsStream("Wro.groovy");
+    return getClass().getResourceAsStream("wro.groovy");
   }
 
   /**
