@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the less.js version <code>1.1.3</code> project:
+ * The underlying implementation use the less.js version <code>1.1.4</code> project:
  * {@link https://github.com/cloudhead/less.js}.
  *
  * @author Alex Objelean
@@ -29,7 +29,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  private static final String DEFAULT_LESS_JS = "less-1.1.3.min.js";
+  private static final String DEFAULT_LESS_JS = "less-1.1.4.min.js";
 
   /**
    * Initialize script builder for evaluation.
