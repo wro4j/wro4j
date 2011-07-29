@@ -7,7 +7,7 @@ import wro4j.grails.plugin.WroDSLHandler
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
-  def version = "1.3.9-SNAPSHOT"
+  def version = "1.4.0-SNAPSHOT"
   // the version or versions of Grails the plugin is designed for
   def grailsVersion = "1.3.7 > *"
   // the other plugins this plugin depends on
