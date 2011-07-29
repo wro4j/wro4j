@@ -34,19 +34,15 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory
  * @author Filirom1
  */
 class GrailsWroManagerFactory extends BaseWroManagerFactory {
-
-  /** Singleton initialized in the doWithSpring closure (in Wro4JGrailsPluguin)  */
-  @Lazy ConfigObject config = WroConfigHandler.config.grailsWroManagerFactory
+  def classLoader = new GroovyClassLoader()
 
   @Override
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new GroovyWroModelFactory() {
 
       Script getWroModelScript() {
-        Class c = new GroovyClassLoader(this.getClass().getClassLoader()).loadClass("Wro")
-        (Script) c.newInstance();
+        return WroDSLHandler.dsl
       }
-
     };
   }
 
@@ -57,9 +53,12 @@ class GrailsWroManagerFactory extends BaseWroManagerFactory {
   protected UriLocatorFactory newUriLocatorFactory() {
     return new GrailsUriLocatorFactory(config);
   }
+
+  /** WroConfigHandler initialized in the doWithSpring closure (in Wro4JGrailsPluguin)             */
+  ConfigObject getConfig() { WroConfigHandler.config.grailsWroManagerFactory }
 }
 
-/** Load preProcessors and postProcessors from the config file.  */
+/** Load preProcessors and postProcessors from the config file.             */
 final class GrailsProcessorsFactory extends SimpleProcessorsFactory {
 
   public GrailsProcessorsFactory(ConfigObject config) {
@@ -68,7 +67,7 @@ final class GrailsProcessorsFactory extends SimpleProcessorsFactory {
   }
 }
 
-/** Load uriLocators from the config file.      */
+/** Load uriLocators from the config file.                 */
 final class GrailsUriLocatorFactory extends SimpleUriLocatorFactory {
 
   public GrailsUriLocatorFactory(ConfigObject config) {

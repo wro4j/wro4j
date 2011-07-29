@@ -1,7 +1,9 @@
 import org.springframework.web.filter.DelegatingFilterProxy
-import ro.isdc.wro.http.ConfigurableWroFilter
+import wro4j.grails.plugin.ReloadableWroFilter
 import wro4j.grails.plugin.WroConfigHandler
-import wro4j.grails.plugin.WroConfigHandler
+import org.springframework.context.ApplicationContext
+import ro.isdc.wro.extensions.model.factory.GroovyWroModelParser
+import wro4j.grails.plugin.WroDSLHandler
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
@@ -55,7 +57,7 @@ Web Resource Optimizer for Grails
   def doWithSpring = {
     WroConfigHandler.application = application
     def config = WroConfigHandler.getConfig()
-    wroFilter(ConfigurableWroFilter) {
+    wroFilter(ReloadableWroFilter) {
       properties = config.toProperties()
     }
   }
@@ -68,14 +70,27 @@ Web Resource Optimizer for Grails
     // TODO Implement post initialization spring config (optional)
   }
 
+  /** File to watch to trigger onChange  */
+  def watchedResources = "file:./grails-app/conf/Wro.groovy"
+
+  /** Detect Wro.groovy changes     */
   def onChange = { event ->
-    // TODO Implement code that is executed when any artefact that this plugin is
-    // watching is modified and reloaded. The event contains: event.source,
-    // event.application, event.manager, event.ctx, and event.plugin.
+    if (event.source && event.source instanceof Class && event.source.name == "Wro") {
+      Class clazz = event.source
+      WroDSLHandler.dsl = clazz.newInstance()
+      reload(event.ctx)
+    }
   }
 
+  /** Detect Config.groovy changes     */
   def onConfigChange = { event ->
-    // TODO Implement code that is executed when the project configuration changes.
-    // The event is the same as for 'onChange'.
+    reload(event.ctx)
+  }
+
+  /** Reload Wro4J Filter    */
+  void reload(ApplicationContext ctx) {
+    WroConfigHandler.reloadConfig()
+    ReloadableWroFilter wroFilter = ctx.getBeansOfType(ReloadableWroFilter).wroFilter as ReloadableWroFilter
+    wroFilter.reload()
   }
 }

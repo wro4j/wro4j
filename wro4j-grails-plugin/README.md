@@ -241,3 +241,12 @@ And register less files in your model :
       }
     }
 
+**Can I change web-app/conf/Wro.groovy at runtime? **
+
+Yes you can. Each time you update the Wro.groovy file, Wro4J is fully reloaded.
+
+
+**Can I change the wro config in web-app/conf/Config.groovy at runtime? **
+
+Yes, of course !!!
+
