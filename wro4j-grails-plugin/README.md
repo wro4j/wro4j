@@ -48,6 +48,14 @@ Step 3: Use optimized resource
 
 Step 4: (Optional) Configure Wro in Config.groovy :
 
+    import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor
+    import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor
+    import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor
+    import ro.isdc.wro.model.resource.processor.impl.css.*
+    import ro.isdc.wro.model.resource.locator.UrlUriLocator
+    import ro.isdc.wro.model.resource.locator.ClasspathUriLocator
+    import ro.isdc.wro.model.resource.locator.ServletContextUriLocator
+
     /**
      * Boolean flag for enable/disable resource gzipping.
      */
@@ -81,6 +89,29 @@ Step 4: (Optional) Configure Wro in Config.groovy :
      * The fully qualified class name of the {@link ro.isdc.wro.manager.WroManagerFactory} implementation.
      */
     wro.managerFactoryClassName = "wro4j.grails.plugin.GrailsWroManagerFactory"
+
+    /** PreProcessor used by wro4j.grails.plugin.GrailsWroManagerFactory  */
+    wro.grailsWroManagerFactory.preProcessors = [
+        new CssUrlRewritingProcessor(),
+        new CssImportPreProcessor(),
+        new BomStripperPreProcessor(),
+        new SemicolonAppenderPreProcessor(),
+        new JSMinProcessor(),
+        new JawrCssMinifierProcessor(),
+    ]
+
+    /** postProcessor used by wro4j.grails.plugin.GrailsWroManagerFactory  */
+    wro.grailsWroManagerFactory.postProcessors = [
+        new CssVariablesProcessor(),
+    ]
+
+    /** uriLocator used by wro4j.grails.plugin.GrailsWroManagerFactory  */
+    wro.grailsWroManagerFactory.uriLocators = [
+        new ServletContextUriLocator(),
+        new ClasspathUriLocator(),
+        new UrlUriLocator(),
+    ]
+
     /**
      * the name of MBean to be used by JMX to configure wro4j.
      */
@@ -113,4 +144,100 @@ In Config.groovy, just set the Wro4J default ManagerFactory like this :
 
     wro.managerFactoryClassName = null
 
+
+**I want to use CoffeeScript**
+
+CoffeeScript is one of the available Resource Processors in Wro4J (others are : Less, Sass, CSSVariables, ...).
+See the whole list of resource processors here : <http://code.google.com/p/wro4j/wiki/AvailableProcessors>
+
+In Config.groovy add this :
+
+
+    import ro.isdc.wro.model.resource.processor.impl.*
+    import ro.isdc.wro.model.resource.processor.impl.js.*
+    import ro.isdc.wro.model.resource.processor.impl.css.*
+    import ro.isdc.wro.extensions.processor.css.*
+    import ro.isdc.wro.extensions.processor.js.*
+
+    //your config stuff...
+
+    wro.grailsWroManagerFactory.preProcessors = [
+        new CssUrlRewritingProcessor(),
+        new CssImportPreProcessor(),
+        new BomStripperPreProcessor(),
+        new SemicolonAppenderPreProcessor(),
+        new JSMinProcessor(),
+        new JawrCssMinifierProcessor(),
+        new CoffeeScriptProcessor(),  //   <------ CoffeeScript is here
+    ]
+
+You see the *new CoffeeScriptProcessor()* line. This is where you add the special processors.
+
+Other lines are the default preProcessors that are used if you don't override the
+wro.grailsWroManagerFactory.preProcessors property. You can remove those preProcessors if you don't need them.
+
+Then create your coffeeScript file :
+
+    /web-app/js/script.js.coffee
+
+    $ ->
+      $('<h2>Enhanced with Coffee Script</h2>').insertAfter $('h1')
+
+And register coffee script files in your model :
+
+    /grails-app/conf/wro.groovy
+
+    groups {
+      all {
+        css "/css/*.css"
+        js "/js/*.js"
+        js "/js/*.js.coffee"
+      }
+    }
+
+**I want to use LessCss**
+
+It is quite similar to CoffeeScript, so look at it first.
+
+Configure your Config.groovy to add this :
+
+    import ro.isdc.wro.model.resource.processor.impl.*
+    import ro.isdc.wro.model.resource.processor.impl.js.*
+    import ro.isdc.wro.model.resource.processor.impl.css.*
+    import ro.isdc.wro.extensions.processor.css.*
+    import ro.isdc.wro.extensions.processor.js.*
+
+    //your config stuff...
+
+    wro.grailsWroManagerFactory.preProcessors = [
+        new CssUrlRewritingProcessor(),
+        new CssImportPreProcessor(),
+        new BomStripperPreProcessor(),
+        new SemicolonAppenderPreProcessor(),
+        new JSMinProcessor(),
+        new JawrCssMinifierProcessor(),
+        new CoffeeScriptProcessor(),  //   <------ Less is here
+    ]
+
+Create your less file :
+
+    /web-app/css/style.less
+
+    @my-size = 12px
+    h1 {
+      font-size: @my-size
+    }
+
+And register less files in your model :
+
+    /grails-app/conf/wro.groovy
+
+    groups {
+      all {
+        css "/css/*.css"
+        css "/css/*.less"
+
+        js "/js/*.js"
+      }
+    }
 

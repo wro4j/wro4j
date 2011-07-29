@@ -1,3 +1,11 @@
+import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor
+import ro.isdc.wro.model.resource.processor.impl.css.*
+import ro.isdc.wro.model.resource.locator.UrlUriLocator
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator
+
 /**
  * Boolean flag for enable/disable resource gzipping.
  */
@@ -31,6 +39,29 @@ wro.encoding = null
  * The fully qualified class name of the {@link ro.isdc.wro.manager.WroManagerFactory} implementation.
  */
 wro.managerFactoryClassName = "wro4j.grails.plugin.GrailsWroManagerFactory"
+
+/** PreProcessor used by wro4j.grails.plugin.GrailsWroManagerFactory   */
+wro.grailsWroManagerFactory.preProcessors = [
+    new CssUrlRewritingProcessor(),
+    new CssImportPreProcessor(),
+    new BomStripperPreProcessor(),
+    new SemicolonAppenderPreProcessor(),
+    new JSMinProcessor(),
+    new JawrCssMinifierProcessor(),
+]
+
+/** postProcessor used by wro4j.grails.plugin.GrailsWroManagerFactory   */
+wro.grailsWroManagerFactory.postProcessors = [
+    new CssVariablesProcessor(),
+]
+
+/** uriLocator used by wro4j.grails.plugin.GrailsWroManagerFactory   */
+wro.grailsWroManagerFactory.uriLocators = [
+    new ServletContextUriLocator(),
+    new ClasspathUriLocator(),
+    new UrlUriLocator(),
+]
+
 /**
  * the name of MBean to be used by JMX to configure wro4j.
  */

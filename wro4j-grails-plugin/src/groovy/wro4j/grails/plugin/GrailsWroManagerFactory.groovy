@@ -15,17 +15,29 @@
 */
 package wro4j.grails.plugin
 
-import ro.isdc.wro.extensions.model.factory.GroovyWroModelFactory
 import javax.servlet.ServletContext
+import ro.isdc.wro.extensions.model.factory.GroovyWroModelFactory
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory
 import ro.isdc.wro.model.factory.WroModelFactory
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory
 
 /**
- * Load Wro.groovy the Wro Model DSL
+ * The Grails WroManagerFactory.
+ *
+ * It does 2 things :
+ *   load the Wro Model DSL (Wro.groovy)
+ *   and load the preProcessors, postProcessors and uriLocators from the Config files (Config.groovy override DefaultWroConfig.groovy)
  *
  * @author Filirom1
  */
 class GrailsWroManagerFactory extends BaseWroManagerFactory {
+
+  /** Singleton initialized in the doWithSpring closure (in Wro4JGrailsPluguin)  */
+  @Lazy ConfigObject config = WroConfigHandler.config.grailsWroManagerFactory
+
   @Override
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
     return new GroovyWroModelFactory() {
@@ -36,5 +48,30 @@ class GrailsWroManagerFactory extends BaseWroManagerFactory {
       }
 
     };
+  }
+
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new GrailsProcessorsFactory(config);
+  }
+
+  protected UriLocatorFactory newUriLocatorFactory() {
+    return new GrailsUriLocatorFactory(config);
+  }
+}
+
+/** Load preProcessors and postProcessors from the config file.  */
+final class GrailsProcessorsFactory extends SimpleProcessorsFactory {
+
+  public GrailsProcessorsFactory(ConfigObject config) {
+    config.preProcessors.each { addPreProcessor(it) }
+    config.postProcessors.each { addPostProcessor(it) }
+  }
+}
+
+/** Load uriLocators from the config file.      */
+final class GrailsUriLocatorFactory extends SimpleUriLocatorFactory {
+
+  public GrailsUriLocatorFactory(ConfigObject config) {
+    config.uriLocators.each { addUriLocator(it) }
   }
 }
