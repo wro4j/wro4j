@@ -19,9 +19,9 @@ import org.mockito.Mockito;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**
  * TestConfigurableWroManagerFactory.
@@ -94,10 +94,10 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testProcessorsExecutionOrder() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("bomStripper, cssImport, cssVariables");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn(JSMinProcessor.ALIAS + "," + CssImportPreProcessor.ALIAS + "," + CssVariablesProcessor.ALIAS);
     initFactory(filterConfig);
     final List<ResourcePreProcessor> list = factory.getPreProcessors();
-    Assert.assertEquals(BomStripperPreProcessor.class, list.get(0).getClass());
+    Assert.assertEquals(JSMinProcessor.class, list.get(0).getClass());
     Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
     Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
   }

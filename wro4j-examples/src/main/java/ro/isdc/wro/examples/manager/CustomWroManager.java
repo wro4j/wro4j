@@ -12,7 +12,6 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.PlaceholderProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -37,7 +36,6 @@ public class CustomWroManager
 
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
     //factory.addPreProcessor(getPlaceholderProcessor());
-    factory.addPreProcessor(new BomStripperPreProcessor());
     factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +144,7 @@ public final class PreProcessorExecutor {
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       return result;

@@ -7,6 +7,10 @@
     <js>https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js</js>
   </group>
   
+  <group name="bom">
+    <js>/static/js/bom/*.js</js>
+  </group>
+  
   <group name="skeleton">
     <css>/static/css/skeleton/*.css</css>
   </group>
