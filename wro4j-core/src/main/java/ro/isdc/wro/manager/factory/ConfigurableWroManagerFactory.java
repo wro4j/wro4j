@@ -88,7 +88,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private Map<String, ResourceProcessor> createCommonProcessors() {
     final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
-    map.put(BomStripperPreProcessor.ALIAS, new BomStripperPreProcessor());
     map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     map.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());

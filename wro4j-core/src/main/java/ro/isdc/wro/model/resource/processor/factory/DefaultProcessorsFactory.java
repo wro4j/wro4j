@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
@@ -21,7 +20,6 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  */
 public final class DefaultProcessorsFactory extends SimpleProcessorsFactory {
   public DefaultProcessorsFactory() {
-    addPreProcessor(new BomStripperPreProcessor());
     addPreProcessor(new CssImportPreProcessor());
     addPreProcessor(new CssUrlRewritingProcessor());
     addPreProcessor(new SemicolonAppenderPreProcessor());

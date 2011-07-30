@@ -144,7 +144,7 @@ public final class PreProcessorExecutor {
       for (final Resource r : resources) {
         duplicateResourceDetector.addResourceUri(r.getUri());
       }
-      final InputStream is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()));
+      final InputStream is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()).getInputStream());
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       return result;
