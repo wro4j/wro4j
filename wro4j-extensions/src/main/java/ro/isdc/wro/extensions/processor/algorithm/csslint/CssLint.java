@@ -36,7 +36,7 @@ public class CssLint {
   /**
    * The name of the csslint script to be used by default.
    */
-  private static final String DEFAULT_CSSLINT_JS = "csslint.js";
+  private static final String DEFAULT_CSSLINT_JS = "csslint-0.5.0.min.js";
   /**
    * Options to apply to js hint processing
    */
