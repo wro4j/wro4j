@@ -25,7 +25,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
@@ -95,7 +94,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   private void initProcessors() {
     preProcessors.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
-    preProcessors.put(BomStripperPreProcessor.ALIAS, new BomStripperPreProcessor());
     preProcessors.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
     preProcessors.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     preProcessors.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
