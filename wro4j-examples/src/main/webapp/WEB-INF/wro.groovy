@@ -1,4 +1,11 @@
 groups {
+  encoding {
+    js("https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js")
+  }
+  bom {
+    js("/static/js/bom/*.js")
+  }
+  
   skeleton {
     css("/static/css/skeleton/*.css")
   }
