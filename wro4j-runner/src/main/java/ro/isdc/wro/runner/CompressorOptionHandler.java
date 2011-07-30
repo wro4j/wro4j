@@ -107,7 +107,6 @@ public class CompressorOptionHandler extends OptionHandler<ResourcePreProcessor>
     map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
     map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
     map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
-
   }
 
 
