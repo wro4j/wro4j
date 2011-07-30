@@ -40,7 +40,6 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -227,7 +226,6 @@ public class Wro4jCommandLineRunner {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
         final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-        factory.addPreProcessor(new BomStripperPreProcessor());
         factory.addPreProcessor(compressor);
         return factory;
       }
