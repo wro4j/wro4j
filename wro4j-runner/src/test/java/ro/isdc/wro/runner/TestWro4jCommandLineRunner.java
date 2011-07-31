@@ -75,7 +75,7 @@ public class TestWro4jCommandLineRunner {
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
       JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(
-      "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + processorsList,
+      "--wroFile %s --contextFolder %s --destinationFolder %s -m --preProcessors " + processorsList,
         new Object[] {
           wroFile, contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
