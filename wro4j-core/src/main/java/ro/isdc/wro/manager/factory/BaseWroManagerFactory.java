@@ -51,11 +51,19 @@ public class BaseWroManagerFactory
    */
   private PropertyChangeListener cacheChangeCallback;
 
-  private GroupExtractor groupExtractor = newGroupExtractor();
-  private WroModelFactory modelFactory = newModelFactory();
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = newCacheStrategy();
-  private HashBuilder hashBuilder = newHashBuilder();
-  private List<? extends Transformer<WroModel>> modelTransformers = newModelTransformers();
+  private GroupExtractor groupExtractor;
+  private WroModelFactory modelFactory;
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private HashBuilder hashBuilder;
+  private List<? extends Transformer<WroModel>> modelTransformers;
+
+  public BaseWroManagerFactory() {
+    groupExtractor = newGroupExtractor();
+    modelFactory = newModelFactory();
+    cacheStrategy = newCacheStrategy();
+    hashBuilder = newHashBuilder();
+    modelTransformers = newModelTransformers();
+  }
 
   /**
    * Creates default singleton instance of manager, by initializing manager
