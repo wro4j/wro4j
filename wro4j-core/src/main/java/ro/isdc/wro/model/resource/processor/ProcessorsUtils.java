@@ -5,12 +5,26 @@ package ro.isdc.wro.model.resource.processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 /**
  * Contains divers utility methods applied on processors.
@@ -95,5 +109,27 @@ public class ProcessorsUtils {
       }
     }
     return null;
+  }
+
+  public static Map<String, ResourceProcessor> createProcessorsMap() {
+    final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
+    populateProcessorsMap(map);
+    return map;
+  }
+
+  private static void populateProcessorsMap(final Map<String, ResourceProcessor> map) {
+    map.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
+    map.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
+    map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
+    map.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
+    map.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
+    map.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, new DuplicatesAwareCssDataUriPreProcessor());
+    map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
+    map.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    map.put(CssMinProcessor.ALIAS, new CssMinProcessor());
+    map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
+    map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
+    map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
   }
 }

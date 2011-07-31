@@ -5,6 +5,7 @@ package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class SimpleProcessorsFactory
    * {@inheritDoc}
    */
   public Collection<ResourceProcessor> getPreProcessors() {
-    return preProcessors;
+    return Collections.unmodifiableCollection(preProcessors);
   }
 
 
@@ -45,7 +46,7 @@ public class SimpleProcessorsFactory
    * {@inheritDoc}
    */
   public Collection<ResourceProcessor> getPostProcessors() {
-    return postProcessors;
+    return Collections.unmodifiableCollection(postProcessors);
   }
 
 
