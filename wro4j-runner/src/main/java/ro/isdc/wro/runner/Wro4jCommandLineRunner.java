@@ -76,10 +76,6 @@ public class Wro4jCommandLineRunner {
   @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", usage = "Comma separated list of processors")
   private String processorsList;
 
-//  @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Name of the compressor to process scripts")
-//  private final ResourcePreProcessor compressor = new JSMinProcessor();
-
-
   public static void main(final String[] args)
     throws Exception {
     new Wro4jCommandLineRunner().doMain(args);
@@ -245,22 +241,12 @@ public class Wro4jCommandLineRunner {
     final StandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
-        final ProcessorsFactory factory = new ConfigurableProcessorsFactory() {
-          @Override
-          protected Properties newProperties() {
-            final Properties props = new Properties();
-            if (processorsList != null) {
-              props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, processorsList);
-            }
-            return props;
-          }
-          @Override
-          public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
-            return createPreProcessorsMap();
-          }
-        };
-        return factory;
-      }
+        final Properties props = new Properties();
+        if (processorsList != null) {
+          props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, processorsList);
+        }
+        return new ConfigurableProcessorsFactory().setProperties(props).setPreProcessorsMap(createPreProcessorsMap());
+     }
     };
     // initialize before process.
     managerFactory.initialize(createStandaloneContext());

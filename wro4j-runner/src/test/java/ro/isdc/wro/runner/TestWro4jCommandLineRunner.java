@@ -15,6 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**
  * @author Alex Objelean
@@ -68,8 +72,10 @@ public class TestWro4jCommandLineRunner {
   public void useSeveralProcessors() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
-    final String processorsList = CssLintProcessor.ALIAS + "," + JsHintProcessor.ALIAS;
-    final String[] args = String.format("--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + processorsList,
+    final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
+      JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
+    final String[] args = String.format(
+      "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + processorsList,
         new Object[] {
           wroFile, contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");

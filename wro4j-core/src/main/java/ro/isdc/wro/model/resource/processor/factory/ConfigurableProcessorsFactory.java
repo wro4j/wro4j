@@ -80,6 +80,20 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   }
 
   /**
+   * Creates a comma separated list of items.
+   */
+  public static String createItemsAsString(final String... items) {
+    final StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < items.length; i++) {
+      sb.append(items[i]);
+      if (i < items.length - 1) {
+        sb.append(TOKEN_DELIMITER);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
    * {@inheritDoc}
    */
   public final Collection<ResourcePreProcessor> getPreProcessors() {
