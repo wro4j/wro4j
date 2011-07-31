@@ -73,7 +73,7 @@ public class Wro4jCommandLineRunner {
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
   private final File destinationFolder = new File(System.getProperty("user.dir"), "wro");
-  @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", usage = "Comma separated list of processors")
+  @Option(name = "-c", aliases = { "--compressor", "--preProcessors" }, metaVar = "COMPRESSOR", usage = "Comma separated list of processors")
   private String processorsList;
 
   public static void main(final String[] args)
