@@ -5,7 +5,6 @@
 package ro.isdc.wro.examples.manager;
 
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
-import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -19,7 +18,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
 /**
  * @author Alex Objelean
  */
-public class CustomStandaloneWroManager
+public class CustomStandaloneWroManagerFactory
     extends DefaultStandaloneContextAwareManagerFactory {
 
   /**
@@ -33,7 +32,6 @@ public class CustomStandaloneWroManager
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     factory.addPreProcessor(new JSMinProcessor());
     factory.addPreProcessor(new YUICssCompressorProcessor());
-    factory.addPreProcessor(new GoogleClosureCompressorProcessor());
     factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
 
     factory.addPostProcessor(new CssVariablesProcessor());

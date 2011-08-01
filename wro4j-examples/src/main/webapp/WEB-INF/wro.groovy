@@ -1,5 +1,6 @@
 groups {
   encoding {
+    js("/static/js/encoding/*.js")
     js("https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js")
   }
   bom {
