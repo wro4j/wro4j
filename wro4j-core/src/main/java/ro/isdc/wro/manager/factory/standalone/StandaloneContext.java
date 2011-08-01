@@ -21,7 +21,6 @@ public class StandaloneContext
   implements Serializable {
   private File wroFile;
   private File contextFolder;
-  private File configProperties;
   private boolean minimize;
   /**
    * Inform the factory about the intention of ignoring the missing resources.

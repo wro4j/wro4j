@@ -56,6 +56,7 @@ public class DefaultStandaloneContextAwareManagerFactory
     LOG.debug("config: " + Context.get().getConfig());
   }
 
+
   @Override
   protected GroupExtractor newGroupExtractor() {
     return new GroupExtractorDecorator(super.newGroupExtractor()) {
