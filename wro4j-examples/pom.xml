@@ -201,11 +201,11 @@
           <ignoreMissingResources>true</ignoreMissingResources>
           <targetGroups>encoding,bom</targetGroups>
         <!-- 
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>          
-          -->
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
+          -->
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
         </configuration>
       </plugin>
       <!--  -->
