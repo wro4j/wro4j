@@ -106,9 +106,9 @@ public class ServletContextUriLocator
     // first attempt
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
-    InputStream inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
+    InputStream inputStream = servletContext.getResourceAsStream(uri);
     if (inputStream == null) {
-      inputStream = servletContext.getResourceAsStream(uri);
+      inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
     }
     if (inputStream == null) {
       LOG.error("Exception while reading resource from " + uri);

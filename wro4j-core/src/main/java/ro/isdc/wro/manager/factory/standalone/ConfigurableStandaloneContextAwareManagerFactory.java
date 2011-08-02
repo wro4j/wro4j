@@ -25,7 +25,8 @@ public class ConfigurableStandaloneContextAwareManagerFactory extends DefaultSta
   }
 
   /**
-   * @return {@link Properties} from where processors lookup will be performed. By default an empty {@link Properties} object is returned.
+   * @return {@link Properties} from where processors lookup will be performed. By default an empty {@link Properties}
+   *         object is returned.
    */
   protected Properties createProperties() {
     return new Properties();

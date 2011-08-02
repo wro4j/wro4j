@@ -23,6 +23,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.maven.plugin.manager.ExtraPropertiesFileAware;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -61,16 +62,29 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private String wroManagerFactory;
+  /**
+   * The path to the destination directory where the files are stored at the end of the process.
+   *
+   * @parameter default-value="${project.build.directory}/wro.properties" expression="${extraProperties}"
+   * @optional
+   */
+  private File extraPropertiesFile;
 
   /**
    * {@inheritDoc}
    */
   @Override
   protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
+    StandaloneContextAwareManagerFactory factory = null;
     if (wroManagerFactory != null) {
-      return createCustomManagerFactory();
+      factory = createCustomManagerFactory();
+    } else {
+      factory = super.newWroManagerFactory();
     }
-    return super.newWroManagerFactory();
+    if (factory instanceof ExtraPropertiesFileAware) {
+      ((ExtraPropertiesFileAware)factory).setExtraPropertiesFile(extraPropertiesFile);
+    }
+    return factory;
   }
 
   /**
