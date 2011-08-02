@@ -3,8 +3,8 @@ Wro4j Grails Plugin
 
 This version is a working SNAPSHOT. You will have to install the plugin using the ZIP archive full path:
 
-    wget http://xxx/grails-wro4j-1.3.9-SNAPSHOT.zip
-    grails install-plugin grails-wro4j-1.3.9-SNAPSHOT.zip
+    wget http://xxx/grails-wro4j-1.4.0-SNAPSHOT.zip
+    grails install-plugin grails-wro4j-1.4.0-SNAPSHOT.zip
 
 
 Web Resource Optimizer for Grails
@@ -250,3 +250,10 @@ Yes you can. Each time you update the Wro.groovy file, Wro4J is fully reloaded.
 
 Yes, of course !!!
 
+
+
+**How to build this plugin**
+
+run 'grails package-plugin'
+
+It will create a plugin archive.
