@@ -63,9 +63,6 @@ groups {
   chineseEncoding {
     js("http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js")
   }
-  encoding {
-    js("https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js")
-  }
   "jquery-mobile" {
     css("http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css")
     js("http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js")

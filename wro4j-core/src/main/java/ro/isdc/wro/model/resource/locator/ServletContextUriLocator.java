@@ -47,7 +47,7 @@ public class ServletContextUriLocator
   /**
    * Locates a stream using request dispatcher.
    */
-  private final DispatcherStreamLocator dynamicStreamLocator = new DispatcherStreamLocator();
+  private final DispatcherStreamLocator dispatcherStreamLocator = new DispatcherStreamLocator();
 
   /**
    * {@inheritDoc}
@@ -106,9 +106,11 @@ public class ServletContextUriLocator
     // first attempt
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
-    InputStream inputStream = servletContext.getResourceAsStream(uri);
+    // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
+    // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
+    InputStream inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
     if (inputStream == null) {
-      inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
+      inputStream = servletContext.getResourceAsStream(uri);
     }
     if (inputStream == null) {
       LOG.error("Exception while reading resource from " + uri);
