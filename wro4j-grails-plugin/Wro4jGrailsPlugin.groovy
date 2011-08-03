@@ -1,8 +1,7 @@
+import org.springframework.context.ApplicationContext
 import org.springframework.web.filter.DelegatingFilterProxy
 import wro4j.grails.plugin.ReloadableWroFilter
 import wro4j.grails.plugin.WroConfigHandler
-import org.springframework.context.ApplicationContext
-import ro.isdc.wro.extensions.model.factory.GroovyWroModelParser
 import wro4j.grails.plugin.WroDSLHandler
 
 class Wro4jGrailsPlugin {
@@ -84,6 +83,7 @@ Web Resource Optimizer for Grails
 
   /** Detect Config.groovy changes     */
   def onConfigChange = { event ->
+    WroDSLHandler.dsl = null
     reload(event.ctx)
   }
 
