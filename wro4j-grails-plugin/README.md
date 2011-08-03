@@ -137,6 +137,11 @@ Step 4: (Optional) Configure Wro in Config.groovy :
 
 FAQ 
 ---
+**I have updated the css and js files, and I want to reload the cache**
+
+Just call this url : http://localhost:${port}/${appName}/wro/wroApi/reloadCache
+
+
 
 **I want to use wro.xml to define my model.**
 
