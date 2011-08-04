@@ -4,8 +4,10 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,6 +64,8 @@ public class TestConfigurableWroManagerFactory {
   @Before
   public void setUp() {
     filterConfig = Mockito.mock(FilterConfig.class);
+    final ServletContext servletContext = Mockito.mock(ServletContext.class);
+    Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
   }
 
   @After
@@ -163,5 +167,16 @@ public class TestConfigurableWroManagerFactory {
     Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn("cssMinJawr, jsMin, cssVariables");
     initFactory(filterConfig);
     Assert.assertEquals(3, processorsFactory.getPostProcessors().size());
+  }
+
+  @Test
+  public void testConfigPropertiesWithValidProcessor() {
+    configureValidUriLocators(filterConfig);
+
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
+    factory.setConfigProperties(configProperties);
+    initFactory(filterConfig);
+    Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
   }
 }

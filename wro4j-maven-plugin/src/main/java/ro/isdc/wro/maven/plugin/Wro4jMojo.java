@@ -23,7 +23,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.maven.plugin.manager.ExtraPropertiesFileAware;
+import ro.isdc.wro.maven.plugin.manager.ExtraConfigFileAware;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -65,10 +65,10 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}/wro.properties" expression="${extraProperties}"
+   * @parameter default-value="${project.build.directory}/wro.properties" expression="${extraConfig}"
    * @optional
    */
-  private File extraPropertiesFile;
+  private File extraConfigFile;
 
   /**
    * {@inheritDoc}
@@ -81,8 +81,12 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     } else {
       factory = super.newWroManagerFactory();
     }
-    if (factory instanceof ExtraPropertiesFileAware) {
-      ((ExtraPropertiesFileAware)factory).setExtraPropertiesFile(extraPropertiesFile);
+    if (factory instanceof ExtraConfigFileAware) {
+      if (extraConfigFile == null) {
+        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
+      }
+      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
+      ((ExtraConfigFileAware)factory).setExtraConfigFile(extraConfigFile);
     }
     return factory;
   }
@@ -270,5 +274,12 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
+  }
+
+  /**
+   * @param extraConfigFile the extraConfigFile to set
+   */
+  public void setExtraConfigFile(final File extraConfigFile) {
+    this.extraConfigFile = extraConfigFile;
   }
 }

@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.Validate;
-
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
@@ -27,8 +25,8 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.4.0
  */
 public class ConfigurableWroManagerFactory
-    extends ConfigurableStandaloneContextAwareManagerFactory implements ExtraPropertiesFileAware {
-  private File extraProperties;
+    extends ConfigurableStandaloneContextAwareManagerFactory implements ExtraConfigFileAware {
+  private File configProperties;
   /**
    * @return a map of preProcessors.
    */
@@ -55,19 +53,18 @@ public class ConfigurableWroManagerFactory
   protected Properties createProperties() {
     try {
       final Properties properties = new Properties();
-      properties.load(new FileInputStream(extraProperties));
+      properties.load(new FileInputStream(configProperties));
       return properties;
     } catch (final IOException e) {
       throw new WroRuntimeException(
-          "Exception while loading properties file from " + extraProperties.getAbsolutePath(), e);
+          "Exception while loading properties file from " + configProperties.getAbsolutePath(), e);
     }
   }
 
   /**
    * {@inheritDoc}
    */
-  public void setExtraPropertiesFile(final File extraProperties) {
-    Validate.notNull(extraProperties);
-    this.extraProperties = extraProperties;
+  public void setExtraConfigFile(final File extraProperties) {
+    this.configProperties = extraProperties;
   }
 }

@@ -10,7 +10,13 @@ import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 
+import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -30,7 +36,10 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * @author Alex Objelean
  * @created Created on Dec 31, 2009
  */
-public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
+public class ConfigurableWroManagerFactory
+    extends BaseWroManagerFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
+  private Properties configProperties;
   /**
    * Name of init param used to specify uri locators.
    */
@@ -47,30 +56,33 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * Allow subclasses to contribute with it's own locators.
    *
-   * @param map containing locator mappings.
+   * @param map
+   *          containing locator mappings.
    */
-  protected void contributeLocators(final Map<String, UriLocator> map) {}
-
+  protected void contributeLocators(final Map<String, UriLocator> map) {
+  }
 
   /**
    * Allow subclasses to contribute with it's own pre processors.
    * <p>
    * It is implementor responsibility to add a {@link ResourcePreProcessor} instance.
    *
-   * @param map containing processor mappings.
+   * @param map
+   *          containing processor mappings.
    */
-  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {}
-
+  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
+  }
 
   /**
    * Allow subclasses to contribute with it's own processors.
    * <p>
    * It is implementor responsibility to add a {@link ResourcePostProcessor} instance.
    *
-   * @param map containing processor mappings.
+   * @param map
+   *          containing processor mappings.
    */
-  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
-
+  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
+  }
 
   /**
    * {@inheritDoc}
@@ -88,7 +100,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return factory;
   }
 
-
   /**
    * Reuse {@link ConfigurableProcessorsFactory} for processors lookup.
    */
@@ -102,7 +113,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         return map;
       }
 
-
       @Override
       public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
         final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
@@ -110,24 +120,78 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         return map;
       }
 
-
       @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
+
         final FilterConfig filterConfig = Context.get().getFilterConfig();
 
         final String preProcessorsAsString = filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
         if (preProcessorsAsString != null) {
           props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, preProcessorsAsString);
+        } else {
+          final String value = getConfigProperties().getProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
+          if (value != null) {
+            props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, value);
+          }
         }
 
         final String postProcessorsAsString = filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         if (postProcessorsAsString != null) {
           props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessorsAsString);
+        } else {
+          final String value = getConfigProperties().getProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
+          if (value != null) {
+            props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, value);
+          }
         }
         return props;
       }
     };
     return factory;
   }
+
+  /**
+   * Override this method to provide a different properties file location. It is very likely that you would like it to
+   * be the same as the one used by the {@link FilterConfigWroConfigurationFactory}. The default properties file
+   * location is /WEB-INF/wro.properties.
+   *
+   * @return a not null properties object used as a secondary configuration option for processors if these are not
+   *         configured in init-param.
+   */
+  protected Properties newConfigProperties() {
+    // default location is /WEB-INF/wro.properties
+    final Properties props = new Properties();
+    try {
+      props.load(PropertiesAndFilterConfigWroConfigurationFactory.defaultConfigPropertyStream(Context.get().getFilterConfig()));
+    } catch (final Exception e) {
+      LOG.debug("No configuration property file found.");
+    }
+    return props;
+  }
+
+  /**
+   * Use this method rather than accessing the field directly, because it will create a default one if none is provided.
+   *
+   * @return a the configProperties.
+   */
+  private Properties getConfigProperties() {
+    if (configProperties == null) {
+      configProperties = newConfigProperties();
+    }
+    return configProperties;
+  }
+
+  /**
+   * Setter is useful for unit tests.
+   *
+   * @param configProperties
+   *          the configProperties to set
+   */
+  public ConfigurableWroManagerFactory setConfigProperties(final Properties configProperties) {
+    Validate.notNull(configProperties);
+    this.configProperties = configProperties;
+    return this;
+  }
+
 }

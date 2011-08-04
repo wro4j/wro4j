@@ -125,7 +125,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
       Validate.notEmpty(tokenName, "Invalid token name: " + tokenName);
       final T processor = map.get(tokenName.trim());
       if (processor == null) {
-        throw new WroRuntimeException("Unknown processor name: " + processor + ". Existing processors are: "
+        throw new WroRuntimeException("Unknown processor name: " + itemsAsString + ". Available processors are: "
           + map.keySet());
       }
       list.add(processor);
