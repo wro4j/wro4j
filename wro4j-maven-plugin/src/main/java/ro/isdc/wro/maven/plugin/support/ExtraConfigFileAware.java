@@ -2,7 +2,7 @@
  * Copyright (C) 2011 Betfair.
  * All rights reserved.
  */
-package ro.isdc.wro.maven.plugin.manager;
+package ro.isdc.wro.maven.plugin.support;
 
 import java.io.File;
 

@@ -110,14 +110,14 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   /**
    * @return an array of options.
    */
-  String[] getOptions() {
+  public String[] getOptions() {
     return StringUtils.isEmpty(options) ? new String[] {} : options.split(",");
   }
 
   /**
    * @param options the options to set
    */
-  public void setOptions(final String options) {
+  void setOptions(final String options) {
     this.options = options;
   }
 

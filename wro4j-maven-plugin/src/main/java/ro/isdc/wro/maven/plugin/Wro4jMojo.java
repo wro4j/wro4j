@@ -23,7 +23,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.maven.plugin.manager.ExtraConfigFileAware;
+import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 

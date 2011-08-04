@@ -21,6 +21,7 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
@@ -94,6 +95,11 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     final List<UriLocator> locators = ConfigurableProcessorsFactory.getListOfItems(uriLocators, map);
     for (final UriLocator locator : locators) {
       factory.addUriLocator(locator);
+    }
+    //TODO deprecate uri locator configuration
+    //use default when none provided
+    if (factory.getUriLocators().isEmpty()) {
+      return new DefaultUriLocatorFactory();
     }
     return factory;
   }

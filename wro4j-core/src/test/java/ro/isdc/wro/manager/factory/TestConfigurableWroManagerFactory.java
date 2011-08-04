@@ -74,18 +74,21 @@ public class TestConfigurableWroManagerFactory {
   	Context.unset();
   }
 
+  /**
+   * When no uri locators are set, the default factory is used.
+   */
   @Test
   public void testWhenNoUriLocatorsParamSet() {
   	initFactory(filterConfig);
     factory.create();
-  	Assert.assertTrue(uriLocatorFactory.getUriLocators().isEmpty());
+  	Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
   }
 
   @Test
   public void testWithEmptyUriLocators() {
   	Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("");
   	initFactory(filterConfig);
-    Assert.assertTrue(uriLocatorFactory.getUriLocators().isEmpty());
+    Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -191,6 +194,19 @@ public class TestConfigurableWroManagerFactory {
     Assert.assertEquals(JSMinProcessor.class,
       processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
   }
+
+
+  @Test
+  public void testConfigPropertiesWithMultipleValidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin, cssMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
+    Assert.assertEquals(JSMinProcessor.class,
+      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
 
   @Test(expected=WroRuntimeException.class)
   public void testConfigPropertiesWithInvalidPreProcessor() {
