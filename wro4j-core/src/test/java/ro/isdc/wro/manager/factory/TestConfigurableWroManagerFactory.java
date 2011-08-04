@@ -26,6 +26,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
@@ -170,13 +171,42 @@ public class TestConfigurableWroManagerFactory {
   }
 
   @Test
-  public void testConfigPropertiesWithValidProcessor() {
-    configureValidUriLocators(filterConfig);
-
+  public void testConfigPropertiesWithValidPreProcessor() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
-    factory.setConfigProperties(configProperties);
     initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
+    Assert.assertEquals(CssMinProcessor.class,
+      processorsFactory.getPreProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+  @Test
+  public void testConfigPropertiesWithValidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
     Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
+    Assert.assertEquals(JSMinProcessor.class,
+      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testConfigPropertiesWithInvalidPreProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "INVALID");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    processorsFactory.getPreProcessors();
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testConfigPropertiesWithInvalidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "INVALID");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    processorsFactory.getPostProcessors();
   }
 }
