@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.extensions.processor.algorithm.csslint;
 
-import org.junit.Before;
 import org.junit.Test;
 
 
@@ -11,14 +10,7 @@ import org.junit.Test;
  * @author Alex Objelean
  */
 public class TestCssLint {
-  private CssLint jsHint;
-
-
-  @Before
-  public void setUp() {
-    jsHint = new CssLint();
-  }
-
+  private CssLint jsHint = new CssLint();
 
   @Test
   public void testSetNullOptions()
