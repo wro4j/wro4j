@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.TestXmlModelFactory;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -48,7 +47,7 @@ public class TestGroovyWroModelFactory {
     factory = new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("INVALID"));
+        return new ClasspathResourceLocator("INVALID");
       }
     };
     factory.create();
@@ -56,7 +55,12 @@ public class TestGroovyWroModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new GroovyWroModelFactory();
+    factory = new GroovyWroModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("Wro.groovy"));
+      }
+    };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
@@ -78,7 +82,7 @@ public class TestGroovyWroModelFactory {
     factory = new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ClasspathResourceLocator("wroWithHiphen.groovy");
+        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroWithHiphen.groovy"));
       }
     };
     final WroModel model = factory.create();
@@ -90,7 +94,7 @@ public class TestGroovyWroModelFactory {
     factory = new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ClasspathResourceLocator("wroGroupRefOrder.groovy");
+        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroGroupRefOrder.groovy"));
       }
     };
     factory.create();
@@ -101,7 +105,7 @@ public class TestGroovyWroModelFactory {
     factory = new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ClasspathResourceLocator("wroRecursiveReference.groovy");
+        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroRecursiveReference.groovy"));
       }
     };
     factory.create();
@@ -112,7 +116,7 @@ public class TestGroovyWroModelFactory {
     factory = new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ClasspathResourceLocator("wroDuplicateGroupName.groovy");
+        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroDuplicateGroupName.groovy"));
       }
     };
     factory.create();
@@ -126,7 +130,7 @@ public class TestGroovyWroModelFactory {
     factory = new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ClasspathResourceLocator("IncompleteWro.groovy");
+        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("IncompleteWro.groovy"));
       }
     };
     factory.create();

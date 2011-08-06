@@ -47,9 +47,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
   private final String location;
 
   public ClasspathResourceLocator(final String path) {
-    if (path == null) {
-      throw new IllegalArgumentException("Path cannot be null");
-    }
+    Validate.notNull(path);
     this.path = path;
     // replace prefix & clean path by removing '..' characters if exists and
     // normalizing the location to use.
