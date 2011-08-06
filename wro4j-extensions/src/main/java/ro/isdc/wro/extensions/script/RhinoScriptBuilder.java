@@ -11,6 +11,7 @@ import java.io.Reader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.ToolErrorReporter;
@@ -49,7 +50,7 @@ public class RhinoScriptBuilder {
    */
   private ScriptableObject createContext(final ScriptableObject initialScope) {
     // remove any existing context.
-    this.context = Context.enter();
+    this.context = ContextFactory.getGlobal().enterContext();
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
@@ -57,7 +58,7 @@ public class RhinoScriptBuilder {
     InputStream script = null;
     final ScriptableObject scope = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
-      script = RhinoScriptBuilder.class.getResourceAsStream("commons.min.js");
+      script = getClass().getResourceAsStream("commons.js");
       context.evaluateReader(scope, new InputStreamReader(script), "common.js", 1, null);
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
@@ -143,9 +144,7 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final InputStream stream, final String sourceName)
     throws IOException {
-    if (stream == null) {
-      throw new IllegalArgumentException("stream cannot be null");
-    }
+    Validate.notNull(stream);
     try {
       return context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
     } catch (final JavaScriptException e) {
@@ -167,9 +166,7 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final Reader reader, final String sourceName)
     throws IOException {
-    if (reader == null) {
-      throw new IllegalArgumentException("reader cannot be null");
-    }
+    Validate.notNull(reader);
     try {
       return context.evaluateReader(scope, reader, sourceName, 1, null);
     } catch (final JavaScriptException e) {
@@ -190,9 +187,7 @@ public class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public Object evaluate(final String script, final String sourceName) {
-    if (script == null) {
-      throw new IllegalArgumentException("script cannot be null");
-    }
+    Validate.notNull(script);
     try {
       return context.evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {

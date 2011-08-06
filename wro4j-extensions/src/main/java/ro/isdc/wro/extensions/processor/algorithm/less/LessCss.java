@@ -60,7 +60,6 @@ public class LessCss {
     }
   }
 
-
   /**
    * @return stream of the less.js script.
    */
