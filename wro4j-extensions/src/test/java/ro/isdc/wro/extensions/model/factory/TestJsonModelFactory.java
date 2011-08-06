@@ -20,19 +20,19 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 
 /**
- * Test {@link JsonWroModelFactory}
+ * Test {@link JsonModelFactory}
  *
  * @author Alex Objelean
  * @created 13 Mar 2011
  * @since 1.3.6
  */
-public class TestJsonWroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(TestJsonWroModelFactory.class);
-  private JsonWroModelFactory factory;
+public class TestJsonModelFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(TestJsonModelFactory.class);
+  private JsonModelFactory factory;
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidStream() throws Exception {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream()
         throws IOException {
@@ -44,7 +44,7 @@ public class TestJsonWroModelFactory {
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidContent() {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() throws IOException {
         return new ByteArrayInputStream("".getBytes());
@@ -55,7 +55,12 @@ public class TestJsonWroModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new JsonWroModelFactory();
+    factory = new JsonModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return TestGroovyWroModelFactory.class.getResourceAsStream("wro.json");
+      };
+    };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
@@ -69,7 +74,7 @@ public class TestJsonWroModelFactory {
    */
   @Test
   public void createIncompleteModel() {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected InputStream getConfigResourceAsStream() throws IOException {
         return getClass().getResourceAsStream("incomplete-wro.json");

@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -175,7 +176,7 @@ public class XmlModelFactory
    */
   protected InputStream getConfigResourceAsStream()
     throws IOException {
-    return getResourceAsStream(XML_CONFIG_FILE);
+    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.xml");
   }
 
 

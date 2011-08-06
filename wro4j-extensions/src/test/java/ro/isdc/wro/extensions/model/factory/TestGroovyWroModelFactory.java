@@ -54,7 +54,12 @@ public class TestGroovyWroModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new GroovyWroModelFactory();
+    factory = new GroovyWroModelFactory() {
+      @Override
+      protected InputStream getConfigResourceAsStream() throws IOException {
+        return TestGroovyWroModelFactory.class.getResourceAsStream("Wro.groovy");
+      };
+    };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
@@ -91,7 +96,7 @@ public class TestGroovyWroModelFactory {
         return getClass().getResourceAsStream("wroGroupRefOrder.groovy");
       }
     };
-    final WroModel model = factory.create();
+    Assert.assertNotNull(factory.create());
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)
