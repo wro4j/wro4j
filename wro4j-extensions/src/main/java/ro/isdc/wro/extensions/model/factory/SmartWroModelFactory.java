@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +15,8 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 
 /**
@@ -78,9 +78,8 @@ public class SmartWroModelFactory
   protected WroModelFactory getJsonFactory() {
     return new JsonWroModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.json");
+      protected ResourceLocator getModelResourceLocator() {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.json");
       }
     };
   }
@@ -88,9 +87,8 @@ public class SmartWroModelFactory
   private WroModelFactory getGroovyFactory() {
     return new GroovyWroModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
+      protected ResourceLocator getModelResourceLocator() {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.groovy");
       }
     };
   }
@@ -98,9 +96,8 @@ public class SmartWroModelFactory
   private XmlModelFactory getXmlFactory() {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.xml");
+      protected ResourceLocator getModelResourceLocator() {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
       }
     };
   }

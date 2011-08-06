@@ -4,8 +4,6 @@
  */
 package ro.isdc.wro.examples.manager;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import ro.isdc.wro.config.Context;
@@ -14,6 +12,8 @@ import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -38,9 +38,8 @@ public class CustomWroManagerFactory
   protected WroModelFactory newModelFactory() {
     return new GroovyWroModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
-        throws IOException {
-        return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
+      protected ResourceLocator getModelResourceLocator() {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.groovy");
       }
     };
   }

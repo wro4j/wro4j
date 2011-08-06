@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 /**
  * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
@@ -47,7 +49,8 @@ public class GroovyWroModelFactory
   public WroModel create() {
     final Script script;
     try {
-      script = new GroovyShell().parse(new InputStreamReader(getConfigResourceAsStream()));
+      final InputStream configResource = getModelResourceLocator().getInputStream();
+      script = new GroovyShell().parse(new InputStreamReader(configResource));
 
       final WroModel model = GroovyWroModelParser.parse(script);
       LOG.debug("groovy model: ", model);
@@ -60,15 +63,14 @@ public class GroovyWroModelFactory
     }
   }
 
-
   /**
    * Override this method, in order to provide different groovy model location.
    *
    * @return stream of the json representation of the model.
    * @throws java.io.IOException if the stream couldn't be read.
    */
-  protected InputStream getConfigResourceAsStream() throws IOException {
-    return getClass().getResourceAsStream("wro.groovy");
+  protected ResourceLocator getModelResourceLocator() {
+    return new ClasspathResourceLocator("wro.groovy");
   }
 
   /**
