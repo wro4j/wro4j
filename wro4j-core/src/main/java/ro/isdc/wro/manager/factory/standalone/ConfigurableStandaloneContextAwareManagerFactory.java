@@ -7,8 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
@@ -35,14 +34,14 @@ public class ConfigurableStandaloneContextAwareManagerFactory extends DefaultSta
   /**
    * @return a map of preProcessors.
    */
-  protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
-    return ProcessorsUtils.createPreProcessorsMap();
+  protected Map<String, ResourceProcessor> createPreProcessorsMap() {
+    return ProcessorsUtils.createProcessorsMap();
   }
 
   /**
    * @return a map of postProcessors.
    */
-  protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
-    return ProcessorsUtils.createPostProcessorsMap();
+  protected Map<String, ResourceProcessor> createPostProcessorsMap() {
+    return ProcessorsUtils.createProcessorsMap();
   }
 }

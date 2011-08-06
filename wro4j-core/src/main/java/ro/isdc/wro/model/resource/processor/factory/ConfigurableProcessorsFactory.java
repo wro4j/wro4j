@@ -89,29 +89,17 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   /**
    * {@inheritDoc}
    */
-<<<<<<< HEAD
   public final Collection<ResourceProcessor> getPreProcessors() {
     final String processorsAsString = properties.getProperty(PARAM_PRE_PROCESSORS);
-    return getListOfItems(processorsAsString, preProcessorsMap);
-=======
-  public final Collection<ResourcePreProcessor> getPreProcessors() {
-    final String processorsAsString = getProperties().getProperty(PARAM_PRE_PROCESSORS);
     return getListOfItems(processorsAsString, getPreProcessorsMap());
->>>>>>> mvn
   }
 
   /**
    * {@inheritDoc}
    */
-<<<<<<< HEAD
   public final Collection<ResourceProcessor> getPostProcessors() {
     final String processorsAsString = properties.getProperty(PARAM_POST_PROCESSORS);
-    return getListOfItems(processorsAsString, postProcessorsMap);
-=======
-  public final Collection<ResourcePostProcessor> getPostProcessors() {
-    final String processorsAsString = getProperties().getProperty(PARAM_POST_PROCESSORS);
     return getListOfItems(processorsAsString, getPostProcessorsMap());
->>>>>>> mvn
   }
 
   /**
@@ -183,7 +171,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
-  private Map<String, ResourcePreProcessor> getPreProcessorsMap() {
+  private Map<String, ResourceProcessor> getPreProcessorsMap() {
     if (this.preProcessorsMap == null) {
       this.preProcessorsMap = newPreProcessorsMap();
     }
@@ -193,7 +181,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
-  private Map<String, ResourcePostProcessor> getPostProcessorsMap() {
+  private Map<String, ResourceProcessor> getPostProcessorsMap() {
     if (this.postProcessorsMap == null) {
       this.postProcessorsMap = newPostProcessorsMap();
     }
