@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -29,9 +30,9 @@ import com.google.gson.reflect.TypeToken;
  * @created 13 Mar 2011
  * @since 1.3.6
  */
-public class JsonWroModelFactory
+public class JsonModelFactory
   implements WroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonWroModelFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
 
   /**
    * {@inheritDoc}

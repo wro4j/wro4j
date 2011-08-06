@@ -193,16 +193,7 @@ public class BaseWroManagerFactory
     } catch (final Exception e) {
       LOG.info("SmartWroModelFactory is not available. Using default model factory: " + e.getMessage());
     }
-    return new XmlModelFactory() {
-      /**
-       * This factory will run properly only when is used inside a web application. The configuration xml file will be
-       * read from the following location: <code>/WEB-INF/wro.xml</code>
-       */
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + XML_CONFIG_FILE);
-      }
-    };
+    return new XmlModelFactory();
   }
 
 

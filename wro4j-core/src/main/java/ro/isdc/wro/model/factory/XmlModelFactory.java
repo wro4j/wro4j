@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -173,8 +174,9 @@ public class XmlModelFactory
    *
    * @return stream of the xml representation of the model.
    */
-  protected ResourceLocator getModelResourceLocator() {
-    return new ClasspathResourceLocator(XML_CONFIG_FILE);
+  protected InputStream getConfigResourceAsStream()
+    throws IOException {
+    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.xml");
   }
 
 

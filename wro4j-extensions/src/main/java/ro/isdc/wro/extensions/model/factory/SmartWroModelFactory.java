@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -32,18 +31,20 @@ public class SmartWroModelFactory
 
   private List<WroModelFactory> factoryList;
 
+
   public SmartWroModelFactory() {
     factoryList = newWroModelFactoryFactoryList();
   }
+
 
   /**
    * @return default list of factories to be used by {@link SmartWroModelFactory}.
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    factoryList.add(getXmlFactory());
-    factoryList.add(getGroovyFactory());
-    factoryList.add(getJsonFactory());
+    factoryList.add(new XmlModelFactory());
+    factoryList.add(new GroovyWroModelFactory());
+    factoryList.add(new JsonModelFactory());
     return factoryList;
   }
 
@@ -65,6 +66,7 @@ public class SmartWroModelFactory
     throw new WroRuntimeException("Cannot create model using any of provided factories");
   }
 
+
   /**
    * @return string representation of the factory name.
    */
@@ -75,32 +77,6 @@ public class SmartWroModelFactory
     return className;
   }
 
-  protected WroModelFactory getJsonFactory() {
-    return new JsonWroModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.json");
-      }
-    };
-  }
-
-  private WroModelFactory getGroovyFactory() {
-    return new GroovyWroModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.groovy");
-      }
-    };
-  }
-
-  private XmlModelFactory getXmlFactory() {
-    return new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
-      }
-    };
-  }
 
   /**
    * @param factoryList the factoryList to set
@@ -110,6 +86,7 @@ public class SmartWroModelFactory
     this.factoryList = factoryList;
     return this;
   }
+
 
   /**
    * {@inheritDoc}

@@ -97,7 +97,7 @@ public class TestGroovyWroModelFactory {
         return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroGroupRefOrder.groovy"));
       }
     };
-    factory.create();
+    Assert.assertNotNull(factory.create());
   }
 
   @Test(expected=RecursiveGroupDefinitionException.class)

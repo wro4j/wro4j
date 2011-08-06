@@ -24,19 +24,19 @@ import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 /**
- * Test {@link JsonWroModelFactory}
+ * Test {@link JsonModelFactory}
  *
  * @author Alex Objelean
  * @created 13 Mar 2011
  * @since 1.3.6
  */
-public class TestJsonWroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(TestJsonWroModelFactory.class);
-  private JsonWroModelFactory factory;
+public class TestJsonModelFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(TestJsonModelFactory.class);
+  private JsonModelFactory factory;
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidStream() throws Exception {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return new ClasspathResourceLocator("INVALID.json");
@@ -47,7 +47,7 @@ public class TestJsonWroModelFactory {
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidContent() {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return new AbstractResourceLocator() {
@@ -83,7 +83,7 @@ public class TestJsonWroModelFactory {
    */
   @Test
   public void createIncompleteModel() {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return new UrlResourceLocator(TestJsonWroModelFactory.class.getResource("incomplete-wro.json"));
