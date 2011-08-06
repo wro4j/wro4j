@@ -28,9 +28,9 @@ import com.google.gson.reflect.TypeToken;
  * @created 13 Mar 2011
  * @since 1.3.6
  */
-public class JsonModelFactory
+public class JsonWroModelFactory
   implements WroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonWroModelFactory.class);
 
   /**
    * {@inheritDoc}
@@ -39,11 +39,11 @@ public class JsonModelFactory
   public WroModel create() {
     try {
       final Type type = new TypeToken<WroModel>() {}.getType();
-      final InputStream is = getWroModelStream();
+      final InputStream is = getConfigResourceAsStream();
       if (is == null) {
         throw new WroRuntimeException("Invalid model stream provided!");
       }
-      final WroModel model = new Gson().fromJson(new InputStreamReader(getWroModelStream()), type);
+      final WroModel model = new Gson().fromJson(new InputStreamReader(getConfigResourceAsStream()), type);
       LOG.debug("json model: {}", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -60,7 +60,7 @@ public class JsonModelFactory
    * @return stream of the json representation of the model.
    * @throws IOException if the stream couldn't be read.
    */
-  protected InputStream getWroModelStream() throws IOException {
+  protected InputStream getConfigResourceAsStream() throws IOException {
     return getClass().getResourceAsStream("wro.json");
   }
 

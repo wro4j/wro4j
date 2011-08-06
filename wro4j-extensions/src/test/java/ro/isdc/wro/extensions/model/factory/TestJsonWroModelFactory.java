@@ -20,21 +20,21 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 
 /**
- * Test {@link JsonModelFactory}
+ * Test {@link JsonWroModelFactory}
  *
  * @author Alex Objelean
  * @created 13 Mar 2011
  * @since 1.3.6
  */
-public class TestJsonModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(TestJsonModelFactory.class);
-  private JsonModelFactory factory;
+public class TestJsonWroModelFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(TestJsonWroModelFactory.class);
+  private JsonWroModelFactory factory;
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidStream() throws Exception {
-    factory = new JsonModelFactory() {
+    factory = new JsonWroModelFactory() {
       @Override
-      protected InputStream getWroModelStream()
+      protected InputStream getConfigResourceAsStream()
         throws IOException {
         throw new IOException();
       };
@@ -44,9 +44,9 @@ public class TestJsonModelFactory {
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidContent() {
-    factory = new JsonModelFactory() {
+    factory = new JsonWroModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
+      protected InputStream getConfigResourceAsStream() throws IOException {
         return new ByteArrayInputStream("".getBytes());
       };
     };
@@ -55,7 +55,7 @@ public class TestJsonModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new JsonModelFactory();
+    factory = new JsonWroModelFactory();
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
@@ -69,9 +69,9 @@ public class TestJsonModelFactory {
    */
   @Test
   public void createIncompleteModel() {
-    factory = new JsonModelFactory() {
+    factory = new JsonWroModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
+      protected InputStream getConfigResourceAsStream() throws IOException {
         return getClass().getResourceAsStream("incomplete-wro.json");
       };
     };
