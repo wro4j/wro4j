@@ -37,8 +37,8 @@ public class LessCss {
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
-    RhinoScriptBuilder builder = null;
     try {
+      RhinoScriptBuilder builder = null;
       if (scope == null) {
         final String SCRIPT_INIT = "init.js";
         final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);

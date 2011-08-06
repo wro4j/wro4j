@@ -38,6 +38,7 @@ public class RhinoScriptBuilder {
     this.scope = createContext(scope);
   }
 
+
   /**
    * @return the context
    */

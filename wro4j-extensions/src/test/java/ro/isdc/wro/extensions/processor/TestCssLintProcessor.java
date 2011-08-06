@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -23,13 +22,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssLintProcessor {
-  private ResourcePreProcessor processor;
-
-
-  @Before
-  public void setUp() {
-    processor = new CssLintProcessor();
-  }
+  private ResourcePreProcessor processor = new CssLintProcessor();
 
 
   @Test

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,14 +44,27 @@ public class JsHint {
    */
   private String[] options;
 
+  private ScriptableObject scope;
+
+  public JsHint() {
+    System.out.println("CONTRUCTOR JSHINT");
+  }
+
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), DEFAULT_JSHINT_JS);
-    } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading init script", ex);
+      RhinoScriptBuilder builder = null;
+      if (scope == null) {
+        builder = RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), DEFAULT_JSHINT_JS);
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
+    } catch (final IOException e) {
+      throw new WroRuntimeException("Failed reading init script", e);
     }
   }
 
