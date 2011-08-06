@@ -35,6 +35,7 @@ public class TestGoogleClosureCompressorProcessor {
       protected CompilerOptions newCompilerOptions() {
         final CompilerOptions options = super.newCompilerOptions();
         // explicitly set this to null to make test pass also when running mvn test from command line.
+        // the reason are some weird characters used in jquery-core
         options.setOutputCharset(null);
         return options;
       }
