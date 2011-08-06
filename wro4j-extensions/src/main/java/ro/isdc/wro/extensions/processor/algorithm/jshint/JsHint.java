@@ -43,12 +43,7 @@ public class JsHint {
    * Options to apply to js hint processing
    */
   private String[] options;
-
   private ScriptableObject scope;
-
-  public JsHint() {
-    System.out.println("CONTRUCTOR JSHINT");
-  }
 
   /**
    * Initialize script builder for evaluation.
