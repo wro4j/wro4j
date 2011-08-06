@@ -21,8 +21,8 @@ import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -191,7 +191,7 @@ public class BaseWroManagerFactory
     } catch (final Exception e) {
       LOG.info("SmartWroModelFactory is not available. Using default model factory: " + e.getMessage());
     }
-    return new ServletContextAwareXmlModelFactory();
+    return new XmlModelFactory();
   }
 
 

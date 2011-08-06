@@ -42,7 +42,7 @@ public class TestFallbackAwareWroModelFactory {
         throws IOException {
         flag = !flag;
         if (flag) {
-          return super.getConfigResourceAsStream();
+          return TestXmlModelFactory.class.getResourceAsStream("wro.xml");
         }
         return null;
       }
