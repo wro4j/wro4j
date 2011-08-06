@@ -13,8 +13,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -29,6 +27,8 @@ import com.google.javascript.jscomp.CompilerOptions;
  */
 public class TestGoogleClosureCompressorProcessor {
   private GoogleClosureCompressorProcessor processor;
+
+
   @Before
   public void setUp() {
     processor = new GoogleClosureCompressorProcessor() {
@@ -44,42 +44,43 @@ public class TestGoogleClosureCompressorProcessor {
     Context.set(Context.standaloneContext());
   }
 
-  @After
-  public void tearDown() {
-    Context.unset();
-  }
-
   @Test
   public void testWhiteSpaceOnly()
-      throws IOException {
+    throws IOException {
     processor.setCompilationLevel(CompilationLevel.WHITESPACE_ONLY);
     final URL url = getClass().getResource("google");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", (ResourcePreProcessor) processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
+
 
   @Test
   public void testSimpleOptimization()
-      throws IOException {
+    throws IOException {
     processor.setCompilationLevel(CompilationLevel.SIMPLE_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedSimple");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", ( ResourcePreProcessor) processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
+
 
   @Test
   public void testAdvancedOptimization()
-      throws IOException {
+    throws IOException {
     processor.setCompilationLevel(CompilationLevel.ADVANCED_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedAdvanced");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      (ResourcePreProcessor)processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 }

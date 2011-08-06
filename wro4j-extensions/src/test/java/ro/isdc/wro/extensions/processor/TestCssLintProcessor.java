@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssLintProcessor {
-  private ResourcePreProcessor processor = new CssLintProcessor();
+  private ResourceProcessor processor = new CssLintProcessor();
 
 
   @Test

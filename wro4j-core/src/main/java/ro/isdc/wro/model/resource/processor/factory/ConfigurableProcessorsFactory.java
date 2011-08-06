@@ -90,7 +90,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    * {@inheritDoc}
    */
   public final Collection<ResourceProcessor> getPreProcessors() {
-    final String processorsAsString = properties.getProperty(PARAM_PRE_PROCESSORS);
+    final String processorsAsString = getProperties().getProperty(PARAM_PRE_PROCESSORS);
     return getListOfItems(processorsAsString, getPreProcessorsMap());
   }
 
@@ -98,7 +98,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    * {@inheritDoc}
    */
   public final Collection<ResourceProcessor> getPostProcessors() {
-    final String processorsAsString = properties.getProperty(PARAM_POST_PROCESSORS);
+    final String processorsAsString = getProperties().getProperty(PARAM_POST_PROCESSORS);
     return getListOfItems(processorsAsString, getPostProcessorsMap());
   }
 

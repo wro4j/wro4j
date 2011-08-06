@@ -144,7 +144,7 @@ public class TestConfigurableWroManagerFactory {
     factory.setConfigProperties(configProperties);
     Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
     Assert.assertEquals(CssMinProcessor.class,
-      processorsFactory.getPreProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+      processorsFactory.getPreProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
   }
 
   @Test
@@ -155,7 +155,7 @@ public class TestConfigurableWroManagerFactory {
     factory.setConfigProperties(configProperties);
     Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(JSMinProcessor.class,
-      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+      processorsFactory.getPostProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
   }
 
 
@@ -167,7 +167,7 @@ public class TestConfigurableWroManagerFactory {
     factory.setConfigProperties(configProperties);
     Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(JSMinProcessor.class,
-      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+      processorsFactory.getPostProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
   }
 
 

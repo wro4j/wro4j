@@ -21,7 +21,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Feb 27, 2011
  */
 public class TestJsHintProcessor {
-  private ResourcePreProcessor processor = new JsHintProcessor();
+  private ResourceProcessor processor = new JsHintProcessor();
 
 
   @Test
