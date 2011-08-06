@@ -191,7 +191,6 @@
          
         <executions>
           <execution>
-             -->
             <goals>
               <goal>run</goal>
             </goals>
