@@ -91,15 +91,14 @@ public class GroupsProcessor {
    */
   private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize)
     throws IOException {
-    if (content == null) {
-      throw new IllegalArgumentException("content cannot be null!");
-    }
+    Validate.notNull(content);
     final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     Collection<ResourceProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
     processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
+    LOG.debug("postProcessors: " + processors);
     final String output = applyPostProcessors(processors, content);
     return output;
   }

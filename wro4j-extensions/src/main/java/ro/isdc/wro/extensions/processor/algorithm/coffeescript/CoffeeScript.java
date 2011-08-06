@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,8 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.1.1</code> project:
- * {@link https://github.com/jashkenas/coffee-script}.
+ * The underlying implementation use the coffee-script version <code>1.1.1</code> project: {@link https
+ * ://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
  * @since 1.3.6
@@ -32,13 +33,22 @@ import ro.isdc.wro.util.WroUtil;
 public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
   private String[] options;
+  private ScriptableObject scope;
+
+
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      return RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(),
-        "coffee-script.js");
+      RhinoScriptBuilder builder = null;
+      if (scope == null) {
+        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), "coffee-script.js");
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading init script", ex);
     }

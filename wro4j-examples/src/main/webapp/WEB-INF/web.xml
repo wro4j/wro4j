@@ -9,33 +9,7 @@
 	<listener>
 	  <listener-class>ro.isdc.wro.examples.guice.WroGuiceListener</listener-class>
 	</listener>
-	
-	<filter>
-	  <filter-name>wro</filter-name>
-	  <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
-	  <init-param>
-      <param-name>managerFactoryClassName</param-name>
-      <param-value>ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory</param-value>
-    </init-param>
-	  <init-param>
-      <param-name>uriLocators</param-name>
-      <param-value>servletContext,classpath,url</param-value>
-    </init-param>
-    <init-param>
-      <param-name>preProcessors</param-name>
-      <param-value>bomStripper,cssImport,cssUrlRewriting,semicolonAppender,yuiJsMinAdvanced,yuiCssMin</param-value>
-    </init-param>
-    <init-param>
-      <param-name>postProcessors</param-name>
-      <param-value>cssVariables</param-value>
-    </init-param>
-  </filter>
   
-  
-  <filter-mapping>
-    <filter-name>wro</filter-name>
-    <url-pattern>/wro/*</url-pattern>
-  </filter-mapping>
   	
 	<filter>
     <filter-name>guiceFilter</filter-name>

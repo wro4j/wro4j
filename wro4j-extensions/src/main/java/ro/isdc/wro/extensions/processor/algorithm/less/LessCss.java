@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,18 +31,27 @@ public class LessCss {
    * The name of the sass script to be used by default.
    */
   private static final String DEFAULT_LESS_JS = "less-1.1.4.min.js";
+  private ScriptableObject scope;
 
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String SCRIPT_INIT = "init.js";
-      final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
-      final String SCRIPT_RUN = "run.js";
-      final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
-      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
+      RhinoScriptBuilder builder = null;
+      if (scope == null) {
+        final String SCRIPT_INIT = "init.js";
+        final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
+        final String SCRIPT_RUN = "run.js";
+        final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
+
+        builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
           getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed reading javascript less.js", ex);
     } catch (final Exception e) {
@@ -49,7 +59,6 @@ public class LessCss {
       throw new WroRuntimeException("Processing error", e);
     }
   }
-
 
   /**
    * @return stream of the less.js script.

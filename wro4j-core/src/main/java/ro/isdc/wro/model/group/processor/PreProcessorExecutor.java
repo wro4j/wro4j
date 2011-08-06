@@ -97,6 +97,7 @@ public final class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final List<Resource> resources,
     final Collection<ResourceProcessor> processors)
     throws IOException {
+    LOG.debug("applying preProcessors: " + processors);
     String resourceContent = getResourceContent(resource, resources);
     if (processors.isEmpty()) {
       return resourceContent;

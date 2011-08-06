@@ -38,6 +38,7 @@ public class BeautifyJsProcessor
    */
   private final UglifyJs engine;
 
+
   /**
    * Default constructor. Instantiates uglifyJs engine.
    */
@@ -45,12 +46,14 @@ public class BeautifyJsProcessor
     engine = newEngine();
   }
 
+
   /**
    * @return new instance of {@link UglifyJs} engine.
    */
   protected UglifyJs newEngine() {
     return UglifyJs.beautifyJs();
   }
+
 
   /**
    * {@inheritDoc}
@@ -65,16 +68,16 @@ public class BeautifyJsProcessor
       writer.write(content);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
+        + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
     }
   }
 
+
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final WroRuntimeException e) {
-  }
+  protected void onException(final WroRuntimeException e) {}
 }

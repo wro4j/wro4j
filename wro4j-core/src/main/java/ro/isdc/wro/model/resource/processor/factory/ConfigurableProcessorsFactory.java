@@ -48,12 +48,6 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   private Map<String, ResourceProcessor> preProcessorsMap;
   private Map<String, ResourceProcessor> postProcessorsMap;
 
-  public ConfigurableProcessorsFactory() {
-    properties = newProperties();
-    preProcessorsMap = newPreProcessorsMap();
-    postProcessorsMap = newPostProcessorsMap();
-  }
-
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
    */
@@ -95,17 +89,29 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   /**
    * {@inheritDoc}
    */
+<<<<<<< HEAD
   public final Collection<ResourceProcessor> getPreProcessors() {
     final String processorsAsString = properties.getProperty(PARAM_PRE_PROCESSORS);
     return getListOfItems(processorsAsString, preProcessorsMap);
+=======
+  public final Collection<ResourcePreProcessor> getPreProcessors() {
+    final String processorsAsString = getProperties().getProperty(PARAM_PRE_PROCESSORS);
+    return getListOfItems(processorsAsString, getPreProcessorsMap());
+>>>>>>> mvn
   }
 
   /**
    * {@inheritDoc}
    */
+<<<<<<< HEAD
   public final Collection<ResourceProcessor> getPostProcessors() {
     final String processorsAsString = properties.getProperty(PARAM_POST_PROCESSORS);
     return getListOfItems(processorsAsString, postProcessorsMap);
+=======
+  public final Collection<ResourcePostProcessor> getPostProcessors() {
+    final String processorsAsString = getProperties().getProperty(PARAM_POST_PROCESSORS);
+    return getListOfItems(processorsAsString, getPostProcessorsMap());
+>>>>>>> mvn
   }
 
   /**
@@ -124,7 +130,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
       Validate.notEmpty(tokenName, "Invalid token name: " + tokenName);
       final T processor = map.get(tokenName.trim());
       if (processor == null) {
-        throw new WroRuntimeException("Unknown processor name: " + processor + ". Existing processors are: "
+        throw new WroRuntimeException("Unknown processor name: " + tokenName + ". Available processors are: "
           + map.keySet());
       }
       list.add(processor);
@@ -164,4 +170,33 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
     return new HashMap<String, ResourceProcessor>();
   }
 
+  /**
+   * To be used for internal usage. Ensure that returned object is not null.
+   */
+  private Properties getProperties() {
+    if (this.properties == null) {
+      this.properties = newProperties();
+    }
+    return this.properties;
+  }
+
+  /**
+   * To be used for internal usage. Ensure that returned object is not null.
+   */
+  private Map<String, ResourcePreProcessor> getPreProcessorsMap() {
+    if (this.preProcessorsMap == null) {
+      this.preProcessorsMap = newPreProcessorsMap();
+    }
+    return this.preProcessorsMap;
+  }
+
+  /**
+   * To be used for internal usage. Ensure that returned object is not null.
+   */
+  private Map<String, ResourcePostProcessor> getPostProcessorsMap() {
+    if (this.postProcessorsMap == null) {
+      this.postProcessorsMap = newPostProcessorsMap();
+    }
+    return this.postProcessorsMap;
+  }
 }

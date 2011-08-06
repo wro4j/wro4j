@@ -318,19 +318,17 @@
     <plugins>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.0.1</version>
+         <version>2.4</version> 
         <reportSets>
           <reportSet>
-            <id>sunlink</id>
             <reports>
-              <report>javadoc</report>
+              <report>license</report>
+              <report>scm</report>
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>cim</report>
+              <report>issue-tracking</report>
             </reports>
-            <inherited>true</inherited>
-            <configuration>
-              <links>
-                <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
-              </links>
-            </configuration>
           </reportSet>
         </reportSets>
       </plugin>

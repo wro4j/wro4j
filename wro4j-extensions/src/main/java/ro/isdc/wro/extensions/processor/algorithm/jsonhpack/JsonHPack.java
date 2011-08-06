@@ -3,10 +3,10 @@
  */
 package ro.isdc.wro.extensions.processor.algorithm.jsonhpack;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,18 +25,22 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class JsonHPack {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPack.class);
-
+  private ScriptableObject scope;
 
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final InputStream scriptStream = getScriptAsStream();
-      return RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
-          scriptStream, "script.js");
-    } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript script.js", ex);
+      RhinoScriptBuilder builder = null;
+      if (scope == null) {
+        builder = RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
+          getScriptAsStream(), "script.js");
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
     } catch (final Exception e) {
       LOG.error("Processing error:" + e.getMessage(), e);
       throw new WroRuntimeException("Processing error", e);

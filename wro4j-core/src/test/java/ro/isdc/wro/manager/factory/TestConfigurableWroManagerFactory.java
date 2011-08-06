@@ -4,8 +4,10 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +24,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
@@ -58,6 +61,8 @@ public class TestConfigurableWroManagerFactory {
   @Before
   public void setUp() {
     filterConfig = Mockito.mock(FilterConfig.class);
+    final ServletContext servletContext = Mockito.mock(ServletContext.class);
+    Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
   }
 
 
@@ -129,5 +134,58 @@ public class TestConfigurableWroManagerFactory {
       "cssMinJawr, jsMin, cssVariables");
     initFactory(filterConfig);
     Assert.assertEquals(3, processorsFactory.getPostProcessors().size());
+  }
+
+  @Test
+  public void testConfigPropertiesWithValidPreProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
+    Assert.assertEquals(CssMinProcessor.class,
+      processorsFactory.getPreProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+  @Test
+  public void testConfigPropertiesWithValidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
+    Assert.assertEquals(JSMinProcessor.class,
+      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+
+  @Test
+  public void testConfigPropertiesWithMultipleValidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin, cssMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
+    Assert.assertEquals(JSMinProcessor.class,
+      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+
+  @Test(expected=WroRuntimeException.class)
+  public void testConfigPropertiesWithInvalidPreProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "INVALID");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    processorsFactory.getPreProcessors();
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testConfigPropertiesWithInvalidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "INVALID");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    processorsFactory.getPostProcessors();
   }
 }

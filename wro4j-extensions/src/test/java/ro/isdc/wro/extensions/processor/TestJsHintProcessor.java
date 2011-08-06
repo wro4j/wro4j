@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -22,13 +21,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Feb 27, 2011
  */
 public class TestJsHintProcessor {
-  private ResourceProcessor processor;
-
-
-  @Before
-  public void setUp() {
-    processor = new JsHintProcessor();
-  }
+  private ResourcePreProcessor processor = new JsHintProcessor();
 
 
   @Test

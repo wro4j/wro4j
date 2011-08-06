@@ -21,6 +21,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
+
 /**
  * Uses coffee script {@link http://jashkenas.github.com/coffee-script/} to compile to javascript code.
  *
