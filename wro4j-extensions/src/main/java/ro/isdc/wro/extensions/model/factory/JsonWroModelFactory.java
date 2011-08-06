@@ -29,9 +29,9 @@ import com.google.gson.reflect.TypeToken;
  * @created 13 Mar 2011
  * @since 1.3.6
  */
-public class JsonModelFactory
+public class JsonWroModelFactory
   implements WroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsonWroModelFactory.class);
 
   /**
    * {@inheritDoc}

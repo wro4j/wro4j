@@ -271,7 +271,11 @@ public class WroManager
       // process groups & put result in the cache
       // find processed result for a group
       final List<Group> groupAsList = new ArrayList<Group>();
-      final Group group = modelFactory.create().getGroupByName(groupName);
+      final WroModel model = modelFactory.create();
+      if (model == null) {
+        throw new WroRuntimeException("Cannot build a valid wro model");
+      }
+      final Group group = model.getGroupByName(groupName);
       groupAsList.add(group);
 
       final String content = groupsProcessor.process(groupAsList, type, minimize);
