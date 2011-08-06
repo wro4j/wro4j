@@ -17,7 +17,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ResourceLocatorDecorator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 
 /**
@@ -38,45 +38,28 @@ public class TestFallbackAwareWroModelFactory {
   public void setUp() {
     // initialize the context
     Context.set(Context.standaloneContext());
+    final ResourceLocator locator = new UrlResourceLocator(TestXmlModelFactory.class.getResource("wro.xml")) {
+      @Override
+      public InputStream getInputStream() throws IOException {
+        if (flag) {
+          return super.getInputStream();
+        }
+        flag = !flag;
+        return null;
+      };
+    };
     fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ResourceLocatorDecorator(super.getModelResourceLocator()) {
-          @Override
-          public InputStream getInputStream()
-            throws IOException {
-            flag = !flag;
-            if (flag) {
-              return TestXmlModelFactory.class.getResourceAsStream("wro.xml");
-            }
-            return null;
-          }
-        };
+        return locator;
       }
     }));
     xmlModelFactory = new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new ResourceLocatorDecorator(super.getModelResourceLocator()) {
-          @Override
-          public InputStream getInputStream()
-            throws IOException {
-            if (flag) {
-              return super.getInputStream();
-            }
-            flag = !flag;
-            return null;
-          }
-        };
+        return locator;
       }
     };
-  }
-
-
-  @After
-  public void tearDown() {
-    fallbackAwareModelFactory.destroy();
-    xmlModelFactory.destroy();
   }
 
 
@@ -91,5 +74,11 @@ public class TestFallbackAwareWroModelFactory {
   @Test(expected = WroRuntimeException.class)
   public void testWithoutLastValidThrowsException() {
     Assert.assertNotNull(xmlModelFactory.create());
+  }
+
+  @After
+  public void tearDown() {
+    fallbackAwareModelFactory.destroy();
+    xmlModelFactory.destroy();
   }
 }

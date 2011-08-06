@@ -43,7 +43,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 
 /**
@@ -168,17 +168,6 @@ public class XmlModelFactory
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
   }
-
-  /**
-   * Override this method, in order to provide different xml definition file name.
-   *
-   * @return stream of the xml representation of the model.
-   */
-  protected InputStream getConfigResourceAsStream()
-    throws IOException {
-    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.xml");
-  }
-
 
   /**
    * Initialize the map
@@ -334,6 +323,15 @@ public class XmlModelFactory
       resource.setMinimize(minimize);
       resources.add(resource);
     }
+  }
+
+  /**
+   * Override this method, in order to provide different xml definition file name.
+   *
+   * @return stream of the xml representation of the model.
+   */
+  protected ResourceLocator getModelResourceLocator() {
+    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
   }
 
 

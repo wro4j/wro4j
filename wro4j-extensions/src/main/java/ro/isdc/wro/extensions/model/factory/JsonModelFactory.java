@@ -15,7 +15,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -57,7 +57,7 @@ public class JsonModelFactory
   }
 
   protected ResourceLocator getModelResourceLocator() {
-    return new ClasspathResourceLocator("wro.json");
+    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
   }
 
   /**

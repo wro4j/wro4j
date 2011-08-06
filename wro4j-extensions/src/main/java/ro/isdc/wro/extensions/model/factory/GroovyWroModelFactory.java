@@ -30,7 +30,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 
 /**
@@ -73,7 +73,7 @@ public class GroovyWroModelFactory
    * @throws java.io.IOException if the stream couldn't be read.
    */
   protected ResourceLocator getModelResourceLocator() {
-    return new ClasspathResourceLocator("wro.groovy");
+    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
   }
 
 

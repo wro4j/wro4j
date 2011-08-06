@@ -64,10 +64,10 @@ public class TestJsonModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new JsonWroModelFactory() {
+    factory = new JsonModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestJsonWroModelFactory.class.getResource("wro.json"));
+        return new UrlResourceLocator(TestJsonModelFactory.class.getResource("wro.json"));
       };
     };
     final WroModel model = factory.create();
@@ -86,7 +86,7 @@ public class TestJsonModelFactory {
     factory = new JsonModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestJsonWroModelFactory.class.getResource("incomplete-wro.json"));
+        return new UrlResourceLocator(TestJsonModelFactory.class.getResource("incomplete-wro.json"));
       };
     };
     final WroModel model = factory.create();
