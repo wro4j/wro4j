@@ -31,20 +31,21 @@ public class TestFallbackAwareWroModelFactory {
   /**
    * Used to simulate that a resource stream used to build the model is not available.
    */
-  private boolean flag = false;
+  private boolean isModelAvailable;
 
 
   @Before
   public void setUp() {
+    isModelAvailable = true;
     // initialize the context
     Context.set(Context.standaloneContext());
-    final ResourceLocator locator = new UrlResourceLocator(TestXmlModelFactory.class.getResource("wro.xml")) {
+    final ResourceLocator locator = new UrlResourceLocator(TestFallbackAwareWroModelFactory.class.getResource("wro.xml")) {
       @Override
       public InputStream getInputStream() throws IOException {
-        if (flag) {
+        if (isModelAvailable) {
           return super.getInputStream();
         }
-        flag = !flag;
+        isModelAvailable = !isModelAvailable;
         return null;
       };
     };
@@ -73,6 +74,7 @@ public class TestFallbackAwareWroModelFactory {
 
   @Test(expected = WroRuntimeException.class)
   public void testWithoutLastValidThrowsException() {
+    isModelAvailable = false;
     Assert.assertNotNull(xmlModelFactory.create());
   }
 
