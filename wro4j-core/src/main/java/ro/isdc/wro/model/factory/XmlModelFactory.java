@@ -60,7 +60,7 @@ public class XmlModelFactory
   /**
    * Default xml to parse.
    */
-  protected static final String XML_CONFIG_FILE = "wro.xml";
+  protected static final String DEFAULT_FILE_NAME = "wro.xml";
 
   /**
    * Default xml to parse.

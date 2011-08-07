@@ -72,6 +72,7 @@ public class TestWro4jCommandLineRunner {
   public void useSeveralProcessors() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
+    System.out.println("wroFile: " + wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
       JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(

@@ -3,6 +3,10 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,10 +32,39 @@ public class SmartWroModelFactory
   private static final Logger LOG = LoggerFactory.getLogger(SmartWroModelFactory.class);
 
   private List<WroModelFactory> factoryList;
+  /**
+   * A little story about wroFile & wroParentFolder fields: these both were introduced as a result of backward
+   * compatibility required by wro4j-maven-plugin for building the model. The idea is if wroFile is provided, then the
+   * exact file will be used to create the model with all modelFactories provided by {@link SmartWroModelFactory}. The
+   * next wroParentFolder is used and wro model files are searched inside that folder. If this is not provided, the
+   * default lookup is performed.
+   * <p/>
+   * The exact file where the model is located.
+   */
+  private File wroFile;
+  /**
+   * The folder where the wro model file is searched.
+   */
+  private File wroParentFolder;
 
+  /**
+   * Allow client code to control the location of the wro model file for all available factories.
+   *
+   * @param wroParentFolder the wroParentFolder to set
+   */
+  public SmartWroModelFactory setWroParentFolder(final File wroParentFolder) {
+    Validate.notNull(wroParentFolder);
+    this.wroParentFolder = wroParentFolder;
+    return this;
+  }
 
-  public SmartWroModelFactory() {
-    factoryList = newWroModelFactoryFactoryList();
+  /**
+   * @param wroFile the wroFile to set
+   */
+  public SmartWroModelFactory setWroFile(final File wroFile) {
+    Validate.notNull(wroFile);
+    this.wroFile = wroFile;
+    return this;
   }
 
 
@@ -40,9 +73,45 @@ public class SmartWroModelFactory
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    factoryList.add(new XmlModelFactory());
-    factoryList.add(new GroovyWroModelFactory());
-    factoryList.add(new JsonModelFactory());
+    factoryList.add(new XmlModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream()
+        throws IOException {
+        if (wroFile != null) {
+          return new FileInputStream(wroFile);
+        }
+        if (wroParentFolder != null) {
+          return new FileInputStream(new File(wroParentFolder, XmlModelFactory.DEFAULT_FILE_NAME));
+        }
+        return super.getModelResourceAsStream();
+      }
+    });
+    factoryList.add(new GroovyWroModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream()
+        throws IOException {
+        if (wroFile != null) {
+          return new FileInputStream(wroFile);
+        }
+        if (wroParentFolder != null) {
+          return new FileInputStream(new File(wroParentFolder, GroovyWroModelFactory.DEFAULT_FILE_NAME));
+        }
+        return super.getModelResourceAsStream();
+      }
+    });
+    factoryList.add(new JsonModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream()
+        throws IOException {
+        if (wroFile != null) {
+          return new FileInputStream(wroFile);
+        }
+        if (wroParentFolder != null) {
+          return new FileInputStream(new File(wroParentFolder, JsonModelFactory.DEFAULT_FILE_NAME));
+        }
+        return super.getModelResourceAsStream();
+      }
+    });
     return factoryList;
   }
 
@@ -52,6 +121,9 @@ public class SmartWroModelFactory
    */
   @Override
   public WroModel create() {
+    if (factoryList == null) {
+      factoryList = newWroModelFactoryFactoryList();
+    }
     for (final WroModelFactory factory : factoryList) {
       try {
         final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
@@ -59,6 +131,7 @@ public class SmartWroModelFactory
         return factory.create();
       } catch (final WroRuntimeException e) {
         LOG.info("Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
+        LOG.debug("Exception occured while building the model using :" + getClassName(factory.getClass()), e);
       }
     }
     throw new WroRuntimeException("Cannot create model using any of provided factories");
@@ -84,6 +157,7 @@ public class SmartWroModelFactory
     this.factoryList = factoryList;
     return this;
   }
+
 
 
   /**

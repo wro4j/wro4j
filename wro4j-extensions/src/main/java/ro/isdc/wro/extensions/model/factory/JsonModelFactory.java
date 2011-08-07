@@ -32,6 +32,10 @@ import com.google.gson.reflect.TypeToken;
 public class JsonModelFactory
   implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
+  /**
+   * Default name of the file used to retrieve the model.
+   */
+  protected static final String DEFAULT_FILE_NAME = "wro.json";
 
   /**
    * {@inheritDoc}

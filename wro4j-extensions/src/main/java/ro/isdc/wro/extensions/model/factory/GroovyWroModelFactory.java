@@ -41,6 +41,10 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 public class GroovyWroModelFactory
   implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(GroovyWroModelFactory.class);
+  /**
+   * Default name of the file used to retrieve the model.
+   */
+  protected static final String DEFAULT_FILE_NAME = "wro.groovy";
 
 
   /**
@@ -72,7 +76,7 @@ public class GroovyWroModelFactory
    */
   protected InputStream getModelResourceAsStream()
     throws IOException {
-    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
+    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/" + DEFAULT_FILE_NAME);
   }
 
 
