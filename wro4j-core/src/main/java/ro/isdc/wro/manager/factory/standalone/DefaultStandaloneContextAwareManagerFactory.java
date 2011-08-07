@@ -72,7 +72,7 @@ public class DefaultStandaloneContextAwareManagerFactory
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
+      protected InputStream getModelResourceAsStream()
         throws IOException {
         return new FileInputStream(standaloneContext.getWroFile());
       }

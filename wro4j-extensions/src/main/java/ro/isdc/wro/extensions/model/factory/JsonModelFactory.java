@@ -40,11 +40,11 @@ public class JsonModelFactory
   public WroModel create() {
     try {
       final Type type = new TypeToken<WroModel>() {}.getType();
-      final InputStream is = getConfigResourceAsStream();
+      final InputStream is = getModelResourceAsStream();
       if (is == null) {
         throw new WroRuntimeException("Invalid model stream provided!");
       }
-      final WroModel model = new Gson().fromJson(new InputStreamReader(getConfigResourceAsStream()), type);
+      final WroModel model = new Gson().fromJson(new InputStreamReader(getModelResourceAsStream()), type);
       LOG.debug("json model: {}", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -61,7 +61,7 @@ public class JsonModelFactory
    * @return stream of the json representation of the model.
    * @throws IOException if the stream couldn't be read.
    */
-  protected InputStream getConfigResourceAsStream() throws IOException {
+  protected InputStream getModelResourceAsStream() throws IOException {
     return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.json");
   }
 

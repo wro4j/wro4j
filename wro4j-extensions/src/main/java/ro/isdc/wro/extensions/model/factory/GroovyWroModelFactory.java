@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Wro4J
+ * Copyright 2011 wro4j
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class GroovyWroModelFactory
   public WroModel create() {
     final Script script;
     try {
-      script = new GroovyShell().parse(new InputStreamReader(getConfigResourceAsStream()));
+      script = new GroovyShell().parse(new InputStreamReader(getModelResourceAsStream()));
 
       final WroModel model = GroovyWroModelParser.parse(script);
       LOG.debug("groovy model: ", model);
@@ -70,7 +70,7 @@ public class GroovyWroModelFactory
    * @return stream of the json representation of the model.
    * @throws java.io.IOException if the stream couldn't be read.
    */
-  protected InputStream getConfigResourceAsStream()
+  protected InputStream getModelResourceAsStream()
     throws IOException {
     return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
   }

@@ -54,7 +54,7 @@ public class TestXmlModelFactory {
   public void recursiveGroupThrowsException() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         return Thread.currentThread().getContextClassLoader()
             .getResourceAsStream("recursive.xml");
       }
@@ -80,7 +80,7 @@ public class TestXmlModelFactory {
   public void testSuccessfulCreation() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         return Thread.currentThread()
           .getContextClassLoader()
           .getResourceAsStream("wro1.xml");
@@ -96,7 +96,7 @@ public class TestXmlModelFactory {
   public void testMinimizeAttributePresence() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("wro-minimizeAttribute.xml");
       }
@@ -116,7 +116,7 @@ public class TestXmlModelFactory {
   public void testValidImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/validImports.xml");
       }
@@ -132,7 +132,7 @@ public class TestXmlModelFactory {
   public void testRecursiveImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/recursive.xml");
       }
@@ -145,7 +145,7 @@ public class TestXmlModelFactory {
   public void testDeepRecursiveImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/deepRecursive.xml");
       }
@@ -158,7 +158,7 @@ public class TestXmlModelFactory {
   public void testCircularImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/circular1.xml");
       }
@@ -171,7 +171,7 @@ public class TestXmlModelFactory {
   public void testInvalidImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/invalidImports.xml");
       }
@@ -185,7 +185,7 @@ public class TestXmlModelFactory {
     try {
       factory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream() {
+        protected InputStream getModelResourceAsStream() {
           // get a class relative test resource
           return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
         }

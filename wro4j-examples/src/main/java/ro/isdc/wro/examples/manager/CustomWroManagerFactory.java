@@ -38,7 +38,7 @@ public class CustomWroManagerFactory
   protected WroModelFactory newModelFactory() {
     return new GroovyWroModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
+      protected InputStream getModelResourceAsStream()
         throws IOException {
         return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
       }

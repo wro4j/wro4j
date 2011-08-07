@@ -131,7 +131,7 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final InputStream configResource = getConfigResourceAsStream();
+      final InputStream configResource = getModelResourceAsStream();
       if (configResource == null) {
         throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
       }
@@ -174,7 +174,7 @@ public class XmlModelFactory
    * @return stream of the xml representation of the model.
    * @throws IOException if the stream couldn't be read.
    */
-  protected InputStream getConfigResourceAsStream()
+  protected InputStream getModelResourceAsStream()
     throws IOException {
     return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.xml");
   }
@@ -204,7 +204,7 @@ public class XmlModelFactory
       LOG.debug("processImports#uriLocatorFactory: " + uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream()
+        protected InputStream getModelResourceAsStream()
           throws IOException {
           LOG.debug("build model from import: " + name);
           LOG.debug("uriLocatorFactory: " + uriLocatorFactory);
