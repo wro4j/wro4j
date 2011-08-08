@@ -19,7 +19,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 
 
 /**
@@ -77,46 +77,76 @@ public class SmartWroModelFactory
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
     LOG.debug("wroFile: " + wroFile);
     LOG.debug("wroParentFolder: " + wroParentFolder);
-    factoryList.add(new XmlModelFactory() {
-      @Override
-      protected InputStream getModelResourceAsStream()
-        throws IOException {
-        if (wroFile != null) {
-          return new FileInputStream(wroFile);
-        }
-        if (wroParentFolder != null) {
-          return new FileInputStream(new File(wroParentFolder, XmlModelFactory.DEFAULT_FILE_NAME));
-        }
-        return super.getModelResourceAsStream();
-      }
-    });
-    factoryList.add(new GroovyWroModelFactory() {
-      @Override
-      protected InputStream getModelResourceAsStream()
-        throws IOException {
-        if (wroFile != null) {
-          return new FileInputStream(wroFile);
-        }
-        if (wroParentFolder != null) {
-          return new FileInputStream(new File(wroParentFolder, GroovyWroModelFactory.DEFAULT_FILE_NAME));
-        }
-        return super.getModelResourceAsStream();
-      }
-    });
-    factoryList.add(new JsonModelFactory() {
-      @Override
-      protected InputStream getModelResourceAsStream()
-        throws IOException {
-        if (wroFile != null) {
-          return new FileInputStream(wroFile);
-        }
-        if (wroParentFolder != null) {
-          return new FileInputStream(new File(wroParentFolder, JsonModelFactory.DEFAULT_FILE_NAME));
-        }
-        return super.getModelResourceAsStream();
-      }
-    });
+    factoryList.add(newXmlModelFactory());
+    factoryList.add(newGroovyModelFactory());
+    factoryList.add(newJsonModelFactory());
     return factoryList;
+  }
+
+  private JsonModelFactory newJsonModelFactory() {
+    return new JsonModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        final ResourceLocator superLocator = super.getModelResourceLocator();
+        return new AbstractResourceLocator() {
+          @Override
+          public InputStream getInputStream()
+              throws IOException {
+            if (wroFile != null) {
+              return new FileInputStream(wroFile);
+            }
+            if (wroParentFolder != null) {
+              return new FileInputStream(new File(wroParentFolder, JsonModelFactory.DEFAULT_FILE_NAME));
+            }
+            return superLocator.getInputStream();
+          }
+        };
+      }
+    };
+  }
+
+  private GroovyWroModelFactory newGroovyModelFactory() {
+    return new GroovyWroModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        final ResourceLocator superLocator = super.getModelResourceLocator();
+        return new AbstractResourceLocator() {
+          @Override
+          public InputStream getInputStream()
+              throws IOException {
+            if (wroFile != null) {
+              return new FileInputStream(wroFile);
+            }
+            if (wroParentFolder != null) {
+              return new FileInputStream(new File(wroParentFolder, GroovyWroModelFactory.DEFAULT_FILE_NAME));
+            }
+            return superLocator.getInputStream();
+          }
+        };
+      }
+    };
+  }
+
+  private XmlModelFactory newXmlModelFactory() {
+    return new XmlModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        final ResourceLocator superLocator = super.getModelResourceLocator();
+        return new AbstractResourceLocator() {
+          @Override
+          public InputStream getInputStream()
+              throws IOException {
+            if (wroFile != null) {
+              return new FileInputStream(wroFile);
+            }
+            if (wroParentFolder != null) {
+              return new FileInputStream(new File(wroParentFolder, XmlModelFactory.DEFAULT_FILE_NAME));
+            }
+            return superLocator.getInputStream();
+          }
+        };
+      }
+    };
   }
 
 
