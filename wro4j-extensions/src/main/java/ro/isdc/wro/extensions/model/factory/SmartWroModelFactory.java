@@ -73,6 +73,8 @@ public class SmartWroModelFactory
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
+    LOG.debug("wroFile: " + wroFile);
+    LOG.debug("wroParentFolder: " + wroParentFolder);
     factoryList.add(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()

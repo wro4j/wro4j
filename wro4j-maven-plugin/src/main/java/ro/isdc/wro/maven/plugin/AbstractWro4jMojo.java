@@ -41,6 +41,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * added in order to be able to use {@link SmartWroModelFactory} and keep the backward compatibility with earlier versions.
    *
    * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/"
+   * @optional
    */
   private File defaultWroFolder;
   /**
@@ -148,7 +149,9 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       @Override
       protected WroModelFactory newModelFactory() {
         final SmartWroModelFactory modelFactory = new SmartWroModelFactory();
-        if (wroFile == null) {
+        if (wroFile != null) {
+          modelFactory.setWroFile(wroFile);
+        } else if (defaultWroFolder != null) {
           modelFactory.setWroParentFolder(defaultWroFolder);
         }
         return modelFactory;
