@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -30,18 +32,25 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
+import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
+import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
+import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -60,14 +69,14 @@ public class Wro4jCommandLineRunner {
   private String targetGroups;
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
-  @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro.xml. By default this is the user current folder.")
-  private final File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
+  @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
+  private File wroFile;
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
   private final File destinationFolder = new File(System.getProperty("user.dir"), "wro");
-  @Option(name = "-c", aliases = { "--compressor" }, metaVar = "COMPRESSOR", handler = CompressorOptionHandler.class, usage = "Name of the compressor to process scripts")
-  private final ResourcePreProcessor compressor = new JSMinProcessor();
+  @Option(name = "-c", aliases = { "--compressor", "--preProcessors" }, metaVar = "COMPRESSOR", usage = "Comma separated list of processors")
+  private String processorsList;
 
 
   public static void main(final String[] args)
@@ -106,10 +115,19 @@ public class Wro4jCommandLineRunner {
       System.err.println("USAGE");
       System.err.println("=======================================");
       parser.printUsage(System.err);
+      onException(e);
     } finally {
       watch.stop();
-      LOG.info("Processing took: {}ms",  watch.getLastTaskTimeMillis());
+      LOG.info("Processing took: {}ms", watch.getLastTaskTimeMillis());
     }
+  }
+
+
+  /**
+   * Exception handler.
+   */
+  protected void onException(final Exception e) {
+
   }
 
 
@@ -141,7 +159,7 @@ public class Wro4jCommandLineRunner {
    */
   private List<String> getTargetGroupsAsList() {
     if (targetGroups == null) {
-      final WroModel model = getManagerFactory().getInstance().getModel();
+      final WroModel model = getManagerFactory().create().getModel();
       return model.getGroupNames();
     }
     return Arrays.asList(targetGroups.split(","));
@@ -171,7 +189,7 @@ public class Wro4jCommandLineRunner {
       // init context
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
       // perform processing
-      getManagerFactory().getInstance().process();
+      getManagerFactory().create().process();
       // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
@@ -226,10 +244,23 @@ public class Wro4jCommandLineRunner {
     final StandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory() {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
-        final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-        factory.addPreProcessor(new BomStripperPreProcessor());
-        factory.addPreProcessor(compressor);
-        return factory;
+        final Properties props = new Properties();
+        if (processorsList != null) {
+          props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, processorsList);
+        }
+        return new ConfigurableProcessorsFactory().setProperties(props).setPreProcessorsMap(createPreProcessorsMap());
+      }
+
+
+      @Override
+      protected WroModelFactory newModelFactory() {
+        final SmartWroModelFactory modelFactory = new SmartWroModelFactory();
+        if (wroFile != null) {
+          modelFactory.setWroFile(wroFile);
+        } else {
+          modelFactory.setWroParentFolder(new File(System.getProperty("user.dir")));
+        }
+        return modelFactory;
       }
     };
     // initialize before process.
@@ -257,5 +288,33 @@ public class Wro4jCommandLineRunner {
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
+
+  /**
+   * Creates the map of known processors.
+   */
+  protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
+    final Map<String, ResourcePreProcessor> map = ProcessorsUtils.createPreProcessorsMap();
+    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    map.put(CssLintProcessor.ALIAS, new CssLintProcessor() {
+      @Override
+      protected void onCssLintException(final CssLintException e, final Resource resource)
+        throws Exception {
+        super.onCssLintException(e, resource);
+        System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
+        System.err.println(e.getErrors());
+      }
+    });
+    map.put(JsHintProcessor.ALIAS, new JsHintProcessor() {
+      @Override
+      protected void onJsHintException(final JsHintException e, final Resource resource)
+        throws Exception {
+        super.onJsHintException(e, resource);
+        System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
+        System.err.println(e.getErrors());
+      }
+    });
+    return map;
   }
 }

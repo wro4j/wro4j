@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 
@@ -31,6 +32,10 @@ import com.google.gson.reflect.TypeToken;
 public class JsonModelFactory
   implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
+  /**
+   * Default name of the file used to retrieve the model.
+   */
+  protected static final String DEFAULT_FILE_NAME = "wro.json";
 
   /**
    * {@inheritDoc}
@@ -39,11 +44,11 @@ public class JsonModelFactory
   public WroModel create() {
     try {
       final Type type = new TypeToken<WroModel>() {}.getType();
-      final InputStream is = getWroModelStream();
+      final InputStream is = getModelResourceAsStream();
       if (is == null) {
         throw new WroRuntimeException("Invalid model stream provided!");
       }
-      final WroModel model = new Gson().fromJson(new InputStreamReader(getWroModelStream()), type);
+      final WroModel model = new Gson().fromJson(new InputStreamReader(getModelResourceAsStream()), type);
       LOG.debug("json model: {}", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -60,8 +65,8 @@ public class JsonModelFactory
    * @return stream of the json representation of the model.
    * @throws IOException if the stream couldn't be read.
    */
-  protected InputStream getWroModelStream() throws IOException {
-    return getClass().getResourceAsStream("wro.json");
+  protected InputStream getModelResourceAsStream() throws IOException {
+    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.json");
   }
 
   /**

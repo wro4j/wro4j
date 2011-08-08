@@ -17,11 +17,13 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 
 
 /**
@@ -29,11 +31,24 @@ import ro.isdc.wro.model.WroModel;
  *
  * @author Alex Objelean
  */
+/**
+ * @author Admin
+ *
+ */
 public abstract class AbstractWro4jMojo extends AbstractMojo {
+  /**
+   * Folder where the wro model file is located by default. This is used if no wroFile is provided. This property was
+   * added in order to be able to use {@link SmartWroModelFactory} and keep the backward compatibility with earlier versions.
+   *
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/"
+   * @optional
+   */
+  private File defaultWroFolder;
   /**
    * File containing the groups definitions.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
+   * @parameter
+   * @optional
    */
   private File wroFile;
   /**
@@ -130,7 +145,18 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * @return
    */
   protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
-    return new DefaultStandaloneContextAwareManagerFactory();
+    return new DefaultStandaloneContextAwareManagerFactory() {
+      @Override
+      protected WroModelFactory newModelFactory() {
+        final SmartWroModelFactory modelFactory = new SmartWroModelFactory();
+        if (wroFile != null) {
+          modelFactory.setWroFile(wroFile);
+        } else if (defaultWroFolder != null) {
+          modelFactory.setWroParentFolder(defaultWroFolder);
+        }
+        return modelFactory;
+      }
+    };
   }
 
   /**
@@ -139,7 +165,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected final List<String> getTargetGroupsAsList()
     throws Exception {
     if (getTargetGroups() == null) {
-      final WroModel model = getManagerFactory().getInstance().getModel();
+      final WroModel model = getManagerFactory().create().getModel();
       return model.getGroupNames();
     }
     return Arrays.asList(getTargetGroups().split(","));
@@ -274,5 +300,13 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    */
   public void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
+  }
+
+
+  /**
+   * @param defaultWroFolder the defaultWroFolder to set
+   */
+  public void setDefaultWroFolder(final File defaultWroFolder) {
+    this.defaultWroFolder = defaultWroFolder;
   }
 }

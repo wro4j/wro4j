@@ -112,24 +112,31 @@ public final class Injector {
    */
   private boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
-    // accept even private modifiers
-    field.setAccessible(true);
-    if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
-      field.set(object, uriLocatorFactory);
-      return true;
+    boolean accept = false;
+    try {
+      // accept even private modifiers
+      field.setAccessible(true);
+      if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
+        field.set(object, uriLocatorFactory);
+        return accept = true;
+      }
+      if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
+        field.set(object, processorsFactory);
+        return accept = true;
+      }
+      if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
+        field.set(object, getPreProcessorExecutor());
+        return accept = true;
+      }
+      if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
+        field.set(object, duplicateResourceDetector);
+        return accept = true;
+      }
+      return accept;
+    } finally {
+      if (accept) {
+        LOG.debug("Successfully injected field of type: " + field.getType());
+      }
     }
-    if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
-      field.set(object, processorsFactory);
-      return true;
-    }
-    if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
-      field.set(object, getPreProcessorExecutor());
-      return true;
-    }
-    if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
-      field.set(object, duplicateResourceDetector);
-      return true;
-    }
-    return false;
   }
 }

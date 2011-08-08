@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.factory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -14,13 +13,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXParseException;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 
 /**
  * TestXmlModelFactory.
@@ -31,13 +34,15 @@ import ro.isdc.wro.model.resource.Resource;
 public class TestXmlModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestXmlModelFactory.class);
   private WroModelFactory factory;
+  private Injector injector;
 
   @Before
-  public void init() {
+  public void setUp() {
     final Context context = Context.standaloneContext();
     Context.set(context);
     context.getConfig().setCacheUpdatePeriod(0);
     context.getConfig().setModelUpdatePeriod(0);
+    injector = new Injector(new DefaultUriLocatorFactory(), new DefaultProcesorsFactory());
   }
 
   @After
@@ -49,7 +54,7 @@ public class TestXmlModelFactory {
   public void recursiveGroupThrowsException() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         return Thread.currentThread().getContextClassLoader()
             .getResourceAsStream("recursive.xml");
       }
@@ -75,7 +80,7 @@ public class TestXmlModelFactory {
   public void testSuccessfulCreation() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         return Thread.currentThread()
           .getContextClassLoader()
           .getResourceAsStream("wro1.xml");
@@ -91,7 +96,7 @@ public class TestXmlModelFactory {
   public void testMinimizeAttributePresence() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("wro-minimizeAttribute.xml");
       }
@@ -111,11 +116,12 @@ public class TestXmlModelFactory {
   public void testValidImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/validImports.xml");
       }
     };
+    injector.inject(factory);
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.create();
     Assert.assertEquals(2, model.getGroupNames().size());
@@ -126,11 +132,12 @@ public class TestXmlModelFactory {
   public void testRecursiveImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/recursive.xml");
       }
     };
+    injector.inject(factory);
     factory.create();
   }
 
@@ -138,11 +145,12 @@ public class TestXmlModelFactory {
   public void testDeepRecursiveImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/deepRecursive.xml");
       }
     };
+    injector.inject(factory);
     factory.create();
   }
 
@@ -150,11 +158,12 @@ public class TestXmlModelFactory {
   public void testCircularImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/circular1.xml");
       }
     };
+    injector.inject(factory);
     factory.create();
   }
 
@@ -162,24 +171,26 @@ public class TestXmlModelFactory {
   public void testInvalidImports() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         //get a class relative test resource
         return TestXmlModelFactory.class.getResourceAsStream("testimport/invalidImports.xml");
       }
     };
+    injector.inject(factory);
     factory.create();
   }
 
-  @Test(expected=IOException.class)
+  @Test(expected=SAXParseException.class)
   public void testWildcardImports() throws Throwable {
     try {
       factory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream() {
+        protected InputStream getModelResourceAsStream() {
           // get a class relative test resource
           return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
         }
       };
+      injector.inject(factory);
       factory.create();
     } catch(final WroRuntimeException e) {
       throw e.getCause();

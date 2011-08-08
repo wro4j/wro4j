@@ -4,8 +4,10 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,10 +20,15 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**
  * TestConfigurableWroManagerFactory.
@@ -32,6 +39,8 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 public class TestConfigurableWroManagerFactory {
   private ConfigurableWroManagerFactory factory;
   private FilterConfig filterConfig;
+  private SimpleUriLocatorFactory uriLocatorFactory;
+  private ProcessorsFactory processorsFactory;
 
   public void initFactory(final FilterConfig filterConfig) {
     //init context
@@ -39,14 +48,25 @@ public class TestConfigurableWroManagerFactory {
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Context.set(Context.webContext(request, response, filterConfig));
 
-    factory = new ConfigurableWroManagerFactory();
+    factory = new ConfigurableWroManagerFactory() {
+      @Override
+      protected UriLocatorFactory newUriLocatorFactory() {
+        return uriLocatorFactory = (SimpleUriLocatorFactory) super.newUriLocatorFactory();
+      };
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        return processorsFactory = super.newProcessorsFactory();
+      };
+    };
     //create one instance for test
-    factory.getInstance();
+    factory.create();
   }
 
   @Before
   public void setUp() {
     filterConfig = Mockito.mock(FilterConfig.class);
+    final ServletContext servletContext = Mockito.mock(ServletContext.class);
+    Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
   }
 
   @After
@@ -54,19 +74,21 @@ public class TestConfigurableWroManagerFactory {
   	Context.unset();
   }
 
+  /**
+   * When no uri locators are set, the default factory is used.
+   */
   @Test
   public void testWhenNoUriLocatorsParamSet() {
   	initFactory(filterConfig);
-    factory.getInstance();
-  	Assert.assertTrue(factory.getLocators().isEmpty());
+    factory.create();
+  	Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
   }
 
   @Test
   public void testWithEmptyUriLocators() {
   	Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("");
   	initFactory(filterConfig);
-  	factory.getLocators();
-    Assert.assertTrue(factory.getLocators().isEmpty());
+    Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -74,13 +96,13 @@ public class TestConfigurableWroManagerFactory {
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("INVALID1,INVALID2");
     initFactory(filterConfig);
-    factory.getLocators();
+    uriLocatorFactory.getUriLocators();
   }
 
   @Test
   public void testWhenValidLocatorsSet() {
     configureValidUriLocators(filterConfig);
-    Assert.assertEquals(3, factory.getLocators().size());
+    Assert.assertEquals(3, uriLocatorFactory.getUriLocators().size());
   }
 
   /**
@@ -94,10 +116,10 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testProcessorsExecutionOrder() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("bomStripper, cssImport, cssVariables");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(JSMinProcessor.ALIAS + "," + CssImportPreProcessor.ALIAS + "," + CssVariablesProcessor.ALIAS);
     initFactory(filterConfig);
-    final List<ResourcePreProcessor> list = factory.getPreProcessors();
-    Assert.assertEquals(BomStripperPreProcessor.class, list.get(0).getClass());
+    final List<ResourcePreProcessor> list = (List<ResourcePreProcessor>) processorsFactory.getPreProcessors();
+    Assert.assertEquals(JSMinProcessor.class, list.get(0).getClass());
     Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
     Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
   }
@@ -105,49 +127,102 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testWithEmptyPreProcessors() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn("");
     initFactory(filterConfig);
-    Assert.assertTrue(factory.getPreProcessors().isEmpty());
+    Assert.assertTrue(processorsFactory.getPreProcessors().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInvalidPreProcessorsSet() {
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("INVALID1,INVALID2");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn("INVALID1,INVALID2");
     initFactory(filterConfig);
-    factory.getPreProcessors();
+    processorsFactory.getPreProcessors();
   }
 
   @Test
   public void testWhenValidPreProcessorsSet() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_PRE_PROCESSORS)).thenReturn("cssUrlRewriting");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn("cssUrlRewriting");
     initFactory(filterConfig);
-    Assert.assertEquals(1, factory.getPreProcessors().size());
+    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
   }
 
   @Test
   public void testWithEmptyPostProcessors() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn("");
     initFactory(filterConfig);
-    Assert.assertTrue(factory.getPostProcessors().isEmpty());
+    Assert.assertTrue(processorsFactory.getPostProcessors().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
   public void cannotUseInvalidPostProcessorsSet() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("INVALID1,INVALID2");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn("INVALID1,INVALID2");
     initFactory(filterConfig);
-    factory.getPostProcessors();
+    processorsFactory.getPostProcessors();
   }
 
   @Test
   public void testWhenValidPostProcessorsSet() {
     configureValidUriLocators(filterConfig);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_POST_PROCESSORS)).thenReturn("cssMinJawr, jsMin, cssVariables");
+    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn("cssMinJawr, jsMin, cssVariables");
     initFactory(filterConfig);
-    Assert.assertEquals(3, factory.getPostProcessors().size());
+    Assert.assertEquals(3, processorsFactory.getPostProcessors().size());
+  }
+
+  @Test
+  public void testConfigPropertiesWithValidPreProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
+    Assert.assertEquals(CssMinProcessor.class,
+      processorsFactory.getPreProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+  @Test
+  public void testConfigPropertiesWithValidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
+    Assert.assertEquals(JSMinProcessor.class,
+      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+
+  @Test
+  public void testConfigPropertiesWithMultipleValidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin, cssMin");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
+    Assert.assertEquals(JSMinProcessor.class,
+      processorsFactory.getPostProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+  }
+
+
+  @Test(expected=WroRuntimeException.class)
+  public void testConfigPropertiesWithInvalidPreProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "INVALID");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    processorsFactory.getPreProcessors();
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testConfigPropertiesWithInvalidPostProcessor() {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "INVALID");
+    initFactory(filterConfig);
+    factory.setConfigProperties(configProperties);
+    processorsFactory.getPostProcessors();
   }
 }

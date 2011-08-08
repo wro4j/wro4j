@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +30,25 @@ public class SassCss {
    * The name of the sass script to be used by default.
    */
   private static final String DEFAULT_SASS_JS = "sass-0.5.0.min.js";
+  private ScriptableObject scope;
+
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      final String scriptInit = "var exports = {};";
-      return RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(getScriptAsStream(), DEFAULT_SASS_JS);
+      RhinoScriptBuilder builder = null;
+      if (scope == null) {
+        final String scriptInit = "var exports = {};";
+        builder = RhinoScriptBuilder.newChain().evaluateChain(scriptInit, "initSass").evaluateChain(
+          getScriptAsStream(), DEFAULT_SASS_JS);
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
     } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript sass.js", ex);
+      throw new WroRuntimeException("Failed reading javascript sass.js", ex);
     }
   }
 

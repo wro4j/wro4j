@@ -5,6 +5,8 @@ package ro.isdc.wro.extensions.manager;
 
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
+
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
@@ -37,7 +39,7 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   @Override
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
-    pupulateMap(map);
+    pupulateMapWithExtensionsProcessors(map);
   }
 
   /**
@@ -45,11 +47,20 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   @Override
   protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
-    pupulateMap(map);
+    pupulateMapWithExtensionsProcessors(map);
   }
 
+
+  /**
+   * Populates a map of processors with processors existing in extensions module.
+   *
+   * @param <T> type of processors (pre or post). This can be one of the following: {@link ResourcePreProcessor} or
+   *        {@link ResourcePostProcessor}.
+   * @param map to populate.
+   */
   @SuppressWarnings("unchecked")
-  private static <T> void pupulateMap(final Map<String, T> map) {
+  public static <T> void pupulateMapWithExtensionsProcessors(final Map<String, T> map) {
+    Validate.notNull(map);
     map.put(YUICssCompressorProcessor.ALIAS, (T) new YUICssCompressorProcessor());
     map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, (T) YUIJsCompressorProcessor.noMungeCompressor());
     map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, (T) YUIJsCompressorProcessor.doMungeCompressor());

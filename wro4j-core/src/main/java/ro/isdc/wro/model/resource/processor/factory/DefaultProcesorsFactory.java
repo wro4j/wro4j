@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
@@ -25,7 +24,6 @@ public final class DefaultProcesorsFactory
   public DefaultProcesorsFactory() {
     addPreProcessor(new CssUrlRewritingProcessor());
     addPreProcessor(new CssImportPreProcessor());
-    addPreProcessor(new BomStripperPreProcessor());
     addPreProcessor(new SemicolonAppenderPreProcessor());
     addPreProcessor(new JSMinProcessor());
     addPreProcessor(new JawrCssMinifierProcessor());

@@ -15,7 +15,7 @@ import ro.isdc.wro.util.Transformer;
  *
  * @author Alex Objelean
  * @created 20 Jul 2011
- * @since 1.3.9
+ * @since 1.4.0
  */
 public interface WildcardExpandedHandlerAware {
   /**

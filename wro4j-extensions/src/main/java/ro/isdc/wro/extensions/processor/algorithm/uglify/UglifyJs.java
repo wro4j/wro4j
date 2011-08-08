@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +34,12 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglify-1.0.2.min.js";
+  private static final String DEFAULT_UGLIFY_JS = "uglify-1.0.6.min.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
   private final boolean uglify;
+  private ScriptableObject scope;
 
 
   /**
@@ -64,19 +66,26 @@ public class UglifyJs {
     return new UglifyJs(false);
   }
 
-
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
+    //TODO: Find a way to encapsulate this code
+    RhinoScriptBuilder builder = null;
     try {
-      final String scriptInit = "var exports = {}; function require() {return exports;}; var process={version:0.1};";
-      return RhinoScriptBuilder.newChain().addJSON().evaluateChain(scriptInit, "initScript").evaluateChain(getScriptAsStream(),
-        DEFAULT_UGLIFY_JS);
+      if (scope == null) {
+        builder = RhinoScriptBuilder.newChain().addJSON().evaluateChain(getClass().getResourceAsStream("init.js"),
+          "initScript").evaluateChain(getScriptAsStream(), DEFAULT_UGLIFY_JS);
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
     } catch (final IOException ex) {
       throw new IllegalStateException("Failed initializing js", ex);
     }
   }
+
 
   /**
    * @return the stream of the uglify script. Override this method to provide a different script version.

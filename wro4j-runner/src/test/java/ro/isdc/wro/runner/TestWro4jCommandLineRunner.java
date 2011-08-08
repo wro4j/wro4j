@@ -15,6 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**
  * @author Alex Objelean
@@ -50,17 +54,45 @@ public class TestWro4jCommandLineRunner {
     Wro4jCommandLineRunner.main("-m".split(" "));
   }
 
+  private void invokeRunner(final String[] args) throws Exception {
+    new Wro4jCommandLineRunner() {
+      @Override
+      public void doMain(final String[] arguments) {
+        super.doMain(arguments);
+      }
+      @Override
+      protected void onException(final Exception e) {
+        LOG.error("Exception occured: ", e.getCause());
+        throw new RuntimeException(e);
+      }
+    }.doMain(args);
+  }
+
+  @Test
+  public void useSeveralProcessors() throws Exception {
+    final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
+    final String wroFile = contextFolder + "\\wro.xml";
+    System.out.println("wroFile: " + wroFile);
+    final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
+      JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
+    final String[] args = String.format(
+      "--wroFile %s --contextFolder %s --destinationFolder %s -m --preProcessors " + processorsList,
+        new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+    }).split(" ");
+    invokeRunner(args);
+  }
 
   @Test
   public void useCssLint() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
 
-    final String[] args = String.format("--wroFile %s --contextFolder %s destinationFolder %s -m -c " + CssLintProcessor.ALIAS,
+    final String[] args = String.format("--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + CssLintProcessor.ALIAS,
         new Object[] {
           wroFile, contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
-    Wro4jCommandLineRunner.main(args);
+    invokeRunner(args);
   }
 
 
@@ -71,10 +103,10 @@ public class TestWro4jCommandLineRunner {
     final String wroFile = contextFolder + "\\wro.xml";
 
     final String[] args = String.format(
-        "--wroFile %s --contextFolder %s destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
+        "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
           wroFile, contextFolder, destinationFolder.getAbsolutePath()
         }).split(" ");
-    Wro4jCommandLineRunner.main(args);
+    invokeRunner(args);
   }
 
   @Test
@@ -87,6 +119,6 @@ public class TestWro4jCommandLineRunner {
     final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
       wroFile, contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
-    Wro4jCommandLineRunner.main(args);
+    invokeRunner(args);
   }
 }

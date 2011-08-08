@@ -23,6 +23,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -61,16 +62,33 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private String wroManagerFactory;
+  /**
+   * The path to the destination directory where the files are stored at the end of the process.
+   *
+   * @parameter default-value="${project.build.directory}/wro.properties" expression="${extraConfig}"
+   * @optional
+   */
+  private File extraConfigFile;
 
   /**
    * {@inheritDoc}
    */
   @Override
   protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
+    StandaloneContextAwareManagerFactory factory = null;
     if (wroManagerFactory != null) {
-      return createCustomManagerFactory();
+      factory = createCustomManagerFactory();
+    } else {
+      factory = super.newWroManagerFactory();
     }
-    return super.newWroManagerFactory();
+    if (factory instanceof ExtraConfigFileAware) {
+      if (extraConfigFile == null) {
+        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
+      }
+      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
+      ((ExtraConfigFileAware)factory).setExtraConfigFile(extraConfigFile);
+    }
+    return factory;
   }
 
   /**
@@ -195,7 +213,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       final WroConfiguration config = Context.get().getConfig();
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       //perform processing
-      getManagerFactory().getInstance().process();
+      getManagerFactory().create().process();
       //encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
@@ -256,5 +274,12 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
+  }
+
+  /**
+   * @param extraConfigFile the extraConfigFile to set
+   */
+  public void setExtraConfigFile(final File extraConfigFile) {
+    this.extraConfigFile = extraConfigFile;
   }
 }

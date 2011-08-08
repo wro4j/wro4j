@@ -9,7 +9,8 @@
 	<listener>
 	  <listener-class>ro.isdc.wro.examples.guice.WroGuiceListener</listener-class>
 	</listener>
-	
+  
+  	
 	<filter>
     <filter-name>guiceFilter</filter-name>
     <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>

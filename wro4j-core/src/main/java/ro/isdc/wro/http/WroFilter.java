@@ -39,10 +39,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -354,7 +350,7 @@ public class WroFilter
     throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager
-    wroManagerFactory.getInstance().process();
+    wroManagerFactory.create().process();
   }
 
 
@@ -403,16 +399,7 @@ public class WroFilter
   protected WroManagerFactory getWroManagerFactory() {
     if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
       // If no context param was specified we return the default factory
-      return new BaseWroManagerFactory() {
-        @Override
-        protected UriLocatorFactory newUriLocatorFactory() {
-          return new DefaultUriLocatorFactory();
-        }
-        @Override
-        protected ProcessorsFactory newProcessorsFactory() {
-          return new DefaultProcesorsFactory();
-        }
-      };
+      return new BaseWroManagerFactory();
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;
