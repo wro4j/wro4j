@@ -33,30 +33,14 @@ public class SmartWroModelFactory
 
   private List<WroModelFactory> factoryList;
   /**
-   * A little story about wroFile & wroParentFolder fields: these both were introduced as a result of backward
-   * compatibility required by wro4j-maven-plugin for building the model. The idea is if wroFile is provided, then the
-   * exact file will be used to create the model with all modelFactories provided by {@link SmartWroModelFactory}. The
-   * next wroParentFolder is used and wro model files are searched inside that folder. If this is not provided, the
-   * default lookup is performed.
-   * <p/>
    * The exact file where the model is located.
    */
   private File wroFile;
   /**
-   * The folder where the wro model file is searched.
+   * flag indicating if the wroFile should be autodetected.
    */
-  private File wroParentFolder;
+  private boolean autoDetectWroFile;
 
-  /**
-   * Allow client code to control the location of the wro model file for all available factories.
-   *
-   * @param wroParentFolder the wroParentFolder to set
-   */
-  public SmartWroModelFactory setWroParentFolder(final File wroParentFolder) {
-    Validate.notNull(wroParentFolder);
-    this.wroParentFolder = wroParentFolder;
-    return this;
-  }
 
   /**
    * @param wroFile the wroFile to set
@@ -74,16 +58,15 @@ public class SmartWroModelFactory
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
     LOG.debug("wroFile: " + wroFile);
-    LOG.debug("wroParentFolder: " + wroParentFolder);
     factoryList.add(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {
         if (wroFile != null) {
+          if (autoDetectWroFile) {
+            return new FileInputStream(new File(wroFile.getParentFile(), XmlModelFactory.DEFAULT_FILE_NAME));
+          }
           return new FileInputStream(wroFile);
-        }
-        if (wroParentFolder != null) {
-          return new FileInputStream(new File(wroParentFolder, XmlModelFactory.DEFAULT_FILE_NAME));
         }
         return super.getModelResourceAsStream();
       }
@@ -93,10 +76,10 @@ public class SmartWroModelFactory
       protected InputStream getModelResourceAsStream()
         throws IOException {
         if (wroFile != null) {
+          if (autoDetectWroFile) {
+            return new FileInputStream(new File(wroFile.getParentFile(), GroovyWroModelFactory.DEFAULT_FILE_NAME));
+          }
           return new FileInputStream(wroFile);
-        }
-        if (wroParentFolder != null) {
-          return new FileInputStream(new File(wroParentFolder, GroovyWroModelFactory.DEFAULT_FILE_NAME));
         }
         return super.getModelResourceAsStream();
       }
@@ -106,10 +89,10 @@ public class SmartWroModelFactory
       protected InputStream getModelResourceAsStream()
         throws IOException {
         if (wroFile != null) {
+          if (autoDetectWroFile) {
+            return new FileInputStream(new File(wroFile.getParentFile(), JsonModelFactory.DEFAULT_FILE_NAME));
+          }
           return new FileInputStream(wroFile);
-        }
-        if (wroParentFolder != null) {
-          return new FileInputStream(new File(wroParentFolder, JsonModelFactory.DEFAULT_FILE_NAME));
         }
         return super.getModelResourceAsStream();
       }
@@ -160,6 +143,18 @@ public class SmartWroModelFactory
     return this;
   }
 
+
+  /**
+   * In order to keep backward compatibility for building the model . The idea is if this field is false, then the exact
+   * file will be used to create the model, otherwise, wro model file is autodetected based on the parent folder where
+   * the wroFile is located.
+   *
+   * @param autoDetectWroFile the autoDetectWroFile to set
+   */
+  public SmartWroModelFactory setAutoDetectWroFile(final boolean autoDetectWroFile) {
+    this.autoDetectWroFile = autoDetectWroFile;
+    return this;
+  }
 
 
   /**

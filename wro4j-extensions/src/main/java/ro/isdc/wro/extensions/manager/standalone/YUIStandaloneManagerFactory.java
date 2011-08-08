@@ -5,7 +5,6 @@ package ro.isdc.wro.extensions.manager.standalone;
 
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -19,7 +18,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  */
-public class YUIStandaloneManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
+public class YUIStandaloneManagerFactory extends ExtensionsStandaloneManagerFactory {
   /**
    * {@inheritDoc}
    */

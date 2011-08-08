@@ -14,7 +14,7 @@ import ro.isdc.wro.model.resource.util.HashEncoderNamingStrategy;
  * @author Alex Objelean
  * @created 15 Aug 2010
  */
-public class FingerprintAwareStandaloneManagerFactory extends GoogleStandaloneManagerFactory {
+public class FingerprintAwareStandaloneManagerFactory extends ExtensionsStandaloneManagerFactory {
   public FingerprintAwareStandaloneManagerFactory() {
     setNamingStrategy(new HashEncoderNamingStrategy());
   }

@@ -62,15 +62,6 @@ public class BaseWroManagerFactory
   private List<? extends Transformer<WroModel>> modelTransformers;
 
 
-  public BaseWroManagerFactory() {
-    groupExtractor = newGroupExtractor();
-    modelFactory = newModelFactory();
-    cacheStrategy = newCacheStrategy();
-    hashBuilder = newHashBuilder();
-    modelTransformers = newModelTransformers();
-  }
-
-
   /**
    * Creates default singleton instance of manager, by initializing manager dependencies with default values
    * (processors).
@@ -81,6 +72,22 @@ public class BaseWroManagerFactory
       synchronized (this) {
         if (this.manager == null) {
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+
+          if (modelFactory == null) {
+            modelFactory = newModelFactory();
+          }
+          if (groupExtractor == null) {
+            groupExtractor = newGroupExtractor();
+          }
+          if (cacheStrategy == null) {
+            cacheStrategy = newCacheStrategy();
+          }
+          if (hashBuilder == null) {
+            hashBuilder = newHashBuilder();
+          }
+          if (modelTransformers == null) {
+            modelTransformers = newModelTransformers();
+          }
 
           this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
