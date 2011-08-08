@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
+import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -43,6 +44,7 @@ import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManag
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
@@ -67,14 +69,15 @@ public class Wro4jCommandLineRunner {
   private String targetGroups;
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
-  @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro.xml. By default this is the user current folder.")
-  private final File wroFile = new File(System.getProperty("user.dir"), "wro.xml");
+  @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
+  private File wroFile;
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
   private final File destinationFolder = new File(System.getProperty("user.dir"), "wro");
   @Option(name = "-c", aliases = { "--compressor", "--preProcessors" }, metaVar = "COMPRESSOR", usage = "Comma separated list of processors")
   private String processorsList;
+
 
   public static void main(final String[] args)
     throws Exception {
@@ -115,7 +118,7 @@ public class Wro4jCommandLineRunner {
       onException(e);
     } finally {
       watch.stop();
-      LOG.info("Processing took: {}ms",  watch.getLastTaskTimeMillis());
+      LOG.info("Processing took: {}ms", watch.getLastTaskTimeMillis());
     }
   }
 
@@ -246,7 +249,19 @@ public class Wro4jCommandLineRunner {
           props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, processorsList);
         }
         return new ConfigurableProcessorsFactory().setProperties(props).setPreProcessorsMap(createPreProcessorsMap());
-     }
+      }
+
+
+      @Override
+      protected WroModelFactory newModelFactory() {
+        final SmartWroModelFactory modelFactory = new SmartWroModelFactory();
+        if (wroFile != null) {
+          modelFactory.setWroFile(wroFile);
+        } else {
+          modelFactory.setWroParentFolder(new File(System.getProperty("user.dir")));
+        }
+        return modelFactory;
+      }
     };
     // initialize before process.
     managerFactory.initialize(createStandaloneContext());

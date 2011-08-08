@@ -62,6 +62,8 @@ public class TestWro4jMojo {
     mojo.setExtraConfigFile(extraConfigFile);
     mojo.setDestinationFolder(destinationFolder);
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
+
+    setWroWithValidResources();
   }
 
   private void setWroFile(final String classpathResourceName)

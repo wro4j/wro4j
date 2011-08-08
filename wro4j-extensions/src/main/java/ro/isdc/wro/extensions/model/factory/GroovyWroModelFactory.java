@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Wro4J
+ * Copyright 2011 wro4j
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,10 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 public class GroovyWroModelFactory
   implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(GroovyWroModelFactory.class);
+  /**
+   * Default name of the file used to retrieve the model.
+   */
+  protected static final String DEFAULT_FILE_NAME = "wro.groovy";
 
 
   /**
@@ -73,7 +77,7 @@ public class GroovyWroModelFactory
    * @throws java.io.IOException if the stream couldn't be read.
    */
   protected ResourceLocator getModelResourceLocator() {
-    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
+    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + DEFAULT_FILE_NAME);
   }
 
 
