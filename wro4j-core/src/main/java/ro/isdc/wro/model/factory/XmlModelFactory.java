@@ -33,7 +33,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -43,7 +42,6 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 
 /**
@@ -54,16 +52,16 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   /**
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(XmlModelFactory.class);
 
   /**
-   * Default xml to parse.
+   * Default xml filename.
    */
-  protected static final String DEFAULT_FILE_NAME = "wro.xml";
+  private static final String DEFAULT_FILE_NAME = "wro.xml";
 
   /**
    * Default xml to parse.
@@ -135,7 +133,7 @@ public class XmlModelFactory
       factory.setNamespaceAware(true);
       final InputStream configResource = getModelResourceLocator().getInputStream();
       if (configResource == null) {
-        throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
+        throw new WroRuntimeException("Could not locate config resource (" + DEFAULT_FILE_NAME + ")!");
       }
       document = factory.newDocumentBuilder().parse(configResource);
       validate(document);
@@ -326,22 +324,11 @@ public class XmlModelFactory
   }
 
   /**
-   * Override this method, in order to provide different xml definition file name.
-   *
-   * @return stream of the xml representation of the model.
-   */
-  protected ResourceLocator getModelResourceLocator() {
-    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.xml");
-  }
-
-
-  /**
    * @return InputStream of the local resource from classpath.
    */
   private static InputStream getResourceAsStream(final String fileName) {
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
   }
-
 
   /**
    * Checks if xml structure is valid.
@@ -358,11 +345,13 @@ public class XmlModelFactory
     validator.validate(new DOMSource(document));
   }
 
-
   /**
    * {@inheritDoc}
    */
-  public void destroy() {}
+  @Override
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
+  }
 
 
   /**

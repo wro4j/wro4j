@@ -1,10 +1,11 @@
 /**
- * Copyright@2011 wor4j
+ * Copyright@2011 wro4j
  */
 package ro.isdc.wro.extensions.model.factory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -31,8 +33,7 @@ import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
  * @created 6 Aug 2011
  * @since 1.4.0
  */
-public class SmartWroModelFactory
-  implements WroModelFactory {
+public class SmartWroModelFactory extends AbstractWroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(SmartWroModelFactory.class);
   /**
    * The default location of the wro model file.
@@ -45,18 +46,23 @@ public class SmartWroModelFactory
    */
   private File wroFile;
   /**
-   * flag indicating if the wroFile should be autodetected.
+   * flag indicating if the wroFile should be auto detected.
    */
   private boolean autoDetectWroFile;
 
 
   /**
    * Use this factory method when you want to use the {@link SmartWroModelFactory} in standalone (maven plugin) context.
+   * The autoDetect flag is set to true if the wroFile path is the same as the default wro file name.
    */
   public static SmartWroModelFactory createFromStandaloneContext(final StandaloneContext context) {
     Validate.notNull(context);
     final boolean autoDetectWroFile = FilenameUtils.normalize(context.getWroFile().getPath()).contains(
       FilenameUtils.normalize(DEFAULT_WRO_FILE));
+    if (!autoDetectWroFile) {
+      LOG.info("autoDetect is " + autoDetectWroFile + " because wroFile: " + context.getWroFile()
+        + " is not the same as the default one: " + DEFAULT_WRO_FILE);
+    }
     return new SmartWroModelFactory().setWroFile(context.getWroFile()).setAutoDetectWroFile(autoDetectWroFile);
   }
 
@@ -78,7 +84,7 @@ public class SmartWroModelFactory
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    LOG.info("autoDetect wroFile: " + autoDetectWroFile);
+    LOG.debug("auto detect wroFile: " + autoDetectWroFile);
     factoryList.add(newXmlModelFactory());
     factoryList.add(newGroovyModelFactory());
     factoryList.add(newJsonModelFactory());
@@ -90,7 +96,10 @@ public class SmartWroModelFactory
     return new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return createAutoDetectingResourceLocator(super.getModelResourceLocator(), XmlModelFactory.DEFAULT_FILE_NAME);
+        if (wroFile == null) {
+          return super.getModelResourceLocator();
+        }
+        return createAutoDetectingResourceLocator(getDefaultModelFilename());
       }
     };
   }
@@ -100,7 +109,10 @@ public class SmartWroModelFactory
     return new GroovyWroModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return createAutoDetectingResourceLocator(super.getModelResourceLocator(), GroovyWroModelFactory.DEFAULT_FILE_NAME);
+        if (wroFile == null) {
+          return super.getModelResourceLocator();
+        }
+        return createAutoDetectingResourceLocator(getDefaultModelFilename());
       }
     };
   }
@@ -110,7 +122,10 @@ public class SmartWroModelFactory
     return new JsonModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return createAutoDetectingResourceLocator(super.getModelResourceLocator(), JsonModelFactory.DEFAULT_FILE_NAME);
+        if (wroFile == null) {
+          return super.getModelResourceLocator();
+        }
+        return createAutoDetectingResourceLocator(getDefaultModelFilename());
       };
     };
   };
@@ -118,22 +133,28 @@ public class SmartWroModelFactory
   /**
    * Creates a {@link ResourceLocator} which is handles the autoDetection logic.
    */
-  private ResourceLocator createAutoDetectingResourceLocator(final ResourceLocator resourceLocator,
-    final String defaultFileName) {
-    if (wroFile == null) {
-      return resourceLocator;
-    }
+  private ResourceLocator createAutoDetectingResourceLocator(final String defaultFileName) {
     return new AbstractResourceLocator() {
       @Override
       public InputStream getInputStream()
         throws IOException {
-        if (autoDetectWroFile) {
-          final File file = new File(wroFile.getParentFile(), defaultFileName);
-          LOG.info("loading autodetected wro file: " + file);
-          return new FileInputStream(file);
+        try {
+          Validate.notNull(wroFile, "Cannot call this method if wroFile is null!");
+          if (autoDetectWroFile) {
+            final File file = new File(wroFile.getParentFile(), defaultFileName);
+            LOG.info("loading autodetected wro file: " + file);
+            return new FileInputStream(file);
+          }
+          LOG.info("loading wroFile: " + wroFile);
+          return new FileInputStream(wroFile);
+        } catch (final FileNotFoundException e) {
+          // When auto detect is turned on, do not skip trying.. because the auto detection assume that the wro file name
+          // can be wrong.
+          if (autoDetectWroFile) {
+            throw e;
+          }
+          throw new WroRuntimeException("The wroFile doesn't exist. Skip trying with other wro model factories", e);
         }
-        LOG.info("loading wroFile: " + wroFile);
-        return new FileInputStream(wroFile);
       }
     };
   }
@@ -155,6 +176,10 @@ public class SmartWroModelFactory
       } catch (final WroRuntimeException e) {
         LOG.info("Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
         LOG.debug("Exception occured while building the model using: " + getClassName(factory.getClass()), e);
+        //stop trying with other factories if the reason is IOException
+        if (!autoDetectWroFile && e.getCause() instanceof IOException) {
+          throw e;
+        }
       }
     }
     throw new WroRuntimeException("Cannot create model using any of provided factories");
@@ -199,6 +224,17 @@ public class SmartWroModelFactory
    * {@inheritDoc}
    */
   @Override
-  public void destroy() {}
+  protected String getDefaultModelFilename() {
+    return DEFAULT_WRO_FILE;
+  }
 
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected InputStream getModelResourceAsStream()
+    throws IOException {
+    throw new IllegalStateException("This method should never be called!");
+  }
 }

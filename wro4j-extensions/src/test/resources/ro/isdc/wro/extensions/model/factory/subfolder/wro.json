@@ -1,0 +1,25 @@
+{
+  groups: [{
+    name: "g1",
+    resources: [{
+      type: "JS",
+      uri: "/static/app.js",
+      minimize: true
+    }, {
+      type: "CSS",
+      uri: "/static/app.css",
+      minimize: true
+    }]
+  }, {
+    name: "g2",
+    resources: [{
+      type: "JS",
+      uri: "classpath:com/application/static/app.js",
+      minimize: true
+    }, {
+      type: "CSS",
+      uri: "http://www.site.com/static/app.css",
+      minimize: true
+    }]
+  }]
+}
