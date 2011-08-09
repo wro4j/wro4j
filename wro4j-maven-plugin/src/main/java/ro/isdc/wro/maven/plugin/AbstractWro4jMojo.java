@@ -17,13 +17,11 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
+import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactory;
 
 
 /**
@@ -31,23 +29,11 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  *
  * @author Alex Objelean
  */
-/**
- * @author Admin
- *
- */
 public abstract class AbstractWro4jMojo extends AbstractMojo {
-  /**
-   * Folder where the wro model file is located by default. This is used if no wroFile is provided. This property was
-   * added in order to be able to use {@link SmartWroModelFactory} and keep the backward compatibility with earlier versions.
-   *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/"
-   * @optional
-   */
-  private File defaultWroFolder;
   /**
    * File containing the groups definitions.
    *
-   * @parameter
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
    * @optional
    */
   private File wroFile;
@@ -93,7 +79,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     validate();
     extendPluginClasspath();
     getLog().info("Executing the mojo: ");
-    getLog().info("Wro4j Model path: " + getWroFile().getPath());
+    getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
@@ -141,22 +127,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return managerFactory;
   }
 
-  /**
-   * @return
-   */
   protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
-    return new DefaultStandaloneContextAwareManagerFactory() {
-      @Override
-      protected WroModelFactory newModelFactory() {
-        final SmartWroModelFactory modelFactory = new SmartWroModelFactory();
-        if (wroFile != null) {
-          modelFactory.setWroFile(wroFile);
-        } else if (defaultWroFolder != null) {
-          modelFactory.setWroParentFolder(defaultWroFolder);
-        }
-        return modelFactory;
-      }
-    };
+    return new ExtensionsStandaloneManagerFactory();
   }
 
   /**
@@ -177,7 +149,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected void validate()
     throws MojoExecutionException {
     if (wroFile == null) {
-      throw new MojoExecutionException("wroFile was not set!");
+      throw new MojoExecutionException("contextFolder was not set!");
     }
     if (contextFolder == null) {
       throw new MojoExecutionException("contextFolder was not set!");
@@ -300,13 +272,5 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    */
   public void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
-  }
-
-
-  /**
-   * @param defaultWroFolder the defaultWroFolder to set
-   */
-  public void setDefaultWroFolder(final File defaultWroFolder) {
-    this.defaultWroFolder = defaultWroFolder;
   }
 }

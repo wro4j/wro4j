@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.maven.plugin.support.ConfigurableWroManagerFactory;
+import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
@@ -63,7 +63,6 @@ public class TestWro4jMojo {
     mojo.setDestinationFolder(destinationFolder);
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
 
-    setWroWithValidResources();
   }
 
   private void setWroFile(final String classpathResourceName)

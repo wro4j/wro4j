@@ -26,7 +26,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**
- * Maven plugin used to validate css code defined in wro model.
+ * Maven plugin which use a singe processor.
  *
  * @author Alex Objelean
  * @since 1.3.8

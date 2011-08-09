@@ -10,11 +10,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -32,35 +34,36 @@ import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 public class SmartWroModelFactory
   implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(SmartWroModelFactory.class);
+  /**
+   * The default location of the wro model file.
+   */
+  private static final String DEFAULT_WRO_FILE = "/src/main/webapp/WEB-INF/wro.xml";
 
   private List<WroModelFactory> factoryList;
   /**
-   * A little story about wroFile & wroParentFolder fields: these both were introduced as a result of backward
-   * compatibility required by wro4j-maven-plugin for building the model. The idea is if wroFile is provided, then the
-   * exact file will be used to create the model with all modelFactories provided by {@link SmartWroModelFactory}. The
-   * next wroParentFolder is used and wro model files are searched inside that folder. If this is not provided, the
-   * default lookup is performed.
-   * <p/>
    * The exact file where the model is located.
    */
   private File wroFile;
   /**
-   * The folder where the wro model file is searched.
+   * flag indicating if the wroFile should be autodetected.
    */
-  private File wroParentFolder;
+  private boolean autoDetectWroFile;
+
 
   /**
-   * Allow client code to control the location of the wro model file for all available factories.
-   *
-   * @param wroParentFolder the wroParentFolder to set
+   * Use this factory method when you want to use the {@link SmartWroModelFactory} in standalone (maven plugin) context.
    */
-  public SmartWroModelFactory setWroParentFolder(final File wroParentFolder) {
-    Validate.notNull(wroParentFolder);
-    this.wroParentFolder = wroParentFolder;
-    return this;
+  public static SmartWroModelFactory createFromStandaloneContext(final StandaloneContext context) {
+    Validate.notNull(context);
+    final boolean autoDetectWroFile = FilenameUtils.normalize(context.getWroFile().getPath()).contains(
+      FilenameUtils.normalize(DEFAULT_WRO_FILE));
+    return new SmartWroModelFactory().setWroFile(context.getWroFile()).setAutoDetectWroFile(autoDetectWroFile);
   }
 
+
   /**
+   * The file to use for creating model. It is not required to set this field, but if you set, do not set a null object.
+   *
    * @param wroFile the wroFile to set
    */
   public SmartWroModelFactory setWroFile(final File wroFile) {
@@ -75,76 +78,62 @@ public class SmartWroModelFactory
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    LOG.debug("wroFile: " + wroFile);
-    LOG.debug("wroParentFolder: " + wroParentFolder);
+    LOG.info("autoDetect wroFile: " + autoDetectWroFile);
     factoryList.add(newXmlModelFactory());
     factoryList.add(newGroovyModelFactory());
     factoryList.add(newJsonModelFactory());
     return factoryList;
   }
 
-  private JsonModelFactory newJsonModelFactory() {
-    return new JsonModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        final ResourceLocator superLocator = super.getModelResourceLocator();
-        return new AbstractResourceLocator() {
-          @Override
-          public InputStream getInputStream()
-              throws IOException {
-            if (wroFile != null) {
-              return new FileInputStream(wroFile);
-            }
-            if (wroParentFolder != null) {
-              return new FileInputStream(new File(wroParentFolder, JsonModelFactory.DEFAULT_FILE_NAME));
-            }
-            return superLocator.getInputStream();
-          }
-        };
-      }
-    };
-  }
-
-  private GroovyWroModelFactory newGroovyModelFactory() {
-    return new GroovyWroModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        final ResourceLocator superLocator = super.getModelResourceLocator();
-        return new AbstractResourceLocator() {
-          @Override
-          public InputStream getInputStream()
-              throws IOException {
-            if (wroFile != null) {
-              return new FileInputStream(wroFile);
-            }
-            if (wroParentFolder != null) {
-              return new FileInputStream(new File(wroParentFolder, GroovyWroModelFactory.DEFAULT_FILE_NAME));
-            }
-            return superLocator.getInputStream();
-          }
-        };
-      }
-    };
-  }
 
   private XmlModelFactory newXmlModelFactory() {
     return new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        final ResourceLocator superLocator = super.getModelResourceLocator();
-        return new AbstractResourceLocator() {
-          @Override
-          public InputStream getInputStream()
-              throws IOException {
-            if (wroFile != null) {
-              return new FileInputStream(wroFile);
-            }
-            if (wroParentFolder != null) {
-              return new FileInputStream(new File(wroParentFolder, XmlModelFactory.DEFAULT_FILE_NAME));
-            }
-            return superLocator.getInputStream();
-          }
-        };
+        return createAutoDetectingResourceLocator(super.getModelResourceLocator(), XmlModelFactory.DEFAULT_FILE_NAME);
+      }
+    };
+  }
+
+
+  private GroovyWroModelFactory newGroovyModelFactory() {
+    return new GroovyWroModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return createAutoDetectingResourceLocator(super.getModelResourceLocator(), GroovyWroModelFactory.DEFAULT_FILE_NAME);
+      }
+    };
+  }
+
+
+  private JsonModelFactory newJsonModelFactory() {
+    return new JsonModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return createAutoDetectingResourceLocator(super.getModelResourceLocator(), JsonModelFactory.DEFAULT_FILE_NAME);
+      };
+    };
+  };
+
+  /**
+   * Creates a {@link ResourceLocator} which is handles the autoDetection logic.
+   */
+  private ResourceLocator createAutoDetectingResourceLocator(final ResourceLocator resourceLocator,
+    final String defaultFileName) {
+    if (wroFile == null) {
+      return resourceLocator;
+    }
+    return new AbstractResourceLocator() {
+      @Override
+      public InputStream getInputStream()
+        throws IOException {
+        if (autoDetectWroFile) {
+          final File file = new File(wroFile.getParentFile(), defaultFileName);
+          LOG.info("loading autodetected wro file: " + file);
+          return new FileInputStream(file);
+        }
+        LOG.info("loading wroFile: " + wroFile);
+        return new FileInputStream(wroFile);
       }
     };
   }
@@ -165,7 +154,7 @@ public class SmartWroModelFactory
         return factory.create();
       } catch (final WroRuntimeException e) {
         LOG.info("Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
-        LOG.debug("Exception occured while building the model using :" + getClassName(factory.getClass()), e);
+        LOG.debug("Exception occured while building the model using: " + getClassName(factory.getClass()), e);
       }
     }
     throw new WroRuntimeException("Cannot create model using any of provided factories");
@@ -192,6 +181,18 @@ public class SmartWroModelFactory
     return this;
   }
 
+
+  /**
+   * In order to keep backward compatibility for building the model . The idea is if this field is false, then the exact
+   * file will be used to create the model, otherwise, wro model file is autodetected based on the parent folder where
+   * the wroFile is located.
+   *
+   * @param autoDetectWroFile the autoDetectWroFile to set
+   */
+  public SmartWroModelFactory setAutoDetectWroFile(final boolean autoDetectWroFile) {
+    this.autoDetectWroFile = autoDetectWroFile;
+    return this;
+  }
 
 
   /**
