@@ -19,16 +19,14 @@ import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 
 
 /**
@@ -39,12 +37,12 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  * @since 1.4.0
  */
 public class GroovyWroModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(GroovyWroModelFactory.class);
   /**
    * Default name of the file used to retrieve the model.
    */
-  protected static final String DEFAULT_FILE_NAME = "wro.groovy";
+  private static final String DEFAULT_FILE_NAME = "wro.groovy";
 
 
   /**
@@ -67,23 +65,12 @@ public class GroovyWroModelFactory
     }
   }
 
-
-  /**
-   * Override this method, in order to provide different groovy model location.
-   *
-   * @return stream of the json representation of the model.
-   * @throws java.io.IOException if the stream couldn't be read.
-   */
-  protected InputStream getModelResourceAsStream()
-    throws IOException {
-    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/" + DEFAULT_FILE_NAME);
-  }
-
-
   /**
    * {@inheritDoc}
    */
   @Override
-  public void destroy() {}
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
+  }
 
 }
