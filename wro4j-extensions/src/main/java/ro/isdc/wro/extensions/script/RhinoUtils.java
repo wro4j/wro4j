@@ -109,8 +109,9 @@ public class RhinoUtils {
       encode(s, (Collection<?>) object, depth);
     } else if (object instanceof Map) {
       encode(s, (Map<?, ?>) object, depth);
-    } else if (object instanceof NativeArray) {
-      encode(s, (NativeArray) object, depth);
+//    } else if (object instanceof NativeArray) {
+//      final NativeArray nativeArray = (NativeArray) object;
+//      encode(s, nativeArray, depth);
     } else if (object instanceof ScriptableObject) {
       final ScriptableObject scriptable = (ScriptableObject) object;
       if (scriptable.getClassName().equals("Date")) {
