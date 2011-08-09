@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.algorithm.less.LessCss;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -39,7 +40,17 @@ public class TestLessCssProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
-//  @Test(expected=WroRuntimeException.class)
+
+  @Test
+  public void executeMultipleTimesDoesntThrowOutOfMemoryException() {
+    final LessCss lessCss = new LessCss();
+    for (int i = 0; i < 100; i++) {
+      lessCss.less("#id {.class {color: red;}}");
+    }
+  }
+
+
+  @Test(expected=WroRuntimeException.class)
   public void testInvalidLessCss()
       throws Exception {
     final ResourcePostProcessor processor = new LessCssProcessor() {
