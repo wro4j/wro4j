@@ -43,7 +43,10 @@ public class SmartWroModelFactory
 
 
   /**
-   * @param wroFile the wroFile to set
+   * The file to use for creating model. It is not required to set this field, but if you set, do not set a null object.
+   *
+   * @param wroFile
+   *          the wroFile to set
    */
   public SmartWroModelFactory setWroFile(final File wroFile) {
     Validate.notNull(wroFile);
@@ -57,15 +60,18 @@ public class SmartWroModelFactory
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    LOG.debug("wroFile: " + wroFile);
+    LOG.info("autoDetect wroFile: " + autoDetectWroFile);
     factoryList.add(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {
         if (wroFile != null) {
           if (autoDetectWroFile) {
-            return new FileInputStream(new File(wroFile.getParentFile(), XmlModelFactory.DEFAULT_FILE_NAME));
+            final File file = new File(wroFile.getParentFile(), XmlModelFactory.DEFAULT_FILE_NAME);
+            LOG.info("loading autodetected wro file: " + file);
+            return new FileInputStream(file);
           }
+          LOG.info("loading wroFile: " + wroFile);
           return new FileInputStream(wroFile);
         }
         return super.getModelResourceAsStream();
@@ -77,8 +83,11 @@ public class SmartWroModelFactory
         throws IOException {
         if (wroFile != null) {
           if (autoDetectWroFile) {
-            return new FileInputStream(new File(wroFile.getParentFile(), GroovyWroModelFactory.DEFAULT_FILE_NAME));
+            final File file = new File(wroFile.getParentFile(), GroovyWroModelFactory.DEFAULT_FILE_NAME);
+            LOG.info("loading autodetected wro file: " + file);
+            return new FileInputStream(file);
           }
+          LOG.info("loading wroFile: " + wroFile);
           return new FileInputStream(wroFile);
         }
         return super.getModelResourceAsStream();
@@ -90,8 +99,11 @@ public class SmartWroModelFactory
         throws IOException {
         if (wroFile != null) {
           if (autoDetectWroFile) {
-            return new FileInputStream(new File(wroFile.getParentFile(), JsonModelFactory.DEFAULT_FILE_NAME));
+            final File file = new File(wroFile.getParentFile(), JsonModelFactory.DEFAULT_FILE_NAME);
+            LOG.info("loading autodetected wro file: " + file);
+            return new FileInputStream(file);
           }
+          LOG.info("loading wroFile: " + wroFile);
           return new FileInputStream(wroFile);
         }
         return super.getModelResourceAsStream();

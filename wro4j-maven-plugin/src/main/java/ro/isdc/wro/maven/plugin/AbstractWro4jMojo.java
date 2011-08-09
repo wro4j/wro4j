@@ -33,7 +33,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * File containing the groups definitions.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/web.xml"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
    * @optional
    */
   private File wroFile;

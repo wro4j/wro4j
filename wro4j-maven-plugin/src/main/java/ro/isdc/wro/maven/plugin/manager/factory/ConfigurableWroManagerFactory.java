@@ -13,7 +13,9 @@ import java.util.Properties;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -28,6 +30,23 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class ConfigurableWroManagerFactory
     extends ConfigurableStandaloneContextAwareManagerFactory implements ExtraConfigFileAware {
   private File configProperties;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initialize(final StandaloneContext standaloneContext) {
+    super.initialize(standaloneContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroModelFactory newModelFactory() {
+    //TODO reuse SmartModelCreation
+    return null;
+  }
+
   /**
    * @return a map of preProcessors.
    */
