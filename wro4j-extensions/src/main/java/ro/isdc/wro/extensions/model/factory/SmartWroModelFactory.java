@@ -10,11 +10,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -30,6 +32,10 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 public class SmartWroModelFactory
   implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(SmartWroModelFactory.class);
+  /**
+   * The default location of the wro model file.
+   */
+  private static final String DEFAULT_WRO_FILE = "/src/main/webapp/WEB-INF/wro.xml";
 
   private List<WroModelFactory> factoryList;
   /**
@@ -41,6 +47,15 @@ public class SmartWroModelFactory
    */
   private boolean autoDetectWroFile;
 
+  /**
+   * Use this factory method when you want to use the {@link SmartWroModelFactory} in standalone (maven plugin) context.
+   */
+  public static SmartWroModelFactory createFromStandaloneContext(final StandaloneContext context) {
+    Validate.notNull(context);
+    final boolean autoDetectWroFile = FilenameUtils.normalize(context.getWroFile().getPath()).contains(
+        FilenameUtils.normalize(DEFAULT_WRO_FILE));
+    return new SmartWroModelFactory().setWroFile(context.getWroFile()).setAutoDetectWroFile(autoDetectWroFile);
+  }
 
   /**
    * The file to use for creating model. It is not required to set this field, but if you set, do not set a null object.

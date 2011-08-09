@@ -33,7 +33,9 @@ import com.google.javascript.jscomp.CompilationLevel;
  *
  * @author Alex Objelean
  */
-public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroManagerFactory {
+public class ExtensionsConfigurableWroManagerFactory
+    extends ConfigurableWroManagerFactory {
+
   /**
    * {@inheritDoc}
    */
@@ -50,13 +52,14 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     pupulateMapWithExtensionsProcessors(map);
   }
 
-
   /**
    * Populates a map of processors with processors existing in extensions module.
    *
-   * @param <T> type of processors (pre or post). This can be one of the following: {@link ResourcePreProcessor} or
-   *        {@link ResourcePostProcessor}.
-   * @param map to populate.
+   * @param <T>
+   *          type of processors (pre or post). This can be one of the following: {@link ResourcePreProcessor} or
+   *          {@link ResourcePostProcessor}.
+   * @param map
+   *          to populate.
    */
   @SuppressWarnings("unchecked")
   public static <T> void pupulateMapWithExtensionsProcessors(final Map<String, T> map) {
@@ -71,7 +74,8 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put(LessCssProcessor.ALIAS, (T) new LessCssProcessor());
     map.put(SassCssProcessor.ALIAS, (T) new SassCssProcessor());
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, (T) new GoogleClosureCompressorProcessor());
-    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(
+        CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put(CoffeeScriptProcessor.ALIAS, (T) new CoffeeScriptProcessor());
     map.put(CJsonProcessor.ALIAS_PACK, (T) CJsonProcessor.packProcessor());
     map.put(CJsonProcessor.ALIAS_UNPACK, (T) CJsonProcessor.unpackProcessor());
