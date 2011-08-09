@@ -33,7 +33,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -51,16 +50,16 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   /**
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(XmlModelFactory.class);
 
   /**
-   * Default xml to parse.
+   * Default xml filename.
    */
-  protected static final String DEFAULT_FILE_NAME = "wro.xml";
+  private static final String DEFAULT_FILE_NAME = "wro.xml";
 
   /**
    * Default xml to parse.
@@ -133,7 +132,7 @@ public class XmlModelFactory
       factory.setNamespaceAware(true);
       final InputStream configResource = getModelResourceAsStream();
       if (configResource == null) {
-        throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
+        throw new WroRuntimeException("Could not locate config resource (" + DEFAULT_FILE_NAME + ")!");
       }
       document = factory.newDocumentBuilder().parse(configResource);
       validate(document);
@@ -165,18 +164,6 @@ public class XmlModelFactory
     final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
-  }
-
-
-  /**
-   * Override this method, in order to provide different xml definition file name.
-   *
-   * @return stream of the xml representation of the model.
-   * @throws IOException if the stream couldn't be read.
-   */
-  protected InputStream getModelResourceAsStream()
-    throws IOException {
-    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.xml");
   }
 
 
@@ -346,7 +333,6 @@ public class XmlModelFactory
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
   }
 
-
   /**
    * Checks if xml structure is valid.
    *
@@ -362,11 +348,13 @@ public class XmlModelFactory
     validator.validate(new DOMSource(document));
   }
 
-
   /**
    * {@inheritDoc}
    */
-  public void destroy() {}
+  @Override
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
+  }
 
 //
 //  /**

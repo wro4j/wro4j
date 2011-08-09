@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -12,9 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,12 +28,12 @@ import com.google.gson.reflect.TypeToken;
  * @since 1.3.6
  */
 public class JsonModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
   /**
    * Default name of the file used to retrieve the model.
    */
-  protected static final String DEFAULT_FILE_NAME = "wro.json";
+  private static final String DEFAULT_FILE_NAME = "wro.json";
 
   /**
    * {@inheritDoc}
@@ -60,19 +58,10 @@ public class JsonModelFactory
   }
 
   /**
-   * Override this method, in order to provide different json model location.
-   *
-   * @return stream of the json representation of the model.
-   * @throws IOException if the stream couldn't be read.
-   */
-  protected InputStream getModelResourceAsStream() throws IOException {
-    return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.json");
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
-  public void destroy() {}
-
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
+  }
 }

@@ -15,18 +15,21 @@
 */
 package ro.isdc.wro.extensions.model.factory;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 
@@ -38,6 +41,10 @@ public class TestSmartWroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestSmartWroModelFactory.class);
   private SmartWroModelFactory factory;
 
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
 
   @Test(expected = WroRuntimeException.class)
   public void noFactoryProvided() throws Exception {
@@ -67,5 +74,28 @@ public class TestSmartWroModelFactory {
   public void testDefaultInstance() throws Exception {
     factory = new SmartWroModelFactory();
     factory.create();
+  }
+
+  @Test
+  public void shouldCreateValidModelWhenWroFileIsSet() throws Exception {
+    factory = new SmartWroModelFactory();
+    final File wroFile = new File(getClass().getResource("wro.xml").toURI());
+    factory.setWroFile(wroFile);
+    Assert.assertNotNull(factory.create());
+  }
+
+  @Test
+  public void shouldCreateValidModelWhenAutoDetectIsTrue() throws Exception {
+    factory = new SmartWroModelFactory();
+    final File wroFile = new File(getClass().getResource("subfolder/wro.json").toURI());
+    factory.setWroFile(wroFile).setAutoDetectWroFile(true);
+    Assert.assertNotNull(factory.create());
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void testWithInvalidWroFileSet() throws Exception {
+    final File wroFile = new File("/path/to/invalid/wro.xml");
+    factory = new SmartWroModelFactory().setWroFile(wroFile);
+    Assert.assertNotNull(factory.create());
   }
 }
