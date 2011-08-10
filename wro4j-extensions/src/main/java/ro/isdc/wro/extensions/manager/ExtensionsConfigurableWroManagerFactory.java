@@ -32,7 +32,9 @@ import com.google.javascript.jscomp.CompilationLevel;
  *
  * @author Alex Objelean
  */
-public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroManagerFactory {
+public class ExtensionsConfigurableWroManagerFactory
+    extends ConfigurableWroManagerFactory {
+
   /**
    * {@inheritDoc}
    */
@@ -49,7 +51,6 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
   protected void contributePreProcessors(final Map<String, ResourceProcessor> map) {
     pupulateMapWithExtensionsProcessors(map);
   }
-
 
   /**
    * Populates a map of processors with processors existing in extensions module.

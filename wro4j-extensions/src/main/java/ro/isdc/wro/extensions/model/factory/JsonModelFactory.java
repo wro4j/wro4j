@@ -11,9 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
@@ -31,12 +30,12 @@ import com.google.gson.reflect.TypeToken;
  * @since 1.3.6
  */
 public class JsonModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(JsonModelFactory.class);
   /**
    * Default name of the file used to retrieve the model.
    */
-  protected static final String DEFAULT_FILE_NAME = "wro.json";
+  private static final String DEFAULT_FILE_NAME = "wro.json";
 
   /**
    * {@inheritDoc}
@@ -60,14 +59,11 @@ public class JsonModelFactory
     }
   }
 
-  protected ResourceLocator getModelResourceLocator() {
-    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + DEFAULT_FILE_NAME);
-  }
-
   /**
    * {@inheritDoc}
    */
   @Override
-  public void destroy() {}
-
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
+  }
 }

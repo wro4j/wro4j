@@ -10,6 +10,7 @@ import java.io.InputStream;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import ro.isdc.wro.util.StringUtils;
  * interpreting relative paths within the web application root directory.
  *
  * @author Alex Objelean
- * @since 1.4.0
+ * @since 1.5.0
  */
 public class ServletContextResourceLocator
     extends AbstractResourceLocator {
@@ -36,12 +37,8 @@ public class ServletContextResourceLocator
   private final String path;
 
   public ServletContextResourceLocator(final ServletContext servletContext, final String path) {
-    if (servletContext == null) {
-      throw new IllegalArgumentException("ServletContext cannot be null!");
-    }
-    if (path == null) {
-      throw new IllegalArgumentException("Path cannot be null!");
-    }
+    Validate.notNull(servletContext);
+    Validate.notNull(path);
     this.servletContext = servletContext;
     String pathToUse = StringUtils.cleanPath(path);
     if (!pathToUse.startsWith(PREFIX)) {
@@ -55,11 +52,8 @@ public class ServletContextResourceLocator
    */
   public InputStream getInputStream()
       throws IOException {
+    Validate.notNull(path);
     LOG.debug("locating uri: " + path);
-    if (path == null) {
-      throw new IllegalArgumentException("URI cannot be NULL!");
-    }
-    LOG.debug("uri resource: " + path);
     try {
       if (getWildcardStreamLocator().hasWildcard(path)) {
         final String fullPath = FilenameUtils.getFullPath(path);

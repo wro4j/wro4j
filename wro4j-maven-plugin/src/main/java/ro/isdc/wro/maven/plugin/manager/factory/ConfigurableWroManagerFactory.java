@@ -2,7 +2,7 @@
  * Copyright (C) 2011 Betfair.
  * All rights reserved.
  */
-package ro.isdc.wro.maven.plugin.support;
+package ro.isdc.wro.maven.plugin.manager.factory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,11 @@ import java.util.Properties;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
+import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
@@ -25,7 +29,25 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  */
 public class ConfigurableWroManagerFactory
     extends ConfigurableStandaloneContextAwareManagerFactory implements ExtraConfigFileAware {
+  private StandaloneContext standaloneContext;
   private File configProperties;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void initialize(final StandaloneContext standaloneContext) {
+    super.initialize(standaloneContext);
+    this.standaloneContext = standaloneContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroModelFactory newModelFactory() {
+    return SmartWroModelFactory.createFromStandaloneContext(standaloneContext);
+  }
+
   /**
    * @return a map of preProcessors.
    */
