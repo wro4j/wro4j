@@ -34,7 +34,7 @@ public class JsonHPack {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        builder = RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
+        builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(
           getScriptAsStream(), "script.js");
         scope = builder.getScope();
       } else {
@@ -49,7 +49,7 @@ public class JsonHPack {
 
 
   /**
-   * @return stream of the less.js script.
+   * @return stream of the script.
    */
   protected InputStream getScriptAsStream() {
     return getClass().getResourceAsStream("json.hpack.min.js");
