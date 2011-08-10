@@ -34,8 +34,8 @@ public class JsonHPack {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(
-          getScriptAsStream(), "script.js");
+        builder = RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
+          getScriptAsStream(), "json.hpack.js");
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);
@@ -52,7 +52,7 @@ public class JsonHPack {
    * @return stream of the script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream("json.hpack.min.js");
+    return getClass().getResourceAsStream("json.hpack.js");
   }
 
 
@@ -71,7 +71,8 @@ public class JsonHPack {
     }
 
     try {
-      final String execute = "JSON.stringify(JSON.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
+
+      final String execute = "JSON.stringify(JsonHPack.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
       final Object result = builder.evaluate(execute, "unpack");
 
       String resultAsString = String.valueOf(result);
@@ -108,7 +109,7 @@ public class JsonHPack {
     }
 
     try {
-      final String execute = "JSON.stringify(JSON.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
+      final String execute = "JSON.stringify(JsonHPack.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
       final Object result = builder.evaluate(execute, "pack");
       String resultAsString = String.valueOf(result);
       if (!isEnclosedInArray) {
