@@ -9,6 +9,9 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -18,8 +21,8 @@ import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.ServletContextAwareXmlModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -42,6 +45,7 @@ import ro.isdc.wro.util.Transformer;
  */
 public class BaseWroManagerFactory
   implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, ObjectFactory<WroManager> {
+  private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
   /**
    * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
    */
@@ -57,17 +61,10 @@ public class BaseWroManagerFactory
   private HashBuilder hashBuilder;
   private List<? extends Transformer<WroModel>> modelTransformers;
 
-  public BaseWroManagerFactory() {
-    groupExtractor = newGroupExtractor();
-    modelFactory = newModelFactory();
-    cacheStrategy = newCacheStrategy();
-    hashBuilder = newHashBuilder();
-    modelTransformers = newModelTransformers();
-  }
 
   /**
-   * Creates default singleton instance of manager, by initializing manager
-   * dependencies with default values (processors).
+   * Creates default singleton instance of manager, by initializing manager dependencies with default values
+   * (processors).
    */
   public final WroManager create() {
     // use double-check locking
@@ -75,6 +72,22 @@ public class BaseWroManagerFactory
       synchronized (this) {
         if (this.manager == null) {
           final Injector injector = new Injector(newUriLocatorFactory(), newProcessorsFactory());
+
+          if (modelFactory == null) {
+            modelFactory = newModelFactory();
+          }
+          if (groupExtractor == null) {
+            groupExtractor = newGroupExtractor();
+          }
+          if (cacheStrategy == null) {
+            cacheStrategy = newCacheStrategy();
+          }
+          if (hashBuilder == null) {
+            hashBuilder = newHashBuilder();
+          }
+          if (modelTransformers == null) {
+            modelTransformers = newModelTransformers();
+          }
 
           this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
@@ -89,12 +102,14 @@ public class BaseWroManagerFactory
     return manager;
   }
 
+
   /**
    * @return default implementation of modelTransformers.
    */
   protected List<? extends Transformer<WroModel>> newModelTransformers() {
     return Arrays.asList(new WildcardExpanderWroModelTransformer());
   }
+
 
   /**
    * Override to provide a different or modified default factory implementation.
@@ -115,6 +130,7 @@ public class BaseWroManagerFactory
     return new DefaultUriLocatorFactory();
   }
 
+
   /**
    * @return {@link HashBuilder} instance.
    */
@@ -122,12 +138,14 @@ public class BaseWroManagerFactory
     return new SHA1HashBuilder();
   }
 
+
   /**
    * {@inheritDoc}
    */
   public void registerCallback(final PropertyChangeListener callback) {
     this.cacheChangeCallback = callback;
   }
+
 
   /**
    * {@inheritDoc}
@@ -138,16 +156,18 @@ public class BaseWroManagerFactory
     }
   }
 
+
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
     if (manager != null) {
       manager.onModelPeriodChanged();
-      //update cache too.
+      // update cache too.
       manager.onCachePeriodChanged();
     }
   }
+
 
   /**
    * @return {@link CacheStrategy} instance for resources' group caching.
@@ -155,6 +175,7 @@ public class BaseWroManagerFactory
   protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
     return new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
   }
+
 
   /**
    * @return {@link GroupExtractor} implementation.
@@ -169,8 +190,18 @@ public class BaseWroManagerFactory
    * @return {@link WroModelFactory} implementation
    */
   protected WroModelFactory newModelFactory() {
-    return new ServletContextAwareXmlModelFactory();
+    try {
+      LOG.info("Trying to use SmartWroModelFactory as default model factory");
+      final Class<? extends WroModelFactory> smartFactoryClass = Class.forName(
+        "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
+      return smartFactoryClass.newInstance();
+    } catch (final Exception e) {
+      LOG.info("[FAIL] SmartWroModelFactory is not available. Using default model factory.");
+      LOG.debug("Reason: " + e.toString());
+    }
+    return new XmlModelFactory();
   }
+
 
   /**
    * @param groupExtractor the groupExtractor to set
@@ -180,6 +211,7 @@ public class BaseWroManagerFactory
     return this;
   }
 
+
   /**
    * @param modelFactory the modelFactory to set
    */
@@ -187,6 +219,7 @@ public class BaseWroManagerFactory
     this.modelFactory = modelFactory;
     return this;
   }
+
 
   /**
    * @param hashBuilder the hashBuilder to set
@@ -196,6 +229,7 @@ public class BaseWroManagerFactory
     return this;
   }
 
+
   /**
    * @param modelTransformers the modelTransformers to set
    */
@@ -203,6 +237,7 @@ public class BaseWroManagerFactory
     this.modelTransformers = modelTransformers;
     return this;
   }
+
 
   /**
    * @param cacheStrategy the cacheStrategy to set
@@ -212,11 +247,12 @@ public class BaseWroManagerFactory
     return this;
   }
 
+
   /**
    * {@inheritDoc}
    */
   public void destroy() {
-    //there is a strange situation when manager actually can be null
+    // there is a strange situation when manager actually can be null
     if (manager != null) {
       manager.destroy();
     }

@@ -38,21 +38,21 @@ public class TestFallbackAwareWroModelFactory {
     Context.set(Context.standaloneContext());
     fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
+      protected InputStream getModelResourceAsStream()
         throws IOException {
         flag = !flag;
         if (flag) {
-          return super.getConfigResourceAsStream();
+          return TestXmlModelFactory.class.getResourceAsStream("wro.xml");
         }
         return null;
       }
     }));
     xmlModelFactory = new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
+      protected InputStream getModelResourceAsStream()
         throws IOException {
         if (flag) {
-          return super.getConfigResourceAsStream();
+          return super.getModelResourceAsStream();
         }
         flag = !flag;
         return null;

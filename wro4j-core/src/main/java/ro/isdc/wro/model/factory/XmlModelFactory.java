@@ -50,16 +50,16 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   /**
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(XmlModelFactory.class);
 
   /**
-   * Default xml to parse.
+   * Default xml filename.
    */
-  protected static final String XML_CONFIG_FILE = "wro.xml";
+  private static final String DEFAULT_FILE_NAME = "wro.xml";
 
   /**
    * Default xml to parse.
@@ -130,9 +130,9 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final InputStream configResource = getConfigResourceAsStream();
+      final InputStream configResource = getModelResourceAsStream();
       if (configResource == null) {
-        throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
+        throw new WroRuntimeException("Could not locate config resource (" + DEFAULT_FILE_NAME + ")!");
       }
       document = factory.newDocumentBuilder().parse(configResource);
       validate(document);
@@ -168,18 +168,6 @@ public class XmlModelFactory
 
 
   /**
-   * Override this method, in order to provide different xml definition file name.
-   *
-   * @return stream of the xml representation of the model.
-   * @throws IOException if the stream couldn't be read.
-   */
-  protected InputStream getConfigResourceAsStream()
-    throws IOException {
-    return getResourceAsStream(XML_CONFIG_FILE);
-  }
-
-
-  /**
    * Initialize the map
    */
   private void processGroups(final Document document) {
@@ -203,7 +191,7 @@ public class XmlModelFactory
       LOG.debug("processImports#uriLocatorFactory: " + uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream()
+        protected InputStream getModelResourceAsStream()
           throws IOException {
           LOG.debug("build model from import: " + name);
           LOG.debug("uriLocatorFactory: " + uriLocatorFactory);
@@ -345,7 +333,6 @@ public class XmlModelFactory
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
   }
 
-
   /**
    * Checks if xml structure is valid.
    *
@@ -361,11 +348,13 @@ public class XmlModelFactory
     validator.validate(new DOMSource(document));
   }
 
-
   /**
    * {@inheritDoc}
    */
-  public void destroy() {}
+  @Override
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
+  }
 
 //
 //  /**

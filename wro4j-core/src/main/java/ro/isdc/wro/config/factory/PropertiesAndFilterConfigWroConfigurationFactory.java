@@ -10,11 +10,13 @@ import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 
 
 /**
@@ -44,6 +46,16 @@ public class PropertiesAndFilterConfigWroConfigurationFactory
    * @throws IOException if the stream could not be retrieved.
    */
   protected InputStream newPropertyStream() throws IOException {
+    return defaultConfigPropertyStream(filterConfig);
+  }
+
+  /**
+   * This method is static in order to be used in other classes, like {@link ConfigurableWroManagerFactory}.
+   *
+   * @return the stream of the default {@link Properties} file used to load configuration.
+   */
+  public static InputStream defaultConfigPropertyStream(final FilterConfig filterConfig) {
+    Validate.notNull(filterConfig);
     return filterConfig.getServletContext().getResourceAsStream("/WEB-INF/" + DEFAULT_PROPERTIES_FILE_NAME);
   }
 

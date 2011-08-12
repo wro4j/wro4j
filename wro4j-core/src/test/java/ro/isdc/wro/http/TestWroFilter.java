@@ -81,7 +81,7 @@ public class TestWroFilter {
       protected WroManagerFactory getWroManagerFactory() {
         return new BaseWroManagerFactory().setModelFactory(new XmlModelFactory() {
           @Override
-          protected InputStream getConfigResourceAsStream() {
+          protected InputStream getModelResourceAsStream() {
             return getClass().getResourceAsStream("wro.xml");
           }
         });

@@ -180,7 +180,7 @@ public class TestWroManager {
   private static XmlModelFactory getValidModelFactory() {
     return new XmlModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream() {
+      protected InputStream getModelResourceAsStream() {
         return TestWroManager.class.getResourceAsStream("wro.xml");
       }
     };

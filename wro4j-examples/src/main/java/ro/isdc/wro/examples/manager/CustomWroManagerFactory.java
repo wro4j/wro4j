@@ -22,7 +22,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -39,7 +38,7 @@ public class CustomWroManagerFactory
   protected WroModelFactory newModelFactory() {
     return new GroovyWroModelFactory() {
       @Override
-      protected InputStream getConfigResourceAsStream()
+      protected InputStream getModelResourceAsStream()
         throws IOException {
         return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
       }

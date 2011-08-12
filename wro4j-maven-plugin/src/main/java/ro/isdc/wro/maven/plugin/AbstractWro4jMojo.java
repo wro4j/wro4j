@@ -17,8 +17,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -34,6 +34,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * File containing the groups definitions.
    *
    * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
+   * @optional
    */
   private File wroFile;
   /**
@@ -78,7 +79,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     validate();
     extendPluginClasspath();
     getLog().info("Executing the mojo: ");
-    getLog().info("Wro4j Model path: " + getWroFile().getPath());
+    getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
@@ -126,11 +127,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return managerFactory;
   }
 
-  /**
-   * @return
-   */
   protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
-    return new DefaultStandaloneContextAwareManagerFactory();
+    return new ExtensionsStandaloneManagerFactory();
   }
 
   /**
@@ -151,7 +149,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected void validate()
     throws MojoExecutionException {
     if (wroFile == null) {
-      throw new MojoExecutionException("wroFile was not set!");
+      throw new MojoExecutionException("contextFolder was not set!");
     }
     if (contextFolder == null) {
       throw new MojoExecutionException("contextFolder was not set!");
