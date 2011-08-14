@@ -1,0 +1,20 @@
+
+h1. validate
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.validate()
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[]
