@@ -145,7 +145,6 @@ public class CssUrlRewritingProcessor
    */
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
-    LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
     if (ServletContextUriLocator.isValid(cssUri)) {
       if (ServletContextUriLocator.isValid(imageUrl)) {
         return imageUrl;
@@ -154,7 +153,7 @@ public class CssUrlRewritingProcessor
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
-      return computeNewImageLocation(".." + cssUri, imageUrl);
+      return computeNewImageLocation(getPostAggregationPathPrefix() + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
       return computeNewImageLocation(cssUri, imageUrl);
@@ -167,6 +166,26 @@ public class CssUrlRewritingProcessor
 
 
   /**
+   * @return the path to be prefixed after css aggregation. This depends on the aggregated css destination folder. This
+   *         is a fix for the following issue: {@link http://code.google.com/p/wro4j/issues/detail?id=259}
+   */
+  private String getPostAggregationPathPrefix() {
+    final String folderPrefix = "/..";
+    final StringBuffer result = new StringBuffer("");
+    final String aggregatedFolder = getAggregatedFolder();
+    final String[] subfolders = aggregatedFolder.split("/");
+    for (final String subfolder : subfolders) {
+      result.append(folderPrefix);
+    }
+    return result.toString().replaceFirst("/", "");
+  }
+
+  protected String getAggregatedFolder() {
+    return "wro";
+  }
+
+
+  /**
    * Concatenates cssUri and imageUrl after few changes are applied to both input parameters.
    *
    * @param cssUri the URI of css resource.
@@ -174,6 +193,7 @@ public class CssUrlRewritingProcessor
    * @return processed new location of image url.
    */
   private String computeNewImageLocation(final String cssUri, final String imageUrl) {
+    LOG.debug("cssUri: {}, imageUrl {}", cssUri, imageUrl);
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     // TODO move to ServletContextUriLocator as a helper method?
     // for the following input: /a/b/c/1.css => /a/b/c/

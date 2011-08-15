@@ -160,8 +160,8 @@ public class XmlModelFactory
     throws IOException, SAXException {
     // create a SchemaFactory capable of understanding WXS schemas
     final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-    final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
+    final InputStream schemaStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(XML_SCHEMA_FILE);
+    final Source schemaFile = new StreamSource(schemaStream);
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
   }
@@ -325,14 +325,6 @@ public class XmlModelFactory
     }
   }
 
-
-  /**
-   * @return InputStream of the local resource from classpath.
-   */
-  protected static InputStream getResourceAsStream(final String fileName) {
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-  }
-
   /**
    * Checks if xml structure is valid.
    *
@@ -355,28 +347,4 @@ public class XmlModelFactory
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
   }
-
-//
-//  /**
-//   * @return lazily instantiated {@link UriLocatorFactory}.
-//   */
-//  private UriLocatorFactory getUriLocatorFactory() {
-//    if (uriLocatorFactory == null) {
-//      uriLocatorFactory = new SimpleUriLocatorFactory();
-//      // use locators with wildcard disabled - to avoid invalid xml parsing error
-//      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
-//        @Override
-//        protected boolean disableWildcards() {
-//          return true;
-//        }
-//      });
-//      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
-//        @Override
-//        protected boolean disableWildcards() {
-//          return true;
-//        }
-//      });
-//    }
-//    return uriLocatorFactory;
-//  }
 }
