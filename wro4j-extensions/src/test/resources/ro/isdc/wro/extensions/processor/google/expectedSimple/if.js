@@ -1,1 +1,1 @@
-var a=1;if(a==1)a=2;else a=17;
+var a=1,a=a==1?2:17;

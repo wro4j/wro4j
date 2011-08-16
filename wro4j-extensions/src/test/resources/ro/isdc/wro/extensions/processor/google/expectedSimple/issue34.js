@@ -1,1 +1,1 @@
-var a={};a["this"]=1;a.that=2;
+var a={"this":1,that:2};

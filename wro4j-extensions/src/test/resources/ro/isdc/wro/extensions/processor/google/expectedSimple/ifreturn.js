@@ -1,1 +1,1 @@
-function a(b){if(b==1)return 2;else return 17};
+function a(b){return b==1?2:17};
