@@ -38,7 +38,7 @@ final class WroExamplesServletModule extends ServletModule {
 
     //filters
     //find out how to add dispatchers to the filter mapping configuration
-    filter("/wro/*").through(WroFilter.class);
+//    filter("/wro/*").through(WroFilter.class);
     wicketFilter("/*");
 
     //servlets

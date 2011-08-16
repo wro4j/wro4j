@@ -102,7 +102,7 @@ public class WroManager
    * processed.
    */
   private List<? extends Transformer<WroModel>> modelTransformers = Collections.EMPTY_LIST;
-  private Injector injector;
+  private final Injector injector;
 
   public WroManager(final Injector injector) {
     Validate.notNull(injector);
