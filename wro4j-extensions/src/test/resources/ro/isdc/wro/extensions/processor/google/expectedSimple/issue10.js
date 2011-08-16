@@ -1,0 +1,1 @@
+function f(){if("a")return"a";else return"a"}f();

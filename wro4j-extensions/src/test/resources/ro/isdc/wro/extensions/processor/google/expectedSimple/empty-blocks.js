@@ -1,0 +1,1 @@
+var x=5;function bar(){return--x}function foo(){for(;bar(););}function mak(){for(;;);};
