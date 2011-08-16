@@ -40,14 +40,13 @@ public abstract class AbstractWroModelFactory
     return servletContext.getResourceAsStream("/WEB-INF/" + getDefaultModelFilename());
   }
 
-
   /**
    * Override this method, in order to provide different xml definition file name.
    *
    * @return stream of the xml representation of the model.
    */
   protected ResourceLocator getModelResourceLocator() {
-    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" +getDefaultModelFilename());
+    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + getDefaultModelFilename());
   }
 
   /**
