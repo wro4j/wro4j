@@ -82,8 +82,6 @@ public class GoogleClosureCompressorProcessor
         compilerOptions = newCompilerOptions();
       }
       compilationLevel.setOptionsForCompilationLevel(compilerOptions);
-      //This is important in order to avoid INTERNAL_ERROR (@see https://groups.google.com/forum/#!topic/closure-compiler-discuss/TDPtHU503Xk}
-      //compilerOptions.foldConstants = false;
       //make it play nice with GAE
       compiler.disableThreads();
       compiler.initOptions(compilerOptions);
