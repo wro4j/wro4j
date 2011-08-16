@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,12 +74,8 @@ public class CssImportPreProcessor
    * Checks if required fields were injected.
    */
   private void validate() {
-    if (uriLocatorFactory == null) {
-      throw new IllegalStateException("No UriLocator was injected");
-    }
-    if (preProcessorExecutor == null) {
-      throw new IllegalStateException("No preProcessorExecutor was injected");
-    }
+    Validate.notNull(uriLocatorFactory);
+    Validate.notNull(preProcessorExecutor);
   }
 
 

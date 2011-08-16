@@ -1,0 +1,1 @@
+goog.require("goog.dom");goog.require("goog.events");goog.dom.createDom("header");goog.dom.appendChild(document.body,element);
