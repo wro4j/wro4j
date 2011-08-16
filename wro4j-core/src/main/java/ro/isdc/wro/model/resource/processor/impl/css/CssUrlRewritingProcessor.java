@@ -3,11 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +107,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 public class CssUrlRewritingProcessor
   extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
+  private static final String DEFAULT_AGGREGATED_FOLDER = "wro";
   public static final String ALIAS = "cssUrlRewriting";  /**
    * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
    */
@@ -118,7 +121,25 @@ public class CssUrlRewritingProcessor
    * A set of allowed url's.
    */
   private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
+  /**
+   * Prefix of the path to the overwritten image url.
+   */
+  private String aggregatedPathPrefix;
 
+  public CssUrlRewritingProcessor() {
+    setAggregatedFolder(DEFAULT_AGGREGATED_FOLDER);
+  }
+
+  /**
+   * The folder where the final css is located. This is important for computing image location after url rewriting.
+   * @param aggregatedFolder the aggregatedFolder to set
+   */
+  public CssUrlRewritingProcessor setAggregatedFolder(final String aggregatedFolder) {
+    aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolder == null ? DEFAULT_AGGREGATED_FOLDER
+        : aggregatedFolder);
+    LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
+    return this;
+  }
 
   /**
    * {@inheritDoc}
@@ -153,7 +174,7 @@ public class CssUrlRewritingProcessor
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
-      return computeNewImageLocation(getPostAggregationPathPrefix() + cssUri, imageUrl);
+      return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
       return computeNewImageLocation(cssUri, imageUrl);
@@ -169,21 +190,19 @@ public class CssUrlRewritingProcessor
    * @return the path to be prefixed after css aggregation. This depends on the aggregated css destination folder. This
    *         is a fix for the following issue: {@link http://code.google.com/p/wro4j/issues/detail?id=259}
    */
-  private String getPostAggregationPathPrefix() {
+  private String computeAggregationPathPrefix(final String aggregatedFolder) {
+    LOG.debug("aggregatedFolder: {}", aggregatedFolder);
     final String folderPrefix = "/..";
     final StringBuffer result = new StringBuffer("");
-    final String aggregatedFolder = getAggregatedFolder();
     final String[] subfolders = aggregatedFolder.split("/");
-    for (final String subfolder : subfolders) {
-      result.append(folderPrefix);
+    LOG.debug("subfolders {}", Arrays.toString(subfolders));
+    for (final String folder : subfolders) {
+      if (!StringUtils.isEmpty(folder)) {
+        result.append(folderPrefix);
+      }
     }
     return result.toString().replaceFirst("/", "");
   }
-
-  protected String getAggregatedFolder() {
-    return "wro";
-  }
-
 
   /**
    * Concatenates cssUri and imageUrl after few changes are applied to both input parameters.

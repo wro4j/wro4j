@@ -25,7 +25,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 3, 2008
  */
 public class TestCssUrlRewritingProcessor {
-  private ResourcePreProcessor processor;
+  private CssUrlRewritingProcessor processor;
 
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
 
@@ -93,6 +93,23 @@ public class TestCssUrlRewritingProcessor {
     throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-servletContext-outcome.css", new ResourcePostProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource("/static/img/" + CSS_INPUT_NAME), reader, writer);
+        }
+      });
+  }
+
+
+  /**
+   * Test a servletContext css resource.
+   */
+  @Test
+  public void processServletContextResourceTypeWithAggregatedFolderSet()
+    throws IOException {
+    processor.setAggregatedFolder("wro/css");
+    WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
+      "classpath:cssUrlRewriting-servletContext-aggregatedFolderSet-outcome.css", new ResourcePostProcessor() {
         public void process(final Reader reader, final Writer writer)
           throws IOException {
           processor.process(createMockResource("/static/img/" + CSS_INPUT_NAME), reader, writer);
