@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Betfair.
+ * Copyright (C) 2011.
  * All rights reserved.
  */
 package ro.isdc.wro.maven.plugin.support;

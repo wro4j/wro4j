@@ -36,9 +36,9 @@ final class WroExamplesServletModule extends ServletModule {
     bind(RedirectResourceServlet.class).in(Singleton.class);
     bind(DispatchResourceServlet.class).in(Singleton.class);
 
-    //filters
-    //find out how to add dispatchers to the filter mapping configuration
-//    filter("/wro/*").through(WroFilter.class);
+    // filters
+    // TODO find out how to add dispatchers to the filter mapping configuration
+    // filter("/wro/*").through(WroFilter.class);
     wicketFilter("/*");
 
     //servlets
