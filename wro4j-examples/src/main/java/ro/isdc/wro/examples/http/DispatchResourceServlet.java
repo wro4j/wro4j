@@ -45,7 +45,7 @@ public class DispatchResourceServlet extends HttpServlet {
     InputStream stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
     combo.append(IOUtils.toString(stream));
 
-    location = "/wro/jsp.css";
+    location = "/wro/wildcard.js";
     stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
     combo.append(IOUtils.toString(stream));
 
