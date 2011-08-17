@@ -34,7 +34,10 @@ public class DispatchResourceServlet extends HttpServlet {
     throws ServletException, IOException {
     final DispatcherStreamLocator streamLocator = new DispatcherStreamLocator();
 
+    //contains a merge response of combo groups content.
     final StringBuffer combo = new StringBuffer();
+
+    //In this case we hardcode 3 resources served by wro, in a production we would inspect the requestUri and would extract combo groups
 
     String location = "/wro/dwr.js";
 
@@ -55,6 +58,9 @@ public class DispatchResourceServlet extends HttpServlet {
     resp.getWriter().close();
   }
 
+  /**
+   * This decorator is required to get an unzipped response..
+   */
   private HttpServletRequest wrapRequestForNoGzip(final HttpServletRequest req) {
     return new HttpServletRequestWrapper(req) {
       @Override
