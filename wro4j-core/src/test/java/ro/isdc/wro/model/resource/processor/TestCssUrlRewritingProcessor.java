@@ -107,7 +107,7 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void processServletContextResourceTypeWithAggregatedFolderSet()
     throws IOException {
-    processor.setAggregatedFolder("wro/css");
+    processor.setAggregatedFolderPath("wro/css");
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-servletContext-aggregatedFolderSet-outcome.css", new ResourcePostProcessor() {
         public void process(final Reader reader, final Writer writer)

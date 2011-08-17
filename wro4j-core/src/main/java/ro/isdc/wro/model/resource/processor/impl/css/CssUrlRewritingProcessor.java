@@ -104,11 +104,10 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  * @author Alex Objelean
  * @created Nov 19, 2008
  */
-public class CssUrlRewritingProcessor
-  extends AbstractCssUrlRewritingProcessor {
+public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
-  private static final String DEFAULT_AGGREGATED_FOLDER = "wro";
-  public static final String ALIAS = "cssUrlRewriting";  /**
+  public static final String ALIAS = "cssUrlRewriting";
+  /**
    * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
    */
   public static final String PATH_RESOURCES = "wroResources";
@@ -122,24 +121,28 @@ public class CssUrlRewritingProcessor
    */
   private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
   /**
-   * Prefix of the path to the overwritten image url.
+   * Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending on
+   * the depth of the aggregatedFolderPath.
    */
   private String aggregatedPathPrefix;
 
   public CssUrlRewritingProcessor() {
-    setAggregatedFolder(DEFAULT_AGGREGATED_FOLDER);
+    LOG.debug("Building CssUrlRewritingProcessor using Context: " + Context.get());
+    //ensure the folder path is set
+    setAggregatedFolderPath(Context.get().getAggregatedFolderPath());
   }
 
   /**
    * The folder where the final css is located. This is important for computing image location after url rewriting.
-   * @param aggregatedFolder the aggregatedFolder to set
+   *
+   * @param aggregatedFolderPath the aggregatedFolder to set
    */
-  public CssUrlRewritingProcessor setAggregatedFolder(final String aggregatedFolder) {
-    aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolder == null ? DEFAULT_AGGREGATED_FOLDER
-        : aggregatedFolder);
+  public CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
+    aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolderPath);
     LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
     return this;
   }
+
 
   /**
    * {@inheritDoc}
@@ -149,6 +152,7 @@ public class CssUrlRewritingProcessor
     LOG.debug("allowed urls: " + allowedUrls);
   }
 
+
   /**
    * {@inheritDoc}
    */
@@ -156,6 +160,7 @@ public class CssUrlRewritingProcessor
   protected void onUrlReplaced(final String replacedUrl) {
     allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
   }
+
 
   /**
    * Replace provided url with the new url if needed.
@@ -190,19 +195,26 @@ public class CssUrlRewritingProcessor
    * @return the path to be prefixed after css aggregation. This depends on the aggregated css destination folder. This
    *         is a fix for the following issue: {@link http://code.google.com/p/wro4j/issues/detail?id=259}
    */
-  private String computeAggregationPathPrefix(final String aggregatedFolder) {
-    LOG.debug("aggregatedFolder: {}", aggregatedFolder);
-    final String folderPrefix = "/..";
-    final StringBuffer result = new StringBuffer("");
-    final String[] subfolders = aggregatedFolder.split("/");
-    LOG.debug("subfolders {}", Arrays.toString(subfolders));
-    for (final String folder : subfolders) {
-      if (!StringUtils.isEmpty(folder)) {
-        result.append(folderPrefix);
+  private String computeAggregationPathPrefix(final String aggregatedFolderPath) {
+    LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
+    String computedPrefix = StringUtils.EMPTY;
+    if (aggregatedFolderPath != null) {
+
+      final String folderPrefix = "/..";
+      final StringBuffer result = new StringBuffer("");
+      final String[] depthFolders = aggregatedFolderPath.split("/");
+      LOG.debug("subfolders {}", Arrays.toString(depthFolders));
+      for (final String folder : depthFolders) {
+        if (!StringUtils.isEmpty(folder)) {
+          result.append(folderPrefix);
+        }
       }
+      computedPrefix = result.toString().replaceFirst("/", "");
     }
-    return result.toString().replaceFirst("/", "");
+    LOG.debug("computedPrefix: {}", computedPrefix);
+    return computedPrefix;
   }
+
 
   /**
    * Concatenates cssUri and imageUrl after few changes are applied to both input parameters.
