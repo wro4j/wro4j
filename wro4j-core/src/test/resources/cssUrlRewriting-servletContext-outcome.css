@@ -1,15 +1,15 @@
 .class1 {
-  background: url(../static/img/img.gif);
-  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../static/img/../images/tabs/tabContent.png',sizingMethod='scale');
-  background: url(../static/img/folder/img.gif);
-  background: url('../static/img/folder/img.gif');
-  background: url("../static/img/folder/img.gif");
-  background: url(../static/img/folder/folder/img.gif) top left;
-  background: url(../static/img/../img.gif) repeat-x;
-  background: url(../static/img/../../img.gif) no-repeat right;
-  BACKGROUND-IMAGE: url(../static/img/../img1.gif);
-  background-image: url(../static/img/../img.gif);
-  background: url(../static/img/../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
+  background: url(/static/img/img.gif);
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/static/img/../images/tabs/tabContent.png',sizingMethod='scale');
+  background: url(/static/img/folder/img.gif);
+  background: url('/static/img/folder/img.gif');
+  background: url("/static/img/folder/img.gif");
+  background: url(/static/img/folder/folder/img.gif) top left;
+  background: url(/static/img/../img.gif) repeat-x;
+  background: url(/static/img/../../img.gif) no-repeat right;
+  BACKGROUND-IMAGE: url(/static/img/../img1.gif);
+  background-image: url(/static/img/../img.gif);
+  background: url(/static/img/../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
 .class2 {
   background-IMAGE: URL(/img.gif);

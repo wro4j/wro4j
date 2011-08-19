@@ -126,12 +126,6 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    */
   private String aggregatedPathPrefix;
 
-  public CssUrlRewritingProcessor() {
-    LOG.debug("Building CssUrlRewritingProcessor using Context: " + Context.get());
-    //ensure the folder path is set
-    setAggregatedFolderPath(Context.get().getAggregatedFolderPath());
-  }
-
   /**
    * The folder where the final css is located. This is important for computing image location after url rewriting.
    *
@@ -179,6 +173,11 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
+      // ensure the folder path is set
+      LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
+      //if (this.aggregatedPathPrefix == null) {
+      setAggregatedFolderPath(Context.get().getAggregatedFolderPath());
+      //}
       return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {

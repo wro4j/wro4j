@@ -40,10 +40,6 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  *
  * @author Alex Objelean
  */
-/**
- * @author Admin
- *
- */
 public class Wro4jMojo extends AbstractWro4jMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.

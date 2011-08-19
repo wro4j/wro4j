@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -32,6 +33,7 @@ public class TestCssUrlRewritingProcessor {
 
   @Before
   public void init() {
+    Context.set(Context.standaloneContext());
     processor = new CssUrlRewritingProcessor() {
       @Override
       protected String getUrlPrefix() {

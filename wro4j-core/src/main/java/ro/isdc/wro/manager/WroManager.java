@@ -21,6 +21,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -188,6 +189,14 @@ public class WroManager
     if (groupName == null || type == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
+    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+      LOG.info("request.getRequestURI {}", request.getRequestURI());
+      LOG.info("request.getRequestURL {}", request.getRequestURL());
+      LOG.info("request.getContextPath {}", request.getContextPath());
+      final String cssFolder = request.getRequestURI().replace(FilenameUtils.getName(request.getRequestURI()), "");
+      Context.get().setAggregatedFolderPath(cssFolder.replace(request.getContextPath(), ""));
+    }
+
     initScheduler();
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
