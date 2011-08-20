@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -149,5 +151,12 @@ public class TestCssUrlRewritingProcessor {
           processor.process(createMockResource("http://www.site.com/static/css/" + CSS_INPUT_NAME), reader, writer);
         }
       });
+  }
+
+  @Test
+  public void checkUrlIsAllowed() throws Exception {
+    processClasspathResourceType();
+    Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
+    Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
   }
 }

@@ -29,7 +29,7 @@ public class TestWro4jCommandLineRunner {
 
   @Before
   public void setUp() {
-    destinationFolder = new File("wroTemp-" + new Date().getTime());
+    destinationFolder = new File(FileUtils.getTempDirectory(), "wroTemp-" + new Date().getTime());
     destinationFolder.mkdir();
   }
 

@@ -152,9 +152,10 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    */
   @Override
   protected void onUrlReplaced(final String replacedUrl) {
-    allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
+    final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
+    LOG.debug("adding allowed url: {}", allowedUrl);
+    allowedUrls.add(allowedUrl);
   }
-
 
   /**
    * Replace provided url with the new url if needed.
@@ -243,7 +244,9 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX)
       ? cleanImageUrl.substring(1)
       : cleanImageUrl;
-    return cssUriFolder + processedImageUrl;
+    final String computedImageLocation = cssUriFolder + processedImageUrl;
+    LOG.debug("computedImageLocation: {}", computedImageLocation);
+    return computedImageLocation;
   }
 
 
@@ -263,6 +266,6 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    */
   protected String getUrlPrefix() {
     final String requestURI = Context.get().getRequest().getRequestURI();
-    return FilenameUtils.getFullPath(requestURI) + PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=";
+    return String.format("%s?%s=", FilenameUtils.getFullPath(requestURI) + PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
 }
