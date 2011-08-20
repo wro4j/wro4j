@@ -1,5 +1,5 @@
 /**
- * Copyright Alex Objelean
+ * Copyright@2011 wro4j
  */
 package ro.isdc.wro.runner;
 
@@ -68,11 +68,36 @@ public class TestWro4jCommandLineRunner {
     }.doMain(args);
   }
 
+
+  @Test
+  public void cssUrlRewriterShouldWorkProperly() throws Exception {
+    final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
+
+    setDestinationFolder(new File(contextFolder, "targetCssFolder"));
+    final String wroFile = contextFolder + "\\wro.xml";
+    LOG.debug("wroFile: " + wroFile);
+    final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
+    final String[] args = String.format(
+      "--wroFile %s --contextFolder %s --destinationFolder %s -m --preProcessors " + processorsList,
+        new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+    }).split(" ");
+    invokeRunner(args);
+  }
+
+  /**
+   * Use this method for correct clean-up of resources.
+   */
+  private void setDestinationFolder(final File file) {
+    FileUtils.deleteQuietly(destinationFolder);
+    this.destinationFolder = file;
+  }
+
   @Test
   public void useSeveralProcessors() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
-    System.out.println("wroFile: " + wroFile);
+    LOG.debug("wroFile: " + wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
       JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(

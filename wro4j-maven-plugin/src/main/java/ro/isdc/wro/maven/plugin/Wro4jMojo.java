@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
@@ -287,7 +288,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     getLog().debug("cssTargetFolder: " + cssTargetFolder);
     getLog().debug("rootFolder: " + rootFolder);
     if (rootFolder != null) {
-      result = cssTargetFolder.getPath().replace(rootFolder.getPath(), "");
+      result = StringUtils.removeStart(cssTargetFolder.getPath(),rootFolder.getPath());
     }
     getLog().debug("computedAggregatedFolderPath: " + result);
     return result;
