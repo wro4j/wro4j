@@ -189,13 +189,8 @@ public class WroManager
     if (groupName == null || type == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
-    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
-      LOG.info("request.getRequestURI {}", request.getRequestURI());
-      LOG.info("request.getRequestURL {}", request.getRequestURL());
-      LOG.info("request.getContextPath {}", request.getContextPath());
-      final String cssFolder = request.getRequestURI().replace(FilenameUtils.getName(request.getRequestURI()), "");
-      Context.get().setAggregatedFolderPath(cssFolder.replace(request.getContextPath(), ""));
-    }
+
+    intAggregatedFolderPath(request, type);
 
     initScheduler();
 
@@ -230,6 +225,18 @@ public class WroManager
     stopWatch.stop();
     LOG.debug("WroManager process time: " + stopWatch.prettyPrint());
     return inputStream;
+  }
+
+  /**
+   * Set the aggregatedFolderPath if required.
+   */
+  private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
+    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+      final String requestUri = request.getRequestURI();
+      final String cssFolder = StringUtils.removeStart(requestUri, FilenameUtils.getName(requestUri));
+      final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
+      Context.get().setAggregatedFolderPath(aggregatedFolder);
+    }
   }
 
 

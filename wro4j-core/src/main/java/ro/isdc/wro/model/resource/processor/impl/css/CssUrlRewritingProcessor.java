@@ -131,7 +131,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    *
    * @param aggregatedFolderPath the aggregatedFolder to set
    */
-  public CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
+  private CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
     aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolderPath);
     LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
     return this;
@@ -174,10 +174,8 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
       // ensure the folder path is set
-      LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
-      //if (this.aggregatedPathPrefix == null) {
       setAggregatedFolderPath(Context.get().getAggregatedFolderPath());
-      //}
+      LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
       return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
