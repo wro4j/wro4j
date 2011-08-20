@@ -32,7 +32,6 @@ public class ServletContextResourceLocator
    * Prefix used to identify if the path is a servlet context path.
    */
   public static final String PREFIX = "/";
-
   private final ServletContext servletContext;
   private final String path;
 

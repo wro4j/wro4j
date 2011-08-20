@@ -6,7 +6,6 @@ groups {
   bom {
     js("/static/js/bom/*.js")
   }
-  
   skeleton {
     css("/static/css/skeleton/*.css")
   }
@@ -79,12 +78,12 @@ groups {
   }
   all {
     jquery()
-    /*
+    classpath()
     twitterBar()
     dynamicResource()
     uniform()
     groupRef('WEBINF-css')
     dwr()
-    */
+    /**/
   }
 }
