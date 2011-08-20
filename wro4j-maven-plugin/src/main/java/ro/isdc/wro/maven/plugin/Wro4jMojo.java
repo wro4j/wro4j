@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
@@ -69,12 +71,21 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private File extraConfigFile;
+  /**
+   * This parameter is not meant to be used. The only purpose is to hold project build directory
+   *
+   * @parameter default-value="${project.build.directory}
+   * @optional
+   */
+  private File buildDirectory;
+
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
+  protected StandaloneContextAwareManagerFactory newWroManagerFactory()
+    throws MojoExecutionException {
     StandaloneContextAwareManagerFactory factory = null;
     if (wroManagerFactory != null) {
       factory = createCustomManagerFactory();
@@ -90,6 +101,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
     return factory;
   }
+
 
   /**
    * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
@@ -108,6 +120,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return managerFactory;
   }
 
+
   /**
    * {@inheritDoc}
    */
@@ -115,11 +128,12 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   protected void validate()
     throws MojoExecutionException {
     super.validate();
-    //additional validation requirements
+    // additional validation requirements
     if (destinationFolder == null) {
       throw new MojoExecutionException("destinationFolder was not set!");
     }
   }
+
 
   /**
    * {@inheritDoc}
@@ -191,6 +205,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return folder;
   }
 
+
   /**
    * Process a single group.
    */
@@ -201,29 +216,31 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     try {
       getLog().info("processing group: " + group);
 
-      //mock request
+      // mock request
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       Mockito.when(request.getRequestURI()).thenReturn(group);
-      //mock response
+      // mock response
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
-      //init context
+      // init context
       final WroConfiguration config = Context.get().getConfig();
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-      //perform processing
+
+      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
+      // perform processing
       getManagerFactory().create().process();
-      //encode version & write result to file
+      // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       destinationFile.createNewFile();
-      //allow the same stream to be read again
+      // allow the same stream to be read again
       resultInputStream.reset();
       getLog().debug("Created file: " + destinationFile.getName());
 
       final OutputStream fos = new FileOutputStream(destinationFile);
-      //use reader to detect encoding
+      // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
       fos.close();
       getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
@@ -232,8 +249,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         getLog().info("No content found for group: " + group);
         destinationFile.delete();
       } else {
-        getLog().info(destinationFile.getAbsolutePath()
-          + " (" + destinationFile.length() + "bytes" + ") has been created!");
+        getLog().info(
+          destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
       }
     } finally {
       if (resultOutputStream != null) {
@@ -243,6 +260,38 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         resultInputStream.close();
       }
     }
+  }
+
+
+  /**
+   * The idea is to compute the aggregatedFolderPath based on a root folder. The root folder is determined by comparing
+   * the cssTargetFolder (the folder where aggregated css files are located) with build directory or contextFolder. If
+   * rootFolder is null, then the result is also null (equivalent to using the cssTargetFolder the same as the root
+   * folder.
+   *
+   * @return the aggregated folder path, based on the cssDestinationFolder (if set) and the build folder or the
+   *         contextFolder.
+   */
+  private String computeAggregatedFolderPath() {
+    Validate.notNull(buildDirectory, "Build directory cannot be null!");
+    String result = null;
+    final File cssTargetFolder = cssDestinationFolder == null ? destinationFolder : cssDestinationFolder;
+    File rootFolder = null;
+    Validate.notNull(cssTargetFolder, "CssTargetFolder cannot be null!");
+    if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
+      rootFolder = buildDirectory;
+    } else if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
+      rootFolder = getContextFolder();
+    }
+    getLog().debug("buildDirectory: " + buildDirectory);
+    getLog().debug("contextFolder: " + getContextFolder());
+    getLog().debug("cssTargetFolder: " + cssTargetFolder);
+    getLog().debug("rootFolder: " + rootFolder);
+    if (rootFolder != null) {
+      result = StringUtils.removeStart(cssTargetFolder.getPath(),rootFolder.getPath());
+    }
+    getLog().debug("computedAggregatedFolderPath: " + result);
+    return result;
   }
 
 
@@ -269,6 +318,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     this.jsDestinationFolder = jsDestinationFolder;
   }
 
+
   /**
    * @param versionEncoder(wroManagerFactory) the wroManagerFactory to set
    */
@@ -276,10 +326,21 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     this.wroManagerFactory = wroManagerFactory;
   }
 
+
   /**
    * @param extraConfigFile the extraConfigFile to set
    */
   public void setExtraConfigFile(final File extraConfigFile) {
     this.extraConfigFile = extraConfigFile;
+  }
+
+
+  /**
+   * The folder where the project is built.
+   *
+   * @param buildDirectory the buildDirectory to set
+   */
+  public void setBuildDirectory(final File buildDirectory) {
+    this.buildDirectory = buildDirectory;
   }
 }

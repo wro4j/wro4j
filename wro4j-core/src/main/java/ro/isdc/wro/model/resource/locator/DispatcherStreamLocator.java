@@ -43,7 +43,7 @@ public final class DispatcherStreamLocator {
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
-   * the portal with multiple threads (web requests) that are combined with threads for wro4.
+   * the portal with multiple threads (web requests) that are combined with threads for wro4j.
    */
   public synchronized InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
       final String location)

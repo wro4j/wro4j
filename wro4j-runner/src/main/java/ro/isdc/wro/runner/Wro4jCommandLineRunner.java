@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.kohsuke.args4j.CmdLineParser;
@@ -119,6 +121,7 @@ public class Wro4jCommandLineRunner {
       onException(e);
     } finally {
       watch.stop();
+      LOG.debug(watch.prettyPrint());
       LOG.info("Processing took: {}ms", watch.getLastTaskTimeMillis());
     }
   }
@@ -186,9 +189,10 @@ public class Wro4jCommandLineRunner {
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
-
       // init context
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
+      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing
       getManagerFactory().create().process();
       // encode version & write result to file
@@ -203,7 +207,7 @@ public class Wro4jCommandLineRunner {
       // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
       fos.close();
-      LOG.info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
+      LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
       // delete empty files
       if (destinationFile.length() == 0) {
         LOG.info("No content found for group: " + group);
@@ -219,6 +223,26 @@ public class Wro4jCommandLineRunner {
         resultInputStream.close();
       }
     }
+  }
+
+  /**
+   * This implementation is similar to the one from Wro4jMojo. TODO: reuse if possible.
+   */
+  private String computeAggregatedFolderPath() {
+    Validate.notNull(destinationFolder, "DestinationFolder cannot be null!");
+    Validate.notNull(contextFolder, "ContextFolder cannot be null!");
+    final File cssTargetFolder = destinationFolder;
+    File rootFolder = null;
+    if (cssTargetFolder.getPath().startsWith(contextFolder.getPath())) {
+      rootFolder = contextFolder;
+    }
+    //compute aggregatedFolderPath
+    String aggregatedFolderPath = null;
+    if (rootFolder != null) {
+      aggregatedFolderPath = StringUtils.removeStart(cssTargetFolder.getPath(), rootFolder.getPath());
+    }
+    LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
+    return aggregatedFolderPath;
   }
 
 

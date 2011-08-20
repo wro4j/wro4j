@@ -21,6 +21,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -102,7 +103,7 @@ public class WroManager
    * processed.
    */
   private List<? extends Transformer<WroModel>> modelTransformers = Collections.EMPTY_LIST;
-  private Injector injector;
+  private final Injector injector;
 
   public WroManager(final Injector injector) {
     Validate.notNull(injector);
@@ -188,6 +189,9 @@ public class WroManager
     if (groupName == null || type == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
+
+    intAggregatedFolderPath(request, type);
+
     initScheduler();
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
@@ -221,6 +225,18 @@ public class WroManager
     stopWatch.stop();
     LOG.debug("WroManager process time: " + stopWatch.prettyPrint());
     return inputStream;
+  }
+
+  /**
+   * Set the aggregatedFolderPath if required.
+   */
+  private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
+    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+      final String requestUri = request.getRequestURI();
+      final String cssFolder = StringUtils.removeStart(requestUri, FilenameUtils.getName(requestUri));
+      final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
+      Context.get().setAggregatedFolderPath(aggregatedFolder);
+    }
   }
 
 
