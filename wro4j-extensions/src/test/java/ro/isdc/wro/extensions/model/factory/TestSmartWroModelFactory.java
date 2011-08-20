@@ -25,8 +25,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
@@ -38,7 +36,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  * @created 6 Aug 2011
  */
 public class TestSmartWroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(TestSmartWroModelFactory.class);
   private SmartWroModelFactory factory;
 
   @Before

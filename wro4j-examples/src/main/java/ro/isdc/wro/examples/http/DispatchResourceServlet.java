@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.DispatcherStreamLocator;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 
 /**
  * @author Alex Objelean
