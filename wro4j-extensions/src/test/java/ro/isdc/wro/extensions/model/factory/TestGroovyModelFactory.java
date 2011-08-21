@@ -58,7 +58,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("Wro.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("Wro.groovy"));
       }
     };
     final WroModel model = factory.create();
@@ -82,7 +82,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroWithHiphen.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("wroWithHiphen.groovy"));
       }
     };
     final WroModel model = factory.create();
@@ -94,7 +94,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroGroupRefOrder.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("wroGroupRefOrder.groovy"));
       }
     };
     Assert.assertNotNull(factory.create());
@@ -105,7 +105,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroRecursiveReference.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("wroRecursiveReference.groovy"));
       }
     };
     factory.create();
@@ -116,7 +116,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("wroDuplicateGroupName.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("wroDuplicateGroupName.groovy"));
       }
     };
     factory.create();
@@ -130,7 +130,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyWroModelFactory.class.getResource("IncompleteWro.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("IncompleteWro.groovy"));
       }
     };
     factory.create();

@@ -99,7 +99,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
         if (wroFile == null) {
           return super.getModelResourceLocator();
         }
-        return createAutoDetectingResourceLocator(getDefaultModelFilename());
+        return createAutoDetectedResourceLocator(getDefaultModelFilename());
       }
     };
   }
@@ -112,7 +112,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
         if (wroFile == null) {
           return super.getModelResourceLocator();
         }
-        return createAutoDetectingResourceLocator(getDefaultModelFilename());
+        return createAutoDetectedResourceLocator(getDefaultModelFilename());
       }
     };
   }
@@ -125,15 +125,16 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
         if (wroFile == null) {
           return super.getModelResourceLocator();
         }
-        return createAutoDetectingResourceLocator(getDefaultModelFilename());
+        return createAutoDetectedResourceLocator(getDefaultModelFilename());
       };
     };
   };
 
+
   /**
    * Creates a {@link ResourceLocator} which is handles the autoDetection logic.
    */
-  private ResourceLocator createAutoDetectingResourceLocator(final String defaultFileName) {
+  private ResourceLocator createAutoDetectedResourceLocator(final String defaultFileName) {
     return new AbstractResourceLocator() {
       @Override
       public InputStream getInputStream()
@@ -148,7 +149,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
           LOG.info("loading wroFile: " + wroFile);
           return new FileInputStream(wroFile);
         } catch (final FileNotFoundException e) {
-          // When auto detect is turned on, do not skip trying.. because the auto detection assume that the wro file name
+          // When auto detect is turned on, do not skip trying.. because the auto detection assume that the wro file
+          // name
           // can be wrong.
           if (autoDetectWroFile) {
             throw e;
@@ -233,8 +235,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    * {@inheritDoc}
    */
   @Override
-  protected InputStream getModelResourceAsStream()
-    throws IOException {
+  protected ResourceLocator getModelResourceLocator() {
     throw new IllegalStateException("This method should never be called!");
   }
 }

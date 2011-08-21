@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
@@ -25,7 +23,6 @@ import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
  */
 @SuppressWarnings("serial")
 public class DispatchResourceServlet extends HttpServlet {
-  private static final Logger LOG = LoggerFactory.getLogger(DispatchResourceServlet.class);
   /**
    * {@inheritDoc}
    */
