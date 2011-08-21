@@ -51,6 +51,13 @@ public class TestServletContextResourceLocator {
   }
 
   @Test
+  public void shouldAcceptNullServletContext()
+    throws Exception {
+    locator = new ServletContextResourceLocator(mockServletContext, "");
+    Assert.assertNotNull(locator);
+  }
+
+  @Test
   public void testWildcard1Resources() throws IOException {
     locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.css"));
     Assert.assertNotNull(locator.getInputStream());

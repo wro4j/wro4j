@@ -36,8 +36,8 @@ public class ServletContextResourceLocator
   private final String path;
 
   public ServletContextResourceLocator(final ServletContext servletContext, final String path) {
-    Validate.notNull(servletContext);
     Validate.notNull(path);
+    //allow null servletContext and prefer throwing IOException if null value is set.
     this.servletContext = servletContext;
     String pathToUse = StringUtils.cleanPath(path);
     if (!pathToUse.startsWith(PREFIX)) {
@@ -51,7 +51,9 @@ public class ServletContextResourceLocator
    */
   public InputStream getInputStream()
       throws IOException {
-    Validate.notNull(path);
+    if (servletContext == null) {
+      throw new IOException("Cannot get stream for the following path: " + path + ", because no servletContext is detected.");
+    }
     LOG.debug("locating uri: " + path);
     try {
       if (getWildcardStreamLocator().hasWildcard(path)) {
