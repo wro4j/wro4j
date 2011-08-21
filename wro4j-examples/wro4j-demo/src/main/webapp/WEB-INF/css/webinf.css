@@ -1,0 +1,48 @@
+.clearfix:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+.ie .clearfix {
+  width: 100%;
+  display: inline-block;
+}
+html[xmlns] .clearfix {
+  display: block;
+}
+* html .clearfix {
+  height: 1%;
+}
+
+#webinf {
+  clear: both;
+  font-weight: bold;
+}
+#webinf ul {
+  background: yellow;
+  clear: both;
+  border: solid red 1px;
+}
+#webinf ul li {
+  list-style: none;
+  float: left;
+  height: 70px;
+  width: 70px;
+  background-position: 0 20px;
+  background-repeat: no-repeat;
+}
+#webinf li.webinf-ancestor {
+  background-image: url(../../img/social_myspace.png);
+}
+#webinf li.webinf-parent {
+	background-image: url(../img/social_twitter.png);
+}
+#webinf li.webinf-sibling {
+  background-image: url(social_facebook.png);
+}
+#webinf li.webinf-child {
+  background-image: url(img/social_youtube.png);
+}

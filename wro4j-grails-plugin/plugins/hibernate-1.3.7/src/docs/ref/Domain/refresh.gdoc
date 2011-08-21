@@ -1,0 +1,20 @@
+
+h1. refresh
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.refresh()
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[]
