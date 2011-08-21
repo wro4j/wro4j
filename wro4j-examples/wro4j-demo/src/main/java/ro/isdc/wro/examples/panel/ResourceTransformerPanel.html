@@ -1,0 +1,49 @@
+<wicket:panel>
+  <form wicket:id="form" method="post">
+    <div class="ui-grid-a">
+      <div class="ui-block-a">
+        <h3>Description</h3>
+		    <p>
+		      Choose a processor from this list, insert some code (css or js,
+		      depending on choosed processor) and press transform button.
+		    </p>      
+      </div>
+      <div class="ui-block-b" style="font-size: 0.8em;">
+        <h3>Processing Results</h3>
+	      <ul data-inset="true" data-theme="c" data-dividertheme="a">
+	        <li>Original size: <b wicket:id="originalSize"></b> KB</li>
+	        <li>Compressed size: <b wicket:id="compressedSize"></b> KB</li>
+	        <li>Compression Rate: <b wicket:id="compressionRate"></b>%. (More is better)</li>
+	        <li>Processing Time: <b wicket:id="processingTime"></b> ms</li>                    
+	      </ul>
+      </div>
+    </div>    
+	  
+	  <div data-role="fieldcontain">
+		  <label for="selectProcessor" class="select">Choose the processor</label>
+		  <select wicket:id="selectProcessor"></select>
+		  <input type="submit" wicket:id="transform" data-role="button" data-theme="b" data-icon="refresh" value="Transform"/>
+		</div>
+		<div class="ui-grid-a">
+      <div class="ui-block-a">
+        <h2>Input</h2>
+        <textarea wicket:id="input" cols="40" rows="20" style="height: 300px; width: 90%;"></textarea>
+      </div>
+      <div class="ui-block-b">
+        <h2>Output</h2>
+        <textarea wicket:id="output" cols="40" rows="20" readonly="readonly" style="height: 300px; width: 90%;"></textarea>
+      </div>
+    </div>  
+      
+    <div class="ui-grid-a">
+      <div class="ui-block-a">
+        <h1>Notes</h1>
+        <ul data-inset="true" data-theme="c" data-dividertheme="a">
+          <li>
+           PackerJS could be very slow for large javascript files.
+          </li>
+        </ul>
+      </div>
+    </div>      
+  </form>
+</wicket:panel>
