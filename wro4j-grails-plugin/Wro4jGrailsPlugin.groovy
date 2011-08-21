@@ -68,7 +68,7 @@ Web Resource Optimizer for Grails
   def doWithApplicationContext = { applicationContext ->
     // TODO Implement post initialization spring config (optional)
   }
-
+  
   /** File to watch to trigger onChange  */
   def watchedResources = "file:./grails-app/conf/Wro.groovy"
 
