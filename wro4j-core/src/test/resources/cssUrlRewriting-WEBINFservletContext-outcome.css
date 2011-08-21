@@ -1,15 +1,15 @@
 .class1 {
   background: url([WRO-PREFIX]?id=/WEB-INF/img.gif);
-  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=/WEB-INF/../images/tabs/tabContent.png',sizingMethod='scale');
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=/images/tabs/tabContent.png',sizingMethod='scale');
   background: url([WRO-PREFIX]?id=/WEB-INF/folder/img.gif);
   background: url('[WRO-PREFIX]?id=/WEB-INF/folder/img.gif');
   background: url("[WRO-PREFIX]?id=/WEB-INF/folder/img.gif");
   background: url([WRO-PREFIX]?id=/WEB-INF/folder/folder/img.gif) top left;
-  background: url([WRO-PREFIX]?id=/WEB-INF/../img.gif) repeat-x;
-  background: url([WRO-PREFIX]?id=/WEB-INF/../../img.gif) no-repeat right;
-  BACKGROUND-IMAGE: url([WRO-PREFIX]?id=/WEB-INF/../img1.gif);
-  background-image: url([WRO-PREFIX]?id=/WEB-INF/../img.gif);
-  background: url([WRO-PREFIX]?id=/WEB-INF/../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
+  background: url([WRO-PREFIX]?id=/img.gif) repeat-x;
+  background: url([WRO-PREFIX]?id=/../img.gif) no-repeat right;
+  BACKGROUND-IMAGE: url([WRO-PREFIX]?id=/img1.gif);
+  background-image: url([WRO-PREFIX]?id=/img.gif);
+  background: url([WRO-PREFIX]?id=/themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
 .class2 {
   background-IMAGE: URL(/img.gif);

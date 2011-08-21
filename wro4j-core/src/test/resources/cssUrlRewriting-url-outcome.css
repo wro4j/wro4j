@@ -1,15 +1,15 @@
 .class1 {
   background: url(http://www.site.com/static/css/img.gif);
-  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.site.com/static/css/../images/tabs/tabContent.png',sizingMethod='scale');
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.site.com/static/images/tabs/tabContent.png',sizingMethod='scale');
   background: url(http://www.site.com/static/css/folder/img.gif);
   background: url('http://www.site.com/static/css/folder/img.gif');
   background: url("http://www.site.com/static/css/folder/img.gif");
   background: url(http://www.site.com/static/css/folder/folder/img.gif) top left;
-  background: url(http://www.site.com/static/css/../img.gif) repeat-x;
-  background: url(http://www.site.com/static/css/../../img.gif) no-repeat right;
-  BACKGROUND-IMAGE: url(http://www.site.com/static/css/../img1.gif);
-  background-image: url(http://www.site.com/static/css/../img.gif);
-  background: url(http://www.site.com/static/css/../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
+  background: url(http://www.site.com/static/img.gif) repeat-x;
+  background: url(http://www.site.com/img.gif) no-repeat right;
+  BACKGROUND-IMAGE: url(http://www.site.com/static/img1.gif);
+  background-image: url(http://www.site.com/static/img.gif);
+  background: url(http://www.site.com/static/themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
 .class2 {
   background-IMAGE: URL(http://www.site.com/static/css/img.gif);
