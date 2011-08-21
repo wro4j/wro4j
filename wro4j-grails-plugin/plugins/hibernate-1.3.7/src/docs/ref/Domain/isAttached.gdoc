@@ -1,0 +1,20 @@
+
+h1. isAttached
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.isAttached()
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[]

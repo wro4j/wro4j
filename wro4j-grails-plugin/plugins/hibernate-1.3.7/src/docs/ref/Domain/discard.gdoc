@@ -1,0 +1,20 @@
+
+h1. discard
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.discard()
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[]

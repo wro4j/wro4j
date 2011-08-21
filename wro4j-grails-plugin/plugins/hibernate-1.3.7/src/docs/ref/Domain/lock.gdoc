@@ -1,0 +1,20 @@
+
+h1. lock
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.lock()
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[]
