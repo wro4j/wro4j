@@ -58,14 +58,12 @@ public abstract class AbstractCssUrlRewritingProcessor
   public final void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
-      LOG.debug("<process>");
       final String cssUri = resource.getUri();
-      LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
+      LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
       final String result = parseCss(css, cssUri);
       writer.write(result);
       onProcessCompleted();
-      LOG.debug("</process>");
     } finally {
       reader.close();
       writer.close();
@@ -98,7 +96,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       }
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [" + urlGroup + "] with: [" + StringUtils.abbreviate(replacedUrl, 30) + "].");
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, StringUtils.abbreviate(replacedUrl, 30));
         final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
         onUrlReplaced(replacedUrl);
         // update allowedUrls list

@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import static ro.isdc.wro.util.StringUtils.cleanPath;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -126,6 +128,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    */
   private String aggregatedPathPrefix;
 
+
   /**
    * The folder where the final css is located. This is important for computing image location after url rewriting.
    *
@@ -156,6 +159,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     LOG.debug("adding allowed url: {}", allowedUrl);
     allowedUrls.add(allowedUrl);
   }
+
 
   /**
    * Replace provided url with the new url if needed.
@@ -244,7 +248,8 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX)
       ? cleanImageUrl.substring(1)
       : cleanImageUrl;
-    final String computedImageLocation = cssUriFolder + processedImageUrl;
+    // remove redundant part of the path
+    final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
     return computedImageLocation;
   }
