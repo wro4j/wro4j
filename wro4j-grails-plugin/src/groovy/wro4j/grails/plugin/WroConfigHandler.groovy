@@ -16,8 +16,9 @@
 package wro4j.grails.plugin
 
 import groovy.util.ConfigObject
+import grails.util.Environment
+import org.codehaus.groovy.grails.commons.GrailsApplication 
 
-import org.omg.CORBA.Environment
 
 /**
  * Helper to load DefaultWroConfig.groovy and merge it with merge Config.groovy
