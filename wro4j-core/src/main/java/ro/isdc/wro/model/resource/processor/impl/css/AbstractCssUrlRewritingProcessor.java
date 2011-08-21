@@ -51,14 +51,12 @@ public abstract class AbstractCssUrlRewritingProcessor
     throws IOException {
     Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
     try {
-      LOG.debug("<process>");
       final String cssUri = resource.getUri();
-      LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
+      LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
       final String result = parseCss(css, cssUri);
       writer.write(result);
       onProcessCompleted();
-      LOG.debug("</process>");
     } finally {
       reader.close();
       writer.close();
@@ -91,7 +89,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       }
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [" + urlGroup + "] with: [" + StringUtils.abbreviate(replacedUrl, 30) + "].");
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, StringUtils.abbreviate(replacedUrl, 30));
         final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
         onUrlReplaced(replacedUrl);
         // update allowedUrls list
