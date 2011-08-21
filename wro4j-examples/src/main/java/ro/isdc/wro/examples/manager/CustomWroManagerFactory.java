@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.model.factory.GroovyWroModelFactory;
+import ro.isdc.wro.extensions.model.factory.GroovyModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -36,7 +36,7 @@ public class CustomWroManagerFactory
    */
   @Override
   protected WroModelFactory newModelFactory() {
-    return new GroovyWroModelFactory() {
+    return new GroovyModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {

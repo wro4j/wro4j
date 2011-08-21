@@ -15,16 +15,15 @@
 */
 package wro4j.grails.plugin
 
-import javax.servlet.ServletContext
-import ro.isdc.wro.extensions.model.factory.GroovyWroModelFactory
+import groovy.util.ConfigObject
+import ro.isdc.wro.extensions.model.factory.GroovyModelFactory
+import ro.isdc.wro.extensions.model.factory.GroovyModelParser
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory
+import ro.isdc.wro.model.WroModel
 import ro.isdc.wro.model.factory.WroModelFactory
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory
-import ro.isdc.wro.extensions.model.factory.GroovyWroModelParser
-import ro.isdc.wro.model.WroModel
+
 
 /**
  * The Grails WroManagerFactory.
@@ -40,10 +39,10 @@ class GrailsWroManagerFactory extends BaseWroManagerFactory {
 
   @Override
   protected WroModelFactory newModelFactory() {
-    return new GroovyWroModelFactory() {
+    return new GroovyModelFactory() {
 
       WroModel create() {
-        return GroovyWroModelParser.parse(WroDSLHandler.dsl);
+        return GroovyModelParser.parse(WroDSLHandler.dsl);
       }
     };
   }

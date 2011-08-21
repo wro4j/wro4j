@@ -36,9 +36,9 @@ import ro.isdc.wro.model.factory.AbstractWroModelFactory;
  * @created 19 Jul 2011
  * @since 1.4.0
  */
-public class GroovyWroModelFactory
+public class GroovyModelFactory
   extends AbstractWroModelFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(GroovyWroModelFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GroovyModelFactory.class);
   /**
    * Default name of the file used to retrieve the model.
    */
@@ -54,7 +54,7 @@ public class GroovyWroModelFactory
     try {
       script = new GroovyShell().parse(new InputStreamReader(getModelResourceAsStream()));
 
-      final WroModel model = GroovyWroModelParser.parse(script);
+      final WroModel model = GroovyModelParser.parse(script);
       LOG.debug("groovy model: ", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -72,5 +72,4 @@ public class GroovyWroModelFactory
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
   }
-
 }

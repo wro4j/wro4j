@@ -29,7 +29,7 @@ import ro.isdc.wro.model.group.RecursiveGroupDefinitionException
  * @created 19 Jul 2011
  * @since 1.4.0
  */
-class GroovyWroModelParser {
+class GroovyModelParser {
 
   /** Parse a groovy DSL into a {@link WroModel} */
   static WroModel parse(Script dslScript) {

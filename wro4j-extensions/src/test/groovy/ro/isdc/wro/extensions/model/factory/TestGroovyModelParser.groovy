@@ -26,7 +26,7 @@ import ro.isdc.wro.WroRuntimeException
  * @author Filirom1
  * @created 19 Jul 2011
  */
-class TestGroovyWroModelParser {
+class TestGroovyModelParser {
 
   @Test
   public void testResourceDelegate() {
@@ -229,7 +229,7 @@ class TestGroovyWroModelParser {
     """
 
     //when:
-    WroModel wroModel = GroovyWroModelParser.parse(dsl)
+    WroModel wroModel = GroovyModelParser.parse(dsl)
 
     //then:
     assert ["g2", "g1"] == wroModel.groupNames

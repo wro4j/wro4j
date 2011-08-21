@@ -104,8 +104,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
   }
 
 
-  private GroovyWroModelFactory newGroovyModelFactory() {
-    return new GroovyWroModelFactory() {
+  private GroovyModelFactory newGroovyModelFactory() {
+    return new GroovyModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {
@@ -135,7 +135,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
   /**
    * Handles the resource model auto detection.
    */
-  private InputStream createAutoDetectedStream(final String defaultFileName) throws IOException {
+  private InputStream createAutoDetectedStream(final String defaultFileName)
+    throws IOException {
     try {
       Validate.notNull(wroFile, "Cannot call this method if wroFile is null!");
       if (autoDetectWroFile) {
@@ -172,7 +173,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
       } catch (final WroRuntimeException e) {
         LOG.info("Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
         LOG.debug("Exception occured while building the model using: " + getClassName(factory.getClass()), e);
-        //stop trying with other factories if the reason is IOException
+        // stop trying with other factories if the reason is IOException
         if (!autoDetectWroFile && e.getCause() instanceof IOException) {
           throw e;
         }
