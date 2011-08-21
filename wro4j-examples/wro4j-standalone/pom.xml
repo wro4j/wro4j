@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ro.isdc.wro4j</groupId>
+  <artifactId>wro4j-standalone</artifactId>
+  <packaging>jar</packaging>
+  <name>wro4j standalone example project</name>
+  <parent>
+    <groupId>ro.isdc.wro4j</groupId>
+    <artifactId>wro4j-parent</artifactId>
+    <version>1.4.0-SNAPSHOT</version>
+  </parent>
+
+	<properties>
+		<wro4j.version>1.4.0-SNAPSHOT</wro4j.version>
+		<project_charset>UTF-8</project_charset>
+	</properties>
+  
+  <dependencies>
+    <!-- Project Dependencies -->
+    <dependency>
+      <groupId>ro.isdc.wro4j</groupId>
+      <artifactId>wro4j-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ro.isdc.wro4j</groupId>
+      <artifactId>wro4j-extensions</artifactId>
+    </dependency>        
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+  </dependencies>
+    
+  <build>
+    <resources>      
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/webapp</directory>        
+      </resource>          
+    </resources>  
+    <plugins>     
+      <plugin>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-maven-plugin</artifactId>
+        <version>1.4.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>run</goal>
+              <!--
+              <goal>jshint</goal>
+              <goal>csslint</goal>
+              -->
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <ignoreMissingResources>false</ignoreMissingResources>          
+          <failNever>true</failNever>
+          <destinationFolder>${project.build.directory}/classes/wro4j/</destinationFolder>            
+          <!--          
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
+          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
+          -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
