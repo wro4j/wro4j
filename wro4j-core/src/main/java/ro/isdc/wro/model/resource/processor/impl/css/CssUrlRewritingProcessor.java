@@ -297,7 +297,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    * @return true if the uri is a protected resource.
    */
   public boolean isProtectedResource(final String uri) {
-    return startsWithIgnoreCase(uri, PROTECTED_PREFIX);
+    return StringUtils.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
   }
 
 
