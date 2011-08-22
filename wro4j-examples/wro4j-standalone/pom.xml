@@ -13,7 +13,6 @@
   </parent>
 
 	<properties>
-		<wro4j.version>1.4.0-SNAPSHOT</wro4j.version>
 		<project_charset>UTF-8</project_charset>
 	</properties>
   
@@ -21,11 +20,11 @@
     <!-- Project Dependencies -->
     <dependency>
       <groupId>ro.isdc.wro4j</groupId>
-      <artifactId>wro4j-core</artifactId>
+      <artifactId>wro4j-core</artifactId>	  
     </dependency>
     <dependency>
       <groupId>ro.isdc.wro4j</groupId>
-      <artifactId>wro4j-extensions</artifactId>
+      <artifactId>wro4j-extensions</artifactId>	  
     </dependency>        
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -60,7 +59,10 @@
           <ignoreMissingResources>false</ignoreMissingResources>          
           <failNever>true</failNever>
           <destinationFolder>${project.build.directory}/classes/wro4j/</destinationFolder>            
-          <!--          
+		  <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
+		  <!--          
+		  <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>		  		  
+          
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>

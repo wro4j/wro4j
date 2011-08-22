@@ -12,4 +12,8 @@
   <group name="oocss">
     <css>/assets/oocss/**.css</css>
   </group>    
+  
+  <group name="bootstrap">
+    <css>/assets/bootstrap/bootstrap.less</css>
+  </group>    
 </groups>
