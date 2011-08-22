@@ -36,8 +36,9 @@ public class CssCompressor {
         Pattern p;
         Matcher m;
         String css = srcsb.toString();
+
         //remove single line comment supported by less css
-        css = css.replaceAll("(?i)\\s//.*", "");
+//        css = css.replaceAll("(?i)\\s//.*", "");
 
         StringBuffer sb = new StringBuffer(css);
 
@@ -82,13 +83,11 @@ public class CssCompressor {
 
         // preserve strings so their content doesn't get accidentally minified
         sb = new StringBuffer();
-        p = Pattern.compile("(\"((?:[^\\\\\"])*|(?:\\\\.)*|(?:\\\\)*)\")|(\'((?:[^\\\\\'])*|(?:\\\\.)*|(?:\\\\)*)\')");
+//        p = Pattern.compile("(?ims)(\"((?:[^\\\\\"])*|(?:\\\\.)*|(?:\\\\)*)\")|(\'((?:[^\\\\\'])*|(?:\\\\.)*|(?:\\\\)*)\')");
+        p = Pattern.compile("(\"([^\\\\\"]|\\\\.|\\\\)*\")|(\'([^\\\\\']|\\\\.|\\\\)*\')");
         m = p.matcher(css);
-        LOG.debug("find");
         while (m.find()) {
-            LOG.debug("bofore token");
             token = m.group();
-            LOG.debug("token: {}", token);
             final char quote = token.charAt(0);
             token = token.substring(1, token.length() - 1);
 
@@ -106,12 +105,10 @@ public class CssCompressor {
 
             preservedTokens.add(token);
             final String preserver = quote + "___YUICSSMIN_PRESERVED_TOKEN_" + (preservedTokens.size() - 1) + "___" + quote;
-            LOG.debug("appendReplacement");
             m.appendReplacement(sb, preserver);
         }
         m.appendTail(sb);
         css = sb.toString();
-        LOG.debug("css: {}", css);
 
         // strings are safe, now wrestle the comments
         for (i = 0, max = comments.size(); i < max; i += 1) {
