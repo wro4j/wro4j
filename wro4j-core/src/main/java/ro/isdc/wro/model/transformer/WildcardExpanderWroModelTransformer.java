@@ -70,11 +70,11 @@ public class WildcardExpanderWroModelTransformer implements Transformer<WroModel
       for (final Resource resource : group.getResources()) {
         LOG.debug("resource uri: {}", resource.getUri());
         final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
-        LOG.debug("uriLocator: " + uriLocator);
+        LOG.debug("uriLocator: {}", uriLocator);
         if (uriLocator instanceof WildcardUriLocatorSupport) {
           final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
           if (wildcardStreamLocator.hasWildcard(resource.getUri()) && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
-            LOG.debug("Wildcard Expander for uri: " + resource.getUri());
+            LOG.debug("Wildcard Expander for uri: {}", resource.getUri());
 
             // force the reset of the detector to avoid situations when resources are considered duplicates in unit
             // tests.
@@ -86,6 +86,8 @@ public class WildcardExpanderWroModelTransformer implements Transformer<WroModel
                 final List<Resource> expandedResources = new ArrayList<Resource>();
                 for (final File file : files) {
                   final String resourceUri = "file:" + file.getAbsolutePath().replace('\\', '/');
+
+
                   expandedResources.add(Resource.create(resourceUri, resource.getType()));
                 }
                 LOG.debug("replace resource {}", resource);
@@ -95,7 +97,7 @@ public class WildcardExpanderWroModelTransformer implements Transformer<WroModel
               }
             };
 
-            ((WildcardExpandedHandlerAware)wildcardStreamLocator).setWildcardExpanderHandler(wildcardExpanderHandler);
+            ((WildcardExpandedHandlerAware) wildcardStreamLocator).setWildcardExpanderHandler(wildcardExpanderHandler);
             try {
               // trigger the wildcard replacement
               uriLocator.locate(resource.getUri());

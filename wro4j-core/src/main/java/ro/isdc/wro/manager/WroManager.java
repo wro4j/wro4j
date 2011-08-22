@@ -102,7 +102,7 @@ public class WroManager
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and
    * processed.
    */
-  private List<? extends Transformer<WroModel>> modelTransformers = Collections.EMPTY_LIST;
+  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
   private final Injector injector;
 
   public WroManager(final Injector injector) {

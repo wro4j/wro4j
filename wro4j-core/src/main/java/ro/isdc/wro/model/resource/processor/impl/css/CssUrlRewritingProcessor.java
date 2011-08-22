@@ -251,7 +251,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     // remove redundant part of the path
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
-    return computedImageLocation;
+    return cssUriFolder + processedImageUrl;
   }
 
 

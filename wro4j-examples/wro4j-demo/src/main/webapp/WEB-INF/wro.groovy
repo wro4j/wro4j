@@ -78,13 +78,9 @@ groups {
     css("/static/module/syntaxHighlighter/styles/shCoreRDark.css")
   }
   all {
-    jquery()
-    /*
-    twitterBar()
     dynamicResource()
     uniform()
     groupRef('WEBINF-css')
     dwr()
-    */
   }
 }

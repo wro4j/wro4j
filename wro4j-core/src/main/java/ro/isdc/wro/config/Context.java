@@ -23,6 +23,11 @@ import ro.isdc.wro.model.resource.ResourceType;
  *
  * @author Alex Objelean
  */
+/**
+ * TODO: DOCUMENT ME!
+ *
+ * @author ObjeleanA
+ */
 public class Context {
   /**
    * Thread local holding CURRENT context. This instance is of {@link InheritableThreadLocal} type because threads
@@ -50,6 +55,10 @@ public class Context {
    * The path to the folder, relative to the root, used to compute rewritten image url.
    */
   private String aggregatedFolderPath;
+  /**
+   * The path to the root folder (webapp).
+   */
+  private String contextFolderPath;
 
   /**
    * @return {@link WroConfiguration} singleton instance.
@@ -57,7 +66,6 @@ public class Context {
   public WroConfiguration getConfig() {
     return wroConfig;
   }
-
 
   /**
    * DO NOT CALL THIS METHOD UNLESS YOU ARE SURE WHAT YOU ARE DOING.
@@ -68,15 +76,13 @@ public class Context {
     wroConfig = config;
   }
 
-
   /**
    * A context useful for running in web context (inside a servlet container).
    */
   public static Context webContext(final HttpServletRequest request, final HttpServletResponse response,
-    final FilterConfig filterConfig) {
+      final FilterConfig filterConfig) {
     return new Context(request, response, filterConfig);
   }
-
 
   /**
    * A context useful for running in non web context (standAlone applications).
@@ -109,7 +115,8 @@ public class Context {
   /**
    * Associate a context with the CURRENT request cycle.
    *
-   * @param context {@link Context} to set.
+   * @param context
+   *          {@link Context} to set.
    */
   public static void set(final Context context, final WroConfiguration config) {
     Validate.notNull(context);
@@ -118,7 +125,6 @@ public class Context {
     CURRENT.get().setConfig(config);
   }
 
-
   /**
    * Remove context from the local thread.
    */
@@ -126,13 +132,11 @@ public class Context {
     CURRENT.remove();
   }
 
-
   /**
    * Private constructor. Used to build {@link StandAloneContext}.
    */
   private Context() {
   }
-
 
   /**
    * Constructor.
@@ -142,6 +146,7 @@ public class Context {
     this.response = response;
     if (filterConfig != null) {
       this.servletContext = filterConfig.getServletContext();
+      this.contextFolderPath = servletContext.getRealPath("/");
     } else {
       this.servletContext = null;
     }
@@ -155,7 +160,6 @@ public class Context {
     return this.request;
   }
 
-
   /**
    * @return the response
    */
@@ -163,14 +167,12 @@ public class Context {
     return this.response;
   }
 
-
   /**
    * @return the servletContext
    */
   public ServletContext getServletContext() {
-     return this.servletContext;
+    return this.servletContext;
   }
-
 
   /**
    * @return the filterConfig
@@ -186,6 +188,21 @@ public class Context {
     return this.aggregatedFolderPath;
   }
 
+  /**
+   * @return the contextFolderPath
+   */
+  public String getContextFolderPath() {
+    return contextFolderPath;
+  }
+
+  /**
+   * DO NOT USE THIS METHOD UNLESS YOU KNOW WHAT YOU DO!
+   * <p/>
+   * Set the absolute path to the folder where context relative resources are located.
+   */
+  public void setContextFolderPath(final String contextFolderPath) {
+    this.contextFolderPath = contextFolderPath;
+  }
 
   /**
    * This field is useful only for the aggregated resources of type {@link ResourceType#CSS}. </br>The
@@ -194,12 +211,12 @@ public class Context {
    * depth is 2 and the prefix is <code>"../.."</code>. The name of the aggregated folder is not important, it is used
    * only to compute the depth.
    *
-   * @param aggregatedFolderPath the aggregatedFolderPath to set
+   * @param aggregatedFolderPath
+   *          the aggregatedFolderPath to set
    */
   public void setAggregatedFolderPath(final String aggregatedFolderPath) {
     this.aggregatedFolderPath = aggregatedFolderPath;
   }
-
 
   /**
    * Perform context clean-up.
