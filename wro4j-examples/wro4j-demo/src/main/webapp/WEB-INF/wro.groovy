@@ -81,6 +81,5 @@ groups {
     dynamicResource()
     uniform()
     groupRef('WEBINF-css')
-    dwr()
   }
 }

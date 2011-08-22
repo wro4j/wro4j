@@ -125,19 +125,22 @@ public class WroManager
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
 
-    LOG.debug("processing: " + request.getRequestURI());
     validate();
+    //TODO refactor
     InputStream is = null;
+    OutputStream os = null;
     if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
+      //do not gzip
+      os = response.getOutputStream();
     } else {
       is = buildGroupsInputStream(request, response);
+      // use gziped response if supported
+      os = getGzipedOutputStream(response);
     }
     if (is == null) {
       throw new WroRuntimeException("Cannot process this request: " + request.getRequestURL());
     }
-    // use gziped response if supported
-    final OutputStream os = getGzipedOutputStream(response);
     IOUtils.copy(is, os);
     is.close();
     os.close();
@@ -233,12 +236,11 @@ public class WroManager
   private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
     if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
-      final String cssFolder = StringUtils.removeStart(requestUri, FilenameUtils.getName(requestUri));
+      final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
       Context.get().setAggregatedFolderPath(aggregatedFolder);
     }
   }
-
 
   /**
    * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js

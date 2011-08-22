@@ -201,7 +201,6 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
     String computedPrefix = StringUtils.EMPTY;
     if (aggregatedFolderPath != null) {
-
       final String folderPrefix = "/..";
       final StringBuffer result = new StringBuffer("");
       final String[] depthFolders = aggregatedFolderPath.split("/");
@@ -251,7 +250,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     // remove redundant part of the path
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
-    return cssUriFolder + processedImageUrl;
+    return computedImageLocation;
   }
 
 
