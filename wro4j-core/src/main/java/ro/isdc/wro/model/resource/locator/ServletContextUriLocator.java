@@ -110,6 +110,7 @@ public class ServletContextUriLocator
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
     InputStream inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
     if (inputStream == null) {
+      LOG.debug("retrieving servletContext stream for uri: {}", uri);
       inputStream = servletContext.getResourceAsStream(uri);
     }
     if (inputStream == null) {

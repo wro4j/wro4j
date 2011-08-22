@@ -65,6 +65,7 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
    * {@inheritDoc}
    */
   public WroModel transform(final WroModel input) {
+    LOG.debug("transforming model: {}", input);
     final WroModel model = input;
 
     for (final Group group : model.getGroups()) {
@@ -75,8 +76,7 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
         if (uriLocator instanceof WildcardUriLocatorSupport) {
           final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
           if (wildcardStreamLocator.hasWildcard(resource.getUri()) && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
-            LOG.debug("Wildcard Expander for uri: {}", resource.getUri());
-            LOG.debug("Wildcard Expander for uri: {}", Context.get().getContextFolderPath());
+            LOG.debug("resource uri: {}", resource.getUri());
 
             // force the reset of the detector to avoid situations when resources are considered duplicates in unit
             // tests.
@@ -88,7 +88,8 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
                 final List<Resource> expandedResources = new ArrayList<Resource>();
                 for (final File file : files) {
                   final String resourceUri = "file:" + file.getAbsolutePath().replace('\\', '/');
-                  LOG.debug("WildcardExpanderWroModelTransformer resourceUri: {}", resourceUri);
+                  LOG.debug("WildcardExpanderModelTransformer - resourceUri: {}", resourceUri);
+                  LOG.debug("WildcardExpanderModelTransformer - contextFolderPath: {}", Context.get().getContextFolderPath());
 
                   expandedResources.add(Resource.create(resourceUri, resource.getType()));
                 }
@@ -115,6 +116,7 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
         }
       }
     }
+    LOG.debug("Transformed model: {}", model);
     return model;
   }
 }
