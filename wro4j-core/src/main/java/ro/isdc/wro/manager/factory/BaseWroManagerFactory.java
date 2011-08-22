@@ -32,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
-import ro.isdc.wro.model.transformer.WildcardExpanderWroModelTransformer;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 
@@ -107,7 +107,7 @@ public class BaseWroManagerFactory
    * @return default implementation of modelTransformers.
    */
   protected List<? extends Transformer<WroModel>> newModelTransformers() {
-    return Arrays.asList(new WildcardExpanderWroModelTransformer());
+    return Arrays.asList(new WildcardExpanderModelTransformer());
   }
 
 

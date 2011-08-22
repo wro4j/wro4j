@@ -23,15 +23,15 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.transformer.WildcardExpanderWroModelTransformer;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.WroUtil;
 
 /**
  * @author Alex Objelean
  */
-public class TestWildcardExpanderWroModelTransformer {
-  private static final Logger LOG = LoggerFactory.getLogger(TestWildcardExpanderWroModelTransformer.class);
-  private WildcardExpanderWroModelTransformer factory;
+public class TestWildcardExpanderModelTransformer {
+  private static final Logger LOG = LoggerFactory.getLogger(TestWildcardExpanderModelTransformer.class);
+  private WildcardExpanderModelTransformer factory;
   @Mock
   private WroModelFactory decoratedFactory;
   @Mock
@@ -43,7 +43,7 @@ public class TestWildcardExpanderWroModelTransformer {
     final UriLocatorFactory uriLocatorFactory = new DefaultUriLocatorFactory();
     final Injector injector = new Injector(uriLocatorFactory, processorsFactory);
 
-    factory = new WildcardExpanderWroModelTransformer();
+    factory = new WildcardExpanderModelTransformer();
 
     injector.inject(factory);
   }

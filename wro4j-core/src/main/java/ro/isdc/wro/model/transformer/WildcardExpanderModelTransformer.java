@@ -12,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -52,8 +53,8 @@ import ro.isdc.wro.util.Transformer;
  * @created 18 Jul 2011
  * @since 1.4.0
  */
-public class WildcardExpanderWroModelTransformer implements Transformer<WroModel> {
-  private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderWroModelTransformer.class);
+public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
+  private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderModelTransformer.class);
 
   @Inject
   private UriLocatorFactory uriLocatorFactory;
@@ -75,6 +76,7 @@ public class WildcardExpanderWroModelTransformer implements Transformer<WroModel
           final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
           if (wildcardStreamLocator.hasWildcard(resource.getUri()) && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
             LOG.debug("Wildcard Expander for uri: {}", resource.getUri());
+            LOG.debug("Wildcard Expander for uri: {}", Context.get().getContextFolderPath());
 
             // force the reset of the detector to avoid situations when resources are considered duplicates in unit
             // tests.
@@ -86,7 +88,7 @@ public class WildcardExpanderWroModelTransformer implements Transformer<WroModel
                 final List<Resource> expandedResources = new ArrayList<Resource>();
                 for (final File file : files) {
                   final String resourceUri = "file:" + file.getAbsolutePath().replace('\\', '/');
-
+                  LOG.debug("WildcardExpanderWroModelTransformer resourceUri: {}", resourceUri);
 
                   expandedResources.add(Resource.create(resourceUri, resource.getType()));
                 }
