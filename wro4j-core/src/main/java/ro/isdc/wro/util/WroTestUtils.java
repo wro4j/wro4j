@@ -31,6 +31,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
@@ -55,6 +56,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
+
   /**
    * @param properties {@link Properties} object to get stream from.
    * @return {@link InputStream} of the provided properties object.
@@ -64,6 +66,7 @@ public class WroTestUtils {
     properties.list(new PrintWriter(propsAsString));
     return new ByteArrayInputStream(propsAsString.toString().getBytes());
   }
+
 
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
@@ -84,7 +87,8 @@ public class WroTestUtils {
   public static void compareProcessedResourceContents(final String inputResourceUri,
     final String expectedContentResourceUri, final ResourcePreProcessor processor)
     throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri, ProcessorsUtils.toPostProcessor(processor));
+    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri,
+      ProcessorsUtils.toPostProcessor(processor));
   }
 
 
@@ -188,6 +192,7 @@ public class WroTestUtils {
     }
   }
 
+
   /**
    * Replace tabs with spaces.
    *
@@ -288,7 +293,7 @@ public class WroTestUtils {
           }
         });
         processedNumber++;
-      } catch (final IOException e) {
+      } catch (final Exception e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
       }
     }
@@ -335,7 +340,7 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
     throws IOException {
-    //TODO use ProcessorsUtils
+    // TODO use ProcessorsUtils
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -381,6 +386,8 @@ public class WroTestUtils {
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath(), e);
+      } catch (final Exception e) {
+        throw new WroRuntimeException("A problem during transformation occured", e);
       }
     }
     logSuccess(processedNumber);

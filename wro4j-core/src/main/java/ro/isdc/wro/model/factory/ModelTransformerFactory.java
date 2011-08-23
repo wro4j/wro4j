@@ -11,6 +11,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.util.Transformer;
 
@@ -49,7 +50,11 @@ public class ModelTransformerFactory
       LOG.debug("using transformer: {}", transformer.getClass());
       //synchronize to avoid multiple replacement in concurrent environment
       synchronized (this) {
-        model = transformer.transform(model);
+        try {
+          model = transformer.transform(model);
+        } catch (final Exception e) {
+          throw new WroRuntimeException("Exception during model transformation", e);
+        }
       }
     }
     return model;

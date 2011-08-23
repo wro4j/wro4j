@@ -81,33 +81,32 @@ public final class Group {
     return false;
   }
 
+
   /**
-   * Replace one resource with a list of other resources. The use case is related to wildcard exploder functionality,
-   * when resources containing wildcards are replaced with simple resources. The order of resources is preserved.
+   * Replace one resource with a list of other resources. The use case is related to wildcard expander functionality,
+   * when resources containing wildcard are replaced with a list of wildcard-free resources. The order of resources is
+   * preserved.
    *
-   * @param resource
-   *          to replace.
-   * @param explodedResources
-   *          a list of resources to replace. If this list is empty, the result is similar to removing the resource from
-   *          the group.
-   * @throws IllegalArgumentException
-   *           when a missing resources is to be replaced.
+   * @param resource to replace.
+   * @param expandedResources a list of resources to replace. If this list is empty, the result is similar to removing
+   *        the resource from the group.
+   * @throws IllegalArgumentException when a missing resources is to be replaced.
    */
-  public void replace(final Resource resource, final List<Resource> explodedResources) {
-    LOG.debug("replacing resource \n{} with exploded resources: \n{} for group: \n" + this, resource, explodedResources);
+  public void replace(final Resource resource, final List<Resource> expandedResources) {
+    LOG.debug("replacing resource {} with expanded resources: {}", resource, expandedResources);
     Validate.notNull(resource);
-    Validate.notNull(explodedResources);
+    Validate.notNull(expandedResources);
     boolean found = false;
     final List<Resource> result = new ArrayList<Resource>();
     for (final Resource resourceItem : resources) {
       if (resourceItem.equals(resource)) {
         found = true;
-        for (final Resource explodedResource : explodedResources) {
+        for (final Resource expandedResource : expandedResources) {
           //preserve minimize flag.
-          explodedResource.setMinimize(resource.isMinimize());
+          expandedResource.setMinimize(resource.isMinimize());
           //use only resources which do not already exist in the group
-          if (!hasResource(explodedResource)) {
-            result.add(explodedResource);
+          if (!hasResource(expandedResource)) {
+            result.add(expandedResource);
           }
         }
       } else {
@@ -116,8 +115,6 @@ public final class Group {
     }
     //if no resources found, an invalid replace is performed
     if (!found) {
-      LOG.debug("Cannot replace resource: {} because this resource is not a part of the group: {}", resource, this);
-      //Don't throw exception, because transformation is invoked multiple times... TODO find out why
       throw new IllegalArgumentException("Cannot replace resource: " + resource + " for group: " + this
           + " because the resource is not a part of this group.");
     }
@@ -136,7 +133,8 @@ public final class Group {
    * @return the readonly list of resources.
    */
   public List<Resource> getResources() {
-    return Collections.unmodifiableList(resources);
+    // use a new list to avoid ConcurrentModificationException when the Group#replace method is called.
+    return Collections.unmodifiableList(new ArrayList<Resource>(resources));
   }
 
   /**
@@ -146,7 +144,12 @@ public final class Group {
    * @return
    */
   public Group addResource(final Resource resource) {
-    resources.add(resource);
+    Validate.notNull(resource);
+    if (!hasResource(resource)) {
+      resources.add(resource);
+    } else {
+      LOG.warn("Resource {} is already contained in this group, skiping it.");
+    }
     return this;
   }
 
@@ -157,7 +160,11 @@ public final class Group {
    *          the resources to set.
    */
   public final void setResources(final List<Resource> resources) {
-    this.resources = resources;
+    Validate.notNull(resources);
+    this.resources.clear();
+    for (final Resource resource : resources) {
+      addResource(resource);
+    }
   }
 
   /**

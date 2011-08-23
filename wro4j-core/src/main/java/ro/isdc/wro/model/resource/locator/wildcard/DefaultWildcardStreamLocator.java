@@ -50,7 +50,7 @@ public class DefaultWildcardStreamLocator
   /**
    * Character to distinguish wildcard inside the uri.
    */
-  private static final String RECURSIVE_WILDCARD = "**";
+  public static final String RECURSIVE_WILDCARD = "**";
   /**
    * Responsible for detecting duplicated resources.
    */
@@ -158,7 +158,11 @@ public class DefaultWildcardStreamLocator
       LOG.warn(message);
     }
     if (wildcardExpanderHandler != null) {
-      wildcardExpanderHandler.transform(files);
+      try {
+        wildcardExpanderHandler.transform(files);
+      } catch (final Exception e) {
+        throw new IOException("Exception during expanding wildcard", e);
+      }
     }
     handleFoundFiles(files);
     return files;

@@ -50,10 +50,6 @@ public class Context {
    * The path to the folder, relative to the root, used to compute rewritten image url.
    */
   private String aggregatedFolderPath;
-  /**
-   * The path to the root folder (webapp).
-   */
-  private String contextFolderPath;
 
 
   /**
@@ -150,10 +146,6 @@ public class Context {
     this.response = response;
     if (filterConfig != null) {
       this.servletContext = filterConfig.getServletContext();
-      // use null check for unit tests which works with mock servlet context
-      if (servletContext != null) {
-        this.contextFolderPath = servletContext.getRealPath("/");
-      }
     } else {
       this.servletContext = null;
     }
@@ -199,25 +191,6 @@ public class Context {
   public String getAggregatedFolderPath() {
     return this.aggregatedFolderPath;
   }
-
-
-  /**
-   * @return the contextFolderPath
-   */
-  public String getContextFolderPath() {
-    return contextFolderPath;
-  }
-
-
-  /**
-   * DO NOT USE THIS METHOD UNLESS YOU KNOW WHAT YOU DO!
-   * <p/>
-   * Set the absolute path to the folder where context relative resources are located.
-   */
-  public void setContextFolderPath(final String contextFolderPath) {
-    this.contextFolderPath = contextFolderPath;
-  }
-
 
   /**
    * This field is useful only for the aggregated resources of type {@link ResourceType#CSS}. </br>The

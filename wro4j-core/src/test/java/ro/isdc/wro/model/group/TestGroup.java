@@ -11,6 +11,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -21,6 +23,7 @@ import ro.isdc.wro.model.resource.ResourceType;
  * @author Alex Objelean
  */
 public class TestGroup {
+  private static final Logger LOG = LoggerFactory.getLogger(TestGroup.class);
 
   @Test(expected=IllegalArgumentException.class)
   public void cannotCreateGroupWithNullName() {
@@ -79,5 +82,26 @@ public class TestGroup {
             Resource.create("/static/two.js", ResourceType.JS)));
     Assert.assertEquals(2, group.getResources().size());
     Assert.assertEquals(resource.isMinimize(), group.getResources().get(0).isMinimize());
+  }
+
+  @Test
+  public void shouldReplaceOnlyOneAndPreserveOtherResources() {
+    final Group group = new Group("group");
+    final Resource resource = Resource.create("/static/*", ResourceType.JS);
+
+    final Resource r0 = Resource.create("/asset/1.js", ResourceType.JS);
+    group.addResource(r0);
+
+    final Resource r1 = Resource.create("/asset/2.js", ResourceType.JS);
+    group.addResource(r1);
+
+    group.addResource(resource);
+    group.replace(
+        resource,
+        Arrays.asList(Resource.create("/static/one.js", ResourceType.JS),
+            Resource.create("/static/two.js", ResourceType.JS)));
+    Assert.assertEquals(4, group.getResources().size());
+    Assert.assertEquals(r0, group.getResources().get(0));
+    Assert.assertEquals(r1, group.getResources().get(1));
   }
 }
