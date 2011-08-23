@@ -74,6 +74,7 @@ groups {
   all {
     dynamicResource()
     uniform()
+    groupRef("jquery-mobile")
     groupRef('WEBINF-css')
   }
 }

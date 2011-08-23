@@ -38,6 +38,7 @@ import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.ModelTransformerFactory;
 import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -481,7 +482,7 @@ public class WroManager
   public final void setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
     //decorate with useful features
-    this.modelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(modelFactory));
+    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(modelFactory))).setTransformers(modelTransformers);
   }
 
 
@@ -498,7 +499,7 @@ public class WroManager
    * @param contentDigester the contentDigester to set
    */
   public void setHashBuilder(final HashBuilder contentDigester) {
-    Validate.notNull(modelTransformers);
+    Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
   }
 
@@ -506,12 +507,8 @@ public class WroManager
   /**
    * @return the modelFactory
    */
-  public final WroModel getModel() {
-    WroModel model = modelFactory.create();
-    for (final Transformer<WroModel> transformer : modelTransformers) {
-      model = transformer.transform(model);
-    }
-    return model;
+  public WroModelFactory getModelFactory() {
+    return modelFactory;
   }
 
   /**
