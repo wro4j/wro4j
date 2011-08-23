@@ -18,12 +18,12 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardExpandedHandlerAware;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.util.Transformer;
 
 
@@ -59,7 +59,7 @@ public class WildcardExpanderModelTransformer
   private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderModelTransformer.class);
 
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
 
 
   /**
@@ -71,24 +71,25 @@ public class WildcardExpanderModelTransformer
     for (final Group group : model.getGroups()) {
       final List<Resource> resources = group.getResources();
       for (final Resource resource : resources) {
-        final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
+        final ResourceLocator resourceLocator = resourceLocatorFactory.locate(resource.getUri());
 
-        if (uriLocator instanceof WildcardUriLocatorSupport) {
-          final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
+        if (resourceLocator instanceof AbstractResourceLocator) {
+          final WildcardStreamLocator wildcardStreamLocator = ((AbstractResourceLocator)resourceLocator).getWildcardStreamLocator();
 
-          //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
+          // TODO should we probably handle the situation when wildcard is present, but the implementation is not
+          // expandedHandledAware?
           if (wildcardStreamLocator.hasWildcard(resource.getUri())
             && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
 
             final WildcardExpandedHandlerAware expandedHandler = (WildcardExpandedHandlerAware)wildcardStreamLocator;
             LOG.debug("expanding resource uri: {}", resource.getUri());
 
-            final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
+            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory, expandedHandler);
 
             expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
             try {
               // trigger the wildcard replacement
-              uriLocator.locate(resource.getUri());
+              resourceLocator.getInputStream();
             } catch (final IOException e) {
               // log only
               LOG.error("problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
@@ -109,7 +110,7 @@ public class WildcardExpanderModelTransformer
    * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
    * {@link WildcardExpandedHandlerAware} to get the baseName.
    */
-  private String computeBaseNameFolder(final Resource resource, final UriLocator uriLocator,
+  private String computeBaseNameFolder(final Resource resource, final ResourceLocatorFactory resourceLocatorFactory,
     final WildcardExpandedHandlerAware expandedHandler) {
     // Find the baseName
     // add a simple wildcard to trigger the wildcard detection
@@ -133,7 +134,7 @@ public class WildcardExpanderModelTransformer
     });
 
     try {
-      uriLocator.locate(resourcePath);
+      resourceLocatorFactory.locate(resourcePath).getInputStream();
     } catch (final Exception e) {
       LOG.error("problem while trying to get basePath for: {}", resourcePath, e);
     }

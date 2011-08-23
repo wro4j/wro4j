@@ -5,6 +5,8 @@
  */
 package ro.isdc.wro.model.resource.locator.support;
 
+import java.io.IOException;
+
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;

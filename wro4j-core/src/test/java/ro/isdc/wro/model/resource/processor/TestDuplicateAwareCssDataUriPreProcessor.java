@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;

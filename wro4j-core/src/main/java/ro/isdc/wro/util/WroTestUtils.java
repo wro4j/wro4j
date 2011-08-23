@@ -78,15 +78,6 @@ public class WroTestUtils {
     WroTestUtils.compare(resultReader, expectedReader, processor);
   }
 
-
-  public static void compareProcessedResourceContents(final String inputResourceUri,
-    final String expectedContentResourceUri, final ResourcePreProcessor processor)
-    throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri,
-      ProcessorsUtils.toPostProcessor(processor));
-  }
-
-
   private static Reader getReaderFromUri(final String uri)
     throws IOException {
     // wrap reader with bufferedReader for top efficiency
@@ -101,6 +92,14 @@ public class WroTestUtils {
   public static InputStream getInputStream(final String uri)
     throws IOException {
     return createDefaultUriLocatorFactory().locate(uri).getInputStream();
+  }
+
+
+  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
+    final String extension, final ResourceProcessor processor)
+    throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
+      Transformers.noOpTransformer(), processor);
   }
 
 
@@ -278,36 +277,6 @@ public class WroTestUtils {
     throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
   }
-
-
-  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
-    final String extension, final ResourceProcessor processor)
-    throws IOException {
-    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
-      Transformers.noOpTransformer(), processor);
-  }
-
-
-  public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
-    final String extension, final ResourcePostProcessor processor)
-    throws IOException {
-    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + extension),
-      Transformers.noOpTransformer(), processor);
-  }
-
-
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
-    final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
-    throws IOException {
-    // TODO use ProcessorsUtils
-    compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, toTargetFileName, new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    });
-  }
-
 
   /**
    * Process and compare the files which a located in different folders.
