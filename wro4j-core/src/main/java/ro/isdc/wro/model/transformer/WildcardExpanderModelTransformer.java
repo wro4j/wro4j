@@ -83,14 +83,18 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
             duplicateResourceDetector.reset();
 
             //TODO find the baseName and pass it to the transformer to build a correct expanded uri.
+            final String baseName = FilenameUtils.getBaseName(resource.getUri());
+            LOG.debug("baseName: {}", baseName);
+            //uriLocator.locate(baseName);
 
-            ((WildcardExpandedHandlerAware) wildcardStreamLocator).setWildcardExpanderHandler(createTransformer(group, resource));
+
+            ((WildcardExpandedHandlerAware) wildcardStreamLocator).setWildcardExpanderHandler(createExpanderHandler(group, resource));
             try {
               // trigger the wildcard replacement
               uriLocator.locate(resource.getUri());
             } catch (final IOException e) {
               // log only
-              LOG.error("problem while trying to expande wildcard for the following resource uri: " + resource.getUri());
+              LOG.error("problem while trying to expand wildcard for the following resource uri: " + resource.getUri());
             } finally {
               //remove the handler, it is not needed anymore
               ((WildcardExpandedHandlerAware)wildcardStreamLocator).setWildcardExpanderHandler(null);
@@ -106,8 +110,8 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
   /**
    * create the handler which expand the resources containing wildcard.
    */
-  public Transformer<Collection<File>> createTransformer(final Group group, final Resource resource) {
-    final Transformer<Collection<File>> wildcardExpanderHandler = new Transformer<Collection<File>>() {
+  public Transformer<Collection<File>> createExpanderHandler(final Group group, final Resource resource) {
+    final Transformer<Collection<File>> handler = new Transformer<Collection<File>>() {
       public Collection<File> transform(final Collection<File> files) {
         final List<Resource> expandedResources = new ArrayList<Resource>();
         for (final File file : files) {
@@ -127,6 +131,6 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
         return null;
       }
     };
-    return wildcardExpanderHandler;
+    return handler;
   }
 }
