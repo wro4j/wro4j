@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,6 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
    * {@inheritDoc}
    */
   public WroModel transform(final WroModel input) {
-    LOG.debug("transforming model: {}", input);
     final WroModel model = input;
 
     for (final Group group : model.getGroups()) {
@@ -76,31 +76,15 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
         if (uriLocator instanceof WildcardUriLocatorSupport) {
           final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
           if (wildcardStreamLocator.hasWildcard(resource.getUri()) && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
-            LOG.debug("resource uri: {}", resource.getUri());
+            LOG.debug("expanding resource uri: {}", resource.getUri());
 
             // force the reset of the detector to avoid situations when resources are considered duplicates in unit
             // tests.
             duplicateResourceDetector.reset();
 
-            //create the handler which expand the resources containing wildcard.
-            final Transformer<Collection<File>> wildcardExpanderHandler = new Transformer<Collection<File>>() {
-              public Collection<File> transform(final Collection<File> files) {
-                final List<Resource> expandedResources = new ArrayList<Resource>();
-                for (final File file : files) {
-                  final String resourceUri = "file:" + file.getAbsolutePath().replace('\\', '/');
-                  LOG.debug("WildcardExpanderModelTransformer - resourceUri: {}", resourceUri);
-                  LOG.debug("WildcardExpanderModelTransformer - contextFolderPath: {}", Context.get().getContextFolderPath());
+            //TODO find the baseName and pass it to the transformer to build a correct expanded uri.
 
-                  expandedResources.add(Resource.create(resourceUri, resource.getType()));
-                }
-                LOG.debug("replace resource {}", resource);
-                group.replace(resource, expandedResources);
-                //Because there is actually no transformation, here it doesn't matter what we return.
-                return null;
-              }
-            };
-
-            ((WildcardExpandedHandlerAware) wildcardStreamLocator).setWildcardExpanderHandler(wildcardExpanderHandler);
+            ((WildcardExpandedHandlerAware) wildcardStreamLocator).setWildcardExpanderHandler(createTransformer(group, resource));
             try {
               // trigger the wildcard replacement
               uriLocator.locate(resource.getUri());
@@ -111,12 +95,38 @@ public class WildcardExpanderModelTransformer implements Transformer<WroModel> {
               //remove the handler, it is not needed anymore
               ((WildcardExpandedHandlerAware)wildcardStreamLocator).setWildcardExpanderHandler(null);
             }
-
           }
         }
       }
     }
     LOG.debug("Transformed model: {}", model);
     return model;
+  }
+
+  /**
+   * create the handler which expand the resources containing wildcard.
+   */
+  public Transformer<Collection<File>> createTransformer(final Group group, final Resource resource) {
+    final Transformer<Collection<File>> wildcardExpanderHandler = new Transformer<Collection<File>>() {
+      public Collection<File> transform(final Collection<File> files) {
+        final List<Resource> expandedResources = new ArrayList<Resource>();
+        for (final File file : files) {
+          final String resourceUri = file.getAbsolutePath().replace('\\', '/');
+
+          final String baseName = FilenameUtils.getFullPathNoEndSeparator(resourceUri);
+          LOG.debug("getFullPathNoEndSeparator: {}", baseName);
+
+          LOG.debug("contextFolderPath: {}", Context.get().getContextFolderPath());
+          final Resource expandedResource = Resource.create(resourceUri, resource.getType());
+          LOG.debug("expanded resource: {}", expandedResource);
+          expandedResources.add(expandedResource);
+        }
+        LOG.debug("replace resource {}", resource);
+        group.replace(resource, expandedResources);
+        //Because there is actually no transformation, here it doesn't matter what we return.
+        return null;
+      }
+    };
+    return wildcardExpanderHandler;
   }
 }

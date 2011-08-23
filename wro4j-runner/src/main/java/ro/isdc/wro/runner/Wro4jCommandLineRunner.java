@@ -65,7 +65,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
-  private File defaultWroFile = new File(System.getProperty("user.dir"), "wro.xml");
+  private final File defaultWroFile = new File(System.getProperty("user.dir"), "wro.xml");
   @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
   @Option(name = "--targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
@@ -73,7 +73,7 @@ public class Wro4jCommandLineRunner {
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
   @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
-  private File wroFile = defaultWroFile;
+  private final File wroFile = defaultWroFile;
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
@@ -163,7 +163,7 @@ public class Wro4jCommandLineRunner {
    */
   private List<String> getTargetGroupsAsList() {
     if (targetGroups == null) {
-      final WroModel model = getManagerFactory().create().getModel();
+      final WroModel model = getManagerFactory().create().getModelFactory().create();
       return model.getGroupNames();
     }
     return Arrays.asList(targetGroups.split(","));

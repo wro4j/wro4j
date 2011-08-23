@@ -47,7 +47,10 @@ public class ModelTransformerFactory
     LOG.debug("using {} transformers", modelTransformers.size());
     for (final Transformer<WroModel> transformer : modelTransformers) {
       LOG.debug("using transformer: {}", transformer.getClass());
-      model = transformer.transform(model);
+      //synchronize to avoid multiple replacement in concurrent environment
+      synchronized (this) {
+        model = transformer.transform(model);
+      }
     }
     return model;
   }

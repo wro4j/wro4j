@@ -6,6 +6,7 @@ package ro.isdc.wro.model.factory;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -40,6 +42,7 @@ public class TestWildcardExpanderModelTransformer {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Context.set(Context.standaloneContext());
     final UriLocatorFactory uriLocatorFactory = new DefaultUriLocatorFactory();
     final Injector injector = new Injector(uriLocatorFactory, processorsFactory);
 
@@ -101,5 +104,10 @@ public class TestWildcardExpanderModelTransformer {
     final WroModel changedModel = factory.transform(model);
     LOG.debug("model: " + changedModel);
     Assert.assertEquals(3, changedModel.getGroupByName("group").getResources().size());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 }

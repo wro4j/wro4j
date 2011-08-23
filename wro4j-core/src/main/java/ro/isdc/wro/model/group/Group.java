@@ -69,6 +69,61 @@ public final class Group {
     return false;
   }
 
+  /**
+   * @return true if the resourceToCheck is already contained in this group.
+   */
+  private boolean hasResource(final Resource resourceToCheck) {
+    for (final Resource resource : resources) {
+      if (resource.equals(resourceToCheck)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Replace one resource with a list of other resources. The use case is related to wildcard exploder functionality,
+   * when resources containing wildcards are replaced with simple resources. The order of resources is preserved.
+   *
+   * @param resource
+   *          to replace.
+   * @param explodedResources
+   *          a list of resources to replace. If this list is empty, the result is similar to removing the resource from
+   *          the group.
+   * @throws IllegalArgumentException
+   *           when a missing resources is to be replaced.
+   */
+  public void replace(final Resource resource, final List<Resource> explodedResources) {
+    LOG.debug("replacing resource \n{} with exploded resources: \n{} for group: \n" + this, resource, explodedResources);
+    Validate.notNull(resource);
+    Validate.notNull(explodedResources);
+    boolean found = false;
+    final List<Resource> result = new ArrayList<Resource>();
+    for (final Resource resourceItem : resources) {
+      if (resourceItem.equals(resource)) {
+        found = true;
+        for (final Resource explodedResource : explodedResources) {
+          //preserve minimize flag.
+          explodedResource.setMinimize(resource.isMinimize());
+          //use only resources which do not already exist in the group
+          if (!hasResource(explodedResource)) {
+            result.add(explodedResource);
+          }
+        }
+      } else {
+        result.add(resourceItem);
+      }
+    }
+    //if no resources found, an invalid replace is performed
+    if (!found) {
+      LOG.debug("Cannot replace resource: {} because this resource is not a part of the group: {}", resource, this);
+      //Don't throw exception, because transformation is invoked multiple times... TODO find out why
+      throw new IllegalArgumentException("Cannot replace resource: " + resource + " for group: " + this
+          + " because the resource is not a part of this group.");
+    }
+    //update resources with newly built list.
+    setResources(result);
+  }
 
   /**
    * @return the name
@@ -103,46 +158,6 @@ public final class Group {
    */
   public final void setResources(final List<Resource> resources) {
     this.resources = resources;
-  }
-
-
-  /**
-   * Replace one resource with a list of other resources. The use case is related to wildcard exploder functionality,
-   * when resources containing wildcards are replaced with simple resources. The order of resources is preserved.
-   *
-   * @param resource
-   *          to replace.
-   * @param explodedResources
-   *          a list of resources to replace. If this list is empty, the result is similar to removing the resource from
-   *          the group.
-   * @throws IllegalArgumentException
-   *           when a missing resources is to be replaced.
-   */
-  public void replace(final Resource resource, final List<Resource> explodedResources) {
-    LOG.debug("replace resource {} with exploded resources: {}", resource, explodedResources);
-    Validate.notNull(resource);
-    Validate.notNull(explodedResources);
-    boolean found = false;
-    final List<Resource> result = new ArrayList<Resource>();
-    for (final Resource resourceItem : resources) {
-      if (resourceItem.equals(resource)) {
-        found = true;
-        for (final Resource explodedResource : explodedResources) {
-          //preserve minimize flag.
-          explodedResource.setMinimize(resource.isMinimize());
-        }
-        result.addAll(explodedResources);
-      } else {
-        result.add(resourceItem);
-      }
-    }
-    //if no resources found, an invalid replace is performed
-    if (!found) {
-      throw new IllegalArgumentException("Cannot replace resource: " + resource + " for group: " + this
-          + " because the resource is not a part of this group.");
-    }
-    //update resources with newly built list.
-    setResources(result);
   }
 
   /**

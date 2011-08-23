@@ -91,11 +91,12 @@ public class BaseWroManagerFactory
 
           this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
+          //set transformers before model factory
+          manager.setModelTransformers(modelTransformers);
           manager.setModelFactory(modelFactory);
           manager.setCacheStrategy(cacheStrategy);
           manager.setHashBuilder(hashBuilder);
           manager.registerCallback(cacheChangeCallback);
-          manager.setModelTransformers(modelTransformers);
         }
       }
     }

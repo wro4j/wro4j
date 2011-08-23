@@ -481,10 +481,10 @@ public class WroManager
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
-    //decorate with useful features
-    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(modelFactory))).setTransformers(modelTransformers);
+    // decorate with useful features
+    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
+        modelFactory))).setTransformers(modelTransformers);
   }
-
 
   /**
    * @param cacheStrategy the cache to set
