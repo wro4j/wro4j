@@ -98,7 +98,7 @@ public class TestWro4jMojo {
   }
 
 
-  @Test
+  @Test(expected=MojoExecutionException.class)
   public void testMojoWithPropertiesSet()
     throws Exception {
     mojo.setIgnoreMissingResources(false);
@@ -135,6 +135,7 @@ public class TestWro4jMojo {
   @Test
   public void testJsAndCssDestinationFolderSet()
     throws Exception {
+    mojo.setIgnoreMissingResources(true);
     mojo.setJsDestinationFolder(jsDestinationFolder);
     mojo.setCssDestinationFolder(cssDestinationFolder);
     mojo.execute();
@@ -203,6 +204,7 @@ public class TestWro4jMojo {
   @Test
   public void executeWithNullTargetGroupsProperty()
     throws Exception {
+    mojo.setIgnoreMissingResources(true);
     mojo.setTargetGroups(null);
     mojo.execute();
   }

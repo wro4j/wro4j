@@ -19,7 +19,6 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 
@@ -42,10 +41,6 @@ public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(JarWildcardStreamLocator.class);
 
   public JarWildcardStreamLocator() {
-  }
-
-  public JarWildcardStreamLocator(final DuplicateResourceDetector duplicateResourceDetector) {
-    super(duplicateResourceDetector);
   }
 
   /**

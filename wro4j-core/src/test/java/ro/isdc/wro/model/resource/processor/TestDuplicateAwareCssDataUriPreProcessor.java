@@ -4,7 +4,6 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
@@ -41,7 +40,7 @@ public class TestDuplicateAwareCssDataUriPreProcessor {
    */
   @Test
   public void processLargeDataUri()
-    throws IOException {
+    throws Exception {
     final URL url = getClass().getResource("duplicateAwareDataUri");
 
     final File testFolder = new File(url.getFile(), "test");

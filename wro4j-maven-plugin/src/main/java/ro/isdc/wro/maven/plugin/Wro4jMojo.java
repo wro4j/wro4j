@@ -65,9 +65,9 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   private String wroManagerFactory;
   /**
-   * The path to the destination directory where the files are stored at the end of the process.
+   * The path to configuration file.
    *
-   * @parameter default-value="${project.build.directory}/wro.properties" expression="${extraConfig}"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" expression="${extraConfig}"
    * @optional
    */
   private File extraConfigFile;
@@ -288,7 +288,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     getLog().debug("cssTargetFolder: " + cssTargetFolder);
     getLog().debug("rootFolder: " + rootFolder);
     if (rootFolder != null) {
-      result = StringUtils.removeStart(cssTargetFolder.getPath(),rootFolder.getPath());
+      result = StringUtils.removeStart(cssTargetFolder.getPath(), rootFolder.getPath());
     }
     getLog().debug("computedAggregatedFolderPath: " + result);
     return result;

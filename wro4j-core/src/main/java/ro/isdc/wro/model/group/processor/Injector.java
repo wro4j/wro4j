@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.factory.InjectorResourceLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -29,7 +28,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
   private final ResourceLocatorFactory resourceLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
   private final ProcessorsFactory processorsFactory;
@@ -126,10 +124,6 @@ public final class Injector {
       }
       if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
         field.set(object, getPreProcessorExecutor());
-        return accept = true;
-      }
-      if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
-        field.set(object, duplicateResourceDetector);
         return accept = true;
       }
       return accept;

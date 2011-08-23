@@ -1,12 +1,10 @@
+/*
+ * Copyright (c) 2008. All rights reserved.
 /**
  * Copyright Alex Objelean
  */
 package ro.isdc.wro.model.resource.locator.support;
 
-import java.io.IOException;
-
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
@@ -20,8 +18,6 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
  */
 public abstract class AbstractResourceLocator
   implements ResourceLocator {
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
   /**
    * Wildcard stream locator implementation.
    */
@@ -31,7 +27,7 @@ public abstract class AbstractResourceLocator
    * @return default implementation of {@link WildcardStreamLocator}.
    */
   public WildcardStreamLocator newWildcardStreamLocator() {
-    return new DefaultWildcardStreamLocator(duplicateResourceDetector) {
+    return new DefaultWildcardStreamLocator() {
       @Override
       public boolean hasWildcard(final String uri) {
         return !disableWildcards() && super.hasWildcard(uri);

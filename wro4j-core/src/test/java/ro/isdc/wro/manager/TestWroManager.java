@@ -220,13 +220,6 @@ public class TestWroManager {
   }
 
 
-  @After
-  public void tearDown() {
-    manager.destroy();
-    Context.unset();
-  }
-
-
   @Test
   public void testNoProcessorWroManagerFactory()
     throws IOException {
@@ -376,6 +369,31 @@ public class TestWroManager {
     Thread.sleep(500);
   }
 
+  @Test
+  public void testAggregatedComputedFolder() throws Exception {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Context.get().getResponse();
+    Mockito.when(request.getRequestURI()).thenReturn("/wro4j/wro/g1.css");
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
+    manager.process();
+
+    Assert.assertEquals("/wro4j/wro/", Context.get().getAggregatedFolderPath());
+  }
+
+  @Test
+  public void testAggregatedComputedFolder2() throws Exception {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletResponse response = Context.get().getResponse();
+    Mockito.when(request.getRequestURI()).thenReturn("/wro4j/wro/path/to/g1.css");
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+
+    manager.process();
+
+    Assert.assertEquals("/wro4j/wro/path/to/", Context.get().getAggregatedFolderPath());
+  }
 
   @Test(expected = UnauthorizedRequestException.class)
   public void testProxyUnauthorizedRequest()
@@ -426,4 +444,12 @@ public class TestWroManager {
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("51e6de8dde498cb0bf082b2cd80323fca19eef5/g3.css?minimize=true", path);
   }
+
+
+  @After
+  public void tearDown() {
+    manager.destroy();
+    Context.unset();
+  }
+
 }

@@ -4,7 +4,6 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import org.junit.Test;
@@ -19,7 +18,7 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestCssMinProcessor {
   @Test
   public void testFromFolder()
-    throws IOException {
+    throws Exception {
     final ResourceProcessor processor = new CssMinProcessor();
 
     final URL url = getClass().getResource("cssmin");

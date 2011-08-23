@@ -15,5 +15,6 @@
 
   <modules>
     <module>wro4j-demo</module>
+    <module>wro4j-standalone</module>
   </modules>
 </project>

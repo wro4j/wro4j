@@ -10,9 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,7 +24,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.support.IOFileFilterDecorator;
 import ro.isdc.wro.util.Transformer;
 
@@ -51,25 +48,12 @@ public class DefaultWildcardStreamLocator
   /**
    * Character to distinguish wildcard inside the uri.
    */
-  private static final String RECURSIVE_WILDCARD = "**";
-  /**
-   * Responsible for detecting duplicated resources.
-   */
-  private DuplicateResourceDetector duplicateResourceDetector;
+  public static final String RECURSIVE_WILDCARD = "**";
   private Transformer<Collection<File>> wildcardExpanderHandler;
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
    */
   public DefaultWildcardStreamLocator() {
-  }
-
-  /**
-   * Creates a WildcardStream locator capable of detecting duplicate resources.
-   *
-   * @param duplicateResourceDetector
-   */
-  public DefaultWildcardStreamLocator(final DuplicateResourceDetector duplicateResourceDetector) {
-    this.duplicateResourceDetector = duplicateResourceDetector;
   }
 
   /**
@@ -140,18 +124,6 @@ public class DefaultWildcardStreamLocator
 
     //TODO remove duplicates if needed:
     LOG.debug("map files: " + uriToFileMap.keySet());
-    //holds duplicates to be removed from the map
-    final List<String> duplicateResourceList = new ArrayList<String>();
-    for (final String resourceUri : uriToFileMap.keySet()) {
-      if (isDuplicateResourceUri(resourceUri)) {
-        LOG.warn("Duplicate resource detected: " + resourceUri);
-        duplicateResourceList.add(resourceUri);
-      }
-    }
-    //if (config.removeDuplicates) {
-    for (final String duplicateResourceUri : duplicateResourceList) {
-      uriToFileMap.remove(duplicateResourceUri);
-    }
 
     final Collection<File> files = uriToFileMap.values();
     if (files.isEmpty()) {
@@ -159,7 +131,11 @@ public class DefaultWildcardStreamLocator
       LOG.warn(message);
     }
     if (wildcardExpanderHandler != null) {
-      wildcardExpanderHandler.transform(files);
+      try {
+        wildcardExpanderHandler.transform(files);
+      } catch (final Exception e) {
+        throw new IOException("Exception during expanding wildcard", e);
+      }
     }
     handleFoundFiles(files);
     return files;
@@ -174,22 +150,6 @@ public class DefaultWildcardStreamLocator
    */
   protected void handleFoundFiles(final Collection<File> files) {
     //do nothing
-  }
-
-  /**
-   * Check if the resourceUri is already duplicated and afterwards add it to processed uri's.
-   *
-   * @return true if the resource is duplicated in the context of the current processing.
-   */
-  private boolean isDuplicateResourceUri(final String resourceUri) {
-    if (duplicateResourceDetector == null) {
-      //when duplicateResourceDetector is not set (unit tests or using locators outside of wro4j), the duplication is assumed to not be enabled.
-      LOG.warn("DuplicateResourceDetector not enabled, assuming no duplicate found for: " + resourceUri);
-      return false;
-    }
-    final boolean result = duplicateResourceDetector.isDuplicateResourceUri(resourceUri);
-    duplicateResourceDetector.addResourceUri(resourceUri);
-    return result;
   }
 
   /**
