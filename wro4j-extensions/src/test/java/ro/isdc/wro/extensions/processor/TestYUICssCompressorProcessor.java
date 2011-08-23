@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestYUICssCompressorProcessor {
   @Test
-  public void testNoMunge()
+  public void shouldMininimizeCss()
     throws IOException {
     final ResourcePostProcessor processor = new YUICssCompressorProcessor();
     final URL url = getClass().getResource("yui");

@@ -13,7 +13,6 @@
   </parent>
 
 	<properties>
-		<wro4j.version>1.4.0-SNAPSHOT</wro4j.version>
 		<wicket.version>1.5-RC5.1</wicket.version>
 		<gae.version>1.5.1</gae.version>
     <dwr.version>3.0.M1</dwr.version>
@@ -182,30 +181,6 @@
           <port>81</port>
         </configuration>
       </plugin>
-      
-      <plugin>
-        <groupId>ro.isdc.wro4j</groupId>
-        <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <ignoreMissingResources>true</ignoreMissingResources>
-          <targetGroups>encoding,bom</targetGroups>
-        <!-- 
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
-          -->
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-        </configuration>
-      </plugin>
-      <!--  -->
     </plugins>
   </build>
   <repositories>

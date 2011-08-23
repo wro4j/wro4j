@@ -38,6 +38,7 @@ import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.ModelTransformerFactory;
 import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -102,7 +103,7 @@ public class WroManager
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and
    * processed.
    */
-  private List<? extends Transformer<WroModel>> modelTransformers = Collections.EMPTY_LIST;
+  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
   private final Injector injector;
 
   public WroManager(final Injector injector) {
@@ -125,19 +126,22 @@ public class WroManager
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
 
-    LOG.debug("processing: " + request.getRequestURI());
     validate();
+    //TODO refactor
     InputStream is = null;
+    OutputStream os = null;
     if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
+      //do not gzip
+      os = response.getOutputStream();
     } else {
       is = buildGroupsInputStream(request, response);
+      // use gziped response if supported
+      os = getGzipedOutputStream(response);
     }
     if (is == null) {
       throw new WroRuntimeException("Cannot process this request: " + request.getRequestURL());
     }
-    // use gziped response if supported
-    final OutputStream os = getGzipedOutputStream(response);
     IOUtils.copy(is, os);
     is.close();
     os.close();
@@ -233,12 +237,11 @@ public class WroManager
   private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
     if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
-      final String cssFolder = StringUtils.removeStart(requestUri, FilenameUtils.getName(requestUri));
+      final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
       Context.get().setAggregatedFolderPath(aggregatedFolder);
     }
   }
-
 
   /**
    * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js
@@ -478,10 +481,10 @@ public class WroManager
    */
   public final void setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
-    //decorate with useful features
-    this.modelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(modelFactory));
+    // decorate with useful features
+    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
+        modelFactory))).setTransformers(modelTransformers);
   }
-
 
   /**
    * @param cacheStrategy the cache to set
@@ -496,7 +499,7 @@ public class WroManager
    * @param contentDigester the contentDigester to set
    */
   public void setHashBuilder(final HashBuilder contentDigester) {
-    Validate.notNull(modelTransformers);
+    Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
   }
 
@@ -504,12 +507,8 @@ public class WroManager
   /**
    * @return the modelFactory
    */
-  public final WroModel getModel() {
-    WroModel model = modelFactory.create();
-    for (final Transformer<WroModel> transformer : modelTransformers) {
-      model = transformer.transform(model);
-    }
-    return model;
+  public WroModelFactory getModelFactory() {
+    return modelFactory;
   }
 
   /**

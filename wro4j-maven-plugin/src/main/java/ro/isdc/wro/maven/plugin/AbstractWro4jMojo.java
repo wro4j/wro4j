@@ -137,7 +137,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected final List<String> getTargetGroupsAsList()
     throws Exception {
     if (getTargetGroups() == null) {
-      final WroModel model = getManagerFactory().create().getModel();
+      final WroModel model = getManagerFactory().create().getModelFactory().create();
       return model.getGroupNames();
     }
     return Arrays.asList(getTargetGroups().split(","));

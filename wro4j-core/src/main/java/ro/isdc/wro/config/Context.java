@@ -51,6 +51,7 @@ public class Context {
    */
   private String aggregatedFolderPath;
 
+
   /**
    * @return {@link WroConfiguration} singleton instance.
    */
@@ -85,6 +86,7 @@ public class Context {
     return new Context();
   }
 
+
   /**
    * @return {@link Context} associated with CURRENT request cycle.
    */
@@ -92,6 +94,7 @@ public class Context {
     validateContext();
     return CURRENT.get();
   }
+
 
   /**
    * Checks if the {@link Context} is accessible from current request cycle.
@@ -102,9 +105,11 @@ public class Context {
     }
   }
 
+
   public static void set(final Context context) {
     set(context, new WroConfiguration());
   }
+
 
   /**
    * Associate a context with the CURRENT request cycle.
@@ -130,8 +135,7 @@ public class Context {
   /**
    * Private constructor. Used to build {@link StandAloneContext}.
    */
-  private Context() {
-  }
+  private Context() {}
 
 
   /**
@@ -147,6 +151,7 @@ public class Context {
     }
     this.filterConfig = filterConfig;
   }
+
 
   /**
    * @return the request
@@ -168,7 +173,7 @@ public class Context {
    * @return the servletContext
    */
   public ServletContext getServletContext() {
-     return this.servletContext;
+    return this.servletContext;
   }
 
 
@@ -179,13 +184,13 @@ public class Context {
     return this.filterConfig;
   }
 
+
   /**
    * @return the aggregatedFolderPath
    */
   public String getAggregatedFolderPath() {
     return this.aggregatedFolderPath;
   }
-
 
   /**
    * This field is useful only for the aggregated resources of type {@link ResourceType#CSS}. </br>The
@@ -207,6 +212,7 @@ public class Context {
   public static void destroy() {
     unset();
   }
+
 
   /**
    * {@inheritDoc}

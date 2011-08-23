@@ -71,20 +71,10 @@ groups {
     js("http://code.jquery.com/jquery-1.5.js")
     groupRef("jquery-mobile")
   }
-  syntaxHighlighter {
-    js("/static/module/syntaxHighlighter/scripts/shCore.js")
-    js("/static/module/syntaxHighlighter/scripts/bootstrap.js")
-    js("/static/module/syntaxHighlighter/scripts/*.js")
-    css("/static/module/syntaxHighlighter/styles/shCoreRDark.css")
-  }
   all {
-    jquery()
-    /*
-    twitterBar()
     dynamicResource()
     uniform()
+    groupRef("jquery-mobile")
     groupRef('WEBINF-css')
-    dwr()
-    */
   }
 }

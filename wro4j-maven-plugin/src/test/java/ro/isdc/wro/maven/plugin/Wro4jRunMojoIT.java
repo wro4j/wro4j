@@ -34,6 +34,7 @@ public class Wro4jRunMojoIT
     mojo = (Wro4jMojo) lookupMojo("run", testPom);
     mojo.setIgnoreMissingResources(false);
     mojo.setMinimize(true);
+    mojo.setBuildDirectory(new File(getBasedir()));
   }
 
   /**

@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
@@ -39,8 +38,6 @@ public final class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
   @Inject
   private ProcessorsFactory processorsFactory;
 
@@ -141,10 +138,6 @@ public final class PreProcessorExecutor {
     throws IOException {
     final WroConfiguration config = Context.get().getConfig();
     try {
-      // populate duplicate Resource detector with known used resource uri's
-      for (final Resource r : resources) {
-        duplicateResourceDetector.addResourceUri(r.getUri());
-      }
       final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
@@ -157,8 +150,6 @@ public final class PreProcessorExecutor {
         LOG.error("Cannot ignore the missing resource:  " + resource);
         throw e;
       }
-    } finally {
-      duplicateResourceDetector.reset();
     }
   }
 }

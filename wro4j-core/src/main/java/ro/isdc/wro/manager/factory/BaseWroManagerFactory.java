@@ -32,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
-import ro.isdc.wro.model.transformer.WildcardExpanderWroModelTransformer;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 
@@ -91,11 +91,12 @@ public class BaseWroManagerFactory
 
           this.manager = new WroManager(injector);
           manager.setGroupExtractor(groupExtractor);
+          //set transformers before model factory
+          manager.setModelTransformers(modelTransformers);
           manager.setModelFactory(modelFactory);
           manager.setCacheStrategy(cacheStrategy);
           manager.setHashBuilder(hashBuilder);
           manager.registerCallback(cacheChangeCallback);
-          manager.setModelTransformers(modelTransformers);
         }
       }
     }
@@ -107,7 +108,7 @@ public class BaseWroManagerFactory
    * @return default implementation of modelTransformers.
    */
   protected List<? extends Transformer<WroModel>> newModelTransformers() {
-    return Arrays.asList(new WildcardExpanderWroModelTransformer());
+    return Arrays.asList(new WildcardExpanderModelTransformer());
   }
 
 

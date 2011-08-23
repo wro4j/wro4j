@@ -6,5 +6,5 @@ package ro.isdc.wro.util;
  * @param <T> type of the object to transform.
  */
 public interface Transformer<T> {
-  T transform(T input);
+  T transform(T input) throws Exception;
 }
