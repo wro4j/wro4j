@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -61,8 +60,6 @@ public class WildcardExpanderModelTransformer
 
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
 
 
   /**
@@ -89,7 +86,7 @@ public class WildcardExpanderModelTransformer
 
             // force the reset of the detector to avoid situations when resources are considered duplicates in unit
             // tests.
-            duplicateResourceDetector.reset();
+            // duplicateResourceDetector.reset();
 
             expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
             try {
@@ -112,9 +109,8 @@ public class WildcardExpanderModelTransformer
 
 
   /**
-   * @param resource
-   * @param uriLocator
-   * @param expandedHandler
+   * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
+   * {@link WildcardExpandedHandlerAware} to get the baseName.
    */
   private String computeBaseNameFolder(final Resource resource, final UriLocator uriLocator,
     final WildcardExpandedHandlerAware expandedHandler) {
@@ -134,7 +130,7 @@ public class WildcardExpanderModelTransformer
           // no need to continue
           break;
         }
-        // us this to skip wildcard stream detection, we are only interested in the baseName
+        // use this to skip wildcard stream detection, we are only interested in the baseName
         throw new IOException("Skip further wildcard processing");
       }
     });
@@ -142,7 +138,7 @@ public class WildcardExpanderModelTransformer
     try {
       uriLocator.locate(resourcePath);
     } catch (final Exception e) {
-      LOG.error("problem while trying to get basePath for : {}", resourcePath);
+      LOG.error("problem while trying to get basePath for: {}", resourcePath, e);
     }
     return baseNameFolderHolder.get();
   }
@@ -157,7 +153,7 @@ public class WildcardExpanderModelTransformer
     final Transformer<Collection<File>> handler = new Transformer<Collection<File>>() {
       public Collection<File> transform(final Collection<File> files) {
         if (baseNameFolder == null) {
-          //replacing group with empty list since the original uri has no associated resources.
+          // replacing group with empty list since the original uri has no associated resources.
           LOG.debug("No BaseNameFolder found, replacing group with empty list");
           group.replace(resource, new ArrayList<Resource>());
         } else {
