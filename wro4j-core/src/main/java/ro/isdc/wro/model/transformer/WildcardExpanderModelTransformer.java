@@ -76,6 +76,7 @@ public class WildcardExpanderModelTransformer
         if (uriLocator instanceof WildcardUriLocatorSupport) {
           final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
 
+          //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
           if (wildcardStreamLocator.hasWildcard(resource.getUri())
             && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
 
@@ -83,10 +84,6 @@ public class WildcardExpanderModelTransformer
             LOG.debug("expanding resource uri: {}", resource.getUri());
 
             final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
-
-            // force the reset of the detector to avoid situations when resources are considered duplicates in unit
-            // tests.
-            // duplicateResourceDetector.reset();
 
             expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
             try {
