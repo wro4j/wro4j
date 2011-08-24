@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +56,7 @@ public class DefaultGroupExtractor
    * {@inheritDoc}
    */
   public ResourceType getResourceType(final HttpServletRequest request) {
-    if (request == null) {
-      throw new IllegalArgumentException("Uri cannot be NULL!");
-    }
+    Validate.notNull(request);
     final String uri = request.getRequestURI();
     final String extension = FilenameUtils.getExtension(uri);
     ResourceType type = null;

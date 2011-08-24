@@ -57,7 +57,7 @@ public class CssImportPreProcessor
   /**
    * {@inheritDoc}
    */
-  public synchronized void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     validate();
     try {

@@ -133,6 +133,7 @@ public class WildcardExpanderModelTransformer
     });
 
     try {
+      LOG.debug("resourcePath: {}", resourcePath);
       uriLocator.locate(resourcePath);
     } catch (final Exception e) {
       LOG.error("problem while trying to get basePath for: {}", resourcePath, e);
