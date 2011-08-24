@@ -84,7 +84,7 @@ public class WildcardExpanderModelTransformer
             final WildcardExpandedHandlerAware expandedHandler = (WildcardExpandedHandlerAware)wildcardStreamLocator;
             LOG.debug("expanding resource uri: {}", resource.getUri());
 
-            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory, expandedHandler);
+            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory);
 
             expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
             try {
@@ -110,20 +110,23 @@ public class WildcardExpanderModelTransformer
    * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
    * {@link WildcardExpandedHandlerAware} to get the baseName.
    */
-  private String computeBaseNameFolder(final Resource resource, final ResourceLocatorFactory resourceLocatorFactory,
-    final WildcardExpandedHandlerAware expandedHandler) {
+  private String computeBaseNameFolder(final Resource resource, final ResourceLocatorFactory resourceLocatorFactory) {
     // Find the baseName
     // add a simple wildcard to trigger the wildcard detection
     final String resourcePath = FilenameUtils.getPath(resource.getUri())
       + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
     LOG.debug("resourcePath: {}", resourcePath);
+
+    final ResourceLocator resourceLocator = resourceLocatorFactory.locate(resourcePath);
+    //TODO get rid of this ugly casts
+    final WildcardExpandedHandlerAware expandedHandler = ((WildcardExpandedHandlerAware)((AbstractResourceLocator)resourceLocator).getWildcardStreamLocator());
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
     expandedHandler.setWildcardExpanderHandler(new Transformer<Collection<File>>() {
       public Collection<File> transform(final Collection<File> input)
         throws Exception {
-        LOG.debug("expanded Files: " + input);
         for (final File file : input) {
+          LOG.debug("expanded file: {}", file);
           baseNameFolderHolder.set(file.getParent());
           // no need to continue
           break;
@@ -134,7 +137,8 @@ public class WildcardExpanderModelTransformer
     });
 
     try {
-      resourceLocatorFactory.locate(resourcePath).getInputStream();
+      LOG.debug("locating baseName using resourcePath: {}", resourcePath);
+      resourceLocator.getInputStream();
     } catch (final Exception e) {
       LOG.error("problem while trying to get basePath for: {}", resourcePath, e);
     }

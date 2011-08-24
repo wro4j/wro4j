@@ -130,13 +130,6 @@ public class DefaultWildcardStreamLocator
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
-    if (wildcardExpanderHandler != null) {
-      try {
-        wildcardExpanderHandler.transform(files);
-      } catch (final Exception e) {
-        throw new IOException("Exception during expanding wildcard", e);
-      }
-    }
     handleFoundFiles(files);
     return files;
   }
@@ -148,8 +141,15 @@ public class DefaultWildcardStreamLocator
    *
    * @param files a collection of found files after the wildcard has beed applied on searched folder.
    */
-  protected void handleFoundFiles(final Collection<File> files) {
-    //do nothing
+  protected void handleFoundFiles(final Collection<File> files) throws IOException {
+    LOG.debug("wildcardExpanderHandler: {}", wildcardExpanderHandler);
+    if (wildcardExpanderHandler != null) {
+      try {
+        wildcardExpanderHandler.transform(files);
+      } catch (final Exception e) {
+        throw new IOException("Exception during expanding wildcard", e);
+      }
+    }
   }
 
   /**
