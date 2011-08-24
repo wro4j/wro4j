@@ -136,8 +136,7 @@ public class DefaultWildcardStreamLocator
 
 
   /**
-   * Used to do something with found collection of files before they are merged into a single stream. This is useful for
-   * testing.
+   * The default implementation uses the wildcardExpanderHandler to process the found files.
    *
    * @param files a collection of found files after the wildcard has beed applied on searched folder.
    */
