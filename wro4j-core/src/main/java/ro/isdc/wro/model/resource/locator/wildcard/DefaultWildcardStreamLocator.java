@@ -129,6 +129,17 @@ public class DefaultWildcardStreamLocator
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
+    handleFoundFiles(files);
+    return files;
+  }
+
+
+  /**
+   * The default implementation uses the wildcardExpanderHandler to process the found files.
+   *
+   * @param files a collection of found files after the wildcard has beed applied on searched folder.
+   */
+  protected void handleFoundFiles(final Collection<File> files) throws IOException {
     if (wildcardExpanderHandler != null) {
       try {
         wildcardExpanderHandler.transform(files);
@@ -136,19 +147,6 @@ public class DefaultWildcardStreamLocator
         throw new IOException("Exception during expanding wildcard", e);
       }
     }
-    handleFoundFiles(files);
-    return files;
-  }
-
-
-  /**
-   * Used to do something with found collection of files before they are merged into a single stream. This is useful for
-   * testing.
-   *
-   * @param files a collection of found files after the wildcard has beed applied on searched folder.
-   */
-  protected void handleFoundFiles(final Collection<File> files) {
-    //do nothing
   }
 
   /**
