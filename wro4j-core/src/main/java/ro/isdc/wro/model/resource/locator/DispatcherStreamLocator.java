@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
 
@@ -50,6 +51,9 @@ public final class DispatcherStreamLocator {
       throws IOException {
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+    //preserve context, in case it is unset during dispatching
+    final Context originalContext = Context.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher == null) {
@@ -81,9 +85,14 @@ public final class DispatcherStreamLocator {
       // included.
       LOG.debug("Error while dispatching the request for location " + location, e);
       return null;
-    }
-    if (os.size() == 0) {
-      LOG.warn("Wrong or empty resource with location : " + location);
+    } finally {
+      if (os.size() == 0) {
+        LOG.warn("Wrong or empty resource with location : " + location);
+      }
+      //Put the context back
+      if (!Context.isContextSet()) {
+        Context.set(originalContext);
+      }
     }
     return new ByteArrayInputStream(os.toByteArray());
   }

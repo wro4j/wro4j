@@ -435,8 +435,6 @@ public class WroManager
    */
   public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
-    // update the cache also when model is changed.
-    onCachePeriodChanged();
     if (modelFactory instanceof WroConfigurationChangeListener) {
       ((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
     }

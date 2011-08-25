@@ -187,14 +187,14 @@ public class XmlModelFactory
     for (int i = 0; i < importsList.getLength(); i++) {
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
-      LOG.debug("processing import: " + name);
-      LOG.debug("processImports#uriLocatorFactory: " + uriLocatorFactory);
+      LOG.debug("processing import: {}", name);
+      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected InputStream getModelResourceAsStream()
           throws IOException {
-          LOG.debug("build model from import: " + name);
-          LOG.debug("uriLocatorFactory: " + uriLocatorFactory);
+          LOG.debug("build model from import: {}", name);
+          LOG.debug("uriLocatorFactory: {}", uriLocatorFactory);
           return uriLocatorFactory.locate(name);
         };
       };
@@ -245,7 +245,7 @@ public class XmlModelFactory
         + ". Recursion path: " + processingGroups);
     }
     processingGroups.add(name);
-    LOG.debug("\tgroupName=" + name);
+    LOG.debug("\tgroupName={}", name);
     // skip if this group is already parsed
     final Group parsedGroup = getGroupByName(name, groups);
     if (parsedGroup != null) {

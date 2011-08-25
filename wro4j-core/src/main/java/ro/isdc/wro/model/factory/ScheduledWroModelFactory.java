@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -22,8 +21,7 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  */
-public class ScheduledWroModelFactory extends WroModelFactoryDecorator
-  implements WroConfigurationChangeListener {
+public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
   /**
    * Logger for this class.
    */
@@ -96,17 +94,12 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator
     };
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
-  public void onCachePeriodChanged() {}
-
-
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
+    LOG.debug("notified about model change");
+    super.onModelPeriodChanged();
     if (scheduler != null) {
       scheduler.shutdown();
       scheduler = null;
