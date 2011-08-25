@@ -239,7 +239,6 @@ public class TestWroManager {
       new ByteArrayInputStream(out.toByteArray()));
   }
 
-
   @Test
   public void testDuplicatedResourcesShouldBeSkipped()
     throws Exception {

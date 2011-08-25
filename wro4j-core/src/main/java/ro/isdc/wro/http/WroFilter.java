@@ -122,6 +122,7 @@ public class WroFilter
     wroConfiguration = newWroConfigurationFactory().create();
     initWroManagerFactory();
     initHeaderValues();
+    registerChangeListeners();
     initJMX();
     doInit(config);
   }
@@ -148,7 +149,6 @@ public class WroFilter
    */
   private void initJMX() {
     try {
-      registerChangeListeners();
       if (wroConfiguration.isJmxEnabled()) {
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
@@ -275,7 +275,6 @@ public class WroFilter
     }
   }
 
-
   /**
    * Custom filter initialization - can be used for extended classes.
    *
@@ -300,9 +299,13 @@ public class WroFilter
       if (shouldReloadCache(request)) {
         Context.get().getConfig().reloadCache();
         WroUtil.addNoCacheHeaders(response);
+        //set explicitly status OK for unit testing
+        response.setStatus(HttpServletResponse.SC_OK);
       } else if (shouldReloadModel(request)) {
         Context.get().getConfig().reloadModel();
         WroUtil.addNoCacheHeaders(response);
+        //set explicitly status OK for unit testing
+        response.setStatus(HttpServletResponse.SC_OK);
       } else {
         processRequest(request, response);
         onRequestProcessed();
