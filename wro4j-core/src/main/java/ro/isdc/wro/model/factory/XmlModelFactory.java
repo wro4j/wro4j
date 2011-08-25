@@ -188,7 +188,6 @@ public class XmlModelFactory
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: {}", name);
-      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected ResourceLocator getModelResourceLocator() {

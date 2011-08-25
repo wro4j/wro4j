@@ -40,8 +40,9 @@ public class TestServletContextResourceLocator {
   private ServletContext mockServletContext;
 
   @Before
-  public void initContext() {
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Context.set(Context.standaloneContext());
   }
 
   @Test(expected = IllegalArgumentException.class)

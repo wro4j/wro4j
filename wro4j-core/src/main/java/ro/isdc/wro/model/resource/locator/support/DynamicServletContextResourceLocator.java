@@ -20,13 +20,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alex Objelean
  */
-public class DynamicServletContextResourceLocator extends ServletContextResourceLocator {
+public class DynamicServletContextResourceLocator
+    extends ServletContextResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DynamicServletContextResourceLocator.class);
   private final HttpServletRequest request;
   private final HttpServletResponse response;
 
   public DynamicServletContextResourceLocator(final HttpServletRequest request, final HttpServletResponse response,
-    final ServletContext servletContext, final String path) {
+      final ServletContext servletContext, final String path) {
     super(servletContext, path);
     if (request == null) {
       throw new IllegalArgumentException("Request cannot be null!");
@@ -43,19 +44,23 @@ public class DynamicServletContextResourceLocator extends ServletContextResource
    */
   @Override
   public InputStream getInputStream()
-    throws IOException {
+      throws IOException {
     /**
-     * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch later
-     * to see if performance change.
+     * Locator of dynamic resources. There can be different strategies. We will always use only this. Try to switch
+     * later to see if performance change.
      */
-    InputStream inputStream = new DispatcherStreamLocator().getInputStream(request, response, getPath());
-    if (inputStream == null) {
-      //second attempt
-      inputStream = super.getInputStream();
-    }
-    if (inputStream == null) {
-      LOG.error("Exception while reading resource from " + getPath());
-      throw new IOException("Exception while reading resource from " + getPath());
+    InputStream inputStream = null;
+    try {
+      inputStream = new DispatcherStreamLocator().getInputStream(request, response, getPath());
+    } catch (final IOException e) {
+      if (inputStream == null) {
+        // second attempt
+        inputStream = super.getInputStream();
+      }
+      if (inputStream == null) {
+        LOG.error("Exception while reading resource from " + getPath());
+        throw new IOException("Exception while reading resource from " + getPath());
+      }
     }
     return inputStream;
   }
