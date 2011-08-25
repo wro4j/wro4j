@@ -113,7 +113,8 @@ public class WildcardExpanderModelTransformer
   private String computeBaseNameFolder(final Resource resource, final ResourceLocatorFactory resourceLocatorFactory) {
     // Find the baseName
     // add a simple wildcard to trigger the wildcard detection
-    final String resourcePath = FilenameUtils.getPath(resource.getUri())
+    LOG.debug("computeBaseNameFolder for resource {}", resource);
+    final String resourcePath = FilenameUtils.getFullPath(resource.getUri())
       + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
     LOG.debug("resourcePath: {}", resourcePath);
 
@@ -156,7 +157,8 @@ public class WildcardExpanderModelTransformer
       public Collection<File> transform(final Collection<File> files) {
         if (baseNameFolder == null) {
           // replacing group with empty list since the original uri has no associated resources.
-          LOG.debug("No BaseNameFolder found, replacing group with empty list");
+          //No BaseNameFolder found
+          LOG.info("The resource {} is probably invalid, removing it from the group.", resource);
           group.replace(resource, new ArrayList<Resource>());
         } else {
           final List<Resource> expandedResources = new ArrayList<Resource>();

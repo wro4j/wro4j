@@ -187,8 +187,8 @@ public class XmlModelFactory
     for (int i = 0; i < importsList.getLength(); i++) {
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
-      LOG.debug("processing import: " + name);
-      LOG.debug("processImports#uriLocatorFactory: " + resourceLocatorFactory);
+      LOG.debug("processing import: {}", name);
+      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected ResourceLocator getModelResourceLocator() {
@@ -243,7 +243,7 @@ public class XmlModelFactory
         + ". Recursion path: " + processingGroups);
     }
     processingGroups.add(name);
-    LOG.debug("\tgroupName=" + name);
+    LOG.debug("\tgroupName={}", name);
     // skip if this group is already parsed
     final Group parsedGroup = getGroupByName(name, groups);
     if (parsedGroup != null) {

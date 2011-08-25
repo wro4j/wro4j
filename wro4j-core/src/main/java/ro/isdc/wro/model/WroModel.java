@@ -55,11 +55,12 @@ public final class WroModel {
    * @param groups
    *          the groups to set
    */
-  public final void setGroups(final Collection<Group> groups) {
+  public final WroModel setGroups(final Collection<Group> groups) {
     Validate.notNull(groups, "groups cannot be null!");
     LOG.debug("setGroups: " + groups);
     identifyDuplicateGroupNames(groups);
     this.groups = new HashSet<Group>(groups);
+    return this;
   }
 
 
@@ -115,9 +116,10 @@ public final class WroModel {
    * Add a single group to the model.
    * @param group a not null {@link Group}.
    */
-  public void addGroup(final Group group) {
+  public WroModel addGroup(final Group group) {
     Validate.notNull(group);
     groups.add(group);
+    return this;
   }
 
   /**

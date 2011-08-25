@@ -152,7 +152,7 @@ public class WroManager
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
   private boolean isProxyResourceRequest(final HttpServletRequest request) {
-    return request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES);
+    return StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
   /**
@@ -436,8 +436,6 @@ public class WroManager
    */
   public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
-    // update the cache also when model is changed.
-    onCachePeriodChanged();
     if (modelFactory instanceof WroConfigurationChangeListener) {
       ((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
     }

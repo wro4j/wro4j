@@ -95,6 +95,13 @@ public class Context {
     return CURRENT.get();
   }
 
+  /**
+   * @return true if the call is done during wro4j request cycle. In other words, if the context is set.
+   */
+  public static boolean isContextSet() {
+    return CURRENT.get() != null;
+  }
+
 
   /**
    * Checks if the {@link Context} is accessible from current request cycle.
