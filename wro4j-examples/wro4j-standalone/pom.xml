@@ -57,8 +57,7 @@
         </executions>
         <configuration>
           <ignoreMissingResources>false</ignoreMissingResources>          
-          <failNever>true</failNever>
-          <destinationFolder>${project.build.directory}/classes/wro4j/</destinationFolder>            
+          <failNever>true</failNever>          
 		      <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
 		      <!--          
 		      <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>		  		  

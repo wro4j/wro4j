@@ -159,7 +159,7 @@ public class WildcardExpanderModelTransformer
         } else {
           final List<Resource> expandedResources = new ArrayList<Resource>();
           for (final File file : files) {
-            final String resourcePath = FilenameUtils.getPathNoEndSeparator(resource.getUri());
+            final String resourcePath = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
             LOG.debug("resourcePath: {}", resourcePath);
 
             final String computedResourceUri = resourcePath
