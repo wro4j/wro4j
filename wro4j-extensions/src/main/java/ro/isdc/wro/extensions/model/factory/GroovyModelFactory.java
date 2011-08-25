@@ -53,9 +53,9 @@ public class GroovyModelFactory
     final Script script;
     try {
       script = new GroovyShell().parse(new InputStreamReader(getModelResourceAsStream()));
-
+      LOG.debug("Parsing groovy script to build the model");
       final WroModel model = GroovyModelParser.parse(script);
-      LOG.debug("groovy model: ", model);
+      LOG.debug("groovy model: {}", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
       }

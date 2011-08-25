@@ -189,8 +189,6 @@ public class TestWroManager {
 
   /**
    * Ignored because it fails when running the test from command line.
-   *
-   * @throws Exception
    */
   @Ignore
   @Test
@@ -238,7 +236,6 @@ public class TestWroManager {
     WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
       new ByteArrayInputStream(out.toByteArray()));
   }
-
 
   @Test
   public void testDuplicatedResourcesShouldBeSkipped()

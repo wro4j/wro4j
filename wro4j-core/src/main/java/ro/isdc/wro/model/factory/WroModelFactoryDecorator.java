@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.factory;
 
+import org.apache.commons.lang.Validate;
+
+import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;
 
 
@@ -13,13 +16,11 @@ import ro.isdc.wro.model.WroModel;
  * @created 13 Mar 2011
  */
 public class WroModelFactoryDecorator
-  implements WroModelFactory {
-  private WroModelFactory decorated;
+    implements WroModelFactory, WroConfigurationChangeListener {
+  private final WroModelFactory decorated;
 
   public WroModelFactoryDecorator(final WroModelFactory decorated) {
-    if (decorated == null) {
-      throw new IllegalArgumentException("Decorated WroModelFactory cannot be null!");
-    }
+    Validate.notNull(decorated);
     this.decorated = decorated;
   }
 
@@ -30,11 +31,28 @@ public class WroModelFactoryDecorator
     return decorated.create();
   }
 
-
   /**
    * {@inheritDoc}
    */
   public void destroy() {
     decorated.destroy();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onCachePeriodChanged() {
+    if (decorated instanceof WroConfigurationChangeListener) {
+      ((WroConfigurationChangeListener) decorated).onCachePeriodChanged();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onModelPeriodChanged() {
+    if (decorated instanceof WroConfigurationChangeListener) {
+      ((WroConfigurationChangeListener) decorated).onModelPeriodChanged();
+    }
   }
 }

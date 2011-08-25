@@ -113,7 +113,8 @@ public class WildcardExpanderModelTransformer
     final WildcardExpandedHandlerAware expandedHandler) {
     // Find the baseName
     // add a simple wildcard to trigger the wildcard detection
-    final String resourcePath = FilenameUtils.getPath(resource.getUri())
+    LOG.debug("computeBaseNameFolder for resource {}", resource);
+    final String resourcePath = FilenameUtils.getFullPath(resource.getUri())
       + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
     LOG.debug("resourcePath: {}", resourcePath);
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
@@ -133,6 +134,7 @@ public class WildcardExpanderModelTransformer
     });
 
     try {
+      LOG.debug("resourcePath: {}", resourcePath);
       uriLocator.locate(resourcePath);
     } catch (final Exception e) {
       LOG.error("problem while trying to get basePath for: {}", resourcePath, e);
@@ -151,7 +153,8 @@ public class WildcardExpanderModelTransformer
       public Collection<File> transform(final Collection<File> files) {
         if (baseNameFolder == null) {
           // replacing group with empty list since the original uri has no associated resources.
-          LOG.debug("No BaseNameFolder found, replacing group with empty list");
+          //No BaseNameFolder found
+          LOG.info("The resource {} is probably invalid, removing it from the group.", resource);
           group.replace(resource, new ArrayList<Resource>());
         } else {
           final List<Resource> expandedResources = new ArrayList<Resource>();
