@@ -18,9 +18,9 @@
   </group>    
   
   <group name="syntaxHighlighter">
-    <js>/static/module/syntaxHighlighter/scripts/shCore.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/bootstrap.js</js>
-    <js>/static/module/syntaxHighlighter/scripts/*.js</js>
-    <js>/static/module/syntaxHighlighter/styles/shCoreRDark.css</js>
+    <js>/assets/syntaxHighlighter/scripts/shCore.js</js>
+    <js>/assets/syntaxHighlighter/scripts/bootstrap.js</js>
+    <js>/assets/syntaxHighlighter/scripts/*.js</js>
+    <js>/assets/syntaxHighlighter/styles/shCoreRDark.css</js>
   </group>
 </groups>
