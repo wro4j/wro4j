@@ -4,12 +4,15 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
@@ -20,6 +23,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -29,6 +34,7 @@ import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactor
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 
 /**
@@ -37,6 +43,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
  * @author Alex Objelean
  */
 public class TestWro4jMojo {
+  private static final Logger LOG = LoggerFactory.getLogger(TestWro4jMojo.class);
   private Wro4jMojo mojo;
   private File cssDestinationFolder;
   private File jsDestinationFolder;
@@ -158,30 +165,6 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
-  public static final class ExceptionThrowingWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
-    @Override
-    protected ProcessorsFactory newProcessorsFactory() {
-      final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-      final ResourcePostProcessor postProcessor = Mockito.mock(ResourcePostProcessor.class);
-      try {
-        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Reader.class),
-          Mockito.any(Writer.class));
-      } catch (final IOException e) {
-        Assert.fail("never happen");
-      }
-      factory.addPostProcessor(postProcessor);
-      return factory;
-    }
-  }
-
-  public static final class CssUrlRewriterWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
-    @Override
-    protected ProcessorsFactory newProcessorsFactory() {
-      final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-      factory.addPreProcessor(new CssUrlRewritingProcessor());
-      return factory;
-    }
-  }
 
 
   @Test(expected = MojoExecutionException.class)
@@ -206,9 +189,6 @@ public class TestWro4jMojo {
     mojo.setIgnoreMissingResources(true);
     mojo.setTargetGroups(null);
     mojo.execute();
-  }
-
-  public static class CustomManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
   }
 
 
@@ -292,6 +272,45 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
+  @Test
+  public void shouldGenerateGroupMappingUsingNoOpNamingStrategy()
+    throws Exception {
+    setWroWithValidResources();
+
+    final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
+
+    mojo.setGroupNameMappingFile(groupNameMappingFile.getPath());
+    mojo.execute();
+
+    //verify
+    final Properties groupNames = new Properties();
+    groupNames.load(new FileInputStream(groupNameMappingFile));
+    LOG.debug("groupNames: {}", groupNames);
+    Assert.assertEquals("g1.js", groupNames.get("g1.js"));
+
+    FileUtils.deleteQuietly(groupNameMappingFile);
+  }
+
+
+  @Test
+  public void shouldGenerateGroupMappingUsingCustomNamingStrategy()
+    throws Exception {
+    setWroWithValidResources();
+
+    final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
+
+    mojo.setWroManagerFactory(CustomNamingStrategyWroManagerFactory.class.getName());
+    mojo.setGroupNameMappingFile(groupNameMappingFile.getPath());
+    mojo.execute();
+
+    //verify
+    final Properties groupNames = new Properties();
+    groupNames.load(new FileInputStream(groupNameMappingFile));
+    LOG.debug("groupNames: {}", groupNames);
+    Assert.assertEquals(CustomNamingStrategyWroManagerFactory.PREFIX + "g1.js", groupNames.get("g1.js"));
+
+    FileUtils.deleteQuietly(groupNameMappingFile);
+  }
 
   @After
   public void tearDown()
@@ -300,6 +319,49 @@ public class TestWro4jMojo {
     FileUtils.deleteDirectory(cssDestinationFolder);
     FileUtils.deleteDirectory(jsDestinationFolder);
     FileUtils.deleteQuietly(extraConfigFile);
+  }
 
+
+  public static final class ExceptionThrowingWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
+    @Override
+    protected ProcessorsFactory newProcessorsFactory() {
+      final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+      final ResourcePostProcessor postProcessor = Mockito.mock(ResourcePostProcessor.class);
+      try {
+        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Reader.class),
+          Mockito.any(Writer.class));
+      } catch (final IOException e) {
+        Assert.fail("never happen");
+      }
+      factory.addPostProcessor(postProcessor);
+      return factory;
+    }
+  }
+
+
+  public static class CustomManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
+  }
+
+
+  public static final class CustomNamingStrategyWroManagerFactory
+      extends DefaultStandaloneContextAwareManagerFactory {
+    public static final String PREFIX = "renamed";
+    {
+      setNamingStrategy(new NamingStrategy() {
+        public String rename(final String originalName, final InputStream inputStream)
+            throws IOException {
+          return PREFIX + originalName;
+        }
+      });
+    }
+  }
+
+  public static final class CssUrlRewriterWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
+    @Override
+    protected ProcessorsFactory newProcessorsFactory() {
+      final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+      factory.addPreProcessor(new CssUrlRewritingProcessor());
+      return factory;
+    }
   }
 }
