@@ -146,4 +146,33 @@ public class TestWro4jCommandLineRunner {
     }).split(" ");
     invokeRunner(args);
   }
+
+  @Test
+  public void shouldAcceptGroovyDSLUsingSmartModelFactory() {
+    final File contextFolderFile = new File(getClass().getResource("").getFile(), "dsl");
+    final String contextFolder = contextFolderFile.getAbsolutePath();
+    //final String wroFile = contextFolder + "\\wro.xml";
+
+    //LOG.debug(wroFile);
+    final String[] args = String.format("-m --contextFolder %s --destinationFolder %s", new Object[] {
+      contextFolder, destinationFolder.getAbsolutePath()
+    }).split(" ");
+
+    //invoke runner
+    new Wro4jCommandLineRunner() {
+      @Override
+      public void doMain(final String[] arguments) {
+        super.doMain(arguments);
+      }
+      @Override
+      protected File newDefaultWroFile() {
+        return new File(contextFolderFile, "wro.xml");
+      }
+      @Override
+      protected void onException(final Exception e) {
+        LOG.error("Exception occured: ", e.getCause());
+        throw new RuntimeException(e);
+      }
+    }.doMain(args);
+  }
 }
