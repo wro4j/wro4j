@@ -402,7 +402,7 @@ public class WroFilter
   protected WroManagerFactory getWroManagerFactory() {
     if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
       // If no context param was specified we return the default factory
-      return new BaseWroManagerFactory();
+      return newWroManagerFactory();
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;
@@ -415,6 +415,14 @@ public class WroFilter
         throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
+  }
+
+  /**
+   * @return default implementation of {@link WroManagerFactory} when none is provided explicitly through
+   *         wroConfiguration option.
+   */
+  protected WroManagerFactory newWroManagerFactory() {
+    return new BaseWroManagerFactory();
   }
 
 

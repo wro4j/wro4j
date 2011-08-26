@@ -469,37 +469,41 @@ public class WroManager
   /**
    * @param groupExtractor the uriProcessor to set
    */
-  public final void setGroupExtractor(final GroupExtractor groupExtractor) {
+  public final WroManager setGroupExtractor(final GroupExtractor groupExtractor) {
     Validate.notNull(groupExtractor);
     this.groupExtractor = groupExtractor;
+    return this;
   }
 
 
   /**
    * @param modelFactory the modelFactory to set
    */
-  public final void setModelFactory(final WroModelFactory modelFactory) {
+  public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
     // decorate with useful features
     this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
         modelFactory))).setTransformers(modelTransformers);
+    return this;
   }
 
   /**
    * @param cacheStrategy the cache to set
    */
-  public final void setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  public final WroManager setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     Validate.notNull(cacheStrategy);
     this.cacheStrategy = cacheStrategy;
+    return this;
   }
 
 
   /**
    * @param contentDigester the contentDigester to set
    */
-  public void setHashBuilder(final HashBuilder contentDigester) {
+  public WroManager setHashBuilder(final HashBuilder contentDigester) {
     Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
+    return this;
   }
 
 
@@ -511,9 +515,16 @@ public class WroManager
   }
 
   /**
+   * @return the processorsFactory used by this WroManager.
+   */
+  public ProcessorsFactory getProcessorsFactory() {
+    return processorsFactory;
+  }
+
+  /**
    * @param modelTransformers the modelTransformers to set
    */
-  public void setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
+  public WroManager setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
     Validate.notNull(modelTransformers);
     this.modelTransformers = modelTransformers;
     //allow model transformers to be aware of injected properties
@@ -521,5 +532,6 @@ public class WroManager
       LOG.debug("injecting: " + transformer);
       injector.inject(transformer);
     }
+    return this;
   }
 }

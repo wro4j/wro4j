@@ -129,7 +129,7 @@ public final class Injector {
       return accept;
     } finally {
       if (accept) {
-        LOG.debug("Successfully injected field of type: " + field.getType());
+        LOG.debug("[OK] Injected field of type: " + field.getType());
       }
     }
   }
