@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2011 wro4j.
+ * All rights reserved.
+ */
+package ro.isdc.wro.model.factory;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.util.Transformer;
+
+/**
+ * Applies transformation using supplied transformers to the decorated model.
+ *
+ * @author Alex Objelean
+ * @created 23 Aug 2011
+ * @since 1.4.0
+ */
+public class ModelTransformerFactory
+    extends WroModelFactoryDecorator {
+  private static final Logger LOG = LoggerFactory.getLogger(ModelTransformerFactory.class);
+  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
+  public ModelTransformerFactory(final WroModelFactory decorated) {
+    super(decorated);
+  }
+
+  /**
+   * Set a list of transformers to apply on decorated model factory.
+   */
+  public ModelTransformerFactory setTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
+    Validate.notNull(modelTransformers);
+    this.modelTransformers = modelTransformers;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public WroModel create() {
+    WroModel model = super.create();
+    LOG.debug("using {} transformers", modelTransformers.size());
+    for (final Transformer<WroModel> transformer : modelTransformers) {
+      LOG.debug("using transformer: {}", transformer.getClass());
+      //synchronize to avoid multiple replacement in concurrent environment
+      synchronized (this) {
+        try {
+          model = transformer.transform(model);
+        } catch (final Exception e) {
+          throw new WroRuntimeException("Exception during model transformation", e);
+        }
+      }
+    }
+    return model;
+  }
+}

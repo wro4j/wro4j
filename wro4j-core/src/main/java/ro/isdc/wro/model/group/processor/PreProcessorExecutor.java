@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
@@ -38,8 +38,6 @@ public final class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
   @Inject
   private ProcessorsFactory processorsFactory;
 
@@ -96,6 +94,7 @@ public final class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final List<Resource> resources,
     final Collection<ResourcePreProcessor> processors)
     throws IOException {
+    LOG.debug("applying preProcessors: " + processors);
     String resourceContent = getResourceContent(resource, resources);
     if (processors.isEmpty()) {
       return resourceContent;
@@ -139,11 +138,7 @@ public final class PreProcessorExecutor {
     throws IOException {
     final WroConfiguration config = Context.get().getConfig();
     try {
-      // populate duplicate Resource detector with known used resource uri's
-      for (final Resource r : resources) {
-        duplicateResourceDetector.addResourceUri(r.getUri());
-      }
-      final InputStream is = uriLocatorFactory.locate(resource.getUri());
+      final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       return result;
@@ -155,8 +150,6 @@ public final class PreProcessorExecutor {
         LOG.error("Cannot ignore the missing resource:  " + resource);
         throw e;
       }
-    } finally {
-      duplicateResourceDetector.reset();
     }
   }
 }

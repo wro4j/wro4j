@@ -5,6 +5,8 @@ package ro.isdc.wro.extensions.manager;
 
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
+
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
@@ -31,13 +33,15 @@ import com.google.javascript.jscomp.CompilationLevel;
  *
  * @author Alex Objelean
  */
-public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroManagerFactory {
+public class ExtensionsConfigurableWroManagerFactory
+    extends ConfigurableWroManagerFactory {
+
   /**
    * {@inheritDoc}
    */
   @Override
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
-    pupulateMap(map);
+    pupulateMapWithExtensionsProcessors(map);
   }
 
   /**
@@ -45,11 +49,21 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
    */
   @Override
   protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
-    pupulateMap(map);
+    pupulateMapWithExtensionsProcessors(map);
   }
 
+  /**
+   * Populates a map of processors with processors existing in extensions module.
+   *
+   * @param <T>
+   *          type of processors (pre or post). This can be one of the following: {@link ResourcePreProcessor} or
+   *          {@link ResourcePostProcessor}.
+   * @param map
+   *          to populate.
+   */
   @SuppressWarnings("unchecked")
-  private static <T> void pupulateMap(final Map<String, T> map) {
+  public static <T> void pupulateMapWithExtensionsProcessors(final Map<String, T> map) {
+    Validate.notNull(map);
     map.put(YUICssCompressorProcessor.ALIAS, (T) new YUICssCompressorProcessor());
     map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, (T) YUIJsCompressorProcessor.noMungeCompressor());
     map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, (T) YUIJsCompressorProcessor.doMungeCompressor());
@@ -60,7 +74,8 @@ public class ExtensionsConfigurableWroManagerFactory extends ConfigurableWroMana
     map.put(LessCssProcessor.ALIAS, (T) new LessCssProcessor());
     map.put(SassCssProcessor.ALIAS, (T) new SassCssProcessor());
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, (T) new GoogleClosureCompressorProcessor());
-    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(
+        CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put(CoffeeScriptProcessor.ALIAS, (T) new CoffeeScriptProcessor());
     map.put(CJsonProcessor.ALIAS_PACK, (T) CJsonProcessor.packProcessor());
     map.put(CJsonProcessor.ALIAS_UNPACK, (T) CJsonProcessor.unpackProcessor());

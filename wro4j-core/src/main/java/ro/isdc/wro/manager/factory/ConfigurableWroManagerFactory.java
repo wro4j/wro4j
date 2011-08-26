@@ -3,41 +3,32 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
+import javax.servlet.FilterConfig;
+
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.BomStripperPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 
 /**
@@ -48,73 +39,19 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  */
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
+  private Properties configProperties;
   /**
    * Name of init param used to specify uri locators.
    */
   public static final String PARAM_URI_LOCATORS = "uriLocators";
-  /**
-   * Name of init param used to specify pre processors.
-   */
-  public static final String PARAM_PRE_PROCESSORS = "preProcessors";
-  /**
-   * Name of init param used to specify post processors.
-   */
-  public static final String PARAM_POST_PROCESSORS = "postProcessors";
-
-  /**
-   * Delimit tokens containing a list of locators, preProcessors & postProcessors.
-   */
-  private static final String TOKEN_DELIMITER = ",";
-  //Use LinkedHashMap to preserve the addition order
-  private final Map<String, ResourcePreProcessor> preProcessors = new LinkedHashMap<String, ResourcePreProcessor>();
-  private final Map<String, ResourcePostProcessor> postProcessors = new LinkedHashMap<String, ResourcePostProcessor>();
-  private final Map<String, UriLocator> locators = new LinkedHashMap<String, UriLocator>();
 
 
-  /**
-   * Initialize processors & locators with a default list.
-   */
-  public ConfigurableWroManagerFactory() {
-    initProcessors();
-    initLocators();
-  }
-
-  /**
-   * Init locators with default values.
-   */
-  private void initLocators() {
-    locators.put("servletContext", new ServletContextUriLocator());
-    locators.put("classpath", new ClasspathUriLocator());
-    locators.put("url", new UrlUriLocator());
-    contributeLocators(locators);
-  }
-
-
-  /**
-   * Init processors with default values.
-   */
-  private void initProcessors() {
-    preProcessors.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
-    preProcessors.put(BomStripperPreProcessor.ALIAS, new BomStripperPreProcessor());
-    preProcessors.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
-    preProcessors.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
-    preProcessors.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
-    preProcessors.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
-    preProcessors.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, new DuplicatesAwareCssDataUriPreProcessor());
-    preProcessors.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
-    preProcessors.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
-    preProcessors.put(CssMinProcessor.ALIAS, new CssMinProcessor());
-    preProcessors.put(JSMinProcessor.ALIAS, new JSMinProcessor());
-    preProcessors.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
-    preProcessors.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
-
-    postProcessors.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
-    postProcessors.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
-    postProcessors.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
-    postProcessors.put(JSMinProcessor.ALIAS, new JSMinProcessor());
-
-    contributePreProcessors(preProcessors);
-    contributePostProcessors(postProcessors);
+  private Map<String, UriLocator> createLocatorsMap() {
+    final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
+    map.put("servletContext", new ServletContextUriLocator());
+    map.put("classpath", new ClasspathUriLocator());
+    map.put("url", new UrlUriLocator());
+    return map;
   }
 
 
@@ -152,97 +89,113 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
     final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-    for (final UriLocator locator : getLocators()) {
+    final Map<String, UriLocator> map = createLocatorsMap();
+    contributeLocators(map);
+    final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
+    final List<UriLocator> locators = ConfigurableProcessorsFactory.getListOfItems(uriLocators, map);
+    for (final UriLocator locator : locators) {
       factory.addUriLocator(locator);
+    }
+    //TODO deprecate uri locator configuration
+    //use default when none provided
+    if (factory.getUriLocators().isEmpty()) {
+      return new DefaultUriLocatorFactory();
     }
     return factory;
   }
 
+
   /**
-   * {@inheritDoc}
+   * Reuse {@link ConfigurableProcessorsFactory} for processors lookup.
    */
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
-    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-    factory.setResourcePreProcessors(getPreProcessors());
-    factory.setResourcePostProcessors(getPostProcessors());
+    final ConfigurableProcessorsFactory factory = new ConfigurableProcessorsFactory() {
+      @Override
+      public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
+        final Map<String, ResourcePreProcessor> map = ProcessorsUtils.createPreProcessorsMap();
+        contributePreProcessors(map);
+        return map;
+      }
+
+
+      @Override
+      public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
+        final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
+        contributePostProcessors(map);
+        return map;
+      }
+
+
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
+        updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
+        return props;
+      }
+
+
+      /**
+       * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
+       */
+      private void updatePropertiesWithProcessors(final Properties props, final String paramName) {
+        final FilterConfig filterConfig = Context.get().getFilterConfig();
+        // first, retrieve value from init-param for backward compatibility
+        final String processorsAsString = filterConfig.getInitParameter(paramName);
+        if (processorsAsString != null) {
+          props.setProperty(paramName, processorsAsString);
+        } else {
+          // retrieve value from configProperties file
+          final String value = getConfigProperties().getProperty(paramName);
+          if (value != null) {
+            props.setProperty(paramName, value);
+          }
+        }
+      }
+    };
     return factory;
   }
 
+
   /**
-   * This method has friendly modifier in order to be able to test it.
+   * Override this method to provide a different config properties file location. It is very likely that you would like
+   * it to be the same as the one used by the {@link FilterConfigWroConfigurationFactory}. The default properties file
+   * location is /WEB-INF/wro.properties.
    *
-   * @return a list of configured uriLocators.
+   * @return a not null properties object used as a secondary configuration option for processors if these are not
+   *         configured in init-param.
    */
-  List<UriLocator> getLocators() {
-    return getListOfItems(PARAM_URI_LOCATORS, locators);
-  }
-
-
-  /**
-   * @return a list of configured preProcessors.
-   */
-  List<ResourcePreProcessor> getPreProcessors() {
-    return getListOfItems(PARAM_PRE_PROCESSORS, preProcessors);
-  }
-
-
-  /**
-   * @return a list of configured preProcessors.
-   */
-  List<ResourcePostProcessor> getPostProcessors() {
-    return getListOfItems(PARAM_POST_PROCESSORS, postProcessors);
-  }
-
-
-  /**
-   * Extracts a list of items (processors) from init-param based on existing values inside the map.
-   *
-   * @param initParamName name of init-param that identifies required items.
-   * @param map mapping between items and its implementations.
-   * @return a list of items (processors).
-   */
-  private <T> List<T> getListOfItems(final String initParamName, final Map<String, T> map) {
-    final List<T> list = new ArrayList<T>();
-    final String paramValue = Context.get().getFilterConfig().getInitParameter(initParamName);
-    LOG.debug("paramValue: " + paramValue);
-    final List<String> tokens = getTokens(paramValue);
-    if (tokens.isEmpty()) {
-      final String message = "No '" + initParamName + "' initParam was set";
-      LOG.warn(message);
-      return list;
+  protected Properties newConfigProperties() {
+    // default location is /WEB-INF/wro.properties
+    final Properties props = new Properties();
+    try {
+      props.load(PropertiesAndFilterConfigWroConfigurationFactory.defaultConfigPropertyStream(Context.get().getFilterConfig()));
+    } catch (final Exception e) {
+      LOG.debug("No configuration property file found.");
     }
-    for (final String token : tokens) {
-      final T item = map.get(token);
-      if (item == null) {
-        LOG.info("Available " + initParamName + " are: " + map.keySet());
-        throw new WroRuntimeException("Invalid " + initParamName + " name: " + token);
-      }
-      LOG.debug("Found " + initParamName + " for name: " + token + " : " + item);
-      list.add(item);
-    }
-    return list;
+    return props;
   }
 
 
   /**
-   * Creates a list of tokens (processors name) based on provided string of comma separated strings.
-   *
-   * @param input string representation of tokens separated by ',' character.
-   * @return a list of non empty strings.
+   * Use this method rather than accessing the field directly, because it will create a default one if none is provided.
    */
-  private List<String> getTokens(final String input) {
-    final List<String> locatorsList = new ArrayList<String>();
-    if (input != null) {
-      // use StringTokenizer instead of split because it skips empty (but not trimmed) strings
-      final StringTokenizer st = new StringTokenizer(input, TOKEN_DELIMITER);
-      while (st.hasMoreTokens()) {
-        final String token = st.nextToken().trim();
-        if (!StringUtils.isEmpty(token)) {
-          locatorsList.add(token);
-        }
-      }
+  private Properties getConfigProperties() {
+    if (configProperties == null) {
+      configProperties = newConfigProperties();
     }
-    return locatorsList;
+    return configProperties;
   }
+
+
+  /**
+   * Setter is useful for unit tests.
+   */
+  public ConfigurableWroManagerFactory setConfigProperties(final Properties configProperties) {
+    Validate.notNull(configProperties);
+    this.configProperties = configProperties;
+    return this;
+  }
+
 }

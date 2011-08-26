@@ -8,7 +8,7 @@ import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategyAware;
 
 /**
- * An implementation of {@link WroManagerFactory} which is aware about the run context.
+ * An implementation of {@link WroManagerFactory} aware about the run context.
  *
  * @author Alex Objelean
  */

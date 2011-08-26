@@ -1,0 +1,21 @@
+
+h1. getPersistentValue
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.getPersistentValue(string)
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[* @string@
+]

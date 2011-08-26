@@ -35,12 +35,10 @@ import org.xml.sax.SAXException;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
 
@@ -52,16 +50,16 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
  * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
-  implements WroModelFactory {
+  extends AbstractWroModelFactory {
   /**
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(XmlModelFactory.class);
 
   /**
-   * Default xml to parse.
+   * Default xml filename.
    */
-  protected static final String XML_CONFIG_FILE = "wro.xml";
+  private static final String DEFAULT_FILE_NAME = "wro.xml";
 
   /**
    * Default xml to parse.
@@ -116,11 +114,12 @@ public class XmlModelFactory
   /**
    * Used to locate imports;
    */
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  @Inject
+  private UriLocatorFactory uriLocatorFactory;
   /**
    * Used to detect recursive import processing.
    */
-  private Set<String> processedImports = new HashSet<String>();
+  private final Set<String> processedImports = new HashSet<String>();
 
 
   /**
@@ -131,9 +130,9 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final InputStream configResource = getConfigResourceAsStream();
+      final InputStream configResource = getModelResourceAsStream();
       if (configResource == null) {
-        throw new WroRuntimeException("Could not locate config resource (wro.xml)!");
+        throw new WroRuntimeException("Could not locate config resource (" + DEFAULT_FILE_NAME + ")!");
       }
       document = factory.newDocumentBuilder().parse(configResource);
       validate(document);
@@ -141,7 +140,7 @@ public class XmlModelFactory
     } catch (final IOException e) {
       throw new WroRuntimeException("Cannot find XML to parse", e);
     } catch (final SAXException e) {
-      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage());
+      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage(), e);
     } catch (final ParserConfigurationException e) {
       throw new WroRuntimeException("Parsing error", e);
     }
@@ -161,22 +160,10 @@ public class XmlModelFactory
     throws IOException, SAXException {
     // create a SchemaFactory capable of understanding WXS schemas
     final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-    final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
+    final InputStream schemaStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(XML_SCHEMA_FILE);
+    final Source schemaFile = new StreamSource(schemaStream);
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
-  }
-
-
-  /**
-   * Override this method, in order to provide different xml definition file name.
-   *
-   * @return stream of the xml representation of the model.
-   * @throws IOException if the stream couldn't be read.
-   */
-  protected InputStream getConfigResourceAsStream()
-    throws IOException {
-    return getResourceAsStream(XML_CONFIG_FILE);
   }
 
 
@@ -200,16 +187,19 @@ public class XmlModelFactory
     for (int i = 0; i < importsList.getLength(); i++) {
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
-      LOG.debug("processing import: " + name);
+      LOG.debug("processing import: {}", name);
+      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
-        protected InputStream getConfigResourceAsStream()
+        protected InputStream getModelResourceAsStream()
           throws IOException {
-          LOG.debug("build model from import: " + name);
-          return getUriLocatorFactory().locate(name);
+          LOG.debug("build model from import: {}", name);
+          LOG.debug("uriLocatorFactory: {}", uriLocatorFactory);
+          return uriLocatorFactory.locate(name);
         };
       };
-
+      //pass the reference of the uriLocatorFactory to the anonymously created factory.
+      importedModelFactory.uriLocatorFactory = this.uriLocatorFactory;
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
         LOG.error(message);
@@ -255,7 +245,7 @@ public class XmlModelFactory
         + ". Recursion path: " + processingGroups);
     }
     processingGroups.add(name);
-    LOG.debug("\tgroupName=" + name);
+    LOG.debug("\tgroupName={}", name);
     // skip if this group is already parsed
     final Group parsedGroup = getGroupByName(name, groups);
     if (parsedGroup != null) {
@@ -264,8 +254,7 @@ public class XmlModelFactory
       processingGroups.remove(name);
       return parsedGroup.getResources();
     }
-    final Group group = new Group();
-    group.setName(name);
+    final Group group = new Group(name);
     final List<Resource> resources = new ArrayList<Resource>();
     final NodeList resourceNodeList = element.getChildNodes();
     for (int i = 0; i < resourceNodeList.getLength(); i++) {
@@ -336,15 +325,6 @@ public class XmlModelFactory
     }
   }
 
-
-  /**
-   * @return InputStream of the local resource from classpath.
-   */
-  protected static InputStream getResourceAsStream(final String fileName) {
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-  }
-
-
   /**
    * Checks if xml structure is valid.
    *
@@ -360,33 +340,11 @@ public class XmlModelFactory
     validator.validate(new DOMSource(document));
   }
 
-
   /**
    * {@inheritDoc}
    */
-  public void destroy() {}
-
-
-  /**
-   * @return lazily instantiated {@link UriLocatorFactory}.
-   */
-  private UriLocatorFactory getUriLocatorFactory() {
-    if (uriLocatorFactory == null) {
-      uriLocatorFactory = new SimpleUriLocatorFactory();
-      // use locators with wildcard disabled - to avoid invalid xml parsing error
-      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
-        @Override
-        protected boolean disableWildcards() {
-          return true;
-        }
-      });
-      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
-        @Override
-        protected boolean disableWildcards() {
-          return true;
-        }
-      });
-    }
-    return uriLocatorFactory;
+  @Override
+  protected String getDefaultModelFilename() {
+    return DEFAULT_FILE_NAME;
   }
 }

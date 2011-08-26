@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.factory.InjectorUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -28,19 +28,14 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private final DuplicateResourceDetector duplicateResourceDetector = new DuplicateResourceDetector();
   private final UriLocatorFactory uriLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
   private final ProcessorsFactory processorsFactory;
 
 
   public Injector(final UriLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalArgumentException("uriLocatorFactory cannot be null");
-    }
-    if (processorsFactory == null) {
-      throw new IllegalArgumentException("processorsFactory cannot be null");
-    }
+    Validate.notNull(uriLocatorFactory, "uriLocatorFactory cannot be null");
+    Validate.notNull(processorsFactory, "processorsFactory cannot be null");
     this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(uriLocatorFactory, this);
     this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, this);
   }
@@ -59,9 +54,7 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
-    if (object == null) {
-      throw new IllegalArgumentException("Object cannot be null!");
-    }
+    Validate.notNull(object, "Object cannot be null!");
     processInjectAnnotation(object);
   }
 
@@ -78,8 +71,8 @@ public final class Injector {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject can be applied only on these types "
-              + UriLocatorFactory.class.getName() + " type");
+            throw new WroRuntimeException("@Inject cannot be applied field of type: "
+              + field.getType());
           }
         }
       }
@@ -117,24 +110,27 @@ public final class Injector {
    */
   private boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
-    // accept even private modifiers
-    field.setAccessible(true);
-    if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
-      field.set(object, uriLocatorFactory);
-      return true;
+    boolean accept = false;
+    try {
+      // accept even private modifiers
+      field.setAccessible(true);
+      if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
+        field.set(object, uriLocatorFactory);
+        return accept = true;
+      }
+      if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
+        field.set(object, processorsFactory);
+        return accept = true;
+      }
+      if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
+        field.set(object, getPreProcessorExecutor());
+        return accept = true;
+      }
+      return accept;
+    } finally {
+      if (accept) {
+        LOG.debug("[OK] Injected field of type: " + field.getType());
+      }
     }
-    if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
-      field.set(object, processorsFactory);
-      return true;
-    }
-    if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
-      field.set(object, getPreProcessorExecutor());
-      return true;
-    }
-    if (DuplicateResourceDetector.class.isAssignableFrom(field.getType())) {
-      field.set(object, duplicateResourceDetector);
-      return true;
-    }
-    return false;
   }
 }

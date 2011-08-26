@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class ServletContextUriLocator
   /**
    * Locates a stream using request dispatcher.
    */
-  private final DispatcherStreamLocator dynamicStreamLocator = new DispatcherStreamLocator();
+  private final DispatcherStreamLocator dispatcherStreamLocator = new DispatcherStreamLocator();
 
   /**
    * {@inheritDoc}
@@ -82,10 +83,7 @@ public class ServletContextUriLocator
    */
   public InputStream locate(final String uri)
     throws IOException {
-    LOG.debug("locating uri: " + uri);
-    if (uri == null) {
-      throw new IllegalArgumentException("URI cannot be NULL!");
-    }
+    Validate.notNull(uri, "URI cannot be NULL!");
     LOG.debug("uri resource: " + uri);
     final ServletContext servletContext = Context.get().getServletContext();
 
@@ -108,13 +106,20 @@ public class ServletContextUriLocator
     // first attempt
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
-    InputStream inputStream = dynamicStreamLocator.getInputStream(request, response, uri);
-    if (inputStream == null) {
-      inputStream = servletContext.getResourceAsStream(uri);
-    }
-    if (inputStream == null) {
-      LOG.error("Exception while reading resource from " + uri);
-      throw new IOException("Exception while reading resource from " + uri);
+    // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
+    // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
+    InputStream inputStream = null;
+    try {
+      inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
+    } catch (final IOException e) {
+      if (inputStream == null) {
+        LOG.debug("retrieving servletContext stream for uri: {}", uri);
+        inputStream = servletContext.getResourceAsStream(uri);
+      }
+      if (inputStream == null) {
+        LOG.error("Exception while reading resource from " + uri);
+        throw new IOException("Exception while reading resource from " + uri);
+      }
     }
     return inputStream;
   }

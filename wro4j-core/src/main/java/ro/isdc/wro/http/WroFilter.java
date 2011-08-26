@@ -39,10 +39,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -126,6 +122,7 @@ public class WroFilter
     wroConfiguration = newWroConfigurationFactory().create();
     initWroManagerFactory();
     initHeaderValues();
+    registerChangeListeners();
     initJMX();
     doInit(config);
   }
@@ -152,7 +149,6 @@ public class WroFilter
    */
   private void initJMX() {
     try {
-      registerChangeListeners();
       if (wroConfiguration.isJmxEnabled()) {
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
@@ -279,7 +275,6 @@ public class WroFilter
     }
   }
 
-
   /**
    * Custom filter initialization - can be used for extended classes.
    *
@@ -304,9 +299,13 @@ public class WroFilter
       if (shouldReloadCache(request)) {
         Context.get().getConfig().reloadCache();
         WroUtil.addNoCacheHeaders(response);
+        //set explicitly status OK for unit testing
+        response.setStatus(HttpServletResponse.SC_OK);
       } else if (shouldReloadModel(request)) {
         Context.get().getConfig().reloadModel();
         WroUtil.addNoCacheHeaders(response);
+        //set explicitly status OK for unit testing
+        response.setStatus(HttpServletResponse.SC_OK);
       } else {
         processRequest(request, response);
         onRequestProcessed();
@@ -354,7 +353,7 @@ public class WroFilter
     throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager
-    wroManagerFactory.getInstance().process();
+    wroManagerFactory.create().process();
   }
 
 
@@ -403,16 +402,7 @@ public class WroFilter
   protected WroManagerFactory getWroManagerFactory() {
     if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
       // If no context param was specified we return the default factory
-      return new BaseWroManagerFactory() {
-        @Override
-        protected UriLocatorFactory newUriLocatorFactory() {
-          return new DefaultUriLocatorFactory();
-        }
-        @Override
-        protected ProcessorsFactory newProcessorsFactory() {
-          return new DefaultProcesorsFactory();
-        }
-      };
+      return newWroManagerFactory();
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;
@@ -425,6 +415,14 @@ public class WroFilter
         throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
+  }
+
+  /**
+   * @return default implementation of {@link WroManagerFactory} when none is provided explicitly through
+   *         wroConfiguration option.
+   */
+  protected WroManagerFactory newWroManagerFactory() {
+    return new BaseWroManagerFactory();
   }
 
 

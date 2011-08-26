@@ -22,9 +22,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
 
@@ -43,13 +45,23 @@ public final class DispatcherStreamLocator {
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
-   * the portal with multiple threads (web requests) that are combined with threads for wro4.
+   * the portal with multiple threads (web requests) that are combined with threads for wro4j.
+   *
+   *
+   * @return a valid stream for required location. This method will never return a null.
+   * @throws IOException
+   *           if the stream cannot be located at the specified location.
    */
   public synchronized InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
       final String location)
       throws IOException {
+    Validate.notNull(request);
+    Validate.notNull(response);
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+    //preserve context, in case it is unset during dispatching
+    final Context originalContext = Context.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher == null) {
@@ -80,10 +92,15 @@ public final class DispatcherStreamLocator {
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
       LOG.debug("Error while dispatching the request for location " + location, e);
-      return null;
-    }
-    if (os.size() == 0) {
-      LOG.warn("Wrong or empty resource with location : " + location);
+      throw new IOException("Error while dispatching the request for location " + location, e);
+    } finally {
+      if (os.size() == 0) {
+        LOG.warn("Wrong or empty resource with location : " + location);
+      }
+      //Put the context back
+      if (!Context.isContextSet()) {
+        Context.set(originalContext);
+      }
     }
     return new ByteArrayInputStream(os.toByteArray());
   }

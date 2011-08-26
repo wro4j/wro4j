@@ -1,0 +1,20 @@
+
+h1. attach
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.attach()
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[]

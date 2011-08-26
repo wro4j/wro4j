@@ -24,6 +24,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,9 +128,7 @@ public final class WroUtil {
    * @return a string representation of the path where the class resides.
    */
   public static String toPackageAsFolder(final Class<?> clazz) {
-    if (clazz == null) {
-      throw new IllegalArgumentException("Class cannot be null!");
-    }
+    Validate.notNull(clazz, "Class cannot be null!");
     return clazz.getPackage().getName().replace('.', '/');
   }
 

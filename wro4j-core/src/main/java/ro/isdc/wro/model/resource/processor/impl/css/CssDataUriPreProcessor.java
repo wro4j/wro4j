@@ -61,8 +61,7 @@ public class CssDataUriPreProcessor
     String fullPath = cleanImageUrl;
     /**
      * Allow dataUri transformation of absolute url's using http(s) protocol. All url's protocola are intentionally not
-     * allowed, because it could be a potential security issue. For instance:
-     * <code>
+     * allowed, because it could be a potential security issue. For instance: <code>
      * .class {
      *   background: url(file:/path/to/secure/file.png);
      * }
@@ -70,7 +69,7 @@ public class CssDataUriPreProcessor
      * This should not be allowed.
      */
     if (!cleanImageUrl.startsWith("http")) {
-      fullPath =FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
+      fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
     try {

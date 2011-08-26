@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
@@ -39,8 +38,6 @@ public class GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
   @Inject
   private ProcessorsFactory processorsFactory;
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
@@ -57,8 +54,6 @@ public class GroupsProcessor {
     Validate.notNull(groups);
     Validate.notNull(type);
 
-    //Supress spurious duplicate resource detection on reload
-    duplicateResourceDetector.reset();
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
@@ -91,15 +86,14 @@ public class GroupsProcessor {
    */
   private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize)
     throws IOException {
-    if (content == null) {
-      throw new IllegalArgumentException("content cannot be null!");
-    }
+    Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     Collection<ResourcePostProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
     processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
+    LOG.debug("postProcessors: " + processors);
     final String output = applyPostProcessors(processors, content);
     return output;
   }

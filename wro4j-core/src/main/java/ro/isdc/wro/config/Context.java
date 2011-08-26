@@ -15,6 +15,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.FieldsSavingRequestWrapper;
+import ro.isdc.wro.model.resource.ResourceType;
 
 
 /**
@@ -45,6 +46,11 @@ public class Context {
    * FilterConfig.
    */
   private FilterConfig filterConfig;
+  /**
+   * The path to the folder, relative to the root, used to compute rewritten image url.
+   */
+  private String aggregatedFolderPath;
+
 
   /**
    * @return {@link WroConfiguration} singleton instance.
@@ -80,6 +86,7 @@ public class Context {
     return new Context();
   }
 
+
   /**
    * @return {@link Context} associated with CURRENT request cycle.
    */
@@ -87,6 +94,14 @@ public class Context {
     validateContext();
     return CURRENT.get();
   }
+
+  /**
+   * @return true if the call is done during wro4j request cycle. In other words, if the context is set.
+   */
+  public static boolean isContextSet() {
+    return CURRENT.get() != null;
+  }
+
 
   /**
    * Checks if the {@link Context} is accessible from current request cycle.
@@ -97,9 +112,11 @@ public class Context {
     }
   }
 
+
   public static void set(final Context context) {
     set(context, new WroConfiguration());
   }
+
 
   /**
    * Associate a context with the CURRENT request cycle.
@@ -125,8 +142,7 @@ public class Context {
   /**
    * Private constructor. Used to build {@link StandAloneContext}.
    */
-  private Context() {
-  }
+  private Context() {}
 
 
   /**
@@ -142,6 +158,7 @@ public class Context {
     }
     this.filterConfig = filterConfig;
   }
+
 
   /**
    * @return the request
@@ -176,11 +193,33 @@ public class Context {
 
 
   /**
+   * @return the aggregatedFolderPath
+   */
+  public String getAggregatedFolderPath() {
+    return this.aggregatedFolderPath;
+  }
+
+  /**
+   * This field is useful only for the aggregated resources of type {@link ResourceType#CSS}. </br>The
+   * aggregatedFolderPath is used to compute the depth. For example, if aggregatedFolder is "wro" then the depth is 1
+   * and the path used to prefix the image url is <code>".."</code>. If the aggregatedFolder is "css/aggregated", the
+   * depth is 2 and the prefix is <code>"../.."</code>. The name of the aggregated folder is not important, it is used
+   * only to compute the depth.
+   *
+   * @param aggregatedFolderPath the aggregatedFolderPath to set
+   */
+  public void setAggregatedFolderPath(final String aggregatedFolderPath) {
+    this.aggregatedFolderPath = aggregatedFolderPath;
+  }
+
+
+  /**
    * Perform context clean-up.
    */
   public static void destroy() {
     unset();
   }
+
 
   /**
    * {@inheritDoc}

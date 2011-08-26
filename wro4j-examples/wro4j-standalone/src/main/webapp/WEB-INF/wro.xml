@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+
+  <group name="uglifyJs.min">
+    <js>/assets/uglify/*.js</js>
+  </group>  
+
+  <group name="csslint.min">
+    <js>/assets/csslint/*.js</js>
+  </group>  
+  
+  <group name="oocss">
+    <css>/assets/oocss/**.css</css>
+  </group>    
+  
+  <group name="bootstrap">
+    <css>/assets/bootstrap/bootstrap.less</css>
+  </group>    
+  
+  <group name="syntaxHighlighter">
+    <js>/assets/syntaxHighlighter/scripts/shCore.js</js>
+    <js>/assets/syntaxHighlighter/scripts/bootstrap.js</js>
+    <js>/assets/syntaxHighlighter/scripts/*.js</js>
+    <js>/assets/syntaxHighlighter/styles/shCoreRDark.css</js>
+  </group>
+</groups>

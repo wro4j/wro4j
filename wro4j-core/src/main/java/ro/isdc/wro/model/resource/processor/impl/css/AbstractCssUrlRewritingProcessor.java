@@ -14,10 +14,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
 
@@ -30,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
  */
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssUrlRewritingProcessor
-  implements ResourcePreProcessor {
+  implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
 
   /**
@@ -42,6 +44,13 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   protected static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
 
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
+  }
 
   /**
    * {@inheritDoc}
@@ -49,14 +58,12 @@ public abstract class AbstractCssUrlRewritingProcessor
   public final void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
-      LOG.debug("<process>");
       final String cssUri = resource.getUri();
-      LOG.debug("\t<cssUri>" + cssUri + "</cssUri>");
+      LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
       final String result = parseCss(css, cssUri);
       writer.write(result);
       onProcessCompleted();
-      LOG.debug("</process>");
     } finally {
       reader.close();
       writer.close();
@@ -89,7 +96,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       }
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [" + urlGroup + "] with: [" + StringUtils.abbreviate(replacedUrl, 30) + "].");
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, StringUtils.abbreviate(replacedUrl, 30));
         final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
         onUrlReplaced(replacedUrl);
         // update allowedUrls list

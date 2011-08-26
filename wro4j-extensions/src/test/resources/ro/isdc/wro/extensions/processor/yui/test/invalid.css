@@ -1,0 +1,39 @@
+  // Shift over the inside div to align all label's relevant content
+  div.input {
+    margin-left: 150px;
+  }
+
+  // Checkboxs and radio buttons
+  input[type=checkbox],
+  input[type=radio] {
+    cursor: pointer;
+  }
+
+  // Inputs, Textareas, Selects
+  input[type=text],
+  input[type=password],
+  textarea,
+  select,
+  .uneditable-input {
+    display: inline-block;
+    width: 210px;
+    margin: 0;
+    padding: 4px;
+    font-size: 13px;
+    line-height: @baseline;
+    height: @baseline;
+    color: @gray;
+    border: 1px solid #ccc;
+    .border-radius(3px);
+  }
+  select,
+  input[type=file] {
+    height: @baseline * 1.5;
+    line-height: @baseline * 1.5;
+  }
+  .uneditable-input {
+    background-color: #eee;
+    display: block;
+    border-color: #ccc;
+    .box-shadow(inset 0 1px 2px rgba(0,0,0,.075));
+  }

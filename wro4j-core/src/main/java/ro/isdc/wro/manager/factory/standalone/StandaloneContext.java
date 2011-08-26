@@ -19,12 +19,15 @@ import org.apache.commons.lang.builder.ToStringStyle;
 @SuppressWarnings("serial")
 public class StandaloneContext
   implements Serializable {
+  /**
+   * Exact location of the wro file.
+   */
   private File wroFile;
   private File contextFolder;
   private boolean minimize;
   /**
-   * Inform the factory about the intention of ignoring the missing resources.
-   * If true - the missing resources will be ignored.
+   * Inform the factory about the intention of ignoring the missing resources. If true - the missing resources will be
+   * ignored.
    */
   private boolean ignoreMissingResources;
 
@@ -91,6 +94,7 @@ public class StandaloneContext
   public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
   }
+
 
   /**
    * {@inheritDoc}

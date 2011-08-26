@@ -26,7 +26,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**
- * Maven plugin used to validate css code defined in wro model.
+ * Maven plugin which use a singe processor.
  *
  * @author Alex Objelean
  */
@@ -81,7 +81,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     //perform processing
-    getManagerFactory().getInstance().process();
+    getManagerFactory().create().process();
 
     getLog().info("Success processing group: " + group);
   }
@@ -110,14 +110,14 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   /**
    * @return an array of options.
    */
-  String[] getOptions() {
+  public String[] getOptions() {
     return StringUtils.isEmpty(options) ? new String[] {} : options.split(",");
   }
 
   /**
    * @param options the options to set
    */
-  public void setOptions(final String options) {
+  void setOptions(final String options) {
     this.options = options;
   }
 

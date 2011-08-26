@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -20,8 +21,10 @@ import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,9 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.ModelTransformerFactory;
+import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -47,6 +53,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -92,10 +99,17 @@ public class WroManager
   private ProcessorsFactory processorsFactory;
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-
+  /**
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
+   * processed.
+   */
+  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
+  private final Injector injector;
 
   public WroManager(final Injector injector) {
+    Validate.notNull(injector);
     groupsProcessor = new GroupsProcessor();
+    this.injector = injector;
     injector.inject(this);
     injector.inject(groupsProcessor);
   }
@@ -112,19 +126,22 @@ public class WroManager
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
 
-    LOG.debug("processing: " + request.getRequestURI());
     validate();
+    //TODO refactor
     InputStream is = null;
+    OutputStream os = null;
     if (isProxyResourceRequest(request)) {
       is = locateInputeStream(request);
+      //do not gzip
+      os = response.getOutputStream();
     } else {
       is = buildGroupsInputStream(request, response);
+      // use gziped response if supported
+      os = getGzipedOutputStream(response);
     }
     if (is == null) {
       throw new WroRuntimeException("Cannot process this request: " + request.getRequestURL());
     }
-    // use gziped response if supported
-    final OutputStream os = getGzipedOutputStream(response);
     IOUtils.copy(is, os);
     is.close();
     os.close();
@@ -134,7 +151,7 @@ public class WroManager
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
   private boolean isProxyResourceRequest(final HttpServletRequest request) {
-    return request.getRequestURI().contains(CssUrlRewritingProcessor.PATH_RESOURCES);
+    return StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
   /**
@@ -176,6 +193,9 @@ public class WroManager
     if (groupName == null || type == null) {
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
+
+    intAggregatedFolderPath(request, type);
+
     initScheduler();
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
@@ -211,6 +231,17 @@ public class WroManager
     return inputStream;
   }
 
+  /**
+   * Set the aggregatedFolderPath if required.
+   */
+  private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
+    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+      final String requestUri = request.getRequestURI();
+      final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
+      final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
+      Context.get().setAggregatedFolderPath(aggregatedFolder);
+    }
+  }
 
   /**
    * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js
@@ -258,7 +289,11 @@ public class WroManager
       // process groups & put result in the cache
       // find processed result for a group
       final List<Group> groupAsList = new ArrayList<Group>();
-      final Group group = modelFactory.create().getGroupByName(groupName);
+      final WroModel model = modelFactory.create();
+      if (model == null) {
+        throw new WroRuntimeException("Cannot build a valid wro model");
+      }
+      final Group group = model.getGroupByName(groupName);
       groupAsList.add(group);
 
       final String content = groupsProcessor.process(groupAsList, type, minimize);
@@ -400,8 +435,6 @@ public class WroManager
    */
   public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
-    // update the cache also when model is changed.
-    onCachePeriodChanged();
     if (modelFactory instanceof WroConfigurationChangeListener) {
       ((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
     }
@@ -425,57 +458,79 @@ public class WroManager
    * Check if all dependencies are set.
    */
   private void validate() {
-    if (this.groupExtractor == null) {
-      throw new WroRuntimeException("GroupExtractor was not set!");
-    }
-    if (this.modelFactory == null) {
-      throw new WroRuntimeException("ModelFactory was not set!");
-    }
-    if (this.cacheStrategy == null) {
-      throw new WroRuntimeException("cacheStrategy was not set!");
-    }
-    if (this.hashBuilder == null) {
-      throw new WroRuntimeException("hashBuilder was not set!");
-    }
+    Validate.notNull(groupExtractor, "GroupExtractor was not set!");
+    Validate.notNull(modelFactory, "ModelFactory was not set!");
+    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
+    Validate.notNull(hashBuilder, "HashBuilder was not set!");
   }
 
 
   /**
    * @param groupExtractor the uriProcessor to set
    */
-  public final void setGroupExtractor(final GroupExtractor groupExtractor) {
+  public final WroManager setGroupExtractor(final GroupExtractor groupExtractor) {
+    Validate.notNull(groupExtractor);
     this.groupExtractor = groupExtractor;
+    return this;
   }
 
 
   /**
    * @param modelFactory the modelFactory to set
    */
-  public final void setModelFactory(final WroModelFactory modelFactory) {
-    this.modelFactory = modelFactory;
+  public final WroManager setModelFactory(final WroModelFactory modelFactory) {
+    Validate.notNull(modelFactory);
+    // decorate with useful features
+    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
+        modelFactory))).setTransformers(modelTransformers);
+    return this;
   }
-
 
   /**
    * @param cacheStrategy the cache to set
    */
-  public final void setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  public final WroManager setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+    Validate.notNull(cacheStrategy);
     this.cacheStrategy = cacheStrategy;
+    return this;
   }
 
 
   /**
    * @param contentDigester the contentDigester to set
    */
-  public void setHashBuilder(final HashBuilder contentDigester) {
+  public WroManager setHashBuilder(final HashBuilder contentDigester) {
+    Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
+    return this;
   }
 
 
   /**
    * @return the modelFactory
    */
-  public final WroModel getModel() {
-    return this.modelFactory.create();
+  public WroModelFactory getModelFactory() {
+    return modelFactory;
+  }
+
+  /**
+   * @return the processorsFactory used by this WroManager.
+   */
+  public ProcessorsFactory getProcessorsFactory() {
+    return processorsFactory;
+  }
+
+  /**
+   * @param modelTransformers the modelTransformers to set
+   */
+  public WroManager setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
+    Validate.notNull(modelTransformers);
+    this.modelTransformers = modelTransformers;
+    //allow model transformers to be aware of injected properties
+    for (final Transformer<WroModel> transformer : modelTransformers) {
+      LOG.debug("injecting: " + transformer);
+      injector.inject(transformer);
+    }
+    return this;
   }
 }

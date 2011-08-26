@@ -1,0 +1,1 @@
+["id","sex","age","classOfWorker","maritalStatus","education","race"],[1,"Female",38,"Private","Married-civilian spouse present","1st 2nd 3rd or 4th grade","White"]

@@ -34,7 +34,7 @@ public class TestJsonModelFactory {
   public void testInvalidStream() throws Exception {
     factory = new JsonModelFactory() {
       @Override
-      protected InputStream getWroModelStream()
+      protected InputStream getModelResourceAsStream()
         throws IOException {
         throw new IOException();
       };
@@ -46,7 +46,7 @@ public class TestJsonModelFactory {
   public void testInvalidContent() {
     factory = new JsonModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
+      protected InputStream getModelResourceAsStream() throws IOException {
         return new ByteArrayInputStream("".getBytes());
       };
     };
@@ -55,7 +55,12 @@ public class TestJsonModelFactory {
 
   @Test
   public void createValidModel() {
-    factory = new JsonModelFactory();
+    factory = new JsonModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream() throws IOException {
+        return TestGroovyModelFactory.class.getResourceAsStream("wro.json");
+      };
+    };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
     Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
@@ -71,7 +76,7 @@ public class TestJsonModelFactory {
   public void createIncompleteModel() {
     factory = new JsonModelFactory() {
       @Override
-      protected InputStream getWroModelStream() throws IOException {
+      protected InputStream getModelResourceAsStream() throws IOException {
         return getClass().getResourceAsStream("incomplete-wro.json");
       };
     };

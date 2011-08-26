@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.resource.locator.wildcard;
 
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
@@ -16,8 +14,6 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  */
 public abstract class WildcardUriLocatorSupport
   implements UriLocator {
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
   /**
    * Wildcard stream locator implementation.
    */
@@ -26,8 +22,8 @@ public abstract class WildcardUriLocatorSupport
   /**
    * @return default implementation of {@link WildcardStreamLocator}.
    */
-  protected WildcardStreamLocator newWildcardStreamLocator() {
-    return new DefaultWildcardStreamLocator(duplicateResourceDetector) {
+  public WildcardStreamLocator newWildcardStreamLocator() {
+    return new DefaultWildcardStreamLocator() {
       @Override
       public boolean hasWildcard(final String uri) {
         return !disableWildcards() && super.hasWildcard(uri);
@@ -35,11 +31,10 @@ public abstract class WildcardUriLocatorSupport
     };
   }
 
-
   /**
    * @return the wildcardStreamLocator
    */
-  protected final WildcardStreamLocator getWildcardStreamLocator() {
+  public final WildcardStreamLocator getWildcardStreamLocator() {
     if (wildcardStreamLocator == null) {
       wildcardStreamLocator = newWildcardStreamLocator();
     }

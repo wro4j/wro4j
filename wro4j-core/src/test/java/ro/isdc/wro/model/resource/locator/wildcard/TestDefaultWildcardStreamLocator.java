@@ -14,7 +14,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -27,7 +26,7 @@ public class TestDefaultWildcardStreamLocator {
 
   @Before
   public void setUp() {
-    locator = new DefaultWildcardStreamLocator(new DuplicateResourceDetector());
+    locator = new DefaultWildcardStreamLocator();
   }
 
   @Test
@@ -92,7 +91,7 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardResourcesOrderedAlphabetically() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundFiles(final Collection<File> files) {
+      protected void handleFoundResources(final Collection<File> files) {
         final Collection<String> filenameList = new ArrayList<String>();
         for (final File file : files) {
           filenameList.add(file.getName());
@@ -104,7 +103,7 @@ public class TestDefaultWildcardStreamLocator {
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
       @Override
-      protected WildcardStreamLocator newWildcardStreamLocator() {
+      public WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };
@@ -113,15 +112,15 @@ public class TestDefaultWildcardStreamLocator {
 
   @Test
   public void testWildcardLocator() throws IOException {
-    locator = new DefaultWildcardStreamLocator(null) {
+    locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundFiles(final java.util.Collection<File> files) {
+      protected void handleFoundResources(final java.util.Collection<File> files) {
         Assert.assertEquals(2, files.size());
       };
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
       @Override
-      protected WildcardStreamLocator newWildcardStreamLocator() {
+      public WildcardStreamLocator newWildcardStreamLocator() {
         return locator;
       }
     };
