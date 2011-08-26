@@ -112,7 +112,8 @@ public class WildcardExpanderModelTransformer
    */
   private String computeBaseNameFolder(final Resource resource, final ResourceLocatorFactory resourceLocatorFactory) {
     // Find the baseName
-    // add a simple wildcard to trigger the wildcard detection
+    // add a recursive wildcard to trigger the wildcard detection. The simple wildcard ('*') is not enough because it
+    // won't work for folders containing only directories with no files.
     LOG.debug("computeBaseNameFolder for resource {}", resource);
     final String resourcePath = FilenameUtils.getFullPath(resource.getUri())
       + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
@@ -133,7 +134,7 @@ public class WildcardExpanderModelTransformer
           break;
         }
         // use this to skip wildcard stream detection, we are only interested in the baseName
-        throw new IOException("Skip further wildcard processing");
+        throw new IOException("BaseNameFolder computed successfully, skip further wildcard processing..");
       }
     });
 
@@ -141,7 +142,11 @@ public class WildcardExpanderModelTransformer
       LOG.debug("locating baseName using resourcePath: {}", resourcePath);
       resourceLocator.getInputStream();
     } catch (final Exception e) {
-      LOG.error("problem while trying to get basePath for: {}", resourcePath, e);
+      LOG.debug("Exception caught during wildcard expanding for resource: {} with exception message {}", resourcePath,
+          e.getMessage());
+    }
+    if (baseNameFolderHolder.get() == null) {
+      LOG.error("Cannot compute baseName folder for resource: {}", resource);
     }
     return baseNameFolderHolder.get();
   }
@@ -163,7 +168,7 @@ public class WildcardExpanderModelTransformer
         } else {
           final List<Resource> expandedResources = new ArrayList<Resource>();
           for (final File file : files) {
-            final String resourcePath = FilenameUtils.getPathNoEndSeparator(resource.getUri());
+            final String resourcePath = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
             LOG.debug("resourcePath: {}", resourcePath);
 
             final String computedResourceUri = resourcePath
