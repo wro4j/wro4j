@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,6 +39,10 @@ public class DefaultWildcardStreamLocator
     implements WildcardStreamLocator, WildcardExpandedHandlerAware {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWildcardStreamLocator.class);
   /**
+   * Character to distinguish wildcard inside the uri.
+   */
+  public static final String RECURSIVE_WILDCARD = "**";
+  /**
    * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?' character, it is considered
    * a wildcard.
    * <p>
@@ -44,10 +50,6 @@ public class DefaultWildcardStreamLocator
    * following characters: [?*].
    */
   private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
-  /**
-   * Character to distinguish wildcard inside the uri.
-   */
-  public static final String RECURSIVE_WILDCARD = "**";
   private Transformer<Collection<File>> wildcardExpanderHandler;
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
@@ -100,8 +102,12 @@ public class DefaultWildcardStreamLocator
     LOG.debug("wildcard: " + wildcard);
 
     //maps resource uri's and corresponding file
-    //this map have to be ordered
+    //this map has to be ordered
     final Map<String, File> uriToFileMap = new TreeMap<String, File>();
+    /**
+     * Holds a list of all files (also folders, not only resources). This is useful for wildcard expander processing.
+     */
+    final List<File> allFiles = new ArrayList<File>();
 
     final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
     final String parentFolderPath = folder.getPath();
@@ -110,11 +116,14 @@ public class DefaultWildcardStreamLocator
       @Override
       public boolean accept(final File file) {
         final boolean accept = super.accept(file);
-        if (accept && !file.isDirectory()) {
-          final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
-          final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
-          uriToFileMap.put(resourceUri, file);
-          LOG.debug("foundUri: " + resourceUri);
+        if (accept) {
+          allFiles.add(file);
+          if (!file.isDirectory()) {
+            final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
+            final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
+            uriToFileMap.put(resourceUri, file);
+            LOG.debug("foundUri: " + resourceUri);
+          }
         }
         return accept;
       }
@@ -129,25 +138,37 @@ public class DefaultWildcardStreamLocator
       final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
       LOG.warn(message);
     }
-    handleFoundFiles(files);
+    handleFoundResources(files);
+    //trigger wildcardExpander processing
+    handleFoundAllFiles(allFiles);
     return files;
   }
 
 
   /**
-   * The default implementation uses the wildcardExpanderHandler to process the found files.
+   * Uses the wildcardExpanderHandler to process the found files, also directories.
    *
-   * @param files a collection of found files after the wildcard has beed applied on searched folder.
+   * @param files a collection of found files after the wildcard has beed applied on the searched folder.
    */
-  protected void handleFoundFiles(final Collection<File> files) throws IOException {
+  private void handleFoundAllFiles(final List<File> allFiles) throws IOException {
     if (wildcardExpanderHandler != null) {
       try {
-        wildcardExpanderHandler.transform(files);
+        wildcardExpanderHandler.transform(allFiles);
       } catch (final Exception e) {
-        throw new IOException("Exception during expanding wildcard", e);
+        throw new IOException("Exception during expanding wildcard: " + e.getMessage());
       }
     }
   }
+
+  /**
+   * The default implementation does nothing. Useful for unit test to check if the order is as expected.
+   *
+   * @param files a collection of found resources after the wildcard has beed applied on the searched folder.
+   */
+  protected void handleFoundResources(final Collection<File> files) throws IOException {
+  }
+
+
 
   /**
    * @param wildcard

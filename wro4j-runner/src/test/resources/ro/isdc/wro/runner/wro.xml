@@ -6,4 +6,8 @@
     <css>/css/*.css</css>
   </group>
   
+  <group name="oocss">
+    <css>/oocss/**.css</css>
+  </group>
+  
 </groups>
