@@ -166,23 +166,6 @@ public class TestWro4jMojo {
     mojo.execute();
   }
 
-  public static final class ExceptionThrowingWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
-    @Override
-    protected ProcessorsFactory newProcessorsFactory() {
-      final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-      final ResourceProcessor postProcessor = Mockito.mock(ResourceProcessor.class);
-      try {
-        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Resource.class),
-            Mockito.any(Reader.class), Mockito.any(Writer.class));
-      } catch (final IOException e) {
-        Assert.fail("never happen");
-      }
-      factory.addPostProcessor(postProcessor);
-      return factory;
-    }
-  }
-
-
   @Test(expected = MojoExecutionException.class)
   public void testMojoWithWroManagerFactorySet()
     throws Exception {
@@ -338,15 +321,14 @@ public class TestWro4jMojo {
     FileUtils.deleteQuietly(extraConfigFile);
   }
 
-
   public static final class ExceptionThrowingWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
     @Override
     protected ProcessorsFactory newProcessorsFactory() {
       final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-      final ResourcePostProcessor postProcessor = Mockito.mock(ResourcePostProcessor.class);
+      final ResourceProcessor postProcessor = Mockito.mock(ResourceProcessor.class);
       try {
-        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Reader.class),
-          Mockito.any(Writer.class));
+        Mockito.doThrow(new RuntimeException()).when(postProcessor).process(Mockito.any(Resource.class),
+            Mockito.any(Reader.class), Mockito.any(Writer.class));
       } catch (final IOException e) {
         Assert.fail("never happen");
       }
