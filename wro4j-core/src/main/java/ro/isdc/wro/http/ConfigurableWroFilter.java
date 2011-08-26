@@ -16,8 +16,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.ObjectFactory;
@@ -104,8 +103,8 @@ public class ConfigurableWroFilter extends WroFilter {
     return new BaseWroManagerFactory() {
       @Override
       protected ProcessorsFactory newProcessorsFactory() {
-        final Map<String, ResourcePreProcessor> preProcessorsMap = ProcessorsUtils.createPreProcessorsMap();
-        final Map<String, ResourcePostProcessor> postProcessorsMap = ProcessorsUtils.createPostProcessorsMap();
+        final Map<String, ResourceProcessor> preProcessorsMap = ProcessorsUtils.createProcessorsMap();
+        final Map<String, ResourceProcessor> postProcessorsMap = ProcessorsUtils.createProcessorsMap();
         LOG.debug("available preProcessors are: {}", preProcessorsMap.keySet());
         LOG.debug("available postProcessors are: {}", preProcessorsMap.keySet());
         //add processors from extensions module if one is available.
