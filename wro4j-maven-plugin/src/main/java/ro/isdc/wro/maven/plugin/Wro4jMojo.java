@@ -4,11 +4,13 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +80,15 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private File buildDirectory;
-
+  /**
+   * @parameter expression="${groupNameMappingFile}"
+   * @optional
+   */
+  private String groupNameMappingFile;
+  /**
+   * Holds a mapping between original group name file & renamed one.
+   */
+  private final Properties groupNames = new Properties();
 
   /**
    * {@inheritDoc}
@@ -144,6 +154,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
+    getLog().info("groupNameMappingFile: " + groupNameMappingFile);
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
@@ -153,8 +164,21 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         processGroup(groupWithExtension, destinationFolder);
       }
     }
+
+    writeGroupNameMap();
   }
 
+  private void writeGroupNameMap()
+      throws Exception {
+    if (groupNameMappingFile != null) {
+      try {
+        final FileOutputStream outputStream = new FileOutputStream(groupNameMappingFile);
+        groupNames.store(outputStream, "Mapping of defined group name to renamed group name");
+      } catch (final FileNotFoundException ex) {
+        throw new MojoExecutionException("Unable to save group name mapping file", ex);
+      }
+    }
+  }
 
   /**
    * Encodes a version using some logic.
@@ -166,7 +190,9 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   private String rename(final String group, final InputStream input)
     throws Exception {
     try {
-      return getManagerFactory().getNamingStrategy().rename(group, input);
+      final String newName = getManagerFactory().getNamingStrategy().rename(group, input);
+      groupNames.setProperty(group, newName);
+      return newName;
     } catch (final IOException e) {
       throw new MojoExecutionException("Error occured during renaming", e);
     }
@@ -320,7 +346,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
 
   /**
-   * @param versionEncoder(wroManagerFactory) the wroManagerFactory to set
+   * @param wroManagerFactory to set
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
@@ -342,5 +368,13 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   public void setBuildDirectory(final File buildDirectory) {
     this.buildDirectory = buildDirectory;
+  }
+
+
+  /**
+   * @param groupNameMappingFile the groupNameMappingFile to set
+   */
+  public void setGroupNameMappingFile(final String groupNameMappingFile) {
+    this.groupNameMappingFile = groupNameMappingFile;
   }
 }
