@@ -97,7 +97,7 @@ public class TestWro4jMojo {
   }
 
 
-  @Test(expected=MojoExecutionException.class)
+  @Test
   public void testMojoWithPropertiesSet()
     throws Exception {
     mojo.setIgnoreMissingResources(false);
