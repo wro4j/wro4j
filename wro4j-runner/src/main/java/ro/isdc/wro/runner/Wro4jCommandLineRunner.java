@@ -32,7 +32,6 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
@@ -65,7 +64,8 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
-  private final File defaultWroFile = new File(System.getProperty("user.dir"), "wro.xml");
+  private final File defaultWroFile = newDefaultWroFile();
+
   @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
   @Option(name = "--targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
@@ -87,6 +87,12 @@ public class Wro4jCommandLineRunner {
     new Wro4jCommandLineRunner().doMain(args);
   }
 
+  /**
+   * @return the location where wro file is located by default. Default implementation uses current directory where user is located.
+   */
+  protected File newDefaultWroFile() {
+    return new File(System.getProperty("user.dir"), "wro.xml");
+  }
 
   /**
    * Used to read argument from standard input.
@@ -131,15 +137,11 @@ public class Wro4jCommandLineRunner {
    * Exception handler.
    */
   protected void onException(final Exception e) {
-
   }
 
 
   private void process() {
     try {
-      if (!wroFile.exists()) {
-        throw new WroRuntimeException("No wro.xml file found at this location: " + wroFile.getAbsolutePath());
-      }
       Context.set(Context.standaloneContext());
       // create destinationFolder if needed
       if (!destinationFolder.exists()) {
