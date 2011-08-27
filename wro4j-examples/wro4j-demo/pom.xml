@@ -8,7 +8,7 @@
   <name>Wro4j Demo project</name>
   <parent>
     <groupId>ro.isdc.wro4j</groupId>
-    <artifactId>wro4j-parent</artifactId>
+    <artifactId>wro4j-examples</artifactId>
     <version>1.4.1-SNAPSHOT</version>
   </parent>
 
