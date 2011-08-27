@@ -125,6 +125,7 @@ public class TestConfigurableWroFilter {
     }
     if (processorsCreationException.get() != null) {
       processorsCreationException.get();
+      throw processorsCreationException.get();
     }
   }
 
