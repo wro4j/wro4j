@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.model.factory;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.WroModel;

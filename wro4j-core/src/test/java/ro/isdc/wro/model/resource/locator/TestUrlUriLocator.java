@@ -27,7 +27,7 @@ public class TestUrlUriLocator {
     uriLocator = new UrlUriLocator();
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotAcceptNullUri() throws IOException {
     uriLocator.locate(null);
   }

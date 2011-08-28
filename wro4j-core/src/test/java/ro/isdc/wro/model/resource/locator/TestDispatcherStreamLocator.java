@@ -43,7 +43,7 @@ public class TestDispatcherStreamLocator {
     locator = new DispatcherStreamLocator();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullRequestOrResponse()
       throws Exception {
     locator.getInputStream(null, null, null);

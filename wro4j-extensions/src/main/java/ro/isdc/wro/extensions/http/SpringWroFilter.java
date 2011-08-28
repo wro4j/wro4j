@@ -6,7 +6,7 @@ package ro.isdc.wro.extensions.http;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

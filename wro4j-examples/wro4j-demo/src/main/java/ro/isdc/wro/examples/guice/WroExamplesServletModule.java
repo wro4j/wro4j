@@ -4,7 +4,7 @@ import java.util.Map;
 
 import javax.servlet.FilterConfig;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.protocol.http.ContextParamWebApplicationFactory;
 import org.apache.wicket.protocol.http.WicketFilter;
 import org.directwebremoting.servlet.DwrServlet;
