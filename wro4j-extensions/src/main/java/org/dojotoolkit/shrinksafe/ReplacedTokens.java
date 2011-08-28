@@ -30,7 +30,7 @@ import java.util.Map;
 
 /*
  * This Class provides a container for the replaced tokens applied for a given scope
- * It provides a method to traverse down through the hierarchy to seach for a 
+ * It provides a method to traverse down through the hierarchy to seach for a
  * replacement match. It also provides a method that generates debug information.
  */
 
@@ -39,23 +39,23 @@ public class ReplacedTokens {
 	private Map replacements = null;
 	private Map lookup = null;
 	private DebugData debugData = null;
-	
-	public ReplacedTokens(Map replacements, int[] parents, Map lookup, DebugData debugData) {
-		this.replacements = replacements; 
+
+	public ReplacedTokens(final Map replacements, final int[] parents, final Map lookup, final DebugData debugData) {
+		this.replacements = replacements;
 		this.parents = parents;
 		this.lookup = lookup;
 		this.debugData = debugData;
 	}
-	
-	public String find(String token) {
+
+	public String find(final String token) {
 		String replacedToken = null;
 		if (replacements != null) {
 			replacedToken = (String)replacements.get(token);
 		}
 		if (replacedToken == null) {
 			for (int i = parents.length; i > 0; i--) {
-				int parentPos = parents[i-1];
-				ReplacedTokens parent = (ReplacedTokens)lookup.get(new Integer(parentPos));
+				final int parentPos = parents[i-1];
+				final ReplacedTokens parent = (ReplacedTokens)lookup.get(new Integer(parentPos));
 				if (parent.replacements != null) {
 					replacedToken = (String)parent.replacements.get(token);
 					if (replacedToken != null) {
@@ -69,9 +69,9 @@ public class ReplacedTokens {
 		}
 		return replacedToken;
 	}
-	
+
 	public String printDebugData() {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		if (debugData != null) {
 			sb.append("Start:"+debugData.start);
 			sb.append(' ');
@@ -83,7 +83,7 @@ public class ReplacedTokens {
 			sb.append(' ');
 			if (debugData.paramAndVarNames != null) {
 				sb.append("Params and Vars: [");
-				for (String paramVar: debugData.paramAndVarNames) {
+				for (final String paramVar: debugData.paramAndVarNames) {
 					sb.append(paramVar);
 					sb.append(' ');
 				}
@@ -92,9 +92,9 @@ public class ReplacedTokens {
 			if (replacements != null && replacements.size() > 0) {
 				sb.append("\t");
 				sb.append("Replacements:\n");
-				for (Iterator itr = replacements.keySet().iterator(); itr.hasNext();) {
-					String token = (String)itr.next();
-					String replacement = (String)replacements.get(token);
+				for (final Iterator itr = replacements.keySet().iterator(); itr.hasNext();) {
+					final String token = (String)itr.next();
+					final String replacement = (String)replacements.get(token);
 					if (!token.equals(replacement)) {
 						sb.append("\t\t");
 						sb.append('[');
@@ -110,14 +110,14 @@ public class ReplacedTokens {
 				sb.append("\n");
 			}
 			for (int i = parents.length; i > 0; i--) {
-				int parentPos = parents[i-1];
-				ReplacedTokens parent = (ReplacedTokens)lookup.get(new Integer(parentPos));
+				final int parentPos = parents[i-1];
+				final ReplacedTokens parent = (ReplacedTokens)lookup.get(new Integer(parentPos));
 				if (parent.replacements != null && parent.replacements.size() > 0) {
 					sb.append("\t");
 					sb.append("Parent Replacements level ["+i+"]:\n");
-					for (Iterator itr = parent.replacements.keySet().iterator(); itr.hasNext();) {
-						String token = (String)itr.next();
-						String replacement = (String)parent.replacements.get(token);
+					for (final Iterator itr = parent.replacements.keySet().iterator(); itr.hasNext();) {
+						final String token = (String)itr.next();
+						final String replacement = (String)parent.replacements.get(token);
 						if (!token.equals(replacement)) {
 							sb.append("\t\t");
 							sb.append('[');
@@ -136,9 +136,9 @@ public class ReplacedTokens {
 		}
 		return sb.toString();
 	}
-	
+
 	public String toJson() {
-		StringBuffer json = new StringBuffer();
+		final StringBuffer json = new StringBuffer();
 		json.append('{');
 		if (debugData != null) {
 			json.append("start: "+debugData.start);
@@ -159,10 +159,9 @@ public class ReplacedTokens {
 				json.append("parentReplacements: [");
 			}
 			int count = 1;
-			for (int i = 0; i < parents.length; i++) {
+			for (final int parentPos : parents) {
 				json.append('{');
-				int parentPos = parents[i];
-				ReplacedTokens parent = (ReplacedTokens)lookup.get(new Integer(parentPos));
+				final ReplacedTokens parent = (ReplacedTokens)lookup.get(new Integer(parentPos));
 				if (parent.replacements != null && parent.replacements.size() > 0) {
 					json.append(replacementsToJson(parent.replacements));
 				}
@@ -178,13 +177,13 @@ public class ReplacedTokens {
 		json.append("}");
 		return json.toString();
 	}
-	
-	private static String replacementsToJson(Map replacements) {
-		StringBuffer sb = new StringBuffer();
+
+	private static String replacementsToJson(final Map replacements) {
+		final StringBuffer sb = new StringBuffer();
 		int count = 1;
-		for (Iterator itr = replacements.keySet().iterator(); itr.hasNext();) {
-			String token = (String)itr.next();
-			String replacement = (String)replacements.get(token);
+		for (final Iterator itr = replacements.keySet().iterator(); itr.hasNext();) {
+			final String token = (String)itr.next();
+			final String replacement = (String)replacements.get(token);
 			sb.append("\""+replacement+'\"');
 			sb.append(" : ");
 			sb.append("\""+token+"\"");
@@ -192,7 +191,7 @@ public class ReplacedTokens {
 				sb.append(", ");
 			}
 		}
-		
+
 		return sb.toString();
 	}
 }

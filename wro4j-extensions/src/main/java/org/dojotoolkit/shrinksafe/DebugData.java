@@ -26,7 +26,7 @@ package org.dojotoolkit.shrinksafe;
 
 /*
  * The class provides a simple data structure to collect debug information
- * for a given function. 
+ * for a given function.
  */
 public class DebugData {
 	public int start = 0;

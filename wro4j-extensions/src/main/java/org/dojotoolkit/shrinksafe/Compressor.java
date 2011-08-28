@@ -50,30 +50,30 @@ import org.mozilla.javascript.UintMap;
  */
 public class Compressor {
     private static final int FUNCTION_END = Token.LAST_TOKEN + 1;
-    
+
     /**
      * Compress the script
      * <p>
-     * 
+     *
      * @param encodedSource encoded source string
      * @param flags Flags specifying format of decompilation output
      * @param properties Decompilation properties
      * @param parseTree Mapping for each function node and corresponding parameters & variables names
      * @return compressed script
      */
-    private static String compress(String encodedSource, 
-    		                       int flags, 
-    		                       UintMap properties, 
-    		                       ScriptOrFnNode parseTree, 
-    		                       boolean escapeUnicode,
-    		                       String stripConsole,
-    		                       TokenMapper tm,
-    		                       Map replacedTokensLookup){
+    private static String compress(final String encodedSource,
+    		                       final int flags,
+    		                       final UintMap properties,
+    		                       final ScriptOrFnNode parseTree,
+    		                       final boolean escapeUnicode,
+    		                       final String stripConsole,
+    		                       final TokenMapper tm,
+    		                       final Map replacedTokensLookup){
          int indent = properties.getInt(Decompiler.INITIAL_INDENT_PROP, 0);
          if (indent < 0) throw new IllegalArgumentException();
-         int indentGap = properties.getInt(Decompiler.INDENT_GAP_PROP, 4);
+         final int indentGap = properties.getInt(Decompiler.INDENT_GAP_PROP, 4);
          if (indentGap < 0) throw new IllegalArgumentException();
-         int caseGap = properties.getInt(Decompiler.CASE_GAP_PROP, 2);
+         final int caseGap = properties.getInt(Decompiler.CASE_GAP_PROP, 2);
          if (caseGap < 0) throw new IllegalArgumentException();
 
          String stripConsoleRegex = "assert|count|debug|dir|dirxml|group|groupEnd|info|profile|profileEnd|time|timeEnd|trace|log";
@@ -89,15 +89,15 @@ public class Compressor {
          } else {
         	 throw new IllegalArgumentException("unrecognised value for stripConsole: " + stripConsole + "!");
          }
-         
+
          Pattern stripConsolePattern = null;
          if (stripConsoleRegex != null) {
         	 stripConsolePattern = Pattern.compile(stripConsoleRegex);
          }
 
-         StringBuffer result = new StringBuffer();
-         boolean justFunctionBody = (0 != (flags & Decompiler.ONLY_BODY_FLAG));
-         boolean toSource = (0 != (flags & Decompiler.TO_SOURCE_FLAG));
+         final StringBuffer result = new StringBuffer();
+         final boolean justFunctionBody = (0 != (flags & Decompiler.ONLY_BODY_FLAG));
+         final boolean toSource = (0 != (flags & Decompiler.TO_SOURCE_FLAG));
          int braceNesting = 0;
          boolean afterFirstEOL = false;
          int i = 0;
@@ -108,8 +108,8 @@ public class Compressor {
 
          boolean discardingConsole = false; // control skipping "console.stuff()"
          int     consoleParenCount = 0; // counter for parenthesis counting
-         StringBuffer discardMe = new StringBuffer(); // throwaway buffer
-         ReplacedTokens dummyTokens = new ReplacedTokens(new HashMap(), new int[]{}, replacedTokensLookup, null);
+         final StringBuffer discardMe = new StringBuffer(); // throwaway buffer
+         final ReplacedTokens dummyTokens = new ReplacedTokens(new HashMap(), new int[]{}, replacedTokensLookup, null);
          int lastMeaningfulToken = Token.SEMI;
          int lastMeaningfulTokenBeforeConsole = Token.SEMI;
 
@@ -132,20 +132,20 @@ public class Compressor {
                  result.append('(');
              }
          }
-         
-         Stack positionStack = new Stack();
-         Stack functionPositionStack = new Stack();
-         
-         int length = encodedSource.length();
+
+         final Stack positionStack = new Stack();
+         final Stack functionPositionStack = new Stack();
+
+         final int length = encodedSource.length();
          int lineCount = 1;
-         
+
          while (i < length) {
            if(i>0){
                prevToken = encodedSource.charAt(i-1);
            }
             if (discardingConsole) {
                 // while we are skipping a console command, discard tokens
-                int thisToken = encodedSource.charAt(i);
+                final int thisToken = encodedSource.charAt(i);
                 /* Logic for controlling state of discardingConsole */
                 switch (thisToken) {
                 case Token.LP:
@@ -156,9 +156,9 @@ public class Compressor {
                     if (consoleParenCount == 0) {
                         // paren count fell to zero, must be end of console call
                         discardingConsole = false;
-                        
+
                         if (i < (length - 1)) {
-                        	int nextToken = getNext(encodedSource, length, i);
+                        	final int nextToken = getNext(encodedSource, length, i);
 
                         	if ((lastMeaningfulTokenBeforeConsole != Token.SEMI &&
                         			lastMeaningfulTokenBeforeConsole != Token.LC &&
@@ -193,7 +193,7 @@ public class Compressor {
                 switch (thisToken) {
                 case Token.NAME:
                 case Token.REGEXP:
-                    int jumpPos = getSourceStringEnd(encodedSource, i + 1,
+                    final int jumpPos = getSourceStringEnd(encodedSource, i + 1,
                             escapeUnicode);
                     if (Token.OBJECTLIT == encodedSource.charAt(jumpPos)) {
                         i = printSourceString(encodedSource, i + 1, false,
@@ -220,22 +220,22 @@ public class Compressor {
             }
 
            // System.out.println(Token.name(getNext(source, length, i)));
-           int thisToken = encodedSource.charAt(i);
+           final int thisToken = encodedSource.charAt(i);
 
            switch(thisToken) {
              case Token.NAME:
              case Token.REGEXP:  // re-wrapped in '/'s in parser...
-                 int jumpPos = getSourceStringEnd(encodedSource, i+1, escapeUnicode);
+                 final int jumpPos = getSourceStringEnd(encodedSource, i+1, escapeUnicode);
                  if (stripConsolePattern != null && thisToken == Token.NAME) {
                 	 // Check to see if this is a console.something() call that we
                 	 //  care about, if so switch on discardingConsole
-                     int nextTokenAt = tm.sourceCompress(encodedSource, i + 1, false, discardMe, prevToken, 
+                     final int nextTokenAt = tm.sourceCompress(encodedSource, i + 1, false, discardMe, prevToken,
                              inArgsList, braceNesting, dummyTokens);
                 	 if (encodedSource.substring(i+2, i+2+encodedSource.charAt(i+1)).equals("console") &&
                          (encodedSource.charAt(nextTokenAt) == Token.DOT)) {
                 		 // Find the name of the console method and check it
-                    	 int afterFnName = printSourceString(encodedSource, nextTokenAt+2, false, discardMe, escapeUnicode);
-                    	 Matcher m = stripConsolePattern.matcher(encodedSource.substring(nextTokenAt + 3, afterFnName));
+                    	 final int afterFnName = printSourceString(encodedSource, nextTokenAt+2, false, discardMe, escapeUnicode);
+                    	 final Matcher m = stripConsolePattern.matcher(encodedSource.substring(nextTokenAt + 3, afterFnName));
                     	 if (m.matches()) {
                     		 // Must be an open parenthesis e.g. "console.log("
                     		 if (encodedSource.charAt(afterFnName) == Token.LP) {
@@ -252,14 +252,14 @@ public class Compressor {
                  }else{
                 	 ReplacedTokens replacedTokens = null;
                 	 if (positionStack.size() > 0) {
-                		 Integer pos = (Integer)positionStack.peek();
+                		 final Integer pos = (Integer)positionStack.peek();
                          replacedTokens = (ReplacedTokens)replacedTokensLookup.get(pos);
                 	 }
                 	 else {
                 		 replacedTokens = new ReplacedTokens(new HashMap(), new int[]{}, replacedTokensLookup, null);
                 	 }
 
-                     i = tm.sourceCompress(	encodedSource, i + 1, false, result, prevToken, 
+                     i = tm.sourceCompress(	encodedSource, i + 1, false, result, prevToken,
                                              inArgsList, braceNesting, replacedTokens);
                  }
                  continue;
@@ -281,7 +281,7 @@ public class Compressor {
 //                 result.append('"');
 //
 // now comment out this line to complete the patch:
-                 i = printSourceString(encodedSource, i + 1, true, result, escapeUnicode); 
+                 i = printSourceString(encodedSource, i + 1, true, result, escapeUnicode);
 
                  continue;
              case Token.NUMBER:
@@ -308,15 +308,15 @@ public class Compressor {
                  if (Token.LP != getNext(encodedSource, length, i)) {
                      result.append(' ');
                  }
-                 Integer functionPos = new Integer(i-1);
+                 final Integer functionPos = new Integer(i-1);
                  functionPositionStack.push(functionPos);
-                 DebugData debugData = tm.getDebugData(functionPos);
+                 final DebugData debugData = tm.getDebugData(functionPos);
                  debugData.compressedStart = lineCount;
                  break;
              }
              case FUNCTION_END: {
-            	 Integer functionPos = (Integer)functionPositionStack.pop();
-                 DebugData debugData = tm.getDebugData(functionPos);
+            	 final Integer functionPos = (Integer)functionPositionStack.pop();
+                 final DebugData debugData = tm.getDebugData(functionPos);
                  debugData.compressedEnd = lineCount;
                  break;
              }
@@ -426,7 +426,7 @@ public class Compressor {
                   */
                  if (i + 1 < length) {
                      int less = 0;
-                     int nextToken = encodedSource.charAt(i + 1);
+                     final int nextToken = encodedSource.charAt(i + 1);
                      if (nextToken == Token.CASE
                          || nextToken == Token.DEFAULT)
                      {
@@ -438,7 +438,7 @@ public class Compressor {
                       * following inlined NAME and look for a COLON.
                       */
                      else if (nextToken == Token.NAME) {
-                         int afterName = getSourceStringEnd(encodedSource, i + 2, escapeUnicode);
+                         final int afterName = getSourceStringEnd(encodedSource, i + 2, escapeUnicode);
                          if (encodedSource.charAt(afterName) == Token.COLON)
                              less = indentGap;
                      }
@@ -734,32 +734,32 @@ public class Compressor {
 
     /**
      * Collect the replaced tokens and store them in a lookup table for the next
-     * source pass. 
-     * 
+     * source pass.
+     *
      * @param encodedSource encoded source string
      * @param escapeUnicode escape chars with unicode.
      * @param tm token mapper object.
      * @return Map containing replaced tokens lookup information
      */
-    private static Map collectReplacedTokens(String encodedSource, boolean escapeUnicode, TokenMapper tm) {
-    	int length = encodedSource.length();
-    	
+    private static Map collectReplacedTokens(final String encodedSource, final boolean escapeUnicode, final TokenMapper tm) {
+    	final int length = encodedSource.length();
+
 		int i = 0;
 		int prevToken = 0;
 		int braceNesting = 0;
-		
+
 		boolean inArgsList = false;
         boolean primeFunctionNesting = false;
         boolean primeInArgsList = false;
-		
+
         if (encodedSource.charAt(i) == Token.SCRIPT) {
             ++i;
         }
 
-        Stack positionStack = new Stack();
-        Stack functionPositionStack = new Stack();
-        Map tokenLookup = new HashMap();
-        
+        final Stack positionStack = new Stack();
+        final Stack functionPositionStack = new Stack();
+        final Map tokenLookup = new HashMap();
+
 		while (i < length) {
 			if (i > 0) {
 				prevToken = encodedSource.charAt(i - 1);
@@ -767,7 +767,7 @@ public class Compressor {
 			switch (encodedSource.charAt(i)) {
 				case Token.NAME:
 				case Token.REGEXP: {
-					int jumpPos = getSourceStringEnd(encodedSource, i + 1, escapeUnicode);
+					final int jumpPos = getSourceStringEnd(encodedSource, i + 1, escapeUnicode);
 					if (Token.OBJECTLIT == encodedSource.charAt(jumpPos)) {
 						i = printSourceString(encodedSource, i + 1, false, null, escapeUnicode);
 					} else {
@@ -796,17 +796,17 @@ public class Compressor {
 					break;
 				}
 				case Token.RC: {
-					Map m = tm.getCurrentTokens();
+					final Map m = tm.getCurrentTokens();
 					if (tm.leaveNestingLevel(braceNesting)) {
-						Integer pos = (Integer)positionStack.pop();
-						Integer functionPos = (Integer)functionPositionStack.pop();
-						int[] parents = new int[positionStack.size()];
+						final Integer pos = (Integer)positionStack.pop();
+						final Integer functionPos = (Integer)functionPositionStack.pop();
+						final int[] parents = new int[positionStack.size()];
 						int idx = 0;
-						for (Iterator itr = positionStack.iterator(); itr.hasNext();) {
+						for (final Iterator itr = positionStack.iterator(); itr.hasNext();) {
 							parents[idx++] = ((Integer)itr.next()).intValue();
 						}
-						DebugData debugData = tm.getDebugData(functionPos);
-						ReplacedTokens replacedTokens = new ReplacedTokens(m, parents, tokenLookup, debugData); 
+						final DebugData debugData = tm.getDebugData(functionPos);
+						final ReplacedTokens replacedTokens = new ReplacedTokens(m, parents, tokenLookup, debugData);
 						tokenLookup.put(pos, replacedTokens);
 					}
 					--braceNesting;
@@ -836,18 +836,18 @@ public class Compressor {
 		return tokenLookup;
 	}
 
-    private static int getNext(String source, int length, int i) {
+    private static int getNext(final String source, final int length, final int i) {
         return (i + 1 < length) ? source.charAt(i + 1) : Token.EOF;
     }
 
-    private static int getSourceStringEnd(String source, int offset, boolean escapeUnicode) {
+    private static int getSourceStringEnd(final String source, final int offset, final boolean escapeUnicode) {
         return printSourceString(source, offset, false, null, escapeUnicode);
     }
 
-    private static int printSourceString(String source, int offset,
-                                         boolean asQuotedString,
-                                         StringBuffer sb,
-                                         boolean escapeUnicode) {
+    private static int printSourceString(final String source, int offset,
+                                         final boolean asQuotedString,
+                                         final StringBuffer sb,
+                                         final boolean escapeUnicode) {
         int length = source.charAt(offset);
         ++offset;
         if ((0x8000 & length) != 0) {
@@ -855,7 +855,7 @@ public class Compressor {
             ++offset;
         }
         if (sb != null) {
-            String str = source.substring(offset, offset + length);
+            final String str = source.substring(offset, offset + length);
             if (!asQuotedString) {
                 sb.append(str);
             } else {
@@ -866,14 +866,14 @@ public class Compressor {
         }
         return offset + length;
     }
-    
-    private static int printSourceNumber(String source, int offset,	StringBuffer sb) {
+
+    private static int printSourceNumber(final String source, int offset,	final StringBuffer sb) {
 		double number = 0.0;
-		char type = source.charAt(offset);
+		final char type = source.charAt(offset);
 		++offset;
 		if (type == 'S') {
 			if (sb != null) {
-				int ival = source.charAt(offset);
+				final int ival = source.charAt(offset);
 				number = ival;
 			}
 			++offset;
@@ -900,17 +900,17 @@ public class Compressor {
 		}
 		return offset;
 	}
-    
-    private static String escapeString(String s, boolean escapeUnicode) {
+
+    private static String escapeString(final String s, final boolean escapeUnicode) {
         return escapeString(s, '"', escapeUnicode);
     }
-    
-    private static String escapeString(String s, char escapeQuote, boolean escapeUnicode) {
+
+    private static String escapeString(final String s, final char escapeQuote, final boolean escapeUnicode) {
         if (!(escapeQuote == '"' || escapeQuote == '\'')) Kit.codeBug();
         StringBuffer sb = null;
 
         for(int i = 0, L = s.length(); i != L; ++i) {
-            int c = s.charAt(i);
+            final int c = s.charAt(i);
 
             if (' ' <= c && c <= '~' && c != escapeQuote && c != '\\') {
                 // an ordinary print character (like C isprint()) and not "
@@ -958,8 +958,8 @@ public class Compressor {
 	                }
 	                // append hexadecimal form of c left-padded with 0
 	                for (int shift = (hexSize - 1) * 4; shift >= 0; shift -= 4) {
-	                    int digit = 0xf & (c >> shift);
-	                    int hc = (digit < 10) ? '0' + digit : 'a' - 10 + digit;
+	                    final int digit = 0xf & (c >> shift);
+	                    final int hc = (digit < 10) ? '0' + digit : 'a' - 10 + digit;
 	                    sb.append((char)hc);
 	                }
             	}
@@ -970,40 +970,40 @@ public class Compressor {
         }
         return (sb == null) ? s : sb.toString();
     }
-    
-    public static final String compressScript(String source, int indent, int lineno, String stripConsole) {
+
+    public static final String compressScript(final String source, final int indent, final int lineno, final String stripConsole) {
     	return compressScript(source, indent, lineno, false, stripConsole);
     }
-    
-    public static final String compressScript(String source, int indent, int lineno, boolean escapeUnicode, String stripConsole) {
+
+    public static final String compressScript(final String source, final int indent, final int lineno, final boolean escapeUnicode, final String stripConsole) {
     	return compressScript(source, indent, lineno, escapeUnicode, stripConsole, null);
     }
-        
-    public static final String compressScript(String source, int indent, int lineno, boolean escapeUnicode, String stripConsole, StringBuffer debugData) {
-        CompilerEnvirons compilerEnv = new CompilerEnvirons();
 
-        Parser parser = new Parser(compilerEnv, compilerEnv.getErrorReporter());
-        
-        ScriptOrFnNode tree = parser.parse(source, null, lineno);
-        String encodedSource = parser.getEncodedSource();
+    public static final String compressScript(final String source, final int indent, final int lineno, final boolean escapeUnicode, final String stripConsole, final StringBuffer debugData) {
+        final CompilerEnvirons compilerEnv = new CompilerEnvirons();
+
+        final Parser parser = new Parser(compilerEnv, compilerEnv.getErrorReporter());
+
+        final ScriptOrFnNode tree = parser.parse(source, null, lineno);
+        final String encodedSource = parser.getEncodedSource();
    	 	if (encodedSource.length() == 0) { return ""; }
-   	 	
-        Interpreter compiler = new Interpreter();
+
+        final Interpreter compiler = new Interpreter();
         compiler.compile(compilerEnv, tree, encodedSource, false);
-        UintMap properties = new UintMap(1);
+        final UintMap properties = new UintMap(1);
         properties.put(Decompiler.INITIAL_INDENT_PROP, indent);
-        
-        TokenMapper tm = new TokenMapper(tree);
-        Map replacedTokensLookup = collectReplacedTokens(encodedSource, escapeUnicode, tm);
+
+        final TokenMapper tm = new TokenMapper(tree);
+        final Map replacedTokensLookup = collectReplacedTokens(encodedSource, escapeUnicode, tm);
         tm.reset();
-        
-        String compressedSource = compress(encodedSource, 0, properties, tree, escapeUnicode, stripConsole, tm, replacedTokensLookup);
+
+        final String compressedSource = compress(encodedSource, 0, properties, tree, escapeUnicode, stripConsole, tm, replacedTokensLookup);
         if (debugData != null) {
         	debugData.append("[\n");
         	int count = 1;
-	        for (Iterator itr = replacedTokensLookup.keySet().iterator(); itr.hasNext();) {
-	        	Integer pos = (Integer)itr.next();
-	        	ReplacedTokens replacedTokens = (ReplacedTokens)replacedTokensLookup.get(pos);
+	        for (final Iterator itr = replacedTokensLookup.keySet().iterator(); itr.hasNext();) {
+	        	final Integer pos = (Integer)itr.next();
+	        	final ReplacedTokens replacedTokens = (ReplacedTokens)replacedTokensLookup.get(pos);
 	        	debugData.append(replacedTokens.toJson());
 	        	if (count++ < replacedTokensLookup.size()) {
 	        		debugData.append(',');
