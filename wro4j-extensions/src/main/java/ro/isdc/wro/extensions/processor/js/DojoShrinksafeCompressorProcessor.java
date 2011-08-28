@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dojotoolkit.shrinksafe.Compressor;
 import org.mozilla.javascript.Context;
 import org.slf4j.Logger;

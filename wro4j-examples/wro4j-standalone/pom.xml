@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ro.isdc.wro4j</groupId>
+
+  <parent>
+    <groupId>ro.isdc.wro4j</groupId>
+    <artifactId>wro4j-examples</artifactId>
+    <version>1.4.1-SNAPSHOT</version>
+  </parent>
+
   <artifactId>wro4j-standalone</artifactId>
   <packaging>jar</packaging>
   <name>wro4j standalone example project</name>
-  <parent>
-    <groupId>ro.isdc.wro4j</groupId>
-    <artifactId>wro4j-parent</artifactId>
-    <version>1.4.0</version>
-  </parent>
 
 	<properties>
 		<project_charset>UTF-8</project_charset>
@@ -19,11 +19,7 @@
   <dependencies>
     <!-- Project Dependencies -->
     <dependency>
-      <groupId>ro.isdc.wro4j</groupId>
-      <artifactId>wro4j-core</artifactId>	  
-    </dependency>
-    <dependency>
-      <groupId>ro.isdc.wro4j</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>wro4j-extensions</artifactId>	  
     </dependency>        
     <dependency>
@@ -43,7 +39,7 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
+        <version>1.4.0</version>
         <executions>
           <execution>
             <goals>

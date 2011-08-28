@@ -25,12 +25,12 @@ import ro.isdc.wro.model.resource.ResourceType;
 public class TestGroup {
   private static final Logger LOG = LoggerFactory.getLogger(TestGroup.class);
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotCreateGroupWithNullName() {
     new Group(null);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotPassNullResourceType() {
     final Group group = new Group("group");
     group.hasResourcesOfType(null);

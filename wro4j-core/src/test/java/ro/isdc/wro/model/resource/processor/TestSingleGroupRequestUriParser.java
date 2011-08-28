@@ -28,7 +28,7 @@ public class TestSingleGroupRequestUriParser {
     requestUriParser = new DefaultGroupExtractor();
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotExtractResourceTypeUsingNullUri() {
     requestUriParser.getResourceType(null);
   }

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
   <version>1.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>  
+  
   <name>Web Resource Optimizer Parent</name>
   <inceptionYear>2008</inceptionYear>
   <url>http://code.google.com/p/wro4j/</url>
@@ -60,25 +62,26 @@
   
   <properties>
     <commons-io.dependency>2.0.1</commons-io.dependency>
-    <commons-lang.dependency>2.6</commons-lang.dependency>       
-    <slf4j.dependency>1.6.1</slf4j.dependency>    
-    <maven.dependency>2.2.1</maven.dependency>    
-    <mockito.dependency>1.8.5</mockito.dependency>
-    <junit.dependency>4.8.2</junit.dependency>    
+    <commons-lang.dependency>3.0.1</commons-lang.dependency>       
+    <slf4j.dependency>1.6.2</slf4j.dependency>    
+    <maven.dependency>3.0.3</maven.dependency>    
+    <mockito.dependency>1.9.0-rc1</mockito.dependency>
+    <junit.dependency>4.9</junit.dependency>    
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  
     <maven.compile.encoding>UTF-8</maven.compile.encoding>
     <maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
   </properties>
   
-  
-  
-  <modules>
-    <module>wro4j-core</module>
+    
+  <modules>		
+    <module>wro4j-core</module>    
+    
     <module>wro4j-extensions</module>
-    <module>wro4j-maven-plugin</module>  
-    <module>wro4j-examples</module>  
-    <module>wro4j-runner</module>  
+    <module>wro4j-maven-plugin</module>
+    <module>wro4j-runner</module>       		
+  	<module>wro4j-examples</module>        		
+    <!---->
   </modules>
 
   <dependencyManagement>
@@ -87,7 +90,7 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>wro4j-core</artifactId>
-        <version>${project.version}</version>
+        <version>1.4.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -111,8 +114,8 @@
         <version>${commons-io.dependency}</version>
       </dependency>
       <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
         <version>${commons-lang.dependency}</version>
       </dependency>  
       <dependency>
@@ -184,11 +187,11 @@
         <artifactId>js</artifactId>
         <version>1.7R2</version>
       </dependency>
- 	  <dependency>
-		<groupId>com.google.javascript</groupId>
-		<artifactId>closure-compiler</artifactId>
-		<version>r1352</version>
-	  </dependency>	  
+ 	    <dependency>
+        <groupId>com.google.javascript</groupId>
+        <artifactId>closure-compiler</artifactId>
+        <version>r1352</version>
+      </dependency>	  
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
@@ -243,7 +246,7 @@
         <filtering>false</filtering>
         <directory>src/main/java</directory>
         <includes>
-          <include>**</include>
+          <include>**/*</include>
         </includes>
         <excludes>
           <exclude>**/*.java</exclude>
@@ -253,11 +256,11 @@
 
     <pluginManagement>   
       <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
-      </plugin>    
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>    
       </plugins>
     </pluginManagement>  
     <plugins>        
@@ -288,7 +291,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
+        <version>2.3.2</version>
         <configuration>
           <archive>
             <manifest>
@@ -318,7 +321,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-         <version>2.4</version> 
+        <version>2.4</version> 
         <reportSets>
           <reportSet>
             <reports>
@@ -340,17 +343,23 @@
 
       <activation>
         <property>
-          <name>performRelease</name>
+          <name>release</name>
           <value>true</value>
         </property>
       </activation>
+      <!-- These modules will go to maven central repo -->
+      <modules>
+        <module>wro4j-core</module>    
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+      </modules>
 
       <build>      
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.0</version>
+            <version>1.4</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -389,7 +398,7 @@
           <id>sonatype-nexus-staging</id>
           <name>Nexus Release Repository</name>
           <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
+        </repository>        
         <snapshotRepository>
           <id>sonatype-nexus-snapshots</id>
           <name>Sonatype Nexus Snapshots</name>
@@ -398,11 +407,12 @@
       </distributionManagement>      
     </profile>
   </profiles>  
-  <!-- Repository for third party libraries -->
+  <!-- Repository for third party libraries 
   <repositories>
     <repository>
       <id>Sonatype</id>
       <url>http://oss.sonatype.org/content/groups/public</url>
     </repository>
   </repositories>
+  -->
 </project>

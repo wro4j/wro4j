@@ -42,7 +42,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     };
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotUseNullArgument() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(null) {
       @Override
