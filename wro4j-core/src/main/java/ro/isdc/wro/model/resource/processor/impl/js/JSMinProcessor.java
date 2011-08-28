@@ -13,7 +13,7 @@ import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

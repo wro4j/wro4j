@@ -30,7 +30,7 @@ public class TestFilterConfigWroConfigurationFactory {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotUseNullArgument() {
     factory = new FilterConfigWroConfigurationFactory(null);
   }
