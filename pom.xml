@@ -191,7 +191,13 @@
         <groupId>com.google.javascript</groupId>
         <artifactId>closure-compiler</artifactId>
         <version>r1352</version>
-      </dependency>	  
+      </dependency>	 
+      <dependency>
+        <groupId>org.dojotoolkit</groupId>
+        <artifactId>dojo-shrinksafe</artifactId>
+        <version>1.6.1</version>
+      </dependency>      
+      <!-- Unit tests -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
