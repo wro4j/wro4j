@@ -2,7 +2,6 @@
 
 wro4j is a free and Open Source Java project which will help you to [easily improve](http://alexo.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized](http://code.google.com/p/wro4j/wiki/WroFileFormat), merge & minify them at [run-time](http://code.google.com/p/wro4j/wiki/Installation) (using a simple filter) or [build-time](http://code.google.com/p/wro4j/wiki/MavenPlugin) (using maven plugin) and has a [dozen of features](http://code.google.com/p/wro4j/wiki/Features) you may find useful when dealing with web resources.
 
-<img src="http://wiki.wro4j.googlecode.com/git/img/serve.jpg"/>
 
 # Getting Started
 
