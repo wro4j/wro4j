@@ -1,16 +1,16 @@
-wro4j - Web Resource Optimizer for Java
-==================================================
-wro4j is a free and Open Source Java project which will help you to [easily improve](http://alexo.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized])http://code.google.com/p/wro4j/wiki/WroFileFormat), merge & minify them at [run-time](http://code.google.com/p/wro4j/wiki/Installation) (using a simple filter) or [build-time](http://code.google.com/p/wro4j/wiki/MavenPlugin) (using maven plugin) and has a [dozen of features](http://code.google.com/p/wro4j/wiki/Features) you may find useful when dealing with web resources.
+# wro4j - Web Resource Optimizer for Java
+
+wro4j is a free and Open Source Java project which will help you to [easily improve](http://alexo.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized](http://code.google.com/p/wro4j/wiki/WroFileFormat), merge & minify them at [run-time](http://code.google.com/p/wro4j/wiki/Installation) (using a simple filter) or [build-time](http://code.google.com/p/wro4j/wiki/MavenPlugin) (using maven plugin) and has a [dozen of features](http://code.google.com/p/wro4j/wiki/Features) you may find useful when dealing with web resources.
 
 
-Getting Started
-______________
+# Getting Started
+
 
 In order to get started with wro4j, you have to follow only 3 simple steps.
 
 
-Step 1: Add WroFilter to web.xml
-____
+## Step 1: Add WroFilter to web.xml
+
 
 
 		<filter>
@@ -25,8 +25,7 @@ ____
 		  <url-pattern>/wro/*</url-pattern>
 		</filter-mapping>
 		
-Step 2: Create wro.xml
-____
+## Step 2: Create wro.xml
 		
 
 		<groups xmlns="http://www.isdc.ro/wro">
@@ -36,8 +35,7 @@ ____
 		  </group>
 		</groups> 		
 		
-Step 3: Use optimized resources
-____
+## Step 3: Use optimized resources
 
 		<html>
 		  <head>
@@ -51,28 +49,23 @@ ____
 		</html>		
 
 		
-Documentation
-______________
-		
+# Documentation
 
 The documentation for this project is located on google code project page: http://code.google.com/p/wro4j/
 
 
-Issues
-______________
+# Issues
 
 Found a bug? Report it to the issue tracker: http://code.google.com/p/wro4j/issues/list
 
 
-Feedback
-______________
+# Feedback
 
 If you have any questions or suggestions, please feel free to post a comment to the discussion group: https://groups.google.com/forum/#!forum/wro4j
 
-Follow me on tweeter: http://twitter.com/#!/wro4j
+[Follow me](http://twitter.com/#!/wro4j) on tweeter. http://twitter.com/#!/wro4j
 
 
-License
---------------------------------------
+# License
 
 This project is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
