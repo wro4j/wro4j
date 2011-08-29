@@ -64,7 +64,7 @@ Found a bug? Report it to the issue tracker: http://code.google.com/p/wro4j/issu
 
 If you have any questions or suggestions, please feel free to post a comment to the discussion group: https://groups.google.com/forum/#!forum/wro4j
 
-[Follow me](http://twitter.com/#!/wro4j) on tweeter. http://twitter.com/#!/wro4j
+[Follow me](http://twitter.com/#!/wro4j) on tweeter.
 
 
 # License
