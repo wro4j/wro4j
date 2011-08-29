@@ -55,8 +55,8 @@ public class TestContext {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
-  public void cannotSetNulContext() {
+  @Test(expected = NullPointerException.class)
+  public void cannotSetNullContext() {
     Context.set(null);
   }
 

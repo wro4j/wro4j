@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>ro.isdc.wro4j</groupId>
-	<artifactId>wro4j-extensions</artifactId>
-	<packaging>jar</packaging>
-	<name>Web Resource Optimizer Extensions</name>
+
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+		<version>1.5.0-SNAPSHOT</version>
 	</parent>
+
+	<artifactId>wro4j-extensions</artifactId>
+	<packaging>jar</packaging>
+	<name>Web Resource Optimizer Extensions</name>
+
 	<dependencies>
 		<dependency>
-			<groupId>ro.isdc.wro4j</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>wro4j-core</artifactId>
 		</dependency>
 		<dependency>
@@ -23,8 +24,8 @@
 		</dependency>
 		<!-- Other Dependencies -->
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -49,6 +50,13 @@
 			<groupId>rhino</groupId>
 			<artifactId>js</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.dojotoolkit</groupId>
+			<artifactId>dojo-shrinksafe</artifactId>
+		</dependency>
+		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId> 
+			<artifactId>gmaven-runtime-default</artifactId> <version>1.0-rc-3</version> 
+			</dependency> -->
 		<dependency>
 			<groupId>org.codehaus.gmaven.runtime</groupId>
 			<artifactId>gmaven-runtime-1.7</artifactId>

@@ -6,7 +6,7 @@ package ro.isdc.wro.config.factory;
 
 import java.util.Properties;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
