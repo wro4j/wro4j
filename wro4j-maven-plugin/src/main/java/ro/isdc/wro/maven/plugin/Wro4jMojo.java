@@ -26,8 +26,6 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -62,18 +60,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   private File jsDestinationFolder;
   /**
-   * @parameter expression="${wroManagerFactory}"
-   * @optional
-   */
-  private String wroManagerFactory;
-  /**
-   * The path to configuration file.
-   *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" expression="${extraConfig}"
-   * @optional
-   */
-  private File extraConfigFile;
-  /**
    * This parameter is not meant to be used. The only purpose is to hold project build directory
    *
    * @parameter default-value="${project.build.directory}
@@ -89,46 +75,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected StandaloneContextAwareManagerFactory newWroManagerFactory()
-    throws MojoExecutionException {
-    StandaloneContextAwareManagerFactory factory = null;
-    if (wroManagerFactory != null) {
-      factory = createCustomManagerFactory();
-    } else {
-      factory = super.newWroManagerFactory();
-    }
-    if (factory instanceof ExtraConfigFileAware) {
-      if (extraConfigFile == null) {
-        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
-      }
-      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
-      ((ExtraConfigFileAware)factory).setExtraConfigFile(extraConfigFile);
-    }
-    return factory;
-  }
-
-
-  /**
-   * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
-   */
-  private StandaloneContextAwareManagerFactory createCustomManagerFactory()
-    throws MojoExecutionException {
-    StandaloneContextAwareManagerFactory managerFactory;
-    try {
-      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-        wroManagerFactory.trim());
-      managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
-    } catch (final Exception e) {
-      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
-      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
-    }
-    return managerFactory;
-  }
 
 
   /**
@@ -343,23 +289,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   public void setJsDestinationFolder(final File jsDestinationFolder) {
     this.jsDestinationFolder = jsDestinationFolder;
   }
-
-
-  /**
-   * @param wroManagerFactory to set
-   */
-  public void setWroManagerFactory(final String wroManagerFactory) {
-    this.wroManagerFactory = wroManagerFactory;
-  }
-
-
-  /**
-   * @param extraConfigFile the extraConfigFile to set
-   */
-  public void setExtraConfigFile(final File extraConfigFile) {
-    this.extraConfigFile = extraConfigFile;
-  }
-
 
   /**
    * The folder where the project is built.

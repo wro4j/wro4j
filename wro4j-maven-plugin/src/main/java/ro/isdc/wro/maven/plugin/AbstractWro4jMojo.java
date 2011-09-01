@@ -21,6 +21,7 @@ import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFact
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
 
 
@@ -66,9 +67,21 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    */
   private MavenProject mavenProject;
   /**
+   * @parameter expression="${wroManagerFactory}"
+   * @optional
+   */
+  private String wroManagerFactory;
+  /**
    * An instance of {@link StandaloneContextAwareManagerFactory}.
    */
   private StandaloneContextAwareManagerFactory managerFactory;
+  /**
+   * The path to configuration file.
+   *
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" expression="${extraConfig}"
+   * @optional
+   */
+  private File extraConfigFile;
 
 
   /**
@@ -83,6 +96,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
+    getLog().info("wroManagerFactory: " + this.wroManagerFactory);
 
     Context.set(Context.standaloneContext());
     try {
@@ -127,9 +141,48 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return managerFactory;
   }
 
-  protected StandaloneContextAwareManagerFactory newWroManagerFactory() throws MojoExecutionException {
-    return new ExtensionsStandaloneManagerFactory();
+  /**
+   * {@inheritDoc}
+   */
+  protected StandaloneContextAwareManagerFactory newWroManagerFactory()
+    throws MojoExecutionException {
+    StandaloneContextAwareManagerFactory factory = null;
+    if (wroManagerFactory != null) {
+      factory = createCustomManagerFactory();
+    } else {
+      factory = new ExtensionsStandaloneManagerFactory();
+    }
+    getLog().info("wroManagerFactory class: " + factory.getClass().getName());
+
+    if (factory instanceof ExtraConfigFileAware) {
+      if (extraConfigFile == null) {
+        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
+      }
+      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
+      ((ExtraConfigFileAware)factory).setExtraConfigFile(extraConfigFile);
+    }
+    return factory;
   }
+
+
+  /**
+   * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
+   */
+  private StandaloneContextAwareManagerFactory createCustomManagerFactory()
+    throws MojoExecutionException {
+    StandaloneContextAwareManagerFactory managerFactory;
+    try {
+      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+        wroManagerFactory.trim());
+      managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
+    } catch (final Exception e) {
+      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
+      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
+    }
+    return managerFactory;
+  }
+
+
 
   /**
    * @return a list containing all groups needs to be processed.
@@ -273,4 +326,22 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   public void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
   }
+
+
+
+  /**
+   * @param wroManagerFactory to set
+   */
+  public void setWroManagerFactory(final String wroManagerFactory) {
+    this.wroManagerFactory = wroManagerFactory;
+  }
+
+
+  /**
+   * @param extraConfigFile the extraConfigFile to set
+   */
+  public void setExtraConfigFile(final File extraConfigFile) {
+    this.extraConfigFile = extraConfigFile;
+  }
+
 }

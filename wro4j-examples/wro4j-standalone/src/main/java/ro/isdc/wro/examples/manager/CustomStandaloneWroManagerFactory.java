@@ -6,6 +6,11 @@ package ro.isdc.wro.examples.manager;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -35,5 +40,24 @@ public class CustomStandaloneWroManagerFactory
     factory.addPostProcessor(new LessCssProcessor());
     factory.addPostProcessor(new YUICssCompressorProcessor());
     return factory;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroModelFactory newModelFactory() {
+    return new WroModelFactory() {
+
+      public WroModel create() {
+        final WroModel model = new WroModel();
+        model.addGroup(new Group("all").addResource(Resource.create("http://code.jquery.com/jquery-1.6.2.js",
+          ResourceType.JS)));
+        return model;
+      }
+
+      public void destroy() {}
+    };
   }
 }
