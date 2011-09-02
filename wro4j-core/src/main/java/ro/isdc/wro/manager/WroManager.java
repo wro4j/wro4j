@@ -52,6 +52,8 @@ import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
+import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
@@ -63,7 +65,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public class WroManager
+public final class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
@@ -75,10 +77,6 @@ public class WroManager
    * GroupExtractor.
    */
   private GroupExtractor groupExtractor;
-  /**
-   * Groups processor.
-   */
-  private final GroupsProcessor groupsProcessor;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
@@ -95,24 +93,24 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-  @Inject
   private ProcessorsFactory processorsFactory;
-  @Inject
   private UriLocatorFactory uriLocatorFactory;
+  /**
+   * Rename the file name based on its original name and content.
+   */
+  private NamingStrategy namingStrategy;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and
    * processed.
    */
   private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
-  private final Injector injector;
-
-  public WroManager(final Injector injector) {
-    Validate.notNull(injector);
-    groupsProcessor = new GroupsProcessor();
-    this.injector = injector;
-    injector.inject(this);
-    injector.inject(groupsProcessor);
-  }
+  @Inject
+  private Injector injector;
+  /**
+   * Groups processor.
+   */
+  @Inject
+  private GroupsProcessor groupsProcessor;
 
   /**
    * Perform processing of the uri.
@@ -458,6 +456,10 @@ public class WroManager
    * Check if all dependencies are set.
    */
   private void validate() {
+    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
+    Validate.notNull(groupsProcessor, "groupsProcessor was not set!");
+    Validate.notNull(uriLocatorFactory, "uriLocatorFactory was not set!");
+    Validate.notNull(processorsFactory, "processorsFactory was not set!");
     Validate.notNull(groupExtractor, "GroupExtractor was not set!");
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
@@ -518,6 +520,54 @@ public class WroManager
    */
   public ProcessorsFactory getProcessorsFactory() {
     return processorsFactory;
+  }
+
+  /**
+   * @param processorsFactory the processorsFactory to set
+   */
+  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+    this.processorsFactory = processorsFactory;
+  }
+
+  /**
+   * @param uriLocatorFactory the uriLocatorFactory to set
+   */
+  public void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+    this.uriLocatorFactory = uriLocatorFactory;
+  }
+
+  /**
+   * @return the cacheStrategy
+   */
+  public CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
+    return cacheStrategy;
+  }
+
+  /**
+   * @return the uriLocatorFactory
+   */
+  public UriLocatorFactory getUriLocatorFactory() {
+    return uriLocatorFactory;
+  }
+
+  /**
+   * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.
+   *
+   * @return a not null {@link NamingStrategy}. If no {@link NamingStrategy} is set, a NoOp implementation will return.
+   */
+  public final NamingStrategy getNamingStrategy() {
+    if (namingStrategy == null) {
+      namingStrategy = new NoOpNamingStrategy();
+    }
+    return this.namingStrategy;
+  }
+
+  /**
+   * @param namingStrategy the namingStrategy to set
+   */
+  public final WroManager setNamingStrategy(final NamingStrategy namingStrategy) {
+    this.namingStrategy = namingStrategy;
+    return this;
   }
 
   /**

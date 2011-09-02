@@ -49,7 +49,7 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
@@ -212,27 +212,6 @@ public final class WroUtil {
 //  public static String toJSMultiLineStringAsCDATA(final String data) {
 //    return "(<r><![CDATA[" + data + "]]></r>).toString()";
 //  }
-
-  /**
-   * Checks if request contains the header value with a given value.
-   *
-   * @param request to check
-   * @param header name of the header to check
-   * @param value of the header to check
-   */
-  @SuppressWarnings("unchecked")
-  private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
-    final Enumeration<String> headerValues = request.getHeaders(header);
-    if (headerValues != null) {
-      while (headerValues.hasMoreElements()) {
-        final String headerValue = headerValues.nextElement();
-        if (headerValue.indexOf(value) != -1) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
 
   /**
    * @return a {@link ThreadFactory} which produces only daemon threads.

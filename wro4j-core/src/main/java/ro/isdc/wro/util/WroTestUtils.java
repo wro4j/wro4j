@@ -33,13 +33,12 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -100,8 +99,7 @@ public class WroTestUtils {
 
 
   private static UriLocatorFactory createDefaultUriLocatorFactory() {
-    return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
-      new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+    return new DefaultUriLocatorFactory();
   }
 
 
@@ -110,14 +108,16 @@ public class WroTestUtils {
     return createDefaultUriLocatorFactory().locate(uri);
   }
 
+  public static void init(final WroModelFactory factory) {
+    new BaseWroManagerFactory().setModelFactory(factory).create();
+  }
 
   /**
    * @return the injector
    */
   public static void initProcessor(final ResourcePreProcessor processor) {
-    final Injector injector = new Injector(
-      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPreProcessor(processor));
-    injector.inject(processor);
+    final WroManager manager = new BaseWroManagerFactory().setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor)).create();
+    manager.getProcessorsFactory().getPreProcessors();
   }
 
 
@@ -125,9 +125,8 @@ public class WroTestUtils {
    * @return the injector
    */
   public static void initProcessor(final ResourcePostProcessor processor) {
-    final Injector injector = new Injector(
-      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPostProcessor(processor));
-    injector.inject(processor);
+    final WroManager manager = new BaseWroManagerFactory().setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor)).create();
+    manager.getProcessorsFactory().getPreProcessors();
   }
 
 

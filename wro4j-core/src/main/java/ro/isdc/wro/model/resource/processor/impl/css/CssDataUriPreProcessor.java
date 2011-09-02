@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +53,7 @@ public class CssDataUriPreProcessor
    */
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalStateException("No UriLocatorFactory was injected!");
-    }
+    Validate.notNull(uriLocatorFactory);
     LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     final String fileName = FilenameUtils.getName(imageUrl);

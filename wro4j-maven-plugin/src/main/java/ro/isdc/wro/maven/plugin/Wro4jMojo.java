@@ -190,7 +190,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   private String rename(final String group, final InputStream input)
     throws Exception {
     try {
-      final String newName = getManagerFactory().getNamingStrategy().rename(group, input);
+      final String newName = getManagerFactory().create().getNamingStrategy().rename(group, input);
       groupNames.setProperty(group, newName);
       return newName;
     } catch (final IOException e) {

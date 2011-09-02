@@ -20,10 +20,8 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * TestXmlModelFactory.
@@ -34,7 +32,6 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 public class TestXmlModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestXmlModelFactory.class);
   private WroModelFactory factory;
-  private Injector injector;
 
   @Before
   public void setUp() {
@@ -42,7 +39,6 @@ public class TestXmlModelFactory {
     Context.set(context);
     context.getConfig().setCacheUpdatePeriod(0);
     context.getConfig().setModelUpdatePeriod(0);
-    injector = new Injector(new DefaultUriLocatorFactory(), new DefaultProcesorsFactory());
   }
 
   @After
@@ -121,7 +117,7 @@ public class TestXmlModelFactory {
         return TestXmlModelFactory.class.getResourceAsStream("testimport/validImports.xml");
       }
     };
-    injector.inject(factory);
+    WroTestUtils.init(factory);
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.create();
     Assert.assertEquals(2, model.getGroupNames().size());
@@ -137,7 +133,7 @@ public class TestXmlModelFactory {
         return TestXmlModelFactory.class.getResourceAsStream("testimport/recursive.xml");
       }
     };
-    injector.inject(factory);
+    WroTestUtils.init(factory);
     factory.create();
   }
 
@@ -150,7 +146,7 @@ public class TestXmlModelFactory {
         return TestXmlModelFactory.class.getResourceAsStream("testimport/deepRecursive.xml");
       }
     };
-    injector.inject(factory);
+    WroTestUtils.init(factory);
     factory.create();
   }
 
@@ -163,7 +159,7 @@ public class TestXmlModelFactory {
         return TestXmlModelFactory.class.getResourceAsStream("testimport/circular1.xml");
       }
     };
-    injector.inject(factory);
+    WroTestUtils.init(factory);
     factory.create();
   }
 
@@ -176,7 +172,7 @@ public class TestXmlModelFactory {
         return TestXmlModelFactory.class.getResourceAsStream("testimport/invalidImports.xml");
       }
     };
-    injector.inject(factory);
+    WroTestUtils.init(factory);
     factory.create();
   }
 
@@ -190,7 +186,7 @@ public class TestXmlModelFactory {
           return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
         }
       };
-      injector.inject(factory);
+      WroTestUtils.init(factory);
       factory.create();
     } catch(final WroRuntimeException e) {
       throw e.getCause();
