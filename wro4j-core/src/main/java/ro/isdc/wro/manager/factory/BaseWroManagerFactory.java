@@ -5,7 +5,6 @@ package ro.isdc.wro.manager.factory;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -22,6 +21,9 @@ import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.ModelTransformerFactory;
+import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -41,7 +43,8 @@ import ro.isdc.wro.util.Transformer;
 
 
 /**
- * Default implementation of {@link WroManagerFactory} which uses default processors and uriLocators.
+ * Default implementation of {@link WroManagerFactory} which creates default locators and processors and handles the
+ * injection logic by creating an {@link Injector} and injecting where it is appropriate.
  *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
@@ -62,7 +65,11 @@ public class BaseWroManagerFactory
   private WroModelFactory modelFactory;
   private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
   private HashBuilder hashBuilder;
-  private List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
+  /**
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
+   * processed.
+   */
+  private List<Transformer<WroModel>> modelTransformers;
   private UriLocatorFactory uriLocatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
@@ -105,13 +112,15 @@ public class BaseWroManagerFactory
     manager.setProcessorsFactory(processorsFactory);
     manager.setNamingStrategy(namingStrategy);
 
-    manager.setModelFactory(modelFactory);
+    manager.setModelFactory(new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
+        modelFactory))).setTransformers(modelTransformers));
 
     final Injector injector = new Injector(manager);
     injector.inject(modelFactory);
+    for (final Transformer<WroModel> transformer : modelTransformers) {
+      injector.inject(transformer);
+    }
 
-    // set transformers before model factory and after Injector is initialized
-    manager.setModelTransformers(modelTransformers);
     return manager;
   }
 
@@ -134,8 +143,8 @@ public class BaseWroManagerFactory
    * @return default implementation of modelTransformers.
    */
   protected List<Transformer<WroModel>> newModelTransformers() {
-    final Transformer<WroModel> transformer = new WildcardExpanderModelTransformer();
-    return Arrays.asList(transformer);
+    addModelTransformer(new WildcardExpanderModelTransformer());
+    return this.modelTransformers;
   }
 
 
@@ -266,7 +275,13 @@ public class BaseWroManagerFactory
     return this;
   }
 
+  /**
+   * Add a single model transformer.
+   */
   public BaseWroManagerFactory addModelTransformer(final Transformer<WroModel> modelTransformer) {
+    if (modelTransformers == null) {
+      modelTransformers = new ArrayList<Transformer<WroModel>>();
+    }
     this.modelTransformers.add(modelTransformer);
     return this;
   }

@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -37,15 +36,11 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.ModelTransformerFactory;
-import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
@@ -55,7 +50,6 @@ import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -99,13 +93,6 @@ public final class WroManager
    * Rename the file name based on its original name and content.
    */
   private NamingStrategy namingStrategy;
-  /**
-   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
-   * processed.
-   */
-  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
-  @Inject
-  private Injector injector;
   /**
    * Groups processor.
    */
@@ -483,8 +470,7 @@ public final class WroManager
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
     // decorate with useful features
-    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
-        modelFactory))).setTransformers(modelTransformers);
+    this.modelFactory = modelFactory;
     return this;
   }
 
@@ -567,20 +553,6 @@ public final class WroManager
    */
   public final WroManager setNamingStrategy(final NamingStrategy namingStrategy) {
     this.namingStrategy = namingStrategy;
-    return this;
-  }
-
-  /**
-   * @param modelTransformers the modelTransformers to set
-   */
-  public WroManager setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
-    Validate.notNull(modelTransformers);
-    this.modelTransformers = modelTransformers;
-    //allow model transformers to be aware of injected properties
-    for (final Transformer<WroModel> transformer : modelTransformers) {
-      LOG.debug("injecting: " + transformer);
-      injector.inject(transformer);
-    }
     return this;
   }
 }

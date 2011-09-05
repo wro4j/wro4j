@@ -36,6 +36,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
@@ -117,7 +118,8 @@ public class WroTestUtils {
    */
   public static void initProcessor(final ResourcePreProcessor processor) {
     final WroManager manager = new BaseWroManagerFactory().setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor)).create();
-    manager.getProcessorsFactory().getPreProcessors();
+    final Injector injector = new Injector(manager);
+    injector.inject(processor);
   }
 
 
@@ -126,7 +128,8 @@ public class WroTestUtils {
    */
   public static void initProcessor(final ResourcePostProcessor processor) {
     final WroManager manager = new BaseWroManagerFactory().setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor)).create();
-    manager.getProcessorsFactory().getPreProcessors();
+    final Injector injector = new Injector(manager);
+    injector.inject(processor);
   }
 
 
