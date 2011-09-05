@@ -48,7 +48,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -537,14 +536,10 @@ public final class WroManager
   }
 
   /**
-   * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.
    *
-   * @return a not null {@link NamingStrategy}. If no {@link NamingStrategy} is set, a NoOp implementation will return.
+   * @return The strategy used to rename bundled resources.
    */
   public final NamingStrategy getNamingStrategy() {
-    if (namingStrategy == null) {
-      namingStrategy = new NoOpNamingStrategy();
-    }
     return this.namingStrategy;
   }
 
@@ -552,6 +547,7 @@ public final class WroManager
    * @param namingStrategy the namingStrategy to set
    */
   public final WroManager setNamingStrategy(final NamingStrategy namingStrategy) {
+    Validate.notNull(namingStrategy);
     this.namingStrategy = namingStrategy;
     return this;
   }

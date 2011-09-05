@@ -36,6 +36,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NamingStrategyAware;
+import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.ObjectFactory;
@@ -103,6 +104,10 @@ public class BaseWroManagerFactory
     if (uriLocatorFactory == null) {
       uriLocatorFactory = newUriLocatorFactory();
     }
+    //use NoOp as default naming strategy
+    if (namingStrategy == null) {
+      namingStrategy = new NoOpNamingStrategy();
+    }
 
     manager.setGroupExtractor(groupExtractor);
     manager.setCacheStrategy(cacheStrategy);
@@ -117,6 +122,7 @@ public class BaseWroManagerFactory
 
     final Injector injector = new Injector(manager);
     injector.inject(modelFactory);
+    //transformers also require injection
     for (final Transformer<WroModel> transformer : modelTransformers) {
       injector.inject(transformer);
     }
