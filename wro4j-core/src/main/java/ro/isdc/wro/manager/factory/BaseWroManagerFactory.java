@@ -116,7 +116,7 @@ public class BaseWroManagerFactory
     manager.setUriLocatorFactory(uriLocatorFactory);
     manager.setProcessorsFactory(processorsFactory);
     manager.setNamingStrategy(namingStrategy);
-
+    //wrap modelFactory with several useful decorators
     manager.setModelFactory(new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
         modelFactory))).setTransformers(modelTransformers));
 
