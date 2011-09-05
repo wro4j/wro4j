@@ -20,8 +20,6 @@ import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 
 /**
  * {@link WroManagerFactory} instance used by the maven plugin.
@@ -35,10 +33,6 @@ public class DefaultStandaloneContextAwareManagerFactory
    * Context used by stand-alone process.
    */
   private StandaloneContext standaloneContext;
-  /**
-   * Rename the file name based on its original name and content.
-   */
-  private NamingStrategy namingStrategy;
   /**
    * {@inheritDoc}
    */
@@ -98,25 +92,5 @@ public class DefaultStandaloneContextAwareManagerFactory
         return new FileInputStream(file);
       }
     };
-  }
-
-
-  /**
-   * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.
-   *
-   * @return a not null {@link NamingStrategy}. If no {@link NamingStrategy} is set, a NoOp implementation will return.
-   */
-  public final NamingStrategy getNamingStrategy() {
-    if (namingStrategy == null) {
-      namingStrategy = new NoOpNamingStrategy();
-    }
-    return this.namingStrategy;
-  }
-
-  /**
-   * @param namingStrategy the namingStrategy to set
-   */
-  public final void setNamingStrategy(final NamingStrategy namingStrategy) {
-    this.namingStrategy = namingStrategy;
   }
 }

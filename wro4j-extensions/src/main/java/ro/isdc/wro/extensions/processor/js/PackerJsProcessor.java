@@ -24,7 +24,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Compress js using packer utility.
+ *  Uses <a href="http://dean.edwards.name/packer/">Dean Edwards packer utility</a> to pack js resources.
  *
  * @author Alex Objelean
  * @created 31 Jul 2010

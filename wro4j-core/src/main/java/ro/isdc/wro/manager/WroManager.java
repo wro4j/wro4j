@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -37,23 +36,19 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.ModelTransformerFactory;
-import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
+import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -63,7 +58,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public class WroManager
+public final class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
@@ -75,10 +70,6 @@ public class WroManager
    * GroupExtractor.
    */
   private GroupExtractor groupExtractor;
-  /**
-   * Groups processor.
-   */
-  private final GroupsProcessor groupsProcessor;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
@@ -95,24 +86,17 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-  @Inject
   private ProcessorsFactory processorsFactory;
-  @Inject
   private UriLocatorFactory uriLocatorFactory;
   /**
-   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
-   * processed.
+   * Rename the file name based on its original name and content.
    */
-  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
-  private final Injector injector;
-
-  public WroManager(final Injector injector) {
-    Validate.notNull(injector);
-    groupsProcessor = new GroupsProcessor();
-    this.injector = injector;
-    injector.inject(this);
-    injector.inject(groupsProcessor);
-  }
+  private NamingStrategy namingStrategy;
+  /**
+   * Groups processor.
+   */
+  @Inject
+  private GroupsProcessor groupsProcessor;
 
   /**
    * Perform processing of the uri.
@@ -458,6 +442,10 @@ public class WroManager
    * Check if all dependencies are set.
    */
   private void validate() {
+    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
+    Validate.notNull(groupsProcessor, "groupsProcessor was not set!");
+    Validate.notNull(uriLocatorFactory, "uriLocatorFactory was not set!");
+    Validate.notNull(processorsFactory, "processorsFactory was not set!");
     Validate.notNull(groupExtractor, "GroupExtractor was not set!");
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
@@ -481,8 +469,7 @@ public class WroManager
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
     // decorate with useful features
-    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
-        modelFactory))).setTransformers(modelTransformers);
+    this.modelFactory = modelFactory;
     return this;
   }
 
@@ -521,16 +508,47 @@ public class WroManager
   }
 
   /**
-   * @param modelTransformers the modelTransformers to set
+   * @param processorsFactory the processorsFactory to set
    */
-  public WroManager setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
-    Validate.notNull(modelTransformers);
-    this.modelTransformers = modelTransformers;
-    //allow model transformers to be aware of injected properties
-    for (final Transformer<WroModel> transformer : modelTransformers) {
-      LOG.debug("injecting: " + transformer);
-      injector.inject(transformer);
-    }
+  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+    this.processorsFactory = processorsFactory;
+  }
+
+  /**
+   * @param uriLocatorFactory the uriLocatorFactory to set
+   */
+  public void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+    this.uriLocatorFactory = uriLocatorFactory;
+  }
+
+  /**
+   * @return the cacheStrategy
+   */
+  public CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
+    return cacheStrategy;
+  }
+
+  /**
+   * @return the uriLocatorFactory
+   */
+  public UriLocatorFactory getUriLocatorFactory() {
+    return uriLocatorFactory;
+  }
+
+  /**
+   *
+   * @return The strategy used to rename bundled resources.
+   */
+  public final NamingStrategy getNamingStrategy() {
+    return this.namingStrategy;
+  }
+
+  /**
+   * @param namingStrategy the namingStrategy to set
+   */
+  public final WroManager setNamingStrategy(final NamingStrategy namingStrategy) {
+    Validate.notNull(namingStrategy);
+    this.namingStrategy = namingStrategy;
     return this;
   }
 }

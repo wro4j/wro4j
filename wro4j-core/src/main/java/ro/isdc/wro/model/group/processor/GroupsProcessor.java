@@ -34,7 +34,6 @@ import ro.isdc.wro.util.StopWatch;
  * @created Created on Nov 3, 2008
  */
 public class GroupsProcessor {
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
   @Inject
   private ProcessorsFactory processorsFactory;

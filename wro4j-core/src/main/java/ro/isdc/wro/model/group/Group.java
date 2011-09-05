@@ -33,7 +33,7 @@ public final class Group {
   /**
    * Resources of the group.
    */
-  private List<Resource> resources = new ArrayList<Resource>();
+  private final List<Resource> resources = new ArrayList<Resource>();
 
   /**
    * To be used by JSON serializer.
@@ -148,7 +148,7 @@ public final class Group {
     if (!hasResource(resource)) {
       resources.add(resource);
     } else {
-      LOG.warn("Resource {} is already contained in this group, skiping it.");
+      LOG.warn("Resource {} is already contained in this group, skiping it.", resource);
     }
     return this;
   }

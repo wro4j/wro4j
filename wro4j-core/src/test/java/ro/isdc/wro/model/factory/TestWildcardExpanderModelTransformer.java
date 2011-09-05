@@ -16,14 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.WroUtil;
@@ -33,7 +31,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestWildcardExpanderModelTransformer {
   private static final Logger LOG = LoggerFactory.getLogger(TestWildcardExpanderModelTransformer.class);
-  private WildcardExpanderModelTransformer factory;
+  private WildcardExpanderModelTransformer transformer;
   @Mock
   private WroModelFactory decoratedFactory;
   @Mock
@@ -43,19 +41,16 @@ public class TestWildcardExpanderModelTransformer {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     Context.set(Context.standaloneContext());
-    final UriLocatorFactory uriLocatorFactory = new DefaultUriLocatorFactory();
-    final Injector injector = new Injector(uriLocatorFactory, processorsFactory);
-
-    factory = new WildcardExpanderModelTransformer();
-
-    injector.inject(factory);
+    transformer = new WildcardExpanderModelTransformer();
+    //create manager to force correct initialization.
+    new BaseWroManagerFactory().setProcessorsFactory(processorsFactory).addModelTransformer(transformer).create();
   }
 
   @Test
   public void testEmptyModel() {
     final WroModel model = new WroModel();
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    final WroModel changedModel = factory.transform(model);
+    final WroModel changedModel = transformer.transform(model);
     Assert.assertEquals(model.getGroups().size(), changedModel.getGroups().size());
   }
 
@@ -65,7 +60,7 @@ public class TestWildcardExpanderModelTransformer {
     final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/file1.js", WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    final WroModel changedModel = factory.transform(model);
+    final WroModel changedModel = transformer.transform(model);
     Assert.assertEquals(1, changedModel.getGroups().size());
   }
 
@@ -78,7 +73,7 @@ public class TestWildcardExpanderModelTransformer {
     final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/INVALID.*", WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    final WroModel changedModel = factory.transform(model);
+    final WroModel changedModel = transformer.transform(model);
     Assert.assertEquals(1, changedModel.getGroups().size());
   }
 
@@ -89,7 +84,7 @@ public class TestWildcardExpanderModelTransformer {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
-    final WroModel changedModel = factory.transform(model);
+    final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: " + changedModel);
     Assert.assertEquals(1, changedModel.getGroupByName("group").getResources().size());
   }
@@ -101,7 +96,7 @@ public class TestWildcardExpanderModelTransformer {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
-    final WroModel changedModel = factory.transform(model);
+    final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: " + changedModel);
     Assert.assertEquals(3, changedModel.getGroupByName("group").getResources().size());
   }
@@ -113,7 +108,7 @@ public class TestWildcardExpanderModelTransformer {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
-    final WroModel changedModel = factory.transform(model);
+    final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: " + changedModel);
 
     final String resultPathPrefix = String.format("%s%s/expander/subfolder", ClasspathUriLocator.PREFIX, WroUtil.toPackageAsFolder(getClass()));

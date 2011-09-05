@@ -45,7 +45,7 @@ public class ModelTransformerFactory
   @Override
   public WroModel create() {
     WroModel model = super.create();
-    LOG.debug("using {} transformers", modelTransformers.size());
+    LOG.debug("using {} transformers", modelTransformers);
     for (final Transformer<WroModel> transformer : modelTransformers) {
       LOG.debug("using transformer: {}", transformer.getClass());
       //synchronize to avoid multiple replacement in concurrent environment
