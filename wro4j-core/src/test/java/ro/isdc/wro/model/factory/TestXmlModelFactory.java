@@ -21,9 +21,8 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * TestXmlModelFactory.

@@ -31,7 +31,7 @@ import ro.isdc.wro.model.resource.util.NamingStrategy;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final WroManager wroManager;
-  private final UriLocatorFactory uriLocatorFactory;
+  private final ResourceLocatorFactory resourceLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
   private final ProcessorsFactory processorsFactory;
   private final GroupsProcessor groupsProcessor;
@@ -43,8 +43,8 @@ public final class Injector {
     this.wroManager = wroManager;
     this.groupsProcessor = new GroupsProcessor();
 
-    this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(wroManager.getUriLocatorFactory(), this);
-    wroManager.setUriLocatorFactory(this.uriLocatorFactory);
+    this.resourceLocatorFactory = new InjectorResourceLocatorFactoryDecorator(wroManager.getResourceLocatorFactory(), this);
+    wroManager.setResourceLocatorFactory(this.resourceLocatorFactory);
 
     this.processorsFactory = new InjectorProcessorsFactoryDecorator(wroManager.getProcessorsFactory(), this);
     wroManager.setProcessorsFactory(this.processorsFactory);

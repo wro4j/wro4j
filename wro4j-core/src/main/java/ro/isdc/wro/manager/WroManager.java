@@ -445,7 +445,7 @@ public final class WroManager
   private void validate() {
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
     Validate.notNull(groupsProcessor, "groupsProcessor was not set!");
-    Validate.notNull(uriLocatorFactory, "uriLocatorFactory was not set!");
+    Validate.notNull(resourceLocatorFactory, "resourceLocatorFactory was not set!");
     Validate.notNull(processorsFactory, "processorsFactory was not set!");
     Validate.notNull(groupExtractor, "GroupExtractor was not set!");
     Validate.notNull(modelFactory, "ModelFactory was not set!");
@@ -515,11 +515,19 @@ public final class WroManager
     this.processorsFactory = processorsFactory;
   }
 
+
   /**
-   * @param uriLocatorFactory the uriLocatorFactory to set
+   * @return the resourceLocatorFactory
    */
-  public void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
+  public ResourceLocatorFactory getResourceLocatorFactory() {
+    return resourceLocatorFactory;
+  }
+
+  /**
+   * @param resourceLocatorFactory the resourceLocatorFactory to set
+   */
+  public void setResourceLocatorFactory(final ResourceLocatorFactory resourceLocatorFactory) {
+    this.resourceLocatorFactory = resourceLocatorFactory;
   }
 
   /**
@@ -527,13 +535,6 @@ public final class WroManager
    */
   public CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
     return cacheStrategy;
-  }
-
-  /**
-   * @return the uriLocatorFactory
-   */
-  public UriLocatorFactory getUriLocatorFactory() {
-    return uriLocatorFactory;
   }
 
   /**

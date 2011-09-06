@@ -60,7 +60,7 @@ public class CssImportPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
-    Validate.notNull(resourceLocatorFactory, "No UriLocator was injected");
+    Validate.notNull(resourceLocatorFactory, "No ResourceLocator was injected");
     Validate.notNull(preProcessorExecutor, "No preProcessorExecutor was injected");
     try {
       final String result = parseCss(resource, reader);

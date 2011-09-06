@@ -17,7 +17,6 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
@@ -30,10 +29,8 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
@@ -74,7 +71,7 @@ public class BaseWroManagerFactory
    * processed.
    */
   private List<Transformer<WroModel>> modelTransformers;
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory resourceLocatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
 
@@ -104,8 +101,8 @@ public class BaseWroManagerFactory
     if (processorsFactory == null) {
       processorsFactory = newProcessorsFactory();
     }
-    if (uriLocatorFactory == null) {
-      uriLocatorFactory = newUriLocatorFactory();
+    if (resourceLocatorFactory == null) {
+      resourceLocatorFactory = newResourceLocatorFactory();
     }
     //use NoOp as default naming strategy
     if (namingStrategy == null) {
@@ -116,7 +113,7 @@ public class BaseWroManagerFactory
     manager.setCacheStrategy(cacheStrategy);
     manager.setHashBuilder(hashBuilder);
     manager.registerCallback(cacheChangeCallback);
-    manager.setUriLocatorFactory(uriLocatorFactory);
+    manager.setResourceLocatorFactory(resourceLocatorFactory);
     manager.setProcessorsFactory(processorsFactory);
     manager.setNamingStrategy(namingStrategy);
     //wrap modelFactory with several useful decorators
@@ -306,8 +303,8 @@ public class BaseWroManagerFactory
   /**
    * @param uriLocatorFactory the uriLocatorFactory to set
    */
-  public BaseWroManagerFactory setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
+  public BaseWroManagerFactory setResourceLocatorFactory(final ResourceLocatorFactory uriLocatorFactory) {
+    this.resourceLocatorFactory = uriLocatorFactory;
     return this;
   }
 
