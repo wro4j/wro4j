@@ -131,9 +131,8 @@ public class TestWroManager {
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
       Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    final WroManagerFactory factory = new BaseWroManagerFactory();
+    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
     manager = factory.create();
-    manager.setModelFactory(getValidModelFactory());
   }
 
   private class GenericTestBuilder {

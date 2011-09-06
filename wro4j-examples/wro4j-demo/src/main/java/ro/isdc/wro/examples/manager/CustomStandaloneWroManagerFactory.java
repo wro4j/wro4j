@@ -37,6 +37,7 @@ public class CustomStandaloneWroManagerFactory
 
     factory.addPostProcessor(new LessCssProcessor());
     factory.addPostProcessor(new CssVariablesProcessor());
+    setNamingStrategy(namingStrategy)
     return factory;
   }
 }

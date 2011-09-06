@@ -20,8 +20,6 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.FileSystemResourceLocator;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 
 /**
  * {@link WroManagerFactory} instance used by the maven plugin.
@@ -35,10 +33,6 @@ public class DefaultStandaloneContextAwareManagerFactory
    * Context used by stand-alone process.
    */
   private StandaloneContext standaloneContext;
-  /**
-   * Rename the file name based on its original name and content.
-   */
-  private NamingStrategy namingStrategy;
   /**
    * {@inheritDoc}
    */
@@ -79,24 +73,5 @@ public class DefaultStandaloneContextAwareManagerFactory
   @Override
   protected ResourceLocatorFactory newResourceLocatorFactory() {
     return DefaultResourceLocatorFactory.standaloneFactory(standaloneContext.getContextFolder());
-  }
-
-  /**
-   * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.
-   *
-   * @return a not null {@link NamingStrategy}. If no {@link NamingStrategy} is set, a NoOp implementation will return.
-   */
-  public final NamingStrategy getNamingStrategy() {
-    if (namingStrategy == null) {
-      namingStrategy = new NoOpNamingStrategy();
-    }
-    return this.namingStrategy;
-  }
-
-  /**
-   * @param namingStrategy the namingStrategy to set
-   */
-  public final void setNamingStrategy(final NamingStrategy namingStrategy) {
-    this.namingStrategy = namingStrategy;
   }
 }

@@ -23,7 +23,7 @@ import ro.isdc.wro.util.StopWatch;
 
 
 /**
- * YUICssCompressorProcessor - an adapter for YUI js compression utility for processing js resources.
+ * Compresses javascript code using compressor implemented by Dojo Shrinksafe utility.
  *
  * @author Alex Objelean
  * @created Created on Dec 4, 2008

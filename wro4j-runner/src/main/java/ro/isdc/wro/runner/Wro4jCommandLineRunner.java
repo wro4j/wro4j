@@ -257,7 +257,7 @@ public class Wro4jCommandLineRunner {
    */
   private String rename(final String group, final InputStream input)
     throws IOException {
-    return getManagerFactory().getNamingStrategy().rename(group, input);
+    return getManagerFactory().create().getNamingStrategy().rename(group, input);
   }
 
 

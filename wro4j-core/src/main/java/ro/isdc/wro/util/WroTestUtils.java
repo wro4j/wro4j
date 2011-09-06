@@ -33,6 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -94,6 +97,9 @@ public class WroTestUtils {
     return createDefaultUriLocatorFactory().locate(uri).getInputStream();
   }
 
+  public static void init(final WroModelFactory factory) {
+    new BaseWroManagerFactory().setModelFactory(factory).create();
+  }
 
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourceProcessor processor)
@@ -107,8 +113,8 @@ public class WroTestUtils {
    * @return the injector
    */
   public static void initProcessor(final ResourceProcessor processor) {
-    final Injector injector = new Injector(
-      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPreProcessor(processor));
+    final WroManager manager = new BaseWroManagerFactory().setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor)).create();
+    final Injector injector = new Injector(manager);
     injector.inject(processor);
   }
 

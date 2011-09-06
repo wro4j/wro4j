@@ -5,6 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,7 @@ public class InjectorProcessorsFactoryDecorator
 
   public InjectorProcessorsFactoryDecorator(final ProcessorsFactory decorated, final Injector injector) {
     super(decorated);
-    if (injector == null) {
-      throw new IllegalArgumentException("injector cannot be null!");
-    }
+    Validate.notNull(injector);
     this.injector = injector;
   }
 
@@ -46,7 +45,8 @@ public class InjectorProcessorsFactoryDecorator
   /**
    * Scan all preProcessors of decorated factory.
    */
-  protected void scanPreProcessors() {
+  private void scanPreProcessors() {
+    LOG.debug("scanPreProcessors");
     // TODO ensure that it is not called to often
     for (final ResourceProcessor processor : super.getPreProcessors()) {
       injector.inject(processor);
@@ -64,7 +64,8 @@ public class InjectorProcessorsFactoryDecorator
   }
 
 
-  protected void scanPostProcessors() {
+  private void scanPostProcessors() {
+    LOG.debug("scanPostProcessors");
     final StopWatch watch = new StopWatch();
     watch.start("scan post processors");
     // TODO ensure that it is not called to often

@@ -43,7 +43,7 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
