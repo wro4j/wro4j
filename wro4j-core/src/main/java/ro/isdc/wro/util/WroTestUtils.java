@@ -387,7 +387,7 @@ public class WroTestUtils {
         });
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath(), e);
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }
