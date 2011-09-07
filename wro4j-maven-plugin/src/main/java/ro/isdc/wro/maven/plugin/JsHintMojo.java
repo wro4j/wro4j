@@ -3,6 +3,10 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
 import org.apache.maven.plugin.MojoExecutionException;
 
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -28,6 +32,15 @@ public class JsHintMojo extends AbstractSingleProcessorMojo {
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
     final ResourcePreProcessor processor = new JsHintProcessor() {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
+        getLog().info("processing resource: " + resource);
+        if (resource != null) {
+          getLog().info("processing resource: " + resource.getUri());
+        }
+        super.process(resource, reader, writer);
+      }
+
       @Override
       protected void onJsHintException(final JsHintException e, final Resource resource)
         throws Exception {

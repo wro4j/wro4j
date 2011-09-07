@@ -90,7 +90,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   public final void execute()
     throws MojoExecutionException {
     validate();
-    extendPluginClasspath();
+
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
@@ -98,6 +98,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
     getLog().info("wroManagerFactory: " + this.wroManagerFactory);
 
+    extendPluginClasspath();
     Context.set(Context.standaloneContext());
     try {
       doExecute();
@@ -131,7 +132,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    *
    * @return {@link WroManagerFactory} implementation.
    */
-  protected final StandaloneContextAwareManagerFactory getManagerFactory()
+  protected StandaloneContextAwareManagerFactory getManagerFactory()
     throws Exception {
     if (managerFactory == null) {
       managerFactory = newWroManagerFactory();
@@ -212,7 +213,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * Update the classpath.
    */
-  @SuppressWarnings("unchecked")
   protected final void extendPluginClasspath()
     throws MojoExecutionException {
     // this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html

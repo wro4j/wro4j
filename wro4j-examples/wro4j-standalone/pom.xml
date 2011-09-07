@@ -53,7 +53,7 @@
         </executions>
         <configuration>
           <ignoreMissingResources>false</ignoreMissingResources>          
-          <failNever>true</failNever>          
+          <failNever>false</failNever>          
 		      <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
           <!--
           <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
