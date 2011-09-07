@@ -124,7 +124,9 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * Perform actual plugin processing.
    */
-  protected abstract void doExecute() throws Exception;
+  protected abstract void doExecute()
+    throws Exception;
+
 
   /**
    * This method will ensure that you have a right and initialized instance of
@@ -141,6 +143,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     }
     return managerFactory;
   }
+
 
   /**
    * {@inheritDoc}
@@ -184,7 +187,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
 
-
   /**
    * @return a list containing all groups needs to be processed.
    */
@@ -196,6 +198,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     }
     return Arrays.asList(getTargetGroups().split(","));
   }
+
 
   /**
    * Checks if all required fields are configured.
@@ -209,6 +212,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       throw new MojoExecutionException("contextFolder was not set!");
     }
   }
+
 
   /**
    * Update the classpath.
@@ -246,12 +250,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
   }
 
+
   /**
    * @param contextFolder the servletContextFolder to set
    */
   public void setContextFolder(final File contextFolder) {
     this.contextFolder = contextFolder;
   }
+
 
   /**
    * @param wroFile the wroFile to set
@@ -260,12 +266,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.wroFile = wroFile;
   }
 
+
   /**
    * @return the wroFile
    */
   public File getWroFile() {
     return this.wroFile;
   }
+
 
   /**
    * @return the contextFolder
@@ -274,12 +282,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return this.contextFolder;
   }
 
+
   /**
    * @param minimize flag for minimization.
    */
   public void setMinimize(final boolean minimize) {
     this.minimize = minimize;
   }
+
 
   /**
    * @param ignoreMissingResources the ignoreMissingResources to set
@@ -295,6 +305,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   public boolean isMinimize() {
     return this.minimize;
   }
+
 
   /**
    * @return the ignoreMissingResources
@@ -313,6 +324,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.mavenProject = mavenProject;
   }
 
+
   /**
    * @return the targetGroups
    */
@@ -320,13 +332,13 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return this.targetGroups;
   }
 
+
   /**
    * @param versionEncoder(targetGroups) comma separated group names.
    */
   public void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
   }
-
 
 
   /**

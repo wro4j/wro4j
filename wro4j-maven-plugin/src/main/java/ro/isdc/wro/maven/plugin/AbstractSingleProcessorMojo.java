@@ -82,6 +82,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     //perform processing
+    getLog().info("ManagerFactory: " + getManagerFactory().create());
     getManagerFactory().create().process();
 
     getLog().info("Success processing group: " + group);
@@ -100,7 +101,9 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
         return factory.getNamingStrategy();
       }
       public WroManager create() {
-        return factory.create().setProcessorsFactory(createSingleProcessorFactory());
+        final WroManager manager = factory.create().setProcessorsFactory(createSingleProcessorsFactory());
+        getLog().info("DecoratedManager: " + manager);
+        return manager;
       }
       public void destroy() {
         factory.destroy();
@@ -111,7 +114,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     };
   }
 
-  private ProcessorsFactory createSingleProcessorFactory() {
+  private ProcessorsFactory createSingleProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
     final ResourcePreProcessor processor = createResourceProcessor();
     factory.addPreProcessor(processor);
