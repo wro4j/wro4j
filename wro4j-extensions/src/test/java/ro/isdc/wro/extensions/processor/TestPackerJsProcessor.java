@@ -23,9 +23,11 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestPackerJsProcessor {
   private ResourceProcessor processor;
+  private File testFolder;
 
   @Before
   public void setUp() {
+    testFolder = new File(ClassLoader.getSystemResource("test").getFile());
     processor = new PackerJsProcessor();
   }
 
@@ -33,7 +35,7 @@ public class TestPackerJsProcessor {
   public void testFromFolder() throws IOException {
     final URL url = getClass().getResource("packer");
 
-    final File testFolder = new File(url.getFile(), "test");
+    //final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }

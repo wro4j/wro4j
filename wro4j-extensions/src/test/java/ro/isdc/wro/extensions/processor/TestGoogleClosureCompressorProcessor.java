@@ -26,11 +26,13 @@ import com.google.javascript.jscomp.CompilerOptions;
  * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor {
+  private File testFolder;
   private GoogleClosureCompressorProcessor processor;
 
 
   @Before
   public void setUp() {
+    testFolder = new File(ClassLoader.getSystemResource("test").getFile());
     processor = new GoogleClosureCompressorProcessor() {
       @Override
       protected CompilerOptions newCompilerOptions() {
@@ -50,7 +52,6 @@ public class TestGoogleClosureCompressorProcessor {
     processor.setCompilationLevel(CompilationLevel.WHITESPACE_ONLY);
     final URL url = getClass().getResource("google");
 
-    final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
@@ -62,7 +63,6 @@ public class TestGoogleClosureCompressorProcessor {
     processor.setCompilationLevel(CompilationLevel.SIMPLE_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
-    final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedSimple");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
@@ -74,7 +74,6 @@ public class TestGoogleClosureCompressorProcessor {
     processor.setCompilationLevel(CompilationLevel.ADVANCED_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
-    final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedAdvanced");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }

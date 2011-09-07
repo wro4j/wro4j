@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
@@ -22,12 +23,18 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Nov 28, 2008
  */
 public class TestYUIJsCompressorProcessor {
+  private File testFolder;
+
+  @Before
+  public void setUp() {
+    testFolder = new File(ClassLoader.getSystemResource("test").getFile());
+  }
+
   @Test
   public void testNoMunge() throws IOException {
     final ResourceProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
     final URL url = getClass().getResource("yui");
 
-    final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedNomunge");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
       processor);
@@ -40,7 +47,6 @@ public class TestYUIJsCompressorProcessor {
     final ResourceProcessor processor = YUIJsCompressorProcessor.noMungeCompressor();
     final URL url = getClass().getResource("yui");
 
-    final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedMunge");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
