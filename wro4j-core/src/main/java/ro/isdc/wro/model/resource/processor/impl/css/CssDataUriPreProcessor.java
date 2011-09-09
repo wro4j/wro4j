@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
+import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 
 
 /**
@@ -55,7 +55,7 @@ public class CssDataUriPreProcessor
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
     Validate.notNull(resourceLocatorFactory);
-    LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
+    LOG.debug("replace url for image: {} from css: {}", imageUrl, cssUri);
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     final String fileName = FilenameUtils.getName(imageUrl);
     String fullPath = cleanImageUrl;
@@ -77,7 +77,7 @@ public class CssDataUriPreProcessor
       final String dataUri = getDataUriGenerator().generateDataURI(inputStream, fileName);
       if (replaceWithDataUri(dataUri)) {
         result = dataUri;
-        LOG.debug("dataUri replacement: " + StringUtils.abbreviate(dataUri, 30));
+        LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));
       }
     } catch (final IOException e) {
       LOG.warn("Couldn't extract dataUri from:" + fullPath + ", because: " + e.getMessage());
@@ -102,7 +102,7 @@ public class CssDataUriPreProcessor
   protected boolean replaceWithDataUri(final String dataUri) throws UnsupportedEncodingException {
     final byte[] bytes = dataUri.getBytes("UTF8");
     final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
-    LOG.debug("dataUri size: " + bytes.length/1024 + "KB, limit exceeded: " + exceedLimit);
+    LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length/1024, exceedLimit);
     return !exceedLimit;
   }
 

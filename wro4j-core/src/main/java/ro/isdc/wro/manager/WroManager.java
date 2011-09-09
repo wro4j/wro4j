@@ -191,8 +191,7 @@ public final class WroManager
     final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
 
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-      LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
-        + " status code");
+      LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       // because we cannot return null, return a stream containing nothing.
       return EMPTY_STREAM;
@@ -212,7 +211,7 @@ public final class WroManager
     response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
     stopWatch.stop();
-    LOG.debug("WroManager process time: " + stopWatch.prettyPrint());
+    LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
     return inputStream;
   }
 
@@ -266,7 +265,7 @@ public final class WroManager
   private ContentHashEntry getContentHashEntry(final String groupName, final ResourceType type, final boolean minimize)
     throws IOException {
     final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
-    LOG.debug("Searching cache entry: " + cacheEntry);
+    LOG.debug("Searching cache entry: {}", cacheEntry);
     // Cache based on uri
     ContentHashEntry contentHashEntry = cacheStrategy.get(cacheEntry);
     if (contentHashEntry == null) {
@@ -298,11 +297,11 @@ public final class WroManager
     throws IOException {
     String hash = null;
     if (content != null) {
-      LOG.debug("Content to fingerprint: [" + StringUtils.abbreviate(content, 40) + "]");
+      LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 40));
       hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
     }
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
-    LOG.debug("computed entry: " + entry);
+    LOG.debug("computed entry: {}", entry);
     return entry;
   }
 
@@ -313,7 +312,7 @@ public final class WroManager
   private void initScheduler() {
     if (scheduler == null) {
       final long period = Context.get().getConfig().getCacheUpdatePeriod();
-      LOG.debug("runing thread with period of " + period);
+      LOG.debug("runing thread with period of {}", period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
         // Run a scheduled task which updates the model.
@@ -392,7 +391,7 @@ public final class WroManager
   private InputStream locateInputeStream(final HttpServletRequest request)
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-    LOG.debug("locating stream for resourceId: " + resourceId);
+    LOG.debug("locating stream for resourceId: {}", resourceId);
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
       processorsFactory.getPreProcessors());
     if (processor != null && !processor.isUriAllowed(resourceId)) {

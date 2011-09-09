@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.CSSMin;
+import ro.isdc.wro.model.resource.processor.support.CSSMin;
 
 
 /**

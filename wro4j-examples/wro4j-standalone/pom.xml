@@ -43,9 +43,10 @@
         <executions>
           <execution>
             <goals>
-              <goal>run</goal>
-              <!--
               <goal>jshint</goal>
+              <!--
+			  <goal>run</goal>
+              
               <goal>csslint</goal>
               -->
             </goals>
@@ -55,6 +56,7 @@
           <ignoreMissingResources>false</ignoreMissingResources>          
           <failNever>true</failNever>          
 		      <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>		  		  
+			  <options>browser,jquery,curly,eqnull,evil,forin,noarg</options>
           <!--
           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>

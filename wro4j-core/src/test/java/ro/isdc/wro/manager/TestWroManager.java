@@ -311,7 +311,7 @@ public class TestWroManager {
     Mockito.doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
         throws Throwable {
-        LOG.debug("Header: " + Arrays.toString(invocation.getArguments()));
+        LOG.debug("Header: {}", Arrays.toString(invocation.getArguments()));
         final Object[] arguments = invocation.getArguments();
         if (HttpHeader.ETAG.toString().equals(arguments[0])) {
           final String etagHeaderValue = (String)arguments[1];

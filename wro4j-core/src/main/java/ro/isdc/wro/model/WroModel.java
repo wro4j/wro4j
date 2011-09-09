@@ -57,7 +57,7 @@ public final class WroModel {
    */
   public final WroModel setGroups(final Collection<Group> groups) {
     Validate.notNull(groups, "groups cannot be null!");
-    LOG.debug("setGroups: " + groups);
+    LOG.debug("setGroups: {}", groups);
     identifyDuplicateGroupNames(groups);
     this.groups = new HashSet<Group>(groups);
     return this;
@@ -103,7 +103,7 @@ public final class WroModel {
    */
   public void merge(final WroModel importedModel) {
     Validate.notNull(importedModel, "imported model cannot be null!");
-    LOG.debug("merging importedModel: " + importedModel);
+    LOG.debug("merging importedModel: {}", importedModel);
     for (final String groupName : importedModel.getGroupNames()) {
       if (getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);

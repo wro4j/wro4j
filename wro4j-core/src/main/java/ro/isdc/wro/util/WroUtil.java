@@ -209,12 +209,12 @@ public final class WroUtil {
       final NodeList nodes = (NodeList) result;
       for (int i = 0; i < nodes.getLength(); i++) {
         final Node node = nodes.item(i);
-        LOG.debug("node: " + node);
+        LOG.debug("\tnode: {}", node);
         if (filterName.equals(node.getTextContent())) {
           final Node filterMappingNode = node.getParentNode().getParentNode();
-          LOG.debug("filterMappingNode: " + filterMappingNode);
+          LOG.debug("filterMappingNode: {}", filterMappingNode);
           urlPattern = urlPatternExpression.evaluate(filterMappingNode);
-          LOG.debug("urlPattern: " + urlPattern);
+          LOG.debug("urlPattern: {}", urlPattern);
         }
       }
 

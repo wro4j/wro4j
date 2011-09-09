@@ -92,10 +92,10 @@ public class CssImportPreProcessor
     //groupExtractor.isMinimized(Context.get().getRequest())
     sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
     if (!importsCollector.isEmpty()) {
-      LOG.debug("Imported resources found : " + importsCollector.size());
+      LOG.debug("Imported resources found : {}", importsCollector.size());
     }
     sb.append(IOUtils.toString(reader));
-    LOG.debug("importsCollector: " + importsCollector);
+    LOG.debug("importsCollector: {}", importsCollector);
     return removeImportStatements(sb.toString());
   }
 

@@ -258,7 +258,7 @@ public class WroFilter
           + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
       }
     }
-    LOG.debug("Header Values: " + headersMap);
+    LOG.debug("Header Values: {}", headersMap);
   }
 
 
@@ -268,7 +268,7 @@ public class WroFilter
    * @param header value to parse.
    */
   private void parseHeader(final String header) {
-    LOG.debug("parseHeader: " + header);
+    LOG.debug("parseHeader: {}", header);
     final String headerName = header.substring(0, header.indexOf(":"));
     if (!headersMap.containsKey(headerName)) {
       headersMap.put(headerName, header.substring(header.indexOf(":") + 1));

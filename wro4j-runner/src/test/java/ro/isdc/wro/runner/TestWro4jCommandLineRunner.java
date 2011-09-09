@@ -75,7 +75,7 @@ public class TestWro4jCommandLineRunner {
 
     setDestinationFolder(new File(contextFolder, "targetCssFolder"));
     final String wroFile = contextFolder + "\\wro.xml";
-    LOG.debug("wroFile: " + wroFile);
+    LOG.debug("wroFile: {}", wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(
       "--wroFile %s --contextFolder %s --destinationFolder %s -m --preProcessors " + processorsList,
@@ -97,7 +97,7 @@ public class TestWro4jCommandLineRunner {
   public void useSeveralProcessors() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + "\\wro.xml";
-    LOG.debug("wroFile: " + wroFile);
+    LOG.debug("wroFile: {}", wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
       JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(

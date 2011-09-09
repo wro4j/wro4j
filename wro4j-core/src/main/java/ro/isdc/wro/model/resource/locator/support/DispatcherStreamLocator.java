@@ -91,11 +91,11 @@ public final class DispatcherStreamLocator {
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
-      LOG.debug("Error while dispatching the request for location " + location, e);
+      LOG.debug("[FAIL] Error while dispatching the request for location {}", location, e);
       throw new IOException("Error while dispatching the request for location " + location, e);
     } finally {
       if (os.size() == 0) {
-        LOG.warn("Wrong or empty resource with location : " + location);
+        LOG.warn("Wrong or empty resource with location: {}", location);
       }
       //Put the context back
       if (!Context.isContextSet()) {
@@ -173,7 +173,7 @@ public final class DispatcherStreamLocator {
        * @param msg
        */
       private void onError(final int sc, final String msg) {
-        LOG.debug("Error detected with code: " + sc + " and message: " + msg);
+        LOG.debug("Error detected with code: {} and message: {}", sc, msg);
         final OutputStream emptyStream = new ByteArrayOutputStream();
         pw = new PrintWriter(emptyStream);
         sos = new DelegatingServletOutputStream(emptyStream);
@@ -193,7 +193,7 @@ public final class DispatcherStreamLocator {
       public void sendRedirect(final String location)
           throws IOException {
         try {
-          LOG.debug("redirecting to: " + location);
+          LOG.debug("redirecting to: {}", location);
           final URL url = new URL(location);
           final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
           // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.

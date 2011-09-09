@@ -44,7 +44,7 @@ public abstract class AbstractDigesterHashBuilder
       final byte[] digest = messageDigest.digest();
       final String hash = new BigInteger(1, digest).toString(16);
 
-      LOG.debug(getClass().getSimpleName() + " hash: " + hash);
+      LOG.debug("{} hash: {}", getClass().getSimpleName(), hash);
       return hash;
     } catch (final NoSuchAlgorithmException e) {
       throw new WroRuntimeException("Exception occured while computing SHA1 hash", e);

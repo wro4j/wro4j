@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.less.LessCss;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -56,7 +55,7 @@ public class TestLessCssProcessor {
     final ResourceProcessor processor = new LessCssProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
-        LOG.debug("Exception message is: " + e.getMessage());
+        LOG.debug("[FAIL] Exception message is: {}", e.getMessage());
         throw e;
       };
     };

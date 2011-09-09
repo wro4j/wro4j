@@ -39,7 +39,7 @@ public final class Injector {
    * Creates the Injector and initialize the provided manager.
    */
   public Injector(final WroManager wroManager) {
-    Validate.notNull(wroManager, "wroManager cannot be null");
+    Validate.notNull(wroManager);
     this.wroManager = wroManager;
     this.groupsProcessor = new GroupsProcessor();
 
@@ -66,7 +66,7 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
-    Validate.notNull(object, "Object cannot be null!");
+    Validate.notNull(object);
     processInjectAnnotation(object);
   }
 
@@ -78,7 +78,7 @@ public final class Injector {
    * @param processor object to check for annotation presence.
    */
   private void processInjectAnnotation(final Object processor) {
-    LOG.debug("processInjectAnnotation for: {}", processor);
+    LOG.debug("processInjectAnnotation for: {}", processor.getClass().getSimpleName());
     try {
       final Collection<Field> fields = getAllFields(processor);
       for (final Field field : fields) {
@@ -101,7 +101,6 @@ public final class Injector {
    */
   private Collection<Field> getAllFields(final Object object) {
     final Collection<Field> fields = new ArrayList<Field>();
-    LOG.debug("getAllFields of: " + object);
     fields.addAll(Arrays.asList(object.getClass().getDeclaredFields()));
     // inspect super classes
     Class<?> superClass = object.getClass().getSuperclass();
@@ -155,7 +154,7 @@ public final class Injector {
       return accept;
     } finally {
       if (accept) {
-        LOG.debug("[OK] Injected field of type: " + field.getType());
+        LOG.debug("\t[OK] Injected field of type: {}", field.getType().getSimpleName());
       }
     }
   }

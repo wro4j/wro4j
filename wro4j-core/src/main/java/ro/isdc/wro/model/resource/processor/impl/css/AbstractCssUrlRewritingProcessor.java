@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
+import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 
 
 /**

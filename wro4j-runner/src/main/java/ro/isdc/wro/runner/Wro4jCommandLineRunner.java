@@ -35,10 +35,10 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
-import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -116,7 +116,7 @@ public class Wro4jCommandLineRunner {
     watch.start("processing");
     try {
       parser.parseArgument(args);
-      LOG.debug("Options: " + this);
+      LOG.debug("Options: {}", this);
       process();
     } catch (final Exception e) {
       System.err.println(e.getMessage() + "\n\n");
@@ -203,7 +203,7 @@ public class Wro4jCommandLineRunner {
       destinationFile.createNewFile();
       // allow the same stream to be read again
       resultInputStream.reset();
-      LOG.debug("Created file: " + destinationFile.getName());
+      LOG.debug("Created file: {}", destinationFile.getName());
 
       final OutputStream fos = new FileOutputStream(destinationFile);
       // use reader to detect encoding
