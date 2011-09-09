@@ -85,7 +85,7 @@ public class TestWildcardExpanderModelTransformer {
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
     final WroModel changedModel = transformer.transform(model);
-    LOG.debug("model: " + changedModel);
+    LOG.debug("model: {}", changedModel);
     Assert.assertEquals(1, changedModel.getGroupByName("group").getResources().size());
   }
 
@@ -97,7 +97,7 @@ public class TestWildcardExpanderModelTransformer {
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
     final WroModel changedModel = transformer.transform(model);
-    LOG.debug("model: " + changedModel);
+    LOG.debug("model: {}", changedModel);
     Assert.assertEquals(3, changedModel.getGroupByName("group").getResources().size());
   }
 
@@ -109,7 +109,7 @@ public class TestWildcardExpanderModelTransformer {
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 
     final WroModel changedModel = transformer.transform(model);
-    LOG.debug("model: " + changedModel);
+    LOG.debug("model: {}", changedModel);
 
     final String resultPathPrefix = String.format("%s%s/expander/subfolder", ClasspathUriLocator.PREFIX, WroUtil.toPackageAsFolder(getClass()));
 

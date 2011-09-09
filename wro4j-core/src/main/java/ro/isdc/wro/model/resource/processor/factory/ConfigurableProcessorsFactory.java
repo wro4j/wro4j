@@ -115,8 +115,8 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
     final List<T> list = new ArrayList<T>();
     final List<String> tokenNames = getTokens(itemsAsString);
     for (final String tokenName : tokenNames) {
-      LOG.debug("tokenName: " + tokenName);
-      Validate.notEmpty(tokenName, "Invalid token name: " + tokenName);
+      LOG.debug("\ttokenName: {}", tokenName);
+      Validate.notEmpty(tokenName);
       final T processor = map.get(tokenName.trim());
       if (processor == null) {
         throw new WroRuntimeException("Unknown processor name: " + tokenName + ". Available processors are: "

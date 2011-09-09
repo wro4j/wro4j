@@ -39,7 +39,7 @@ public class CRC32HashBuilder
     }
 
     final String hash = new BigInteger(Long.toString(checksum.getValue())).toString(16);
-    LOG.debug("CRC32 hash: " + hash);
+    LOG.debug("CRC32 hash: {}", hash);
     return hash;
   }
 }

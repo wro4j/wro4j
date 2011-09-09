@@ -92,7 +92,7 @@ public class GroupsProcessor {
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
-    LOG.debug("postProcessors: " + processors);
+    LOG.debug("postProcessors: {}", processors);
     final String output = applyPostProcessors(processors, content);
     return output;
   }

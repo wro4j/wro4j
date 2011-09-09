@@ -84,7 +84,7 @@ public class ServletContextUriLocator
   public InputStream locate(final String uri)
     throws IOException {
     Validate.notNull(uri, "URI cannot be NULL!");
-    LOG.debug("uri resource: " + uri);
+    LOG.debug("locate resource: {}", uri);
     final ServletContext servletContext = Context.get().getServletContext();
 
     try {
@@ -99,7 +99,7 @@ public class ServletContextUriLocator
         return getWildcardStreamLocator().locateStream(uri, new File(realPath));
       }
     } catch (final IOException e) {
-      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
+      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
         + "\".\n Trying to locate the stream without the wildcard.");
     }
 

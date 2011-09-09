@@ -162,7 +162,7 @@ public final class WroConfiguration
    */
   private void reloadCacheWithNewValue(final Long newValue) {
     final long newValueAsPrimitive = newValue == null ? getModelUpdatePeriod() : newValue;
-    LOG.debug("invoking " + cacheUpdatePeriodListeners.size() + " listeners");
+    LOG.debug("invoking {} listeners", cacheUpdatePeriodListeners.size());
     for (final PropertyChangeListener listener : cacheUpdatePeriodListeners) {
       final PropertyChangeEvent event = new PropertyChangeEvent(
         this, "cache", getCacheUpdatePeriod(), newValueAsPrimitive);
