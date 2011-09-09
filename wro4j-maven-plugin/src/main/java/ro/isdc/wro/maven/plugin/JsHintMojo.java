@@ -5,8 +5,8 @@ package ro.isdc.wro.maven.plugin;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 

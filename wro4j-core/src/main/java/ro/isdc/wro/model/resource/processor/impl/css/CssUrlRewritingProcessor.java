@@ -146,7 +146,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    */
   @Override
   protected void onProcessCompleted() {
-    LOG.debug("allowed urls: " + allowedUrls);
+    LOG.debug("allowed urls: {}", allowedUrls);
   }
 
 

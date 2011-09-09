@@ -56,7 +56,7 @@ public class DojoShrinksafeCompressorProcessor
     try {
       final String script = IOUtils.toString(reader);
       final String stripConsole = null; //normal, warn, all
-      LOG.debug("compressing script: " + StringUtils.abbreviate(script, 40));
+      LOG.debug("compressing script: {}", StringUtils.abbreviate(script, 40));
       final String out = Compressor.compressScript(script, 0, 0, stripConsole);
 
       writer.write(out);

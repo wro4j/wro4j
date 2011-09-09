@@ -31,12 +31,11 @@ public abstract class AbstractUriLocatorFactory implements UriLocatorFactory {
    */
   public final InputStream locate(final String uri)
     throws IOException {
-    LOG.debug("locate: " + uri);
     final UriLocator uriLocator = getInstance(uri);
-    LOG.debug("using locator: " + uriLocator);
     if (uriLocator == null) {
       throw new IOException("No locator is capable of handling uri: " + uri);
     }
+    LOG.debug("[OK] locating {} using locator: {}", uri, uriLocator.getClass().getSimpleName());
     return new AutoCloseInputStream(uriLocator.locate(uri));
   }
 }

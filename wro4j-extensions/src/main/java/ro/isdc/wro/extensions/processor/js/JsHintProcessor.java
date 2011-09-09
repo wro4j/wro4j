@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHint;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHint;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;

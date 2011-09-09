@@ -97,9 +97,9 @@ public class DefaultWildcardStreamLocator
     }
 
     final String wildcard = FilenameUtils.getName(uri);
-    LOG.debug("uri: " + uri);
-    LOG.debug("folder: " + folder.getPath());
-    LOG.debug("wildcard: " + wildcard);
+    LOG.debug("uri: {}", uri);
+    LOG.debug("folder: {}", folder.getPath());
+    LOG.debug("wildcard: {}", wildcard);
 
     //maps resource uri's and corresponding file
     //this map has to be ordered
@@ -122,7 +122,7 @@ public class DefaultWildcardStreamLocator
             final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
             final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
             uriToFileMap.put(resourceUri, file);
-            LOG.debug("foundUri: " + resourceUri);
+            LOG.debug("\tfoundUri: {}", resourceUri);
           }
         }
         return accept;
@@ -131,12 +131,11 @@ public class DefaultWildcardStreamLocator
     FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
 
     //TODO remove duplicates if needed:
-    LOG.debug("map files: " + uriToFileMap.keySet());
+    LOG.debug("map files: {}", uriToFileMap.keySet());
 
     final Collection<File> files = uriToFileMap.values();
     if (files.isEmpty()) {
-      final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
-      LOG.warn(message);
+      LOG.warn("No files found inside the {} for wildcard: {}", folder.getPath(), wildcard);
     }
     handleFoundResources(files);
     //trigger wildcardExpander processing

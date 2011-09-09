@@ -63,7 +63,7 @@ public class DefaultGroupExtractor
     try {
       type = ResourceType.valueOf(extension.toUpperCase());
     } catch (final IllegalArgumentException e) {
-      LOG.debug("Cannot identify resourceType for uri: " + uri);
+      LOG.debug("[FAIL] Cannot identify resourceType for uri: {}", uri);
     }
     return type;
   }

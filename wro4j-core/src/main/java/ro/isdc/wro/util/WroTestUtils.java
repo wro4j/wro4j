@@ -281,12 +281,12 @@ public class WroTestUtils {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
-      LOG.debug("processing: " + file.getName());
+      LOG.debug("processing: {}", file.getName());
       File targetFile = null;
       try {
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("comparing with: " + targetFile.getName());
+        LOG.debug("comparing with: {}", targetFile.getName());
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
@@ -304,12 +304,12 @@ public class WroTestUtils {
 
 
   private static void logSuccess(final int size) {
-    LOG.debug("===============");
-    LOG.debug("Successfully compared: " + size + " files.");
-    LOG.debug("===============");
     if (size == 0) {
       throw new IllegalStateException("No files compared. Check if there is at least one resource to compare");
     }
+    LOG.debug("===============");
+    LOG.debug("Successfully compared: {} files.", size);
+    LOG.debug("===============");
   }
 
 
@@ -365,8 +365,8 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePreProcessor preProcessor)
     throws IOException {
-    LOG.debug("sourceFolder: " + sourceFolder);
-    LOG.debug("targetFolder: " + targetFolder);
+    LOG.debug("sourceFolder: {}", sourceFolder);
+    LOG.debug("targetFolder: {}", targetFolder);
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
@@ -374,7 +374,7 @@ public class WroTestUtils {
       try {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("processing: " + file.getName());
+        LOG.debug("processing: {}", file.getName());
         // ResourceType doesn't matter here
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)

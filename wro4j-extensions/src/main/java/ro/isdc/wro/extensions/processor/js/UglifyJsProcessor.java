@@ -4,7 +4,7 @@
  */
 package ro.isdc.wro.extensions.processor.js;
 
-import ro.isdc.wro.extensions.processor.algorithm.uglify.UglifyJs;
+import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;

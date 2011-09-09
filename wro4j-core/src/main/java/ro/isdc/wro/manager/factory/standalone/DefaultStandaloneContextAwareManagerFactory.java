@@ -40,8 +40,8 @@ public class DefaultStandaloneContextAwareManagerFactory
     this.standaloneContext = standaloneContext;
     //This is important in order to make plugin aware about ignoreMissingResources option.
     Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
-    LOG.debug("initialize: " + standaloneContext);
-    LOG.debug("config: " + Context.get().getConfig());
+    LOG.debug("initialize: {}", standaloneContext);
+    LOG.debug("config: {}", Context.get().getConfig());
   }
 
 
@@ -85,7 +85,6 @@ public class DefaultStandaloneContextAwareManagerFactory
           return getWildcardStreamLocator().locateStream(uri, new File(realPath));
         }
 
-        LOG.debug("locating uri: " + uri);
         final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
         final File file = new File(standaloneContext.getContextFolder(), uriWithoutPrefix);
         LOG.debug("Opening file: " + file.getPath());

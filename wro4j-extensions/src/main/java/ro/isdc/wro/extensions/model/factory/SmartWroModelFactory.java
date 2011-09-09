@@ -82,7 +82,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    LOG.debug("auto detect wroFile: " + autoDetectWroFile);
+    LOG.debug("auto detect wroFile: {}", autoDetectWroFile);
     factoryList.add(newXmlModelFactory());
     factoryList.add(newGroovyModelFactory());
     factoryList.add(newJsonModelFactory());
@@ -141,7 +141,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
       Validate.notNull(wroFile, "Cannot call this method if wroFile is null!");
       if (autoDetectWroFile) {
         final File file = new File(wroFile.getParentFile(), defaultFileName);
-        LOG.info("loading autodetected wro file: " + file);
+        LOG.info("\tloading autodetected wro file: " + file);
         return new FileInputStream(file);
       }
       LOG.info("loading wroFile: " + wroFile);
@@ -168,11 +168,11 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
     for (final WroModelFactory factory : factoryList) {
       try {
         final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
-        LOG.info("Trying to use {} for model creation", getClassName(factoryClass));
+        LOG.info("Using {} for model creation..", getClassName(factoryClass));
         return factory.create();
       } catch (final WroRuntimeException e) {
-        LOG.info("Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
-        LOG.debug("Exception occured while building the model using: " + getClassName(factory.getClass()), e);
+        LOG.info("[FAIL] Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
+        LOG.debug("[FAIL] Exception occured while building the model using: {}", getClassName(factory.getClass()), e);
         // stop trying with other factories if the reason is IOException
         if (!autoDetectWroFile && e.getCause() instanceof IOException) {
           throw e;

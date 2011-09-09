@@ -240,7 +240,7 @@ public class BaseWroManagerFactory
       return smartFactoryClass.newInstance();
     } catch (final Exception e) {
       LOG.info("[FAIL] SmartWroModelFactory is not available. Using default model factory.");
-      LOG.debug("Reason: " + e.toString());
+      LOG.debug("Reason: {}", e.toString());
     }
     return new XmlModelFactory();
   }
