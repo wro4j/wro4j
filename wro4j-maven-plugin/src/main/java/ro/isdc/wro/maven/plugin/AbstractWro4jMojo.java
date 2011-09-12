@@ -111,7 +111,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
-  protected final StandaloneContext createStandaloneContext() {
+  private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
     runContext.setContextFolder(getContextFolder());
     runContext.setMinimize(isMinimize());

@@ -43,7 +43,9 @@ public class TestWildcardExpanderModelTransformer {
     Context.set(Context.standaloneContext());
     transformer = new WildcardExpanderModelTransformer();
     //create manager to force correct initialization.
-    new BaseWroManagerFactory().setProcessorsFactory(processorsFactory).addModelTransformer(transformer).create();
+    final BaseWroManagerFactory factory = new BaseWroManagerFactory();
+    factory.setProcessorsFactory(processorsFactory);
+    factory.addModelTransformer(transformer).create();
   }
 
   @Test

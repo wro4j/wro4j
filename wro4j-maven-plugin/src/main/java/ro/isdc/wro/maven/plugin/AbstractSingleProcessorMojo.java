@@ -16,14 +16,11 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 
 /**
@@ -94,24 +91,9 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   @Override
   protected StandaloneContextAwareManagerFactory getManagerFactory()
     throws Exception {
-    //TODO: create decorator
     final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
-    return new StandaloneContextAwareManagerFactory() {
-      public NamingStrategy getNamingStrategy() {
-        return factory.getNamingStrategy();
-      }
-      public WroManager create() {
-        final WroManager manager = factory.create().setProcessorsFactory(createSingleProcessorsFactory());
-        getLog().info("DecoratedManager: " + manager);
-        return manager;
-      }
-      public void destroy() {
-        factory.destroy();
-      }
-      public void initialize(final StandaloneContext standaloneContext) {
-        factory.initialize(standaloneContext);
-      }
-    };
+    factory.setProcessorsFactory(createSingleProcessorsFactory());
+    return factory;
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {

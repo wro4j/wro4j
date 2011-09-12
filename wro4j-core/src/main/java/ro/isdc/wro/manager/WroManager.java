@@ -60,7 +60,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public class WroManager
+public final class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
@@ -511,15 +511,17 @@ public class WroManager
   /**
    * @param processorsFactory the processorsFactory to set
    */
-  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+  public WroManager setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
+    return this;
   }
 
   /**
    * @param uriLocatorFactory the uriLocatorFactory to set
    */
-  public void setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+  public WroManager setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
     this.uriLocatorFactory = uriLocatorFactory;
+    return this;
   }
 
   /**

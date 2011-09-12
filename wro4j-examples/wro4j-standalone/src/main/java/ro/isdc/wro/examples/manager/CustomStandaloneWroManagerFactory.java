@@ -10,8 +10,8 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
