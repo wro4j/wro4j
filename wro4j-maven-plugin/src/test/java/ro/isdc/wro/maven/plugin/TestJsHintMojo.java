@@ -14,10 +14,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 
 /**
@@ -118,6 +115,7 @@ public class TestJsHintMojo {
   @Test
   public void shouldOverrideCustomProcessorsFactory()
     throws Exception {
+
     mojo.setWroManagerFactory(CustomWroManagerFactory.class.getName());
     mojo.execute();
   }
@@ -125,12 +123,8 @@ public class TestJsHintMojo {
   public static class CustomWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
     @Override
     protected ProcessorsFactory newProcessorsFactory() {
-      return new SimpleProcessorsFactory().addPreProcessor(new JSMinProcessor());
-    }
-
-    @Override
-    protected WroModelFactory newModelFactory() {
-      return super.newModelFactory();
+      throw new RuntimeException("Should have not call this method");
+      //return new SimpleProcessorsFactory().addPreProcessor(new JSMinProcessor());
     }
   }
 
