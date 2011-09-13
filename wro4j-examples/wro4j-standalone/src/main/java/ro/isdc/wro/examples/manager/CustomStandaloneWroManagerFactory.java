@@ -80,12 +80,11 @@ public class CustomStandaloneWroManagerFactory
 
       public WroModel create() {
         final WroModel model = new WroModel();
-        model.addGroup(new Group("all").addResource(
-          Resource.create("http://code.jquery.com/jquery-1.6.2.js", ResourceType.JS)).addResource(
-          Resource.create("http://plugins.jquery.com/sites/all/modules/fivestar/js/fivestar.js?8", ResourceType.JS)));
 //        model.addGroup(new Group("all").addResource(
-//          Resource.create("/assets/**.js", ResourceType.JS)).addResource(
-//          Resource.create("/assets/**.css", ResourceType.CSS)));
+//          Resource.create("http://code.jquery.com/jquery-1.6.2.js", ResourceType.JS)));
+        model.addGroup(new Group("all").addResource(
+          Resource.create("/assets/**.js", ResourceType.JS)).addResource(
+          Resource.create("/assets/**.css", ResourceType.CSS)));
         return model;
       }
 
