@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,7 @@ public class DefaultStandaloneContextAwareManagerFactory
    * {@inheritDoc}
    */
   public void initialize(final StandaloneContext standaloneContext) {
+    Validate.notNull(standaloneContext);
     this.standaloneContext = standaloneContext;
     //This is important in order to make plugin aware about ignoreMissingResources option.
     Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());

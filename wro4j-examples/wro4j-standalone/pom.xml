@@ -39,14 +39,13 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
               <goal>jshint</goal>
               <!--
-			  <goal>run</goal>
-              
+              <goal>run</goal>              
               <goal>csslint</goal>
               -->
             </goals>
@@ -55,10 +54,9 @@
         <configuration>
           <ignoreMissingResources>false</ignoreMissingResources>          
           <failNever>true</failNever>          
-		      <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>		  		  
-			  <options>browser,jquery,curly,eqnull,evil,forin,noarg</options>
+		      <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
           <!--
-          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
+          <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>

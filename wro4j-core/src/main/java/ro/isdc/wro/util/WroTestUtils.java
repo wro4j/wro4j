@@ -113,8 +113,9 @@ public class WroTestUtils {
    * @return the injector
    */
   public static void initProcessor(final ResourceProcessor processor) {
-    final WroManager manager = new BaseWroManagerFactory().setProcessorsFactory(
-        new SimpleProcessorsFactory().addPreProcessor(processor).addPostProcessor(processor)).create();
+    final BaseWroManagerFactory factory = new BaseWroManagerFactory();
+    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor).addPostProcessor(processor));
+    final WroManager manager = factory.create();
     final Injector injector = new Injector(manager);
     injector.inject(processor);
   }

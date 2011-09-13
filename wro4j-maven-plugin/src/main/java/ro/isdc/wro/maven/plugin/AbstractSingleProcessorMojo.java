@@ -11,13 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -83,29 +81,29 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     //perform processing
+    getLog().info("ManagerFactory: " + getManagerFactory().create());
     getManagerFactory().create().process();
 
     getLog().info("Success processing group: " + group);
   }
 
-
   /**
    * {@inheritDoc}
    */
   @Override
-  protected final StandaloneContextAwareManagerFactory newWroManagerFactory()
-    throws MojoExecutionException {
-    return new DefaultStandaloneContextAwareManagerFactory() {
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-        final ResourceProcessor processor = createResourceProcessor();
-        factory.addPreProcessor(processor);
-        return factory;
-      }
-    };
+  protected StandaloneContextAwareManagerFactory getManagerFactory()
+    throws Exception {
+    final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
+    factory.setProcessorsFactory(createSingleProcessorsFactory());
+    return factory;
   }
 
+  private ProcessorsFactory createSingleProcessorsFactory() {
+    final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
+    final ResourceProcessor processor = createResourceProcessor();
+    factory.addPreProcessor(processor);
+    return factory;
+  }
 
   protected abstract ResourceProcessor createResourceProcessor();
 

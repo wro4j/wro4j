@@ -24,6 +24,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -510,23 +512,24 @@ public final class WroManager
   /**
    * @param processorsFactory the processorsFactory to set
    */
-  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+  public WroManager setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
+    return this;
   }
 
+  /**
+   * @param resourceLocatorFactory the resourceLocatorFactory to set
+   */
+  public WroManager setResourceLocatorFactory(final ResourceLocatorFactory resourceLocatorFactory) {
+    this.resourceLocatorFactory = resourceLocatorFactory;
+    return this;
+  }
 
   /**
    * @return the resourceLocatorFactory
    */
   public ResourceLocatorFactory getResourceLocatorFactory() {
     return resourceLocatorFactory;
-  }
-
-  /**
-   * @param resourceLocatorFactory the resourceLocatorFactory to set
-   */
-  public void setResourceLocatorFactory(final ResourceLocatorFactory resourceLocatorFactory) {
-    this.resourceLocatorFactory = resourceLocatorFactory;
   }
 
   /**
@@ -551,5 +554,13 @@ public final class WroManager
     Validate.notNull(namingStrategy);
     this.namingStrategy = namingStrategy;
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }

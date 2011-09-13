@@ -311,9 +311,8 @@ public class BaseWroManagerFactory
   /**
    * @param processorsFactory the processorsFactory to set
    */
-  public BaseWroManagerFactory setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
-    return this;
   }
 
   /**
