@@ -27,13 +27,21 @@ public class WroRuntimeException extends RuntimeException {
    */
   public WroRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
+    LOG.debug(message);
   }
 
   /**
    * @param message
    */
   public WroRuntimeException(final String message) {
-    super(message);
-    LOG.debug(message);
+    this(message, null);
+  }
+
+  /**
+   * Logs the error of this exception. By default errors are logged with DEBUG level. This method will use ERROR level.
+   */
+  public WroRuntimeException logError() {
+    LOG.error(getMessage());
+    return this;
   }
 }
