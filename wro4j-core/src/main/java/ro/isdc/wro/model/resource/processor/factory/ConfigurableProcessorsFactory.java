@@ -119,7 +119,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
       final T processor = map.get(tokenName.trim());
       if (processor == null) {
         throw new WroRuntimeException("Unknown processor name: " + tokenName + ". Available processors are: "
-          + map.keySet());
+          + map.keySet()).logError();
       }
       list.add(processor);
     }
