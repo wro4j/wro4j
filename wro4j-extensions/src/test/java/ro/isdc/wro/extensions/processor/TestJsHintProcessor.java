@@ -55,7 +55,7 @@ public class TestJsHintProcessor {
       "maxerr=1"
     });
 
-    processor.process(new StringReader("alert(;"), new StringWriter());
+    processor.process(null, new StringReader("alert(;"), new StringWriter());
     Assert.assertNotNull(cause.get());
   }
 }
