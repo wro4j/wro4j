@@ -3,10 +3,9 @@
  */
 package ro.isdc.wro.extensions.processor.support.jshint;
 
-import org.junit.Test;
+import junit.framework.Assert;
 
-import ro.isdc.wro.extensions.processor.support.jshint.JsHint;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import org.junit.Test;
 
 
 /**
@@ -74,6 +73,44 @@ public class TestJsHint {
     jsHint.validate("if (text == 0) {win.location.href = link; }");
   }
 
+  @Test
+  public void testEmptyOptions() throws Exception {
+    testGenericOptions("{}", "");
+  }
 
+  @Test
+  public void testNullOptions() throws Exception {
+    testGenericOptions("{}", null);
+  }
 
+  @Test
+  public void testOptionWithNoValue() throws Exception {
+    testGenericOptions("{\"devel\": \"true\"}", "devel");
+  }
+
+  @Test
+  public void testOptionWithValue() throws Exception {
+    testGenericOptions("{\"maxerr\": \"100\"}", "maxerr=100");
+  }
+
+  @Test
+  public void testOptionWithValueAndSpaces() throws Exception {
+    testGenericOptions("{\"maxerr\": \"100\"}", "maxerr =  100");
+  }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void testOptionWithEmptyValue() throws Exception {
+    testGenericOptions("{\"maxerr\": \"100\"}", "maxerr=");
+  }
+
+  private void testGenericOptions(final String expectedOptions, final String... providedOptions) throws Exception {
+    new JsHint() {
+      @Override
+      protected String buildOptions(final String... options) {
+        final String json = super.buildOptions(options);
+        Assert.assertEquals(expectedOptions, json);
+        return json;
+      }
+    }.setOptions(providedOptions).validate("");
+  }
 }

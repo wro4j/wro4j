@@ -54,7 +54,7 @@ public class JsHintProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      new JsHint().setOptions(options).validate(content);
+      newJsHint().setOptions(options).validate(content);
     } catch (final JsHintException e) {
       try {
         onJsHintException(e, resource);
@@ -71,6 +71,13 @@ public class JsHintProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * Override this method to provide a custom {@link JsHint} implementation.
+   */
+  protected JsHint newJsHint() {
+    return new JsHint();
   }
 
   /**
