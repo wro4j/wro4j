@@ -87,6 +87,7 @@ public class CssLint {
       watch.start("cssLint");
       LOG.debug("options: {}", Arrays.toString(this.options));
       final String script = buildCssLintScript(WroUtil.toJSMultiLineString(data), this.options);
+      LOG.debug("script: {}", script);
       builder.evaluate(script, "CSSLint.verify").toString();
       final boolean valid = Boolean.parseBoolean(builder.evaluate("result.length == 0", "checkNoErrors").toString());
       if (!valid) {
