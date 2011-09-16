@@ -72,4 +72,20 @@ public class TestConfigurableProcessorsFactory {
     factory.setProperties(props);
     Assert.assertEquals(1, factory.getPostProcessors().size());
   }
+
+
+  @Test
+  public void shouldDecorateWithExtensionAwareProcessorDecorator() {
+    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+    final String extension = "js";
+    final String processorName = "valid";
+    map.put(processorName, Mockito.mock(ResourcePreProcessor.class));
+    final Properties props = new Properties();
+    props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS,
+        String.format("%s.%s", processorName, extension));
+    factory.setPreProcessorsMap(map);
+    factory.setProperties(props);
+    Assert.assertEquals(1, factory.getPreProcessors().size());
+  }
+
 }
