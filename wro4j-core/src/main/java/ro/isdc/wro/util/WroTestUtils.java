@@ -27,6 +27,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -327,6 +328,24 @@ public class WroTestUtils {
   }
 
 
+  /**
+   * Process and compare all the files from the sourceFolder and compare them with the files from the targetFolder.
+   */
+  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+      final ResourcePreProcessor processor)
+      throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, TrueFileFilter.TRUE, Transformers.noOpTransformer(),
+        processor);
+  }
+
+  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+      final ResourcePostProcessor processor)
+      throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, TrueFileFilter.TRUE, Transformers.noOpTransformer(),
+        processor);
+  }
+
+
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourcePreProcessor processor)
     throws IOException {
@@ -384,8 +403,12 @@ public class WroTestUtils {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
-
-            final ResourceType resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            ResourceType resourceType = ResourceType.JS;
+            try {
+              resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            } catch (final IllegalArgumentException e) {
+              LOG.warn("unkown resource type for file: {}, assuming resource type is: {}", file.getPath(), resourceType);
+            }
             preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
           }
         });
