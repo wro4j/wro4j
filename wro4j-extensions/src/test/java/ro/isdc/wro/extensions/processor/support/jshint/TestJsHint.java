@@ -85,32 +85,36 @@ public class TestJsHint {
 
   @Test
   public void testOptionWithNoValue() throws Exception {
-    testGenericOptions("{\"devel\": \"true\"}", "devel");
+    testGenericOptions("{\"devel\": true}", "devel");
   }
 
   @Test
   public void testOptionWithValue() throws Exception {
-    testGenericOptions("{\"maxerr\": \"100\"}", "maxerr=100");
+    testGenericOptions("{\"maxerr\": 100}", "maxerr=100");
   }
 
   @Test
+  public void predefOption() throws Exception {
+    testGenericOptions("{\"predef\": ['YUI']}", "predef=['YUI']");
+  }
+
+  @Test
+  public void predefOptionWithQuotes() throws Exception {
+    testGenericOptions("{\"predef\": \"['YUI']\"}", "predef=\"['YUI']\"");
+  }
+
+
+  @Test
   public void testOptionWithValueAndSpaces() throws Exception {
-    testGenericOptions("{\"maxerr\": \"100\"}", "maxerr =  100");
+    testGenericOptions("{\"maxerr\": 100}", "maxerr =  100");
   }
 
   @Test(expected=IllegalArgumentException.class)
   public void testOptionWithEmptyValue() throws Exception {
-    testGenericOptions("{\"maxerr\": \"100\"}", "maxerr=");
+    testGenericOptions("{\"maxerr\": 100}", "maxerr=");
   }
 
   private void testGenericOptions(final String expectedOptions, final String... providedOptions) throws Exception {
-    new JsHint() {
-      @Override
-      protected String buildOptions(final String... options) {
-        final String json = super.buildOptions(options);
-        Assert.assertEquals(expectedOptions, json);
-        return json;
-      }
-    }.setOptions(providedOptions).validate("");
+    Assert.assertEquals(expectedOptions, jsHint.buildOptions(providedOptions));
   }
 }

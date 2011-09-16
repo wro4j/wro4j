@@ -140,6 +140,7 @@ public class JsHint {
       }
     }
     sb.append("}");
+    LOG.debug("options: {}", options);
     return sb.toString();
   }
 
@@ -158,7 +159,7 @@ public class JsHint {
       optionName = optionEntry[0];
       optionValue = option.split("=")[1];
     }
-    return String.format("\"%s\": \"%s\"", optionName.trim(), optionValue.trim());
+    return String.format("\"%s\": %s", optionName.trim(), optionValue.trim());
   }
 
   /**
