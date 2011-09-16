@@ -67,6 +67,14 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   private File buildDirectory;
   /**
+   * This parameter is not meant to be used. The only purpose is to hold the final build name of the artifacty
+   *
+   * @parameter default-value="${project.build.directory}/${project.build.finalName}
+   * @optional
+   */
+  private File buildFinalName;
+  //${project.build.directory}/${project.build.finalName}
+  /**
    * @parameter expression="${groupNameMappingFile}"
    * @optional
    */
@@ -249,8 +257,11 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     String result = null;
     final File cssTargetFolder = cssDestinationFolder == null ? destinationFolder : cssDestinationFolder;
     File rootFolder = null;
-    Validate.notNull(cssTargetFolder, "CssTargetFolder cannot be null!");
-    if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
+    Validate.notNull(cssTargetFolder, "cssTargetFolder cannot be null!");
+
+    if (buildFinalName != null && cssTargetFolder.getPath().startsWith(buildFinalName.getPath())) {
+      rootFolder = buildFinalName;
+    } else if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
       rootFolder = buildDirectory;
     } else if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
       rootFolder = getContextFolder();
@@ -297,6 +308,13 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   public void setBuildDirectory(final File buildDirectory) {
     this.buildDirectory = buildDirectory;
+  }
+
+  /**
+   * @param buildFinalName the buildFinalName to set
+   */
+  public void setBuildFinalName(final File buildFinalName) {
+    this.buildFinalName = buildFinalName;
   }
 
 
