@@ -94,6 +94,9 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    */
   public final Collection<ResourcePreProcessor> getPreProcessors() {
     final String processorsAsString = getProperties().getProperty(PARAM_PRE_PROCESSORS);
+    if (StringUtils.isEmpty(processorsAsString)) {
+      LOG.warn("No PreProcessors found, are you sure the configuration is correct?");
+    }
     return getListOfItems(processorsAsString, getPreProcessorsMap());
   }
 
@@ -102,6 +105,9 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    */
   public final Collection<ResourcePostProcessor> getPostProcessors() {
     final String processorsAsString = getProperties().getProperty(PARAM_POST_PROCESSORS);
+    if (StringUtils.isEmpty(processorsAsString)) {
+      LOG.warn("No PostProcessors found, are you sure the configuration is correct?");
+    }
     return getListOfItems(processorsAsString, getPostProcessorsMap());
   }
 
