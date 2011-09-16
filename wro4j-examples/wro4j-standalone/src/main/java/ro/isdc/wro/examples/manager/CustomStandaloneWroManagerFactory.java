@@ -10,6 +10,8 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -21,6 +23,10 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 
 /**
@@ -36,14 +42,14 @@ public class CustomStandaloneWroManagerFactory
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-//    factory.addPreProcessor(new CssImportPreProcessor());
-//    factory.addPreProcessor(new CssUrlRewritingProcessor());
-//    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
-//    factory.addPreProcessor(new JSMinProcessor());
-//
-//    // factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
-//    factory.addPostProcessor(new LessCssProcessor());
-//    factory.addPostProcessor(new YUICssCompressorProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
+    factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new SemicolonAppenderPreProcessor());
+    factory.addPreProcessor(new JSMinProcessor());
+
+    // factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
+    factory.addPostProcessor(new LessCssProcessor());
+    factory.addPostProcessor(new YUICssCompressorProcessor());
 
     final ResourcePreProcessor processor = new JsHintProcessor() {
       @Override
@@ -66,7 +72,7 @@ public class CustomStandaloneWroManagerFactory
 //        }
       };
     }.setOptions(new String[] {});
-    factory.addPreProcessor(processor);
+//    factory.addPreProcessor(processor);
     return factory;
   }
 
@@ -83,8 +89,7 @@ public class CustomStandaloneWroManagerFactory
 //        model.addGroup(new Group("all").addResource(
 //          Resource.create("http://code.jquery.com/jquery-1.6.2.js", ResourceType.JS)));
         model.addGroup(new Group("all").addResource(
-          Resource.create("/assets/**.js", ResourceType.JS)).addResource(
-          Resource.create("/assets/**.css", ResourceType.CSS)));
+          Resource.create("/css/test.css", ResourceType.CSS)));
         return model;
       }
 

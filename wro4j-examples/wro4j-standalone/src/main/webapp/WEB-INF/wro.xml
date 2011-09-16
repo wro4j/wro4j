@@ -19,8 +19,12 @@
     <js>/assets/syntaxHighlighter/scripts/*.js</js>
     <js>/assets/syntaxHighlighter/styles/shCoreRDark.css</js>
   </group>
-  -->
+  
   <group name="oocss">
     <css>/assets/oocss/**.css</css>
-  </group>    
+  </group>
+  -->    
+  <group name="g1">
+    <css>/css/**.css</css>
+  </group>
 </groups>
