@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>wro4j-standalone</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <name>wro4j standalone example project</name>
 
 	<properties>
@@ -43,9 +43,10 @@
         <executions>
           <execution>
             <goals>
-              <goal>jshint</goal>
+              <goal>run</goal>
               <!--
-              <goal>run</goal>              
+              <goal>jshint</goal>
+                            
               <goal>csslint</goal>
               -->
             </goals>
@@ -53,9 +54,10 @@
         </executions>
         <configuration>
           <ignoreMissingResources>false</ignoreMissingResources>          
-          <failNever>true</failNever>          
-		      <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
+          <failNever>true</failNever>
+          <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/bundle/</cssDestinationFolder>
           <!--
+          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>          
           <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
