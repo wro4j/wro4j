@@ -6,6 +6,7 @@ package ro.isdc.wro.extensions.processor.support.uglify;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -19,12 +20,13 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the less.js version <code>1.0.2</code> project:
+ * The underlying implementation use the uglifyJs version (1.0.8 snapshot) <br/>
+ * commited at the following date: 2011-09-18 08:14:44.
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
  * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
- * is compressed with packerJs compressor, because it seems to be most efficient for this situation.
+ * is compressed with googleClosure compressor (simple mode), becuase it is quite efficient and doesn't break the code.
  *
  * @author Alex Objelean
  * @since 1.3.1
@@ -34,7 +36,7 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglify-1.0.6.min.js";
+  private static final String DEFAULT_UGLIFY_JS = "uglify-1.0.8-pre.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
@@ -109,16 +111,10 @@ public class UglifyJs {
       watch.start(uglify ? "uglify" : "beautify");
 
       final String originalCode = WroUtil.toJSMultiLineString(code);
-      final StringBuffer sb = new StringBuffer("(function() {");
-      sb.append("var orig_code = " + originalCode + ";");
-      sb.append("var ast = jsp.parse(orig_code);");
-      sb.append("ast = exports.ast_mangle(ast);");
-      sb.append("ast = exports.ast_squeeze(ast);");
-      // the second argument is true for uglify and false for beautify.
-      sb.append("return exports.gen_code(ast, {beautify: " + !uglify + " });");
-      sb.append("})();");
+      final String invokeScript = String.format(IOUtils.toString(getClass().getResourceAsStream("invoke.js")),
+        originalCode, !uglify);
+      final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
 
-      final Object result = builder.evaluate(sb.toString(), "uglifyIt");
       watch.stop();
       LOG.debug(watch.prettyPrint());
       return String.valueOf(result);

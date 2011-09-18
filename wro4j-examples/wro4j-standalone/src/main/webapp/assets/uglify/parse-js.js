@@ -508,9 +508,9 @@ function tokenizer($TEXT) {
                 return name;
         };
 
-        function read_regexp() {
+        function read_regexp(regexp) {
                 return with_eof_error("Unterminated regular expression", function(){
-                        var prev_backslash = false, regexp = "", ch, in_class = false;
+                        var prev_backslash = false, ch, in_class = false;
                         while ((ch = next(true))) if (prev_backslash) {
                                 regexp += "\\" + ch;
                                 prev_backslash = false;
@@ -559,7 +559,7 @@ function tokenizer($TEXT) {
                         S.regex_allowed = regex_allowed;
                         return next_token();
                 }
-                return S.regex_allowed ? read_regexp() : read_operator("/");
+                return S.regex_allowed ? read_regexp("") : read_operator("/");
         };
 
         function handle_dot() {
@@ -590,8 +590,8 @@ function tokenizer($TEXT) {
         };
 
         function next_token(force_regexp) {
-                if (force_regexp)
-                        return read_regexp();
+                if (force_regexp != null)
+                        return read_regexp(force_regexp);
                 skip_whitespace();
                 start_token();
                 var ch = peek();
@@ -780,9 +780,9 @@ function parse($TEXT, exigent_mode, embed_tokens) {
         };
 
         var statement = maybe_embed_tokens(function() {
-                if (is("operator", "/")) {
+                if (is("operator", "/") || is("operator", "/=")) {
                         S.peeked = null;
-                        S.token = S.input(true); // force regexp
+                        S.token = S.input(S.token.value.substr(1)); // force regexp
                 }
                 switch (S.token.type) {
                     case "num":
@@ -852,6 +852,8 @@ function parse($TEXT, exigent_mode, embed_tokens) {
                                 return as("switch", parenthesised(), switch_block_());
 
                             case "throw":
+                                if (S.token.nlb)
+                                        croak("Illegal newline after 'throw'");
                                 return as("throw", prog1(expression, semicolon));
 
                             case "try":
@@ -1227,7 +1229,7 @@ function parse($TEXT, exigent_mode, embed_tokens) {
 
         function is_assignable(expr) {
                 if (!exigent_mode) return true;
-                switch (expr[0]) {
+                switch (expr[0]+"") {
                     case "dot":
                     case "sub":
                     case "new":

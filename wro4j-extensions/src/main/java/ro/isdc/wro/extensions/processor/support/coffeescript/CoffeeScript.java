@@ -24,8 +24,8 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.1.1</code> project: {@link https
- * ://github.com/jashkenas/coffee-script}.
+ * The underlying implementation use the coffee-script version <code>1.1.3-pre</code> (commited at 2011-09-18 06:52:30)
+ * project: {@link https ://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
  * @since 1.3.6
@@ -62,7 +62,7 @@ public class CoffeeScript {
    * @return The stream of the CoffeeScript.
    */
   protected InputStream getCoffeeScriptAsStream() {
-    return getClass().getResourceAsStream("coffee-script-1.1.1.js");
+    return getClass().getResourceAsStream("coffee-script-1.1.3-pre.js");
   }
 
 

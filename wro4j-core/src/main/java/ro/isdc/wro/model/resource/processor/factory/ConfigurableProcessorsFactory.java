@@ -136,7 +136,6 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
           final String processorName = tokens[0].trim();
           LOG.debug("processorName: {}", processorName);
           processor = map.get(processorName);
-          System.out.println(processor);
           if (processor != null && processor instanceof ResourcePreProcessor) {
             final String extension = tokens[1].trim();
             LOG.debug("adding Extension: {}", extension);

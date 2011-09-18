@@ -193,7 +193,6 @@ public final class WroUtil {
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
   public static String toJSMultiLineString(final String data) {
-    LOG.debug("data: {}", data);
     final String[] lines = data.split("\n");
     final StringBuffer result = new StringBuffer("[");
     if (lines.length == 0) {
