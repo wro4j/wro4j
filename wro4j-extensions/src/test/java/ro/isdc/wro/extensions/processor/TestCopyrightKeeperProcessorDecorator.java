@@ -6,11 +6,13 @@ package ro.isdc.wro.extensions.processor;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -20,10 +22,15 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCopyrightKeeperProcessorDecorator {
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
+
   @Test
-  public void testWithUglifyJs()
+  public void decorateJsMinProcessor()
       throws Exception {
-    final ResourceProcessor decoratedProcessor = new UglifyJsProcessor();
+    final ResourceProcessor decoratedProcessor = new JSMinProcessor();
     final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 

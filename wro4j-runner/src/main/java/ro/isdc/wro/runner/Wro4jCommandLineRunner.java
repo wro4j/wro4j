@@ -212,10 +212,10 @@ public class Wro4jCommandLineRunner {
       LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
       // delete empty files
       if (destinationFile.length() == 0) {
-        LOG.info("No content found for group: " + group);
+        LOG.info("No content found for group: {}", group);
         destinationFile.delete();
       } else {
-        LOG.info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
+        LOG.info("{} ({}bytes) has been created!", destinationFile.getAbsolutePath(), destinationFile.length());
       }
     } finally {
       if (resultOutputStream != null) {
