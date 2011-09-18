@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +81,7 @@ public class WildcardExpanderModelTransformer
             && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
 
             final WildcardExpandedHandlerAware expandedHandler = (WildcardExpandedHandlerAware)wildcardStreamLocator;
-            LOG.debug("expanding resource uri: {}", resource.getUri());
+            LOG.debug("Expanding resource: {}", resource.getUri());
 
             final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
 
@@ -91,7 +91,7 @@ public class WildcardExpanderModelTransformer
               uriLocator.locate(resource.getUri());
             } catch (final IOException e) {
               // log only
-              LOG.error("problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
+              LOG.error("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
             } finally {
               // remove the handler, it is not needed anymore
               expandedHandler.setWildcardExpanderHandler(null);
@@ -123,7 +123,7 @@ public class WildcardExpanderModelTransformer
     expandedHandler.setWildcardExpanderHandler(new Transformer<Collection<File>>() {
       public Collection<File> transform(final Collection<File> input)
         throws Exception {
-        LOG.debug("expanded Files: " + input);
+        LOG.debug("\texpanded Files: {}", input);
         for (final File file : input) {
           baseNameFolderHolder.set(file.getParent());
           // no need to continue
@@ -138,11 +138,11 @@ public class WildcardExpanderModelTransformer
       LOG.debug("resourcePath: {}", resourcePath);
       uriLocator.locate(resourcePath);
     } catch (final Exception e) {
-      LOG.debug("Exception caught during wildcard expanding for resource: {} with exception message {}", resourcePath,
+      LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
           e.getMessage());
     }
     if (baseNameFolderHolder.get() == null) {
-      LOG.error("Cannot compute baseName folder for resource: {}", resource);
+      LOG.error("[FAIL] Cannot compute baseName folder for resource: {}", resource);
     }
     return baseNameFolderHolder.get();
   }
@@ -153,7 +153,7 @@ public class WildcardExpanderModelTransformer
    */
   public Transformer<Collection<File>> createExpanderHandler(final Group group, final Resource resource,
     final String baseNameFolder) {
-    LOG.debug("createExpanderHandler using baseNameFolder {} for resource {}", baseNameFolder, resource);
+    LOG.debug("createExpanderHandler using baseNameFolder: {}\n for resource {}", baseNameFolder, resource);
     final Transformer<Collection<File>> handler = new Transformer<Collection<File>>() {
       public Collection<File> transform(final Collection<File> files) {
         if (baseNameFolder == null) {
@@ -171,10 +171,10 @@ public class WildcardExpanderModelTransformer
               + StringUtils.removeStart(file.getPath(), baseNameFolder).replace('\\', '/');
 
             final Resource expandedResource = Resource.create(computedResourceUri, resource.getType());
-            LOG.debug("expanded resource: {}", expandedResource);
+            LOG.debug("\texpanded resource: {}", expandedResource);
             expandedResources.add(expandedResource);
           }
-          LOG.debug("replace resource {}", resource);
+          LOG.debug("\treplace resource {}", resource);
           group.replace(resource, expandedResources);
 
         }

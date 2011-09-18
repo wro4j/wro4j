@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;

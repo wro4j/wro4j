@@ -8,8 +8,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,7 +162,7 @@ public final class WroConfiguration
    */
   private void reloadCacheWithNewValue(final Long newValue) {
     final long newValueAsPrimitive = newValue == null ? getModelUpdatePeriod() : newValue;
-    LOG.debug("invoking " + cacheUpdatePeriodListeners.size() + " listeners");
+    LOG.debug("invoking {} listeners", cacheUpdatePeriodListeners.size());
     for (final PropertyChangeListener listener : cacheUpdatePeriodListeners) {
       final PropertyChangeEvent event = new PropertyChangeEvent(
         this, "cache", getCacheUpdatePeriod(), newValueAsPrimitive);

@@ -26,7 +26,8 @@ public class TestDojoShrinksafeCompressorProcessor {
     final ResourcePostProcessor processor = new DojoShrinksafeCompressorProcessor();
     final URL url = getClass().getResource("dojo");
 
-    final File testFolder = new File(url.getFile(), "test");
+    final File testFolder = new File(ClassLoader.getSystemResource("test").getFile());
+
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }

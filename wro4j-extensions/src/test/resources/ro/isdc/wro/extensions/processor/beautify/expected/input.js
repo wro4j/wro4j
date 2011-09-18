@@ -13,16 +13,12 @@
             e = a.pageX, f = a.pageY;
         }, j = function(b, c) {
             c.hoverIntent_t = clearTimeout(c.hoverIntent_t);
-            if (Math.abs(g - e) + Math.abs(h - f) < d.sensitivity) {
-                a(c).unbind("mousemove", i), c.hoverIntent_s = 1;
-                return d.over.apply(c, [ b ]);
-            }
+            if (Math.abs(g - e) + Math.abs(h - f) < d.sensitivity) return a(c).unbind("mousemove", i), c.hoverIntent_s = 1, d.over.apply(c, [ b ]);
             g = e, h = f, c.hoverIntent_t = setTimeout(function() {
                 j(b, c);
             }, d.interval);
         }, k = function(a, b) {
-            b.hoverIntent_t = clearTimeout(b.hoverIntent_t), b.hoverIntent_s = 0;
-            return d.out.apply(b, [ a ]);
+            return b.hoverIntent_t = clearTimeout(b.hoverIntent_t), b.hoverIntent_s = 0, d.out.apply(b, [ a ]);
         }, l = function(a) {
             var b = (a.type == "mouseover" ? a.fromElement : a.toElement) || a.relatedTarget;
             while (b && b != this) try {

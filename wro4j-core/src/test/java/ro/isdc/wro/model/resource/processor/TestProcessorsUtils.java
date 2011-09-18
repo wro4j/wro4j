@@ -33,7 +33,7 @@ public class TestProcessorsUtils {
   }
 
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void cannotAcceptNullArgumentForGetProcessorsByType() {
     ProcessorsUtils.getProcessorsByType(null, null);
   }

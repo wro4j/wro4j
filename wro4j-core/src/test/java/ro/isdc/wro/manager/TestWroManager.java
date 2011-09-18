@@ -129,9 +129,8 @@ public class TestWroManager {
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
       Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    final WroManagerFactory factory = new BaseWroManagerFactory();
+    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
     manager = factory.create();
-    manager.setModelFactory(getValidModelFactory());
   }
 
   private class GenericTestBuilder {
@@ -310,7 +309,7 @@ public class TestWroManager {
     Mockito.doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
         throws Throwable {
-        LOG.debug("Header: " + Arrays.toString(invocation.getArguments()));
+        LOG.debug("Header: {}", Arrays.toString(invocation.getArguments()));
         final Object[] arguments = invocation.getArguments();
         if (HttpHeader.ETAG.toString().equals(arguments[0])) {
           final String etagHeaderValue = (String)arguments[1];

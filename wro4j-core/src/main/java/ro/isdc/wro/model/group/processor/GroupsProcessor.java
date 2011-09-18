@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,6 @@ import ro.isdc.wro.util.StopWatch;
  * @created Created on Nov 3, 2008
  */
 public class GroupsProcessor {
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
   @Inject
   private ProcessorsFactory processorsFactory;
@@ -93,7 +92,7 @@ public class GroupsProcessor {
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
-    LOG.debug("postProcessors: " + processors);
+    LOG.debug("postProcessors: {}", processors);
     final String output = applyPostProcessors(processors, content);
     return output;
   }

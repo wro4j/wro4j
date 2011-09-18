@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,10 +98,10 @@ public class CssImportPreProcessor
     //groupExtractor.isMinimized(Context.get().getRequest())
     sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
     if (!importsCollector.isEmpty()) {
-      LOG.debug("Imported resources found : " + importsCollector.size());
+      LOG.debug("Imported resources found : {}", importsCollector.size());
     }
     sb.append(IOUtils.toString(reader));
-    LOG.debug("importsCollector: " + importsCollector);
+    LOG.debug("importsCollector: {}", importsCollector);
     return removeImportStatements(sb.toString());
   }
 

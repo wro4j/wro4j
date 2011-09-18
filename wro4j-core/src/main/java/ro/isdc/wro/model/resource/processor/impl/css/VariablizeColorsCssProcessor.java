@@ -14,7 +14,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.Lessify;
+import ro.isdc.wro.model.resource.processor.support.Lessify;
 
 /**
  * @author Alex Objelean

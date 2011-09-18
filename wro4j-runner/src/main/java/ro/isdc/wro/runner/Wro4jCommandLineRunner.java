@@ -22,10 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.mockito.Mockito;
@@ -35,10 +35,10 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
-import ro.isdc.wro.extensions.processor.algorithm.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -116,7 +116,7 @@ public class Wro4jCommandLineRunner {
     watch.start("processing");
     try {
       parser.parseArgument(args);
-      LOG.debug("Options: " + this);
+      LOG.debug("Options: {}", this);
       process();
     } catch (final Exception e) {
       System.err.println(e.getMessage() + "\n\n");
@@ -203,7 +203,7 @@ public class Wro4jCommandLineRunner {
       destinationFile.createNewFile();
       // allow the same stream to be read again
       resultInputStream.reset();
-      LOG.debug("Created file: " + destinationFile.getName());
+      LOG.debug("Created file: {}", destinationFile.getName());
 
       final OutputStream fos = new FileOutputStream(destinationFile);
       // use reader to detect encoding
@@ -212,10 +212,10 @@ public class Wro4jCommandLineRunner {
       LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
       // delete empty files
       if (destinationFile.length() == 0) {
-        LOG.info("No content found for group: " + group);
+        LOG.info("No content found for group: {}", group);
         destinationFile.delete();
       } else {
-        LOG.info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
+        LOG.info("{} ({}bytes) has been created!", destinationFile.getAbsolutePath(), destinationFile.length());
       }
     } finally {
       if (resultOutputStream != null) {
@@ -257,7 +257,7 @@ public class Wro4jCommandLineRunner {
    */
   private String rename(final String group, final InputStream input)
     throws IOException {
-    return getManagerFactory().getNamingStrategy().rename(group, input);
+    return getManagerFactory().create().getNamingStrategy().rename(group, input);
   }
 
 

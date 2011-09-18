@@ -9,13 +9,13 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHint;
-import ro.isdc.wro.extensions.processor.algorithm.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHint;
+import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -54,7 +54,7 @@ public class JsHintProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      new JsHint().setOptions(options).validate(content);
+      newJsHint().setOptions(options).validate(content);
     } catch (final JsHintException e) {
       try {
         onJsHintException(e, resource);
@@ -71,6 +71,13 @@ public class JsHintProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * Override this method to provide a custom {@link JsHint} implementation.
+   */
+  protected JsHint newJsHint() {
+    return new JsHint();
   }
 
   /**

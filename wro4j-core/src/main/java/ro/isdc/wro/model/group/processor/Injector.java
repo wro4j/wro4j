@@ -8,15 +8,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.InjectorUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 
 /**
@@ -28,16 +30,26 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
+  private final WroManager wroManager;
   private final UriLocatorFactory uriLocatorFactory;
   private PreProcessorExecutor preProcessorExecutor;
   private final ProcessorsFactory processorsFactory;
+  private final GroupsProcessor groupsProcessor;
+  /**
+   * Creates the Injector and initialize the provided manager.
+   */
+  public Injector(final WroManager wroManager) {
+    Validate.notNull(wroManager);
+    this.wroManager = wroManager;
+    this.groupsProcessor = new GroupsProcessor();
 
+    this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(wroManager.getUriLocatorFactory(), this);
+    wroManager.setUriLocatorFactory(this.uriLocatorFactory);
 
-  public Injector(final UriLocatorFactory uriLocatorFactory, final ProcessorsFactory processorsFactory) {
-    Validate.notNull(uriLocatorFactory, "uriLocatorFactory cannot be null");
-    Validate.notNull(processorsFactory, "processorsFactory cannot be null");
-    this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(uriLocatorFactory, this);
-    this.processorsFactory = new InjectorProcessorsFactoryDecorator(processorsFactory, this);
+    this.processorsFactory = new InjectorProcessorsFactoryDecorator(wroManager.getProcessorsFactory(), this);
+    wroManager.setProcessorsFactory(this.processorsFactory);
+
+    inject(wroManager);
   }
 
   private PreProcessorExecutor getPreProcessorExecutor() {
@@ -54,7 +66,7 @@ public final class Injector {
    * @param object {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
-    Validate.notNull(object, "Object cannot be null!");
+    Validate.notNull(object);
     processInjectAnnotation(object);
   }
 
@@ -66,6 +78,7 @@ public final class Injector {
    * @param processor object to check for annotation presence.
    */
   private void processInjectAnnotation(final Object processor) {
+    LOG.debug("processInjectAnnotation for: {}", processor.getClass().getSimpleName());
     try {
       final Collection<Field> fields = getAllFields(processor);
       for (final Field field : fields) {
@@ -88,7 +101,6 @@ public final class Injector {
    */
   private Collection<Field> getAllFields(final Object object) {
     final Collection<Field> fields = new ArrayList<Field>();
-    LOG.debug("getAllFields of: " + object);
     fields.addAll(Arrays.asList(object.getClass().getDeclaredFields()));
     // inspect super classes
     Class<?> superClass = object.getClass().getSuperclass();
@@ -126,10 +138,23 @@ public final class Injector {
         field.set(object, getPreProcessorExecutor());
         return accept = true;
       }
+      if (NamingStrategy.class.isAssignableFrom(field.getType())) {
+        field.set(object, wroManager.getNamingStrategy());
+        return accept = true;
+      }
+      if (GroupsProcessor.class.isAssignableFrom(field.getType())) {
+        field.set(object, groupsProcessor);
+        inject(groupsProcessor);
+        return accept = true;
+      }
+      if (Injector.class.isAssignableFrom(field.getType())) {
+        field.set(object, this);
+        return accept = true;
+      }
       return accept;
     } finally {
       if (accept) {
-        LOG.debug("[OK] Injected field of type: " + field.getType());
+        LOG.debug("\t[OK] Injected field of type: {}", field.getType().getSimpleName());
       }
     }
   }

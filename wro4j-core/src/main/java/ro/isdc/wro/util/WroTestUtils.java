@@ -27,19 +27,20 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -100,8 +101,7 @@ public class WroTestUtils {
 
 
   private static UriLocatorFactory createDefaultUriLocatorFactory() {
-    return new SimpleUriLocatorFactory().addUriLocator(new ServletContextUriLocator()).addUriLocator(
-      new ClasspathUriLocator()).addUriLocator(new UrlUriLocator());
+    return new DefaultUriLocatorFactory();
   }
 
 
@@ -110,13 +110,18 @@ public class WroTestUtils {
     return createDefaultUriLocatorFactory().locate(uri);
   }
 
+  public static void init(final WroModelFactory factory) {
+    new BaseWroManagerFactory().setModelFactory(factory).create();
+  }
 
   /**
    * @return the injector
    */
   public static void initProcessor(final ResourcePreProcessor processor) {
-    final Injector injector = new Injector(
-      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPreProcessor(processor));
+    final BaseWroManagerFactory factory = new BaseWroManagerFactory();
+    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
+    final WroManager manager = factory.create();
+    final Injector injector = new Injector(manager);
     injector.inject(processor);
   }
 
@@ -125,8 +130,10 @@ public class WroTestUtils {
    * @return the injector
    */
   public static void initProcessor(final ResourcePostProcessor processor) {
-    final Injector injector = new Injector(
-      createDefaultUriLocatorFactory(), new SimpleProcessorsFactory().addPostProcessor(processor));
+    final BaseWroManagerFactory factory = new BaseWroManagerFactory();
+    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor));
+    final WroManager manager = factory.create();
+    final Injector injector = new Injector(manager);
     injector.inject(processor);
   }
 
@@ -279,12 +286,12 @@ public class WroTestUtils {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
-      LOG.debug("processing: " + file.getName());
+      LOG.debug("processing: {}", file.getName());
       File targetFile = null;
       try {
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("comparing with: " + targetFile.getName());
+        LOG.debug("comparing with: {}", targetFile.getName());
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
@@ -302,12 +309,12 @@ public class WroTestUtils {
 
 
   private static void logSuccess(final int size) {
-    LOG.debug("===============");
-    LOG.debug("Successfully compared: " + size + " files.");
-    LOG.debug("===============");
     if (size == 0) {
       throw new IllegalStateException("No files compared. Check if there is at least one resource to compare");
     }
+    LOG.debug("===============");
+    LOG.debug("Successfully compared: {} files.", size);
+    LOG.debug("===============");
   }
 
 
@@ -318,6 +325,24 @@ public class WroTestUtils {
     final IOFileFilter fileFilter, final ResourcePostProcessor processor)
     throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
+  }
+
+
+  /**
+   * Process and compare all the files from the sourceFolder and compare them with the files from the targetFolder.
+   */
+  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+      final ResourcePreProcessor processor)
+      throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, TrueFileFilter.TRUE, Transformers.noOpTransformer(),
+        processor);
+  }
+
+  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+      final ResourcePostProcessor processor)
+      throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, TrueFileFilter.TRUE, Transformers.noOpTransformer(),
+        processor);
   }
 
 
@@ -363,8 +388,8 @@ public class WroTestUtils {
   public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePreProcessor preProcessor)
     throws IOException {
-    LOG.debug("sourceFolder: " + sourceFolder);
-    LOG.debug("targetFolder: " + targetFolder);
+    LOG.debug("sourceFolder: {}", sourceFolder);
+    LOG.debug("targetFolder: {}", targetFolder);
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
@@ -372,20 +397,24 @@ public class WroTestUtils {
       try {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("processing: " + file.getName());
+        LOG.debug("processing: {}", file.getName());
         // ResourceType doesn't matter here
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)
             throws IOException {
             // ResourceType doesn't matter here
-
-            final ResourceType resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            ResourceType resourceType = ResourceType.JS;
+            try {
+              resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
+            } catch (final IllegalArgumentException e) {
+              LOG.warn("unkown resource type for file: {}, assuming resource type is: {}", file.getPath(), resourceType);
+            }
             preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
           }
         });
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath(), e);
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }

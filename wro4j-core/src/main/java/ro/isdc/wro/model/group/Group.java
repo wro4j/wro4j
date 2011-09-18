@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public final class Group {
   /**
    * Resources of the group.
    */
-  private List<Resource> resources = new ArrayList<Resource>();
+  private final List<Resource> resources = new ArrayList<Resource>();
 
   /**
    * To be used by JSON serializer.
@@ -148,7 +148,7 @@ public final class Group {
     if (!hasResource(resource)) {
       resources.add(resource);
     } else {
-      LOG.warn("Resource {} is already contained in this group, skiping it.");
+      LOG.warn("Resource {} is already contained in this group, skiping it.", resource);
     }
     return this;
   }

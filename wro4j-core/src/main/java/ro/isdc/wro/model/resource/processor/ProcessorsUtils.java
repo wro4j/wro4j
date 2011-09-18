@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
@@ -166,7 +166,6 @@ public class ProcessorsUtils {
     map.put(SemicolonAppenderPreProcessor.ALIAS, (T) new SemicolonAppenderPreProcessor());
     map.put(CssDataUriPreProcessor.ALIAS, (T) new CssDataUriPreProcessor());
     map.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, (T) new DuplicatesAwareCssDataUriPreProcessor());
-    map.put(CssCompressorProcessor.ALIAS, (T) new CssCompressorProcessor());
     map.put(JawrCssMinifierProcessor.ALIAS, (T) new JawrCssMinifierProcessor());
     map.put(CssMinProcessor.ALIAS, (T) new CssMinProcessor());
     map.put(JSMinProcessor.ALIAS, (T) new JSMinProcessor());

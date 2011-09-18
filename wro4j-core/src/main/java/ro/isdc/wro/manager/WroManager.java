@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -23,8 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,23 +38,19 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.ModelTransformerFactory;
-import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
+import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.StopWatch;
-import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -63,7 +60,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public class WroManager
+public final class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
@@ -75,10 +72,6 @@ public class WroManager
    * GroupExtractor.
    */
   private GroupExtractor groupExtractor;
-  /**
-   * Groups processor.
-   */
-  private final GroupsProcessor groupsProcessor;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
@@ -95,24 +88,17 @@ public class WroManager
    * Scheduled executors service, used to update the output result.
    */
   private ScheduledExecutorService scheduler;
-  @Inject
   private ProcessorsFactory processorsFactory;
-  @Inject
   private UriLocatorFactory uriLocatorFactory;
   /**
-   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
-   * processed.
+   * Rename the file name based on its original name and content.
    */
-  private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
-  private final Injector injector;
-
-  public WroManager(final Injector injector) {
-    Validate.notNull(injector);
-    groupsProcessor = new GroupsProcessor();
-    this.injector = injector;
-    injector.inject(this);
-    injector.inject(groupsProcessor);
-  }
+  private NamingStrategy namingStrategy;
+  /**
+   * Groups processor.
+   */
+  @Inject
+  private GroupsProcessor groupsProcessor;
 
   /**
    * Perform processing of the uri.
@@ -206,8 +192,7 @@ public class WroManager
     final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
 
     if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-      LOG.debug("ETag hash detected: " + etagValue + ". Sending " + HttpServletResponse.SC_NOT_MODIFIED
-        + " status code");
+      LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       // because we cannot return null, return a stream containing nothing.
       return EMPTY_STREAM;
@@ -227,7 +212,7 @@ public class WroManager
     response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
     stopWatch.stop();
-    LOG.debug("WroManager process time: " + stopWatch.prettyPrint());
+    LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
     return inputStream;
   }
 
@@ -281,7 +266,7 @@ public class WroManager
   private ContentHashEntry getContentHashEntry(final String groupName, final ResourceType type, final boolean minimize)
     throws IOException {
     final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
-    LOG.debug("Searching cache entry: " + cacheEntry);
+    LOG.debug("Searching cache entry: {}", cacheEntry);
     // Cache based on uri
     ContentHashEntry contentHashEntry = cacheStrategy.get(cacheEntry);
     if (contentHashEntry == null) {
@@ -313,11 +298,11 @@ public class WroManager
     throws IOException {
     String hash = null;
     if (content != null) {
-      LOG.debug("Content to fingerprint: [" + StringUtils.abbreviate(content, 40) + "]");
+      LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 40));
       hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
     }
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
-    LOG.debug("computed entry: " + entry);
+    LOG.debug("computed entry: {}", entry);
     return entry;
   }
 
@@ -328,7 +313,7 @@ public class WroManager
   private void initScheduler() {
     if (scheduler == null) {
       final long period = Context.get().getConfig().getCacheUpdatePeriod();
-      LOG.debug("runing thread with period of " + period);
+      LOG.debug("runing thread with period of {}", period);
       if (period > 0) {
         scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
         // Run a scheduled task which updates the model.
@@ -407,7 +392,7 @@ public class WroManager
   private InputStream locateInputeStream(final HttpServletRequest request)
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-    LOG.debug("locating stream for resourceId: " + resourceId);
+    LOG.debug("locating stream for resourceId: {}", resourceId);
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
       processorsFactory.getPreProcessors());
     if (processor != null && !processor.isUriAllowed(resourceId)) {
@@ -458,6 +443,10 @@ public class WroManager
    * Check if all dependencies are set.
    */
   private void validate() {
+    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
+    Validate.notNull(groupsProcessor, "groupsProcessor was not set!");
+    Validate.notNull(uriLocatorFactory, "uriLocatorFactory was not set!");
+    Validate.notNull(processorsFactory, "processorsFactory was not set!");
     Validate.notNull(groupExtractor, "GroupExtractor was not set!");
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
@@ -481,8 +470,7 @@ public class WroManager
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
     // decorate with useful features
-    this.modelFactory = new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
-        modelFactory))).setTransformers(modelTransformers);
+    this.modelFactory = modelFactory;
     return this;
   }
 
@@ -521,16 +509,57 @@ public class WroManager
   }
 
   /**
-   * @param modelTransformers the modelTransformers to set
+   * @param processorsFactory the processorsFactory to set
    */
-  public WroManager setModelTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
-    Validate.notNull(modelTransformers);
-    this.modelTransformers = modelTransformers;
-    //allow model transformers to be aware of injected properties
-    for (final Transformer<WroModel> transformer : modelTransformers) {
-      LOG.debug("injecting: " + transformer);
-      injector.inject(transformer);
-    }
+  public WroManager setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+    this.processorsFactory = processorsFactory;
     return this;
+  }
+
+  /**
+   * @param uriLocatorFactory the uriLocatorFactory to set
+   */
+  public WroManager setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+    this.uriLocatorFactory = uriLocatorFactory;
+    return this;
+  }
+
+  /**
+   * @return the cacheStrategy
+   */
+  public CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
+    return cacheStrategy;
+  }
+
+  /**
+   * @return the uriLocatorFactory
+   */
+  public UriLocatorFactory getUriLocatorFactory() {
+    return uriLocatorFactory;
+  }
+
+  /**
+   *
+   * @return The strategy used to rename bundled resources.
+   */
+  public final NamingStrategy getNamingStrategy() {
+    return this.namingStrategy;
+  }
+
+  /**
+   * @param namingStrategy the namingStrategy to set
+   */
+  public final WroManager setNamingStrategy(final NamingStrategy namingStrategy) {
+    Validate.notNull(namingStrategy);
+    this.namingStrategy = namingStrategy;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }

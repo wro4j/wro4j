@@ -8,6 +8,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +21,6 @@ import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 
 /**
  * {@link WroManagerFactory} instance used by the maven plugin.
@@ -36,18 +35,15 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   private StandaloneContext standaloneContext;
   /**
-   * Rename the file name based on its original name and content.
-   */
-  private NamingStrategy namingStrategy;
-  /**
    * {@inheritDoc}
    */
   public void initialize(final StandaloneContext standaloneContext) {
+    Validate.notNull(standaloneContext);
     this.standaloneContext = standaloneContext;
     //This is important in order to make plugin aware about ignoreMissingResources option.
     Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
-    LOG.debug("initialize: " + standaloneContext);
-    LOG.debug("config: " + Context.get().getConfig());
+    LOG.debug("initialize: {}", standaloneContext);
+    LOG.debug("config: {}", Context.get().getConfig());
   }
 
 
@@ -91,32 +87,11 @@ public class DefaultStandaloneContextAwareManagerFactory
           return getWildcardStreamLocator().locateStream(uri, new File(realPath));
         }
 
-        LOG.debug("locating uri: " + uri);
         final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
         final File file = new File(standaloneContext.getContextFolder(), uriWithoutPrefix);
         LOG.debug("Opening file: " + file.getPath());
         return new FileInputStream(file);
       }
     };
-  }
-
-
-  /**
-   * This method will never return null. If no NamingStrategy is set, a NoOp implementation will return.
-   *
-   * @return a not null {@link NamingStrategy}. If no {@link NamingStrategy} is set, a NoOp implementation will return.
-   */
-  public final NamingStrategy getNamingStrategy() {
-    if (namingStrategy == null) {
-      namingStrategy = new NoOpNamingStrategy();
-    }
-    return this.namingStrategy;
-  }
-
-  /**
-   * @param namingStrategy the namingStrategy to set
-   */
-  public final void setNamingStrategy(final NamingStrategy namingStrategy) {
-    this.namingStrategy = namingStrategy;
   }
 }

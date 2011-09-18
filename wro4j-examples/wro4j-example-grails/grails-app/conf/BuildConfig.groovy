@@ -4,8 +4,8 @@ grails.project.test.reports.dir = "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 
-//I specify where are the sources of the wro4j-grails-plugin
-grails.plugin.location.wro4j = "../wro4j-grails-plugin/"
+//specify the sources of the wro4j-grails-plugin
+//grails.plugin.location.wro4j = "../../wro4j-grails-plugin/"
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies

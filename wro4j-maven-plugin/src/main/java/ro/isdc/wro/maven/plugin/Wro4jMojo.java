@@ -18,16 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
-import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -62,24 +60,20 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   private File jsDestinationFolder;
   /**
-   * @parameter expression="${wroManagerFactory}"
-   * @optional
-   */
-  private String wroManagerFactory;
-  /**
-   * The path to configuration file.
-   *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" expression="${extraConfig}"
-   * @optional
-   */
-  private File extraConfigFile;
-  /**
    * This parameter is not meant to be used. The only purpose is to hold project build directory
    *
    * @parameter default-value="${project.build.directory}
    * @optional
    */
   private File buildDirectory;
+  /**
+   * This parameter is not meant to be used. The only purpose is to hold the final build name of the artifacty
+   *
+   * @parameter default-value="${project.build.directory}/${project.build.finalName}
+   * @optional
+   */
+  private File buildFinalName;
+  //${project.build.directory}/${project.build.finalName}
   /**
    * @parameter expression="${groupNameMappingFile}"
    * @optional
@@ -89,46 +83,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected StandaloneContextAwareManagerFactory newWroManagerFactory()
-    throws MojoExecutionException {
-    StandaloneContextAwareManagerFactory factory = null;
-    if (wroManagerFactory != null) {
-      factory = createCustomManagerFactory();
-    } else {
-      factory = super.newWroManagerFactory();
-    }
-    if (factory instanceof ExtraConfigFileAware) {
-      if (extraConfigFile == null) {
-        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
-      }
-      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
-      ((ExtraConfigFileAware)factory).setExtraConfigFile(extraConfigFile);
-    }
-    return factory;
-  }
-
-
-  /**
-   * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
-   */
-  private StandaloneContextAwareManagerFactory createCustomManagerFactory()
-    throws MojoExecutionException {
-    StandaloneContextAwareManagerFactory managerFactory;
-    try {
-      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-        wroManagerFactory.trim());
-      managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
-    } catch (final Exception e) {
-      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
-      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
-    }
-    return managerFactory;
-  }
 
 
   /**
@@ -190,7 +144,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   private String rename(final String group, final InputStream input)
     throws Exception {
     try {
-      final String newName = getManagerFactory().getNamingStrategy().rename(group, input);
+      final String newName = getManagerFactory().create().getNamingStrategy().rename(group, input);
       groupNames.setProperty(group, newName);
       return newName;
     } catch (final IOException e) {
@@ -303,8 +257,11 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     String result = null;
     final File cssTargetFolder = cssDestinationFolder == null ? destinationFolder : cssDestinationFolder;
     File rootFolder = null;
-    Validate.notNull(cssTargetFolder, "CssTargetFolder cannot be null!");
-    if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
+    Validate.notNull(cssTargetFolder, "cssTargetFolder cannot be null!");
+
+    if (buildFinalName != null && cssTargetFolder.getPath().startsWith(buildFinalName.getPath())) {
+      rootFolder = buildFinalName;
+    } else if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
       rootFolder = buildDirectory;
     } else if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
       rootFolder = getContextFolder();
@@ -344,23 +301,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     this.jsDestinationFolder = jsDestinationFolder;
   }
 
-
-  /**
-   * @param wroManagerFactory to set
-   */
-  public void setWroManagerFactory(final String wroManagerFactory) {
-    this.wroManagerFactory = wroManagerFactory;
-  }
-
-
-  /**
-   * @param extraConfigFile the extraConfigFile to set
-   */
-  public void setExtraConfigFile(final File extraConfigFile) {
-    this.extraConfigFile = extraConfigFile;
-  }
-
-
   /**
    * The folder where the project is built.
    *
@@ -368,6 +308,13 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   public void setBuildDirectory(final File buildDirectory) {
     this.buildDirectory = buildDirectory;
+  }
+
+  /**
+   * @param buildFinalName the buildFinalName to set
+   */
+  public void setBuildFinalName(final File buildFinalName) {
+    this.buildFinalName = buildFinalName;
   }
 
 

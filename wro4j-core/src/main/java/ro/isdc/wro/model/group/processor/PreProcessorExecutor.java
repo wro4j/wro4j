@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public final class PreProcessorExecutor {
     throws IOException {
     final StringBuffer result = new StringBuffer();
     for (final Resource resource : resources) {
-      LOG.debug("merging resource: " + resource);
+      LOG.debug("\tmerging resource: {}", resource);
       result.append(processSingleResource(resource, resources, minimize));
     }
     return result.toString();
@@ -94,7 +94,7 @@ public final class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final List<Resource> resources,
     final Collection<ResourcePreProcessor> processors)
     throws IOException {
-    LOG.debug("applying preProcessors: " + processors);
+    LOG.debug("applying preProcessors: {}", processors);
     String resourceContent = getResourceContent(resource, resources);
     if (processors.isEmpty()) {
       return resourceContent;
@@ -107,7 +107,7 @@ public final class PreProcessorExecutor {
       // skip minimize validation if resource doesn't want to be minimized
       final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
       if (applyProcessor) {
-        LOG.debug("PreProcessing - " + processor.getClass().getSimpleName());
+        LOG.debug("\tPreProcessing - {}", processor.getClass().getSimpleName());
         final Reader reader = new StringReader(resourceContent);
         try {
           processor.process(resource, reader, writer);
@@ -118,7 +118,7 @@ public final class PreProcessorExecutor {
         }
       } else {
         writer.write(resourceContent);
-        LOG.debug("skipped processing on resource: " + resource);
+        LOG.debug("skipped processing on resource: {}", resource);
       }
       resourceContent = writer.toString();
       stopWatch.stop();

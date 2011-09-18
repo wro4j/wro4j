@@ -13,6 +13,7 @@ import org.junit.Test;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.util.WroTestUtils;
 
+
 /**
  * Tests if {@link ClasspathUriLocator} works properly.
  *
@@ -36,53 +37,56 @@ public class TestClasspathUriLocator {
   }
 
   @Test
-  public void resourceAvailable() throws IOException {
+  public void resourceAvailable()
+      throws IOException {
     Assert.assertNotNull(uriLocator.locate(createUri("test.css")));
   }
 
   @Test
-  public void resourceAvailableWithTrailingSpaces() throws IOException {
+  public void resourceAvailableWithTrailingSpaces()
+      throws IOException {
     Assert.assertNotNull(uriLocator.locate(createUri(" test.css ")));
   }
 
   @Test
-  public void testWildcardInexistentResources() throws IOException {
+  public void testWildcardInexistentResources()
+      throws IOException {
     uriLocator.locate(createUri("*.NOTEXIST"));
   }
 
   @Test
-  public void testWildcard1Resources() throws IOException {
-    WroTestUtils.compare(uriLocator.locate(createUri("ro/isdc/wro/http/*.merged")), uriLocator.locate(createUri("ro/isdc/wro/http/*.css")));
+  public void testWildcard1Resources()
+      throws IOException {
+    WroTestUtils.compare(uriLocator.locate(createUri("ro/isdc/wro/http/*.merged")),
+        uriLocator.locate(createUri("ro/isdc/wro/http/*.css")));
   }
 
   @Test
-  public void testWildcard2Resources() throws IOException {
+  public void testWildcard2Resources()
+      throws IOException {
     uriLocator.locate(createUri("*.cs?"));
   }
 
   @Test
-  public void testWildcard3Resources() throws IOException {
+  public void testWildcard3Resources()
+      throws IOException {
     uriLocator.locate(createUri("*.???"));
   }
 
   @Test
-  public void testRecursiveWildcardResources() throws IOException {
+  public void testRecursiveWildcardResources()
+      throws IOException {
     uriLocator.locate(createUri("**.css"));
   }
 
-
   @Test
-  public void testRecursiveWildcard4Resources() throws IOException {
+  public void testRecursiveWildcard4Resources()
+      throws IOException {
     uriLocator.locate(createUri("ro/isdc/wro/**.cs?"));
   }
 
-  @Test
-  public void resourceUnavailable() {
-    try {
-      uriLocator.locate(createUri("123123.css"));
-      Assert.fail("Should throw exception");
-    } catch (final IOException e) {
-      // TODO: handle exception
-    }
+  @Test(expected = IOException.class)
+  public void resourceUnavailable() throws Exception {
+    uriLocator.locate(createUri("123123.css"));
   }
 }

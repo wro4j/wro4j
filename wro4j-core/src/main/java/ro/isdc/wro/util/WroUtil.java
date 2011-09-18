@@ -23,9 +23,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -49,7 +49,7 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
@@ -193,10 +193,23 @@ public final class WroUtil {
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
   public static String toJSMultiLineString(final String data) {
-    final String[] lines = data.split("\\n");
-    final StringBuffer result = new StringBuffer("[\"\"");
-    for (final String line : lines) {
-      result.append(", \"" + line.replace("\\","\\\\").replace("\"","\\\"").replaceAll("\\r|\\n", "") + "\"");
+    final String[] lines = data.split("\n");
+    final StringBuffer result = new StringBuffer("[");
+    if (lines.length == 0) {
+      result.append("\"\"");
+    }
+    for (int i = 0; i < lines.length; i++) {
+      final String line = lines[i];
+      result.append("\"");
+      result.append(line.replace("\\", "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
+      //this is used to force a single line to have at least one new line (otherwise cssLint fails).
+      if (lines.length == 1) {
+        result.append("\\n");
+      }
+      result.append("\"");
+      if (i < lines.length - 1) {
+        result.append(",");
+      }
     }
     result.append("].join(\"\\n\")");
     return result.toString();
@@ -212,27 +225,6 @@ public final class WroUtil {
 //  public static String toJSMultiLineStringAsCDATA(final String data) {
 //    return "(<r><![CDATA[" + data + "]]></r>).toString()";
 //  }
-
-  /**
-   * Checks if request contains the header value with a given value.
-   *
-   * @param request to check
-   * @param header name of the header to check
-   * @param value of the header to check
-   */
-  @SuppressWarnings("unchecked")
-  private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
-    final Enumeration<String> headerValues = request.getHeaders(header);
-    if (headerValues != null) {
-      while (headerValues.hasMoreElements()) {
-        final String headerValue = headerValues.nextElement();
-        if (headerValue.indexOf(value) != -1) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
 
   /**
    * @return a {@link ThreadFactory} which produces only daemon threads.
@@ -285,12 +277,12 @@ public final class WroUtil {
       final NodeList nodes = (NodeList) result;
       for (int i = 0; i < nodes.getLength(); i++) {
         final Node node = nodes.item(i);
-        LOG.debug("node: " + node);
+        LOG.debug("\tnode: {}", node);
         if (filterName.equals(node.getTextContent())) {
           final Node filterMappingNode = node.getParentNode().getParentNode();
-          LOG.debug("filterMappingNode: " + filterMappingNode);
+          LOG.debug("filterMappingNode: {}", filterMappingNode);
           urlPattern = urlPatternExpression.evaluate(filterMappingNode);
-          LOG.debug("urlPattern: " + urlPattern);
+          LOG.debug("urlPattern: {}", urlPattern);
         }
       }
 

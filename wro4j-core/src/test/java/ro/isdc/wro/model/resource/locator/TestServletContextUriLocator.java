@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,7 @@ public class TestServletContextUriLocator {
     Context.set(context);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotAcceptNullUri()
     throws Exception {
     locator.locate(null);
@@ -140,7 +139,7 @@ public class TestServletContextUriLocator {
 
       public void forward(final ServletRequest request, final ServletResponse response)
           throws ServletException, IOException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
       }
     };
 
