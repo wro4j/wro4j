@@ -17,6 +17,7 @@ import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
@@ -82,6 +83,7 @@ public class ExtensionsConfigurableWroManagerFactory
     map.put(JsonHPackProcessor.ALIAS_PACK, (T) JsonHPackProcessor.packProcessor());
     map.put(JsonHPackProcessor.ALIAS_UNPACK, (T) JsonHPackProcessor.unpackProcessor());
     map.put(JsHintProcessor.ALIAS, (T) new JsHintProcessor());
+    map.put(JsLintProcessor.ALIAS, (T) new JsLintProcessor());
     map.put(CssLintProcessor.ALIAS, (T) new CssLintProcessor());
   }
 }

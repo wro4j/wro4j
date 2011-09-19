@@ -60,10 +60,7 @@ public class CustomStandaloneWroManagerFactory
         }
         super.process(resource, reader, writer);
       }
-
-      @Override
-      protected void onJsHintException(final LinterException e, final Resource resource)
-        throws Exception {
+      protected void onLinterException(final LinterException e, final Resource resource) throws Exception {
         LOG.error(
           e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
             + e.getErrors());
@@ -83,7 +80,6 @@ public class CustomStandaloneWroManagerFactory
   @Override
   protected WroModelFactory newModelFactory() {
     return new WroModelFactory() {
-
       public WroModel create() {
         final WroModel model = new WroModel();
 //        model.addGroup(new Group("all").addResource(

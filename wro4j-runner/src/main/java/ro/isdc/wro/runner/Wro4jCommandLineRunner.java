@@ -331,9 +331,9 @@ public class Wro4jCommandLineRunner {
     });
     map.put(JsHintProcessor.ALIAS, new JsHintProcessor() {
       @Override
-      protected void onJsHintException(final LinterException e, final Resource resource)
-        throws Exception {
-        super.onJsHintException(e, resource);
+      protected void onLinterException(final LinterException e, final Resource resource)
+          throws Exception {
+        super.onLinterException(e, resource);
         System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
         System.err.println(e.getErrors());
       }
