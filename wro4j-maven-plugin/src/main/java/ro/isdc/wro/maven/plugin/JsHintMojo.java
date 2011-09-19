@@ -10,7 +10,7 @@ import java.io.Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -42,7 +42,7 @@ public class JsHintMojo extends AbstractSingleProcessorMojo {
       }
 
       @Override
-      protected void onJsHintException(final JsHintException e, final Resource resource)
+      protected void onJsHintException(final LinterException e, final Resource resource)
         throws Exception {
         getLog().error(
           e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "

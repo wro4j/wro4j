@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHint;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.JsHint;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -55,7 +55,7 @@ public class JsHintProcessor
     final String content = IOUtils.toString(reader);
     try {
       newJsHint().setOptions(options).validate(content);
-    } catch (final JsHintException e) {
+    } catch (final LinterException e) {
       try {
         onJsHintException(e, resource);
       } catch (final Exception ex) {
@@ -88,13 +88,13 @@ public class JsHintProcessor
   }
 
   /**
-   * Called when {@link JsHintException} is thrown. Allows subclasses to re-throw this exception as a
+   * Called when {@link LinterException} is thrown. Allows subclasses to re-throw this exception as a
    * {@link RuntimeException} or handle it differently. The default implementation simply logs the errors.
    *
-   * @param e {@link JsHintException} which has occurred.
+   * @param e {@link LinterException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onJsHintException(final JsHintException e, final Resource resource)
+  protected void onJsHintException(final LinterException e, final Resource resource)
     throws Exception {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }

@@ -1,11 +1,14 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.extensions.processor.support.jshint;
+package ro.isdc.wro.extensions.processor.support.linter;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+
+import ro.isdc.wro.extensions.processor.support.linter.JsHint;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 
 
 /**
@@ -37,7 +40,7 @@ public class TestJsHint {
   }
 
 
-  @Test(expected = JsHintException.class)
+  @Test(expected = LinterException.class)
   public void testInvalidScript()
     throws Exception {
     jsHint.validate("al ert(1)");
@@ -51,7 +54,7 @@ public class TestJsHint {
   }
 
 
-  @Test(expected = JsHintException.class)
+  @Test(expected = LinterException.class)
   public void testWithUndefOption()
     throws Exception {
     jsHint.setOptions("undef");
@@ -59,14 +62,14 @@ public class TestJsHint {
   }
 
 
-  @Test(expected = JsHintException.class)
+  @Test(expected = LinterException.class)
   public void testEqeqOption()
     throws Exception {
     jsHint.setOptions("eqeqeq");
     jsHint.validate("var j = 1;var i = j == 0 ? j + 1 : j - 1;");
   }
 
-  @Test(expected = JsHintException.class)
+  @Test(expected = LinterException.class)
   public void testEqeqOption2()
     throws Exception {
     jsHint.setOptions("eqeqeq");

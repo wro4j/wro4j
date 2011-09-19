@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -62,7 +62,7 @@ public class CustomStandaloneWroManagerFactory
       }
 
       @Override
-      protected void onJsHintException(final JsHintException e, final Resource resource)
+      protected void onJsHintException(final LinterException e, final Resource resource)
         throws Exception {
         LOG.error(
           e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "

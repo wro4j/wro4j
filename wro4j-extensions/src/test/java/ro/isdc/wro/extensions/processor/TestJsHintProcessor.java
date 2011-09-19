@@ -14,7 +14,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -46,7 +46,7 @@ public class TestJsHintProcessor {
     final ThreadLocal<Throwable> cause = new ThreadLocal<Throwable>();
 
     final JsHintProcessor processor = new JsHintProcessor() {
-      protected void onJsHintException(final JsHintException e, final Resource resource)
+      protected void onJsHintException(final LinterException e, final Resource resource)
           throws Exception {
         cause.set(e);
       };
