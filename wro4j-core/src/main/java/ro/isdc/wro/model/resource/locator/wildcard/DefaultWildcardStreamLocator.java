@@ -51,6 +51,9 @@ public class DefaultWildcardStreamLocator
    * following characters: [?*].
    */
   private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
+  /**
+   * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
+   */
   private Transformer<Collection<File>> wildcardExpanderHandler;
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
@@ -106,11 +109,11 @@ public class DefaultWildcardStreamLocator
     //this map has to be ordered
     final Map<String, File> uriToFileMap = new TreeMap<String, File>();
     /**
-     * Holds a list of all files (also folders, not only resources). This is useful for wildcard expander processing.
+     * Holds a set of all files (also folders, not only resources). This is useful for wildcard expander processing.
      */
     final Set<File> allFiles = new TreeSet<File>(new Comparator<File>() {
         // File's natural ordering varies between platforms
-        public int compare(File o1, File o2) {
+        public int compare(final File o1, final File o2) {
             return o1.getPath().compareTo(o2.getPath());
         }
     });
@@ -136,7 +139,6 @@ public class DefaultWildcardStreamLocator
     };
     FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
 
-    //TODO remove duplicates if needed:
     LOG.debug("map files: {}", uriToFileMap.keySet());
 
     final Collection<File> files = uriToFileMap.values();
