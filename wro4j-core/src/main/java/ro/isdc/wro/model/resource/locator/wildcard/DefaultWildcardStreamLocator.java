@@ -10,11 +10,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -107,7 +108,12 @@ public class DefaultWildcardStreamLocator
     /**
      * Holds a list of all files (also folders, not only resources). This is useful for wildcard expander processing.
      */
-    final List<File> allFiles = new ArrayList<File>();
+    final Set<File> allFiles = new TreeSet<File>(new Comparator<File>() {
+        // File's natural ordering varies between platforms
+        public int compare(File o1, File o2) {
+            return o1.getPath().compareTo(o2.getPath());
+        }
+    });
 
     final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
     final String parentFolderPath = folder.getPath();
@@ -149,7 +155,7 @@ public class DefaultWildcardStreamLocator
    *
    * @param files a collection of found files after the wildcard has beed applied on the searched folder.
    */
-  private void handleFoundAllFiles(final List<File> allFiles) throws IOException {
+  private void handleFoundAllFiles(final Set<File> allFiles) throws IOException {
     if (wildcardExpanderHandler != null) {
       try {
         wildcardExpanderHandler.transform(allFiles);
