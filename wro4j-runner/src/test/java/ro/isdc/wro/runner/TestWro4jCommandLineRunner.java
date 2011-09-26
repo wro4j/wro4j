@@ -74,7 +74,7 @@ public class TestWro4jCommandLineRunner {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
 
     setDestinationFolder(new File(contextFolder, "targetCssFolder"));
-    final String wroFile = contextFolder + "\\wro.xml";
+    final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(
@@ -96,7 +96,7 @@ public class TestWro4jCommandLineRunner {
   @Test
   public void useSeveralProcessors() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
-    final String wroFile = contextFolder + "\\wro.xml";
+    final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
       JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
@@ -111,7 +111,7 @@ public class TestWro4jCommandLineRunner {
   @Test
   public void useCssLint() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
-    final String wroFile = contextFolder + "\\wro.xml";
+    final String wroFile = contextFolder + File.separator + "wro.xml";
 
     final String[] args = String.format("--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + CssLintProcessor.ALIAS,
         new Object[] {
@@ -125,7 +125,7 @@ public class TestWro4jCommandLineRunner {
   public void useJsHint()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
-    final String wroFile = contextFolder + "\\wro.xml";
+    final String wroFile = contextFolder + File.separator + "wro.xml";
 
     final String[] args = String.format(
         "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
@@ -138,7 +138,7 @@ public class TestWro4jCommandLineRunner {
   public void processTestWroXml()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
-    final String wroFile = contextFolder + "\\wro.xml";
+    final String wroFile = contextFolder + File.separator + "wro.xml";
 
     LOG.debug(wroFile);
     final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
@@ -151,7 +151,7 @@ public class TestWro4jCommandLineRunner {
   public void shouldAcceptGroovyDSLUsingSmartModelFactory() {
     final File contextFolderFile = new File(getClass().getResource("").getFile(), "dsl");
     final String contextFolder = contextFolderFile.getAbsolutePath();
-    //final String wroFile = contextFolder + "\\wro.xml";
+    //final String wroFile = contextFolder + File.separator + "wro.xml";
 
     //LOG.debug(wroFile);
     final String[] args = String.format("-m --contextFolder %s --destinationFolder %s", new Object[] {
