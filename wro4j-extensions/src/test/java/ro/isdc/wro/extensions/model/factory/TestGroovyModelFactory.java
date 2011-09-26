@@ -57,7 +57,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream() throws IOException {
-        return TestGroovyModelFactory.class.getResourceAsStream("Wro.groovy");
+        return TestGroovyModelFactory.class.getResourceAsStream("wro.groovy");
       };
     };
     final WroModel model = factory.create();
