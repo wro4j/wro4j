@@ -84,7 +84,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
     return new Runnable() {
       public void run() {
         try {
-          model = ScheduledWroModelFactory.this.create();
+          model = ScheduledWroModelFactory.super.create();
           // find a way to clear the cache
           LOG.info("Wro Model (wro.xml) updated!");
         } catch (final Exception e) {
@@ -97,6 +97,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onModelPeriodChanged() {
     LOG.debug("notified about model change");
     super.onModelPeriodChanged();
