@@ -59,6 +59,7 @@ public final class DispatcherStreamLocator {
     Validate.notNull(response);
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
+    boolean warnOnEmptyStream = false;
 
     //preserve context, in case it is unset during dispatching
     final Context originalContext = Context.get();
@@ -82,6 +83,7 @@ public final class DispatcherStreamLocator {
       LOG.debug("dispatching request to location: " + location);
       // use dispatcher
       dispatcher.include(wrappedRequest, wrappedResponse);
+      warnOnEmptyStream = true;
       // force flushing - the content will be written to
       // BytArrayOutputStream. Otherwise exactly 32K of data will be
       // written.
@@ -94,7 +96,7 @@ public final class DispatcherStreamLocator {
       LOG.debug("[FAIL] Error while dispatching the request for location {}", location, e);
       throw new IOException("Error while dispatching the request for location " + location, e);
     } finally {
-      if (os.size() == 0) {
+      if (warnOnEmptyStream && os.size() == 0) {
         LOG.warn("Wrong or empty resource with location: {}", location);
       }
       //Put the context back
