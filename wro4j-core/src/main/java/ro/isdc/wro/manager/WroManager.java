@@ -87,7 +87,7 @@ public final class WroManager
   /**
    * Scheduled executors service, used to update the output result.
    */
-  private ScheduledExecutorService scheduler;
+  private volatile ScheduledExecutorService scheduler;
   private ProcessorsFactory processorsFactory;
   private UriLocatorFactory uriLocatorFactory;
   /**
@@ -312,14 +312,18 @@ public final class WroManager
    */
   private void initScheduler() {
     if (scheduler == null) {
-      final long period = Context.get().getConfig().getCacheUpdatePeriod();
-      LOG.debug("runing thread with period of {}", period);
-      if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
-        // Run a scheduled task which updates the model.
-        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
-        // (thread tries to make up for lost time in some situations)
-        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
+      synchronized (this) {
+        if (scheduler == null) {
+          final long period = Context.get().getConfig().getCacheUpdatePeriod();
+          LOG.debug("runing thread with period of {}", period);
+          if (period > 0) {
+            scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
+            // Run a scheduled task which updates the model.
+            // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
+            // (thread tries to make up for lost time in some situations)
+            scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
+          }
+        }
       }
     }
   }
@@ -407,8 +411,12 @@ public final class WroManager
   public final void onCachePeriodChanged() {
     LOG.info("CacheChange event triggered!");
     if (scheduler != null) {
-      scheduler.shutdown();
-      scheduler = null;
+      synchronized (this) {
+        if (scheduler != null) {
+          scheduler.shutdown();
+          scheduler = null;
+        }
+      }
     }
     // flush the cache by destroying it.
     cacheStrategy.clear();
