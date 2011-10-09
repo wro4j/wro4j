@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -42,18 +43,21 @@ public class TestWroUtil {
     Assert.assertEquals("/a", result);
   }
 
+  @Ignore
   @Test
   public void test1GetFilterPath() throws Exception {
     final InputStream is = ClassLoader.getSystemResourceAsStream(WroUtil.toPackageAsFolder(getClass()) + "/web.xml");
     Assert.assertEquals("wro/", WroUtil.getFilterPath("Test1", is));
   }
 
+  @Ignore
   @Test
   public void test2GetFilterPath() throws Exception {
     final InputStream is = ClassLoader.getSystemResourceAsStream(WroUtil.toPackageAsFolder(getClass()) + "/web.xml");
     Assert.assertEquals("", WroUtil.getFilterPath("Test2", is));
   }
 
+  @Ignore
   @Test(expected=ServletException.class)
   public void test3GetFilterPath() throws Exception {
     final InputStream is = ClassLoader.getSystemResourceAsStream(WroUtil.toPackageAsFolder(getClass()) + "/web.xml");
