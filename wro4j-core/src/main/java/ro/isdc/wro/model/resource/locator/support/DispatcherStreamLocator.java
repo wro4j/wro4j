@@ -57,42 +57,6 @@ public final class DispatcherStreamLocator {
       throws IOException {
     Validate.notNull(request);
     Validate.notNull(response);
-<<<<<<< HEAD
-    // where to write the bytes of the stream
-    final ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-    //preserve context, in case it is unset during dispatching
-    final Context originalContext = Context.get();
-    try {
-      final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
-      if (dispatcher == null) {
-        // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
-        // the thread responsible for refreshing resources)
-
-        // Returns the part URL from the protocol name up to the query string and contextPath.
-        final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-
-        final String absolutePath = servletContextPath + location;
-        final URL url = new URL(absolutePath);
-        return url.openStream();
-      }
-      // Wrap request
-      final ServletRequest wrappedRequest = getWrappedServletRequest(request, location);
-      // Wrap response
-      final ServletResponse wrappedResponse = getWrappedServletResponse(response, os);
-      LOG.debug("dispatching request to location: " + location);
-      // use dispatcher
-      dispatcher.include(wrappedRequest, wrappedResponse);
-      // force flushing - the content will be written to
-      // BytArrayOutputStream. Otherwise exactly 32K of data will be
-      // written.
-      wrappedResponse.getWriter().flush();
-      os.close();
-    } catch (final Exception e) {
-      // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
-      // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
-      // included.
-=======
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
@@ -129,7 +93,6 @@ public final class DispatcherStreamLocator {
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
->>>>>>> patch
       LOG.debug("[FAIL] Error while dispatching the request for location {}", location, e);
       throw new IOException("Error while dispatching the request for location " + location, e);
     } finally {
