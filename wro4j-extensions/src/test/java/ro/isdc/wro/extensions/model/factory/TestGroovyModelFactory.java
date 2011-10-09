@@ -58,7 +58,7 @@ public class TestGroovyModelFactory {
     factory = new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("Wro.groovy"));
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("wro.groovy"));
       }
     };
     final WroModel model = factory.create();

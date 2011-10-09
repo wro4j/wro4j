@@ -33,7 +33,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
   /**
    * Scheduled executors service, used to refresh the WroModel.
    */
-  private ScheduledExecutorService scheduler;
+  private volatile ScheduledExecutorService scheduler;
 
   public ScheduledWroModelFactory(final WroModelFactory decorated) {
     super(decorated);
@@ -65,14 +65,18 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
    */
   private void initScheduler() {
     if (scheduler == null) {
-      final long period = Context.get().getConfig().getModelUpdatePeriod();
-      if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
-        // Run a scheduled task which updates the model.
-        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
-        // (thread tries to make up for lost time in some situations)
-        LOG.info("Schedule Model Update for " + period + " seconds period");
-        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
+      synchronized (this) {
+        if (scheduler == null) {
+          final long period = Context.get().getConfig().getModelUpdatePeriod();
+          if (period > 0) {
+            scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
+            // Run a scheduled task which updates the model.
+            // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
+            // (thread tries to make up for lost time in some situations)
+            LOG.info("Schedule Model Update for " + period + " seconds period");
+            scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
+          }
+        }
       }
     }
   }
@@ -84,7 +88,7 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
     return new Runnable() {
       public void run() {
         try {
-          model = ScheduledWroModelFactory.this.create();
+          model = ScheduledWroModelFactory.super.create();
           // find a way to clear the cache
           LOG.info("Wro Model (wro.xml) updated!");
         } catch (final Exception e) {
@@ -97,12 +101,17 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onModelPeriodChanged() {
     LOG.debug("notified about model change");
     super.onModelPeriodChanged();
     if (scheduler != null) {
-      scheduler.shutdown();
-      scheduler = null;
+      synchronized (this) {
+        if (scheduler != null) {
+          scheduler.shutdown();
+          scheduler = null;
+        }
+      }
     }
     // force scheduler to reload
     model = null;
