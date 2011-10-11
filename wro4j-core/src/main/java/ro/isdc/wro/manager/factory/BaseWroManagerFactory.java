@@ -35,7 +35,6 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NamingStrategyAware;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
@@ -51,7 +50,7 @@ import ro.isdc.wro.util.Transformer;
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
-  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, NamingStrategyAware, ObjectFactory<WroManager> {
+  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, ObjectFactory<WroManager> {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
   /**
    * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
@@ -133,8 +132,9 @@ public class BaseWroManagerFactory
   /**
    * @param namingStrategy the namingStrategy to set
    */
-  public void setNamingStrategy(final NamingStrategy namingStrategy) {
+  public BaseWroManagerFactory setNamingStrategy(final NamingStrategy namingStrategy) {
     this.namingStrategy = namingStrategy;
+    return this;
   }
 
 
