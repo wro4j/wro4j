@@ -438,11 +438,18 @@ public final class WroManager
    * Called when {@link WroManager} is being taken out of service.
    */
   public final void destroy() {
-    LOG.debug("WroManager destroyed");
+    LOG.info("WroManager destroyed");
     cacheStrategy.destroy();
     modelFactory.destroy();
     if (scheduler != null) {
+      LOG.info("Shutting down the Scheduler using shutdownNow()...");
+      //scheduler.shutdown();
       scheduler.shutdownNow();
+      try {
+        scheduler.awaitTermination(1, TimeUnit.SECONDS);
+      } catch (final InterruptedException e) {
+        LOG.debug("Scheduler execution interrupted", e);
+      }
     }
   }
 
