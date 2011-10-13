@@ -11,7 +11,6 @@ import java.io.Reader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.ToolErrorReporter;
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
   private Context context;
-  private ScriptableObject scope;
+  private final ScriptableObject scope;
 
   private RhinoScriptBuilder() {
     this(null);
@@ -37,7 +36,6 @@ public class RhinoScriptBuilder {
   private RhinoScriptBuilder(final ScriptableObject scope) {
     this.scope = createContext(scope);
   }
-
 
   /**
    * @return the context
@@ -50,8 +48,7 @@ public class RhinoScriptBuilder {
    * Initialize the context.
    */
   private ScriptableObject createContext(final ScriptableObject initialScope) {
-    // remove any existing context.
-    this.context = ContextFactory.getGlobal().enterContext();
+    initContext();
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
@@ -80,7 +77,7 @@ public class RhinoScriptBuilder {
     try {
       final String SCRIPT_ENV = "env.rhino.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluate(script, SCRIPT_ENV);
+      evaluateChain(script, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize env.rhino script", e);
@@ -92,7 +89,7 @@ public class RhinoScriptBuilder {
     try {
       final String SCRIPT_ENV = "json2.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluate(script, SCRIPT_ENV);
+      evaluateChain(script, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);
@@ -111,11 +108,21 @@ public class RhinoScriptBuilder {
   public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
     throws IOException {
     Validate.notNull(stream);
+    initContext();
     try {
       context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
+    } catch(final RuntimeException e) {
+      LOG.error("Exception caught", e);
+      throw e;
     } finally {
       stream.close();
+    }
+  }
+
+  public void initContext() {
+    if (Context.getCurrentContext() == null) {
+      context = Context.enter();
     }
   }
 
@@ -130,32 +137,10 @@ public class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
     Validate.notNull(script);
+    initContext();
     context.evaluateString(scope, script, sourceName, 1, null);
     return this;
   }
-
-
-  /**
-   * Evaluates a script from a stream.
-   *
-   * @param script {@link InputStream} of the script to evaluate.
-   * @param sourceName the name of the evaluated script.
-   * @return evaluated object.
-   * @throws IOException if the script couldn't be retrieved.
-   */
-  public Object evaluate(final InputStream stream, final String sourceName)
-    throws IOException {
-    Validate.notNull(stream);
-    try {
-      return context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
-    } catch (final JavaScriptException e) {
-      LOG.error("JavaScriptException occured: " + e.getMessage());
-      throw e;
-    } finally {
-      stream.close();
-    }
-  }
-
 
   /**
    * Evaluates a script from a reader.
@@ -169,10 +154,7 @@ public class RhinoScriptBuilder {
     throws IOException {
     Validate.notNull(reader);
     try {
-      return context.evaluateReader(scope, reader, sourceName, 1, null);
-    } catch (final JavaScriptException e) {
-      LOG.error("JavaScriptException occured: " + e.getMessage());
-      throw e;
+      return evaluate(IOUtils.toString(reader), sourceName);
     } finally {
       reader.close();
     }
@@ -189,14 +171,20 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final String script, final String sourceName) {
     Validate.notNull(script);
+    //make sure we have a context associated with current thread
+    initContext();
     try {
       return context.evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
+    } finally {
+      //Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
+      if (Context.getCurrentContext() != null) {
+        Context.exit();
+      }
     }
   }
-
 
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.
@@ -208,7 +196,6 @@ public class RhinoScriptBuilder {
   public static RhinoScriptBuilder newChain(final ScriptableObject scope) {
     return new RhinoScriptBuilder(scope);
   }
-
 
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.
