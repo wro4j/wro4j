@@ -230,10 +230,10 @@ public final class WroUtil {
    * @return a {@link ThreadFactory} which produces only daemon threads.
    */
   public static ThreadFactory createDaemonThreadFactory() {
-    final ThreadFactory backingThreadFactory = Executors.defaultThreadFactory();
     return new ThreadFactory() {
       public Thread newThread(final Runnable runnable) {
-        final Thread thread = backingThreadFactory.newThread(runnable);
+        final Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+        thread.setName("wro4j-thread-daemon-thread");
         thread.setDaemon(true);
         return thread;
       }
