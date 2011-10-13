@@ -39,7 +39,7 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.2-SNAPSHOT</version>
+        <version>1.4.1</version>
         <executions>
           <execution>
             <goals>
