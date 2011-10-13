@@ -53,6 +53,7 @@
           </execution>
         </executions>
         <configuration>
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
           <ignoreMissingResources>false</ignoreMissingResources>          
           <failNever>true</failNever>
           <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/bundle/</cssDestinationFolder>
