@@ -84,6 +84,7 @@ public class WildcardExpanderModelTransformer
             LOG.debug("Expanding resource: {}", resource.getUri());
 
             final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
+            LOG.debug("baseNameFolder: {}", baseNameFolder);
 
             expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
             try {
@@ -125,6 +126,7 @@ public class WildcardExpanderModelTransformer
         throws Exception {
         LOG.debug("\texpanded Files: {}", input);
         for (final File file : input) {
+          LOG.debug("\tsetting baseNameFolder: {}", file.getParent());
           baseNameFolderHolder.set(file.getParent());
           // no need to continue
           break;
@@ -135,7 +137,6 @@ public class WildcardExpanderModelTransformer
     });
 
     try {
-      LOG.debug("resourcePath: {}", resourcePath);
       uriLocator.locate(resourcePath);
     } catch (final Exception e) {
       LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
