@@ -32,10 +32,21 @@ public class SchedulerHelper {
    * Period in seconds (how often a runnable should run).
    */
   private long period = 0;
+  private String name;
+
 
   private SchedulerHelper(final ObjectFactory<Runnable> runnableFactory) {
+    this(runnableFactory, null);
+  }
+
+  private SchedulerHelper(final ObjectFactory<Runnable> runnableFactory, final String name) {
     Validate.notNull(runnableFactory);
+    this.name = name;
     this.runnableFactory = runnableFactory;
+  }
+
+  public static SchedulerHelper create(final ObjectFactory<Runnable> runnableFactory, final String name) {
+    return new SchedulerHelper(runnableFactory, name);
   }
 
   /**
@@ -43,6 +54,7 @@ public class SchedulerHelper {
    * allows lazy runnable initialization.
    */
   public static SchedulerHelper create(final ObjectFactory<Runnable> runnableFactory) {
+    LOG.info("creating SchedulerHelper");
     return new SchedulerHelper(runnableFactory);
   }
 
@@ -98,21 +110,21 @@ public class SchedulerHelper {
    * Syncronous operation which ensure that all running jobs are stopped.
    */
   private void destroyScheduler() {
-    LOG.debug("destroyScheduler");
+    LOG.info("destroyScheduler: {}", this.name);
     if (scheduler != null) {
       synchronized (this) {
         if (scheduler != null) {
-          LOG.debug("Shutting down scheduler...");
-          scheduler.shutdown();
+          LOG.info("Shutting down scheduler...");
+          scheduler.shutdownNow();
           while (!scheduler.isTerminated()) {
             try {
-              LOG.debug("\tawaiting scheduler termination...");
+              LOG.info("\tawaiting scheduler termination...");
               scheduler.awaitTermination(500, TimeUnit.MILLISECONDS);
             } catch (final InterruptedException e) {
               LOG.debug("couldn't await scheduler termination", e);
             }
           }
-          LOG.debug("[OK] Scheduler terminated successfully!");
+          LOG.info("[OK] Scheduler terminated successfully!");
           scheduler = null;
         }
       }
@@ -140,7 +152,7 @@ public class SchedulerHelper {
     return new ThreadFactory() {
       public Thread newThread(final Runnable runnable) {
         final Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-        thread.setName("wro4j-thread-daemon-thread");
+        thread.setName("wro4j-daemon-thread");
         thread.setDaemon(true);
         return thread;
       }

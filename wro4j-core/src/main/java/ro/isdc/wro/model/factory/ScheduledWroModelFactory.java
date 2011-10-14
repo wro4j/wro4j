@@ -6,10 +6,7 @@ package ro.isdc.wro.model.factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.util.ObjectFactory;
-import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -27,15 +24,15 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
    * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
    */
   private volatile WroModel model;
-  private final SchedulerHelper schedulerHelper;
+//  private final SchedulerHelper schedulerHelper;
 
   public ScheduledWroModelFactory(final WroModelFactory decorated) {
     super(decorated);
-    schedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
-      public Runnable create() {
-        return getSchedulerRunnable();
-      }
-    });
+//    schedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
+//      public Runnable create() {
+//        return getSchedulerRunnable();
+//      }
+//    });
   }
 
   /**
@@ -43,8 +40,8 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
    */
   @Override
   public WroModel create() {
-    final long period = Context.get().getConfig().getModelUpdatePeriod();
-    schedulerHelper.scheduleWithPeriod(period);
+//    final long period = Context.get().getConfig().getModelUpdatePeriod();
+//    schedulerHelper.scheduleWithPeriod(period);
 
     // use double-check locking
     if (model == null) {
@@ -61,22 +58,22 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
     return model;
   }
 
-  /**
-   * @return {@link Runnable} implementation which reloads the model when scheduled.
-   */
-  private Runnable getSchedulerRunnable() {
-    return new Runnable() {
-      public void run() {
-        try {
-          model = ScheduledWroModelFactory.super.create();
-          // find a way to clear the cache
-          LOG.info("Wro Model (wro.xml) updated!");
-        } catch (final Exception e) {
-          LOG.error("Exception occured", e);
-        }
-      }
-    };
-  }
+//  /**
+//   * @return {@link Runnable} implementation which reloads the model when scheduled.
+//   */
+//  private Runnable getSchedulerRunnable() {
+//    return new Runnable() {
+//      public void run() {
+//        try {
+//          model = ScheduledWroModelFactory.super.create();
+//          // find a way to clear the cache
+//          LOG.info("Wro Model updated!");
+//        } catch (final Exception e) {
+//          LOG.error("Exception occured", e);
+//        }
+//      }
+//    };
+//  }
 
   /**
    * {@inheritDoc}
@@ -85,9 +82,8 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
   public void onModelPeriodChanged() {
     LOG.debug("notified about model change");
     super.onModelPeriodChanged();
-
-    final long period = Context.get().getConfig().getModelUpdatePeriod();
-    schedulerHelper.scheduleWithPeriod(period);
+//    final long period = Context.get().getConfig().getModelUpdatePeriod();
+//    schedulerHelper.scheduleWithPeriod(period);
     // force scheduler to reload
     model = null;
   }
@@ -99,7 +95,8 @@ public class ScheduledWroModelFactory extends WroModelFactoryDecorator {
   @Override
   public void destroy() {
     // kill running threads
-    schedulerHelper.destroy();
+//    schedulerHelper.destroy();
+    model = null;
   }
 
 }

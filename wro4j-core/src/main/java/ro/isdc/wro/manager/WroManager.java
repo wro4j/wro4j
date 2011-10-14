@@ -83,7 +83,14 @@ public class WroManager
    * A callback to be notified about the cache change.
    */
   private PropertyChangeListener cacheChangeCallback;
-  private final SchedulerHelper schedulerHelper;
+  /**
+   * Schedules the cache update.
+   */
+  private final SchedulerHelper cacheSchedulerHelper;
+  /**
+   * Schedules the model update.
+   */
+  private final SchedulerHelper modelSchedulerHelper;
   private ProcessorsFactory processorsFactory;
   private UriLocatorFactory uriLocatorFactory;
   /**
@@ -97,11 +104,21 @@ public class WroManager
   private GroupsProcessor groupsProcessor;
 
   public WroManager() {
-    schedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
+    cacheSchedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
       public Runnable create() {
         return new ReloadCacheRunnable();
       }
-    });
+    }, "CACHE RESOURCES");
+    modelSchedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
+      public Runnable create() {
+        return new Runnable() {
+          public void run() {
+            modelFactory.destroy();
+            modelFactory.create();
+          }
+        };
+      }
+    }, "CACHE MODEL");
   }
 
   /**
@@ -186,7 +203,10 @@ public class WroManager
     intAggregatedFolderPath(request, type);
 
     final long period = Context.get().getConfig().getCacheUpdatePeriod();
-    schedulerHelper.scheduleWithPeriod(period);
+    cacheSchedulerHelper.scheduleWithPeriod(period);
+
+    final long modelUpdatePeriod = Context.get().getConfig().getModelUpdatePeriod();
+    modelSchedulerHelper.scheduleWithPeriod(modelUpdatePeriod);
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
@@ -379,7 +399,7 @@ public class WroManager
   public final void onCachePeriodChanged() {
     LOG.info("CacheChange event triggered!");
     final long period = Context.get().getConfig().getCacheUpdatePeriod();
-    schedulerHelper.scheduleWithPeriod(period);
+    cacheSchedulerHelper.scheduleWithPeriod(period);
     // flush the cache by destroying it.
     cacheStrategy.clear();
   }
@@ -403,7 +423,8 @@ public class WroManager
     LOG.info("WroManager destroyed");
     cacheStrategy.destroy();
     modelFactory.destroy();
-    schedulerHelper.destroy();
+    cacheSchedulerHelper.destroy();
+    modelSchedulerHelper.destroy();
   }
 
 
