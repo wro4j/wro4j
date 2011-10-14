@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +47,8 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -60,8 +59,8 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class WroManager
-  implements WroConfigurationChangeListener, CacheChangeCallbackAware {
+public class WroManager
+  implements WroConfigurationChangeListener, CacheChangeCallbackAware {;
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
   /**
@@ -84,10 +83,7 @@ public final class WroManager
    * A callback to be notified about the cache change.
    */
   private PropertyChangeListener cacheChangeCallback;
-  /**
-   * Scheduled executors service, used to update the output result.
-   */
-  private volatile ScheduledExecutorService scheduler;
+  private final SchedulerHelper schedulerHelper;
   private ProcessorsFactory processorsFactory;
   private UriLocatorFactory uriLocatorFactory;
   /**
@@ -99,6 +95,14 @@ public final class WroManager
    */
   @Inject
   private GroupsProcessor groupsProcessor;
+
+  public WroManager() {
+    schedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
+      public Runnable create() {
+        return new ReloadCacheRunnable();
+      }
+    });
+  }
 
   /**
    * Perform processing of the uri.
@@ -113,7 +117,6 @@ public final class WroManager
     final HttpServletResponse response = Context.get().getResponse();
 
     validate();
-    //TODO refactor
     InputStream is = null;
     OutputStream os = null;
     if (isProxyResourceRequest(request)) {
@@ -182,7 +185,8 @@ public final class WroManager
 
     intAggregatedFolderPath(request, type);
 
-    initScheduler();
+    final long period = Context.get().getConfig().getCacheUpdatePeriod();
+    schedulerHelper.scheduleWithPeriod(period);
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
@@ -306,85 +310,49 @@ public final class WroManager
     return entry;
   }
 
-
   /**
-   * Initialize the scheduler based on configuration values.
+   * A {@link Runnable} executed by scheduler to reload the cache.
    */
-  private void initScheduler() {
-    if (scheduler == null) {
-      synchronized (this) {
-        if (scheduler == null) {
-          final long period = Context.get().getConfig().getCacheUpdatePeriod();
-          LOG.debug("runing thread with period of {}", period);
-          if (period > 0) {
-            scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
-            // Run a scheduled task which updates the model.
-            // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
-            // (thread tries to make up for lost time in some situations)
-            scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
-          }
+  private final class ReloadCacheRunnable
+      implements Runnable {
+    public void run() {
+      try {
+        if (cacheChangeCallback != null) {
+          // invoke cacheChangeCallback
+          cacheChangeCallback.propertyChange(null);
         }
-      }
-    }
-  }
-
-
-  /**
-   * @return a {@link Runnable} which will update the cache content with latest data.
-   */
-  private Runnable getSchedulerRunnable() {
-    return new Runnable() {
-      public void run() {
-        try {
-          if (cacheChangeCallback != null) {
-            // invoke cacheChangeCallback
-            cacheChangeCallback.propertyChange(null);
-          }
-          LOG.info("reloading cache");
-          final WroModel model = modelFactory.create();
-          // process groups & put update cache
-          final Collection<Group> groups = model.getGroups();
-          // update cache for all resources
-          for (final Group group : groups) {
-            for (final ResourceType resourceType : ResourceType.values()) {
-              if (group.hasResourcesOfType(resourceType)) {
-                final Collection<Group> groupAsList = new HashSet<Group>();
-                groupAsList.add(group);
-                // TODO notify the filter about the change - expose a callback
-                // TODO check if request parameter can be fetched here without errors.
-                // groupExtractor.isMinimized(Context.get().getRequest())
-                final Boolean[] minimizeValues = new Boolean[] { true, false };
-                for (final boolean minimize : minimizeValues) {
-                  final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
-                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
-                    getContentHashEntryByContent(content));
+        LOG.info("reloading cache");
+        final WroModel model = modelFactory.create();
+        // process groups & put update cache
+        final Collection<Group> groups = model.getGroups();
+        // update cache for all resources
+        for (final Group group : groups) {
+          for (final ResourceType resourceType : ResourceType.values()) {
+            if (group.hasResourcesOfType(resourceType)) {
+              final Collection<Group> groupAsList = new HashSet<Group>();
+              groupAsList.add(group);
+              // TODO notify the filter about the change - expose a callback
+              // TODO check if request parameter can be fetched here without errors.
+              // groupExtractor.isMinimized(Context.get().getRequest())
+              final Boolean[] minimizeValues = new Boolean[] { true, false };
+              for (final boolean minimize : minimizeValues) {
+                //make sure this thread stops if the scheduler was shutdown
+                if (Thread.interrupted()) {
+                  return;
                 }
+                final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
+                cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
+                  getContentHashEntryByContent(content));
               }
             }
           }
-        } catch (final Exception e) {
-          // Catch all exception in order to avoid situation when scheduler runs out of threads.
-          LOG.error("Exception occured: ", e);
         }
+      } catch (final Exception e) {
+        // Catch all exception in order to avoid situation when scheduler runs out of threads.
+        LOG.error("Exception occured: ", e);
       }
-    };
+    }
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final void registerCallback(final PropertyChangeListener callback) {
-    this.cacheChangeCallback = callback;
-  }
-
-
-  /**
-   * @return true if Gzip is Supported
-   */
-  private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
-  }
-
 
   /**
    * Resolve the stream for a request.
@@ -410,14 +378,8 @@ public final class WroManager
    */
   public final void onCachePeriodChanged() {
     LOG.info("CacheChange event triggered!");
-    if (scheduler != null) {
-      synchronized (this) {
-        if (scheduler != null) {
-          scheduler.shutdown();
-          scheduler = null;
-        }
-      }
-    }
+    final long period = Context.get().getConfig().getCacheUpdatePeriod();
+    schedulerHelper.scheduleWithPeriod(period);
     // flush the cache by destroying it.
     cacheStrategy.clear();
   }
@@ -441,16 +403,7 @@ public final class WroManager
     LOG.info("WroManager destroyed");
     cacheStrategy.destroy();
     modelFactory.destroy();
-    if (scheduler != null) {
-      LOG.info("Shutting down the Scheduler using shutdownNow()...");
-      //scheduler.shutdown();
-      scheduler.shutdownNow();
-      try {
-        scheduler.awaitTermination(1, TimeUnit.SECONDS);
-      } catch (final InterruptedException e) {
-        LOG.debug("Scheduler execution interrupted", e);
-      }
-    }
+    schedulerHelper.destroy();
   }
 
 
@@ -466,6 +419,21 @@ public final class WroManager
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
     Validate.notNull(hashBuilder, "HashBuilder was not set!");
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void registerCallback(final PropertyChangeListener callback) {
+    this.cacheChangeCallback = callback;
+  }
+
+
+  /**
+   * @return true if Gzip is Supported
+   */
+  private boolean isGzipSupported() {
+    return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 
 
