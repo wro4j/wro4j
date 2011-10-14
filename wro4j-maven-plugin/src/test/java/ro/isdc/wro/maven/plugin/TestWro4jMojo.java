@@ -105,8 +105,8 @@ public class TestWro4jMojo {
   }
 
 
-  @Test
-  public void testMojoWithPropertiesSet()
+  @Test(expected = MojoExecutionException.class)
+  public void shouldFailWhenInvalidResourcesAreUsed()
     throws Exception {
     mojo.setIgnoreMissingResources(false);
     mojo.execute();
@@ -279,6 +279,7 @@ public class TestWro4jMojo {
     final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
 
     mojo.setGroupNameMappingFile(groupNameMappingFile.getPath());
+    mojo.setIgnoreMissingResources(true);
     mojo.execute();
 
     //verify
@@ -300,6 +301,7 @@ public class TestWro4jMojo {
 
     mojo.setWroManagerFactory(CustomNamingStrategyWroManagerFactory.class.getName());
     mojo.setGroupNameMappingFile(groupNameMappingFile.getPath());
+    mojo.setIgnoreMissingResources(true);
     mojo.execute();
 
     //verify
