@@ -111,12 +111,7 @@ public class WroManager
     }, "CACHE RESOURCES");
     modelSchedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
       public Runnable create() {
-        return new Runnable() {
-          public void run() {
-            modelFactory.destroy();
-            modelFactory.create();
-          }
-        };
+        return new ReloadModelRunnable();
       }
     }, "CACHE MODEL");
   }
@@ -202,11 +197,9 @@ public class WroManager
 
     intAggregatedFolderPath(request, type);
 
-    final long period = Context.get().getConfig().getCacheUpdatePeriod();
-    cacheSchedulerHelper.scheduleWithPeriod(period);
-
-    final long modelUpdatePeriod = Context.get().getConfig().getModelUpdatePeriod();
-    modelSchedulerHelper.scheduleWithPeriod(modelUpdatePeriod);
+    //reschedule cache & model updates
+    cacheSchedulerHelper.scheduleWithPeriod(Context.get().getConfig().getCacheUpdatePeriod());
+    modelSchedulerHelper.scheduleWithPeriod(Context.get().getConfig().getModelUpdatePeriod());
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
@@ -331,6 +324,22 @@ public class WroManager
   }
 
   /**
+   * A {@link Runnable} executed by scheduler to reload the model.
+   */
+  private final class ReloadModelRunnable
+    implements Runnable {
+    public void run() {
+      try {
+        LOG.info("Reloading Model....");
+        modelFactory.destroy();
+        modelFactory.create();
+      } catch (final Exception e) {
+        LOG.error("Exception caught while creating model", e);
+      }
+    }
+  }
+
+  /**
    * A {@link Runnable} executed by scheduler to reload the cache.
    */
   private final class ReloadCacheRunnable
@@ -356,10 +365,6 @@ public class WroManager
               // groupExtractor.isMinimized(Context.get().getRequest())
               final Boolean[] minimizeValues = new Boolean[] { true, false };
               for (final boolean minimize : minimizeValues) {
-                //make sure this thread stops if the scheduler was shutdown
-                if (Thread.interrupted()) {
-                  return;
-                }
                 final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
                 cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
                   getContentHashEntryByContent(content));
@@ -410,9 +415,8 @@ public class WroManager
    */
   public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
-    if (modelFactory instanceof WroConfigurationChangeListener) {
-      ((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
-    }
+    final long period = Context.get().getConfig().getModelUpdatePeriod();
+    modelSchedulerHelper.scheduleWithPeriod(period);
   }
 
 
@@ -421,10 +425,10 @@ public class WroManager
    */
   public final void destroy() {
     LOG.info("WroManager destroyed");
-    cacheStrategy.destroy();
-    modelFactory.destroy();
     cacheSchedulerHelper.destroy();
     modelSchedulerHelper.destroy();
+    cacheStrategy.destroy();
+    modelFactory.destroy();
   }
 
 

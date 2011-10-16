@@ -11,7 +11,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.WroModel;
 
-public class TestScheduledWroModelFactory {
+public class TestInMemoryCacheableWroModelFactory {
 
   private WroModelFactory scheduledModelFactory;
 
@@ -39,7 +39,7 @@ public class TestScheduledWroModelFactory {
     WroModelFactory underlyingModelFactory = Mockito.mock(WroModelFactory.class);
     Mockito.when(underlyingModelFactory.create()).thenReturn(first, second);
 
-    scheduledModelFactory = new ScheduledWroModelFactory(underlyingModelFactory);
+    scheduledModelFactory = new InMemoryCacheableWroModelFactory(underlyingModelFactory);
 
     scheduledModelFactory.create();
 

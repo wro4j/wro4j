@@ -23,7 +23,7 @@ import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.ModelTransformerFactory;
-import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
+import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -116,7 +116,7 @@ public class BaseWroManagerFactory
     manager.setProcessorsFactory(processorsFactory);
     manager.setNamingStrategy(namingStrategy);
     //wrap modelFactory with several useful decorators
-    manager.setModelFactory(new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
+    manager.setModelFactory(new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
         modelFactory))).setTransformers(modelTransformers));
 
     final Injector injector = new Injector(manager);

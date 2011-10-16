@@ -36,7 +36,7 @@ public class TestFallbackAwareWroModelFactory {
   public void setUp() {
     // initialize the context
     Context.set(Context.standaloneContext());
-    fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
+    fallbackAwareModelFactory = new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {

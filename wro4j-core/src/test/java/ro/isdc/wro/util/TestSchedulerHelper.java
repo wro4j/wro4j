@@ -85,7 +85,7 @@ public class TestSchedulerHelper {
   public void schedulerHelperIsSynchronized() throws Exception {
     helper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
       public Runnable create() {
-        return createSleepingRunnable(300);
+        return createSleepingRunnable(2000);
       }
     });
     final ThreadLocal<Long> period = new InheritableThreadLocal<Long>() {
@@ -95,9 +95,10 @@ public class TestSchedulerHelper {
       }
     };
 
-    final ExecutorService service = Executors.newFixedThreadPool(10);
+    final ExecutorService service = Executors.newFixedThreadPool(5);
     for (int i = 0; i < 10; i++) {
       period.set(period.get() + 100);
+      //Thread.sleep(300);
       service.execute(new Runnable() {
         public void run() {
           final long periodAsLong = period.get();
@@ -105,7 +106,7 @@ public class TestSchedulerHelper {
         }
       });
     }
-    Thread.sleep(2000);
+    Thread.sleep(5000);
     service.shutdown();
   }
 
@@ -119,7 +120,7 @@ public class TestSchedulerHelper {
     return new Runnable() {
       public void run() {
         try {
-          LOG.debug("\tTHREAD IS RUNNING....");
+          LOG.debug("\tTHREAD IS RUNNING.... ");
           Thread.sleep(period);
         } catch (final InterruptedException e) {
           LOG.debug("thread interrupted", e);
