@@ -7,6 +7,8 @@ package ro.isdc.wro.util;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import junit.framework.Assert;
 
@@ -85,7 +87,18 @@ public class TestSchedulerHelper {
   public void schedulerHelperIsSynchronized() throws Exception {
     helper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
       public Runnable create() {
-        return createSleepingRunnable(2000);
+        return new Runnable() {
+          public void run() {
+            try {
+              final ReentrantLock lock = new ReentrantLock();
+              final Condition condition = lock.newCondition();
+              condition.await(1, TimeUnit.SECONDS);
+            } catch (final Exception e) {
+              LOG.error("runnable interrupted");
+            }
+          }
+        };
+        //return createSleepingRunnable(2000);
       }
     });
     final ThreadLocal<Long> period = new InheritableThreadLocal<Long>() {
@@ -102,11 +115,15 @@ public class TestSchedulerHelper {
       service.execute(new Runnable() {
         public void run() {
           final long periodAsLong = period.get();
-          helper.scheduleWithPeriod(periodAsLong, TimeUnit.MILLISECONDS);
+          //helper.scheduleWithPeriod(periodAsLong, TimeUnit.MILLISECONDS);
+          helper.scheduleWithPeriod(1, TimeUnit.SECONDS);
         }
       });
     }
-    Thread.sleep(5000);
+    Thread.sleep(3000);
+    helper.getPool().shutdown();
+    Thread.sleep(3000);
+    helper.destroy();
     service.shutdown();
   }
 
@@ -120,9 +137,8 @@ public class TestSchedulerHelper {
     return new Runnable() {
       public void run() {
         try {
-          LOG.debug("\tTHREAD IS RUNNING.... ");
           Thread.sleep(period);
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
           LOG.debug("thread interrupted", e);
         }
       }

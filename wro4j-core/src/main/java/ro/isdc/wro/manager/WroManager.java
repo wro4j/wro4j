@@ -175,7 +175,6 @@ public class WroManager
     return response.getOutputStream();
   }
 
-
   /**
    * @param model the model used to build stream.
    * @param request {@link HttpServletRequest} for this request cycle.
@@ -329,12 +328,24 @@ public class WroManager
   private final class ReloadModelRunnable
     implements Runnable {
     public void run() {
+      LOG.info("[START] Reloading Model....");
       try {
-        LOG.info("Reloading Model....");
         modelFactory.destroy();
+        LOG.info("\tmodel destroyed");
         modelFactory.create();
+        LOG.info("\tmodel created");
+        if (Thread.interrupted()) {
+          LOG.info("######ReloadModelRunnable was interrupted - stop processing!");
+          throw new InterruptedException();
+        }
+      } catch (final InterruptedException e) {
+        // Catch all exception in order to avoid situation when scheduler runs out of threads.
+        LOG.error("Interrupted exception occured: ", e);
+        Thread.currentThread().interrupt();
       } catch (final Exception e) {
         LOG.error("Exception caught while creating model", e);
+      } finally {
+        LOG.info("[STOP] Reloading Model....");
       }
     }
   }
@@ -345,12 +356,12 @@ public class WroManager
   private final class ReloadCacheRunnable
       implements Runnable {
     public void run() {
+      LOG.info("[START] reloading cache");
       try {
         if (cacheChangeCallback != null) {
           // invoke cacheChangeCallback
           cacheChangeCallback.propertyChange(null);
         }
-        LOG.info("reloading cache");
         final WroModel model = modelFactory.create();
         // process groups & put update cache
         final Collection<Group> groups = model.getGroups();
@@ -365,16 +376,28 @@ public class WroManager
               // groupExtractor.isMinimized(Context.get().getRequest())
               final Boolean[] minimizeValues = new Boolean[] { true, false };
               for (final boolean minimize : minimizeValues) {
+                LOG.info("\tprocessing group...");
                 final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
                 cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
                   getContentHashEntryByContent(content));
+                //stop processing if the current thread is interrupted
+                if (Thread.interrupted()) {
+                  LOG.info("######ReloadCacheRunnable was interrupted - stop processing!");
+                  throw new InterruptedException();
+                }
               }
             }
           }
         }
+      } catch (final InterruptedException e) {
+        // Catch all exception in order to avoid situation when scheduler runs out of threads.
+        LOG.error("Interrupted exception occured: ", e);
+        Thread.currentThread().interrupt();
       } catch (final Exception e) {
         // Catch all exception in order to avoid situation when scheduler runs out of threads.
-        LOG.error("Exception occured: ", e);
+        LOG.error("Exception occured during cache reload: ", e);
+      } finally {
+        LOG.info("[STOP] reloading cache");
       }
     }
   }
@@ -424,11 +447,17 @@ public class WroManager
    * Called when {@link WroManager} is being taken out of service.
    */
   public final void destroy() {
-    LOG.info("WroManager destroyed");
-    cacheSchedulerHelper.destroy();
-    modelSchedulerHelper.destroy();
-    cacheStrategy.destroy();
-    modelFactory.destroy();
+    LOG.info("Destroying WroManager...");
+    try {
+      cacheSchedulerHelper.destroy();
+      modelSchedulerHelper.destroy();
+      cacheStrategy.destroy();
+      modelFactory.destroy();
+    } catch (final Exception e) {
+      LOG.error("Exception occured during manager destroy!!!");
+    } finally {
+      LOG.info("WroManager destroyed");
+    }
   }
 
 

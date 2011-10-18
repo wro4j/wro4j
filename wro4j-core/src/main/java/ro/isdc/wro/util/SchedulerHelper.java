@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2011.
- * All rights reserved.
+ * Copyright (C) 2011. All rights reserved.
  */
 package ro.isdc.wro.util;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(SchedulerHelper.class);
-  private ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor(createDaemonThreadFactory());
+  private final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor(createDaemonThreadFactory());
   /**
    * A factory providing the runnable to schedule.
    */
@@ -34,14 +33,12 @@ public class SchedulerHelper {
    */
   private volatile long period = 0;
 
-  private String name;
-  private Future<?> future;
-
+  private final String name;
+  private ScheduledFuture<?> future;
 
   private SchedulerHelper(final ObjectFactory<Runnable> runnableFactory) {
     this(runnableFactory, null);
   }
-
 
   private SchedulerHelper(final ObjectFactory<Runnable> runnableFactory, final String name) {
     Validate.notNull(runnableFactory);
@@ -49,19 +46,19 @@ public class SchedulerHelper {
     this.runnableFactory = runnableFactory;
   }
 
-
   /**
    * Factory method. Creates a {@link SchedulerHelper} which consumes a factory providing a runnable. This approach
    * allows lazy runnable initialization.
    *
-   * @param runnableFactory a factory creating the runnable to schedule.
-   * @param name the name associated with this {@link SchedulerHelper} (useful to detect if this class is causing a
-   *        memory leak.
+   * @param runnableFactory
+   *          a factory creating the runnable to schedule.
+   * @param name
+   *          the name associated with this {@link SchedulerHelper} (useful to detect if this class is causing a memory
+   *          leak.
    */
   public static SchedulerHelper create(final ObjectFactory<Runnable> runnableFactory, final String name) {
     return new SchedulerHelper(runnableFactory, name);
   }
-
 
   /**
    * @see SchedulerHelper#create(ObjectFactory, String)
@@ -71,13 +68,14 @@ public class SchedulerHelper {
     return new SchedulerHelper(runnableFactory);
   }
 
-
   /**
    * Run the scheduler with the provided period of time. If the scheduler is already started, it will be stopped (not
    * before the running job is complete).
    *
-   * @param period new period for scheduling.
-   * @param timeUnit what kind of time unit is associated with the period.
+   * @param period
+   *          new period for scheduling.
+   * @param timeUnit
+   *          what kind of time unit is associated with the period.
    */
   public SchedulerHelper scheduleWithPeriod(final long period, final TimeUnit timeUnit) {
     Validate.notNull(timeUnit);
@@ -93,7 +91,6 @@ public class SchedulerHelper {
     }
     return this;
   }
-
 
   /**
    * @param period
@@ -115,14 +112,12 @@ public class SchedulerHelper {
     }
   }
 
-
   private void cancelRunningTask() {
     if (future != null) {
       future.cancel(false);
       LOG.debug("[STOP] Scheduler terminated successfully! {}", Thread.currentThread().getId());
     }
   }
-
 
   public static Runnable decorate(final Runnable runnable) {
     final long threadId = Thread.currentThread().getId();
@@ -134,17 +129,23 @@ public class SchedulerHelper {
     };
   }
 
-
   /**
    * Schedules with provided period using {@link TimeUnit#SECONDS} as a default time unit.
    *
-   * @param period new period for scheduling.
+   * @param period
+   *          new period for scheduling.
    */
   public SchedulerHelper scheduleWithPeriod(final long period) {
     scheduleWithPeriod(period, TimeUnit.SECONDS);
     return this;
   }
 
+  /**
+   * @return the pool
+   */
+  public ScheduledExecutorService getPool() {
+    return pool;
+  }
 
   /**
    * Stops all jobs runned by the scheduler. It is important to call this method before application stops.
@@ -153,29 +154,25 @@ public class SchedulerHelper {
     destroyScheduler();
   }
 
-
   /**
    * The following method shuts down an ExecutorService in two phases, first by calling shutdown to reject incoming
    * tasks, and then calling shutdownNow, if necessary, to cancel any lingering tasks:
    *
-   * @param destroyNow - if true, any running operation will be stopped immediately, otherwise scheduler will await
-   *        termination.
+   * @param destroyNow
+   *          - if true, any running operation will be stopped immediately, otherwise scheduler will await termination.
    */
   private synchronized void destroyScheduler() {
-    LOG.info("destroyScheduler: {} with id {}", this.name, Thread.currentThread().getId());
+    LOG.info("destroyScheduler: with id {}", Thread.currentThread().getId());
     if (!pool.isShutdown()) {
-      pool.shutdownNow(); // Disable new tasks from being submitted
+      // Disable new tasks from being submitted
+      pool.shutdownNow();
       try {
         // Wait a while for existing tasks to terminate
-        if (!pool.awaitTermination(2, TimeUnit.SECONDS)) {
-          // Cancel currently executing tasks
-          pool.shutdownNow();
-          // Wait a while for tasks to respond to being cancelled
-          if (!pool.awaitTermination(2, TimeUnit.SECONDS)) {
-            LOG.error("Pool did not terminate");
-          }
+        while (!pool.awaitTermination(2, TimeUnit.SECONDS)) {
+          LOG.info("\tawaiting termination...: " + name);
         }
       } catch (final InterruptedException e) {
+        LOG.info("Interrupted Exception occured during scheduler destroy", e);
         // (Re-)Cancel if current thread also interrupted
         pool.shutdownNow();
         // Preserve interrupt status
@@ -184,26 +181,8 @@ public class SchedulerHelper {
         LOG.info("[STOP] Scheduler terminated successfully! {}", Thread.currentThread().getId());
       }
 
-//      scheduler.shutdownNow();
-//      // make sure scheduler is terminated before continue thread execution in order to prevent memory leak
-//      // (reported by tomcat).
-//      boolean terminated = future == null || future != null && future.isDone();
-//      while (!terminated) {
-//        try {
-//          LOG.info("\tawaiting scheduler termination...");
-//          LOG.info("\tdetails: ... s.shutDown: " + scheduler.isShutdown() + " s.terminated: "
-//            + scheduler.isTerminated() + " f.done: " + future.isDone() + " f.cancelled: " + future.isCancelled());
-//          terminated = scheduler.awaitTermination(500, TimeUnit.MILLISECONDS);
-//          Thread.sleep(500);
-//          terminated = future.cancel(true);
-//        } catch (final InterruptedException e) {
-//          LOG.info("couldn't await scheduler termination", e);
-//          break;
-//        }
-//      }
     }
   }
-
 
   /**
    * @return {@link ThreadFactory} with daemon threads.
@@ -218,7 +197,6 @@ public class SchedulerHelper {
       }
     };
   }
-
 
   /**
    * @return the period
