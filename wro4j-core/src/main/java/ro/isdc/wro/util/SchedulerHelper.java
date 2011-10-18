@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -184,14 +185,18 @@ public class SchedulerHelper {
     }
   }
 
+  private static final AtomicInteger poolNumber = new AtomicInteger(1);
+
   /**
    * @return {@link ThreadFactory} with daemon threads.
    */
   private static ThreadFactory createDaemonThreadFactory() {
     return new ThreadFactory() {
+      private final String prefix = "wro4j-scheduler-" + poolNumber.getAndIncrement() + "-thread-";
+      private final AtomicInteger threadNumber = new AtomicInteger(1);
+
       public Thread newThread(final Runnable runnable) {
-        final Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-        thread.setName("wro4j-daemon-thread");
+        final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
         thread.setDaemon(true);
         return thread;
       }
