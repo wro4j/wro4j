@@ -23,6 +23,25 @@ import org.slf4j.LoggerFactory;
  */
 public class SchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(SchedulerHelper.class);
+
+  private static final AtomicInteger poolNumber = new AtomicInteger(1);
+
+  /**
+   * @return {@link ThreadFactory} with daemon threads.
+   */
+  private static ThreadFactory createDaemonThreadFactory() {
+    return new ThreadFactory() {
+      private final String prefix = "wro4j-scheduler-" + poolNumber.getAndIncrement() + "-thread-";
+      private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+      public Thread newThread(final Runnable runnable) {
+        final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
+        thread.setDaemon(true);
+        return thread;
+      }
+    };
+  }
+
   private SafeLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new SafeLazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
@@ -46,12 +65,15 @@ public class SchedulerHelper {
   private volatile long period = 0;
 
   private final String name;
+  /**
+   * The future of the currently running task. Allows reschedule operation by cancelling execution of the running
+   * thread.
+   */
   private ScheduledFuture<?> future;
 
   private SchedulerHelper(final SafeLazyInitializer<Runnable> lazyRunnable) {
     this(lazyRunnable, null);
   }
-
 
   private SchedulerHelper(final SafeLazyInitializer<Runnable> lazyRunnable, final String name) {
     Validate.notNull(lazyRunnable);
@@ -125,6 +147,34 @@ public class SchedulerHelper {
     }
   }
 
+  /**
+   * The following method shuts down an ExecutorService in two phases, first by calling shutdown to reject incoming
+   * tasks, and then calling shutdownNow, if necessary, to cancel any lingering tasks:
+   *
+   * @param destroyNow
+   *          - if true, any running operation will be stopped immediately, otherwise scheduler will await termination.
+   */
+  private synchronized void destroyScheduler() {
+    LOG.info("destroyScheduler: with name {}", name);
+    if (!poolInitializer.get().isShutdown()) {
+      // Disable new tasks from being submitted
+      poolInitializer.get().shutdownNow();
+      try {
+        while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
+          LOG.debug("\tTermination awaited: " + name);
+        }
+      } catch (final InterruptedException e) {
+        LOG.info("Interrupted Exception occured during scheduler destroy", e);
+        // (Re-)Cancel if current thread also interrupted
+        poolInitializer.get().shutdownNow();
+        // Preserve interrupt status
+        Thread.currentThread().interrupt();
+      } finally {
+        LOG.info("[STOP] Scheduler terminated successfully! {}", name);
+      }
+    }
+  }
+
   private void cancelRunningTask() {
     if (future != null) {
       future.cancel(false);
@@ -148,58 +198,6 @@ public class SchedulerHelper {
    */
   public void destroy() {
     destroyScheduler();
-  }
-
-  /**
-   * The following method shuts down an ExecutorService in two phases, first by calling shutdown to reject incoming
-   * tasks, and then calling shutdownNow, if necessary, to cancel any lingering tasks:
-   *
-   * @param destroyNow
-   *          - if true, any running operation will be stopped immediately, otherwise scheduler will await termination.
-   */
-  private synchronized void destroyScheduler() {
-    LOG.info("destroyScheduler: with name {}", name);
-    if (!poolInitializer.get().isShutdown()) {
-      // Disable new tasks from being submitted
-      poolInitializer.get().shutdown();
-      LOG.debug("Clearing the queue");
-      try {
-        if (future != null) {
-          future.cancel(true);
-        }
-        while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
-          LOG.info("\tTermination awaited: " + name);
-          poolInitializer.get().shutdownNow();
-        }
-      } catch (final InterruptedException e) {
-        LOG.info("Interrupted Exception occured during scheduler destroy", e);
-        // (Re-)Cancel if current thread also interrupted
-        poolInitializer.get().shutdownNow();
-        // Preserve interrupt status
-        Thread.currentThread().interrupt();
-      } finally {
-        LOG.info("[STOP] Scheduler terminated successfully! {}", name);
-      }
-
-    }
-  }
-
-  private static final AtomicInteger poolNumber = new AtomicInteger(1);
-
-  /**
-   * @return {@link ThreadFactory} with daemon threads.
-   */
-  private static ThreadFactory createDaemonThreadFactory() {
-    return new ThreadFactory() {
-      private final String prefix = "wro4j-scheduler-" + poolNumber.getAndIncrement() + "-thread-";
-      private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-      public Thread newThread(final Runnable runnable) {
-        final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
-        thread.setDaemon(true);
-        return thread;
-      }
-    };
   }
 
   /**
