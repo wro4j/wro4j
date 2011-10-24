@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
@@ -47,7 +45,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.SafeLazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -66,7 +64,7 @@ public class WroManager
   /**
    * ResourcesModel factory.
    */
-  private WroModelFactory modelFactory;
+  WroModelFactory modelFactory;
   /**
    * GroupExtractor.
    */
@@ -78,11 +76,11 @@ public class WroManager
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
   /**
    * A callback to be notified about the cache change.
    */
-  private PropertyChangeListener cacheChangeCallback;
+  PropertyChangeListener cacheChangeCallback;
   /**
    * Schedules the cache update.
    */
@@ -104,14 +102,16 @@ public class WroManager
   private GroupsProcessor groupsProcessor;
 
   public WroManager() {
-    cacheSchedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
-      public Runnable create() {
-        return new ReloadCacheRunnable();
+    cacheSchedulerHelper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return new ReloadCacheRunnable(WroManager.this);
       }
     }, "CACHE RESOURCES");
-    modelSchedulerHelper = SchedulerHelper.create(new ObjectFactory<Runnable>() {
-      public Runnable create() {
-        return new ReloadModelRunnable();
+    modelSchedulerHelper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return new ReloadModelRunnable(WroManager.this);
       }
     }, "CACHE MODEL");
   }
@@ -310,7 +310,7 @@ public class WroManager
   /**
    * Creates a {@link ContentHashEntry} based on provided content.
    */
-  private ContentHashEntry getContentHashEntryByContent(final String content)
+  ContentHashEntry getContentHashEntryByContent(final String content)
     throws IOException {
     String hash = null;
     if (content != null) {
@@ -320,86 +320,6 @@ public class WroManager
     final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
     LOG.debug("computed entry: {}", entry);
     return entry;
-  }
-
-  /**
-   * A {@link Runnable} executed by scheduler to reload the model.
-   */
-  private final class ReloadModelRunnable
-    implements Runnable {
-    public void run() {
-      LOG.info("[START] Reloading Model....");
-      try {
-        modelFactory.destroy();
-        LOG.info("\tmodel destroyed");
-        modelFactory.create();
-        LOG.info("\tmodel created");
-        if (Thread.interrupted()) {
-          LOG.info("######ReloadModelRunnable was interrupted - stop processing!");
-          throw new InterruptedException();
-        }
-      } catch (final InterruptedException e) {
-        // Catch all exception in order to avoid situation when scheduler runs out of threads.
-        LOG.error("Interrupted exception occured: ", e);
-        Thread.currentThread().interrupt();
-      } catch (final Exception e) {
-        LOG.error("Exception caught while creating model", e);
-      } finally {
-        LOG.info("[STOP] Reloading Model....");
-      }
-    }
-  }
-
-  /**
-   * A {@link Runnable} executed by scheduler to reload the cache.
-   */
-  private final class ReloadCacheRunnable
-      implements Runnable {
-    public void run() {
-      LOG.info("[START] reloading cache");
-      try {
-        if (cacheChangeCallback != null) {
-          // invoke cacheChangeCallback
-          cacheChangeCallback.propertyChange(null);
-        }
-        final WroModel model = modelFactory.create();
-        // process groups & put update cache
-        final Collection<Group> groups = model.getGroups();
-        // update cache for all resources
-        for (final Group group : groups) {
-          for (final ResourceType resourceType : ResourceType.values()) {
-            if (group.hasResourcesOfType(resourceType)) {
-              final Collection<Group> groupAsList = new HashSet<Group>();
-              groupAsList.add(group);
-              // TODO notify the filter about the change - expose a callback
-              // TODO check if request parameter can be fetched here without errors.
-              // groupExtractor.isMinimized(Context.get().getRequest())
-              final Boolean[] minimizeValues = new Boolean[] { true, false };
-              for (final boolean minimize : minimizeValues) {
-                LOG.info("\tprocessing group...");
-                final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
-                cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
-                  getContentHashEntryByContent(content));
-                //stop processing if the current thread is interrupted
-                if (Thread.interrupted()) {
-                  LOG.info("######ReloadCacheRunnable was interrupted - stop processing!");
-                  throw new InterruptedException();
-                }
-              }
-            }
-          }
-        }
-      } catch (final InterruptedException e) {
-        // Catch all exception in order to avoid situation when scheduler runs out of threads.
-        LOG.error("Interrupted exception occured: ", e);
-        Thread.currentThread().interrupt();
-      } catch (final Exception e) {
-        // Catch all exception in order to avoid situation when scheduler runs out of threads.
-        LOG.error("Exception occured during cache reload: ", e);
-      } finally {
-        LOG.info("[STOP] reloading cache");
-      }
-    }
   }
 
   /**
@@ -581,6 +501,13 @@ public class WroManager
    */
   public final NamingStrategy getNamingStrategy() {
     return this.namingStrategy;
+  }
+
+  /**
+   * @return the groupsProcessor
+   */
+  GroupsProcessor getGroupsProcessor() {
+    return this.groupsProcessor;
   }
 
   /**

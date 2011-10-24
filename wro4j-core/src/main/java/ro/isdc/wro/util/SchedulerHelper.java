@@ -3,9 +3,8 @@
  */
 package ro.isdc.wro.util;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,11 +23,23 @@ import org.slf4j.LoggerFactory;
  */
 public class SchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(SchedulerHelper.class);
-  private final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor(createDaemonThreadFactory());
+  private SafeLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new SafeLazyInitializer<ScheduledThreadPoolExecutor>() {
+    @Override
+    protected ScheduledThreadPoolExecutor initialize() {
+      return new ScheduledThreadPoolExecutor(1, createDaemonThreadFactory()) {
+        @Override
+        public boolean getExecuteExistingDelayedTasksAfterShutdownPolicy() {
+          return false;
+        };
+      };
+    }
+  };
+
+    //Executors.newSingleThreadScheduledExecutor(createDaemonThreadFactory());
   /**
-   * A factory providing the runnable to schedule.
+   * An initializer providing the runnable to schedule.
    */
-  private final ObjectFactory<Runnable> runnableFactory;
+  private final SafeLazyInitializer<Runnable> lazyRunnable;
   /**
    * Period in seconds (how often a runnable should run).
    */
@@ -37,14 +48,15 @@ public class SchedulerHelper {
   private final String name;
   private ScheduledFuture<?> future;
 
-  private SchedulerHelper(final ObjectFactory<Runnable> runnableFactory) {
-    this(runnableFactory, null);
+  private SchedulerHelper(final SafeLazyInitializer<Runnable> lazyRunnable) {
+    this(lazyRunnable, null);
   }
 
-  private SchedulerHelper(final ObjectFactory<Runnable> runnableFactory, final String name) {
-    Validate.notNull(runnableFactory);
+
+  private SchedulerHelper(final SafeLazyInitializer<Runnable> lazyRunnable, final String name) {
+    Validate.notNull(lazyRunnable);
     this.name = name;
-    this.runnableFactory = runnableFactory;
+    this.lazyRunnable = lazyRunnable;
   }
 
   /**
@@ -57,14 +69,14 @@ public class SchedulerHelper {
    *          the name associated with this {@link SchedulerHelper} (useful to detect if this class is causing a memory
    *          leak.
    */
-  public static SchedulerHelper create(final ObjectFactory<Runnable> runnableFactory, final String name) {
+  public static SchedulerHelper create(final SafeLazyInitializer<Runnable> runnableFactory, final String name) {
     return new SchedulerHelper(runnableFactory, name);
   }
 
   /**
    * @see SchedulerHelper#create(ObjectFactory, String)
    */
-  public static SchedulerHelper create(final ObjectFactory<Runnable> runnableFactory) {
+  public static SchedulerHelper create(final SafeLazyInitializer<Runnable> runnableFactory) {
     LOG.info("creating SchedulerHelper");
     return new SchedulerHelper(runnableFactory);
   }
@@ -84,7 +96,7 @@ public class SchedulerHelper {
     LOG.debug("timeUnit: {}", timeUnit);
     if (this.period != period) {
       this.period = period;
-      if (!pool.isShutdown()) {
+      if (!poolInitializer.get().isShutdown()) {
         startScheduler(period, timeUnit);
       } else {
         LOG.warn("Cannot schedule because destroy was already called!");
@@ -103,12 +115,12 @@ public class SchedulerHelper {
     if (period > 0) {
       // scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
       // (thread tries to make up for lost time in some situations)
-      final Runnable runnable = runnableFactory.create();
+      final Runnable runnable = lazyRunnable.get();
       Validate.notNull(runnable);
       // avoid reject when this method is accessed concurrently.
-      if (!pool.isShutdown()) {
+      if (!poolInitializer.get().isShutdown()) {
         LOG.debug("\t[START] Scheduling thread with period of {} - {}", period, Thread.currentThread().getId());
-        future = pool.scheduleWithFixedDelay(decorate(runnable), 0, period, timeUnit);
+        future = poolInitializer.get().scheduleWithFixedDelay(runnable, 0, period, timeUnit);
       }
     }
   }
@@ -116,18 +128,8 @@ public class SchedulerHelper {
   private void cancelRunningTask() {
     if (future != null) {
       future.cancel(false);
-      LOG.debug("[STOP] Scheduler terminated successfully! {}", Thread.currentThread().getId());
+      LOG.debug("[STOP] Scheduler terminated successfully! {}", name);
     }
-  }
-
-  public static Runnable decorate(final Runnable runnable) {
-    final long threadId = Thread.currentThread().getId();
-    return new Runnable() {
-      public void run() {
-        LOG.debug("\tThreadId: {}", threadId);
-        runnable.run();
-      }
-    };
   }
 
   /**
@@ -139,13 +141,6 @@ public class SchedulerHelper {
   public SchedulerHelper scheduleWithPeriod(final long period) {
     scheduleWithPeriod(period, TimeUnit.SECONDS);
     return this;
-  }
-
-  /**
-   * @return the pool
-   */
-  public ScheduledExecutorService getPool() {
-    return pool;
   }
 
   /**
@@ -163,23 +158,27 @@ public class SchedulerHelper {
    *          - if true, any running operation will be stopped immediately, otherwise scheduler will await termination.
    */
   private synchronized void destroyScheduler() {
-    LOG.info("destroyScheduler: with id {}", Thread.currentThread().getId());
-    if (!pool.isShutdown()) {
+    LOG.info("destroyScheduler: with name {}", name);
+    if (!poolInitializer.get().isShutdown()) {
       // Disable new tasks from being submitted
-      pool.shutdownNow();
+      poolInitializer.get().shutdown();
+      LOG.debug("Clearing the queue");
       try {
-        // Wait a while for existing tasks to terminate
-        while (!pool.awaitTermination(2, TimeUnit.SECONDS)) {
-          LOG.info("\tawaiting termination...: " + name);
+        if (future != null) {
+          future.cancel(true);
+        }
+        while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
+          LOG.info("\tTermination awaited: " + name);
+          poolInitializer.get().shutdownNow();
         }
       } catch (final InterruptedException e) {
         LOG.info("Interrupted Exception occured during scheduler destroy", e);
         // (Re-)Cancel if current thread also interrupted
-        pool.shutdownNow();
+        poolInitializer.get().shutdownNow();
         // Preserve interrupt status
         Thread.currentThread().interrupt();
       } finally {
-        LOG.info("[STOP] Scheduler terminated successfully! {}", Thread.currentThread().getId());
+        LOG.info("[STOP] Scheduler terminated successfully! {}", name);
       }
 
     }
