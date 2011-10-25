@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
@@ -67,7 +67,7 @@ public class CoffeeScript {
 
 
   /**
-   * Validates a js using jsHint and throws {@link JsHintException} if the js is invalid. If no exception is thrown, the
+   * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the
    * js is valid.
    *
    * @param data js content to process.

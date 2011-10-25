@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. All rights reserved.
+ * Copyright (c) 2011. All rights reserved.
  */
 package ro.isdc.wro.extensions.processor;
 
@@ -10,25 +10,24 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**
- * Test {@link JsHintProcessor}.
+ * Test {@link JsLintProcessor}.
  *
  * @author Alex Objelean
- * @created Created on Feb 27, 2011
  */
-public class TestJsHintProcessor extends AbstractTestLinterProcessor {
+public class TestJsLintProcessor extends AbstractTestLinterProcessor {
   /**
    * {@inheritDoc}
    */
   @Override
   protected ResourceProcessor newLinterProcessor() {
-    return new JsHintProcessor();
+    return new JsLintProcessor();
   }
 
 
@@ -37,7 +36,7 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
       throws Exception {
     final ThreadLocal<Throwable> cause = new ThreadLocal<Throwable>();
 
-    final ResourceProcessor processor = new JsHintProcessor() {
+    final ResourceProcessor processor = new JsLintProcessor() {
       @Override
       protected void onLinterException(final LinterException e, final Resource resource) throws Exception {
         cause.set(e);
