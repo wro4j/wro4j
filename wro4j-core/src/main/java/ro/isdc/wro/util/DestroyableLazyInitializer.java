@@ -19,27 +19,26 @@ public abstract class DestroyableLazyInitializer<T> {
   private volatile T object;
 
   /**
-   * Returns the object wrapped by this instance. On first access the object
-   * is created. After that it is cached and can be accessed pretty fast.
+   * Returns the object wrapped by this instance. On first access the object is created. After that it is cached and can
+   * be accessed pretty fast.
    *
-   * @return the object initialized by this {@code LazyInitializer}
-   * the object
+   * @return the object initialized by this {@code LazyInitializer} the object
    */
   public T get() {
-      // use a temporary variable to reduce the number of reads of the
-      // volatile field
-      T result = object;
+    // use a temporary variable to reduce the number of reads of the
+    // volatile field
+    T result = object;
 
-      if (result == null) {
-          synchronized (this) {
-              result = object;
-              if (result == null) {
-                  object = result = initialize();
-              }
-          }
+    if (result == null) {
+      synchronized (this) {
+        result = object;
+        if (result == null) {
+          object = result = initialize();
+        }
       }
+    }
 
-      return result;
+    return result;
   }
 
 
@@ -51,12 +50,11 @@ public abstract class DestroyableLazyInitializer<T> {
     object = null;
   }
 
+
   /**
-   * Creates and initializes the object managed by this {@code
-   * LazyInitializer}. This method is called by {@link #get()} when the object
-   * is accessed for the first time. An implementation can focus on the
-   * creation of the object. No synchronization is needed, as this is already
-   * handled by {@code get()}.
+   * Creates and initializes the object managed by this {@code LazyInitializer}. This method is called by {@link #get()}
+   * when the object is accessed for the first time. An implementation can focus on the creation of the object. No
+   * synchronization is needed, as this is already handled by {@code get()}.
    *
    * @return the managed data object
    */
