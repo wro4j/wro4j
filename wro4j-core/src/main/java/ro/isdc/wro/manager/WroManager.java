@@ -107,13 +107,13 @@ public class WroManager
       protected Runnable initialize() {
         return new ReloadCacheRunnable(WroManager.this);
       }
-    }, "CACHE RESOURCES");
+    }, ReloadCacheRunnable.class.getSimpleName());
     modelSchedulerHelper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return new ReloadModelRunnable(WroManager.this);
       }
-    }, "CACHE MODEL");
+    }, ReloadModelRunnable.class.getSimpleName());
   }
 
   /**

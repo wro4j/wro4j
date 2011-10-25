@@ -99,7 +99,6 @@ public class SchedulerHelper {
    * @see SchedulerHelper#create(ObjectFactory, String)
    */
   public static SchedulerHelper create(final SafeLazyInitializer<Runnable> runnableFactory) {
-    LOG.info("creating SchedulerHelper");
     return new SchedulerHelper(runnableFactory);
   }
 
@@ -141,7 +140,7 @@ public class SchedulerHelper {
       Validate.notNull(runnable);
       // avoid reject when this method is accessed concurrently.
       if (!poolInitializer.get().isShutdown()) {
-        LOG.debug("\t[START] Scheduling thread with period of {} - {}", period, Thread.currentThread().getId());
+        LOG.debug("[START] Scheduling thread with period of {} - {}", period, Thread.currentThread().getId());
         future = poolInitializer.get().scheduleWithFixedDelay(runnable, 0, period, timeUnit);
       }
     }
@@ -155,22 +154,21 @@ public class SchedulerHelper {
    *          - if true, any running operation will be stopped immediately, otherwise scheduler will await termination.
    */
   private synchronized void destroyScheduler() {
-    LOG.info("destroyScheduler: with name {}", name);
     if (!poolInitializer.get().isShutdown()) {
       // Disable new tasks from being submitted
       poolInitializer.get().shutdownNow();
       try {
         while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
-          LOG.debug("\tTermination awaited: " + name);
+          LOG.debug("Termination awaited: " + name);
         }
       } catch (final InterruptedException e) {
-        LOG.info("Interrupted Exception occured during scheduler destroy", e);
+        LOG.debug("Interrupted Exception occured during scheduler destroy", e);
         // (Re-)Cancel if current thread also interrupted
         poolInitializer.get().shutdownNow();
         // Preserve interrupt status
         Thread.currentThread().interrupt();
       } finally {
-        LOG.info("[STOP] Scheduler terminated successfully! {}", name);
+        LOG.debug("[STOP] Scheduler terminated successfully! {}", name);
       }
     }
   }
@@ -203,7 +201,7 @@ public class SchedulerHelper {
   /**
    * @return the period
    */
-  public long getPeriod() {
+  long getPeriod() {
     return period;
   }
 }

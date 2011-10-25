@@ -11,4 +11,7 @@ groups {
   uglifyJs {
     js("/libraries/uglifyJs/**")
   }
+  styles {
+    css("/assets/oocss/**.css")
+  }
 }

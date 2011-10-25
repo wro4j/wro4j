@@ -7,8 +7,6 @@ package ro.isdc.wro.util;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import junit.framework.Assert;
 
@@ -93,15 +91,13 @@ public class TestSchedulerHelper {
         return new Runnable() {
           public void run() {
             try {
-              final ReentrantLock lock = new ReentrantLock();
-              final Condition condition = lock.newCondition();
-              condition.await(1, TimeUnit.SECONDS);
+              LOG.debug("\tRunning thread ...");
+              Thread.sleep(400);
             } catch (final Exception e) {
-              LOG.error("runnable interrupted");
+              LOG.error("runnable interrupted", e);
             }
           }
         };
-        //return createSleepingRunnable(2000);
       }
     });
     final ThreadLocal<Long> period = new InheritableThreadLocal<Long>() {
@@ -117,9 +113,7 @@ public class TestSchedulerHelper {
       //Thread.sleep(300);
       service.execute(new Runnable() {
         public void run() {
-          final long periodAsLong = period.get();
-          //helper.scheduleWithPeriod(periodAsLong, TimeUnit.MILLISECONDS);
-          helper.scheduleWithPeriod(1, TimeUnit.SECONDS);
+          helper.scheduleWithPeriod(period.get(), TimeUnit.MILLISECONDS);
         }
       });
     }
@@ -140,7 +134,7 @@ public class TestSchedulerHelper {
         try {
           Thread.sleep(period);
         } catch (final Exception e) {
-          LOG.debug("thread interrupted", e);
+          LOG.error("thread interrupted", e);
         }
       }
     };
