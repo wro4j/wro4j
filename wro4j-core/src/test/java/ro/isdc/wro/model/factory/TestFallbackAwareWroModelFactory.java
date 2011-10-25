@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
@@ -49,7 +48,7 @@ public class TestFallbackAwareWroModelFactory {
         return null;
       };
     };
-    fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
+    fallbackAwareModelFactory = new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return locator;
@@ -67,7 +66,7 @@ public class TestFallbackAwareWroModelFactory {
   @Test
   public void testLastValidIsOK() {
     Assert.assertNotNull(fallbackAwareModelFactory.create());
-    ((WroConfigurationChangeListener)fallbackAwareModelFactory).onModelPeriodChanged();
+    fallbackAwareModelFactory.destroy();
     Assert.assertNotNull(fallbackAwareModelFactory.create());
   }
 

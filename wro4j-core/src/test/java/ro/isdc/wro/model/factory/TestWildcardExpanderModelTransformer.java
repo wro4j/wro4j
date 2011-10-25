@@ -24,8 +24,6 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
@@ -129,7 +127,7 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void wildcardResourcesAreOrderedAlphabetically() {
     final WroModel model = new WroModel();
-    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/order/**.js", WroUtil.toPackageAsFolder(getClass()));
+    final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/order/**.js", WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
 

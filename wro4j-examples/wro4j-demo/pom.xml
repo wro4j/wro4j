@@ -14,8 +14,8 @@
   <name>Wro4j Demo project</name>
 
 	<properties>
-		<wicket.version>1.5-RC5.1</wicket.version>
-		<gae.version>1.5.1</gae.version>
+		<wicket.version>1.5.1</wicket.version>
+		<gae.version>1.5.4</gae.version>
     <dwr.version>3.0.M1</dwr.version>
     <guice.version>3.0</guice.version>
 		<project_charset>UTF-8</project_charset>

@@ -6,8 +6,6 @@ package ro.isdc.wro.util;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.TimeZone;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -172,21 +170,6 @@ public final class WroUtil {
 //  }
 
   /**
-   * @return a {@link ThreadFactory} which produces only daemon threads.
-   */
-  public static ThreadFactory createDaemonThreadFactory() {
-    final ThreadFactory backingThreadFactory = Executors.defaultThreadFactory();
-    return new ThreadFactory() {
-      public Thread newThread(final Runnable runnable) {
-        final Thread thread = backingThreadFactory.newThread(runnable);
-        thread.setDaemon(true);
-        return thread;
-      }
-    };
-  }
-
-
-  /**
    * Returns the filter path read from the web.xml
    *
    * @param filterName the name of the searched filter.
@@ -195,12 +178,8 @@ public final class WroUtil {
    */
   public static String getFilterPath(final String filterName, final InputStream is)
     throws ServletException {
-    if (filterName == null) {
-      throw new IllegalArgumentException("filterName cannot be null!");
-    }
-    if (is == null) {
-      throw new IllegalArgumentException("InputStream cannot be null!");
-    }
+    Validate.notNull(filterName);
+    Validate.notNull(is);
     final String prefix = "filter";
     final String mapping = prefix + "-mapping";
 

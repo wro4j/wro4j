@@ -75,6 +75,11 @@ public final class WroConfiguration
    */
   private String header;
   /**
+   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend too
+   * much time on slow end-point.
+   */
+  private int connectionTimeout = 2;
+  /**
    * Listeners for the change of cache & model period properties.
    */
   private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(
@@ -356,6 +361,24 @@ public final class WroConfiguration
    */
   public void setHeader(final String header) {
     this.header = header;
+  }
+
+  /**
+   * @return the connectionTimeout
+   */
+  public int getConnectionTimeout() {
+    return this.connectionTimeout;
+  }
+
+
+  /**
+   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend
+   * too much time on slow end-point.
+   *
+   * @param connectionTimeout the connectionTimeout to set
+   */
+  public void setConnectionTimeout(final int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
   }
 
 

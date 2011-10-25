@@ -1,7 +1,6 @@
 groups {
   encoding {
     js("/static/js/encoding/*.js")
-    js("https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js")
   }
   bom {
     js("/static/js/bom/*.js")
@@ -19,8 +18,6 @@ groups {
     css("/WEB-INF/jsp/css.jsp")
   }
   dynamicResource {
-    js("/resource/redirect.js")
-    js("/external/resource.js")
   }
   placeholder {
     css("/static/css/placeholder/*.css")
@@ -47,7 +44,6 @@ groups {
     css("/static/css/webapp.css")
     css("/static/css/css1.css")
     css("/static/css/css2.css")
-    css("/static/css/NOTEXIST.css")
     css("classpath:ro/isdc/wro/resources/*.css")
   }
   otherGroup {
