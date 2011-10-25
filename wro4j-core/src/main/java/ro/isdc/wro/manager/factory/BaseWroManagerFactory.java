@@ -22,8 +22,8 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
 import ro.isdc.wro.model.factory.ModelTransformerFactory;
-import ro.isdc.wro.model.factory.ScheduledWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -39,6 +39,7 @@ import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.Transformer;
 
 
@@ -52,10 +53,6 @@ import ro.isdc.wro.util.Transformer;
 public class BaseWroManagerFactory
   implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, ObjectFactory<WroManager> {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
-  /**
-   * Manager instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
-   */
-  private volatile WroManager manager;
   /**
    * A callback to be notified about the cache change.
    */
@@ -73,60 +70,67 @@ public class BaseWroManagerFactory
   private UriLocatorFactory uriLocatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
+  /**
+   * Handles the lazy synchronized creation of the manager
+   */
+  private DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
+    @Override
+    protected WroManager initialize() {
+      final WroManager manager = new WroManager();
+      if (modelFactory == null) {
+        modelFactory = newModelFactory();
+      }
+      if (groupExtractor == null) {
+        groupExtractor = newGroupExtractor();
+      }
+      if (cacheStrategy == null) {
+        cacheStrategy = newCacheStrategy();
+      }
+      if (hashBuilder == null) {
+        hashBuilder = newHashBuilder();
+      }
+      if (modelTransformers == null) {
+        modelTransformers = newModelTransformers();
+      }
+      if (processorsFactory == null) {
+        processorsFactory = newProcessorsFactory();
+      }
+      if (uriLocatorFactory == null) {
+        uriLocatorFactory = newUriLocatorFactory();
+      }
+      //use NoOp as default naming strategy
+      if (namingStrategy == null) {
+        namingStrategy = new NoOpNamingStrategy();
+      }
+
+      manager.setGroupExtractor(groupExtractor);
+      manager.setCacheStrategy(cacheStrategy);
+      manager.setHashBuilder(hashBuilder);
+      manager.registerCallback(cacheChangeCallback);
+      manager.setUriLocatorFactory(uriLocatorFactory);
+      manager.setProcessorsFactory(processorsFactory);
+      manager.setNamingStrategy(namingStrategy);
+      //wrap modelFactory with several useful decorators
+      manager.setModelFactory(new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
+          modelFactory))).setTransformers(modelTransformers));
+
+      final Injector injector = new Injector(manager);
+      injector.inject(modelFactory);
+      //transformers also require injection
+      for (final Transformer<WroModel> transformer : modelTransformers) {
+        injector.inject(transformer);
+      }
+
+      return manager;
+    }
+  };
 
   /**
    * Creates default singleton instance of manager, by initializing manager dependencies with default values
    * (processors).
    */
   public final WroManager create() {
-    if (manager == null) {
-      manager = new WroManager();
-    }
-    if (modelFactory == null) {
-      modelFactory = newModelFactory();
-    }
-    if (groupExtractor == null) {
-      groupExtractor = newGroupExtractor();
-    }
-    if (cacheStrategy == null) {
-      cacheStrategy = newCacheStrategy();
-    }
-    if (hashBuilder == null) {
-      hashBuilder = newHashBuilder();
-    }
-    if (modelTransformers == null) {
-      modelTransformers = newModelTransformers();
-    }
-    if (processorsFactory == null) {
-      processorsFactory = newProcessorsFactory();
-    }
-    if (uriLocatorFactory == null) {
-      uriLocatorFactory = newUriLocatorFactory();
-    }
-    //use NoOp as default naming strategy
-    if (namingStrategy == null) {
-      namingStrategy = new NoOpNamingStrategy();
-    }
-
-    manager.setGroupExtractor(groupExtractor);
-    manager.setCacheStrategy(cacheStrategy);
-    manager.setHashBuilder(hashBuilder);
-    manager.registerCallback(cacheChangeCallback);
-    manager.setUriLocatorFactory(uriLocatorFactory);
-    manager.setProcessorsFactory(processorsFactory);
-    manager.setNamingStrategy(namingStrategy);
-    //wrap modelFactory with several useful decorators
-    manager.setModelFactory(new ModelTransformerFactory(new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(
-        modelFactory))).setTransformers(modelTransformers));
-
-    final Injector injector = new Injector(manager);
-    injector.inject(modelFactory);
-    //transformers also require injection
-    for (final Transformer<WroModel> transformer : modelTransformers) {
-      injector.inject(transformer);
-    }
-
-    return manager;
+    return managerInitializer.get();
   }
 
   /**
@@ -194,9 +198,7 @@ public class BaseWroManagerFactory
    * {@inheritDoc}
    */
   public void onCachePeriodChanged() {
-    if (manager != null) {
-      manager.onCachePeriodChanged();
-    }
+    managerInitializer.get().onCachePeriodChanged();
   }
 
 
@@ -204,11 +206,9 @@ public class BaseWroManagerFactory
    * {@inheritDoc}
    */
   public void onModelPeriodChanged() {
-    if (manager != null) {
-      manager.onModelPeriodChanged();
-      // update cache too.
-      manager.onCachePeriodChanged();
-    }
+    managerInitializer.get().onModelPeriodChanged();
+    // update cache too.
+    managerInitializer.get().onCachePeriodChanged();
   }
 
 
@@ -320,9 +320,6 @@ public class BaseWroManagerFactory
    * {@inheritDoc}
    */
   public void destroy() {
-    // there is a strange situation when manager actually can be null
-    if (manager != null) {
-      manager.destroy();
-    }
+    managerInitializer.destroy();
   }
 }

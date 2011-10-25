@@ -92,7 +92,7 @@ public class WildcardExpanderModelTransformer
               uriLocator.locate(resource.getUri());
             } catch (final IOException e) {
               // log only
-              LOG.error("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
+              LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
             } finally {
               // remove the handler, it is not needed anymore
               expandedHandler.setWildcardExpanderHandler(null);
@@ -143,7 +143,7 @@ public class WildcardExpanderModelTransformer
           e.getMessage());
     }
     if (baseNameFolderHolder.get() == null) {
-      LOG.error("[FAIL] Cannot compute baseName folder for resource: {}", resource);
+      LOG.debug("[FAIL] Cannot compute baseName folder for resource: {}", resource);
     }
     return baseNameFolderHolder.get();
   }
@@ -160,7 +160,7 @@ public class WildcardExpanderModelTransformer
         if (baseNameFolder == null) {
           // replacing group with empty list since the original uri has no associated resources.
           //No BaseNameFolder found
-          LOG.info("The resource {} is probably invalid, removing it from the group.", resource);
+          LOG.warn("The resource {} is probably invalid, removing it from the group.", resource);
           group.replace(resource, new ArrayList<Resource>());
         } else {
           final List<Resource> expandedResources = new ArrayList<Resource>();

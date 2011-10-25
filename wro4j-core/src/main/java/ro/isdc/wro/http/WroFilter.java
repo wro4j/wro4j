@@ -438,8 +438,8 @@ public class WroFilter
    * {@inheritDoc}
    */
   public void destroy() {
+    wroManagerFactory.destroy();
     wroConfiguration.destroy();
     Context.destroy();
-    wroManagerFactory.destroy();
   }
 }

@@ -63,6 +63,6 @@ public class WebResourceOptimizationApplication extends WebApplication {
    * @return true if application is to be deployed on GAE.
    */
   public boolean isDeploy() {
-    return false;
+    return true;
   }
 }
