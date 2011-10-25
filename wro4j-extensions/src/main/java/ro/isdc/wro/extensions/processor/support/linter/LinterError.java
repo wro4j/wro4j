@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.extensions.processor.support.jshint;
+package ro.isdc.wro.extensions.processor.support.linter;
 
 import java.io.Serializable;
 
@@ -16,7 +16,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @since 1.3.5
  */
 @SuppressWarnings("serial")
-public class JsHintError
+public class LinterError
   implements Serializable {
   /**
    * The line (relative to 0) at which the lint was found

@@ -38,7 +38,7 @@ import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -331,9 +331,9 @@ public class Wro4jCommandLineRunner {
     });
     map.put(JsHintProcessor.ALIAS, new JsHintProcessor() {
       @Override
-      protected void onJsHintException(final JsHintException e, final Resource resource)
-        throws Exception {
-        super.onJsHintException(e, resource);
+      protected void onLinterException(final LinterException e, final Resource resource)
+          throws Exception {
+        super.onLinterException(e, resource);
         System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
         System.err.println(e.getErrors());
       }
