@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Apply <a href="https://github.com/douglascrockford/JSLint">JsLint</a> script checking utility.
  * <p/>
- * Using untagged version (commited: 2011-09-16 23:09:32)
+ * Using untagged version (commited: 2011-10-23 20:56:22)
  *
  * @author Alex Objelean
  * @since 1.4.2
@@ -23,6 +23,7 @@ public class JsLint extends AbstractLinter {
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.
    */
+  @Override
   protected InputStream getScriptAsStream() {
     //this resource is packed with packerJs compressor
     return getClass().getResourceAsStream(DEFAULT_JSLINT_JS);
