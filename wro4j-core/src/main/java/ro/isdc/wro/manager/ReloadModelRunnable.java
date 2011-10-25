@@ -21,13 +21,17 @@ public final class ReloadModelRunnable
   private static final Logger LOG = LoggerFactory.getLogger(ReloadModelRunnable.class);
 
   private final WeakReference<WroManager> wroManagerReference;
+
+
   public ReloadModelRunnable(final WroManager wroManager) {
     wroManagerReference = new WeakReference<WroManager>(wroManager);
   }
+
+
   public void run() {
     LOG.debug("Reloading Model....");
     try {
-      //TODO: do not destroy, until the creation is done and the new model is different than the new one
+      // TODO: do not destroy, until the creation is done and the new model is different than the new one
       wroManagerReference.get().getModelFactory().destroy();
       if (Thread.interrupted()) {
         LOG.debug("ReloadModelRunnable was interrupted - stop processing!");
@@ -38,6 +42,10 @@ public final class ReloadModelRunnable
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.debug("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
+    } catch (final Exception e) {
+      // Catch all exception in order to avoid situation when scheduler runs out of threads.
+      LOG.error("Exception occured during cache reload: ", e);
     }
+
   }
 }

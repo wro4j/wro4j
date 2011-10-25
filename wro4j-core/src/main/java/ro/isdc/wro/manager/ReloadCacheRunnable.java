@@ -56,7 +56,7 @@ public final class ReloadCacheRunnable
             for (final boolean minimize : minimizeValues) {
               //stop processing if the current thread is interrupted
               if (Thread.interrupted()) {
-                LOG.info("######ReloadCacheRunnable was interrupted - stop processing!");
+                LOG.debug("ReloadCacheRunnable was interrupted - stop processing!");
                 throw new InterruptedException();
               }
               final String content = wroManagerReference.get().getGroupsProcessor().process(groupAsList, resourceType,
