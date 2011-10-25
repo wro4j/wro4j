@@ -87,6 +87,9 @@ public class GroupsProcessor {
     throws IOException {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
+    if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
+      LOG.warn("No processors defined. Please, check if your configuration is correct.");
+    }
     Collection<ResourcePostProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
     processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
