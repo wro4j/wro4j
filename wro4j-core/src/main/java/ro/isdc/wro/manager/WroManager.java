@@ -33,6 +33,7 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.manager.callback.WroCallback;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -59,7 +60,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Oct 30, 2008
  */
 public class WroManager
-  implements WroConfigurationChangeListener, CacheChangeCallbackAware {;
+  implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
   /**
@@ -81,7 +82,7 @@ public class WroManager
   /**
    * A callback to be notified about the cache change.
    */
-  PropertyChangeListener cacheChangeCallback;
+  PropertyChangeListener cacheChangeListener;
   /**
    * Schedules the cache update.
    */
@@ -96,6 +97,7 @@ public class WroManager
    * Rename the file name based on its original name and content.
    */
   private NamingStrategy namingStrategy;
+  private WroCallback callback;
   /**
    * Groups processor.
    */
@@ -195,7 +197,7 @@ public class WroManager
       throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
     }
 
-    intAggregatedFolderPath(request, type);
+    initAggregatedFolderPath(request, type);
 
     //reschedule cache & model updates
     final WroConfiguration config = Context.get().getConfig();
@@ -237,7 +239,7 @@ public class WroManager
   /**
    * Set the aggregatedFolderPath if required.
    */
-  private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
+  private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
     if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
@@ -360,6 +362,7 @@ public class WroManager
    */
   public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
+    //trigger model destroy
     getModelFactory().destroy();
     final long period = Context.get().getConfig().getModelUpdatePeriod();
     modelSchedulerHelper.scheduleWithPeriod(period);
@@ -401,8 +404,8 @@ public class WroManager
   /**
    * {@inheritDoc}
    */
-  public final void registerCallback(final PropertyChangeListener callback) {
-    this.cacheChangeCallback = callback;
+  public final void registerCacheChangeListener(final PropertyChangeListener cacheChangeListener) {
+    this.cacheChangeListener = cacheChangeListener;
   }
 
 
@@ -520,6 +523,21 @@ public class WroManager
     Validate.notNull(namingStrategy);
     this.namingStrategy = namingStrategy;
     return this;
+  }
+
+  /**
+   * @param callback the callback to set
+   */
+  public final WroManager setCallback(final WroCallback callback) {
+    this.callback = callback;
+    return this;
+  }
+
+  /**
+   * @return the callback
+   */
+  public WroCallback getCallback() {
+    return this.callback;
   }
 
   /**

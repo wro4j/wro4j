@@ -6,6 +6,8 @@ package ro.isdc.wro.manager;
 
 import java.beans.PropertyChangeListener;
 
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+
 
 /**
  * The {@link WroManagerFactory} classes which implement this interface allows registration of a callback to be invoked
@@ -17,5 +19,5 @@ public interface CacheChangeCallbackAware {
   /**
    * @param callback to invoke when the cache is changed.
    */
-  void registerCallback(PropertyChangeListener callback);
+  void registerCacheChangeListener(PropertyChangeListener callback);
 }

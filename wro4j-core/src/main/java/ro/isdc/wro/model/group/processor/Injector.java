@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.callback.WroCallback;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.InjectorUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -145,6 +146,10 @@ public final class Injector {
       if (GroupsProcessor.class.isAssignableFrom(field.getType())) {
         field.set(object, groupsProcessor);
         inject(groupsProcessor);
+        return accept = true;
+      }
+      if (WroCallback.class.isAssignableFrom(field.getType())) {
+        field.set(object, wroManager.getCallback());
         return accept = true;
       }
       if (Injector.class.isAssignableFrom(field.getType())) {

@@ -4,7 +4,7 @@
  */
 package ro.isdc.wro.config.jmx;
 
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
  * Hold the name of the properties.

@@ -37,8 +37,8 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
-import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -135,7 +135,7 @@ public class WroFilter
     this.wroManagerFactory = getWroManagerFactory();
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
       // register cache change callback -> when cache is changed, update headers values.
-      ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
+      ((CacheChangeCallbackAware)wroManagerFactory).registerCacheChangeListener(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
           // update header values
           initHeaderValues();

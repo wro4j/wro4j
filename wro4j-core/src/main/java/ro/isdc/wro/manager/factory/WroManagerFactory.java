@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.manager;
+package ro.isdc.wro.manager.factory;
 
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.util.ObjectFactory;
 
 /**
