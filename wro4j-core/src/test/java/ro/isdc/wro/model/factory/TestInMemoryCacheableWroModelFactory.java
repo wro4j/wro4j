@@ -1,6 +1,6 @@
 package ro.isdc.wro.model.factory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,11 +13,11 @@ import ro.isdc.wro.model.WroModel;
 
 public class TestInMemoryCacheableWroModelFactory {
 
-  private WroModelFactory scheduledModelFactory;
+  private WroModelFactory cacheableModelFactory;
 
   @Before
   public void setUp() {
-    WroConfiguration configuration = new WroConfiguration();
+    final WroConfiguration configuration = new WroConfiguration();
     configuration.setModelUpdatePeriod(1);
 
     Context.set(Context.standaloneContext(), configuration);
@@ -25,26 +25,33 @@ public class TestInMemoryCacheableWroModelFactory {
 
   @After
   public void tearDown() {
-    if (scheduledModelFactory != null) {
-      scheduledModelFactory.destroy();
+    if (cacheableModelFactory != null) {
+      cacheableModelFactory.destroy();
     }
     Context.destroy();
   }
 
   @Test
-  public void testCreateReplacesExistingModel() throws Exception {
-    WroModel first = new WroModel();
-    WroModel second = new WroModel();
+  public void createReplacesExistingModel() throws Exception {
+    final WroModel first = new WroModel();
+    final WroModel second = new WroModel();
+    final WroModel third = new WroModel();
 
-    WroModelFactory underlyingModelFactory = Mockito.mock(WroModelFactory.class);
-    Mockito.when(underlyingModelFactory.create()).thenReturn(first, second);
+    final WroModelFactory underlyingModelFactory = Mockito.mock(WroModelFactory.class);
+    Mockito.when(underlyingModelFactory.create()).thenReturn(first, second, third);
 
-    scheduledModelFactory = new InMemoryCacheableWroModelFactory(underlyingModelFactory);
+    cacheableModelFactory = new InMemoryCacheableWroModelFactory(underlyingModelFactory);
 
-    scheduledModelFactory.create();
+    cacheableModelFactory.create();
+    cacheableModelFactory.create();
+    cacheableModelFactory.destroy();
+    cacheableModelFactory.create();
+    cacheableModelFactory.create();
 
-    Thread.sleep(1500);
-    assertSame(second, scheduledModelFactory.create());
+    assertSame(second, cacheableModelFactory.create());
+
+    cacheableModelFactory.destroy();
+    assertSame(third, cacheableModelFactory.create());
   }
 
 }

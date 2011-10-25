@@ -30,6 +30,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
@@ -45,7 +46,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.util.SafeLazyInitializer;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -102,13 +103,13 @@ public class WroManager
   private GroupsProcessor groupsProcessor;
 
   public WroManager() {
-    cacheSchedulerHelper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+    cacheSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return new ReloadCacheRunnable(WroManager.this);
       }
     }, ReloadCacheRunnable.class.getSimpleName());
-    modelSchedulerHelper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+    modelSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return new ReloadModelRunnable(WroManager.this);
@@ -197,8 +198,9 @@ public class WroManager
     intAggregatedFolderPath(request, type);
 
     //reschedule cache & model updates
-    cacheSchedulerHelper.scheduleWithPeriod(Context.get().getConfig().getCacheUpdatePeriod());
-    modelSchedulerHelper.scheduleWithPeriod(Context.get().getConfig().getModelUpdatePeriod());
+    final WroConfiguration config = Context.get().getConfig();
+    cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
+    modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
 
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
@@ -358,6 +360,7 @@ public class WroManager
    */
   public final void onModelPeriodChanged() {
     LOG.info("ModelChange event triggered!");
+    getModelFactory().destroy();
     final long period = Context.get().getConfig().getModelUpdatePeriod();
     modelSchedulerHelper.scheduleWithPeriod(period);
   }

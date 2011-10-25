@@ -35,7 +35,6 @@ public final class ReloadCacheRunnable
   }
 
   public void run() {
-    LOG.info("[START] reloading cache");
     try {
       if (wroManagerReference.get().cacheChangeCallback != null) {
         // invoke cacheChangeCallback
@@ -76,8 +75,6 @@ public final class ReloadCacheRunnable
     } catch (final Exception e) {
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.error("Exception occured during cache reload: ", e);
-    } finally {
-      LOG.info("[STOP] reloading cache");
     }
   }
 }

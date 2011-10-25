@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 
 
 /**
@@ -71,7 +70,7 @@ public class TestFallbackAwareWroModelFactory {
   @Test
   public void testLastValidIsOK() {
     Assert.assertNotNull(fallbackAwareModelFactory.create());
-    ((WroConfigurationChangeListener)fallbackAwareModelFactory).onModelPeriodChanged();
+    fallbackAwareModelFactory.destroy();
     Assert.assertNotNull(fallbackAwareModelFactory.create());
   }
 

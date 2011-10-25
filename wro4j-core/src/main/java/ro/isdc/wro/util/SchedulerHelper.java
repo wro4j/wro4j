@@ -42,7 +42,7 @@ public class SchedulerHelper {
     };
   }
 
-  private SafeLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new SafeLazyInitializer<ScheduledThreadPoolExecutor>() {
+  private DestroyableLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new DestroyableLazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
       return new ScheduledThreadPoolExecutor(1, createDaemonThreadFactory()) {
@@ -58,7 +58,7 @@ public class SchedulerHelper {
   /**
    * An initializer providing the runnable to schedule.
    */
-  private final SafeLazyInitializer<Runnable> lazyRunnable;
+  private final DestroyableLazyInitializer<Runnable> lazyRunnable;
   /**
    * Period in seconds (how often a runnable should run).
    */
@@ -71,11 +71,11 @@ public class SchedulerHelper {
    */
   private ScheduledFuture<?> future;
 
-  private SchedulerHelper(final SafeLazyInitializer<Runnable> lazyRunnable) {
+  private SchedulerHelper(final DestroyableLazyInitializer<Runnable> lazyRunnable) {
     this(lazyRunnable, null);
   }
 
-  private SchedulerHelper(final SafeLazyInitializer<Runnable> lazyRunnable, final String name) {
+  private SchedulerHelper(final DestroyableLazyInitializer<Runnable> lazyRunnable, final String name) {
     Validate.notNull(lazyRunnable);
     this.name = name;
     this.lazyRunnable = lazyRunnable;
@@ -91,14 +91,14 @@ public class SchedulerHelper {
    *          the name associated with this {@link SchedulerHelper} (useful to detect if this class is causing a memory
    *          leak.
    */
-  public static SchedulerHelper create(final SafeLazyInitializer<Runnable> runnableFactory, final String name) {
+  public static SchedulerHelper create(final DestroyableLazyInitializer<Runnable> runnableFactory, final String name) {
     return new SchedulerHelper(runnableFactory, name);
   }
 
   /**
    * @see SchedulerHelper#create(ObjectFactory, String)
    */
-  public static SchedulerHelper create(final SafeLazyInitializer<Runnable> runnableFactory) {
+  public static SchedulerHelper create(final DestroyableLazyInitializer<Runnable> runnableFactory) {
     return new SchedulerHelper(runnableFactory);
   }
 

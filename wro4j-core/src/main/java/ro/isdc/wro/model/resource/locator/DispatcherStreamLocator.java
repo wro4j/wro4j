@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletOutputStream;
@@ -38,11 +39,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public final class DispatcherStreamLocator {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-
 
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
@@ -78,8 +75,10 @@ public final class DispatcherStreamLocator {
         final URLConnection conn = url.openConnection();
         // setting these timeouts ensures the client does not deadlock indefinitely
         // when the server has problems.
-        //TODO make it configurable
-        final int timeout = 2000;
+        //TimeUnit.MILLISECONDS.con
+        final int timeout = (int) TimeUnit.MILLISECONDS.convert(Context.get().getConfig().getConnectionTimeout(),
+          TimeUnit.SECONDS);
+        LOG.debug("Computed timeout milliseconds: {}", timeout);
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
         return conn.getInputStream();

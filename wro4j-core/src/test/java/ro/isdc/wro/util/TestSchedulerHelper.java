@@ -51,7 +51,7 @@ public class TestSchedulerHelper {
 
   @Test
   public void scheduleWithDifferentPeriods() throws Exception {
-    helper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+    helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return createSleepingRunnable(100);
@@ -68,7 +68,7 @@ public class TestSchedulerHelper {
 
   @Test
   public void scheduleWithSamePeriods() throws Exception {
-    helper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+    helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return createSleepingRunnable(100);
@@ -85,7 +85,7 @@ public class TestSchedulerHelper {
 
   @Test
   public void schedulerHelperIsSynchronized() throws Exception {
-    helper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+    helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return new Runnable() {
@@ -146,7 +146,7 @@ public class TestSchedulerHelper {
 
 
   private void createAndRunHelperForTest(final Runnable runnable, final long period, final TimeUnit timeUnit) {
-    helper = SchedulerHelper.create(new SafeLazyInitializer<Runnable>() {
+    helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return runnable;

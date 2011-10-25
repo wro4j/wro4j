@@ -25,24 +25,19 @@ public final class ReloadModelRunnable
     wroManagerReference = new WeakReference<WroManager>(wroManager);
   }
   public void run() {
-    LOG.info("[START] Reloading Model....");
+    LOG.debug("Reloading Model....");
     try {
+      //TODO: do not destroy, until the creation is done and the new model is different than the new one
       wroManagerReference.get().getModelFactory().destroy();
-      LOG.info("\tmodel destroyed");
       if (Thread.interrupted()) {
-        LOG.info("######ReloadModelRunnable was interrupted - stop processing!");
+        LOG.debug("ReloadModelRunnable was interrupted - stop processing!");
         throw new InterruptedException();
       }
       wroManagerReference.get().getModelFactory().create();
-      LOG.info("\tmodel created");
     } catch (final InterruptedException e) {
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
-      LOG.error("Interrupted exception occured: ", e);
+      LOG.debug("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
-    } catch (final Exception e) {
-      LOG.error("Exception caught while creating model", e);
-    } finally {
-      LOG.info("[STOP] Reloading Model....");
     }
   }
 }
