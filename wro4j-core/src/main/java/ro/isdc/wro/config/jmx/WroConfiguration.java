@@ -13,6 +13,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
 
 
@@ -181,6 +182,7 @@ public final class WroConfiguration
    */
   public void reloadModel() {
     LOG.debug("reloadModel");
+    LOG.debug("Context.isContextSet(): {}", Context.isContextSet());
     reloadModelWithNewValue(null);
   }
 
