@@ -23,3 +23,6 @@
   background:#B3B3B3 url('/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
   background:#B3B3B3 url(/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
 }
+.foo {
+  background-image: url( "/absolute/path/to/style.css" );
+}
