@@ -59,9 +59,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
-  ;
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
   /**
    * ResourcesModel factory.
    */

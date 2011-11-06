@@ -6,7 +6,10 @@ package ro.isdc.wro.cache;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.zip.GZIPOutputStream;
@@ -14,6 +17,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -101,5 +105,25 @@ public final class ContentHashEntry
   @Override
   public String toString() {
     return "hash: " + hash;
+  }
+
+  public static void main(final String[] args) throws Exception {
+    final StopWatch watch = new StopWatch();
+
+    final OutputStream baos = new BufferedOutputStream(new ByteArrayOutputStream());
+    final OutputStream os = new GZIPOutputStream(baos);
+    final File file = new File("E:\\temp\\json6.js");
+    final InputStream is = new FileInputStream(file);
+    watch.start("gzip");
+    IOUtils.copy(is, os);
+    watch.stop();
+    os.close();
+
+    watch.start("simple");
+    IOUtils.copy(new FileInputStream(file), baos);
+    watch.stop();
+
+    System.out.println(file.length() + " bytes");
+    System.out.println(watch.prettyPrint());
   }
 }
