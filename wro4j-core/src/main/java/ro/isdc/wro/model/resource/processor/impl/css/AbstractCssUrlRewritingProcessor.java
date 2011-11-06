@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Pattern used to identify the placeholders where the url rewriting will be performed.
    */
-  private static final String PATTERN_PATH = "url\\s*\\(['\"]?((?:.*?|\\s*?))['\"]?\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+  private static final String PATTERN_PATH = "url\\s*\\(\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
   /**
    * Compiled pattern.
    */
@@ -91,17 +90,15 @@ public abstract class AbstractCssUrlRewritingProcessor
     while (matcher.find()) {
       final String oldMatch = matcher.group();
       final String urlGroup = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+      LOG.debug("urlGroup: {}", urlGroup);
       if (urlGroup == null) {
         throw new IllegalStateException("Could not extract urlGroup from: " + oldMatch);
       }
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, StringUtils.abbreviate(replacedUrl, 30));
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, replacedUrl);
         final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
         onUrlReplaced(replacedUrl);
-        // update allowedUrls list
-        // TODO no need to hold absolute url's inside
-        // allowedUrls.add(replacedUrl.replace(getUrlPrefix(), ""));
         matcher.appendReplacement(sb, newReplacement);
       }
     }

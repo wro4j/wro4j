@@ -11,15 +11,25 @@
   background-image: url([WRO-PREFIX]?id=/img.gif);
   background: url([WRO-PREFIX]?id=/themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
 }
-.class2 {
+.noQuotes {
   background-IMAGE: URL(/img.gif);
   background: url(/img.gif) red;
   background: url(/folder/img.gif) no-repeat right;
   background: url(http://www.google.com/);
 }
 
-.inlineHelp {
+.differentTypeOfQuotes {
   background:#B3B3B3 url("/images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
   background:#B3B3B3 url('/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
   background:#B3B3B3 url(/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
+}
+.contextPathWithWhitespaces {
+  background-image: url(/absolute/path/to/image.png);
+  background-image: url(/absolute/path/to/image.png);
+  background-image: url(/absolute/path/to/image.png);
+}
+.relativePathWithWhitespaces {
+  background-image: url([WRO-PREFIX]?id=/WEB-INF/path/to/image.png);
+  background-image: url([WRO-PREFIX]?id=/WEB-INF/path/to/image.png);
+  background-image: url([WRO-PREFIX]?id=/WEB-INF/path/to/image.png);
 }
