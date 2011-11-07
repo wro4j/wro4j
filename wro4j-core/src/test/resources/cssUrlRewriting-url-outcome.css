@@ -1,25 +1,54 @@
-.class1 {
+.imageWithSrcAttribute {
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.site.com/static/images/tabs/tabContent.png',
+    sizingMethod='scale' );
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.site.com/static/css/images/tabs/tabContent.png',
+    sizingMethod='scale' );
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  'http://www.site.com/static/css/images/tabs/tabContent.png',
+    sizingMethod='scale' );
+}
+
+.relativeImageBackgrounds {
   background: url(http://www.site.com/static/css/img.gif);
-  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.site.com/static/images/tabs/tabContent.png',sizingMethod='scale');
   background: url(http://www.site.com/static/css/folder/img.gif);
-  background: url('http://www.site.com/static/css/folder/img.gif');
-  background: url("http://www.site.com/static/css/folder/img.gif");
+  background: url(http://www.site.com/static/css/folder/img.gif);
+  background: url(http://www.site.com/static/css/folder/img.gif);
   background: url(http://www.site.com/static/css/folder/folder/img.gif) top left;
   background: url(http://www.site.com/static/img.gif) repeat-x;
   background: url(http://www.site.com/img.gif) no-repeat right;
   BACKGROUND-IMAGE: url(http://www.site.com/static/img1.gif);
   background-image: url(http://www.site.com/static/img.gif);
-  background: url(http://www.site.com/static/themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
+  background:
+    url(http://www.site.com/static/themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png)
+    0 1.1em no-repeat !important;
 }
-.class2 {
+
+.noQuotes {
   background-IMAGE: URL(http://www.site.com/static/css/img.gif);
   background: url(http://www.site.com/static/css/img.gif) red;
   background: url(http://www.site.com/static/css/folder/img.gif) no-repeat right;
   background: url(http://www.google.com/);
 }
 
-.inlineHelp {
-  background:#B3B3B3 url("http://www.site.com/static/css/images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
-  background:#B3B3B3 url('http://www.site.com/static/css/images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
-  background:#B3B3B3 url(http://www.site.com/static/css/images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
+.differentTypeOfQuotes {
+  background: #B3B3B3 url(http://www.site.com/static/css/images/buttons/button_gry_bg.png) repeat-x
+    scroll 0 -1px;
+  background: #B3B3B3 url(http://www.site.com/static/css/images/buttons/button_gry_bg.png) repeat-x
+    scroll 0 -1px;
+  background: #B3B3B3 url(http://www.site.com/static/css/images/buttons/button_gry_bg.png) repeat-x
+    scroll 0 -1px;
+}
+
+.contextPathWithWhitespaces {
+  background-image: url(http://www.site.com/static/css/absolute/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/absolute/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/absolute/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/absolute/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/absolute/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/absolute/path/to/image.png);
+}
+
+.relativePathWithWhitespaces {
+  background-image: url(http://www.site.com/static/css/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/path/to/image.png);
+  background-image: url(http://www.site.com/static/css/path/to/image.png);
 }
