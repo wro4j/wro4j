@@ -1,16 +1,27 @@
-.class1 {
+.imageWithSrcAttribute {
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=classpath:../images/tabs/tabContent.png',
+    sizingMethod='scale' );
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',
+    sizingMethod='scale' );
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',
+    sizingMethod='scale' );
+}
+
+.relativeImageBackgrounds {
   background: url([WRO-PREFIX]?id=classpath:img.gif);
-  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=classpath:../images/tabs/tabContent.png',sizingMethod='scale');
   background: url([WRO-PREFIX]?id=classpath:folder/img.gif);
-  background: url('[WRO-PREFIX]?id=classpath:folder/img.gif');
-  background: url("[WRO-PREFIX]?id=classpath:folder/img.gif");
+  background: url([WRO-PREFIX]?id=classpath:folder/img.gif);
+  background: url([WRO-PREFIX]?id=classpath:folder/img.gif);
   background: url([WRO-PREFIX]?id=classpath:folder/folder/img.gif) top left;
   background: url([WRO-PREFIX]?id=classpath:../img.gif) repeat-x;
   background: url([WRO-PREFIX]?id=classpath:../../img.gif) no-repeat right;
   BACKGROUND-IMAGE: url([WRO-PREFIX]?id=classpath:../img1.gif);
   background-image: url([WRO-PREFIX]?id=classpath:../img.gif);
-  background: url([WRO-PREFIX]?id=classpath:../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png) 0 1.1em no-repeat !important;
+  background:
+    url([WRO-PREFIX]?id=classpath:../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png)
+    0 1.1em no-repeat !important;
 }
+
 .noQuotes {
   background-IMAGE: URL([WRO-PREFIX]?id=classpath:img.gif);
   background: url([WRO-PREFIX]?id=classpath:img.gif) red;
@@ -19,15 +30,23 @@
 }
 
 .differentTypeOfQuotes {
-  background:#B3B3B3 url("[WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png") repeat-x scroll 0 -1px;
-  background:#B3B3B3 url('[WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png') repeat-x scroll 0 -1px;
-  background:#B3B3B3 url([WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png) repeat-x scroll 0 -1px;
+  background: #B3B3B3 url([WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png) repeat-x
+    scroll 0 -1px;
+  background: #B3B3B3 url([WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png) repeat-x
+    scroll 0 -1px;
+  background: #B3B3B3 url([WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png) repeat-x
+    scroll 0 -1px;
 }
+
 .contextPathWithWhitespaces {
   background-image: url([WRO-PREFIX]?id=classpath:absolute/path/to/image.png);
   background-image: url([WRO-PREFIX]?id=classpath:absolute/path/to/image.png);
   background-image: url([WRO-PREFIX]?id=classpath:absolute/path/to/image.png);
+  background-image: url([WRO-PREFIX]?id=classpath:absolute/path/to/image.png);
+  background-image: url([WRO-PREFIX]?id=classpath:absolute/path/to/image.png);
+  background-image: url([WRO-PREFIX]?id=classpath:absolute/path/to/image.png);
 }
+
 .relativePathWithWhitespaces {
   background-image: url([WRO-PREFIX]?id=classpath:path/to/image.png);
   background-image: url([WRO-PREFIX]?id=classpath:path/to/image.png);

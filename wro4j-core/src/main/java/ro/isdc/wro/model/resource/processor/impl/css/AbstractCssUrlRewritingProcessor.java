@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Pattern used to identify the placeholders where the url rewriting will be performed.
    */
-  private static final String PATTERN_PATH = "url\\s*\\(\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+  private static final String PATTERN_PATH = "url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
   /**
    * Compiled pattern.
    */
@@ -89,15 +90,18 @@ public abstract class AbstractCssUrlRewritingProcessor
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
       final String oldMatch = matcher.group();
-      final String urlGroup = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+      
+      String urlGroup = matcher.group(3) != null ? matcher.group(3) : matcher.group(2);
       LOG.debug("urlGroup: {}", urlGroup);
-      if (urlGroup == null) {
-        throw new IllegalStateException("Could not extract urlGroup from: " + oldMatch);
-      }
+      //use urlContent to get rid of trailing spaces inside the url() construction 
+      final String urlContent = matcher.group(1) != null ? matcher.group(1) : urlGroup;
+      
+      Validate.notNull(urlGroup);
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, replacedUrl);
-        final String newReplacement = oldMatch.replace(urlGroup, replacedUrl);
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, replacedUrl);
+        final String newReplacement = oldMatch.replace(urlContent, replacedUrl);
+        System.out.println("newReplacement: " + newReplacement);
         onUrlReplaced(replacedUrl);
         matcher.appendReplacement(sb, newReplacement);
       }
