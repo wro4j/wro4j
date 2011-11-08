@@ -36,6 +36,12 @@ public enum ConfigConstants {
    */
   disableCache,
   /**
+   * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
+   * requests will use the cached gzipped content. Otherwise, the gzip operation will be performed for each request.
+   * This flag allow to control the memory vs processing power trade-off.
+   */
+  cacheGzippedContent,
+  /**
    * Instructs wro4j to not throw an exception when a resource is missing.
    */
   ignoreMissingResources,

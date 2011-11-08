@@ -13,6 +13,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
 
 
@@ -21,6 +22,10 @@ import ro.isdc.wro.manager.WroManagerFactory;
  * should be accessible even outside of the request cycle.
  *
  * @author Alex Objelean
+ */
+/**
+ * @author Admin
+ *
  */
 public final class WroConfiguration
   implements WroConfigurationMBean {
@@ -54,6 +59,13 @@ public final class WroConfiguration
    * this flag will have no effect. By default this value is false.
    */
   private boolean disableCache = false;
+
+  /**
+   * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
+   * requests will use the cached gzipped content. Otherwise, the gzip operation will be performed for each request.
+   * This flag allow to control the memory vs processing power trade-off.
+   */
+  private boolean cacheGzippedContent = false;
   /**
    * Allow to turn jmx on or off. By default this value is true.
    */
@@ -181,6 +193,7 @@ public final class WroConfiguration
    */
   public void reloadModel() {
     LOG.debug("reloadModel");
+    LOG.debug("Context.isContextSet(): {}", Context.isContextSet());
     reloadModelWithNewValue(null);
   }
 
@@ -292,6 +305,22 @@ public final class WroConfiguration
 
 
   /**
+   * @return the cacheGzippedContent
+   */
+  public boolean isCacheGzippedContent() {
+    return this.cacheGzippedContent;
+  }
+
+
+  /**
+   * @param cacheGzippedContent the cacheGzippedContent to set
+   */
+  public void setCacheGzippedContent(final boolean cacheGzippedContent) {
+    this.cacheGzippedContent = cacheGzippedContent;
+  }
+
+
+  /**
    * Perform the cleanup, clear the listeners.
    */
   public void destroy() {
@@ -306,7 +335,6 @@ public final class WroConfiguration
   public String getEncoding() {
     return this.encoding;
   }
-
 
   /**
    * @param encoding the encoding to set

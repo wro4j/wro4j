@@ -60,12 +60,12 @@ groups {
     js("http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js")
   }
   "jquery-mobile" {
+    groupRef("jquery")
     css("http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css")
     js("http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js")
   }
   jquery {
-    js("http://code.jquery.com/jquery-1.5.js")
-    groupRef("jquery-mobile")
+    js("http://code.jquery.com/jquery-1.6.js")
   }
   all {
     dynamicResource()

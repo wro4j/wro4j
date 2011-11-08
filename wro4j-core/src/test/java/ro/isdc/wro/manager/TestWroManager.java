@@ -444,5 +444,4 @@ public class TestWroManager {
     manager.destroy();
     Context.unset();
   }
-
 }
