@@ -23,6 +23,10 @@ import ro.isdc.wro.manager.WroManagerFactory;
  *
  * @author Alex Objelean
  */
+/**
+ * @author Admin
+ *
+ */
 public final class WroConfiguration
   implements WroConfigurationMBean {
   private static final Logger LOG = LoggerFactory.getLogger(WroConfiguration.class);
@@ -55,6 +59,13 @@ public final class WroConfiguration
    * this flag will have no effect. By default this value is false.
    */
   private boolean disableCache = false;
+
+  /**
+   * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
+   * requests will use the cached gzipped content. Otherwise, the gzip operation will be performed for each request.
+   * This flag allow to control the memory vs processing power trade-off.
+   */
+  private boolean cacheGzippedContent = false;
   /**
    * Allow to turn jmx on or off. By default this value is true.
    */
@@ -294,6 +305,22 @@ public final class WroConfiguration
 
 
   /**
+   * @return the cacheGzippedContent
+   */
+  public boolean isCacheGzippedContent() {
+    return this.cacheGzippedContent;
+  }
+
+
+  /**
+   * @param cacheGzippedContent the cacheGzippedContent to set
+   */
+  public void setCacheGzippedContent(final boolean cacheGzippedContent) {
+    this.cacheGzippedContent = cacheGzippedContent;
+  }
+
+
+  /**
    * Perform the cleanup, clear the listeners.
    */
   public void destroy() {
@@ -308,7 +335,6 @@ public final class WroConfiguration
   public String getEncoding() {
     return this.encoding;
   }
-
 
   /**
    * @param encoding the encoding to set

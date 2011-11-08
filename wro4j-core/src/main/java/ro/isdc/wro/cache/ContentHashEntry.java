@@ -6,18 +6,17 @@ package ro.isdc.wro.cache;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.config.Context;
 
 
 /**
@@ -28,17 +27,22 @@ import ro.isdc.wro.util.StopWatch;
 @SuppressWarnings("serial")
 public final class ContentHashEntry
   implements Serializable {
+  private static final Logger LOG = LoggerFactory.getLogger(ContentHashEntry.class);
   private String rawContent;
   private byte[] gzippedContent;
   private String hash;
 
-  private ContentHashEntry(final String content, final String hash) {
-    this.rawContent = content;
+  private ContentHashEntry(final String rawContent, final String hash) {
+    this.rawContent = rawContent;
     this.hash = hash;
-    gzippedContent = computeGzippedContent(content);
+    //the trade-off between the memory and processing time
+    if (Context.get().getConfig().isCacheGzippedContent()) {
+      gzippedContent = computeGzippedContent(rawContent);
+    }
   }
 
   private byte[] computeGzippedContent(final String content) {
+    LOG.debug("Gzipping the content....");
     try {
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
       final OutputStream os = new GZIPOutputStream(new BufferedOutputStream(baos));
@@ -95,9 +99,18 @@ public final class ContentHashEntry
    * @return the gzippedContent
    */
   public byte[] getGzippedContent() {
+    if (gzippedContent == null) {
+      return computeGzippedContent(rawContent);
+    }
     return this.gzippedContent;
   }
 
+  /**
+   * Used by unit test to prove that gzipped content is cached only when required.
+   */
+  byte[] getGzippedContentInternal() {
+    return this.gzippedContent;
+  }
 
   /**
    * {@inheritDoc}
@@ -105,25 +118,5 @@ public final class ContentHashEntry
   @Override
   public String toString() {
     return "hash: " + hash;
-  }
-
-  public static void main(final String[] args) throws Exception {
-    final StopWatch watch = new StopWatch();
-
-    final OutputStream baos = new BufferedOutputStream(new ByteArrayOutputStream());
-    final OutputStream os = new GZIPOutputStream(baos);
-    final File file = new File("E:\\temp\\json6.js");
-    final InputStream is = new FileInputStream(file);
-    watch.start("gzip");
-    IOUtils.copy(is, os);
-    watch.stop();
-    os.close();
-
-    watch.start("simple");
-    IOUtils.copy(new FileInputStream(file), baos);
-    watch.stop();
-
-    System.out.println(file.length() + " bytes");
-    System.out.println(watch.prettyPrint());
   }
 }
