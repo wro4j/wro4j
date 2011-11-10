@@ -212,7 +212,8 @@ public class WroFilter
         // reset cache headers when any property is changed in order to avoid browser caching
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
+          final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
+          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged(value);
         }
       }
     });
@@ -220,7 +221,8 @@ public class WroFilter
       public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-          ((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
+          final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
+          ((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged(value);
         }
       }
     });

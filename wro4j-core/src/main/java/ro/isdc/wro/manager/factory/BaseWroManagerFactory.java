@@ -196,18 +196,18 @@ public class BaseWroManagerFactory
   /**
    * {@inheritDoc}
    */
-  public void onCachePeriodChanged() {
-    managerInitializer.get().onCachePeriodChanged();
+  public void onCachePeriodChanged(final long period) {
+    managerInitializer.get().onCachePeriodChanged(period);
   }
 
 
   /**
    * {@inheritDoc}
    */
-  public void onModelPeriodChanged() {
-    managerInitializer.get().onModelPeriodChanged();
+  public void onModelPeriodChanged(final long period) {
+    managerInitializer.get().onModelPeriodChanged(period);
     // update cache too.
-    managerInitializer.get().onCachePeriodChanged();
+    managerInitializer.get().getCacheStrategy().clear();
   }
 
 

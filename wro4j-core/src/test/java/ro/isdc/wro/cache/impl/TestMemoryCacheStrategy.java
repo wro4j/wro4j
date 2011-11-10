@@ -44,7 +44,7 @@ public class TestMemoryCacheStrategy {
 
     Assert.assertNotNull(entry);
     Assert.assertEquals(hash, entry.getHash());
-    Assert.assertEquals(content, entry.getContent());
+    Assert.assertEquals(content, entry.getRawContent());
 
     cache.clear();
     Assert.assertNull(cache.get(key));
