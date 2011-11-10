@@ -5,11 +5,13 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.HashBuilder;
@@ -25,6 +27,7 @@ public class TestLruMemoryCacheStrategy {
 
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     cache = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>(3);
   }
 
@@ -47,5 +50,10 @@ public class TestLruMemoryCacheStrategy {
     // above.
     cache.put(key4, ContentHashEntry.valueOf(content, hash));
     Assert.assertNull(cache.get(key2));
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 }
