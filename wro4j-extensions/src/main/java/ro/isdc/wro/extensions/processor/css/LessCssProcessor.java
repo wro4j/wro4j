@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.support.RhinoEnginePool;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -108,11 +108,11 @@ public class LessCssProcessor
 
   public static final String ALIAS = "lessCss";
 
-  private RhinoEnginePool<LessCss> enginePool;
+  private ObjectPoolHelper<LessCss> enginePool;
 
 
   public LessCssProcessor() {
-    enginePool = new RhinoEnginePool<LessCss>(new ObjectFactory<LessCss>() {
+    enginePool = new ObjectPoolHelper<LessCss>(new ObjectFactory<LessCss>() {
       @Override
       public LessCss create() {
         return newLessCss();
@@ -140,7 +140,7 @@ public class LessCssProcessor
       writer.close();
       //return for later reuse
       try {
-        enginePool.returnEngine(lessCss);
+        enginePool.returnObject(lessCss);
       } catch (final Exception e) {
         //should never happen
         LOG.error("Cannot return lessCss engine to the pool", e);
@@ -159,7 +159,7 @@ public class LessCssProcessor
    * A getter used for lazy loading.
    */
   private LessCss getEngine() {
-    return enginePool.getEngine();
+    return enginePool.getObject();
   }
 
 

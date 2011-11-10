@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.support.RhinoEnginePool;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.coffeescript.CoffeeScript;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -37,11 +37,11 @@ public class CoffeeScriptProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
   public static final String ALIAS = "coffeeScript";
-  private RhinoEnginePool<CoffeeScript> enginePool;
+  private ObjectPoolHelper<CoffeeScript> enginePool;
 
 
   public CoffeeScriptProcessor() {
-    enginePool = new RhinoEnginePool<CoffeeScript>(new ObjectFactory<CoffeeScript>() {
+    enginePool = new ObjectPoolHelper<CoffeeScript>(new ObjectFactory<CoffeeScript>() {
       @Override
       public CoffeeScript create() {
         return newCoffeeScript();
@@ -55,7 +55,7 @@ public class CoffeeScriptProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
-    final CoffeeScript coffeeScript = enginePool.getEngine();
+    final CoffeeScript coffeeScript = enginePool.getObject();
     try {
       writer.write(coffeeScript.compile(content));
     } catch (final WroRuntimeException e) {
@@ -67,7 +67,7 @@ public class CoffeeScriptProcessor
     } finally {
       reader.close();
       writer.close();
-      enginePool.returnEngine(coffeeScript);
+      enginePool.returnObject(coffeeScript);
     }
   }
 
