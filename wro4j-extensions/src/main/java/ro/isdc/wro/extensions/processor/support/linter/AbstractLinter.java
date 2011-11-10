@@ -61,7 +61,7 @@ public abstract class AbstractLinter {
   }
 
   /**
-   * @return the stream of the jshint script. Override this method to provide a different script version.
+   * @return the stream of the linter script. Override this method to provide a different script version.
    */
   protected abstract InputStream getScriptAsStream();
 

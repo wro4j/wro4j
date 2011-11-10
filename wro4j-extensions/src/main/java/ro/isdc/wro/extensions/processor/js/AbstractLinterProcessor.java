@@ -40,7 +40,6 @@ public abstract class AbstractLinterProcessor
    */
   private String[] options;
 
-
   public AbstractLinterProcessor setOptions(final String[] options) {
     this.options = options;
     return this;
@@ -53,6 +52,7 @@ public abstract class AbstractLinterProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
+      // TODO investigate why linter fails when trying to reuse the same instance twice
       newLinter().setOptions(options).validate(content);
     } catch (final LinterException e) {
       try {
@@ -61,6 +61,7 @@ public abstract class AbstractLinterProcessor
         throw new WroRuntimeException("", ex);
       }
     } catch (final WroRuntimeException e) {
+      onException(e);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
@@ -70,6 +71,12 @@ public abstract class AbstractLinterProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * Invoked when a processing exception occurs.
+   */
+  protected void onException(final WroRuntimeException e) {
   }
 
   /**

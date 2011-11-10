@@ -14,12 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.RhinoEnginePool;
 import ro.isdc.wro.extensions.processor.support.coffeescript.CoffeeScript;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 
@@ -35,10 +37,17 @@ public class CoffeeScriptProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
   public static final String ALIAS = "coffeeScript";
-  /**
-   * Engine.
-   */
-  private CoffeeScript engine;
+  private RhinoEnginePool<CoffeeScript> enginePool;
+
+
+  public CoffeeScriptProcessor() {
+    enginePool = new RhinoEnginePool<CoffeeScript>(new ObjectFactory<CoffeeScript>() {
+      @Override
+      public CoffeeScript create() {
+        return newCoffeeScript();
+      }
+    });
+  }
 
   /**
    * {@inheritDoc}
@@ -46,8 +55,9 @@ public class CoffeeScriptProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final CoffeeScript coffeeScript = enginePool.getEngine();
     try {
-      writer.write(getEngine().compile(content));
+      writer.write(coffeeScript.compile(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
@@ -57,6 +67,7 @@ public class CoffeeScriptProcessor
     } finally {
       reader.close();
       writer.close();
+      enginePool.returnEngine(coffeeScript);
     }
   }
 
@@ -64,17 +75,6 @@ public class CoffeeScriptProcessor
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {
-  }
-
-
-  /**
-   * @return PackerJs engine.
-   */
-  private CoffeeScript getEngine() {
-    if (engine == null) {
-      engine = newCoffeeScript();
-    }
-    return engine;
   }
 
   /**

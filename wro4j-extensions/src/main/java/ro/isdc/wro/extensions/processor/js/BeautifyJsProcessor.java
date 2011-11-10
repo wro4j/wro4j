@@ -14,12 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.RhinoEnginePool;
 import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -37,14 +39,19 @@ public class BeautifyJsProcessor
   /**
    * Engine.
    */
-  private final UglifyJs engine;
+  private final RhinoEnginePool<UglifyJs> enginePool;
 
 
   /**
    * Default constructor. Instantiates uglifyJs engine.
    */
   public BeautifyJsProcessor() {
-    engine = newEngine();
+    enginePool = new RhinoEnginePool<UglifyJs>(new ObjectFactory<UglifyJs>() {
+      @Override
+      public UglifyJs create() {
+        return newEngine();
+      }
+    });
   }
 
 
@@ -62,6 +69,7 @@ public class BeautifyJsProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final UglifyJs engine = enginePool.getEngine();
     try {
       writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
@@ -73,6 +81,7 @@ public class BeautifyJsProcessor
     } finally {
       reader.close();
       writer.close();
+      enginePool.returnEngine(engine);
     }
   }
 
