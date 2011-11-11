@@ -13,13 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.jsonhpack.JsonHPack;
+import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -31,7 +34,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)
-public abstract class JsonHPackProcessor
+public class JsonHPackProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPackProcessor.class);
   public static final String ALIAS_PACK = "jsonh-pack";
@@ -39,31 +42,30 @@ public abstract class JsonHPackProcessor
   /**
    * Engine.
    */
-  private JsonHPack engine;
-
+  private ObjectPoolHelper<JsonHPack> enginePool;
   /**
-   * Private constructor, prevent instantiation.
+   * If true, the packing will be used, otherwise unpack.
    */
-  private JsonHPackProcessor() {
+  private boolean pack;
+  
+  public JsonHPackProcessor(boolean pack) {
+    this.pack = pack;
+    enginePool = new ObjectPoolHelper<JsonHPack>(new ObjectFactory<JsonHPack>() {
+      @Override
+      public JsonHPack create() {
+        return newEngine();
+      }
+    });
   }
 
   public static JsonHPackProcessor packProcessor() {
-    return new JsonHPackProcessor() {
-      @Override
-      protected String doProcess(final String content) {
-        return getEngine().pack(content);
-      }
-    };
+    return new JsonHPackProcessor(true);
   }
 
   public static JsonHPackProcessor unpackProcessor() {
-    return new JsonHPackProcessor() {
-      @Override
-      protected String doProcess(final String content) {
-        return getEngine().unpack(content);
-      }
-    };
+    return new JsonHPackProcessor(false);
   }
+  
 
   /**
    * {@inheritDoc}
@@ -85,23 +87,23 @@ public abstract class JsonHPackProcessor
     }
   }
 
-
-  protected abstract String doProcess(final String content);
+  
+  private String doProcess(final String content) {
+    JsonHPack engine = enginePool.getObject();
+    try {
+      if (pack) {
+        return engine.pack(content);
+      }
+      return engine.unpack(content);      
+    } finally {
+      enginePool.returnObject(engine);
+    }
+  }
 
   /**
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {
-  }
-
-  /**
-   * A getter used for lazy loading.
-   */
-  JsonHPack getEngine() {
-    if (engine == null) {
-      engine = newEngine();
-    }
-    return engine;
   }
 
   /**

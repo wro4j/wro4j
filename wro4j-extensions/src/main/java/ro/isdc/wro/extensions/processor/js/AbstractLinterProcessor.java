@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
+import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.extensions.processor.support.linter.AbstractLinter;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
@@ -21,6 +23,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -35,10 +38,20 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public abstract class AbstractLinterProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinterProcessor.class);
+  private ObjectPoolHelper<AbstractLinter> enginePool;
   /**
    * Options to use to configure the linter.
    */
   private String[] options;
+  
+  public AbstractLinterProcessor() {
+    enginePool = new ObjectPoolHelper<AbstractLinter>(new ObjectFactory<AbstractLinter>() {
+      @Override
+      public AbstractLinter create() {
+        return newLinter();
+      }
+    });
+  }
 
   public AbstractLinterProcessor setOptions(final String[] options) {
     this.options = options;
@@ -51,9 +64,10 @@ public abstract class AbstractLinterProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    AbstractLinter linter = enginePool.getObject();
     try {
       // TODO investigate why linter fails when trying to reuse the same instance twice
-      newLinter().setOptions(options).validate(content);
+      linter.setOptions(options).validate(content);
     } catch (final LinterException e) {
       try {
         onLinterException(e, resource);
@@ -70,6 +84,7 @@ public abstract class AbstractLinterProcessor
       writer.write(content);
       reader.close();
       writer.close();
+      enginePool.returnObject(linter);
     }
   }
 

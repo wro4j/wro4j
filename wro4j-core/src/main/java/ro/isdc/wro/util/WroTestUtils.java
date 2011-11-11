@@ -434,7 +434,7 @@ public class WroTestUtils {
    * @throws Exception if any of the executed tasks fails.
    */
   public static void runConcurrently(final Callable<Void> task) throws Exception {
-    final ExecutorService service = Executors.newFixedThreadPool(3);
+    final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
     for (int i = 0; i < 10; i++) {
       futures.add(service.submit(task));

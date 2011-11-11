@@ -17,6 +17,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -78,9 +79,6 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
         return null;
       }
     };
-    task.call();
-    task.call();
-    //WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task);
   }
-
 }

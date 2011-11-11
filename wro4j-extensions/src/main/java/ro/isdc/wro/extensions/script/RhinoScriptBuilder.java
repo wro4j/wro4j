@@ -58,7 +58,7 @@ public class RhinoScriptBuilder {
     context.setErrorReporter(new ToolErrorReporter(false));
     context.setLanguageVersion(Context.VERSION_1_7);
     InputStream script = null;
-    final ScriptableObject scope = (ScriptableObject)context.initStandardObjects(initialScope);
+    final ScriptableObject scope = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
       script = getClass().getResourceAsStream("commons.js");
       context.evaluateReader(scope, new InputStreamReader(script), "common.js", 1, null);
@@ -69,7 +69,6 @@ public class RhinoScriptBuilder {
     }
     return scope;
   }
-
 
   /**
    * Add a clinet side environment to the script context (client-side aware).
