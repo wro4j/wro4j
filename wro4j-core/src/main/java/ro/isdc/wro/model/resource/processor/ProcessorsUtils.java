@@ -17,6 +17,7 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
@@ -171,5 +172,6 @@ public class ProcessorsUtils {
     map.put(JSMinProcessor.ALIAS, (T) new JSMinProcessor());
     map.put(VariablizeColorsCssProcessor.ALIAS, (T) new VariablizeColorsCssProcessor());
     map.put(ConformColorsCssProcessor.ALIAS, (T) new ConformColorsCssProcessor());
+    map.put(MultiLineCommentStripperProcessor.ALIAS, (T) new MultiLineCommentStripperProcessor());
   }
 }
