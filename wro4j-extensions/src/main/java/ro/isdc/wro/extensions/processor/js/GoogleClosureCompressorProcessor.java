@@ -91,7 +91,12 @@ public class GoogleClosureCompressorProcessor
         JSSourceFile.fromInputStream(fileName,
         new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())))
       };
-      final Result result = compiler.compile(getExterns(resource), input, compilerOptions);
+      JSSourceFile[] externs = getExterns(resource);
+      if (externs == null) {
+        //fallback to empty array when null is provided.
+        externs = new JSSourceFile[] {};
+      }
+      final Result result = compiler.compile(externs, input, compilerOptions);
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
