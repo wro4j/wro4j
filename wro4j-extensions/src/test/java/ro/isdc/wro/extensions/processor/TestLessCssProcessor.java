@@ -62,7 +62,7 @@ public class TestLessCssProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          lessCss.process(new StringReader("#id {.class {color: red;}}"), new StringWriter());
+          lessCss.process(null, new StringReader("#id {.class {color: red;}}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

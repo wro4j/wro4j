@@ -12,7 +12,6 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -55,9 +54,9 @@ public class TestJsonHPackProcessor {
     genericThreadSafeTest(false);
   }
 
-  private void genericThreadSafeTest(boolean pack)
+  private void genericThreadSafeTest(final boolean pack)
       throws Exception {
-    final ResourcePostProcessor processor = new JsonHPackProcessor(pack) {
+    final ResourceProcessor processor = new JsonHPackProcessor(pack) {
       @Override
       protected void onException(final WroRuntimeException e) {
         throw e;
@@ -66,7 +65,7 @@ public class TestJsonHPackProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          processor.process(new StringReader("{p : 1}"), new StringWriter());
+          processor.process(null, new StringReader("{p : 1}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

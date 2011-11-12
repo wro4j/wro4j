@@ -28,7 +28,7 @@ public class TestCJsonProcessor {
   @Test
   public void testPackFromFolder()
       throws Exception {
-    final ResourcePostProcessor processor = new CJsonProcessor(true) {
+    final ResourceProcessor processor = new CJsonProcessor(true) {
       @Override
       protected void onException(final WroRuntimeException e) {
         throw e;
@@ -44,7 +44,7 @@ public class TestCJsonProcessor {
   @Test
   public void testUnpackFromFolder()
       throws Exception {
-    final ResourcePostProcessor processor = new CJsonProcessor(false) {
+    final ResourceProcessor processor = new CJsonProcessor(false) {
       @Override
       protected void onException(final WroRuntimeException e) {
         throw e;
@@ -64,7 +64,7 @@ public class TestCJsonProcessor {
     genericThreadSafeTest(false);
   }
 
-  private void genericThreadSafeTest(boolean pack)
+  private void genericThreadSafeTest(final boolean pack)
       throws Exception {
     final CJsonProcessor processor = new CJsonProcessor(pack) {
       @Override
@@ -75,7 +75,7 @@ public class TestCJsonProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          processor.process(new StringReader("{\"p\" : 1}"), new StringWriter());
+          processor.process(null, new StringReader("{\"p\" : 1}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

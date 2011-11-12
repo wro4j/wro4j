@@ -92,7 +92,7 @@ public class TestCoffeeScriptProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          processor.process(new StringReader("square = (x) -> x * x"), new StringWriter());
+          processor.process(null, new StringReader("square = (x) -> x * x"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

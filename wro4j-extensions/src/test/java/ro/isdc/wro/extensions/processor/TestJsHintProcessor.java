@@ -42,7 +42,6 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
 
     final ResourceProcessor processor = new JsHintProcessor() {
       @Override
-      @Override
       protected void onLinterException(final LinterException e, final Resource resource) throws Exception {
         cause.set(e);
       };
