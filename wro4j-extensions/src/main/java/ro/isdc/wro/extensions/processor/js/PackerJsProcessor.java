@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.packer.PackerJs;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
@@ -21,6 +22,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -35,10 +37,18 @@ public class PackerJsProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(PackerJsProcessor.class);
   public static final String ALIAS = "packerJs";
-  /**
-   * Engine.
-   */
-  private PackerJs engine;
+  private ObjectPoolHelper<PackerJs> enginePool;
+
+
+  public PackerJsProcessor() {
+    enginePool = new ObjectPoolHelper<PackerJs>(new ObjectFactory<PackerJs>() {
+      @Override
+      public PackerJs create() {
+        return newPackerJs();
+      }
+    });
+  }
+
 
   /**
    * {@inheritDoc}
@@ -46,8 +56,9 @@ public class PackerJsProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final PackerJs packerJs = enginePool.getObject();
     try {
-      writer.write(getEngine().pack(content));
+      writer.write(packerJs.pack(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
@@ -57,6 +68,7 @@ public class PackerJsProcessor
     } finally {
       reader.close();
       writer.close();
+      enginePool.returnObject(packerJs);
     }
   }
 
@@ -69,11 +81,8 @@ public class PackerJsProcessor
   /**
    * @return PackerJs engine.
    */
-  private PackerJs getEngine() {
-    if (engine == null) {
-      engine = new PackerJs();
-    }
-    return engine;
+  protected PackerJs newPackerJs() {
+    return new PackerJs();
   }
 
 
