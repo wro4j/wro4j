@@ -13,6 +13,7 @@ import org.apache.commons.lang3.Validate;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
@@ -131,5 +132,6 @@ public class ProcessorsUtils {
     map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
     map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
     map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
+    map.put(MultiLineCommentStripperProcessor.ALIAS, new MultiLineCommentStripperProcessor());
   }
 }
