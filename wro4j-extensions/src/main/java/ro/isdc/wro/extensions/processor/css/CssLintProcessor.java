@@ -14,12 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLint;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -41,6 +43,18 @@ public class CssLintProcessor
    */
   private String[] options;
 
+  private ObjectPoolHelper<CssLint> enginePool;
+
+  public CssLintProcessor() {
+    enginePool = new ObjectPoolHelper<CssLint>(new ObjectFactory<CssLint>() {
+      @Override
+      public CssLint create() {
+        return newCssLint();
+      }
+    });
+  }
+
+
 
   public CssLintProcessor setOptions(final String[] options) {
     this.options = options;
@@ -54,13 +68,15 @@ public class CssLintProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final CssLint cssLint = enginePool.getObject();
     try {
-      new CssLint().setOptions(options).validate(content);
+      cssLint.setOptions(options).validate(content);
     } catch (final CssLintException e) {
       try {
+        LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
         onCssLintException(e, resource);
       } catch (final Exception ex) {
-        throw new WroRuntimeException("", ex);
+        throw new WroRuntimeException("Rethrowing original exception: " + ex.getMessage(), ex);
       }
     } catch (final WroRuntimeException e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
@@ -71,18 +87,33 @@ public class CssLintProcessor
       writer.write(content);
       reader.close();
       writer.close();
+      enginePool.returnObject(cssLint);
     }
   }
 
   /**
+   * @return {@link CssLint} instance.
+   */
+  protected CssLint newCssLint() {
+    return new CssLint();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer) throws IOException {
+    process(null, reader, writer);
+  }
+
+  /**
    * Called when {@link CssLintException} is thrown. Allows subclasses to re-throw this exception as a
-   * {@link RuntimeException} or handle it differently. The default implementation simply logs the errors.
+   * {@link RuntimeException} or handle it differently.
    *
    * @param e {@link CssLintException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
   protected void onCssLintException(final CssLintException e, final Resource resource)
     throws Exception {
-    LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
 }

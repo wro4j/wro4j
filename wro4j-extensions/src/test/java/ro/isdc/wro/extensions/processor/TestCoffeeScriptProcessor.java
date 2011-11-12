@@ -5,7 +5,10 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
@@ -78,6 +81,26 @@ public class TestCoffeeScriptProcessor {
     Assert.assertEquals(2, counter.getIndex());
   }
 
+  @Test
+  public void shouldBeThreadSafe() throws Exception {
+    final CoffeeScriptProcessor processor = new CoffeeScriptProcessor() {
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        throw e;
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          processor.process(new StringReader("square = (x) -> x * x"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
+  }
 
   @Test
   public void testSimple()

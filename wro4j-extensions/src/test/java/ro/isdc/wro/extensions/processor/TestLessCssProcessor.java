@@ -6,8 +6,10 @@ package ro.isdc.wro.extensions.processor;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -47,6 +49,27 @@ public class TestLessCssProcessor {
     for (int i = 0; i < 100; i++) {
       lessCss.less("#id {.class {color: red;}}");
     }
+  }
+
+  @Test
+  public void shouldBeThreadSafe() throws Exception {
+    final LessCssProcessor lessCss = new LessCssProcessor() {
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        throw e;
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          lessCss.process(new StringReader("#id {.class {color: red;}}"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
   }
 
 

@@ -39,8 +39,6 @@ public abstract class AbstractLinter {
    * Options to apply to js hint processing
    */
   private String[] options;
-  private ScriptableObject scope;
-
 
   /**
    * Initialize script builder for evaluation.
@@ -48,12 +46,10 @@ public abstract class AbstractLinter {
   private RhinoScriptBuilder initScriptBuilder() {
     try {
       RhinoScriptBuilder builder = null;
-      if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
-        scope = builder.getScope();
-      } else {
-        builder = RhinoScriptBuilder.newChain(scope);
-      }
+      // reusing the scope doesn't work here. Get the following error: TypeError: Cannot find function create in object
+      // function Object() { [native code for Object.Object, arity=1] }
+      // TODO investigate why
+      builder = RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
       return builder;
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
@@ -61,7 +57,7 @@ public abstract class AbstractLinter {
   }
 
   /**
-   * @return the stream of the jshint script. Override this method to provide a different script version.
+   * @return the stream of the linter script. Override this method to provide a different script version.
    */
   protected abstract InputStream getScriptAsStream();
 

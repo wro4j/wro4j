@@ -13,12 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.cjson.CJson;
+import ro.isdc.wro.extensions.processor.support.jsonhpack.JsonHPack;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -30,7 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)
-public abstract class CJsonProcessor
+public class CJsonProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CJsonProcessor.class);
   public static final String ALIAS_PACK = "cjson-pack";
@@ -38,32 +41,33 @@ public abstract class CJsonProcessor
   /**
    * Engine.
    */
-  private CJson engine;
-
+  private ObjectPoolHelper<CJson> enginePool;
+  /**
+   * If true, the packing will be used, otherwise unpack.
+   */
+  private boolean pack;
 
   /**
    * Private constructor, prevent instantiation.
    */
-  private CJsonProcessor() {}
+  public CJsonProcessor(boolean pack) {
+    enginePool = new ObjectPoolHelper<CJson>(new ObjectFactory<CJson>() {
+      @Override
+      public CJson create() {
+        return newEngine();
+      }
+    });
+    this.pack = pack;
+  }
 
 
   public static CJsonProcessor packProcessor() {
-    return new CJsonProcessor() {
-      @Override
-      protected String doProcess(final String content) {
-        return getEngine().pack(content);
-      }
-    };
+    return new CJsonProcessor(true);
   }
 
 
   public static CJsonProcessor unpackProcessor() {
-    return new CJsonProcessor() {
-      @Override
-      protected String doProcess(final String content) {
-        return getEngine().unpack(content);
-      }
-    };
+    return new CJsonProcessor(false);
   }
 
 
@@ -87,25 +91,23 @@ public abstract class CJsonProcessor
     }
   }
 
-
-  protected abstract String doProcess(final String content);
+  private String doProcess(final String content) {
+    CJson engine = enginePool.getObject();
+    try {
+      if (pack) {
+        return engine.pack(content);
+      }
+      return engine.unpack(content);      
+    } finally {
+      enginePool.returnObject(engine);
+    }
+  }
 
 
   /**
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {}
-
-
-  /**
-   * A getter used for lazy loading.
-   */
-  CJson getEngine() {
-    if (engine == null) {
-      engine = newEngine();
-    }
-    return engine;
-  }
 
 
   /**

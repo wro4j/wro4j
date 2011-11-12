@@ -29,13 +29,16 @@ public class RhinoScriptBuilder {
   private Context context;
   private final ScriptableObject scope;
 
+
   private RhinoScriptBuilder() {
     this(null);
   }
 
+
   private RhinoScriptBuilder(final ScriptableObject scope) {
     this.scope = createContext(scope);
   }
+
 
   /**
    * @return the context
@@ -43,6 +46,7 @@ public class RhinoScriptBuilder {
   public ScriptableObject getScope() {
     return this.scope;
   }
+
 
   /**
    * Initialize the context.
@@ -65,7 +69,6 @@ public class RhinoScriptBuilder {
     }
     return scope;
   }
-
 
   /**
    * Add a clinet side environment to the script context (client-side aware).
@@ -112,13 +115,14 @@ public class RhinoScriptBuilder {
     try {
       context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
-    } catch(final RuntimeException e) {
+    } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
       throw e;
     } finally {
       stream.close();
     }
   }
+
 
   public void initContext() {
     if (Context.getCurrentContext() == null) {
@@ -141,6 +145,7 @@ public class RhinoScriptBuilder {
     context.evaluateString(scope, script, sourceName, 1, null);
     return this;
   }
+
 
   /**
    * Evaluates a script from a reader.
@@ -171,7 +176,7 @@ public class RhinoScriptBuilder {
    */
   public Object evaluate(final String script, final String sourceName) {
     Validate.notNull(script);
-    //make sure we have a context associated with current thread
+    // make sure we have a context associated with current thread
     initContext();
     try {
       return context.evaluateString(scope, script, sourceName, 1, null);
@@ -179,7 +184,7 @@ public class RhinoScriptBuilder {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
     } finally {
-      //Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
+      // Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
       if (Context.getCurrentContext() != null) {
         Context.exit();
       }
@@ -193,9 +198,11 @@ public class RhinoScriptBuilder {
     return new RhinoScriptBuilder();
   }
 
+
   public static RhinoScriptBuilder newChain(final ScriptableObject scope) {
     return new RhinoScriptBuilder(scope);
   }
+
 
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.
