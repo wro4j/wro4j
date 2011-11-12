@@ -27,7 +27,8 @@ public class MultiLineCommentStripperProcessor
   /**
    * Pattern containing a regex matching multiline comments & empty new lines.
    */
-  public static final Pattern PATTERN = Pattern.compile("[\\t ]*/\\*.*?\\*/\\r\\n?", Pattern.DOTALL);
+  public static final Pattern PATTERN = Pattern.compile("(?ims)[\\t ]*/\\*.*?\\*/[\\r\\n]?");
+  public static final String ALIAS = "multilineStripper";
 
 
   /**
