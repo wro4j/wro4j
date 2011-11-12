@@ -5,16 +5,19 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -39,6 +42,7 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
     final ThreadLocal<Throwable> cause = new ThreadLocal<Throwable>();
 
     final ResourcePostProcessor processor = new JsHintProcessor() {
+      @Override
       protected void onLinterException(final LinterException e, final Resource resource) throws Exception {
         cause.set(e);
       };
@@ -48,5 +52,33 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
 
     processor.process(new StringReader("alert(;"), new StringWriter());
     Assert.assertNotNull(cause.get());
+  }
+
+
+  /**
+   * This test was created initially to prove that {@link JsHintProcessor} is thread-safe, but it doesn't work well when
+   * trying to reuse the scope. TODO: This needs to be investigated.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void canBeExecutedMultipleTimes() throws Exception {
+    final JsHintProcessor processor = new JsHintProcessor() {
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        throw e;
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          processor.process(new StringReader("alert(1);"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
   }
 }

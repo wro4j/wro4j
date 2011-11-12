@@ -5,16 +5,20 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -47,5 +51,26 @@ public class TestJsLintProcessor extends AbstractTestLinterProcessor {
 
     processor.process(new StringReader("alert(;"), new StringWriter());
     Assert.assertNotNull(cause.get());
+  }
+  
+  @Test
+  public void canBeExecutedMultipleTimes() throws Exception {
+    final JsLintProcessor processor = new JsLintProcessor() {
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        throw e;
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          processor.process(new StringReader("var i = 1;"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
   }
 }

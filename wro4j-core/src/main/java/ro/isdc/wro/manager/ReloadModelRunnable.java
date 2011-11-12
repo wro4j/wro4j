@@ -42,10 +42,6 @@ public final class ReloadModelRunnable
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.debug("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
-    } catch (final Exception e) {
-      // Catch all exception in order to avoid situation when scheduler runs out of threads.
-      LOG.error("Exception occured during cache reload: ", e);
     }
-
   }
 }

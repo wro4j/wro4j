@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,7 +50,6 @@ public final class ReloadCacheRunnable
           if (group.hasResourcesOfType(resourceType)) {
             final Collection<Group> groupAsList = new HashSet<Group>();
             groupAsList.add(group);
-            // TODO notify the filter about the change - expose a callback
             // TODO check if request parameter can be fetched here without errors.
             // groupExtractor.isMinimized(Context.get().getRequest())
             final Boolean[] minimizeValues = new Boolean[] { true, false };
@@ -72,8 +72,7 @@ public final class ReloadCacheRunnable
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.error("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
-    } catch (final Exception e) {
-      // Catch all exception in order to avoid situation when scheduler runs out of threads.
+    } catch (final IOException e) {
       LOG.error("Exception occured during cache reload: ", e);
     }
   }
