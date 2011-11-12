@@ -85,11 +85,17 @@ public class GoogleClosureCompressorProcessor
       compiler.disableThreads();
       compiler.initOptions(compilerOptions);
 
-      final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
-      final JSSourceFile input = JSSourceFile.fromInputStream(fileName,
-        new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())));
-      final Result result = compiler.compile(extern, input, compilerOptions);
+      final JSSourceFile[] input = new JSSourceFile[] {
+        JSSourceFile.fromInputStream(fileName,
+        new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())))
+      };
+      JSSourceFile[] externs = getExterns(resource);
+      if (externs == null) {
+        //fallback to empty array when null is provided.
+        externs = new JSSourceFile[] {};
+      }
+      final Result result = compiler.compile(externs, input, compilerOptions);
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
@@ -101,6 +107,17 @@ public class GoogleClosureCompressorProcessor
       writer.close();
     }
   }
+
+
+  /**
+   * @param resource Currently processed resource. The resource can be null, when the closure compiler is used as a post
+   *        processor.
+   * @return An Array of externs files for the resource to process.
+   */
+  protected JSSourceFile[] getExterns(final Resource resource) {
+    return new JSSourceFile[] {};
+  }
+
 
   /**
    * @param compilerOptions the compilerOptions to set
