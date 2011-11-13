@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
@@ -70,17 +68,17 @@ public final class PreProcessorExecutor {
       //use at most the number of available processors (true parallelism)
       final int threadPoolSize = availableProcessors;
 
-      final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize, WroUtil.createDaemonThreadFactory());
-      final List<Future<String>> futures = new ArrayList<Future<String>>();
+      final List<Callable<String>> callables = new ArrayList<Callable<String>>();
       for (final Resource resource : resources) {
-        futures.add(exec.submit(new Callable<String>() {
+        callables.add(new Callable<String>() {
           public String call()
             throws Exception {
             return processSingleResource(resource, resources, minimize);
           }
-        }));
+        });
       }
-      exec.shutdown();
+      final List<Future<String>> futures = WroUtil.runInParallel(callables, threadPoolSize);
+
       for (final Future<String> future : futures) {
         try {
           result.append(future.get());

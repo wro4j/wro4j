@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Apply <a href="https://github.com/douglascrockford/JSLint">JsLint</a> script checking utility.
  * <p/>
- * Using untagged version (commited: 2011-10-23 20:56:22)
+ * Using untagged version (committed: 2011-11-09 01:47:52)
  *
  * @author Alex Objelean
  * @since 1.4.2
@@ -18,7 +18,7 @@ public class JsLint extends AbstractLinter {
   /**
    * The name of the jshint script to be used by default.
    */
-  private static final String DEFAULT_JSLINT_JS = "jslint.js";
+  private static final String DEFAULT_JSLINT_JS = "jslint.min.js";
 
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.

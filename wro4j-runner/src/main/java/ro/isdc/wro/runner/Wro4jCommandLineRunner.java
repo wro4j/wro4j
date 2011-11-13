@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -191,8 +192,11 @@ public class Wro4jCommandLineRunner {
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
+
       // init context
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      final WroConfiguration config = new WroConfiguration();
+      config.setParallelPreprocessing(true);
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
       Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing

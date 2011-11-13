@@ -20,8 +20,8 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs version (1.0.8 snapshot) <br/>
- * commited at the following date: 2011-09-18 08:14:44.
+ * The underlying implementation use the uglifyJs version (1.1.1) <br/>
+ * committed at the following date: 2011-09-29 11:35:11.
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
@@ -36,7 +36,7 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglify-1.0.8-pre.js";
+  private static final String DEFAULT_UGLIFY_JS = "uglifyJs-1.1.1.min.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
