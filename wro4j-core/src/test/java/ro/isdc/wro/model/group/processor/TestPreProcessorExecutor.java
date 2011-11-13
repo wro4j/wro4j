@@ -26,6 +26,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -65,8 +66,10 @@ public class TestPreProcessorExecutor {
     injector.inject(executor);
   }
 
-  @Test(expected=NullPointerException.class)
-  public void cannotAcceptNullArguments() throws Exception {
+
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullArguments()
+    throws Exception {
     executor.processAndMerge(null, true);
   }
 
@@ -88,6 +91,7 @@ public class TestPreProcessorExecutor {
     };
   }
 
+
   private ResourcePreProcessor createProcessorUsingMissingResource() {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -97,6 +101,7 @@ public class TestPreProcessorExecutor {
       }
     };
   }
+
 
   private ResourcePreProcessor createProcessorWhichFails() {
     return new ResourcePreProcessor() {
@@ -108,20 +113,25 @@ public class TestPreProcessorExecutor {
     };
   }
 
+
   @Test
-  public void processEmptyList() throws Exception {
+  public void processEmptyList()
+    throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
     Assert.assertEquals("", executor.processAndMerge(resources, true));
     Assert.assertEquals("", executor.processAndMerge(resources, false));
   }
 
+
   @Test
-  public void shouldNotFailWhenNoResourcesProcessed() throws Exception {
+  public void shouldNotFailWhenNoResourcesProcessed()
+    throws Exception {
     initExecutor(createProcessorUsingMissingResource());
     executor.processAndMerge(createResources(), true);
   }
 
-  private List<Resource> createResources(final Resource...resources) {
+
+  private List<Resource> createResources(final Resource... resources) {
     final List<Resource> resourcesList = new ArrayList<Resource>();
     for (final Resource resource : resources) {
       resourcesList.add(resource);
@@ -129,8 +139,10 @@ public class TestPreProcessorExecutor {
     return resourcesList;
   }
 
-  @Test(expected=IOException.class)
-  public void shouldFailWhenProcessingInvalidResource() throws Exception {
+
+  @Test(expected = IOException.class)
+  public void shouldFailWhenProcessingInvalidResource()
+    throws Exception {
     Context.get().getConfig().setIgnoreMissingResources(false);
     shouldNotFailWhenProcessingInvalidResource();
   }
@@ -145,21 +157,33 @@ public class TestPreProcessorExecutor {
     Assert.assertEquals("", result);
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void shouldFailWhenUsingFailingPreProcessor() throws Exception {
+
+  @Test(expected = WroRuntimeException.class)
+  public void shouldFailWhenUsingFailingPreProcessor()
+    throws Exception {
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
     Assert.assertEquals("", result);
   }
 
+
   @Test
-  public void test() throws Exception {
-    initExecutor(createSlowPreProcessor(1000));
-    final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
+  public void preProcessingInParallelIsFaster()
+    throws Exception {
+    final StopWatch watch = new StopWatch();
+    watch.start("processAndMerge");
+    initExecutor(createSlowPreProcessor(200), createSlowPreProcessor(200), createSlowPreProcessor(200));
+    final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
+      Resource.create("r2", ResourceType.JS), Resource.create("r3", ResourceType.JS),
+      Resource.create("r4", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
     Assert.assertEquals("", result);
+    watch.stop();
+    // prove that running in parallel is faster
+    Assert.assertTrue(watch.getTotalTimeMillis() < 1000);
   }
+
 
   @After
   public void tearDown() {

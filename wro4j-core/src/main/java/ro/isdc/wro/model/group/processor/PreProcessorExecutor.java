@@ -62,42 +62,42 @@ public final class PreProcessorExecutor {
     Validate.notNull(resources);
 
     final StringBuffer result = new StringBuffer();
+    final boolean isParallel = true;
+    if (isParallel && resources.size() > 0) {
+      final int threadPoolSize = resources.size();
 
-    final ExecutorService exec = Executors.newFixedThreadPool(6);
-    final List<Future<String>> futures = new ArrayList<Future<String>>();
-    for (final Resource resource : resources) {
-      futures.add(exec.submit(new Callable<String>() {
-        public String call() {
-          try {
+      final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize);
+      final List<Future<String>> futures = new ArrayList<Future<String>>();
+      for (final Resource resource : resources) {
+        futures.add(exec.submit(new Callable<String>() {
+          public String call()
+            throws Exception {
             return processSingleResource(resource, resources, minimize);
-          } catch (final IOException e) {
-            return null;
+          }
+        }));
+      }
+      exec.shutdown();
+      for (final Future<String> future : futures) {
+        try {
+          result.append(future.get());
+        } catch (final Exception e) {
+          // propagate original cause
+          final Throwable cause = e.getCause();
+          if (cause instanceof WroRuntimeException) {
+            throw (WroRuntimeException)cause;
+          } else if (cause instanceof IOException) {
+            throw (IOException)cause;
+          } else {
+            throw new WroRuntimeException("", e.getCause());
           }
         }
-      }));
-    }
-    exec.shutdown();
-
-    for (final Future<String> future : futures) {
-      try {
-        result.append(future.get());
-      } catch (final Exception e) {
-        LOG.error("Exception caught", e);
-        final Throwable cause = e.getCause();
-        if (cause instanceof WroRuntimeException) {
-          throw (WroRuntimeException) cause;
-        } else if (cause instanceof IOException) {
-          throw (IOException) cause;
-        } else {
-          throw new WroRuntimeException("", e.getCause());
-        }
+      }
+    } else {
+      for (final Resource resource : resources) {
+        LOG.debug("\tmerging resource: {}", resource);
+        result.append(processSingleResource(resource, resources, minimize));
       }
     }
-
-//    for (final Resource resource : resources) {
-//      LOG.debug("\tmerging resource: {}", resource);
-//      result.append(processSingleResource(resource, resources, minimize));
-//    }
     return result.toString();
   }
 
