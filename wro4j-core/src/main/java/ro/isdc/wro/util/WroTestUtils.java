@@ -357,7 +357,9 @@ public class WroTestUtils {
       Transformers.noOpTransformer(), processor);
   }
 
-
+  /**
+   * TODO run tests in parallel
+   */
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourcePostProcessor processor)
     throws IOException {
@@ -396,6 +398,7 @@ public class WroTestUtils {
     LOG.debug("targetFolder: {}", targetFolder);
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
+    //TODO use WroUtil#runInParallel for running tests faster
     for (final File file : files) {
       File targetFile = null;
       try {
