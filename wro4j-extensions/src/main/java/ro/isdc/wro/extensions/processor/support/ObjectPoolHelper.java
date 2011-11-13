@@ -20,7 +20,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {
-  private static final int MAX_ACTIVE = 5;
+  private static final int MAX_ACTIVE = 2;
   private static final int MAX_IDLE = 1;
   private static final byte EXHAUSTED_ACTION = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
   private static final long MAX_WAIT = 1000L * 5L;

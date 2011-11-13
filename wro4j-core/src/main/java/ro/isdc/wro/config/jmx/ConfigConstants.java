@@ -36,6 +36,10 @@ public enum ConfigConstants {
    */
   disableCache,
   /**
+   * When true, will run in parallel pre processing of multiple resources. In theory this should improve the performance.
+   */
+  parallelProcessing,
+  /**
    * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
    * requests will use the cached gzipped content. Otherwise, the gzip operation will be performed for each request.
    * This flag allow to control the memory vs processing power trade-off.

@@ -14,7 +14,7 @@
   <name>Wro4j Demo project</name>
 
 	<properties>
-		<wicket.version>1.5.1</wicket.version>
+		<wicket.version>1.5.2</wicket.version>
 		<gae.version>1.5.4</gae.version>
     <dwr.version>3.0.M1</dwr.version>
     <guice.version>3.0</guice.version>
