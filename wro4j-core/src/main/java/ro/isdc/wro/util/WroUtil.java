@@ -7,8 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -341,5 +347,24 @@ public final class WroUtil {
         return object;
       }
     };
+  }
+
+
+  /**
+   * Creates a threadPool which spawns provided callables and returns the futures describing the status of their
+   * execution.
+   *
+   * @param callables a list of {@link Callable} to execute in paralel.
+   * @param threadPoolSize the size of the thread pool.
+   * @return a list of futures representing the result of callables execution.
+   */
+  public static <T> List<Future<T>> runInParallel(final List<Callable<T>> callables, final int threadPoolSize) {
+    final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize, createDaemonThreadFactory());
+    final List<Future<T>> futures = new ArrayList<Future<T>>();
+    for (final Callable<T> callable : callables) {
+      futures.add(exec.submit(callable));
+    }
+    exec.shutdown();
+    return futures;
   }
 }
