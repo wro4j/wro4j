@@ -6,15 +6,22 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
@@ -24,6 +31,7 @@ import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -52,10 +60,47 @@ public final class PreProcessorExecutor {
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
     throws IOException {
+    Validate.notNull(resources);
+
     final StringBuffer result = new StringBuffer();
-    for (final Resource resource : resources) {
-      LOG.debug("\tmerging resource: {}", resource);
-      result.append(processSingleResource(resource, resources, minimize));
+
+    final boolean isParallel = Context.get().getConfig().isParallelPreprocessing();
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+    if (isParallel && resources.size() > 1 && availableProcessors > 1) {
+      //use at most the number of available processors (true parallelism)
+      final int threadPoolSize = availableProcessors;
+
+      final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize, WroUtil.createDaemonThreadFactory());
+      final List<Future<String>> futures = new ArrayList<Future<String>>();
+      for (final Resource resource : resources) {
+        futures.add(exec.submit(new Callable<String>() {
+          public String call()
+            throws Exception {
+            return processSingleResource(resource, resources, minimize);
+          }
+        }));
+      }
+      exec.shutdown();
+      for (final Future<String> future : futures) {
+        try {
+          result.append(future.get());
+        } catch (final Exception e) {
+          // propagate original cause
+          final Throwable cause = e.getCause();
+          if (cause instanceof WroRuntimeException) {
+            throw (WroRuntimeException)cause;
+          } else if (cause instanceof IOException) {
+            throw (IOException)cause;
+          } else {
+            throw new WroRuntimeException("", e.getCause());
+          }
+        }
+      }
+    } else {
+      for (final Resource resource : resources) {
+        LOG.debug("\tmerging resource: {}", resource);
+        result.append(processSingleResource(resource, resources, minimize));
+      }
     }
     return result.toString();
   }
@@ -71,6 +116,7 @@ public final class PreProcessorExecutor {
    */
   private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
     throws IOException {
+    LOG.debug("processingSingleResource: {}", resource);
     // TODO: hold a list of processed resources in order to avoid duplicates
     // merge preProcessorsBy type and anyPreProcessors
     Collection<ResourcePreProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
@@ -127,12 +173,11 @@ public final class PreProcessorExecutor {
     return writer.toString();
   }
 
+
   /**
    * @return a Reader for the provided resource.
-   * @param resource
-   *          {@link Resource} which content to return.
-   * @param resources
-   *          the list of all resources processed in this context, used for duplicate resource detection.
+   * @param resource {@link Resource} which content to return.
+   * @param resources the list of all resources processed in this context, used for duplicate resource detection.
    */
   private String getResourceContent(final Resource resource, final List<Resource> resources)
     throws IOException {

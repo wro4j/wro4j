@@ -13,7 +13,6 @@ import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +54,8 @@ public class JSMinProcessor implements ResourcePreProcessor,
       jsmin.jsmin();
       is.close();
       os.close();
-    } catch (final IOException e) {
-      LOG.error("Error occured", e);
-      throw e;
 		} catch (final Exception e) {
-		  final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-		  final String errorMessage = "Exception while applying " + getClass().getSimpleName() + " processor on the "
-      + resourceUri + " resource";
-		  LOG.error(errorMessage);
-      throw new IOException(errorMessage, e);
+      throw new IOException(e.getMessage(), e);
     } finally {
       reader.close();
       writer.close();
