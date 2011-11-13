@@ -92,6 +92,11 @@ public final class WroConfiguration
    */
   private int connectionTimeout = 2;
   /**
+   * When true, will run in parallel preprocessing of multiple resources. In theory this should improve the performance.
+   * By default this flag is false, because this feature is experimental.
+   */
+  private boolean parallelPreprocessing = false;
+  /**
    * Listeners for the change of cache & model period properties.
    */
   private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(
@@ -407,6 +412,22 @@ public final class WroConfiguration
    */
   public void setConnectionTimeout(final int connectionTimeout) {
     this.connectionTimeout = connectionTimeout;
+  }
+
+
+  /**
+   * @return the parallelPreprocessing
+   */
+  public boolean isParallelPreprocessing() {
+    return this.parallelPreprocessing;
+  }
+
+
+  /**
+   * @param parallelPreprocessing the parallelPreprocessing to set
+   */
+  public void setParallelPreprocessing(final boolean parallelPreprocessing) {
+    this.parallelPreprocessing = parallelPreprocessing;
   }
 
 

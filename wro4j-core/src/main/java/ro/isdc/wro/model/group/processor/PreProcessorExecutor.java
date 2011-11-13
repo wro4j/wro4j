@@ -63,10 +63,12 @@ public final class PreProcessorExecutor {
     Validate.notNull(resources);
 
     final StringBuffer result = new StringBuffer();
-    final boolean isParallel = true;
-    if (isParallel && resources.size() > 1) {
-//      final int threadPoolSize = resources.size();
-      final int threadPoolSize = Runtime.getRuntime().availableProcessors();
+
+    final boolean isParallel = Context.get().getConfig().isParallelPreprocessing();
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+    if (isParallel && resources.size() > 1 && availableProcessors > 1) {
+      //use at most the number of available processors (true parallelism)
+      final int threadPoolSize = availableProcessors;
 
       final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize, WroUtil.createDaemonThreadFactory());
       final List<Future<String>> futures = new ArrayList<Future<String>>();

@@ -41,6 +41,8 @@ public class TestPreProcessorExecutor {
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
+    //force parallel execution
+    Context.get().getConfig().setParallelPreprocessing(true);
     initExecutor();
   }
 
@@ -181,7 +183,7 @@ public class TestPreProcessorExecutor {
     watch.stop();
     // prove that running in parallel is faster
 
-    Assert.assertTrue("Processing took: " + watch.getTotalTimeMillis(), watch.getTotalTimeMillis() < 800);
+    Assert.assertTrue("Processing took: " + watch.getTotalTimeMillis(), watch.getTotalTimeMillis() < 900);
   }
 
 
