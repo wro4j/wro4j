@@ -175,13 +175,13 @@ public class TestPreProcessorExecutor {
     watch.start("processAndMerge");
     initExecutor(createSlowPreProcessor(200), createSlowPreProcessor(200), createSlowPreProcessor(200));
     final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
-      Resource.create("r2", ResourceType.JS), Resource.create("r3", ResourceType.JS),
-      Resource.create("r4", ResourceType.JS));
+      Resource.create("r2", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
     Assert.assertEquals("", result);
     watch.stop();
     // prove that running in parallel is faster
-    Assert.assertTrue(watch.getTotalTimeMillis() < 1000);
+
+    Assert.assertTrue("Processing took: " + watch.getTotalTimeMillis(), watch.getTotalTimeMillis() < 800);
   }
 
 

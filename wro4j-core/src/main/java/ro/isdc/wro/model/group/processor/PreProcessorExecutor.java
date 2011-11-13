@@ -31,6 +31,7 @@ import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -63,10 +64,11 @@ public final class PreProcessorExecutor {
 
     final StringBuffer result = new StringBuffer();
     final boolean isParallel = true;
-    if (isParallel && resources.size() > 0) {
-      final int threadPoolSize = resources.size();
+    if (isParallel && resources.size() > 1) {
+//      final int threadPoolSize = resources.size();
+      final int threadPoolSize = Runtime.getRuntime().availableProcessors();
 
-      final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize);
+      final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize, WroUtil.createDaemonThreadFactory());
       final List<Future<String>> futures = new ArrayList<Future<String>>();
       for (final Resource resource : resources) {
         futures.add(exec.submit(new Callable<String>() {
