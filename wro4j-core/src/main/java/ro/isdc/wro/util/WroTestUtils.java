@@ -357,7 +357,9 @@ public class WroTestUtils {
       Transformers.noOpTransformer(), processor);
   }
 
-
+  /**
+   * TODO run tests in parallel
+   */
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourcePostProcessor processor)
     throws IOException {
