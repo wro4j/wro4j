@@ -74,6 +74,8 @@ public final class ReloadCacheRunnable
       Thread.currentThread().interrupt();
     } catch (final IOException e) {
       LOG.error("Exception occured during cache reload: ", e);
+    } catch (final Exception e) {
+      LOG.error("Exception occured during cache reload: ", e);
     }
   }
 }

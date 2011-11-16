@@ -26,7 +26,7 @@ public class SchedulerHelper {
   private DestroyableLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new DestroyableLazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
-      return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory()) {
+      return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory(SchedulerHelper.this.name)) {
         @Override
         public boolean getExecuteExistingDelayedTasksAfterShutdownPolicy() {
           return false;
@@ -139,7 +139,7 @@ public class SchedulerHelper {
       // Disable new tasks from being submitted
       poolInitializer.get().shutdownNow();
       try {
-        while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
+        while (!poolInitializer.get().awaitTermination(15, TimeUnit.SECONDS)) {
           LOG.debug("Termination awaited: " + name);
         }
       } catch (final InterruptedException e) {
