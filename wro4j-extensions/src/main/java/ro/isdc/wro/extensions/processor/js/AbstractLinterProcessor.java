@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
-import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.extensions.processor.support.linter.AbstractLinter;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
@@ -42,7 +41,7 @@ public abstract class AbstractLinterProcessor
    * Options to use to configure the linter.
    */
   private String[] options;
-  
+
   public AbstractLinterProcessor() {
     enginePool = new ObjectPoolHelper<AbstractLinter>(new ObjectFactory<AbstractLinter>() {
       @Override
@@ -63,7 +62,7 @@ public abstract class AbstractLinterProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
-    AbstractLinter linter = enginePool.getObject();
+    final AbstractLinter linter = enginePool.getObject();
     try {
       // TODO investigate why linter fails when trying to reuse the same instance twice
       linter.setOptions(options).validate(content);
@@ -90,7 +89,7 @@ public abstract class AbstractLinterProcessor
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final WroRuntimeException e) {
+  protected void onException(final Exception e) {
   }
 
   /**

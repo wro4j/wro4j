@@ -183,7 +183,7 @@ public class TestPreProcessorExecutor {
     watch.stop();
     // prove that running in parallel is faster
 
-    Assert.assertTrue("Processing took: " + watch.getTotalTimeMillis(), watch.getTotalTimeMillis() < 900);
+    Assert.assertTrue("Processing took: " + watch.getTotalTimeMillis(), watch.getTotalTimeMillis() < 1000);
   }
 
 

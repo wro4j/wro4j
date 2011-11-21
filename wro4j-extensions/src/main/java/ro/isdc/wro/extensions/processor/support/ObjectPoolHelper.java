@@ -20,7 +20,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {
-  private static final int MAX_ACTIVE = 2;
+  private static final int MAX_ACTIVE = 4;
   private static final int MAX_IDLE = 1;
   private static final byte EXHAUSTED_ACTION = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
   private static final long MAX_WAIT = 1000L * 5L;
@@ -30,13 +30,14 @@ public class ObjectPoolHelper<T> {
 
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
+    int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
     objectPool = new GenericObjectPool(new BasePoolableObjectFactory() {
       @Override
       public Object makeObject()
         throws Exception {
         return objectFactory.create();
       }
-    }, MAX_ACTIVE, EXHAUSTED_ACTION, MAX_WAIT, MAX_IDLE);
+    }, maxActive, EXHAUSTED_ACTION, MAX_WAIT, MAX_IDLE);
   }
 
 

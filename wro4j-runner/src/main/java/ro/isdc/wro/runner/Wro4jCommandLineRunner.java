@@ -138,6 +138,8 @@ public class Wro4jCommandLineRunner {
    * Exception handler.
    */
   protected void onException(final Exception e) {
+    System.out.println(e.getMessage());
+    System.exit(1); // non-zero exit code indicates there was an error
   }
 
 
@@ -331,6 +333,7 @@ public class Wro4jCommandLineRunner {
         super.onCssLintException(e, resource);
         System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
         System.err.println(e.getErrors());
+        onException(e);
       }
     });
     map.put(JsHintProcessor.ALIAS, new JsHintProcessor() {
@@ -340,6 +343,7 @@ public class Wro4jCommandLineRunner {
         super.onLinterException(e, resource);
         System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
         System.err.println(e.getErrors());
+        onException(e);
       }
     });
     return map;

@@ -45,8 +45,20 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(true, config.isGzipEnabled());
     Assert.assertEquals(true, config.isIgnoreMissingResources());
     Assert.assertEquals(true, config.isJmxEnabled());
+    Assert.assertEquals(false, config.isCacheGzippedContent());
+    Assert.assertEquals(false, config.isParallelPreprocessing());
   }
 
+  @Test
+  public void invalidBooleanFallbacksToFalse() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.cacheGzippedContent.name(), "INVALID_BOOLEAN");
+    
+    factory.setProperties(props);
+    final WroConfiguration config = factory.create();
+    
+    Assert.assertEquals(false, config.isCacheGzippedContent());
+  }
 
   @Test
   public void testConfigWithProperties() {
@@ -55,6 +67,8 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.modelUpdatePeriod.name(), "20");
     props.setProperty(ConfigConstants.disableCache.name(), "true");
     props.setProperty(ConfigConstants.gzipResources.name(), "false");
+    props.setProperty(ConfigConstants.cacheGzippedContent.name(), "true");
+    props.setProperty(ConfigConstants.parallelPreprocessing.name(), "true");
     factory.setProperties(props);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
@@ -62,6 +76,8 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(20, config.getModelUpdatePeriod());
     Assert.assertEquals(true, config.isDisableCache());
     Assert.assertEquals(false, config.isGzipEnabled());
+    Assert.assertEquals(true, config.isCacheGzippedContent());
+    Assert.assertEquals(true, config.isParallelPreprocessing());
   }
 
 
