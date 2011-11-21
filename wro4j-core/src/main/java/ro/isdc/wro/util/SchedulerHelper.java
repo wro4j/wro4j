@@ -137,10 +137,14 @@ public class SchedulerHelper {
   private synchronized void destroyScheduler() {
     if (!poolInitializer.get().isShutdown()) {
       // Disable new tasks from being submitted
-      poolInitializer.get().shutdownNow();
+      poolInitializer.get().shutdown();
+      if (future != null) {
+        future.cancel(true);
+      }
       try {
         while (!poolInitializer.get().awaitTermination(15, TimeUnit.SECONDS)) {
           LOG.debug("Termination awaited: " + name);
+          poolInitializer.get().shutdownNow();
         }
       } catch (final InterruptedException e) {
         LOG.debug("Interrupted Exception occured during scheduler destroy", e);
