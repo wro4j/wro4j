@@ -21,7 +21,13 @@ public class TestJsHintMojo extends AbstractTestLinterMojo {
     return new JsHintMojo();
   }
 
+  @Test
+  public void usePredefOptions() throws Exception {
+    getMojo().setOptions("predef=['YUI','window','document','OnlineOpinion','xui']");
 
+    getMojo().setTargetGroups("undef");
+    getMojo().execute();
+  }
 
   @Test
   public void testMojoWithPropertiesSet()

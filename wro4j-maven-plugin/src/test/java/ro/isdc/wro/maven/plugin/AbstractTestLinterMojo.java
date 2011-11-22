@@ -6,6 +6,9 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
+
+import junit.framework.Assert;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -102,6 +105,19 @@ public abstract class AbstractTestLinterMojo {
     mojo.setTargetGroups(null);
     mojo.execute();
   }
+
+
+  @Test
+  public void shouldSplitOptions() throws Exception {
+    final String option = "predef=['YUI','window','document','OnlineOpinion','xui']";
+    getMojo().setOptions(option);
+    Assert.assertEquals(1, getMojo().getOptions().length);
+    Assert.assertEquals(Arrays.toString(new String[] {
+      option
+    }), Arrays.toString(getMojo().getOptions()));
+    getMojo().execute();
+  }
+
 
   public static class CustomWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
     @Override

@@ -30,7 +30,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  */
 public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   /**
-   * Comma separated jsHint options. This field is optional. If no value is provided, no options will be used..
+   * Comma separated options. This field is optional. If no value is provided, no options will be used..
    *
    * @parameter expression="${options}"
    * @optional
@@ -63,7 +63,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   }
 
   /**
-   * @param group
+   * @param group the name of the group to process.
    */
   private void processGroup(final String group) throws Exception {
     getLog().info("processing group: " + group);
@@ -113,6 +113,14 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   }
 
   /**
+   * @return raw representation of the option value.
+   */
+  public String getOptionsAsString() {
+    return options;
+  }
+
+  /**
+   * Used for tests only.
    * @param options the options to set
    */
   void setOptions(final String options) {

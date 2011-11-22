@@ -113,6 +113,7 @@ public class CssLint {
    * @return Script used to pack and return the packed result.
    */
   private String buildCssLintScript(final String data, final String... options) {
+    //TODO use OptionsBuilder
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {
