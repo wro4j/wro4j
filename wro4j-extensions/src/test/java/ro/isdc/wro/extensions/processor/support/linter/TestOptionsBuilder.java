@@ -100,7 +100,7 @@ public class TestOptionsBuilder {
   }
 
   @Test
-  public void splitingMoreOptions() {
+  public void splitingTwoOptions() {
     Assert.assertTrue(Arrays.equals(new String[] { "o1", "o2" }, optionsBuilder.splitOptions("o1,o2")));
   }
 
@@ -108,10 +108,17 @@ public class TestOptionsBuilder {
   public void splitingComplexOption() {
     final String option = "predef=['YUI','window','document','OnlineOpinion','xui']";
     final String[] result = optionsBuilder.splitOptions(option);
-
-    System.out.println("result.length: " + result.length);
-    System.out.println("result: " + Arrays.toString(result));
     Assert.assertEquals(1, result.length);
     Assert.assertTrue(Arrays.equals(new String[] { option }, result));
+  }
+
+  @Test
+  public void splitingComplexOptions() {
+    final String option = "option1,option2,option3=['YUI','window','document','xui'],option4,option5=['YUI','xui'],option6";
+    final String[] result = optionsBuilder.splitOptions(option);
+    Assert.assertEquals(6, result.length);
+    Assert.assertEquals(
+      Arrays.toString(new String[] { "option1", "option2", "option3=['YUI','window','document','xui']", "option4",
+          "option5=['YUI','xui']", "option6" }), Arrays.toString(result));
   }
 }

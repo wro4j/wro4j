@@ -27,8 +27,7 @@ public class OptionsBuilder {
    * @return an array of options.
    */
   public String[] splitOptions(final String optionAsString) {
-    //,\s*(?=([^"]*"[^"]*")*[^"]*$)
-    return optionAsString == null ? ArrayUtils.EMPTY_STRING_ARRAY : optionAsString.split("(?<!\\[),");
+    return optionAsString == null ? ArrayUtils.EMPTY_STRING_ARRAY : optionAsString.split("(?ims),(?![^\\[\\]]*\\])");
   }
 
   /**

@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 
@@ -18,7 +20,12 @@ public class TestJsHintMojo extends AbstractTestLinterMojo {
    */
   @Override
   protected AbstractSingleProcessorMojo newLinterMojo() {
-    return new JsHintMojo();
+    return new JsHintMojo() {
+      @Override
+      void onException(final Exception e) {
+        Assert.fail("Shouldn't fail. Exception message: " + e.getMessage());
+      }
+    };
   }
 
   @Test

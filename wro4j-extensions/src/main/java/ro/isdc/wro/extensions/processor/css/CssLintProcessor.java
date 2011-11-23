@@ -57,7 +57,7 @@ public class CssLintProcessor
 
 
 
-  public CssLintProcessor setOptions(final String[] options) {
+  public CssLintProcessor setOptions(final String... options) {
     this.options = options;
     return this;
   }

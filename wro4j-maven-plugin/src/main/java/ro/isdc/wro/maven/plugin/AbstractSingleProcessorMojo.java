@@ -10,7 +10,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
@@ -106,16 +105,9 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   protected abstract ResourcePreProcessor createResourceProcessor();
 
   /**
-   * @return an array of options.
-   */
-  public String[] getOptions() {
-    return StringUtils.isEmpty(options) ? new String[] {} : options.split(",");
-  }
-
-  /**
    * @return raw representation of the option value.
    */
-  public String getOptionsAsString() {
+  public String getOptions() {
     return options;
   }
 
