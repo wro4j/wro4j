@@ -34,14 +34,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * File containing the groups definitions.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml" expression="${wroFile}"
    * @optional
    */
   private File wroFile;
   /**
    * The folder where web application context resides useful for locating resources relative to servletContext .
    *
-   * @parameter default-value="${basedir}/src/main/webapp/"
+   * @parameter default-value="${basedir}/src/main/webapp/"  expression="${contextFolder}"
    */
   private File contextFolder;
   /**

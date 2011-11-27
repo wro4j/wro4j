@@ -60,7 +60,8 @@ public class CustomStandaloneWroManagerFactory
         }
         super.process(resource, reader, writer);
       }
-      protected void onLinterException(final LinterException e, final Resource resource) throws Exception {
+      @Override
+      protected void onLinterException(final LinterException e, final Resource resource) {
         LOG.error(
           e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
             + e.getErrors());

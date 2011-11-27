@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
@@ -42,16 +41,28 @@ public class JsHintMojo
         super.process(resource, reader, writer);
       }
 
-      protected void onLinterException(final LinterException e, final Resource resource)
-          throws Exception {
+      @Override
+      protected void onException(final Exception e) {
+        JsHintMojo.this.onException(e);
+      }
+
+      @Override
+      protected void onLinterException(final LinterException e, final Resource resource) {
         getLog().error(
             e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
                 + e.getErrors());
         if (!isFailNever()) {
-          throw new MojoExecutionException("Errors found when validating resource: " + resource);
+          //throw new MojoExecutionException("Errors found when validating resource: " + resource);
+          throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
       };
     }.setOptions(getOptions());
     return processor;
+  }
+
+  /**
+   * Used by unit test to check if mojo doesn't fail.
+   */
+  void onException(final Exception e) {
   }
 }

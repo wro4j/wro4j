@@ -34,7 +34,6 @@ public class JsHint extends AbstractLinter {
    */
   @Override
   protected String getLinterName() {
-    // TODO Auto-generated method stub
     return "JSHINT";
   }
 }
