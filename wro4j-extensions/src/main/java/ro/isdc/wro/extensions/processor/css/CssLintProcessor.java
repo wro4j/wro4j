@@ -23,6 +23,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -77,7 +78,7 @@ public class CssLintProcessor
         LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
         onCssLintException(e, resource);
       } catch (final Exception ex) {
-        throw new WroRuntimeException("Rethrowing original exception: " + ex.getMessage(), ex);
+        WroUtil.wrapWithWroRuntimeException(e);
       }
     } catch (final WroRuntimeException e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";

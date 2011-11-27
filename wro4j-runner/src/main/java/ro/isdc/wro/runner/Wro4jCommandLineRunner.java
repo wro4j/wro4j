@@ -109,7 +109,7 @@ public class Wro4jCommandLineRunner {
   /**
    * @param args
    */
-  public void doMain(final String[] args) {
+  protected void doMain(final String[] args) {
     LOG.debug("arguments: " + Arrays.toString(args));
     final CmdLineParser parser = new CmdLineParser(this);
     parser.setUsageWidth(100);
