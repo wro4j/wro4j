@@ -52,7 +52,7 @@ public abstract class AbstractLinterProcessor
     });
   }
 
-  public AbstractLinterProcessor setOptions(final String[] options) {
+  public AbstractLinterProcessor setOptions(final String... options) {
     this.options = options;
     return this;
   }
@@ -68,11 +68,7 @@ public abstract class AbstractLinterProcessor
       // TODO investigate why linter fails when trying to reuse the same instance twice
       linter.setOptions(options).validate(content);
     } catch (final LinterException e) {
-      try {
-        onLinterException(e, resource);
-      } catch (final Exception ex) {
-        throw new WroRuntimeException("", ex);
-      }
+      onLinterException(e, resource);
     } catch (final WroRuntimeException e) {
       onException(e);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
@@ -112,8 +108,7 @@ public abstract class AbstractLinterProcessor
    * @param e {@link LinterException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onLinterException(final LinterException e, final Resource resource)
-    throws Exception {
+  protected void onLinterException(final LinterException e, final Resource resource) {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
 }
