@@ -50,6 +50,10 @@
 			<artifactId>closure-compiler</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.google.css</groupId>
+			<artifactId>closure-stylesheets</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>rhino</groupId>
 			<artifactId>js</artifactId>
 		</dependency>
