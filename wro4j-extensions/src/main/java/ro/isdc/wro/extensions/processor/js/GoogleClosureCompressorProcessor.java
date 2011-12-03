@@ -23,10 +23,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.ClosureCodingConvention;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DefaultCodingConvention;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
@@ -103,7 +103,6 @@ public class GoogleClosureCompressorProcessor
         writer.write(content);
       }
     } finally {
-      LOG.debug("finally");
       reader.close();
       writer.close();
     }
@@ -145,7 +144,7 @@ public class GoogleClosureCompressorProcessor
      * According to John Lenz from the Closure Compiler project, if you are using the Compiler API directly, you
      * should specify a CodingConvention. {@link http://code.google.com/p/wro4j/issues/detail?id=155}
      */
-    options.setCodingConvention(new DefaultCodingConvention());
+    options.setCodingConvention(new ClosureCodingConvention());
     //use the wro4j encoding by default
     options.setOutputCharset(Context.get().getConfig().getEncoding());
     //set it to warning, otherwise compiler will fail
