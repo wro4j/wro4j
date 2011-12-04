@@ -64,7 +64,7 @@
     <commons-io.version>2.1</commons-io.version>
     <commons-lang.version>3.0.1</commons-lang.version>
     <commons-pool.version>1.5.6</commons-pool.version>
-    <closure.version>r1459</closure.version>
+    <closure.version>r1592</closure.version>
     <slf4j.version>1.6.2</slf4j.version>    
     <maven.version>3.0.3</maven.version>    
     <mockito.version>1.9.0-rc1</mockito.version>
