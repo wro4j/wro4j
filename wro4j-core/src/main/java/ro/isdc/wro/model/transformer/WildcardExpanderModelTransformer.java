@@ -54,6 +54,7 @@ import ro.isdc.wro.util.Transformer;
  * @created 18 Jul 2011
  * @since 1.4.0
  */
+@SuppressWarnings("serial")
 public class WildcardExpanderModelTransformer
   implements Transformer<WroModel> {
   private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderModelTransformer.class);
@@ -61,6 +62,15 @@ public class WildcardExpanderModelTransformer
   @Inject
   private ResourceLocatorFactory resourceLocatorFactory;
 
+
+  /**
+   * An instance of IOException having a special purpose: to skip subsequent attempts to localize a stream.
+   */
+  public static class NoMoreAttemptsIOException extends IOException {
+    public NoMoreAttemptsIOException(final String message) {
+      super(message);
+    }
+  }
 
   /**
    * {@inheritDoc}
@@ -136,7 +146,7 @@ public class WildcardExpanderModelTransformer
           break;
         }
         // use this to skip wildcard stream detection, we are only interested in the baseName
-        throw new IOException("BaseNameFolder computed successfully, skip further wildcard processing..");
+        throw new NoMoreAttemptsIOException("BaseNameFolder computed successfully, skip further wildcard processing..");
       }
     });
 

@@ -163,6 +163,10 @@ public class DefaultWildcardStreamLocator
       try {
         wildcardExpanderHandler.transform(allFiles);
       } catch (final Exception e) {
+        //preserve exception type if the exception is already an IOException
+        if (e instanceof IOException) {
+          throw (IOException) e;
+        }
         throw new IOException("Exception during expanding wildcard: " + e.getMessage());
       }
     }

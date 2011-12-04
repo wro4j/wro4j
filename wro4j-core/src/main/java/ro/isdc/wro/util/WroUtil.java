@@ -4,14 +4,8 @@
 package ro.isdc.wro.util;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.TimeZone;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -69,9 +63,9 @@ public final class WroUtil {
   /**
    * @return {@link ThreadFactory} with daemon threads.
    */
-  public static ThreadFactory createDaemonThreadFactory() {
+  public static ThreadFactory createDaemonThreadFactory(final String name) {
     return new ThreadFactory() {
-      private final String prefix = "wro4j-thread-" + threadFactoryNumber.getAndIncrement() + "-thread-";
+      private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
       private final AtomicInteger threadNumber = new AtomicInteger(1);
 
       public Thread newThread(final Runnable runnable) {
@@ -279,25 +273,6 @@ public final class WroUtil {
         return object;
       }
     };
-  }
-
-
-  /**
-   * Creates a threadPool which spawns provided callables and returns the futures describing the status of their
-   * execution.
-   *
-   * @param callables a list of {@link Callable} to execute in paralel.
-   * @param threadPoolSize the size of the thread pool.
-   * @return a list of futures representing the result of callables execution.
-   */
-  public static <T> List<Future<T>> runInParallel(final List<Callable<T>> callables, final int threadPoolSize) {
-    final ExecutorService exec = Executors.newFixedThreadPool(threadPoolSize, createDaemonThreadFactory());
-    final List<Future<T>> futures = new ArrayList<Future<T>>();
-    for (final Callable<T> callable : callables) {
-      futures.add(exec.submit(callable));
-    }
-    exec.shutdown();
-    return futures;
   }
 
 

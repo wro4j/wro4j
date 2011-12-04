@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -82,18 +83,17 @@ public abstract class AbstractCssUrlRewritingProcessor
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
       final String oldMatch = matcher.group();
-      
-      String urlGroup = matcher.group(3) != null ? matcher.group(3) : matcher.group(2);
+
+      final String urlGroup = matcher.group(3) != null ? matcher.group(3) : matcher.group(2);
       LOG.debug("urlGroup: {}", urlGroup);
-      //use urlContent to get rid of trailing spaces inside the url() construction 
+      //use urlContent to get rid of trailing spaces inside the url() construction
       final String urlContent = matcher.group(1) != null ? matcher.group(1) : urlGroup;
-      
+
       Validate.notNull(urlGroup);
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, replacedUrl);
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
         final String newReplacement = oldMatch.replace(urlContent, replacedUrl);
-        System.out.println("newReplacement: " + newReplacement);
         onUrlReplaced(replacedUrl);
         matcher.appendReplacement(sb, newReplacement);
       }

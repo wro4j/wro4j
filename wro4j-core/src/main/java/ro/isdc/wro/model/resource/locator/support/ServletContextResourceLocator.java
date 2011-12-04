@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.StringUtils;
 
 
@@ -67,6 +68,9 @@ public class ServletContextResourceLocator
         return getWildcardStreamLocator().locateStream(path, new File(realPath));
       }
     } catch (final IOException e) {
+      if (e instanceof NoMoreAttemptsIOException) {
+        throw e;
+      }
       LOG.warn("Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }

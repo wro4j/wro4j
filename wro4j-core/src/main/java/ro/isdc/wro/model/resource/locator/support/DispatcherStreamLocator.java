@@ -100,8 +100,8 @@ public final class DispatcherStreamLocator {
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
-      LOG.debug("[FAIL] Error while dispatching the request for location {}", location, e);
-      throw new IOException("Error while dispatching the request for location " + location, e);
+      LOG.debug("[FAIL] Error while dispatching the request for location {}", location);
+      throw new IOException("Error while dispatching the request for location " + location);
     } finally {
       if (warnOnEmptyStream && os.size() == 0) {
         LOG.warn("Wrong or empty resource with location: {}", location);
