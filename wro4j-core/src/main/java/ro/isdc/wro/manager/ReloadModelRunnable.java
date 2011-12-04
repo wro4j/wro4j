@@ -31,6 +31,10 @@ public final class ReloadModelRunnable
   public void run() {
     LOG.debug("Reloading Model....");
     try {
+      if (true) {
+        Thread.sleep(2000);
+        return;
+      }
       // TODO: do not destroy, until the creation is done and the new model is different than the new one
       wroManagerReference.get().getModelFactory().destroy();
       if (Thread.interrupted()) {
@@ -42,6 +46,8 @@ public final class ReloadModelRunnable
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.debug("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
+    } catch (final Exception e) {
+      LOG.error("Exception occured during cache reload: ", e);
     }
   }
 }
