@@ -31,7 +31,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  private static final String DEFAULT_LESS_JS = "less-1.1.4.min.js";
+  private static final String DEFAULT_LESS_JS = "less-1.1.5.min.js";
   private ScriptableObject scope;
 
   /**
