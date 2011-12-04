@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Apply JsHint script checking utility.
  * <p/>
- * Using untagged version (commited: 2011-11-09 21:06:21)
+ * Using untagged version (commited: 2011-11-29 09:47:27)
  *
  * @author Alex Objelean
  * @since 1.3.5

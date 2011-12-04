@@ -20,13 +20,13 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs version (1.1.1) <br/>
- * committed at the following date: 2011-09-29 11:35:11.
+ * The underlying implementation use the uglifyJs version (1.1.2-SNAPSHOT) <br/>
+ * committed at the following date: 2011-12-03 17:10:36.
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
  * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
- * is compressed with googleClosure compressor (simple mode), becuase it is quite efficient and doesn't break the code.
+ * is compressed with googleClosure compressor (simple mode), because it is quite efficient and doesn't break the code.
  *
  * @author Alex Objelean
  * @since 1.3.1
@@ -36,7 +36,7 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglifyJs-1.1.1.min.js";
+  private static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
