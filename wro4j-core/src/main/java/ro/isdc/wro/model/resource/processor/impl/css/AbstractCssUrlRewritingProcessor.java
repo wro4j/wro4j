@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       Validate.notNull(urlGroup);
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, replacedUrl);
+        LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
         final String newReplacement = oldMatch.replace(urlContent, replacedUrl);
         onUrlReplaced(replacedUrl);
         matcher.appendReplacement(sb, newReplacement);
