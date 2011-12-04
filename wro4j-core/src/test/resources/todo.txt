@@ -1,7 +1,6 @@
-# update jshint to latest version
-# update csslint to 0.8.5
-# update uglifyJs to 1.1.2-SNAPSHOT
+# update uglifyJs to 1.1.2-SNAPSHOT - [OK]
 # update coffeeScript to 1.1.3 - [FAIL]
 # update jslint to latest version - [OK]
 # update less to latest version - [OK]
-  
+# update jshint to latest version [OK]
+# update csslint to 0.8.5 - [OK]  
