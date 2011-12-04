@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -341,5 +342,19 @@ public final class WroUtil {
         return object;
       }
     };
+  }
+
+
+  /**
+   * Wraps original exception into {@link WroRuntimeException} and throw it.
+   *
+   * @param e the exception to wrap.
+   */
+  public static void wrapWithWroRuntimeException(final Exception e) {
+    LOG.error("Exception occured: " + e.getClass(), e.getCause());
+    if (e instanceof WroRuntimeException) {
+      throw (WroRuntimeException) e;
+    }
+    throw new WroRuntimeException(e.getMessage(), e);
   }
 }

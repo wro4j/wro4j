@@ -3,12 +3,7 @@
  */
 package ro.isdc.wro.extensions.processor.support.linter;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-
-import ro.isdc.wro.extensions.processor.support.linter.JsHint;
-import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 
 
 /**
@@ -20,7 +15,7 @@ public class TestJsHint {
   @Test
   public void testSetNullOptions()
     throws Exception {
-    jsHint.setOptions((String[])null);
+    jsHint.setOptions(null);
     jsHint.validate("");
   }
 
@@ -35,7 +30,7 @@ public class TestJsHint {
   @Test
   public void testWithSeveralOptions()
     throws Exception {
-    jsHint.setOptions("1", "2");
+    jsHint.setOptions("1,2");
     jsHint.validate("");
   }
 
@@ -74,50 +69,5 @@ public class TestJsHint {
     throws Exception {
     jsHint.setOptions("eqeqeq");
     jsHint.validate("if (text == 0) {win.location.href = link; }");
-  }
-
-  @Test
-  public void testEmptyOptions() throws Exception {
-    testGenericOptions("{}", "");
-  }
-
-  @Test
-  public void testNullOptions() throws Exception {
-    testGenericOptions("{}", null);
-  }
-
-  @Test
-  public void testOptionWithNoValue() throws Exception {
-    testGenericOptions("{\"devel\": true}", "devel");
-  }
-
-  @Test
-  public void testOptionWithValue() throws Exception {
-    testGenericOptions("{\"maxerr\": 100}", "maxerr=100");
-  }
-
-  @Test
-  public void predefOption() throws Exception {
-    testGenericOptions("{\"predef\": ['YUI']}", "predef=['YUI']");
-  }
-
-  @Test
-  public void predefOptionWithQuotes() throws Exception {
-    testGenericOptions("{\"predef\": \"['YUI']\"}", "predef=\"['YUI']\"");
-  }
-
-
-  @Test
-  public void testOptionWithValueAndSpaces() throws Exception {
-    testGenericOptions("{\"maxerr\": 100}", "maxerr =  100");
-  }
-
-  @Test(expected=IllegalArgumentException.class)
-  public void testOptionWithEmptyValue() throws Exception {
-    testGenericOptions("{\"maxerr\": 100}", "maxerr=");
-  }
-
-  private void testGenericOptions(final String expectedOptions, final String... providedOptions) throws Exception {
-    Assert.assertEquals(expectedOptions, jsHint.buildOptions(providedOptions));
   }
 }
