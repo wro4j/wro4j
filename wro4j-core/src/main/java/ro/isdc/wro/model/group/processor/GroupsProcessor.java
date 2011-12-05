@@ -44,6 +44,7 @@ public class GroupsProcessor {
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
 
+
   /**
    * {@inheritDoc}
    * <p>
@@ -53,7 +54,7 @@ public class GroupsProcessor {
     Validate.notNull(group);
     Validate.notNull(type);
 
-	final StopWatch stopWatch = new StopWatch();
+    final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
     filterResources(group, type);
@@ -63,7 +64,7 @@ public class GroupsProcessor {
       // Merge
       final String result = preProcessorExecutor.processAndMerge(group, minimize);
       stopWatch.stop();
-        
+
       stopWatch.start("post process");
       // postProcessing
       final String postProcessedResult = applyPostProcessors(group, type, result, minimize);
@@ -84,7 +85,8 @@ public class GroupsProcessor {
    * @param minimize whether minimize aware post processor must be applied.
    * @return the post processed contents.
    */
-  private String applyPostProcessors(final Group group, final ResourceType resourceType, final String content, final boolean minimize)
+  private String applyPostProcessors(final Group group, final ResourceType resourceType, final String content,
+    final boolean minimize)
     throws IOException {
     Validate.notNull(content);
     final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
@@ -97,11 +99,11 @@ public class GroupsProcessor {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
 
-    String resourceName = group.getName() + "." + resourceType.name().toLowerCase();
-    Resource mergedResource = Resource.create(resourceName, resourceType);
+    final String resourceName = group.getName() + "." + resourceType.name().toLowerCase();
+    final Resource mergedResource = Resource.create(resourceName, resourceType);
     mergedResource.setMinimize(false);
     mergedResource.setType(resourceType);
-    
+
     LOG.debug("postProcessors: {}", processors);
     final String output = applyPostProcessors(mergedResource, processors, content);
     return output;
@@ -115,12 +117,13 @@ public class GroupsProcessor {
    * @param content to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Resource mergedResource, final Collection<ResourceProcessor> processors, final String content)
+  private String applyPostProcessors(final Resource mergedResource, final Collection<ResourceProcessor> processors,
+    final String content)
     throws IOException {
     if (processors.isEmpty()) {
       return content;
     }
-    
+
     Reader input = new StringReader(content.toString());
     Writer output = null;
     final StopWatch stopWatch = new StopWatch();
@@ -134,6 +137,7 @@ public class GroupsProcessor {
     LOG.debug(stopWatch.prettyPrint());
     return output.toString();
   }
+
 
   /**
    * @param groups list of groups where to search resources to filter.
@@ -155,7 +159,7 @@ public class GroupsProcessor {
         }
       }
     }
-    
+
     group.setResources(filteredResources);
   }
 }
