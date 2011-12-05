@@ -3,14 +3,6 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -22,11 +14,20 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.Assert;
 
 
 /**
@@ -120,8 +121,10 @@ public class TestPreProcessorExecutor {
   public void processEmptyList()
     throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
-    Assert.assertEquals("", executor.processAndMerge(resources, true));
-    Assert.assertEquals("", executor.processAndMerge(resources, false));
+    Group group = new Group("dummy");
+    group.setResources(resources);
+    Assert.assertEquals("", executor.processAndMerge(group, true));
+    Assert.assertEquals("", executor.processAndMerge(group, false));
   }
 
 
@@ -129,17 +132,19 @@ public class TestPreProcessorExecutor {
   public void shouldNotFailWhenNoResourcesProcessed()
     throws Exception {
     initExecutor(createProcessorUsingMissingResource());
-    executor.processAndMerge(createResources(), true);
+    executor.processAndMerge(createGroup(), true);
   }
 
 
-  private List<Resource> createResources(final Resource... resources) {
-    final List<Resource> resourcesList = new ArrayList<Resource>();
-    for (final Resource resource : resources) {
-      resourcesList.add(resource);
-    }
-    return resourcesList;
-  }
+	private Group createGroup(final Resource... resources) {
+		Group group = new Group("dummy");
+		final List<Resource> resourcesList = new ArrayList<Resource>();
+		for (final Resource resource : resources) {
+			resourcesList.add(resource);
+		}
+		group.setResources(resourcesList);
+		return group;
+	}
 
 
   @Test(expected = IOException.class)
@@ -154,8 +159,8 @@ public class TestPreProcessorExecutor {
   public void shouldNotFailWhenProcessingInvalidResource()
     throws IOException {
     initExecutor(createProcessorUsingMissingResource());
-    final List<Resource> resources = createResources(Resource.create("uri", ResourceType.JS));
-    final String result = executor.processAndMerge(resources, true);
+    final Group group = createGroup(Resource.create("uri", ResourceType.JS));
+    final String result = executor.processAndMerge(group, true);
     Assert.assertEquals("", result);
   }
 
@@ -164,8 +169,8 @@ public class TestPreProcessorExecutor {
   public void shouldFailWhenUsingFailingPreProcessor()
     throws Exception {
     initExecutor(createProcessorWhichFails());
-    final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
-    final String result = executor.processAndMerge(resources, true);
+    final Group group = createGroup(Resource.create("", ResourceType.JS));
+    final String result = executor.processAndMerge(group, true);
     Assert.assertEquals("", result);
   }
 
@@ -176,9 +181,9 @@ public class TestPreProcessorExecutor {
     final StopWatch watch = new StopWatch();
     watch.start("processAndMerge");
     initExecutor(createSlowPreProcessor(200), createSlowPreProcessor(200), createSlowPreProcessor(200));
-    final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
+    final Group group = createGroup(Resource.create("r1", ResourceType.JS),
       Resource.create("r2", ResourceType.JS));
-    final String result = executor.processAndMerge(resources, true);
+    final String result = executor.processAndMerge(group, true);
     Assert.assertEquals("", result);
     watch.stop();
     // prove that running in parallel is faster

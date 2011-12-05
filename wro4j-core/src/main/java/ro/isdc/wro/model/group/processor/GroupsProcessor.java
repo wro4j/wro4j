@@ -49,23 +49,24 @@ public class GroupsProcessor {
    * <p>
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
-  public String process(final Collection<Group> groups, final ResourceType type, final boolean minimize) {
-    Validate.notNull(groups);
+  public String process(final Group group, final ResourceType type, final boolean minimize) {
+    Validate.notNull(group);
     Validate.notNull(type);
 
-    final StopWatch stopWatch = new StopWatch();
+	final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
-    final List<Resource> filteredResources = getFilteredResources(groups, type);
+    filterResources(group, type);
     try {
       stopWatch.stop();
       stopWatch.start("pre process and merge");
       // Merge
-      final String result = preProcessorExecutor.processAndMerge(filteredResources, minimize);
+      final String result = preProcessorExecutor.processAndMerge(group, minimize);
       stopWatch.stop();
+        
       stopWatch.start("post process");
       // postProcessing
-      final String postProcessedResult = applyPostProcessors(type, result, minimize);
+      final String postProcessedResult = applyPostProcessors(group, type, result, minimize);
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
       return postProcessedResult;
@@ -83,7 +84,7 @@ public class GroupsProcessor {
    * @param minimize whether minimize aware post processor must be applied.
    * @return the post processed contents.
    */
-  private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize)
+  private String applyPostProcessors(final Group group, final ResourceType resourceType, final String content, final boolean minimize)
     throws IOException {
     Validate.notNull(content);
     final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
@@ -95,8 +96,14 @@ public class GroupsProcessor {
     if (!minimize) {
       processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
     }
+
+    String resourceName = group.getName() + "." + resourceType.name().toLowerCase();
+    Resource mergedResource = Resource.create(resourceName, resourceType);
+    mergedResource.setMinimize(false);
+    mergedResource.setType(resourceType);
+    
     LOG.debug("postProcessors: {}", processors);
-    final String output = applyPostProcessors(processors, content);
+    final String output = applyPostProcessors(mergedResource, processors, content);
     return output;
   }
 
@@ -108,18 +115,19 @@ public class GroupsProcessor {
    * @param content to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourceProcessor> processors, final String content)
+  private String applyPostProcessors(final Resource mergedResource, final Collection<ResourceProcessor> processors, final String content)
     throws IOException {
     if (processors.isEmpty()) {
       return content;
     }
+    
     Reader input = new StringReader(content.toString());
     Writer output = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
-      processor.process(null, input, output);
+      processor.process(mergedResource, input, output);
       input = new StringReader(output.toString());
       stopWatch.stop();
     }
@@ -132,11 +140,10 @@ public class GroupsProcessor {
    * @param type of resources to collect.
    * @return a list of resources of provided type.
    */
-  private final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
+  private final void filterResources(final Group group, final ResourceType type) {
     final List<Resource> allResources = new ArrayList<Resource>();
-    for (final Group group : groups) {
-      allResources.addAll(group.getResources());
-    }
+    allResources.addAll(group.getResources());
+
     // retain only resources of needed type
     final List<Resource> filteredResources = new ArrayList<Resource>();
     for (final Resource resource : allResources) {
@@ -148,6 +155,7 @@ public class GroupsProcessor {
         }
       }
     }
-    return filteredResources;
+    
+    group.setResources(filteredResources);
   }
 }

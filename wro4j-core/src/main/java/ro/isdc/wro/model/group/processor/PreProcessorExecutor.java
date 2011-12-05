@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
@@ -53,15 +54,17 @@ public final class PreProcessorExecutor {
   /**
    * Apply preProcessors on resources and merge them.
    *
-   * @param resources what are the resources to merge.
+   * @param group what are the resources to merge.
    * @param minimize whether minimize aware processors must be applied or not.
    * @return preProcessed merged content.
    * @throws IOException if IO error occurs while merging.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize)
+  public String processAndMerge(final Group group, final boolean minimize)
     throws IOException {
-    Validate.notNull(resources);
+    Validate.notNull(group);
 
+    final List<Resource> resources = group.getResources();
+    
     final StringBuffer result = new StringBuffer();
 
     final boolean isParallel = Context.get().getConfig().isParallelPreprocessing();

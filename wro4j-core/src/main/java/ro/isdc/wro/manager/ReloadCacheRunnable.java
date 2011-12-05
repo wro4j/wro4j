@@ -52,8 +52,6 @@ public final class ReloadCacheRunnable
       for (final Group group : groups) {
         for (final ResourceType resourceType : ResourceType.values()) {
           if (group.hasResourcesOfType(resourceType)) {
-            final Collection<Group> groupAsList = new HashSet<Group>();
-            groupAsList.add(group);
             // TODO check if request parameter can be fetched here without errors.
             // groupExtractor.isMinimized(Context.get().getRequest())
             final Boolean[] minimizeValues = new Boolean[] { true, false };
@@ -63,7 +61,7 @@ public final class ReloadCacheRunnable
                 LOG.debug("ReloadCacheRunnable was interrupted - stop processing!");
                 throw new InterruptedException();
               }
-              final String content = wroManagerReference.get().getGroupsProcessor().process(groupAsList, resourceType,
+              final String content = wroManagerReference.get().getGroupsProcessor().process(group, resourceType,
                 minimize);
               final CacheEntry cacheEntry = new CacheEntry(group.getName(), resourceType, minimize);
               final ContentHashEntry contentHashEntry = wroManagerReference.get().getContentHashEntryByContent(content);
