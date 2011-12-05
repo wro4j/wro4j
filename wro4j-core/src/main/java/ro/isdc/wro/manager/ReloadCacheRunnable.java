@@ -37,6 +37,10 @@ public final class ReloadCacheRunnable
 
   public void run() {
     try {
+      if (true) {
+        //Thread.sleep(2000);
+        return;
+      }
       if (wroManagerReference.get().cacheChangeCallback != null) {
         // invoke cacheChangeCallback
         wroManagerReference.get().cacheChangeCallback.propertyChange(null);
@@ -73,6 +77,8 @@ public final class ReloadCacheRunnable
       LOG.error("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
     } catch (final IOException e) {
+      LOG.error("Exception occured during cache reload: ", e);
+    } catch (final Exception e) {
       LOG.error("Exception occured during cache reload: ", e);
     }
   }

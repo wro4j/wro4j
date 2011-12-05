@@ -33,19 +33,19 @@ public class Context {
   /**
    * Request.
    */
-  private HttpServletRequest request;
+  private transient HttpServletRequest request;
   /**
    * Response.
    */
-  private HttpServletResponse response;
+  private transient HttpServletResponse response;
   /**
    * ServletContext.
    */
-  private ServletContext servletContext;
+  private transient ServletContext servletContext;
   /**
    * FilterConfig.
    */
-  private FilterConfig filterConfig;
+  private transient FilterConfig filterConfig;
   /**
    * The path to the folder, relative to the root, used to compute rewritten image url.
    */
