@@ -68,11 +68,10 @@ groups {
   jquery {
     js("http://code.jquery.com/jquery-1.6.js")
   }
-  all1 {
+  all {
     groupRef("jquery-mobile")
   }
-  all {
-    //css("/static/**.css")
+  all1 {
     dynamicResource()
     uniform()  
     groupRef('WEBINF-css')
