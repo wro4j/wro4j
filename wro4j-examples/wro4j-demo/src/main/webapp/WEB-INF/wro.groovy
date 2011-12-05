@@ -1,5 +1,5 @@
 groups {
-  /*
+  /**/
   encoding {
     js("/static/js/encoding/*.js")
   }
@@ -68,18 +68,18 @@ groups {
   jquery {
     js("http://code.jquery.com/jquery-1.6.js")
   }
-  all {
-    dynamicResource()
-    uniform()
+  all1 {
     groupRef("jquery-mobile")
-    groupRef('WEBINF-css')
   }
-  */
   all {
+    //css("/static/**.css")
+    dynamicResource()
+    uniform()  
+    groupRef('WEBINF-css')
     css("/static/**.css")
-    /*
     css("/static/css/css1.css")
     css("/static/css/css2.css")
-    /*css("classpath:ro/isdc/wro/resources/*.css")*/
+    css("classpath:ro/isdc/wro/resources/*.css")
   }
+  
 }
