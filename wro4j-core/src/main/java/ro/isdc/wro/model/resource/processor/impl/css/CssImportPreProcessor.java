@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
@@ -90,7 +91,9 @@ public class CssImportPreProcessor
     // for now, minimize always
     // TODO: find a way to get minimize property dynamically.
     //groupExtractor.isMinimized(Context.get().getRequest())
-    sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
+    Group group = new Group("dummy");
+    group.setResources(importsCollector);
+    sb.append(preProcessorExecutor.processAndMerge(group, true));
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : {}", importsCollector.size());
     }
