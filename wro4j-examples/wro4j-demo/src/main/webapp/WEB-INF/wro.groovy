@@ -1,5 +1,5 @@
 groups {
-  /*
+  
   encoding {
     js("/static/js/encoding/*.js")
   }
@@ -74,12 +74,7 @@ groups {
     groupRef("jquery-mobile")
     groupRef('WEBINF-css')
   }
-  */
-  all {
-    css("/static/**.css")
-    /*
-    css("/static/css/css1.css")
-    css("/static/css/css2.css")
-    /*css("classpath:ro/isdc/wro/resources/*.css")*/
+  testPage {
+    wildcard()
   }
 }
