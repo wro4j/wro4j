@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.1</version>
+  <version>1.4.2</version>
   <packaging>pom</packaging>  
   
   <name>Web Resource Optimizer Parent</name>
@@ -61,12 +61,16 @@
   </developers>
   
   <properties>
-    <commons-io.dependency>2.0.1</commons-io.dependency>
-    <commons-lang.dependency>3.0.1</commons-lang.dependency>       
-    <slf4j.dependency>1.6.2</slf4j.dependency>    
-    <maven.dependency>3.0.3</maven.dependency>    
-    <mockito.dependency>1.9.0-rc1</mockito.dependency>
-    <junit.dependency>4.9</junit.dependency>    
+    <commons-io.version>2.1</commons-io.version>
+    <commons-lang.version>3.0.1</commons-lang.version>
+    <commons-pool.version>1.5.6</commons-pool.version>
+    <closure.version>r1592</closure.version>
+    <slf4j.version>1.6.2</slf4j.version>    
+    <maven.version>3.0.3</maven.version>    
+    <mockito.version>1.9.0-rc1</mockito.version>
+    <junit.version>4.10</junit.version>    
+    <rhino.version>1.7R2</rhino.version>
+    
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  
     <maven.compile.encoding>UTF-8</maven.compile.encoding>
@@ -111,42 +115,47 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>${commons-io.dependency}</version>
+        <version>${commons-io.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>${commons-lang.dependency}</version>
-      </dependency>  
+        <version>${commons-lang.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-pool</groupId>
+        <artifactId>commons-pool</artifactId>
+        <version>${commons-pool.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.dependency}</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>${slf4j.dependency}</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4j.dependency}</version>        
+        <version>${slf4j.version}</version>        
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>${maven.dependency}</version>
+        <version>${maven.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
-        <version>${maven.dependency}</version>
+        <version>${maven.version}</version>
       </dependency>      
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
-        <version>${maven.dependency}</version>
+        <version>${maven.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -185,12 +194,12 @@
       <dependency>
         <groupId>rhino</groupId>
         <artifactId>js</artifactId>
-        <version>1.7R2</version>
+        <version>${rhino.version}</version>
       </dependency>
  	    <dependency>
         <groupId>com.google.javascript</groupId>
         <artifactId>closure-compiler</artifactId>
-        <version>r1352</version>
+        <version>${closure.version}</version>
       </dependency>	 
       <dependency>
         <groupId>org.dojotoolkit</groupId>
@@ -201,19 +210,19 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>${junit.dependency}</version>
+        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>${mockito.dependency}</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>            
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
-        <version>${mockito.dependency}</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>      
     </dependencies>        
@@ -231,14 +240,14 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.dependency}</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
-      <version>${mockito.dependency}</version>
+      <version>${mockito.version}</version>
     </dependency>    
   </dependencies>
 

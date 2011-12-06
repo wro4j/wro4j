@@ -1,6 +1,7 @@
 .element {
-	border: solid black 1px;
+  border: solid black 1px;
 }
 .uniform {
-  background: yellow;  color: red;
+  background: yellow;
+  color: red;
 }

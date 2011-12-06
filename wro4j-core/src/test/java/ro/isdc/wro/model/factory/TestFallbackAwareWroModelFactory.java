@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 
 
 /**
@@ -36,7 +35,7 @@ public class TestFallbackAwareWroModelFactory {
   public void setUp() {
     // initialize the context
     Context.set(Context.standaloneContext());
-    fallbackAwareModelFactory = new ScheduledWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
+    fallbackAwareModelFactory = new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {
@@ -71,7 +70,7 @@ public class TestFallbackAwareWroModelFactory {
   @Test
   public void testLastValidIsOK() {
     Assert.assertNotNull(fallbackAwareModelFactory.create());
-    ((WroConfigurationChangeListener)fallbackAwareModelFactory).onModelPeriodChanged();
+    fallbackAwareModelFactory.destroy();
     Assert.assertNotNull(fallbackAwareModelFactory.create());
   }
 

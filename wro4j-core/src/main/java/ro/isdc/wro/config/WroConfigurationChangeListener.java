@@ -15,9 +15,9 @@ public interface WroConfigurationChangeListener {
 	/**
 	 * Invoked when the cachePeriod property is changed.
 	 */
-	void onCachePeriodChanged();
+	void onCachePeriodChanged(long value);
 	/**
 	 * Invoked when the modelPeriod property is changed.
 	 */
-	void onModelPeriodChanged();
+	void onModelPeriodChanged(long value);
 }

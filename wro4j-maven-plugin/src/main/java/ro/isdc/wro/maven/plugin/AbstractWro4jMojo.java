@@ -34,14 +34,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * File containing the groups definitions.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml" expression="${wroFile}"
    * @optional
    */
   private File wroFile;
   /**
    * The folder where web application context resides useful for locating resources relative to servletContext .
    *
-   * @parameter default-value="${basedir}/src/main/webapp/"
+   * @parameter default-value="${basedir}/src/main/webapp/"  expression="${contextFolder}"
    */
   private File contextFolder;
   /**
@@ -78,7 +78,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * The path to configuration file.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" expression="${extraConfig}"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" expression="${extraConfigFile}"
    * @optional
    */
   private File extraConfigFile;
@@ -97,6 +97,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
     getLog().info("wroManagerFactory: " + this.wroManagerFactory);
+    getLog().info("extraConfig: " + extraConfigFile);
+
 
     extendPluginClasspath();
     Context.set(Context.standaloneContext());

@@ -49,14 +49,14 @@ public class GroupsProcessor {
    * <p>
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
-  public String process(final Collection<Group> groups, final ResourceType type, final boolean minimize) {
-    Validate.notNull(groups);
+  public String process(final Group group, final ResourceType type, final boolean minimize) {
+    Validate.notNull(group);
     Validate.notNull(type);
 
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
-    final List<Resource> filteredResources = getFilteredResources(groups, type);
+    final List<Resource> filteredResources = getFilteredResources(group, type);
     try {
       stopWatch.stop();
       stopWatch.start("pre process and merge");
@@ -87,6 +87,9 @@ public class GroupsProcessor {
     throws IOException {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
+    if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
+      LOG.warn("No processors defined. Please, check if your configuration is correct.");
+    }
     Collection<ResourcePostProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
     processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
     if (!minimize) {
@@ -129,14 +132,10 @@ public class GroupsProcessor {
    * @param type of resources to collect.
    * @return a list of resources of provided type.
    */
-  private final List<Resource> getFilteredResources(final Collection<Group> groups, final ResourceType type) {
-    final List<Resource> allResources = new ArrayList<Resource>();
-    for (final Group group : groups) {
-      allResources.addAll(group.getResources());
-    }
+  private final List<Resource> getFilteredResources(final Group group, final ResourceType type) {
     // retain only resources of needed type
     final List<Resource> filteredResources = new ArrayList<Resource>();
-    for (final Resource resource : allResources) {
+    for (final Resource resource : group.getResources()) {
       if (type == resource.getType()) {
         if (filteredResources.contains(resource)) {
           LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");

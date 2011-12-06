@@ -7,25 +7,24 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Maven plugin used to validate js scripts defined in wro model.
+ * Maven plugin used to validate js scripts defined in wro model using <a href="http://jshint.com/">jsLint</a>.
  *
  * @goal jshint
  * @phase compile
  * @requiresDependencyResolution runtime
- *
  * @author Alex Objelean
  * @since 1.3.5
  */
-public class JsHintMojo extends AbstractSingleProcessorMojo {
+public class JsHintMojo
+    extends AbstractSingleProcessorMojo {
   /**
    * {@inheritDoc}
    */
@@ -33,7 +32,8 @@ public class JsHintMojo extends AbstractSingleProcessorMojo {
   protected ResourcePreProcessor createResourceProcessor() {
     final ResourcePreProcessor processor = new JsHintProcessor() {
       @Override
-      public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
         getLog().info("processing resource: " + resource);
         if (resource != null) {
           getLog().info("processing resource: " + resource.getUri());
@@ -42,16 +42,27 @@ public class JsHintMojo extends AbstractSingleProcessorMojo {
       }
 
       @Override
-      protected void onJsHintException(final JsHintException e, final Resource resource)
-        throws Exception {
+      protected void onException(final Exception e) {
+        JsHintMojo.this.onException(e);
+      }
+
+      @Override
+      protected void onLinterException(final LinterException e, final Resource resource) {
         getLog().error(
-          e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
-            + e.getErrors());
+            e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
+                + e.getErrors());
         if (!isFailNever()) {
-          throw new MojoExecutionException("Errors found when validating resource: " + resource);
+          //throw new MojoExecutionException("Errors found when validating resource: " + resource);
+          throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
       };
     }.setOptions(getOptions());
     return processor;
+  }
+
+  /**
+   * Used by unit test to check if mojo doesn't fail.
+   */
+  void onException(final Exception e) {
   }
 }

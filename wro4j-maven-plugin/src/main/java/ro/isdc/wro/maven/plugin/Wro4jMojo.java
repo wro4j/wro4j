@@ -230,7 +230,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         destinationFile.delete();
       } else {
         getLog().info(
-          destinationFile.getAbsolutePath() + " (" + destinationFile.length() + "bytes" + ") has been created!");
+          destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
       }
     } finally {
       if (resultOutputStream != null) {

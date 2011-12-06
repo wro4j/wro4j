@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -60,10 +60,8 @@ public class CustomStandaloneWroManagerFactory
         }
         super.process(resource, reader, writer);
       }
-
       @Override
-      protected void onJsHintException(final JsHintException e, final Resource resource)
-        throws Exception {
+      protected void onLinterException(final LinterException e, final Resource resource) {
         LOG.error(
           e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
             + e.getErrors());
@@ -83,7 +81,6 @@ public class CustomStandaloneWroManagerFactory
   @Override
   protected WroModelFactory newModelFactory() {
     return new WroModelFactory() {
-
       public WroModel create() {
         final WroModel model = new WroModel();
 //        model.addGroup(new Group("all").addResource(

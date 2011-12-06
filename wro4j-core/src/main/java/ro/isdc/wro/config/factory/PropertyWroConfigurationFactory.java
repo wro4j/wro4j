@@ -47,6 +47,8 @@ public class PropertyWroConfigurationFactory
       config.setWroManagerClassName(valueAsString(properties.get(ConfigConstants.managerFactoryClassName.name())));
       config.setMbeanName(valueAsString(properties.get(ConfigConstants.mbeanName.name())));
       config.setHeader(valueAsString(properties.get(ConfigConstants.header.name())));
+      config.setCacheGzippedContent(valueAsBoolean(properties.get(ConfigConstants.cacheGzippedContent.name()), false));
+      config.setParallelPreprocessing(valueAsBoolean(properties.get(ConfigConstants.parallelPreprocessing.name()), false));
     }
     LOG.debug("WroConfiguration created: {}", config);
     return config;

@@ -33,12 +33,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
@@ -108,7 +109,7 @@ public class Wro4jCommandLineRunner {
   /**
    * @param args
    */
-  public void doMain(final String[] args) {
+  protected void doMain(final String[] args) {
     LOG.debug("arguments: " + Arrays.toString(args));
     final CmdLineParser parser = new CmdLineParser(this);
     parser.setUsageWidth(100);
@@ -137,6 +138,8 @@ public class Wro4jCommandLineRunner {
    * Exception handler.
    */
   protected void onException(final Exception e) {
+    System.out.println(e.getMessage());
+    System.exit(1); // non-zero exit code indicates there was an error
   }
 
 
@@ -191,8 +194,11 @@ public class Wro4jCommandLineRunner {
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
+
       // init context
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      final WroConfiguration config = new WroConfiguration();
+      config.setParallelPreprocessing(true);
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
       Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing
@@ -327,15 +333,16 @@ public class Wro4jCommandLineRunner {
         super.onCssLintException(e, resource);
         System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
         System.err.println(e.getErrors());
+        onException(e);
       }
     });
     map.put(JsHintProcessor.ALIAS, new JsHintProcessor() {
       @Override
-      protected void onJsHintException(final JsHintException e, final Resource resource)
-        throws Exception {
-        super.onJsHintException(e, resource);
+      protected void onLinterException(final LinterException e, final Resource resource) {
+        super.onLinterException(e, resource);
         System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
         System.err.println(e.getErrors());
+        onException(e);
       }
     });
     return map;

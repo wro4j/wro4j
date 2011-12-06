@@ -8,14 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +27,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.model.WroModel;
@@ -50,6 +43,8 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
+import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -60,14 +55,13 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class WroManager
+public class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[] {});
   /**
    * ResourcesModel factory.
    */
-  private WroModelFactory modelFactory;
+  WroModelFactory modelFactory;
   /**
    * GroupExtractor.
    */
@@ -79,15 +73,19 @@ public final class WroManager
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
   /**
    * A callback to be notified about the cache change.
    */
-  private PropertyChangeListener cacheChangeCallback;
+  PropertyChangeListener cacheChangeCallback;
   /**
-   * Scheduled executors service, used to update the output result.
+   * Schedules the cache update.
    */
-  private ScheduledExecutorService scheduler;
+  private final SchedulerHelper cacheSchedulerHelper;
+  /**
+   * Schedules the model update.
+   */
+  private final SchedulerHelper modelSchedulerHelper;
   private ProcessorsFactory processorsFactory;
   private UriLocatorFactory uriLocatorFactory;
   /**
@@ -99,6 +97,23 @@ public final class WroManager
    */
   @Inject
   private GroupsProcessor groupsProcessor;
+
+
+  public WroManager() {
+    cacheSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return new ReloadCacheRunnable(WroManager.this);
+      }
+    }, ReloadCacheRunnable.class.getSimpleName());
+    modelSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return new ReloadModelRunnable(WroManager.this);
+      }
+    }, ReloadModelRunnable.class.getSimpleName());
+  }
+
 
   /**
    * Perform processing of the uri.
@@ -113,25 +128,13 @@ public final class WroManager
     final HttpServletResponse response = Context.get().getResponse();
 
     validate();
-    //TODO refactor
-    InputStream is = null;
-    OutputStream os = null;
     if (isProxyResourceRequest(request)) {
-      is = locateInputeStream(request);
-      //do not gzip
-      os = response.getOutputStream();
+      serveProxyResourceRequest(request, response.getOutputStream());
     } else {
-      is = buildGroupsInputStream(request, response);
-      // use gziped response if supported
-      os = getGzipedOutputStream(response);
+      serveProcessedBundle(request, response);
     }
-    if (is == null) {
-      throw new WroRuntimeException("Cannot process this request: " + request.getRequestURL());
-    }
-    IOUtils.copy(is, os);
-    is.close();
-    os.close();
   }
+
 
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
@@ -140,81 +143,83 @@ public final class WroManager
     return StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
-  /**
-   * Add gzip header to response and wrap the response {@link OutputStream} with {@link GZIPOutputStream}.
-   *
-   * @param response {@link HttpServletResponse} object.
-   * @return wrapped gziped OutputStream.
-   * @throws IOException when Gzip operation fails.
-   */
-  private OutputStream getGzipedOutputStream(final HttpServletResponse response)
-    throws IOException {
-    if (Context.get().getConfig().isGzipEnabled() && isGzipSupported()) {
-      // add gzip header and gzip response
-      response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
-      response.setHeader("Vary", "Accept-Encoding");
-      LOG.debug("Gziping outputStream response");
-      // Create a gzip stream
-      return new GZIPOutputStream(response.getOutputStream());
-    }
-    return response.getOutputStream();
+
+  private boolean isGzipAllowed() {
+    return Context.get().getConfig().isGzipEnabled() && isGzipSupported();
   }
 
 
   /**
+   * Write to stream the content of the processed resource bundle.
+   *
    * @param model the model used to build stream.
    * @param request {@link HttpServletRequest} for this request cycle.
    * @param response {@link HttpServletResponse} used to set content type.
-   * @return {@link InputStream} for groups found in requestURI or null if the request is not as expected.
    */
-  private InputStream buildGroupsInputStream(final HttpServletRequest request, final HttpServletResponse response)
+  private void serveProcessedBundle(final HttpServletRequest request, final HttpServletResponse response)
     throws IOException {
     final StopWatch stopWatch = new StopWatch();
-    stopWatch.start("buildGroupsStream");
-    InputStream inputStream = null;
-    // find names & type
-    final ResourceType type = groupExtractor.getResourceType(request);
-    final String groupName = groupExtractor.getGroupName(request);
-    final boolean minimize = groupExtractor.isMinimized(request);
-    if (groupName == null || type == null) {
-      throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
+    stopWatch.start("serveProcessedBundle");
+    final OutputStream os = response.getOutputStream();
+    try {
+      // find names & type
+      final ResourceType type = groupExtractor.getResourceType(request);
+      final String groupName = groupExtractor.getGroupName(request);
+      final boolean minimize = groupExtractor.isMinimized(request);
+      if (groupName == null || type == null) {
+        throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
+      }
+      intAggregatedFolderPath(request, type);
+
+      // reschedule cache & model updates
+      final WroConfiguration config = Context.get().getConfig();
+      cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
+      modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+
+      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
+
+      // TODO move ETag check in wroManagerFactory
+      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+      // enclose etag value in quotes to be compliant with the RFC
+      final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
+
+      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
+        LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
+        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        // because we cannot return null, return a stream containing nothing.
+        // TODO close output stream?
+        return;
+      }
+      if (contentHashEntry.getRawContent() != null) {
+        // Do not set content length because we don't know the length in case it is gzipped. This could cause an
+        // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
+        // make the input stream encoding aware.
+        // use gziped response if supported
+        if (isGzipAllowed()) {
+          // add gzip header and gzip response
+          response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
+          response.setHeader("Vary", "Accept-Encoding");
+          IOUtils.write(contentHashEntry.getGzippedContent(), os);
+        } else {
+          IOUtils.write(contentHashEntry.getRawContent(), os);
+        }
+      }
+      if (type != null) {
+        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+      }
+
+      // set ETag header
+      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
+
+      stopWatch.stop();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
+      }
+    } finally {
+      IOUtils.closeQuietly(os);
     }
-
-    intAggregatedFolderPath(request, type);
-
-    initScheduler();
-
-    final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
-
-    // TODO move ETag check in wroManagerFactory
-    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-    //enclose etag value in quotes to be compliant with the RFC
-    final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
-
-    if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-      LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      // because we cannot return null, return a stream containing nothing.
-      return EMPTY_STREAM;
-    }
-    if (contentHashEntry.getContent() != null) {
-      // Do not set content length because we don't know the length in case it is gzipped. This could cause an
-      // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
-      // make the input stream encoding aware.
-      inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes(
-        Context.get().getConfig().getEncoding()));
-    }
-    if (type != null) {
-      response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
-    }
-
-    // set ETag header
-    response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-
-    stopWatch.stop();
-    LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
-    return inputStream;
   }
+
 
   /**
    * Set the aggregatedFolderPath if required.
@@ -227,6 +232,7 @@ public final class WroManager
       Context.get().setAggregatedFolderPath(aggregatedFolder);
     }
   }
+
 
   /**
    * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js
@@ -273,15 +279,13 @@ public final class WroManager
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
       // find processed result for a group
-      final List<Group> groupAsList = new ArrayList<Group>();
       final WroModel model = modelFactory.create();
       if (model == null) {
         throw new WroRuntimeException("Cannot build a valid wro model");
       }
       final Group group = model.getGroupByName(groupName);
-      groupAsList.add(group);
 
-      final String content = groupsProcessor.process(groupAsList, type, minimize);
+      final String content = groupsProcessor.process(group, type, minimize);
       contentHashEntry = getContentHashEntryByContent(content);
       if (!Context.get().getConfig().isDisableCache()) {
         cacheStrategy.put(cacheEntry, contentHashEntry);
@@ -294,7 +298,7 @@ public final class WroManager
   /**
    * Creates a {@link ContentHashEntry} based on provided content.
    */
-  private ContentHashEntry getContentHashEntryByContent(final String content)
+  ContentHashEntry getContentHashEntryByContent(final String content)
     throws IOException {
     String hash = null;
     if (content != null) {
@@ -308,88 +312,13 @@ public final class WroManager
 
 
   /**
-   * Initialize the scheduler based on configuration values.
-   */
-  private void initScheduler() {
-    if (scheduler == null) {
-      final long period = Context.get().getConfig().getCacheUpdatePeriod();
-      LOG.debug("runing thread with period of {}", period);
-      if (period > 0) {
-        scheduler = Executors.newSingleThreadScheduledExecutor(WroUtil.createDaemonThreadFactory());
-        // Run a scheduled task which updates the model.
-        // Here a scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
-        // (thread tries to make up for lost time in some situations)
-        scheduler.scheduleWithFixedDelay(getSchedulerRunnable(), 0, period, TimeUnit.SECONDS);
-      }
-    }
-  }
-
-
-  /**
-   * @return a {@link Runnable} which will update the cache content with latest data.
-   */
-  private Runnable getSchedulerRunnable() {
-    return new Runnable() {
-      public void run() {
-        try {
-          if (cacheChangeCallback != null) {
-            // invoke cacheChangeCallback
-            cacheChangeCallback.propertyChange(null);
-          }
-          LOG.info("reloading cache");
-          final WroModel model = modelFactory.create();
-          // process groups & put update cache
-          final Collection<Group> groups = model.getGroups();
-          // update cache for all resources
-          for (final Group group : groups) {
-            for (final ResourceType resourceType : ResourceType.values()) {
-              if (group.hasResourcesOfType(resourceType)) {
-                final Collection<Group> groupAsList = new HashSet<Group>();
-                groupAsList.add(group);
-                // TODO notify the filter about the change - expose a callback
-                // TODO check if request parameter can be fetched here without errors.
-                // groupExtractor.isMinimized(Context.get().getRequest())
-                final Boolean[] minimizeValues = new Boolean[] { true, false };
-                for (final boolean minimize : minimizeValues) {
-                  final String content = groupsProcessor.process(groupAsList, resourceType, minimize);
-                  cacheStrategy.put(new CacheEntry(group.getName(), resourceType, minimize),
-                    getContentHashEntryByContent(content));
-                }
-              }
-            }
-          }
-        } catch (final Exception e) {
-          // Catch all exception in order to avoid situation when scheduler runs out of threads.
-          LOG.error("Exception occured: ", e);
-        }
-      }
-    };
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final void registerCallback(final PropertyChangeListener callback) {
-    this.cacheChangeCallback = callback;
-  }
-
-
-  /**
-   * @return true if Gzip is Supported
-   */
-  private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
-  }
-
-
-  /**
-   * Resolve the stream for a request.
+   * Serve images and other external resources referred by bundled resources.
    *
    * @param request {@link HttpServletRequest} object.
-   * @return {@link InputStream} not null object if the resource is valid and can be accessed
+   * @param outputStream where the stream will be written.
    * @throws IOException if no stream could be resolved.
    */
-  private InputStream locateInputeStream(final HttpServletRequest request)
+  private void serveProxyResourceRequest(final HttpServletRequest request, final OutputStream outputStream)
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
@@ -398,18 +327,22 @@ public final class WroManager
     if (processor != null && !processor.isUriAllowed(resourceId)) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
-    return uriLocatorFactory.locate(resourceId);
+    final InputStream is = uriLocatorFactory.locate(resourceId);
+    if (is == null) {
+      throw new WroRuntimeException("Cannot process request with uri: " + request.getRequestURI());
+    }
+    IOUtils.copy(is, outputStream);
+    IOUtils.closeQuietly(is);
+    IOUtils.closeQuietly(outputStream);
   }
+
 
   /**
    * {@inheritDoc}
    */
-  public final void onCachePeriodChanged() {
-    LOG.info("CacheChange event triggered!");
-    if (scheduler != null) {
-      scheduler.shutdown();
-      scheduler = null;
-    }
+  public final void onCachePeriodChanged(final long period) {
+    LOG.info("onCachePeriodChanged with value {} has been triggered!", period);
+    cacheSchedulerHelper.scheduleWithPeriod(period);
     // flush the cache by destroying it.
     cacheStrategy.clear();
   }
@@ -418,11 +351,10 @@ public final class WroManager
   /**
    * {@inheritDoc}
    */
-  public final void onModelPeriodChanged() {
-    LOG.info("ModelChange event triggered!");
-    if (modelFactory instanceof WroConfigurationChangeListener) {
-      ((WroConfigurationChangeListener)modelFactory).onModelPeriodChanged();
-    }
+  public final void onModelPeriodChanged(final long period) {
+    LOG.info("onModelPeriodChanged with value {} has been triggered!", period);
+    getModelFactory().destroy();
+    modelSchedulerHelper.scheduleWithPeriod(period);
   }
 
 
@@ -430,11 +362,15 @@ public final class WroManager
    * Called when {@link WroManager} is being taken out of service.
    */
   public final void destroy() {
-    LOG.debug("WroManager destroyed");
-    cacheStrategy.destroy();
-    modelFactory.destroy();
-    if (scheduler != null) {
-      scheduler.shutdownNow();
+    try {
+      cacheSchedulerHelper.destroy();
+      modelSchedulerHelper.destroy();
+      cacheStrategy.destroy();
+      modelFactory.destroy();
+    } catch (final Exception e) {
+      LOG.error("Exception occured during manager destroy!!!");
+    } finally {
+      LOG.info("WroManager destroyed");
     }
   }
 
@@ -451,6 +387,22 @@ public final class WroManager
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
     Validate.notNull(hashBuilder, "HashBuilder was not set!");
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void registerCallback(final PropertyChangeListener callback) {
+    this.cacheChangeCallback = callback;
+  }
+
+
+  /**
+   * @return true if Gzip is Supported
+   */
+  private boolean isGzipSupported() {
+    return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 
 
@@ -473,6 +425,7 @@ public final class WroManager
     this.modelFactory = modelFactory;
     return this;
   }
+
 
   /**
    * @param cacheStrategy the cache to set
@@ -501,12 +454,14 @@ public final class WroManager
     return modelFactory;
   }
 
+
   /**
    * @return the processorsFactory used by this WroManager.
    */
   public ProcessorsFactory getProcessorsFactory() {
     return processorsFactory;
   }
+
 
   /**
    * @param processorsFactory the processorsFactory to set
@@ -516,6 +471,7 @@ public final class WroManager
     return this;
   }
 
+
   /**
    * @param uriLocatorFactory the uriLocatorFactory to set
    */
@@ -524,6 +480,7 @@ public final class WroManager
     return this;
   }
 
+
   /**
    * @return the cacheStrategy
    */
@@ -531,12 +488,14 @@ public final class WroManager
     return cacheStrategy;
   }
 
+
   /**
    * @return the uriLocatorFactory
    */
   public UriLocatorFactory getUriLocatorFactory() {
     return uriLocatorFactory;
   }
+
 
   /**
    *
@@ -546,6 +505,15 @@ public final class WroManager
     return this.namingStrategy;
   }
 
+
+  /**
+   * @return the groupsProcessor
+   */
+  GroupsProcessor getGroupsProcessor() {
+    return this.groupsProcessor;
+  }
+
+
   /**
    * @param namingStrategy the namingStrategy to set
    */
@@ -554,6 +522,7 @@ public final class WroManager
     this.namingStrategy = namingStrategy;
     return this;
   }
+
 
   /**
    * {@inheritDoc}

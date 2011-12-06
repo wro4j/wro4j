@@ -1,7 +1,7 @@
 groups {
+  
   encoding {
     js("/static/js/encoding/*.js")
-    js("https://raw.github.com/yui/yui3/3.3.0/build/text/text-data-wordbreak.js")
   }
   bom {
     js("/static/js/bom/*.js")
@@ -19,8 +19,6 @@ groups {
     css("/WEB-INF/jsp/css.jsp")
   }
   dynamicResource {
-    js("/resource/redirect.js")
-    js("/external/resource.js")
   }
   placeholder {
     css("/static/css/placeholder/*.css")
@@ -47,7 +45,6 @@ groups {
     css("/static/css/webapp.css")
     css("/static/css/css1.css")
     css("/static/css/css2.css")
-    css("/static/css/NOTEXIST.css")
     css("classpath:ro/isdc/wro/resources/*.css")
   }
   otherGroup {
@@ -64,17 +61,20 @@ groups {
     js("http://wro4j.googlecode.com/svn/wiki/static/encoding/chinese.js")
   }
   "jquery-mobile" {
+    groupRef("jquery")
     css("http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.css")
     js("http://code.jquery.com/mobile/1.0a1/jquery.mobile-1.0a1.js")
   }
   jquery {
-    js("http://code.jquery.com/jquery-1.5.js")
-    groupRef("jquery-mobile")
+    js("http://code.jquery.com/jquery-1.6.js")
   }
   all {
     dynamicResource()
     uniform()
     groupRef("jquery-mobile")
     groupRef('WEBINF-css')
+  }
+  testPage {
+    wildcard()
   }
 }

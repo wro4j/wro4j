@@ -3,19 +3,19 @@
  */
 package ro.isdc.wro.extensions.processor;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.jshint.JsHintException;
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -26,28 +26,24 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  * @created Created on Feb 27, 2011
  */
-public class TestJsHintProcessor {
-  private final ResourcePreProcessor processor = new JsHintProcessor();
-
-
-  @Test
-  public void testFromFolder()
-    throws IOException {
-    final URL url = getClass().getResource("jsHint");
-
-    final File testFolder = new File(url.getFile(), "test");
-    final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
+public class TestJsHintProcessor extends AbstractTestLinterProcessor {
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected ResourcePreProcessor newLinterProcessor() {
+    return new JsHintProcessor();
   }
+
 
   @Test
   public void testWithOptionsSet()
       throws Exception {
     final ThreadLocal<Throwable> cause = new ThreadLocal<Throwable>();
 
-    final JsHintProcessor processor = new JsHintProcessor() {
-      protected void onJsHintException(final JsHintException e, final Resource resource)
-          throws Exception {
+    final ResourcePostProcessor processor = new JsHintProcessor() {
+      @Override
+      protected void onLinterException(final LinterException e, final Resource resource) {
         cause.set(e);
       };
     }.setOptions(new String[] {
@@ -56,5 +52,33 @@ public class TestJsHintProcessor {
 
     processor.process(new StringReader("alert(;"), new StringWriter());
     Assert.assertNotNull(cause.get());
+  }
+
+
+  /**
+   * This test was created initially to prove that {@link JsHintProcessor} is thread-safe, but it doesn't work well when
+   * trying to reuse the scope. TODO: This needs to be investigated.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void canBeExecutedMultipleTimes() throws Exception {
+    final JsHintProcessor processor = new JsHintProcessor() {
+      @Override
+      protected void onException(final Exception e) {
+        throw new WroRuntimeException("", e);
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          processor.process(new StringReader("alert(1);"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
   }
 }

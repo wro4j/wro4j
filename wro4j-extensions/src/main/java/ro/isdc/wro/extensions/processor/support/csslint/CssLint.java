@@ -26,7 +26,7 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * CssLint script engine utility. The underlying implementation uses CSSLint script utility {@link https
- * ://github.com/stubbornella/csslint} - version 0.6.1.
+ * ://github.com/stubbornella/csslint} - version 0.8.6-SNAPSHOT (commit from: 2011-11-29 23:01:04).
  *
  * @author Alex Objelean
  * @since 1.3.8
@@ -37,7 +37,7 @@ public class CssLint {
   /**
    * The name of the csslint script to be used by default.
    */
-  private static final String DEFAULT_CSSLINT_JS = "csslint-0.6.1.min.js";
+  private static final String DEFAULT_CSSLINT_JS = "csslint.min.js";
   /**
    * Options to apply to js hint processing
    */
@@ -113,6 +113,7 @@ public class CssLint {
    * @return Script used to pack and return the packed result.
    */
   private String buildCssLintScript(final String data, final String... options) {
+    //TODO use OptionsBuilder
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {

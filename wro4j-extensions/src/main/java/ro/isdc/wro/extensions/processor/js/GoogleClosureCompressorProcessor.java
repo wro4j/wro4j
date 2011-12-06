@@ -23,10 +23,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.ClosureCodingConvention;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DefaultCodingConvention;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
@@ -86,22 +86,38 @@ public class GoogleClosureCompressorProcessor
       compiler.disableThreads();
       compiler.initOptions(compilerOptions);
 
-      final JSSourceFile extern = JSSourceFile.fromCode("externs.js", "");
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
-      final JSSourceFile input = JSSourceFile.fromInputStream(fileName,
-        new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())));
-      final Result result = compiler.compile(extern, input, compilerOptions);
+      final JSSourceFile[] input = new JSSourceFile[] {
+        JSSourceFile.fromInputStream(fileName,
+        new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())))
+      };
+      JSSourceFile[] externs = getExterns(resource);
+      if (externs == null) {
+        //fallback to empty array when null is provided.
+        externs = new JSSourceFile[] {};
+      }
+      final Result result = compiler.compile(externs, input, compilerOptions);
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
         writer.write(content);
       }
     } finally {
-      LOG.debug("finally");
       reader.close();
       writer.close();
     }
   }
+
+
+  /**
+   * @param resource Currently processed resource. The resource can be null, when the closure compiler is used as a post
+   *        processor.
+   * @return An Array of externs files for the resource to process.
+   */
+  protected JSSourceFile[] getExterns(final Resource resource) {
+    return new JSSourceFile[] {};
+  }
+
 
   /**
    * @param compilerOptions the compilerOptions to set
@@ -128,7 +144,7 @@ public class GoogleClosureCompressorProcessor
      * According to John Lenz from the Closure Compiler project, if you are using the Compiler API directly, you
      * should specify a CodingConvention. {@link http://code.google.com/p/wro4j/issues/detail?id=155}
      */
-    options.setCodingConvention(new DefaultCodingConvention());
+    options.setCodingConvention(new ClosureCodingConvention());
     //use the wro4j encoding by default
     options.setOutputCharset(Context.get().getConfig().getEncoding());
     //set it to warning, otherwise compiler will fail
