@@ -8,8 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +52,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * Contains all the factories used by optimizer in order to perform the logic.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
@@ -120,7 +118,7 @@ public class WroManager
 
   /**
    * Perform processing of the uri.
-   * 
+   *
    * @param request {@link HttpServletRequest} to process.
    * @param response HttpServletResponse where to write the result content.
    * @throws IOException when any IO related problem occurs or if the request cannot be processed.
@@ -132,7 +130,7 @@ public class WroManager
 
     validate();
     if (isProxyResourceRequest(request)) {
-      serverProxyResourceRequest(request, response.getOutputStream());
+      serveProxyResourceRequest(request, response.getOutputStream());
     } else {
       serveProcessedBundle(request, response);
     }
@@ -154,7 +152,7 @@ public class WroManager
 
   /**
    * Write to stream the content of the processed resource bundle.
-   * 
+   *
    * @param model the model used to build stream.
    * @param request {@link HttpServletRequest} for this request cycle.
    * @param response {@link HttpServletResponse} used to set content type.
@@ -163,60 +161,63 @@ public class WroManager
     throws IOException {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("serveProcessedBundle");
-    // find names & type
-    final ResourceType type = groupExtractor.getResourceType(request);
-    final String groupName = groupExtractor.getGroupName(request);
-    final boolean minimize = groupExtractor.isMinimized(request);
-    if (groupName == null || type == null) {
-      throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
-    }
-    intAggregatedFolderPath(request, type);
-
-    // reschedule cache & model updates
-    final WroConfiguration config = Context.get().getConfig();
-    cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
-    modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
-
-    final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
-
-    // TODO move ETag check in wroManagerFactory
-    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-    // enclose etag value in quotes to be compliant with the RFC
-    final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
-
-    if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-      LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      // because we cannot return null, return a stream containing nothing.
-      // TODO close output stream?
-      return;
-    }
-    if (contentHashEntry.getRawContent() != null) {
-      // Do not set content length because we don't know the length in case it is gzipped. This could cause an
-      // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
-      // make the input stream encoding aware.
-      // use gziped response if supported
-      final OutputStream os = response.getOutputStream();
-      if (isGzipAllowed()) {
-        // add gzip header and gzip response
-        response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
-        response.setHeader("Vary", "Accept-Encoding");
-        IOUtils.write(contentHashEntry.getGzippedContent(), os);
-      } else {
-        IOUtils.write(contentHashEntry.getRawContent(), os);
+    final OutputStream os = response.getOutputStream();
+    try {
+      // find names & type
+      final ResourceType type = groupExtractor.getResourceType(request);
+      final String groupName = groupExtractor.getGroupName(request);
+      final boolean minimize = groupExtractor.isMinimized(request);
+      if (groupName == null || type == null) {
+        throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
       }
+      intAggregatedFolderPath(request, type);
+
+      // reschedule cache & model updates
+      final WroConfiguration config = Context.get().getConfig();
+      cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
+      modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+
+      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
+
+      // TODO move ETag check in wroManagerFactory
+      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+      // enclose etag value in quotes to be compliant with the RFC
+      final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
+
+      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
+        LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
+        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        // because we cannot return null, return a stream containing nothing.
+        // TODO close output stream?
+        return;
+      }
+      if (contentHashEntry.getRawContent() != null) {
+        // Do not set content length because we don't know the length in case it is gzipped. This could cause an
+        // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
+        // make the input stream encoding aware.
+        // use gziped response if supported
+        if (isGzipAllowed()) {
+          // add gzip header and gzip response
+          response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
+          response.setHeader("Vary", "Accept-Encoding");
+          IOUtils.write(contentHashEntry.getGzippedContent(), os);
+        } else {
+          IOUtils.write(contentHashEntry.getRawContent(), os);
+        }
+      }
+      if (type != null) {
+        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+      }
+
+      // set ETag header
+      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
+
+      stopWatch.stop();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
+      }
+    } finally {
       IOUtils.closeQuietly(os);
-    }
-    if (type != null) {
-      response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
-    }
-
-    // set ETag header
-    response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-
-    stopWatch.stop();
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
     }
   }
 
@@ -236,7 +237,7 @@ public class WroManager
 
   /**
    * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js
-   * 
+   *
    * @return a path to the resource with the fingerprint encoded as a folder name.
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
@@ -256,7 +257,7 @@ public class WroManager
    * Format the version of the resource in the path. Default implementation use hash as a folder: <hash>/groupName.js.
    * The implementation can be changed to follow a different versioning style, like version parameter:
    * /groupName.js?version=<hash>
-   * 
+   *
    * @param hash Hash of the resource.
    * @param resourcePath Path of the resource.
    * @return formatted versioned path of the resource.
@@ -314,12 +315,12 @@ public class WroManager
 
   /**
    * Serve images and other external resources referred by bundled resources.
-   * 
+   *
    * @param request {@link HttpServletRequest} object.
    * @param outputStream where the stream will be written.
    * @throws IOException if no stream could be resolved.
    */
-  private void serverProxyResourceRequest(final HttpServletRequest request, final OutputStream outputStream)
+  private void serveProxyResourceRequest(final HttpServletRequest request, final OutputStream outputStream)
     throws IOException {
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
@@ -499,7 +500,7 @@ public class WroManager
 
 
   /**
-   * 
+   *
    * @return The strategy used to rename bundled resources.
    */
   public final NamingStrategy getNamingStrategy() {

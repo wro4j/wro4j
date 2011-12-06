@@ -37,10 +37,6 @@ public final class ReloadCacheRunnable
 
   public void run() {
     try {
-      if (true) {
-        //Thread.sleep(2000);
-        return;
-      }
       if (wroManagerReference.get().cacheChangeCallback != null) {
         // invoke cacheChangeCallback
         wroManagerReference.get().cacheChangeCallback.propertyChange(null);

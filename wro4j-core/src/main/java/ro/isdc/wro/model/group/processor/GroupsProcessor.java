@@ -150,7 +150,7 @@ public class GroupsProcessor {
 
     // retain only resources of needed type
     final List<Resource> filteredResources = new ArrayList<Resource>();
-    for (final Resource resource : allResources) {
+    for (final Resource resource : group.getResources()) {
       if (type == resource.getType()) {
         if (filteredResources.contains(resource)) {
           LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
