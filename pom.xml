@@ -65,7 +65,7 @@
     <commons-lang.version>3.0.1</commons-lang.version>
     <commons-pool.version>1.5.6</commons-pool.version>
     <closure.version>r1592</closure.version>
-    <closure.stylesheets.version>20111118</closure.stylesheets.version>
+    <closure.stylesheets.version>20111205</closure.stylesheets.version>
     <slf4j.version>1.6.2</slf4j.version>    
     <maven.version>3.0.3</maven.version>    
     <mockito.version>1.9.0-rc1</mockito.version>
@@ -203,7 +203,7 @@
         <version>${closure.version}</version>
       </dependency>
       <dependency>
-		<groupId>com.google.css</groupId>
+		<groupId>com.google.closure-stylesheet</groupId>
 		<artifactId>closure-stylesheets</artifactId>
         <version>${closure.stylesheets.version}</version>
       </dependency>

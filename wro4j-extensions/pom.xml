@@ -50,7 +50,7 @@
 			<artifactId>closure-compiler</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.css</groupId>
+			<groupId>com.google.closure-stylesheet</groupId>
 			<artifactId>closure-stylesheets</artifactId>
 		</dependency>
 		<dependency>
