@@ -31,10 +31,6 @@ public final class ReloadModelRunnable
   public void run() {
     LOG.debug("Reloading Model....");
     try {
-      if (true) {
-        Thread.sleep(2000);
-        return;
-      }
       // TODO: do not destroy, until the creation is done and the new model is different than the new one
       wroManagerReference.get().getModelFactory().destroy();
       if (Thread.interrupted()) {

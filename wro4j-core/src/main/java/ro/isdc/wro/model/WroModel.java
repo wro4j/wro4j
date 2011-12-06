@@ -4,12 +4,14 @@
 package ro.isdc.wro.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -93,10 +95,25 @@ public final class WroModel {
         return group;
       }
     }
-    throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + groups);
+    throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + getGroupNames(groups));
+  }
+  
+  /**
+   * This implementation would be simpler if java would have closures :).
+   * 
+   * @param groups
+   *          a collection of groups to get as string.
+   * @return a comma separated list of group names.
+   */
+  private String getGroupNames(final Collection<Group> groups) {
+    final Set<String> groupNames = new HashSet<String>();
+    for (final Group group : groups) {
+      groupNames.add(group.getName());
+    }
+    return StringUtils.join(groupNames, ", ");
   }
 
-  /**
+/**
    * Merge this model with another model. This is useful for supporting model imports.
    *
    * @param importedModel model to import.
