@@ -69,16 +69,12 @@ groups {
     js("http://code.jquery.com/jquery-1.6.js")
   }
   all {
-    //dynamicResource()
-    //uniform()
+    dynamicResource()
+    uniform()
     groupRef("jquery-mobile")
-    //groupRef('WEBINF-css')
+    groupRef('WEBINF-css')
   }
-  /*
-  all {
-    css("/static/**.css")
-    css("/static/css/css1.css")
-    css("/static/css/css2.css")
+  testPage {
+    wildcard()
   }
-  */
 }
