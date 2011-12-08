@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.manager.callback;
 
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
@@ -56,4 +53,16 @@ public class LifecycleCallbackSupport
   public void onAfterPostProcess() {
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  public void onBeforeLocatingResource() {
+    
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterLocatingResource() {
+  }
 }

@@ -22,6 +22,17 @@ public interface LifecycleCallback {
   void onAfterModelCreated();
   
   /**
+   * Called before a resource is located.
+   */
+  void onBeforeLocatingResource();
+  
+  /**
+   * Called after a resource was located. This method is invoked no matter whether the result of the operation was
+   * successful or not.
+   */
+  void onAfterLocatingResource();
+  
+  /**
    * Called before each resource is processed.
    */
   void onBeforePreProcess();

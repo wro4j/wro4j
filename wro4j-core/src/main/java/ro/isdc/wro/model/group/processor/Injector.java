@@ -148,10 +148,6 @@ public final class Injector {
         inject(groupsProcessor);
         return accept = true;
       }
-      if (LifecycleCallback.class.isAssignableFrom(field.getType())) {
-        field.set(object, wroManager.getCallback());
-        return accept = true;
-      }
       if (Injector.class.isAssignableFrom(field.getType())) {
         field.set(object, this);
         return accept = true;
