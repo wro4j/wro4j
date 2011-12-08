@@ -33,7 +33,7 @@ public class TestPropertyWroConfigurationFactory {
 
 
   @Test
-  public void testCreateDefaultConfig() {
+  public void createDefaultConfig() {
     factory.setProperties(null);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
@@ -61,7 +61,7 @@ public class TestPropertyWroConfigurationFactory {
   }
 
   @Test
-  public void testConfigWithProperties() {
+  public void configWithProperties() {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
     props.setProperty(ConfigConstants.modelUpdatePeriod.name(), "20");
@@ -82,7 +82,7 @@ public class TestPropertyWroConfigurationFactory {
 
 
   @Test(expected = WroRuntimeException.class)
-  public void testConfigWithInvalidProperties() {
+  public void cannotAcceptInvalidLong() {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "INVALID_LONG");
     factory.setProperties(props);
