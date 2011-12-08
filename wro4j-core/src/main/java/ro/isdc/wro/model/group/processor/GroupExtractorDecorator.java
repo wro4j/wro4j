@@ -5,6 +5,8 @@ package ro.isdc.wro.model.group.processor;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.Validate;
+
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -28,9 +30,7 @@ public class GroupExtractorDecorator
    * @param decorated {@link GroupExtractor} to decorate.
    */
   public GroupExtractorDecorator(final GroupExtractor decorated) {
-    if (decorated == null) {
-      throw new IllegalArgumentException("GroupExtractor cannot be NULL!");
-    }
+    Validate.notNull(decorated);
     this.decorated = decorated;
   }
 

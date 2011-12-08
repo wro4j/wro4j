@@ -528,6 +528,7 @@ public class TestWroFilter {
     Context.set(Context.standaloneContext());
 
     final WroFilter filter = new WroFilter() {
+      @Override
       protected WroManagerFactory getWroManagerFactory() {
         return wroManagerFactory;
       }
@@ -604,11 +605,9 @@ public class TestWroFilter {
   class RequestBuilder {
     private final String requestUri;
 
-
     public RequestBuilder(final String requestUri) {
       this.requestUri = requestUri;
     }
-
 
     protected HttpServletRequest newRequest() {
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);

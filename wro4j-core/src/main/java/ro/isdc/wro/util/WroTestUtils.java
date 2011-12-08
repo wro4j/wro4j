@@ -14,8 +14,14 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
@@ -351,7 +357,9 @@ public class WroTestUtils {
       Transformers.noOpTransformer(), processor);
   }
 
-
+  /**
+   * TODO run tests in parallel
+   */
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourcePostProcessor processor)
     throws IOException {
@@ -390,6 +398,7 @@ public class WroTestUtils {
     LOG.debug("targetFolder: {}", targetFolder);
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
+    //TODO use WroUtil#runInParallel for running tests faster
     for (final File file : files) {
       File targetFile = null;
       try {
@@ -418,5 +427,23 @@ public class WroTestUtils {
       }
     }
     logSuccess(processedNumber);
+  }
+
+
+  /**
+   * Runs a task concurrently. Allows to test thread-safe behavior.
+   *
+   * @param task a {@link Callable} to run concurrently.
+   * @throws Exception if any of the executed tasks fails.
+   */
+  public static void runConcurrently(final Callable<Void> task) throws Exception {
+    final ExecutorService service = Executors.newFixedThreadPool(5);
+    final List<Future<?>> futures = new ArrayList<Future<?>>();
+    for (int i = 0; i < 10; i++) {
+      futures.add(service.submit(task));
+    }
+    for (final Future<?> future : futures) {
+      future.get();
+    }
   }
 }

@@ -9,6 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.TimeZone;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -62,6 +65,24 @@ public final class WroUtil {
     "(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
   private static final Pattern PATTERN_GZIP = Pattern.compile(
     "(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
+
+  private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
+
+  /**
+   * @return {@link ThreadFactory} with daemon threads.
+   */
+  public static ThreadFactory createDaemonThreadFactory(final String name) {
+    return new ThreadFactory() {
+      private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
+      private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+      public Thread newThread(final Runnable runnable) {
+        final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
+        thread.setDaemon(true);
+        return thread;
+      }
+    };
+  }
 
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
@@ -340,5 +361,19 @@ public final class WroUtil {
         return object;
       }
     };
+  }
+
+
+  /**
+   * Wraps original exception into {@link WroRuntimeException} and throw it.
+   *
+   * @param e the exception to wrap.
+   */
+  public static void wrapWithWroRuntimeException(final Exception e) {
+    LOG.error("Exception occured: " + e.getClass(), e.getCause());
+    if (e instanceof WroRuntimeException) {
+      throw (WroRuntimeException) e;
+    }
+    throw new WroRuntimeException(e.getMessage(), e);
   }
 }

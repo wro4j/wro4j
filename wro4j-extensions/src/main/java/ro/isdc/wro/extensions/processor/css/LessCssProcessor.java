@@ -14,12 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -103,11 +105,20 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class LessCssProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
+
   public static final String ALIAS = "lessCss";
-  /**
-   * Engine.
-   */
-  private LessCss engine;
+
+  private ObjectPoolHelper<LessCss> enginePool;
+
+
+  public LessCssProcessor() {
+    enginePool = new ObjectPoolHelper<LessCss>(new ObjectFactory<LessCss>() {
+      @Override
+      public LessCss create() {
+        return newLessCss();
+      }
+    });
+  }
 
   /**
    * {@inheritDoc}
@@ -115,8 +126,9 @@ public class LessCssProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final LessCss lessCss = getEngine();
     try {
-      writer.write(getEngine().less(content));
+      writer.write(lessCss.less(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
@@ -126,9 +138,15 @@ public class LessCssProcessor
     } finally {
       reader.close();
       writer.close();
+      //return for later reuse
+      try {
+        enginePool.returnObject(lessCss);
+      } catch (final Exception e) {
+        //should never happen
+        LOG.error("Cannot return lessCss engine to the pool", e);
+      }
     }
   }
-
 
   /**
    * Invoked when a processing exception occurs.
@@ -141,10 +159,7 @@ public class LessCssProcessor
    * A getter used for lazy loading.
    */
   private LessCss getEngine() {
-    if (engine == null) {
-      engine = newLessCss();
-    }
-    return engine;
+    return enginePool.getObject();
   }
 
 

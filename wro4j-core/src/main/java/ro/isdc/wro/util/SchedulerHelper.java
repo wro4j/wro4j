@@ -5,9 +5,7 @@ package ro.isdc.wro.util;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -24,28 +22,11 @@ import org.slf4j.LoggerFactory;
 public class SchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(SchedulerHelper.class);
 
-  private static final AtomicInteger poolNumber = new AtomicInteger(1);
-
-  /**
-   * @return {@link ThreadFactory} with daemon threads.
-   */
-  private static ThreadFactory createDaemonThreadFactory() {
-    return new ThreadFactory() {
-      private final String prefix = "wro4j-scheduler-" + poolNumber.getAndIncrement() + "-thread-";
-      private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-      public Thread newThread(final Runnable runnable) {
-        final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
-        thread.setDaemon(true);
-        return thread;
-      }
-    };
-  }
 
   private DestroyableLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new DestroyableLazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
-      return new ScheduledThreadPoolExecutor(1, createDaemonThreadFactory()) {
+      return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory(SchedulerHelper.this.name)) {
         @Override
         public boolean getExecuteExistingDelayedTasksAfterShutdownPolicy() {
           return false;
@@ -156,10 +137,14 @@ public class SchedulerHelper {
   private synchronized void destroyScheduler() {
     if (!poolInitializer.get().isShutdown()) {
       // Disable new tasks from being submitted
-      poolInitializer.get().shutdownNow();
+      poolInitializer.get().shutdown();
+      if (future != null) {
+        future.cancel(true);
+      }
       try {
-        while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
+        while (!poolInitializer.get().awaitTermination(15, TimeUnit.SECONDS)) {
           LOG.debug("Termination awaited: " + name);
+          poolInitializer.get().shutdownNow();
         }
       } catch (final InterruptedException e) {
         LOG.debug("Interrupted Exception occured during scheduler destroy", e);

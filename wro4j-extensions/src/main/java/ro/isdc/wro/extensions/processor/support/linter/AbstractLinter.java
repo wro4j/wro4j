@@ -9,9 +9,8 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +34,11 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
+  private OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
    */
   private String[] options;
-  private ScriptableObject scope;
-
 
   /**
    * Initialize script builder for evaluation.
@@ -48,12 +46,10 @@ public abstract class AbstractLinter {
   private RhinoScriptBuilder initScriptBuilder() {
     try {
       RhinoScriptBuilder builder = null;
-      if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
-        scope = builder.getScope();
-      } else {
-        builder = RhinoScriptBuilder.newChain(scope);
-      }
+      // reusing the scope doesn't work here. Get the following error: TypeError: Cannot find function create in object
+      // function Object() { [native code for Object.Object, arity=1] }
+      // TODO investigate why
+      builder = RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
       return builder;
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
@@ -61,7 +57,7 @@ public abstract class AbstractLinter {
   }
 
   /**
-   * @return the stream of the jshint script. Override this method to provide a different script version.
+   * @return the stream of the linter script. Override this method to provide a different script version.
    */
   protected abstract InputStream getScriptAsStream();
 
@@ -80,7 +76,7 @@ public abstract class AbstractLinter {
       watch.stop();
       watch.start("lint");
       LOG.debug("options: {}", Arrays.toString(this.options));
-      final String packIt = buildJsHintScript(WroUtil.toJSMultiLineString(data), this.options);
+      final String packIt = buildLinterScript(WroUtil.toJSMultiLineString(data), this.options);
       final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
       if (!valid) {
         final String json = builder.addJSON().evaluate(String.format("JSON.stringify(%s.errors)", getLinterName()),
@@ -113,59 +109,21 @@ public abstract class AbstractLinter {
    *          options to set as true
    * @return Script used to pack and return the packed result.
    */
-  private String buildJsHintScript(final String data, final String... options) {
-    final String script = String.format("%s(%s,%s);", getLinterName(), data, buildOptions(options));
+  private String buildLinterScript(final String data, final String... options) {
+    final String script = String.format("%s(%s,%s);", getLinterName(), data, optionsBuilder.build(options));
     return script;
-  }
-
-
-  /**
-   * @param options
-   *          an array of options as provided by user.
-   * @return the json object containing options to be used by JsHint.
-   */
-  protected String buildOptions(final String... options) {
-    final StringBuffer sb = new StringBuffer("{");
-    if (options != null) {
-      for (int i = 0; i < options.length; i++) {
-        final String option = options[i];
-        if (!StringUtils.isEmpty(option)) {
-          sb.append(processSingleOption(option));
-          if (i < options.length - 1) {
-            sb.append(",");
-          }
-        }
-      }
-    }
-    sb.append("}");
-    LOG.debug("options: {}", options);
-    return sb.toString();
-  }
-
-
-  /**
-   * @return
-   */
-  private String processSingleOption(final String option) {
-    String optionName = option;
-    String optionValue = Boolean.TRUE.toString();
-    if (option.contains("=")) {
-      final String[] optionEntry = option.split("=");
-      if (optionEntry.length != 2) {
-        throw new IllegalArgumentException("Invalid option provided: " + option);
-      }
-      optionName = optionEntry[0];
-      optionValue = option.split("=")[1];
-    }
-    return String.format("\"%s\": %s", optionName.trim(), optionValue.trim());
   }
 
   /**
    * @param options the options to set
    */
   public AbstractLinter setOptions(final String ... options) {
-    LOG.debug("setOptions: {}", options);
-    this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: " + options);
+    if (options != null) {
+      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
+    } else {
+      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
+    }
     return this;
   }
 }

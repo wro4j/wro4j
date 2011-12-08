@@ -10,7 +10,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
@@ -30,7 +29,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  */
 public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   /**
-   * Comma separated jsHint options. This field is optional. If no value is provided, no options will be used..
+   * Comma separated options. This field is optional. If no value is provided, no options will be used..
    *
    * @parameter expression="${options}"
    * @optional
@@ -63,7 +62,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   }
 
   /**
-   * @param group
+   * @param group the name of the group to process.
    */
   private void processGroup(final String group) throws Exception {
     getLog().info("processing group: " + group);
@@ -106,13 +105,14 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   protected abstract ResourcePreProcessor createResourceProcessor();
 
   /**
-   * @return an array of options.
+   * @return raw representation of the option value.
    */
-  public String[] getOptions() {
-    return StringUtils.isEmpty(options) ? new String[] {} : options.split(",");
+  public String getOptions() {
+    return options;
   }
 
   /**
+   * Used for tests only.
    * @param options the options to set
    */
   void setOptions(final String options) {

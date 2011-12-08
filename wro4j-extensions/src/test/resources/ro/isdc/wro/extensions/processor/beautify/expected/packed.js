@@ -1,6 +1,6 @@
 eval(function(a, b, c, d, e, f) {
     e = function(a) {
-        return (a < 62 ? "" : e(parseInt(a / 62))) + ((a = a % 62) > 35 ? String.fromCharCode(a + 29) : a.toString(36));
+        return (a < 62 ? "" : e(parseInt(a / 62))) + ((a %= 62) > 35 ? String.fromCharCode(a + 29) : a.toString(36));
     };
     if ("0".replace(0, e) == 0) {
         while (c--) f[e(c)] = d[c];

@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Apply JsHint script checking utility.
  * <p/>
- * Using untagged version (commited: 2011-09-05 11:13:44)
+ * Using untagged version (commited: 2011-11-29 09:47:27)
  *
  * @author Alex Objelean
  * @since 1.3.5
@@ -23,6 +23,7 @@ public class JsHint extends AbstractLinter {
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.
    */
+  @Override
   protected InputStream getScriptAsStream() {
     //this resource is packed with packerJs compressor
     return getClass().getResourceAsStream(DEFAULT_JSLINT_JS);
@@ -33,7 +34,6 @@ public class JsHint extends AbstractLinter {
    */
   @Override
   protected String getLinterName() {
-    // TODO Auto-generated method stub
     return "JSHINT";
   }
 }

@@ -61,13 +61,14 @@
   </developers>
   
   <properties>
-    <commons-io.version>2.0.1</commons-io.version>
-    <commons-lang.version>3.0.1</commons-lang.version>       
-    <closure.version>r1459</closure.version>
+    <commons-io.version>2.1</commons-io.version>
+    <commons-lang.version>3.0.1</commons-lang.version>
+    <commons-pool.version>1.5.6</commons-pool.version>
+    <closure.version>r1592</closure.version>
     <slf4j.version>1.6.2</slf4j.version>    
     <maven.version>3.0.3</maven.version>    
     <mockito.version>1.9.0-rc1</mockito.version>
-    <junit.version>4.9</junit.version>    
+    <junit.version>4.10</junit.version>    
     <rhino.version>1.7R2</rhino.version>
     
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -120,7 +121,12 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>${commons-lang.version}</version>
-      </dependency>  
+      </dependency>
+      <dependency>
+        <groupId>commons-pool</groupId>
+        <artifactId>commons-pool</artifactId>
+        <version>${commons-pool.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>

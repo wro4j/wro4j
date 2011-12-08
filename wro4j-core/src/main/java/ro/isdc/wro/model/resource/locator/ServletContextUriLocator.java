@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -99,6 +100,18 @@ public class ServletContextUriLocator
         return getWildcardStreamLocator().locateStream(uri, new File(realPath));
       }
     } catch (final IOException e) {
+      /**
+       * This is a special case when no more attempts are required, since the required computation was achieved
+       * successfully. This solves the following <a
+       * href="http://code.google.com/p/wro4j/issues/detail?id=321">issue</a>.<p/>
+       * The problem was that in some situations,
+       * when the dispatcherStreamLocator was used to locate resources containing wildcard, the following message was
+       * printed to the console: <code>SEVERE: Servlet.service() for servlet default threw exception
+       * java.io.FileNotFoundException.</code>
+       */
+      if (e instanceof NoMoreAttemptsIOException) {
+        throw e;
+      }
       LOG.warn("Couldn't localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
         + "\".\n Trying to locate the stream without the wildcard.");
     }
@@ -112,10 +125,8 @@ public class ServletContextUriLocator
     try {
       inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
     } catch (final IOException e) {
-      if (inputStream == null) {
-        LOG.debug("retrieving servletContext stream for uri: {}", uri);
-        inputStream = servletContext.getResourceAsStream(uri);
-      }
+      LOG.debug("retrieving servletContext stream for uri: {}", uri);
+      inputStream = servletContext.getResourceAsStream(uri);
       if (inputStream == null) {
         LOG.error("Exception while reading resource from " + uri);
         throw new IOException("Exception while reading resource from " + uri);

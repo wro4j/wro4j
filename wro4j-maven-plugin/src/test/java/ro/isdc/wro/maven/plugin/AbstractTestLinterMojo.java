@@ -103,6 +103,7 @@ public abstract class AbstractTestLinterMojo {
     mojo.execute();
   }
 
+
   public static class CustomWroManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
     @Override
     protected ProcessorsFactory newProcessorsFactory() {
