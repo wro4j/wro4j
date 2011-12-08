@@ -8,9 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -57,17 +55,17 @@ public class GroupsProcessor {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
-    filterResources(group, type);
+    final Group filteredGroup = group.collectResourcesOfType(type);
     try {
       stopWatch.stop();
       stopWatch.start("pre process and merge");
       // Merge
-      final String result = preProcessorExecutor.processAndMerge(group, minimize);
+      final String result = preProcessorExecutor.processAndMerge(filteredGroup, minimize);
       stopWatch.stop();
 
       stopWatch.start("post process");
       // postProcessing
-      final String postProcessedResult = applyPostProcessors(group, type, result, minimize);
+      final String postProcessedResult = applyPostProcessors(filteredGroup, type, result, minimize);
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
       return postProcessedResult;
@@ -136,30 +134,5 @@ public class GroupsProcessor {
     }
     LOG.debug(stopWatch.prettyPrint());
     return output.toString();
-  }
-
-
-  /**
-   * @param groups list of groups where to search resources to filter.
-   * @param type of resources to collect.
-   * @return a list of resources of provided type.
-   */
-  private final void filterResources(final Group group, final ResourceType type) {
-    final List<Resource> allResources = new ArrayList<Resource>();
-    allResources.addAll(group.getResources());
-
-    // retain only resources of needed type
-    final List<Resource> filteredResources = new ArrayList<Resource>();
-    for (final Resource resource : group.getResources()) {
-      if (type == resource.getType()) {
-        if (filteredResources.contains(resource)) {
-          LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
-        } else {
-          filteredResources.add(resource);
-        }
-      }
-    }
-
-    group.setResources(filteredResources);
   }
 }

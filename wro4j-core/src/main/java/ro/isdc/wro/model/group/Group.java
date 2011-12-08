@@ -123,6 +123,32 @@ public final class Group {
   }
 
   /**
+   * @param type
+   *          of resources to collect.
+   * @return a group containing filtered resources. The created group has the same name.
+   */
+  public final Group collectResourcesOfType(final ResourceType type) {
+    final List<Resource> allResources = new ArrayList<Resource>();
+    allResources.addAll(getResources());
+
+    // retain only resources of needed type
+    final List<Resource> filteredResources = new ArrayList<Resource>();
+    for (final Resource resource : getResources()) {
+      if (type == resource.getType()) {
+        if (filteredResources.contains(resource)) {
+          LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
+        } else {
+          filteredResources.add(resource);
+        }
+      }
+    }
+    
+    final Group filteredGroup = new Group(getName());
+    filteredGroup.setResources(filteredResources);
+    return filteredGroup;
+  }
+  
+  /**
    * @return the name
    */
   public String getName() {

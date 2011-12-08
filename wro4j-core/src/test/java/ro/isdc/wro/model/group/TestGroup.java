@@ -23,11 +23,39 @@ import ro.isdc.wro.model.resource.ResourceType;
  * @author Alex Objelean
  */
 public class TestGroup {
-  private static final Logger LOG = LoggerFactory.getLogger(TestGroup.class);
-
   @Test(expected=NullPointerException.class)
   public void cannotCreateGroupWithNullName() {
     new Group(null);
+  }
+  
+  @Test
+  public void shouldReturnSameGroupWhenGroupHasNoResources() {
+    final Group group = new Group("group");
+    Group newGroup = group.collectResourcesOfType(null);
+    Assert.assertEquals(group, newGroup);
+    
+    newGroup = group.collectResourcesOfType(ResourceType.CSS);
+    Assert.assertEquals(group, newGroup);
+    
+    newGroup = group.collectResourcesOfType(ResourceType.JS);
+    Assert.assertEquals(group, newGroup);
+  }
+  
+  @Test
+  public void shouldCollectSearchedResources() {
+    final Group group = new Group("group");
+    group.addResource(Resource.create("1", ResourceType.CSS));
+    group.addResource(Resource.create("2", ResourceType.JS));
+    group.addResource(Resource.create("3", ResourceType.JS));
+    
+    Group newGroup = group.collectResourcesOfType(null);
+    Assert.assertEquals(0, newGroup.getResources().size());
+    
+    newGroup = group.collectResourcesOfType(ResourceType.CSS);
+    Assert.assertEquals(1, newGroup.getResources().size());
+    
+    newGroup = group.collectResourcesOfType(ResourceType.JS);
+    Assert.assertEquals(2, newGroup.getResources().size());
   }
 
   @Test(expected=NullPointerException.class)
