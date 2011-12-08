@@ -155,7 +155,7 @@ public class WroManager
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
   private boolean isProxyResourceRequest(final HttpServletRequest request) {
-    return StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
+    return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
   /**
@@ -207,7 +207,7 @@ public class WroManager
     final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
     // TODO move ETag check in wroManagerFactory
-    final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
+    final String ifNoneMatch = request != null ? request.getHeader(HttpHeader.IF_NONE_MATCH.toString()) : null;
     //enclose etag value in quotes to be compliant with the RFC
     final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
 
@@ -224,12 +224,13 @@ public class WroManager
       inputStream = new ByteArrayInputStream(contentHashEntry.getContent().getBytes(
         Context.get().getConfig().getEncoding()));
     }
-    if (type != null) {
-      response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+    if (response != null) {
+      if (type != null) {
+        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+      }
+      // set ETag header
+      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
     }
-
-    // set ETag header
-    response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
     stopWatch.stop();
     LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
