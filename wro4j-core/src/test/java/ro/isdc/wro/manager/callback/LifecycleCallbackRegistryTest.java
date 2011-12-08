@@ -80,7 +80,8 @@ public class LifecycleCallbackRegistryTest {
 
     final WroModelFactory modelFactory = WroUtil.factoryFor(new WroModel().addGroup(new Group(groupName)));
 
-    final WroManager manager = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(modelFactory).create();
+    final WroManager manager = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(
+      modelFactory).create();
     manager.getCallbackRegistry().registerCallback(callback);
     manager.process();
   }

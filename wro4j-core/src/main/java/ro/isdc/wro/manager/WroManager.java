@@ -171,7 +171,7 @@ public class WroManager
       if (groupName == null || type == null) {
         throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
       }
-      intAggregatedFolderPath(request, type);
+      initAggregatedFolderPath(request, type);
 
       // reschedule cache & model updates
       final WroConfiguration config = Context.get().getConfig();
