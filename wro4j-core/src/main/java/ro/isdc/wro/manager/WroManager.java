@@ -33,7 +33,6 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
-import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -295,7 +294,12 @@ public class WroManager
       // process groups & put result in the cache
       // find processed result for a group
       final List<Group> groupAsList = new ArrayList<Group>();
+
+      //TODO update the context
+      getCallbackRegistry().onBeforeModelCreated();
       final WroModel model = modelFactory.create();
+      getCallbackRegistry().onAfterModelCreated();
+
       if (model == null) {
         throw new WroRuntimeException("Cannot build a valid wro model");
       }

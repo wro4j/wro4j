@@ -7,7 +7,7 @@ package ro.isdc.wro.manager.callback;
 
 /**
  * Default implementation of {@link LifecycleCallback} interface with empty implementations.
- * 
+ *
  * @author Alex Objelean
  * @created 26 Oct 2011
  * @since 1.4.3
@@ -15,18 +15,18 @@ package ro.isdc.wro.manager.callback;
 public class LifecycleCallbackDecorator
     implements LifecycleCallback {
   private final LifecycleCallback decorated;
-  
+
   public LifecycleCallbackDecorator(final LifecycleCallback decorated) {
     this.decorated = decorated;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public void onBeforeModelCreated() {
     decorated.onBeforeModelCreated();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -60,19 +60,5 @@ public class LifecycleCallbackDecorator
    */
   public void onAfterPostProcess() {
     decorated.onAfterPostProcess();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void onBeforeLocatingResource() {
-    decorated.onBeforeLocatingResource();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void onAfterLocatingResource() {
-    decorated.onAfterLocatingResource();
   }
 }

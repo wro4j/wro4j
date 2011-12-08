@@ -4,22 +4,25 @@
 package ro.isdc.wro.manager.callback;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 
+
 /**
- * Register all available callbacks.
+ * Register all available callbacks. The registry acts as a {@link LifecycleCallback} itself whose implementation
+ * delegate the call to registered callbacks.
  *
  * @author Alex Objelean
  * @created Created on 8 Dec 2011
  * @since 1.4.3
  */
-public class LifecycleCallbackRegistry {
+public class LifecycleCallbackRegistry implements LifecycleCallback {
+  /**
+   * The list of registered callbacks.
+   */
   private List<LifecycleCallback> callbacks = new ArrayList<LifecycleCallback>();
-  
+
   /**
    * @param callback to register.
    */
@@ -27,11 +30,59 @@ public class LifecycleCallbackRegistry {
     Validate.notNull(callback);
     callbacks.add(callback);
   }
-  
+
   /**
-   * @return a readonly collection of the registered callbacks.
+   * {@inheritDoc}
    */
-  public Collection<LifecycleCallback> getCallbacks() {
-    return Collections.unmodifiableCollection(callbacks);
+  public void onBeforeModelCreated() {
+    for (final LifecycleCallback callback : callbacks) {
+      callback.onBeforeModelCreated();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterModelCreated() {
+    for (final LifecycleCallback callback : callbacks) {
+      callback.onAfterModelCreated();
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onBeforePreProcess() {
+    for (final LifecycleCallback callback : callbacks) {
+      callback.onBeforePreProcess();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterPreProcess() {
+    for (final LifecycleCallback callback : callbacks) {
+      callback.onAfterPreProcess();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onBeforePostProcess() {
+    for (final LifecycleCallback callback : callbacks) {
+      callback.onBeforePostProcess();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterPostProcess() {
+    for (final LifecycleCallback callback : callbacks) {
+      callback.onAfterPostProcess();
+    }
   }
 }

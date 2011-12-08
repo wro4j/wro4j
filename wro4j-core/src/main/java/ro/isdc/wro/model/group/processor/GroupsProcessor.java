@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
@@ -35,6 +36,8 @@ import ro.isdc.wro.util.StopWatch;
  */
 public class GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);
+  @Inject
+  private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private ProcessorsFactory processorsFactory;
   /**
@@ -119,7 +122,12 @@ public class GroupsProcessor {
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
+
+      //TODO update callbackContext
+      callbackRegistry.onBeforePostProcess();
       processor.process(input, output);
+      callbackRegistry.onAfterPostProcess();
+
       input = new StringReader(output.toString());
       stopWatch.stop();
     }
