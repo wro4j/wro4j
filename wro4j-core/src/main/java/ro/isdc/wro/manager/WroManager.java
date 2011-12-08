@@ -33,7 +33,7 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
-import ro.isdc.wro.manager.callback.WroCallback;
+import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -97,7 +97,7 @@ public class WroManager
    * Rename the file name based on its original name and content.
    */
   private NamingStrategy namingStrategy;
-  private WroCallback callback;
+  private LifecycleCallback callback;
   /**
    * Groups processor.
    */
@@ -528,7 +528,7 @@ public class WroManager
   /**
    * @param callback the callback to set
    */
-  public final WroManager setCallback(final WroCallback callback) {
+  public final WroManager setCallback(final LifecycleCallback callback) {
     this.callback = callback;
     return this;
   }
@@ -536,7 +536,7 @@ public class WroManager
   /**
    * @return the callback
    */
-  public WroCallback getCallback() {
+  public LifecycleCallback getCallback() {
     return this.callback;
   }
 
