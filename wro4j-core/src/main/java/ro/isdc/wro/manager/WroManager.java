@@ -120,20 +120,15 @@ public class WroManager
   /**
    * Perform processing of the uri.
    *
-   * @param request {@link HttpServletRequest} to process.
-   * @param response HttpServletResponse where to write the result content.
    * @throws IOException when any IO related problem occurs or if the request cannot be processed.
    */
   public final void process()
     throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final HttpServletResponse response = Context.get().getResponse();
-
     validate();
-    if (isProxyResourceRequest(request)) {
-      serveProxyResourceRequest(request, response.getOutputStream());
+    if (isProxyResourceRequest()) {
+      serveProxyResourceRequest();
     } else {
-      serveProcessedBundle(request, response);
+      serveProcessedBundle();
     }
   }
 
@@ -141,7 +136,8 @@ public class WroManager
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
-  private boolean isProxyResourceRequest(final HttpServletRequest request) {
+  private boolean isProxyResourceRequest() {
+    final HttpServletRequest request = Context.get().getRequest();
     return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
@@ -155,13 +151,15 @@ public class WroManager
    * Write to stream the content of the processed resource bundle.
    *
    * @param model the model used to build stream.
-   * @param request {@link HttpServletRequest} for this request cycle.
-   * @param response {@link HttpServletResponse} used to set content type.
    */
-  private void serveProcessedBundle(final HttpServletRequest request, final HttpServletResponse response)
+  private void serveProcessedBundle()
     throws IOException {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("serveProcessedBundle");
+    
+    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletResponse response = Context.get().getResponse();
+    
     final OutputStream os = response.getOutputStream();
     try {
       // find names & type
@@ -325,8 +323,11 @@ public class WroManager
    * @param outputStream where the stream will be written.
    * @throws IOException if no stream could be resolved.
    */
-  private void serveProxyResourceRequest(final HttpServletRequest request, final OutputStream outputStream)
+  private void serveProxyResourceRequest()
     throws IOException {
+    final HttpServletRequest request = Context.get().getRequest();
+    final OutputStream outputStream = Context.get().getResponse().getOutputStream();
+    
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
