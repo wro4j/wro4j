@@ -7,6 +7,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -33,32 +35,42 @@ public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final WroManager wroManager;
   private final UriLocatorFactory uriLocatorFactory;
-  private PreProcessorExecutor preProcessorExecutor;
   private final ProcessorsFactory processorsFactory;
-  private final GroupsProcessor groupsProcessor;
+  private final GroupsProcessor groupsProcessor = new GroupsProcessor();
+  private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  /**
+   * Mapping of classes to be annotated and the coresponding injected object.
+   */
+  private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+
   /**
    * Creates the Injector and initialize the provided manager.
    */
   public Injector(final WroManager wroManager) {
     Validate.notNull(wroManager);
     this.wroManager = wroManager;
-    this.groupsProcessor = new GroupsProcessor();
 
     this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(wroManager.getUriLocatorFactory(), this);
     wroManager.setUriLocatorFactory(this.uriLocatorFactory);
 
     this.processorsFactory = new InjectorProcessorsFactoryDecorator(wroManager.getProcessorsFactory(), this);
     wroManager.setProcessorsFactory(this.processorsFactory);
+    //first initialize the map
+    initMap();
 
+    inject(preProcessorExecutor);
+    inject(groupsProcessor);
     inject(wroManager);
   }
 
-  private PreProcessorExecutor getPreProcessorExecutor() {
-    if (preProcessorExecutor == null) {
-      preProcessorExecutor = new PreProcessorExecutor();
-      inject(preProcessorExecutor);
-    }
-    return preProcessorExecutor;
+  private void initMap() {
+    map.put(PreProcessorExecutor.class, preProcessorExecutor);
+    map.put(GroupsProcessor.class, groupsProcessor);
+    map.put(UriLocatorFactory.class, uriLocatorFactory);
+    map.put(ProcessorsFactory.class, processorsFactory);
+    map.put(NamingStrategy.class, wroManager.getNamingStrategy());
+    map.put(LifecycleCallbackRegistry.class, wroManager.getCallbackRegistry());
+    map.put(Injector.class, this);
   }
 
   /**
@@ -127,40 +139,16 @@ public final class Injector {
     try {
       // accept even private modifiers
       field.setAccessible(true);
-      if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
-        field.set(object, uriLocatorFactory);
-        return accept = true;
-      }
-      if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
-        field.set(object, processorsFactory);
-        return accept = true;
-      }
-      if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
-        field.set(object, getPreProcessorExecutor());
-        return accept = true;
-      }
-      if (NamingStrategy.class.isAssignableFrom(field.getType())) {
-        field.set(object, wroManager.getNamingStrategy());
-        return accept = true;
-      }
-      if (GroupsProcessor.class.isAssignableFrom(field.getType())) {
-        field.set(object, groupsProcessor);
-        inject(groupsProcessor);
-        return accept = true;
-      }
-      if (LifecycleCallbackRegistry.class.isAssignableFrom(field.getType())) {
-        field.set(object, wroManager.getCallbackRegistry());
-        inject(wroManager.getCallbackRegistry());
-        return accept = true;
-      }
-      if (Injector.class.isAssignableFrom(field.getType())) {
-        field.set(object, this);
-        return accept = true;
+      for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
+        if (entry.getKey().isAssignableFrom(field.getType())) {
+          field.set(object, entry.getValue());
+          return accept = true;
+        }
       }
       return accept;
     } finally {
       if (accept) {
-        LOG.debug("\t[OK] Injected field of type: {}", field.getType().getSimpleName());
+        LOG.debug("\t[OK] Injected field of type: {} for object of type: {}", field.getType().getSimpleName(), object.getClass().getSimpleName());
       }
     }
   }

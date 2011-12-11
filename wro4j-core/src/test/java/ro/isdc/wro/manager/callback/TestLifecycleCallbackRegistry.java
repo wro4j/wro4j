@@ -73,7 +73,24 @@ public class TestLifecycleCallbackRegistry {
   }
 
   @Test
-  public void test() throws Exception {
+  public void shouldCatchCallbacksExceptionsAndContinueExecution() {
+    final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
+    final LifecycleCallback simpleCallback = Mockito.mock(LifecycleCallback.class);
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeModelCreated();
+
+    registry.registerCallback(failingCallback);
+    registry.registerCallback(simpleCallback);
+
+    registry.onBeforeModelCreated();
+
+    Mockito.verify(simpleCallback).onBeforeModelCreated();
+  }
+
+  /**
+   * TODO: Simplify the test and move common usage to utility method.
+   */
+  @Test
+  public void shouldInvokeCallbackWhenCallingProcess() throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);;
 
@@ -82,12 +99,8 @@ public class TestLifecycleCallbackRegistry {
     Mockito.when(request.getRequestURI()).thenReturn("");
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-    final LifecycleCallback callback = new LifecycleCallbackSupport() {
-      @Override
-      public void onBeforeModelCreated() {
-        System.out.println("onBeforeModelCreated");
-      }
-    };
+
+    final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
 
     final String groupName = "group";
 
@@ -101,5 +114,9 @@ public class TestLifecycleCallbackRegistry {
       modelFactory).create();
     manager.getCallbackRegistry().registerCallback(callback);
     manager.process();
+
+    Mockito.verify(callback).onBeforeModelCreated();
+    Mockito.verify(callback).onAfterModelCreated();
+    Mockito.verifyNoMoreInteractions(callback);
   }
 }

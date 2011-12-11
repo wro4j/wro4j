@@ -94,9 +94,6 @@ public class WroManager
    */
   private NamingStrategy namingStrategy;
   private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
-  /**
-   * Groups processor.
-   */
   @Inject
   private GroupsProcessor groupsProcessor;
 
@@ -156,10 +153,10 @@ public class WroManager
     throws IOException {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("serveProcessedBundle");
-    
+
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
-    
+
     final OutputStream os = response.getOutputStream();
     try {
       // find names & type
@@ -327,7 +324,7 @@ public class WroManager
     throws IOException {
     final HttpServletRequest request = Context.get().getRequest();
     final OutputStream outputStream = Context.get().getResponse().getOutputStream();
-    
+
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,

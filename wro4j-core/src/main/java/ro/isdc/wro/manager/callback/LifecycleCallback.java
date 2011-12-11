@@ -4,7 +4,8 @@
 package ro.isdc.wro.manager.callback;
 
 /**
- * Defines callbacks invoked by the wro4j during processing.
+ * Defines callbacks invoked by the manager during processing. Any of the lifecycle method can throw a
+ * {@link RuntimeException} which will be handled properly by {@link LifecycleCallbackRegistry}.
  *
  * @author Alex Objelean
  * @created 26 Oct 2011
