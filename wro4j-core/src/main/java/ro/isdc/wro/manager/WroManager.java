@@ -93,7 +93,8 @@ public class WroManager
    * Rename the file name based on its original name and content.
    */
   private NamingStrategy namingStrategy;
-  private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
+  @Inject
+  private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private GroupsProcessor groupsProcessor;
 
@@ -278,9 +279,9 @@ public class WroManager
       // find processed result for a group
 
       //TODO update the context
-      getCallbackRegistry().onBeforeModelCreated();
+      callbackRegistry.onBeforeModelCreated();
       final WroModel model = modelFactory.create();
-      getCallbackRegistry().onAfterModelCreated();
+      callbackRegistry.onAfterModelCreated();
 
       if (model == null) {
         throw new WroRuntimeException("Cannot build a valid wro model");
@@ -511,12 +512,15 @@ public class WroManager
     return this.namingStrategy;
   }
 
-
-  /**
-   * @return the groupsProcessor
-   */
   GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
+  }
+
+  /**
+   * @return the holder of registered callbacks. Use it to register custom callbacks.
+   */
+  public LifecycleCallbackRegistry getCallbackRegistry() {
+    return callbackRegistry;
   }
 
 
@@ -527,14 +531,6 @@ public class WroManager
     Validate.notNull(namingStrategy);
     this.namingStrategy = namingStrategy;
     return this;
-  }
-
-
-  /**
-   * @return {@link LifecycleCallbackRegistry}.
-   */
-  public LifecycleCallbackRegistry getCallbackRegistry() {
-    return callbackRegistry;
   }
 
   /**

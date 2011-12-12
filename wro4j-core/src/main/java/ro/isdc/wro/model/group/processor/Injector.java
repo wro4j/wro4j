@@ -38,6 +38,7 @@ public final class Injector {
   private final ProcessorsFactory processorsFactory;
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
   /**
    * Mapping of classes to be annotated and the coresponding injected object.
    */
@@ -69,7 +70,7 @@ public final class Injector {
     map.put(UriLocatorFactory.class, uriLocatorFactory);
     map.put(ProcessorsFactory.class, processorsFactory);
     map.put(NamingStrategy.class, wroManager.getNamingStrategy());
-    map.put(LifecycleCallbackRegistry.class, wroManager.getCallbackRegistry());
+    map.put(LifecycleCallbackRegistry.class, callbackRegistry);
     map.put(Injector.class, this);
   }
 
