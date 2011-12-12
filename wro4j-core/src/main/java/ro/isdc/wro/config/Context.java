@@ -80,7 +80,7 @@ public class Context {
 
 
   /**
-   * A context useful for running in non web context (standAlone applications).
+   * A context useful for running in non web context (standalone applications).
    */
   public static Context standaloneContext() {
     return new Context();

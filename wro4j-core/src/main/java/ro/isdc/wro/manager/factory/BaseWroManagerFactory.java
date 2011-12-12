@@ -19,7 +19,6 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
@@ -106,13 +105,13 @@ public class BaseWroManagerFactory
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
       manager.setHashBuilder(hashBuilder);
-      manager.registerCallback(cacheChangeCallback);
+      manager.registerCacheChangeListener(cacheChangeCallback);
       manager.setResourceLocatorFactory(resourceLocatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
-      //wrap modelFactory with several useful decorators
-      manager.setModelFactory(new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
-          modelFactory))).setTransformers(modelTransformers));
+      // wrap modelFactory with several useful decorators
+      manager.setModelFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
+        new ModelTransformerFactory(modelFactory).setTransformers(modelTransformers))));
 
       final Injector injector = new Injector(manager);
       injector.inject(modelFactory);
@@ -120,7 +119,7 @@ public class BaseWroManagerFactory
       for (final Transformer<WroModel> transformer : modelTransformers) {
         injector.inject(transformer);
       }
-
+      onAfterInitializeManager(manager);
       return manager;
     }
   };
@@ -131,6 +130,16 @@ public class BaseWroManagerFactory
    */
   public final WroManager create() {
     return managerInitializer.get();
+  }
+
+  /**
+   * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
+   * callbacks. Default implementation does nothing.
+   * 
+   * @param manager
+   *          initialized instance of {@link WroManager}.
+   */
+  protected void onAfterInitializeManager(final WroManager manager) {
   }
 
   /**
@@ -188,8 +197,8 @@ public class BaseWroManagerFactory
   /**
    * {@inheritDoc}
    */
-  public void registerCallback(final PropertyChangeListener callback) {
-    this.cacheChangeCallback = callback;
+  public void registerCacheChangeListener(final PropertyChangeListener cacheChangeListener) {
+    this.cacheChangeCallback = cacheChangeListener;
   }
 
 

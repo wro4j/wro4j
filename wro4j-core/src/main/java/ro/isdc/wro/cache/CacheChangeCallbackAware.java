@@ -19,5 +19,5 @@ public interface CacheChangeCallbackAware {
   /**
    * @param callback to invoke when the cache is changed.
    */
-  void registerCallback(PropertyChangeListener callback);
+  void registerCacheChangeListener(PropertyChangeListener callback);
 }

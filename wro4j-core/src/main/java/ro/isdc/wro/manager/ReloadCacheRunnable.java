@@ -37,9 +37,9 @@ public final class ReloadCacheRunnable
 
   public void run() {
     try {
-      if (wroManagerReference.get().cacheChangeCallback != null) {
+      if (wroManagerReference.get().cacheChangeListener != null) {
         // invoke cacheChangeCallback
-        wroManagerReference.get().cacheChangeCallback.propertyChange(null);
+        wroManagerReference.get().cacheChangeListener.propertyChange(null);
       }
       final WroModel model = wroManagerReference.get().modelFactory.create();
       // process groups & put update cache

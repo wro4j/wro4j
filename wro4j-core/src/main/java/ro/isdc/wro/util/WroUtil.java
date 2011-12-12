@@ -31,6 +31,11 @@ import org.w3c.dom.NodeList;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
@@ -135,15 +140,17 @@ public final class WroUtil {
    * @return true if this request support gzip encoding.
    */
   public static boolean isGzipSupported(final HttpServletRequest request) {
-    final Enumeration<String> headerNames = request.getHeaderNames();
-    if (headerNames != null) {
-      while (headerNames.hasMoreElements()) {
-        final String headerName = headerNames.nextElement();
-        final Matcher m = PATTERN_ACCEPT_ENCODING.matcher(headerName);
-        if (m.find()) {
-          final String headerValue = request.getHeader(headerName);
-          final Matcher mValue = PATTERN_GZIP.matcher(headerValue);
-          return mValue.find();
+    if (request != null) {
+      final Enumeration<String> headerNames = request.getHeaderNames();
+      if (headerNames != null) {
+        while (headerNames.hasMoreElements()) {
+          final String headerName = headerNames.nextElement();
+          final Matcher m = PATTERN_ACCEPT_ENCODING.matcher(headerName);
+          if (m.find()) {
+            final String headerValue = request.getHeader(headerName);
+            final Matcher mValue = PATTERN_GZIP.matcher(headerValue);
+            return mValue.find();
+          }
         }
       }
     }
@@ -265,6 +272,21 @@ public final class WroUtil {
     response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
     response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
     response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
+  }
+
+
+  /**
+   * A simple way to create a {@link WroModelFactory}.
+   *
+   * @param model {@link WroModel} instance to be returned by the factory.
+   */
+  public static WroModelFactory factoryFor(final WroModel model) {
+    return new WroModelFactory() {
+      public WroModel create() {
+        return model;
+      }
+      public void destroy() {}
+    };
   }
 
   public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
