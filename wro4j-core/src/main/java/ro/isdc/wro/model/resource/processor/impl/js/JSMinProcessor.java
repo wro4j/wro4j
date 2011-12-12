@@ -13,8 +13,6 @@ import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
@@ -37,7 +35,6 @@ import ro.isdc.wro.model.resource.processor.support.JSMin;
 @SupportedResourceType(ResourceType.JS)
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
   public static final String ALIAS = "jsMin";
   /**
    * {@inheritDoc}

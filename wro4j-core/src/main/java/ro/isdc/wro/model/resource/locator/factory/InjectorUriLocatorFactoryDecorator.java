@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator.factory;
 
+import org.apache.commons.lang3.Validate;
+
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
@@ -19,9 +21,7 @@ public class InjectorUriLocatorFactoryDecorator
 
   public InjectorUriLocatorFactoryDecorator(final UriLocatorFactory uriLocatorFactory, final Injector injector) {
     super(uriLocatorFactory);
-    if (injector == null) {
-      throw new IllegalArgumentException("injector cannot be null!");
-    }
+    Validate.notNull(injector);
     this.injector = injector;
   }
 

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -44,6 +45,8 @@ import ro.isdc.wro.util.WroUtil;
  */
 public final class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
+  @Inject
+  private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private UriLocatorFactory uriLocatorFactory;
   @Inject
@@ -168,11 +171,14 @@ public final class PreProcessorExecutor {
         LOG.debug("\tPreProcessing - {}", processor.getClass().getSimpleName());
         final Reader reader = new StringReader(resourceContent);
         try {
+          callbackRegistry.onBeforePreProcess();
           processor.process(resource, reader, writer);
         } catch (final IOException e) {
           if (!Context.get().getConfig().isIgnoreMissingResources()) {
             throw e;
           }
+        } finally {
+          callbackRegistry.onAfterPreProcess();
         }
       } else {
         writer.write(resourceContent);

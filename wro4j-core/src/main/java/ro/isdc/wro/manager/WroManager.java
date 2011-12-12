@@ -30,8 +30,10 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
@@ -77,7 +79,7 @@ public class WroManager
   /**
    * A callback to be notified about the cache change.
    */
-  PropertyChangeListener cacheChangeCallback;
+  PropertyChangeListener cacheChangeListener;
   /**
    * Schedules the cache update.
    */
@@ -92,9 +94,8 @@ public class WroManager
    * Rename the file name based on its original name and content.
    */
   private NamingStrategy namingStrategy;
-  /**
-   * Groups processor.
-   */
+  @Inject
+  private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private GroupsProcessor groupsProcessor;
 
@@ -118,20 +119,15 @@ public class WroManager
   /**
    * Perform processing of the uri.
    *
-   * @param request {@link HttpServletRequest} to process.
-   * @param response HttpServletResponse where to write the result content.
    * @throws IOException when any IO related problem occurs or if the request cannot be processed.
    */
   public final void process()
     throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final HttpServletResponse response = Context.get().getResponse();
-
     validate();
-    if (isProxyResourceRequest(request)) {
-      serveProxyResourceRequest(request, response.getOutputStream());
+    if (isProxyResourceRequest()) {
+      serveProxyResourceRequest();
     } else {
-      serveProcessedBundle(request, response);
+      serveProcessedBundle();
     }
   }
 
@@ -139,8 +135,9 @@ public class WroManager
   /**
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
-  private boolean isProxyResourceRequest(final HttpServletRequest request) {
-    return StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
+  private boolean isProxyResourceRequest() {
+    final HttpServletRequest request = Context.get().getRequest();
+    return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
 
@@ -153,13 +150,15 @@ public class WroManager
    * Write to stream the content of the processed resource bundle.
    *
    * @param model the model used to build stream.
-   * @param request {@link HttpServletRequest} for this request cycle.
-   * @param response {@link HttpServletResponse} used to set content type.
    */
-  private void serveProcessedBundle(final HttpServletRequest request, final HttpServletResponse response)
+  private void serveProcessedBundle()
     throws IOException {
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("serveProcessedBundle");
+
+    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletResponse response = Context.get().getResponse();
+
     final OutputStream os = response.getOutputStream();
     try {
       // find names & type
@@ -169,7 +168,7 @@ public class WroManager
       if (groupName == null || type == null) {
         throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
       }
-      intAggregatedFolderPath(request, type);
+      initAggregatedFolderPath(request, type);
 
       // reschedule cache & model updates
       final WroConfiguration config = Context.get().getConfig();
@@ -224,7 +223,7 @@ public class WroManager
   /**
    * Set the aggregatedFolderPath if required.
    */
-  private void intAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
+  private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
     if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
@@ -279,7 +278,9 @@ public class WroManager
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
       // find processed result for a group
+
       final WroModel model = modelFactory.create();
+
       if (model == null) {
         throw new WroRuntimeException("Cannot build a valid wro model");
       }
@@ -318,8 +319,11 @@ public class WroManager
    * @param outputStream where the stream will be written.
    * @throws IOException if no stream could be resolved.
    */
-  private void serveProxyResourceRequest(final HttpServletRequest request, final OutputStream outputStream)
+  private void serveProxyResourceRequest()
     throws IOException {
+    final HttpServletRequest request = Context.get().getRequest();
+    final OutputStream outputStream = Context.get().getResponse().getOutputStream();
+
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
@@ -353,6 +357,7 @@ public class WroManager
    */
   public final void onModelPeriodChanged(final long period) {
     LOG.info("onModelPeriodChanged with value {} has been triggered!", period);
+    //trigger model destroy
     getModelFactory().destroy();
     modelSchedulerHelper.scheduleWithPeriod(period);
   }
@@ -393,8 +398,8 @@ public class WroManager
   /**
    * {@inheritDoc}
    */
-  public final void registerCallback(final PropertyChangeListener callback) {
-    this.cacheChangeCallback = callback;
+  public final void registerCacheChangeListener(final PropertyChangeListener cacheChangeListener) {
+    this.cacheChangeListener = cacheChangeListener;
   }
 
 
@@ -421,8 +426,18 @@ public class WroManager
    */
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
-    // decorate with useful features
-    this.modelFactory = modelFactory;
+    // decorate with callback registry call
+    this.modelFactory = new WroModelFactoryDecorator(modelFactory) {
+      @Override
+      public WroModel create() {
+        callbackRegistry.onBeforeModelCreated();
+        try {
+          return super.create();
+        } finally {
+          callbackRegistry.onAfterModelCreated();
+        }
+      }
+    };
     return this;
   }
 
@@ -505,12 +520,15 @@ public class WroManager
     return this.namingStrategy;
   }
 
-
-  /**
-   * @return the groupsProcessor
-   */
   GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
+  }
+
+  /**
+   * @return the holder of registered callbacks. Use it to register custom callbacks.
+   */
+  public LifecycleCallbackRegistry getCallbackRegistry() {
+    return callbackRegistry;
   }
 
 
@@ -522,7 +540,6 @@ public class WroManager
     this.namingStrategy = namingStrategy;
     return this;
   }
-
 
   /**
    * {@inheritDoc}
