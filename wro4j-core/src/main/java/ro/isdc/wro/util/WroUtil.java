@@ -33,9 +33,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**

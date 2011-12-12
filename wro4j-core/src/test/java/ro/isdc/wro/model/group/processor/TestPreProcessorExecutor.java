@@ -3,6 +3,14 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.Assert;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -14,19 +22,13 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.Assert;
 
 
 /**
@@ -47,9 +49,9 @@ public class TestPreProcessorExecutor {
   }
 
 
-  private WroManagerFactory createWroManager(final ResourcePreProcessor... preProcessors) {
+  private WroManagerFactory createWroManager(final ResourceProcessor... preProcessors) {
     final SimpleProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
-    for (final ResourcePreProcessor resourcePreProcessor : preProcessors) {
+    for (final ResourceProcessor resourcePreProcessor : preProcessors) {
       processorsFactory.addPreProcessor(resourcePreProcessor);
     }
     final BaseWroManagerFactory wroManagerFactory = new BaseWroManagerFactory();
@@ -61,7 +63,7 @@ public class TestPreProcessorExecutor {
   /**
    * @param wroManagerFactory
    */
-  private void initExecutor(final ResourcePreProcessor... preProcessors) {
+  private void initExecutor(final ResourceProcessor... preProcessors) {
     final WroManagerFactory wroManagerFactory = createWroManager(preProcessors);
     final Injector injector = new Injector(wroManagerFactory.create());
     executor = new PreProcessorExecutor();
@@ -105,8 +107,8 @@ public class TestPreProcessorExecutor {
   }
 
 
-  private ResourcePreProcessor createProcessorWhichFails() {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createProcessorWhichFails() {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
         LOG.debug("executing failing processor...");

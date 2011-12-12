@@ -6,7 +6,7 @@ package ro.isdc.wro.cache;
 
 import java.beans.PropertyChangeListener;
 
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
 /**

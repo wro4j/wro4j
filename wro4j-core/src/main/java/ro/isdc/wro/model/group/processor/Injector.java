@@ -67,7 +67,7 @@ public final class Injector {
   private void initMap() {
     map.put(PreProcessorExecutor.class, preProcessorExecutor);
     map.put(GroupsProcessor.class, groupsProcessor);
-    map.put(UriLocatorFactory.class, uriLocatorFactory);
+    map.put(ResourceLocatorFactory.class, resourceLocatorFactory);
     map.put(ProcessorsFactory.class, processorsFactory);
     map.put(NamingStrategy.class, wroManager.getNamingStrategy());
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);

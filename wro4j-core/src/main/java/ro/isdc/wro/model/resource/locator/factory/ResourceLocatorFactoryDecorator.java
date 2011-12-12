@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator.factory;
 
+import org.apache.commons.lang3.Validate;
+
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 
 /**
@@ -17,9 +19,7 @@ public class ResourceLocatorFactoryDecorator
   private final ResourceLocatorFactory decorated;
 
   public ResourceLocatorFactoryDecorator(final ResourceLocatorFactory decorated) {
-    if (decorated == null) {
-      throw new IllegalArgumentException("resourceLocatorFactory cannot be null!");
-    }
+    Validate.notNull(decorated);
     this.decorated = decorated;
   }
 
