@@ -75,15 +75,32 @@ public class TestLifecycleCallbackRegistry {
   @Test
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
-    final LifecycleCallback simpleCallback = Mockito.mock(LifecycleCallback.class);
+    final LifecycleCallback simpleCallback = Mockito.spy(new LifecycleCallbackSupport());
+    
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeModelCreated();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterModelCreated();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePreProcess();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterPreProcess();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePostProcess();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterPostProcess();
+    
 
     registry.registerCallback(failingCallback);
     registry.registerCallback(simpleCallback);
 
     registry.onBeforeModelCreated();
+    registry.onAfterModelCreated();
+    registry.onBeforePreProcess();
+    registry.onAfterPreProcess();
+    registry.onBeforePostProcess();
+    registry.onAfterPostProcess();
 
     Mockito.verify(simpleCallback).onBeforeModelCreated();
+    Mockito.verify(simpleCallback).onAfterModelCreated();
+    Mockito.verify(simpleCallback).onBeforePreProcess();
+    Mockito.verify(simpleCallback).onAfterPreProcess();
+    Mockito.verify(simpleCallback).onBeforePostProcess();
+    Mockito.verify(simpleCallback).onAfterPostProcess();
   }
 
   /**

@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.manager.callback;
 
+import org.apache.commons.lang3.Validate;
+
 
 
 /**
@@ -17,6 +19,7 @@ public class LifecycleCallbackDecorator
   private final LifecycleCallback decorated;
 
   public LifecycleCallbackDecorator(final LifecycleCallback decorated) {
+    Validate.notNull(decorated);
     this.decorated = decorated;
   }
 
