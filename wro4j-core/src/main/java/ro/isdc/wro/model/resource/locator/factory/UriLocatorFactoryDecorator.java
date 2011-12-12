@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator.factory;
 
+import org.apache.commons.lang3.Validate;
+
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 /**
@@ -16,9 +18,7 @@ public class UriLocatorFactoryDecorator
   private final UriLocatorFactory uriLocatorFactory;
 
   public UriLocatorFactoryDecorator(final UriLocatorFactory uriLocatorFactory) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalArgumentException("uriLocatorFactory cannot be null!");
-    }
+    Validate.notNull(uriLocatorFactory);
     this.uriLocatorFactory = uriLocatorFactory;
   }
 

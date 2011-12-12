@@ -97,8 +97,9 @@ public final class Injector {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject cannot be applied field of type: "
-              + field.getType());
+            final String message = "@Inject cannot be applied to field of type: " + field.getType();
+            LOG.error(message + ". Supported types are: {}", map.keySet());
+            throw new WroRuntimeException(message);
           }
         }
       }
@@ -148,7 +149,7 @@ public final class Injector {
       return accept;
     } finally {
       if (accept) {
-        LOG.debug("\t[OK] Injected field of type: {} for object of type: {}", field.getType().getSimpleName(), object.getClass().getSimpleName());
+        LOG.debug("\t[OK] Injected {} -> {}", object.getClass().getName(), field.getType().getSimpleName());
       }
     }
   }
