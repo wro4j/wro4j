@@ -119,7 +119,7 @@ public class BaseWroManagerFactory
       for (final Transformer<WroModel> transformer : modelTransformers) {
         injector.inject(transformer);
       }
-
+      onAfterInitializeManager(manager);
       return manager;
     }
   };
@@ -130,6 +130,16 @@ public class BaseWroManagerFactory
    */
   public final WroManager create() {
     return managerInitializer.get();
+  }
+
+  /**
+   * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
+   * callbacks. Default implementation does nothing.
+   * 
+   * @param manager
+   *          initialized instance of {@link WroManager}.
+   */
+  protected void onAfterInitializeManager(final WroManager manager) {
   }
 
   /**

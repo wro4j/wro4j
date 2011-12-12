@@ -33,6 +33,7 @@ import ro.isdc.wro.http.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
@@ -278,10 +279,7 @@ public class WroManager
       // process groups & put result in the cache
       // find processed result for a group
 
-      //TODO update the context
-      callbackRegistry.onBeforeModelCreated();
       final WroModel model = modelFactory.create();
-      callbackRegistry.onAfterModelCreated();
 
       if (model == null) {
         throw new WroRuntimeException("Cannot build a valid wro model");
@@ -428,8 +426,18 @@ public class WroManager
    */
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
-    // decorate with useful features
-    this.modelFactory = modelFactory;
+    // decorate with callback registry call
+    this.modelFactory = new WroModelFactoryDecorator(modelFactory) {
+      @Override
+      public WroModel create() {
+        callbackRegistry.onBeforeModelCreated();
+        try {
+          return super.create();
+        } finally {
+          callbackRegistry.onAfterModelCreated();
+        }
+      }
+    };
     return this;
   }
 
