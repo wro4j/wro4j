@@ -47,6 +47,7 @@ public abstract class AbstractWro4jTag extends TagSupport {
       throw jspTagException("The name parameter is mandatory");
     }
     try {
+      pageContext.getServletContext().get
       final HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
       //createRenderer(tags).render(pageContext.getOut(), name, request.getContextPath());
 //    } catch (final IOException e) {
