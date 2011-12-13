@@ -51,12 +51,18 @@ public class LifecycleCallbackSupport
   /**
    * {@inheritDoc}
    */
-  public void onBeforeProcess() {
+  public void onBeforeMerge() {
   }
   
   /**
    * {@inheritDoc}
    */
-  public void onAfterProcess() {
+  public void onProcessingComplete() {
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterMerge() {
   }
 }

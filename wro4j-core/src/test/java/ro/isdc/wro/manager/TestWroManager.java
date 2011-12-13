@@ -37,6 +37,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -71,7 +72,12 @@ public class TestWroManager {
    */
   private static final class WroManagerProcessor
     implements ResourcePreProcessor {
-    private final WroManager manager = new BaseWroManagerFactory().create();
+    private final WroManager manager = new BaseWroManagerFactory() {
+      @Override
+      protected void onAfterInitializeManager(WroManager manager) {
+        manager.getCallbackRegistry().registerCallback(new PerformanceLoggerCallback());
+      };
+    }.create();
 
 
     public void process(final Resource resource, final Reader reader, final Writer writer)
