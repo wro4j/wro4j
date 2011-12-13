@@ -143,30 +143,4 @@ public class ProcessorsUtils {
     map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
     map.put(MultiLineCommentStripperProcessor.ALIAS, new MultiLineCommentStripperProcessor());
   }
-  
-  /**
-   * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
-   * doesn't require the minimization.
-   */
-  public static ResourceProcessor decorateWithMinimizeAware(final ResourceProcessor processor) {
-    return new ResourceProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
-        if (applyProcessor) {
-          LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
-          try {
-            processor.process(resource, reader, writer);
-          } catch (final IOException e) {
-            if (!Context.get().getConfig().isIgnoreMissingResources()) {
-              throw e;
-            }
-          }
-        } else {
-          IOUtils.copy(reader, writer);
-          LOG.debug("skipped processing on resource: {}", resource);
-        }
-      }
-    };
-  }
 }

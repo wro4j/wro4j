@@ -28,7 +28,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -44,7 +44,7 @@ public class GroupsProcessor {
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-
+  
 
   /**
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
@@ -52,27 +52,34 @@ public class GroupsProcessor {
   public String process(final Group group, final ResourceType type, final boolean minimize) {
     Validate.notNull(group);
     Validate.notNull(type);
-
-    // TODO find a way to reuse contents from cache
-    final Group filteredGroup = group.collectResourcesOfType(type);
     try {
-      callbackRegistry.onBeforeMerge();
-      // Merge
-      final String result = preProcessorExecutor.processAndMerge(filteredGroup, minimize);
-
-      callbackRegistry.onAfterMerge();
-      
-      // postProcessing
-      final String postProcessedResult = doPostProcess(filteredGroup, type, result, minimize);
-      
-      callbackRegistry.onProcessingComplete();
-      return postProcessedResult;
+      final Group filteredGroup = group.collectResourcesOfType(type);
+      final String result = decorateWithMergeCallback(preProcessorExecutor).processAndMerge(filteredGroup, minimize);
+      return doPostProcess(group, type, result, minimize);
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources", e);
+    } finally {
+      callbackRegistry.onProcessingComplete();
     }
   }
-
-
+  
+  /**
+   * @return decorated {@link PreProcessorExecutor} which add callback calls.
+   */
+  private PreProcessorExecutor decorateWithMergeCallback(final PreProcessorExecutor executor) {
+    return new PreProcessorExecutor() {
+      @Override
+      public String processAndMerge(final Group group, final boolean minimize) throws IOException {
+        callbackRegistry.onBeforeMerge();
+        try {
+          return executor.processAndMerge(group, minimize);
+        } finally {
+          callbackRegistry.onAfterMerge();
+        }
+      }
+    };
+  }
+  
   /**
    * Perform postProcessing.
    * 
@@ -107,18 +114,19 @@ public class GroupsProcessor {
     final String output = applyPostProcessors(mergedResource, processors, content);
     return output;
   }
-
-
+  
   /**
    * Apply resourcePostProcessors.
-   *
-   * @param processors a collection of processors to apply on the content from the supplied writer.
-   * @param content to process with all postProcessors.
+   * 
+   * @param processors
+   *          a collection of processors to apply on the content from the supplied writer.
+   * @param content
+   *          to process with all postProcessors.
    * @return the post processed content.
    */
   private String applyPostProcessors(final Resource mergedResource, final Collection<ResourceProcessor> processors,
     final String content)
-    throws IOException {
+      throws IOException {
     if (processors.isEmpty()) {
       return content;
     }
@@ -129,16 +137,33 @@ public class GroupsProcessor {
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
-
-      //TODO update callbackContext
-      callbackRegistry.onBeforePostProcess();
-      processor.process(mergedResource, input, output);
-      callbackRegistry.onAfterPostProcess();
+      
+      decorateWithPostProcessCallback(processor).process(mergedResource, input, output);
+  
 
       input = new StringReader(output.toString());
       stopWatch.stop();
     }
     LOG.debug(stopWatch.prettyPrint());
     return output.toString();
+  }
+  
+
+  /**
+   * @return a decorated postProcessor which invokes callback methods.
+   */
+  private ResourceProcessor decorateWithPostProcessCallback(final ResourceProcessor processor) {
+    return new ResourceProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        // TODO update callbackContext
+        callbackRegistry.onBeforePostProcess();
+        try {
+          processor.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPostProcess();
+        }        
+      }
+    };
   }
 }
