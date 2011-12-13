@@ -43,7 +43,7 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  */
-public final class PreProcessorExecutor {
+public class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
@@ -55,56 +55,72 @@ public final class PreProcessorExecutor {
 
   /**
    * Apply preProcessors on resources and merge them.
-   *
-   * @param resources what are the resources to merge.
-   * @param minimize whether minimize aware processors must be applied or not.
+   * 
+   * @param resources
+   *          what are the resources to merge.
+   * @param minimize
+   *          whether minimize aware processors must be applied or not.
    * @return preProcessed merged content.
-   * @throws IOException if IO error occurs while merging.
+   * @throws IOException
+   *           if IO error occurs while merging.
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
-    throws IOException {
+      throws IOException {
     Validate.notNull(resources);
-
     final StringBuffer result = new StringBuffer();
-
-    final boolean isParallel = Context.get().getConfig().isParallelPreprocessing();
-    final int availableProcessors = Runtime.getRuntime().availableProcessors();
-    if (isParallel && resources.size() > 1 && availableProcessors > 1) {
-
-      final List<Callable<String>> callables = new ArrayList<Callable<String>>();
-      for (final Resource resource : resources) {
-        callables.add(new Callable<String>() {
-          public String call()
-            throws Exception {
-            return processSingleResource(resource, resources, minimize);
-          }
-        });
-      }
-      final ExecutorService exec = getExecutorService();
-      final List<Future<String>> futures = new ArrayList<Future<String>>();
-      for (final Callable<String> callable : callables) {
-        futures.add(exec.submit(callable));
-      }
-
-      for (final Future<String> future : futures) {
-        try {
-          result.append(future.get());
-        } catch (final Exception e) {
-          // propagate original cause
-          final Throwable cause = e.getCause();
-          if (cause instanceof WroRuntimeException) {
-            throw (WroRuntimeException)cause;
-          } else if (cause instanceof IOException) {
-            throw (IOException)cause;
-          } else {
-            throw new WroRuntimeException("", e.getCause());
-          }
-        }
-      }
+    if (shouldRunInParallel(resources)) {
+      result.append(runInParallel(resources, minimize));
     } else {
       for (final Resource resource : resources) {
         LOG.debug("\tmerging resource: {}", resource);
         result.append(processSingleResource(resource, resources, minimize));
+      }
+    }
+    return result.toString();
+  }
+
+  private boolean shouldRunInParallel(final List<Resource> resources) {
+    final boolean isParallel = Context.get().getConfig().isParallelPreprocessing();
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+    return isParallel && resources.size() > 1 && availableProcessors > 1;
+  }
+
+  /**
+   * runs the pre processors in parallel.
+   * 
+   * @return merged and pre processed content.
+   */
+  private String runInParallel(final List<Resource> resources, final boolean minimize)
+      throws IOException {
+    final StringBuffer result = new StringBuffer();
+    final List<Callable<String>> callables = new ArrayList<Callable<String>>();
+    for (final Resource resource : resources) {
+      callables.add(new Callable<String>() {
+        public String call()
+            throws Exception {
+          return processSingleResource(resource, resources, minimize);
+        }
+      });
+    }
+    final ExecutorService exec = getExecutorService();
+    final List<Future<String>> futures = new ArrayList<Future<String>>();
+    for (final Callable<String> callable : callables) {
+      futures.add(exec.submit(callable));
+    }
+    
+    for (final Future<String> future : futures) {
+      try {
+        result.append(future.get());
+      } catch (final Exception e) {
+        // propagate original cause
+        final Throwable cause = e.getCause();
+        if (cause instanceof WroRuntimeException) {
+          throw (WroRuntimeException) cause;
+        } else if (cause instanceof IOException) {
+          throw (IOException) cause;
+        } else {
+          throw new WroRuntimeException("Problem during parallel pre processing", e.getCause());
+        }
       }
     }
     return result.toString();
@@ -143,23 +159,6 @@ public final class PreProcessorExecutor {
   }
 
   /**
-   * @return a decorated preProcessor which invokes callback methods.
-   */
-  private ResourcePreProcessor decorateWithCallback(final ResourcePreProcessor processor) {
-    return new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        callbackRegistry.onBeforePreProcess();
-        try {
-          processor.process(resource, reader, writer);
-        } finally {
-          callbackRegistry.onAfterPreProcess();
-        }        
-      }
-    };
-  }
-
-  /**
    * Apply a list of preprocessors on a resource.
    *
    * @param resource the {@link Resource} on which processors will be applied
@@ -180,7 +179,7 @@ public final class PreProcessorExecutor {
       stopWatch.start("Processor: " + processor.getClass().getSimpleName());
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
-      decorateWithCallback(ProcessorsUtils.decorateWithMinimizeAware(processor)).process(resource, reader, writer);
+      decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
       resourceContent = writer.toString();
       stopWatch.stop();
     }
@@ -211,5 +210,48 @@ public final class PreProcessorExecutor {
         throw e;
       }
     }
+  }
+
+  /**
+   * @return a decorated preProcessor which invokes callback methods.
+   */
+  private ResourcePreProcessor decorateWithPreProcessCallback(final ResourcePreProcessor processor) {
+    return new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        callbackRegistry.onBeforePreProcess();
+        try {
+          processor.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPreProcess();
+        }        
+      }
+    };
+  }
+
+  /**
+   * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
+   * doesn't require the minimization.
+   */
+  private ResourcePreProcessor decorateWithMinimizeAware(final ResourcePreProcessor processor) {
+    return new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
+        if (applyProcessor) {
+          LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
+          try {
+            processor.process(resource, reader, writer);
+          } catch (final IOException e) {
+            if (!Context.get().getConfig().isIgnoreMissingResources()) {
+              throw e;
+            }
+          }
+        } else {
+          IOUtils.copy(reader, writer);
+          LOG.debug("skipped processing on resource: {}", resource);
+        }
+      }
+    };
   }
 }
