@@ -8,9 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -20,7 +18,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -54,26 +51,19 @@ public class GroupsProcessor {
     Validate.notNull(group);
     Validate.notNull(type);
 
-    final StopWatch stopWatch = new StopWatch();
-    stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
-    final List<Resource> filteredResources = getFilteredResources(group, type);
+    final Group filteredGroup = group.collectResourcesOfType(type);
     try {
-      stopWatch.stop();
-      stopWatch.start("pre process and merge");
-      
-      callbackRegistry.onBeforeProcess();
+      callbackRegistry.onBeforeMerge();
       // Merge
-      final String result = preProcessorExecutor.processAndMerge(filteredResources, minimize);
-      stopWatch.stop();
-      stopWatch.start("post process");
+      final String result = preProcessorExecutor.processAndMerge(filteredGroup.getResources(), minimize);
+      
+      callbackRegistry.onAfterMerge();
+      
       // postProcessing
-      final String postProcessedResult = applyPostProcessors(type, result, minimize);
+      final String postProcessedResult = doPostProcess(type, result, minimize);
       
-      callbackRegistry.onAfterProcess();
-      
-      stopWatch.stop();
-      LOG.debug(stopWatch.prettyPrint());
+      callbackRegistry.onProcessingComplete();
       return postProcessedResult;
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources", e);
@@ -89,7 +79,7 @@ public class GroupsProcessor {
    * @param minimize whether minimize aware post processor must be applied.
    * @return the post processed contents.
    */
-  private String applyPostProcessors(final ResourceType resourceType, final String content, final boolean minimize)
+  private String doPostProcess(final ResourceType resourceType, final String content, final boolean minimize)
     throws IOException {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
@@ -136,25 +126,5 @@ public class GroupsProcessor {
     }
     LOG.debug(stopWatch.prettyPrint());
     return output.toString();
-  }
-
-  /**
-   * @param groups list of groups where to search resources to filter.
-   * @param type of resources to collect.
-   * @return a list of resources of provided type.
-   */
-  private final List<Resource> getFilteredResources(final Group group, final ResourceType type) {
-    // retain only resources of needed type
-    final List<Resource> filteredResources = new ArrayList<Resource>();
-    for (final Resource resource : group.getResources()) {
-      if (type == resource.getType()) {
-        if (filteredResources.contains(resource)) {
-          LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
-        } else {
-          filteredResources.add(resource);
-        }
-      }
-    }
-    return filteredResources;
   }
 }

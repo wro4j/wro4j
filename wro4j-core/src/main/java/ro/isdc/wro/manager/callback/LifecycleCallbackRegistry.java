@@ -125,12 +125,22 @@ public class LifecycleCallbackRegistry
   /**
    * {@inheritDoc}
    */
-  public void onBeforeProcess() {
+  public void onBeforeMerge() {
     for (final LifecycleCallback callback : callbacks) {
       try {
-        callback.onBeforeProcess();
+        callback.onBeforeMerge();
       } catch (final Exception e) {
-        LOG.error("Problem invoking onBeforeProcess", e);
+        LOG.error("Problem invoking onBeforeMerge", e);
+      }
+    }    
+  }
+  
+  public void onAfterMerge() {
+    for (final LifecycleCallback callback : callbacks) {
+      try {
+        callback.onAfterMerge();
+      } catch (final Exception e) {
+        LOG.error("Problem invoking onAfterMerge", e);
       }
     }    
   }
@@ -138,13 +148,15 @@ public class LifecycleCallbackRegistry
   /**
    * {@inheritDoc}
    */
-  public void onAfterProcess() {
+  public void onProcessingComplete() {
     for (final LifecycleCallback callback : callbacks) {
       try {
-        callback.onAfterProcess();
+        callback.onProcessingComplete();
       } catch (final Exception e) {
-        LOG.error("Problem invoking onAfterProcess", e);
+        LOG.error("Problem invoking onProcessingComplete", e);
       }
     }    
   }
+  
+  
 }

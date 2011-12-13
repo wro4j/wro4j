@@ -68,14 +68,21 @@ public class LifecycleCallbackDecorator
   /**
    * {@inheritDoc}
    */  
-  public void onBeforeProcess() {
-    decorated.onBeforeProcess();
+  public void onBeforeMerge() {
+    decorated.onBeforeMerge();
   }
 
   /**
    * {@inheritDoc}
+   */  
+  public void onAfterMerge() {
+    decorated.onAfterMerge();
+  }
+  
+  /**
+   * {@inheritDoc}
    */
-  public void onAfterProcess() {
-    decorated.onAfterProcess();
+  public void onProcessingComplete() {
+    decorated.onProcessingComplete();
   }
 }

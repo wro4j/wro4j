@@ -43,12 +43,16 @@ public interface LifecycleCallback {
   void onAfterPostProcess();
   
   /**
-   * Called before the first preProcessor is used.
+   * Called before resources are merged and before any processing is applied.
    */
-  void onBeforeProcess();
+  void onBeforeMerge();
   
   /**
-   * Called after the last postProcessor is used.
+   * Called after all resources are merged and the preProcessing is completed.
    */
-  void onAfterProcess();
+  void onAfterMerge();
+  /**
+   * Called after all postProcessors are applied and overall processing is complete.
+   */
+  void onProcessingComplete();
 }
