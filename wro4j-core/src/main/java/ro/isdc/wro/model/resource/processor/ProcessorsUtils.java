@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
@@ -144,8 +148,8 @@ public class ProcessorsUtils {
    * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
    * doesn't require the minimization.
    */
-  public static ResourcePreProcessor decorateWithMinimizeAware(final ResourcePreProcessor processor) {
-    return new ResourcePreProcessor() {
+  public static ResourceProcessor decorateWithMinimizeAware(final ResourceProcessor processor) {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);

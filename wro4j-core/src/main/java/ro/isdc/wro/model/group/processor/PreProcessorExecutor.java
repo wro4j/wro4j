@@ -148,8 +148,8 @@ public final class PreProcessorExecutor {
   /**
    * @return a decorated preProcessor which invokes callback methods.
    */
-  private ResourcePreProcessor decorateWithCallback(final ResourcePreProcessor processor) {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor decorateWithCallback(final ResourceProcessor processor) {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         callbackRegistry.onBeforePreProcess();

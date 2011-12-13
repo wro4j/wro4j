@@ -18,6 +18,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -59,13 +60,10 @@ public class GroupsProcessor {
       // Merge
       final String result = preProcessorExecutor.processAndMerge(filteredGroup, minimize);
 
-      // postProcessing
-      final String postProcessedResult = doPostProcess(filteredGroup, type, result, minimize);
-      
       callbackRegistry.onAfterMerge();
       
       // postProcessing
-      final String postProcessedResult = doPostProcess(type, result, minimize);
+      final String postProcessedResult = doPostProcess(filteredGroup, type, result, minimize);
       
       callbackRegistry.onProcessingComplete();
       return postProcessedResult;
@@ -77,14 +75,18 @@ public class GroupsProcessor {
 
   /**
    * Perform postProcessing.
-   *
-   * @param resourceType the type of the resources to process. This value will never be null.
-   * @param content the merged content of all resources which were pre-processed.
-   * @param minimize whether minimize aware post processor must be applied.
+   * 
+   * @param resourceType
+   *          the type of the resources to process. This value will never be null.
+   * @param content
+   *          the merged content of all resources which were pre-processed.
+   * @param minimize
+   *          whether minimize aware post processor must be applied.
    * @return the post processed contents.
    */
-  private String doPostProcess(final ResourceType resourceType, final String content, final boolean minimize)
-    throws IOException {
+  private String doPostProcess(final Group group, final ResourceType resourceType, final String content,
+      final boolean minimize)
+      throws IOException {
     Validate.notNull(content);
     final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
