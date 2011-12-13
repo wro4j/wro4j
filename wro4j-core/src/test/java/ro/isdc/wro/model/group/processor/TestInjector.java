@@ -40,7 +40,7 @@ public class TestInjector {
   }
   
   @Test(expected=WroRuntimeException.class)
-  public void cannotNotInjectUnsupportedType() {
+  public void cannotInjectUnsupportedType() {
     initializeValidInjector();
     Object inner = new Object() {
       @Inject

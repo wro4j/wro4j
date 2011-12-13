@@ -121,4 +121,30 @@ public class LifecycleCallbackRegistry
       }
     }
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onBeforeProcess() {
+    for (final LifecycleCallback callback : callbacks) {
+      try {
+        callback.onBeforeProcess();
+      } catch (final Exception e) {
+        LOG.error("Problem invoking onBeforeProcess", e);
+      }
+    }    
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterProcess() {
+    for (final LifecycleCallback callback : callbacks) {
+      try {
+        callback.onAfterProcess();
+      } catch (final Exception e) {
+        LOG.error("Problem invoking onAfterProcess", e);
+      }
+    }    
+  }
 }

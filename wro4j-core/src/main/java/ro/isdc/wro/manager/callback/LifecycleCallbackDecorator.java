@@ -64,4 +64,18 @@ public class LifecycleCallbackDecorator
   public void onAfterPostProcess() {
     decorated.onAfterPostProcess();
   }
+
+  /**
+   * {@inheritDoc}
+   */  
+  public void onBeforeProcess() {
+    decorated.onBeforeProcess();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterProcess() {
+    decorated.onAfterProcess();
+  }
 }
