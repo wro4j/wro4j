@@ -145,6 +145,9 @@ public class TestLifecycleCallbackRegistry {
 
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
+    Mockito.verify(callback).onBeforeProcess();
+    Mockito.verify(callback).onAfterProcess();
+    
     Mockito.verifyNoMoreInteractions(callback);
   }
 }
