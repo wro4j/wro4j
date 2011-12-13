@@ -48,8 +48,6 @@ public class GroupsProcessor {
   private transient PreProcessorExecutor preProcessorExecutor;
 
   /**
-   * {@inheritDoc}
-   * <p>
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
   public String process(final Group group, final ResourceType type, final boolean minimize) {
@@ -63,12 +61,17 @@ public class GroupsProcessor {
     try {
       stopWatch.stop();
       stopWatch.start("pre process and merge");
+      
+      callbackRegistry.onBeforeProcess();
       // Merge
       final String result = preProcessorExecutor.processAndMerge(filteredResources, minimize);
       stopWatch.stop();
       stopWatch.start("post process");
       // postProcessing
       final String postProcessedResult = applyPostProcessors(type, result, minimize);
+      
+      callbackRegistry.onAfterProcess();
+      
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
       return postProcessedResult;
