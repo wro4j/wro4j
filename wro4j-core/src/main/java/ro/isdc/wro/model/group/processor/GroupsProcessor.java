@@ -18,7 +18,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -53,27 +52,22 @@ public class GroupsProcessor {
     Validate.notNull(group);
     Validate.notNull(type);
 
-    final StopWatch stopWatch = new StopWatch();
-    stopWatch.start("filter resources");
     // TODO find a way to reuse contents from cache
     final Group filteredGroup = group.collectResourcesOfType(type);
     try {
-      stopWatch.stop();
-      stopWatch.start("pre process and merge");
-      
-      callbackRegistry.onBeforeProcess();
+      callbackRegistry.onBeforeMerge();
       // Merge
       final String result = preProcessorExecutor.processAndMerge(filteredGroup, minimize);
-      stopWatch.stop();
 
-      stopWatch.start("post process");
       // postProcessing
-      final String postProcessedResult = applyPostProcessors(filteredGroup, type, result, minimize);
+      final String postProcessedResult = doPostProcess(filteredGroup, type, result, minimize);
       
-      callbackRegistry.onAfterProcess();
+      callbackRegistry.onAfterMerge();
       
-      stopWatch.stop();
-      LOG.debug(stopWatch.prettyPrint());
+      // postProcessing
+      final String postProcessedResult = doPostProcess(type, result, minimize);
+      
+      callbackRegistry.onProcessingComplete();
       return postProcessedResult;
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources", e);
@@ -89,8 +83,7 @@ public class GroupsProcessor {
    * @param minimize whether minimize aware post processor must be applied.
    * @return the post processed contents.
    */
-  private String applyPostProcessors(final Group group, final ResourceType resourceType, final String content,
-    final boolean minimize)
+  private String doPostProcess(final ResourceType resourceType, final String content, final boolean minimize)
     throws IOException {
     Validate.notNull(content);
     final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();

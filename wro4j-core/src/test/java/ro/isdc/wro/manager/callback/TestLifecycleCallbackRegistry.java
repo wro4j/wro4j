@@ -71,11 +71,14 @@ public class TestLifecycleCallbackRegistry {
     registry.onAfterPostProcess();
     Mockito.verify(callback).onAfterPostProcess();
     
-    registry.onBeforeProcess();
-    Mockito.verify(callback).onBeforeProcess();
+    registry.onBeforeMerge();
+    Mockito.verify(callback).onBeforeMerge();
     
-    registry.onAfterProcess();
-    Mockito.verify(callback).onAfterProcess();
+    registry.onAfterMerge();
+    Mockito.verify(callback).onAfterMerge();
+    
+    registry.onProcessingComplete();
+    Mockito.verify(callback).onProcessingComplete();
   }
 
   @Test
@@ -89,8 +92,9 @@ public class TestLifecycleCallbackRegistry {
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterPreProcess();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePostProcess();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterPostProcess();
-    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeProcess();
-    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterProcess();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeMerge();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterMerge();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onProcessingComplete();
 
     registry.registerCallback(failingCallback);
     registry.registerCallback(simpleCallback);
@@ -101,8 +105,9 @@ public class TestLifecycleCallbackRegistry {
     registry.onAfterPreProcess();
     registry.onBeforePostProcess();
     registry.onAfterPostProcess();
-    registry.onBeforeProcess();
-    registry.onAfterProcess();
+    registry.onBeforeMerge();
+    registry.onAfterMerge();
+    registry.onProcessingComplete();
 
     Mockito.verify(simpleCallback).onBeforeModelCreated();
     Mockito.verify(simpleCallback).onAfterModelCreated();
@@ -110,8 +115,9 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(simpleCallback).onAfterPreProcess();
     Mockito.verify(simpleCallback).onBeforePostProcess();
     Mockito.verify(simpleCallback).onAfterPostProcess();
-    Mockito.verify(simpleCallback).onBeforeProcess();
-    Mockito.verify(simpleCallback).onAfterProcess();
+    Mockito.verify(simpleCallback).onBeforeMerge();
+    Mockito.verify(simpleCallback).onAfterMerge();
+    Mockito.verify(simpleCallback).onProcessingComplete();
   }
 
   /**
@@ -145,8 +151,9 @@ public class TestLifecycleCallbackRegistry {
 
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
-    Mockito.verify(callback).onBeforeProcess();
-    Mockito.verify(callback).onAfterProcess();
+    Mockito.verify(callback).onBeforeMerge();
+    Mockito.verify(callback).onAfterMerge();
+    Mockito.verify(callback).onProcessingComplete();
     
     Mockito.verifyNoMoreInteractions(callback);
   }

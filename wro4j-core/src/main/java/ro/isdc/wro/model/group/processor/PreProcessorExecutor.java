@@ -145,10 +145,24 @@ public final class PreProcessorExecutor {
     return applyPreProcessors(resource, resources, processors);
   }
 
+  /**
+   * @return a decorated preProcessor which invokes callback methods.
+   */
+  private ResourcePreProcessor decorateWithCallback(final ResourcePreProcessor processor) {
+    return new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        callbackRegistry.onBeforePreProcess();
+        try {
+          processor.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPreProcess();
+        }        
+      }
+    };
+  }
 
   /**
-   * TODO: refactor this method.
-   * <p/>
    * Apply a list of preprocessors on a resource.
    *
    * @param resource the {@link Resource} on which processors will be applied
@@ -166,27 +180,10 @@ public final class PreProcessorExecutor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
-      stopWatch.start("Using " + processor.getClass().getSimpleName());
+      stopWatch.start("Processor: " + processor.getClass().getSimpleName());
       writer = new StringWriter();
-      // skip minimize validation if resource doesn't want to be minimized
-      final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
-      if (applyProcessor) {
-        LOG.debug("\tPreProcessing - {}", processor.getClass().getSimpleName());
-        final Reader reader = new StringReader(resourceContent);
-        try {
-          callbackRegistry.onBeforePreProcess();
-          processor.process(resource, reader, writer);
-        } catch (final IOException e) {
-          if (!Context.get().getConfig().isIgnoreMissingResources()) {
-            throw e;
-          }
-        } finally {
-          callbackRegistry.onAfterPreProcess();
-        }
-      } else {
-        writer.write(resourceContent);
-        LOG.debug("skipped processing on resource: {}", resource);
-      }
+      final Reader reader = new StringReader(resourceContent);
+      decorateWithCallback(ProcessorsUtils.decorateWithMinimizeAware(processor)).process(resource, reader, writer);
       resourceContent = writer.toString();
       stopWatch.stop();
     }

@@ -154,9 +154,6 @@ public class WroManager
    */
   private void serveProcessedBundle()
     throws IOException {
-    final StopWatch stopWatch = new StopWatch();
-    stopWatch.start("serveProcessedBundle");
-
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
 
@@ -210,11 +207,6 @@ public class WroManager
 
       // set ETag header
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-
-      stopWatch.stop();
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("WroManager process time: {}", stopWatch.prettyPrint());
-      }
     } finally {
       IOUtils.closeQuietly(os);
     }

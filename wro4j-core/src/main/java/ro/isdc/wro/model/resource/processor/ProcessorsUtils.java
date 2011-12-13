@@ -8,8 +8,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -34,6 +38,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * @created 21 Nov 2010
  */
 public class ProcessorsUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessorsUtils.class);
   /**
    * Returns a collection free of minimize aware processors (annotated with @Minimize).
    *
@@ -133,5 +138,31 @@ public class ProcessorsUtils {
     map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
     map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
     map.put(MultiLineCommentStripperProcessor.ALIAS, new MultiLineCommentStripperProcessor());
+  }
+  
+  /**
+   * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
+   * doesn't require the minimization.
+   */
+  public static ResourcePreProcessor decorateWithMinimizeAware(final ResourcePreProcessor processor) {
+    return new ResourcePreProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
+        if (applyProcessor) {
+          LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
+          try {
+            processor.process(resource, reader, writer);
+          } catch (final IOException e) {
+            if (!Context.get().getConfig().isIgnoreMissingResources()) {
+              throw e;
+            }
+          }
+        } else {
+          IOUtils.copy(reader, writer);
+          LOG.debug("skipped processing on resource: {}", resource);
+        }
+      }
+    };
   }
 }
