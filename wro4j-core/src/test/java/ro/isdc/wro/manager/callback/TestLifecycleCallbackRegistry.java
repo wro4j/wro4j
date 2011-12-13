@@ -70,6 +70,12 @@ public class TestLifecycleCallbackRegistry {
 
     registry.onAfterPostProcess();
     Mockito.verify(callback).onAfterPostProcess();
+    
+    registry.onBeforeProcess();
+    Mockito.verify(callback).onBeforeProcess();
+    
+    registry.onAfterProcess();
+    Mockito.verify(callback).onAfterProcess();
   }
 
   @Test
@@ -83,7 +89,8 @@ public class TestLifecycleCallbackRegistry {
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterPreProcess();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePostProcess();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterPostProcess();
-    
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeProcess();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterProcess();
 
     registry.registerCallback(failingCallback);
     registry.registerCallback(simpleCallback);
@@ -94,6 +101,8 @@ public class TestLifecycleCallbackRegistry {
     registry.onAfterPreProcess();
     registry.onBeforePostProcess();
     registry.onAfterPostProcess();
+    registry.onBeforeProcess();
+    registry.onAfterProcess();
 
     Mockito.verify(simpleCallback).onBeforeModelCreated();
     Mockito.verify(simpleCallback).onAfterModelCreated();
@@ -101,6 +110,8 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(simpleCallback).onAfterPreProcess();
     Mockito.verify(simpleCallback).onBeforePostProcess();
     Mockito.verify(simpleCallback).onAfterPostProcess();
+    Mockito.verify(simpleCallback).onBeforeProcess();
+    Mockito.verify(simpleCallback).onAfterProcess();
   }
 
   /**

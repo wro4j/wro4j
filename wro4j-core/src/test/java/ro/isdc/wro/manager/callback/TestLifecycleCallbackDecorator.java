@@ -53,6 +53,8 @@ public class TestLifecycleCallbackDecorator {
     registry.onAfterPreProcess();
     registry.onBeforePostProcess();
     registry.onAfterPostProcess();
+    registry.onBeforeProcess();
+    registry.onAfterProcess();
 
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
@@ -60,5 +62,7 @@ public class TestLifecycleCallbackDecorator {
     Mockito.verify(callback).onAfterPreProcess();
     Mockito.verify(callback).onBeforePostProcess();
     Mockito.verify(callback).onAfterPostProcess();
+    Mockito.verify(callback).onBeforeProcess();
+    Mockito.verify(callback).onAfterProcess();
   }
 }

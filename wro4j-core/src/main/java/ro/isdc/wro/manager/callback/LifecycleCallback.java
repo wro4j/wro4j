@@ -41,4 +41,14 @@ public interface LifecycleCallback {
    * Called after a resource is post processed.
    */
   void onAfterPostProcess();
+  
+  /**
+   * Called before the first preProcessor is used.
+   */
+  void onBeforeProcess();
+  
+  /**
+   * Called after the last postProcessor is used.
+   */
+  void onAfterProcess();
 }

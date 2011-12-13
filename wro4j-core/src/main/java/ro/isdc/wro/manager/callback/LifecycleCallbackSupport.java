@@ -5,48 +5,58 @@ package ro.isdc.wro.manager.callback;
 
 /**
  * Default implementation of {@link LifecycleCallback} interface with empty implementations.
- *
+ * 
  * @author Alex Objelean
  * @created 26 Oct 2011
  * @since 1.4.3
  */
 public class LifecycleCallbackSupport
-  implements LifecycleCallback {
+    implements LifecycleCallback {
   /**
    * {@inheritDoc}
    */
-  public void onBeforeModelCreated() {}
-
-
+  public void onBeforeModelCreated() {
+  }
+  
   /**
    * {@inheritDoc}
    */
-  public void onAfterModelCreated() {}
-
-
+  public void onAfterModelCreated() {
+  }
+  
   /**
    * {@inheritDoc}
    */
-  public void onBeforePreProcess() {}
-
-
+  public void onBeforePreProcess() {
+  }
+  
   /**
    * {@inheritDoc}
    */
-  public void onAfterPreProcess() {}
-
-
+  public void onAfterPreProcess() {
+  }
+  
   /**
    * {@inheritDoc}
    */
   public void onBeforePostProcess() {
-
   }
-
-
+  
   /**
    * {@inheritDoc}
    */
-  public void onAfterPostProcess() {}
-
+  public void onAfterPostProcess() {
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onBeforeProcess() {
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onAfterProcess() {
+  }
 }

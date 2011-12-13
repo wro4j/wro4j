@@ -55,5 +55,6 @@ public class TestBaseWroManagerFactory {
     manager.getModelFactory().create();
     
     Mockito.verify(callback).onBeforeModelCreated();
+    Mockito.verify(callback).onAfterModelCreated();
   }
 }
