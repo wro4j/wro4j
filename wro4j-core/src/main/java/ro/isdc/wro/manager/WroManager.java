@@ -187,6 +187,13 @@ public class WroManager
         // TODO close output stream?
         return;
       }
+      /**
+       * Set contentType before actual content is written, solves <br/>
+       * <a href="http://code.google.com/p/wro4j/issues/detail?id=341">issue341</a>
+       */
+      if (type != null) {
+        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+      }
       if (contentHashEntry.getRawContent() != null) {
         // Do not set content length because we don't know the length in case it is gzipped. This could cause an
         // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
@@ -200,9 +207,6 @@ public class WroManager
         } else {
           IOUtils.write(contentHashEntry.getRawContent(), os);
         }
-      }
-      if (type != null) {
-        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
       }
 
       // set ETag header
