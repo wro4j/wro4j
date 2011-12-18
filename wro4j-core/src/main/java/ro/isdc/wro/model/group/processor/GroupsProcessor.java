@@ -29,7 +29,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -45,7 +45,7 @@ public class GroupsProcessor {
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-  
+
   /**
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
@@ -63,7 +63,7 @@ public class GroupsProcessor {
       callbackRegistry.onProcessingComplete();
     }
   }
-  
+
   /**
    * @return decorated {@link PreProcessorExecutor} which add callback calls.
    */
@@ -80,10 +80,10 @@ public class GroupsProcessor {
       }
     };
   }
-  
+
   /**
    * Perform postProcessing.
-   * 
+   *
    * @param resourceType
    *          the type of the resources to process. This value will never be null.
    * @param content
@@ -99,19 +99,14 @@ public class GroupsProcessor {
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
       LOG.warn("No processors defined. Please, check if your configuration is correct.");
     }
-    Collection<ResourcePostProcessor> processors = ProcessorsUtils.getProcessorsByType(resourceType, allPostProcessors);
-    processors.addAll(ProcessorsUtils.getProcessorsByType(null, allPostProcessors));
-    if (!minimize) {
-      processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
-    }
-    LOG.debug("postProcessors: {}", processors);
+    final Collection<ResourcePostProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resourceType, allPostProcessors);
     final String output = applyPostProcessors(processors, content);
     return output;
   }
-  
+
   /**
    * Apply resourcePostProcessors.
-   * 
+   *
    * @param processors
    *          a collection of processors to apply on the content from the supplied writer.
    * @param content
@@ -120,6 +115,7 @@ public class GroupsProcessor {
    */
   private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
       throws IOException {
+    LOG.debug("postProcessors: {}", processors);
     if (processors.isEmpty()) {
       return content;
     }
@@ -129,16 +125,16 @@ public class GroupsProcessor {
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
-      
+
       decorateWithPostProcessCallback(processor).process(input, output);
-      
+
       input = new StringReader(output.toString());
       stopWatch.stop();
     }
     LOG.debug(stopWatch.prettyPrint());
     return output.toString();
   }
-  
+
 
   /**
    * @return a decorated postProcessor which invokes callback methods.
@@ -153,7 +149,7 @@ public class GroupsProcessor {
           processor.process(reader, writer);
         } finally {
           callbackRegistry.onAfterPostProcess();
-        }        
+        }
       }
     };
   }
