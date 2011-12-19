@@ -148,7 +148,7 @@ public class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final boolean minimize)
     throws IOException {
     // merge preProcessorsBy type and anyPreProcessors
-    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
+    final Collection<ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
       resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
     String resourceContent = getResourceContent(resource);

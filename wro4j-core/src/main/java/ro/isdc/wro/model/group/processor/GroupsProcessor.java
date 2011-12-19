@@ -99,7 +99,13 @@ public class GroupsProcessor {
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
       LOG.warn("No processors defined. Please, check if your configuration is correct.");
     }
-    final Collection<ResourcePostProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resourceType, allPostProcessors);
+    final Collection<ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resourceType, allPostProcessors);
+    
+    final String resourceName = group.getName() + "." + resourceType.name().toLowerCase();
+    final Resource mergedResource = Resource.create(resourceName, resourceType);
+    mergedResource.setMinimize(minimize);
+    mergedResource.setType(resourceType);
+    
     final String output = applyPostProcessors(mergedResource, processors, content);
     return output;
   }
