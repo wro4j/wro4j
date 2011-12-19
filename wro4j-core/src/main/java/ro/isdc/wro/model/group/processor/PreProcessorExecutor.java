@@ -56,7 +56,7 @@ public class PreProcessorExecutor {
   
   /**
    * Apply preProcessors on resources and merge them.
-   * 
+   *
    * @param resources
    *          what are the resources to merge.
    * @param minimize
@@ -76,7 +76,7 @@ public class PreProcessorExecutor {
     } else {
       for (final Resource resource : resources) {
         LOG.debug("\tmerging resource: {}", resource);
-        result.append(processSingleResource(resource, resources, minimize));
+        result.append(applyPreProcessors(resource, minimize));
       }
     }
     return result.toString();
@@ -90,7 +90,7 @@ public class PreProcessorExecutor {
   
   /**
    * runs the pre processors in parallel.
-   * 
+   *
    * @return merged and pre processed content.
    */
   private String runInParallel(final List<Resource> resources, final boolean minimize)
@@ -101,7 +101,7 @@ public class PreProcessorExecutor {
       callables.add(new Callable<String>() {
         public String call()
             throws Exception {
-          return processSingleResource(resource, resources, minimize);
+          return applyPreProcessors(resource, minimize);
         }
       });
     }
@@ -110,7 +110,7 @@ public class PreProcessorExecutor {
     for (final Callable<String> callable : callables) {
       futures.add(exec.submit(callable));
     }
-    
+
     for (final Future<String> future : futures) {
       try {
         result.append(future.get());
@@ -140,44 +140,18 @@ public class PreProcessorExecutor {
   }
   
   /**
-   * Execute all the preProcessors on the provided resource.
-   * 
-   * @param resource
-   *          {@link Resource} to preProcess.
-   * @param resources
-   *          the list of all resources to be processed in this context.
-   * @param minimize
-   *          whether the minimize aware preProcessor must be applied.
-   * @return the result of preProcessing as string content.
-   */
-  private String processSingleResource(final Resource resource, final List<Resource> resources, final boolean minimize)
-      throws IOException {
-    LOG.debug("processingSingleResource: {}", resource);
-    // TODO: hold a list of processed resources in order to avoid duplicates
-    // merge preProcessorsBy type and anyPreProcessors
-    Collection<ResourceProcessor> processors = ProcessorsUtils.getProcessorsByType(resource.getType(),
-        processorsFactory.getPreProcessors());
-    if (!minimize) {
-      processors = ProcessorsUtils.getMinimizeFreeProcessors(processors);
-    }
-    return applyPreProcessors(resource, resources, processors);
-  }
-  
-  /**
    * Apply a list of preprocessors on a resource.
-   * 
-   * @param resource
-   *          the {@link Resource} on which processors will be applied
-   * @param resources
-   *          the list of all resources to be processed in this context.
-   * @param processors
-   *          the list of processor to apply on the resource.
+   *
+   * @param resource the {@link Resource} on which processors will be applied
+   * @param processors the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final List<Resource> resources,
-      final Collection<ResourceProcessor> processors)
-      throws IOException {
+  private String applyPreProcessors(final Resource resource, final boolean minimize)
+    throws IOException {
+    // merge preProcessorsBy type and anyPreProcessors
+    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
+      resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
-    String resourceContent = getResourceContent(resource, resources);
+    String resourceContent = getResourceContent(resource);
     if (processors.isEmpty()) {
       return resourceContent;
     }
@@ -202,7 +176,7 @@ public class PreProcessorExecutor {
    * @param resources
    *          the list of all resources processed in this context, used for duplicate resource detection.
    */
-  private String getResourceContent(final Resource resource, final List<Resource> resources)
+  private String getResourceContent(final Resource resource)
       throws IOException {
     final WroConfiguration config = Context.get().getConfig();
     try {

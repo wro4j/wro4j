@@ -11,12 +11,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -42,25 +38,11 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * @created 21 Nov 2010
  */
 public class ProcessorsUtils {
-  private static final Logger LOG = LoggerFactory.getLogger(ProcessorsUtils.class);
   /**
-   * Returns a collection free of minimize aware processors (annotated with @Minimize).
-   *
    * @param <T>
-   *          type of processor
-   * @param processors
-   *          a collection of processors.
+   * @param processor the processor to check.
+   * @return true if the processor is {@link MinimizeAware}.
    */
-  public static <T> Collection<T> getMinimizeFreeProcessors(final Collection<T> processors) {
-    final Collection<T> result = new ArrayList<T>();
-    for (final T processor : processors) {
-      if (!processor.getClass().isAnnotationPresent(Minimize.class)) {
-        result.add(processor);
-      }
-    }
-    return result;
-  }
-
   public static <T> boolean isMinimizeAwareProcessor(final T processor) {
     if (processor instanceof MinimizeAware) {
       return ((MinimizeAware)processor).isMinimize();
@@ -68,6 +50,13 @@ public class ProcessorsUtils {
     return processor.getClass().isAnnotationPresent(Minimize.class);
   }
 
+  /**
+   * Identifies the {@link SupportedResourceType} of the provided processor.
+   *
+   * @param <T>
+   * @param processor to check.
+   * @return The {@link SupportedResourceType} of the processor.
+   */
   public static <T> SupportedResourceType getSupportedResourceType(final T processor) {
     SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
     /**
@@ -82,7 +71,8 @@ public class ProcessorsUtils {
   }
 
   /**
-   * @param <T> processor type. Can be {@link ResourceProcessor}, {@link ResourcePostProcessor} or null (any).
+   * This method is visible for testing only.
+   * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor} or null (any).
    * @param type {@link ResourceType} to apply for searching on available processors.
    * @param availableProcessors a list where to perform the search.
    * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:
@@ -92,13 +82,15 @@ public class ProcessorsUtils {
    *          <li>If you search by CSS type - you'll get processors which can be applied on CSS resources & any (null) resources </li>
    *        </ul>
    */
-  public static <T> Collection<T> getProcessorsByType(final ResourceType type, final Collection<T> availableProcessors) {
+  public static <T> Collection<T> filterProcessorsToApply(final boolean minimize, final ResourceType type,
+    final Collection<T> availableProcessors) {
     Validate.notNull(availableProcessors);
     final Collection<T> found = new ArrayList<T>();
     for (final T processor : availableProcessors) {
       final SupportedResourceType supportedType = getSupportedResourceType(processor);
       final boolean isTypeSatisfied = supportedType == null || (supportedType != null && type == supportedType.value());
-      if (isTypeSatisfied) {
+      final boolean isMinimizedSatisfied = minimize == true || !isMinimizeAwareProcessor(processor);
+      if (isTypeSatisfied && isMinimizedSatisfied) {
         found.add(processor);
       }
     }
