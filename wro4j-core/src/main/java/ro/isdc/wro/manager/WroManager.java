@@ -156,7 +156,7 @@ public class WroManager
     final HttpServletRequest request = Context.get().getRequest();
     final HttpServletResponse response = Context.get().getResponse();
 
-    final OutputStream os = response.getOutputStream();
+    OutputStream os = null;
     try {
       // find names & type
       final ResourceType type = groupExtractor.getResourceType(request);
@@ -193,6 +193,10 @@ public class WroManager
       if (type != null) {
         response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
       }
+      // set ETag header
+      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
+      
+      os = response.getOutputStream();
       if (contentHashEntry.getRawContent() != null) {
         // Do not set content length because we don't know the length in case it is gzipped. This could cause an
         // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
@@ -207,11 +211,9 @@ public class WroManager
           IOUtils.write(contentHashEntry.getRawContent(), os);
         }
       }
-
-      // set ETag header
-      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
     } finally {
-      IOUtils.closeQuietly(os);
+      if(os != null)
+        IOUtils.closeQuietly(os);
     }
   }
 
