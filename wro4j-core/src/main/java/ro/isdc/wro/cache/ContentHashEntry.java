@@ -46,7 +46,7 @@ public final class ContentHashEntry
     try {
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
       final OutputStream os = new GZIPOutputStream(new BufferedOutputStream(baos));
-      IOUtils.copy(new ByteArrayInputStream(content.getBytes()), os);
+      IOUtils.copy(new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())), os);
       os.close();
       return baos.toByteArray();
     } catch (final IOException e) {
