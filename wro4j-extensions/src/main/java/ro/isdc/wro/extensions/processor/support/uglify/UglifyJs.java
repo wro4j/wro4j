@@ -41,6 +41,10 @@ public class UglifyJs {
    * If true, the script is uglified, otherwise it is beautified.
    */
   private final boolean uglify;
+  /**
+   * Comma delimited variable names to have uglify not mangle
+   */
+  private final String reservedNames;
   private ScriptableObject scope;
 
 
@@ -48,8 +52,9 @@ public class UglifyJs {
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
    *        formatted).
    */
-  public UglifyJs(final boolean uglify) {
+  public UglifyJs(final boolean uglify, final String reservedNames) {
     this.uglify = uglify;
+    this.reservedNames = reservedNames;
   }
 
 
@@ -57,7 +62,15 @@ public class UglifyJs {
    * Factory method for creating the uglifyJs engine.
    */
   public static UglifyJs uglifyJs() {
-    return new UglifyJs(true);
+    return new UglifyJs(true, "");
+  }
+
+
+  /**
+   * Factory method for creating the uglifyJs engine.
+   */
+  public static UglifyJs uglifyJs(String reservedNames) {
+    return new UglifyJs(true, reservedNames);
   }
 
 
@@ -65,7 +78,15 @@ public class UglifyJs {
    * Factory method for creating the beautifyJs engine.
    */
   public static UglifyJs beautifyJs() {
-    return new UglifyJs(false);
+    return new UglifyJs(false, "");
+  }
+
+
+  /**
+   * Factory method for creating the beautifyJs engine.
+   */
+  public static UglifyJs beautifyJs(String reservedNames) {
+    return new UglifyJs(false, reservedNames);
   }
 
   /**
@@ -101,18 +122,17 @@ public class UglifyJs {
    * @param data js content to process.
    * @return packed js content.
    */
-  public String process(final String code)
+  public String process(String filename, final String code)
     throws IOException {
     try {
       final StopWatch watch = new StopWatch();
-      watch.start("init");
+      watch.start("init " + filename);
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
-      watch.start(uglify ? "uglify" : "beautify");
-
       final String originalCode = WroUtil.toJSMultiLineString(code);
       final String invokeScript = String.format(IOUtils.toString(getClass().getResourceAsStream("invoke.js")),
-        originalCode, !uglify);
+        originalCode, reservedNames, !uglify);
+      watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
 
       watch.stop();

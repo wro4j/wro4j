@@ -71,7 +71,7 @@ public class BeautifyJsProcessor
     final String content = IOUtils.toString(reader);
     final UglifyJs engine = enginePool.getObject();
     try {
-      writer.write(engine.process(content));
+      writer.write(engine.process(resource.getUri(), content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
