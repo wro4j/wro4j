@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -127,7 +128,8 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    * the depth of the aggregatedFolderPath.
    */
   private String aggregatedPathPrefix;
-
+  @Inject
+  private Context context;
 
   /**
    * The folder where the final css is located. This is important for computing image location after url rewriting.
@@ -179,7 +181,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
       // ensure the folder path is set
-      setAggregatedFolderPath(Context.get().getAggregatedFolderPath());
+      setAggregatedFolderPath(context.getAggregatedFolderPath());
       LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
       return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
     }
@@ -269,7 +271,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
    * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
-    final String requestURI = Context.get().getRequest().getRequestURI();
+    final String requestURI = context.getRequest().getRequestURI();
     return String.format("%s?%s=", FilenameUtils.getFullPath(requestURI) + PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
 }

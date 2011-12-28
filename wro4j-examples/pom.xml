@@ -6,7 +6,7 @@
   <parent>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-parent</artifactId>
-		<version>1.4.2</version>
+		<version>1.4.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>wro4j-examples</artifactId>

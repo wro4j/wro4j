@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
@@ -51,6 +50,11 @@ public class PreProcessorExecutor {
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private ProcessorsFactory processorsFactory;
+  @Inject
+  private WroConfiguration configuration;
+  /**
+   * Runs the preProcessing in parallel.
+   */
   private ExecutorService executor;
 
   /**
@@ -80,7 +84,7 @@ public class PreProcessorExecutor {
   }
 
   private boolean shouldRunInParallel(final List<Resource> resources) {
-    final boolean isParallel = Context.get().getConfig().isParallelPreprocessing();
+    final boolean isParallel = configuration.isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
@@ -175,15 +179,14 @@ public class PreProcessorExecutor {
    */
   private String getResourceContent(final Resource resource)
     throws IOException {
-    final WroConfiguration config = Context.get().getConfig();
     try {
       final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
-      final String result = IOUtils.toString(is, config.getEncoding());
+      final String result = IOUtils.toString(is, configuration.getEncoding());
       is.close();
       return result;
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: " + resource);
-      if (config.isIgnoreMissingResources()) {
+      if (configuration.isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
         LOG.error("Cannot ignore the missing resource:  " + resource);
@@ -223,7 +226,7 @@ public class PreProcessorExecutor {
           try {
             processor.process(resource, reader, writer);
           } catch (final IOException e) {
-            if (!Context.get().getConfig().isIgnoreMissingResources()) {
+            if (!configuration.isIgnoreMissingResources()) {
               throw e;
             }
           }

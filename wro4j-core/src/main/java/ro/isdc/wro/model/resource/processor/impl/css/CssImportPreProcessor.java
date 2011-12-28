@@ -17,7 +17,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
@@ -47,6 +47,8 @@ public class CssImportPreProcessor
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
+  @Inject
+  private WroConfiguration configuration;
   /**
    * List of processed resources, useful for detecting deep recursion.
    */
@@ -128,7 +130,7 @@ public class CssImportPreProcessor
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
     final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()),
-      Context.get().getConfig().getEncoding());
+      configuration.getEncoding());
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));

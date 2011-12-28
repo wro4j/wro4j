@@ -47,7 +47,6 @@ import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
-import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -98,7 +97,10 @@ public class WroManager
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private GroupsProcessor groupsProcessor;
-
+  @Inject
+  private WroConfiguration configuration;
+  @Inject
+  private Context context;
 
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
@@ -136,13 +138,13 @@ public class WroManager
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
   private boolean isProxyResourceRequest() {
-    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletRequest request = context.getRequest();
     return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
 
   private boolean isGzipAllowed() {
-    return Context.get().getConfig().isGzipEnabled() && isGzipSupported();
+    return configuration.isGzipEnabled() && isGzipSupported();
   }
 
 
@@ -153,8 +155,8 @@ public class WroManager
    */
   private void serveProcessedBundle()
     throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletRequest request = context.getRequest();
+    final HttpServletResponse response = context.getResponse();
 
     OutputStream os = null;
     try {
@@ -168,9 +170,8 @@ public class WroManager
       initAggregatedFolderPath(request, type);
 
       // reschedule cache & model updates
-      final WroConfiguration config = Context.get().getConfig();
-      cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
-      modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+      cacheSchedulerHelper.scheduleWithPeriod(configuration.getCacheUpdatePeriod());
+      modelSchedulerHelper.scheduleWithPeriod(configuration.getModelUpdatePeriod());
 
       final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
@@ -191,11 +192,11 @@ public class WroManager
        * <a href="http://code.google.com/p/wro4j/issues/detail?id=341">issue341</a>
        */
       if (type != null) {
-        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+        response.setContentType(type.getContentType() + "; charset=" + configuration.getEncoding());
       }
       // set ETag header
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-      
+
       os = response.getOutputStream();
       if (contentHashEntry.getRawContent() != null) {
         // Do not set content length because we don't know the length in case it is gzipped. This could cause an
@@ -208,7 +209,7 @@ public class WroManager
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(contentHashEntry.getGzippedContent(), os);
         } else {
-          IOUtils.write(contentHashEntry.getRawContent(), os, Context.get().getConfig().getEncoding());
+          IOUtils.write(contentHashEntry.getRawContent(), os, configuration.getEncoding());
         }
       }
     } finally {
@@ -222,11 +223,11 @@ public class WroManager
    * Set the aggregatedFolderPath if required.
    */
   private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
-    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+    if (ResourceType.CSS == type && context.getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
-      Context.get().setAggregatedFolderPath(aggregatedFolder);
+      context.setAggregatedFolderPath(aggregatedFolder);
     }
   }
 
@@ -286,7 +287,7 @@ public class WroManager
 
       final String content = groupsProcessor.process(group, type, minimize);
       contentHashEntry = getContentHashEntryByContent(content);
-      if (!Context.get().getConfig().isDisableCache()) {
+      if (!configuration.isDisableCache()) {
         cacheStrategy.put(cacheEntry, contentHashEntry);
       }
     }
@@ -319,8 +320,8 @@ public class WroManager
    */
   private void serveProxyResourceRequest()
     throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final OutputStream outputStream = Context.get().getResponse().getOutputStream();
+    final HttpServletRequest request = context.getRequest();
+    final OutputStream outputStream = context.getResponse().getOutputStream();
 
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
@@ -405,7 +406,7 @@ public class WroManager
    * @return true if Gzip is Supported
    */
   private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
+    return WroUtil.isGzipSupported(context.getRequest());
   }
 
 
