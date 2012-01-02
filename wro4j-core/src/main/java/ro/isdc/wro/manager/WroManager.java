@@ -48,7 +48,6 @@ import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
-import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
