@@ -36,6 +36,7 @@ public class InjectorProcessorsFactoryDecorator
   /**
    * {@inheritDoc}
    */
+  @Override
   public Collection<ResourcePreProcessor> getPreProcessors() {
     scanPreProcessors();
     return super.getPreProcessors();
@@ -46,7 +47,6 @@ public class InjectorProcessorsFactoryDecorator
    * Scan all preProcessors of decorated factory.
    */
   private void scanPreProcessors() {
-    LOG.debug("scanPreProcessors");
     // TODO ensure that it is not called to often
     for (final ResourcePreProcessor processor : super.getPreProcessors()) {
       injector.inject(processor);
@@ -57,6 +57,7 @@ public class InjectorProcessorsFactoryDecorator
   /**
    * {@inheritDoc}
    */
+  @Override
   public Collection<ResourcePostProcessor> getPostProcessors() {
     scanPostProcessors();
     return super.getPostProcessors();
@@ -64,7 +65,6 @@ public class InjectorProcessorsFactoryDecorator
 
 
   private void scanPostProcessors() {
-    LOG.debug("scanPostProcessors");
     final StopWatch watch = new StopWatch();
     watch.start("scan post processors");
     // TODO ensure that it is not called to often

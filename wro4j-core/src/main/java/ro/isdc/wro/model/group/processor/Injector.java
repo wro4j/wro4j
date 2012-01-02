@@ -36,14 +36,14 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private final WroManager wroManager;
-  private final UriLocatorFactory uriLocatorFactory;
-  private final ProcessorsFactory processorsFactory;
-  private final GroupsProcessor groupsProcessor = new GroupsProcessor();
+  private WroManager wroManager;
+  private UriLocatorFactory uriLocatorFactory;
+  private ProcessorsFactory processorsFactory;
+  private GroupsProcessor groupsProcessor = new GroupsProcessor();
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
   /**
-   * Mapping of classes to be annotated and the coresponding injected object.
+   * Mapping of classes to be annotated and the corresponding injected object.
    */
   private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
 
@@ -75,12 +75,12 @@ public final class Injector {
     map.put(NamingStrategy.class, wroManager.getNamingStrategy());
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
     map.put(Injector.class, this);
-    map.put(Context.class, new ObjectFactory<Context>() {
+    map.put(Context.class, new InjectorObjectFactory<Context>() {
       public Context create() {
         return Context.get();
       }
     });
-    map.put(WroConfiguration.class, new ObjectFactory<WroConfiguration>() {
+    map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return Context.get().getConfig();
       }
@@ -158,8 +158,8 @@ public final class Injector {
         if (entry.getKey().isAssignableFrom(field.getType())) {
           Object value = entry.getValue();
           //treat factories as a special case for lazy load of the objects.
-          if (value instanceof ObjectFactory) {
-            value = ((ObjectFactory<?>) value).create();
+          if (value instanceof InjectorObjectFactory) {
+            value = ((InjectorObjectFactory<?>) value).create();
           }
           field.set(object, value);
           return accept = true;
@@ -172,4 +172,9 @@ public final class Injector {
       }
     }
   }
+
+  /**
+   * A special type used for lazy object injection only in context of this class.
+   */
+  private static interface InjectorObjectFactory <T> extends ObjectFactory <T> {};
 }
