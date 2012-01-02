@@ -298,12 +298,12 @@ public class WroFilter
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
       // TODO move API related checks into separate class and determine filter mapping for better mapping
-      if (shouldReloadCache(request)) {
+      if (shouldReloadCache()) {
         Context.get().getConfig().reloadCache();
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
         response.setStatus(HttpServletResponse.SC_OK);
-      } else if (shouldReloadModel(request)) {
+      } else if (shouldReloadModel()) {
         Context.get().getConfig().reloadModel();
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
@@ -328,21 +328,22 @@ public class WroFilter
   /**
    * @return true if reload model must be triggered.
    */
-  private boolean shouldReloadModel(final HttpServletRequest request) {
-    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_MODEL);
+  private boolean shouldReloadModel() {
+    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_MODEL);
   }
 
   /**
    * @return true if reload cache must be triggered.
    */
-  private boolean shouldReloadCache(final HttpServletRequest request) {
-    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_CACHE);
+  private boolean shouldReloadCache() {
+    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_CACHE);
   }
 
   /**
    * Check if the request path matches the provided api path.
    */
-  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
+  private boolean matchesUrl(final String apiPath) {
+    final HttpServletRequest request = Context.get().getRequest();
     final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
     final Matcher m = pattern.matcher(request.getRequestURI());
     return m.matches();
