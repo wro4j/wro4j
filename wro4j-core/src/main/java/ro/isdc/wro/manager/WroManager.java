@@ -47,7 +47,6 @@ import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
-import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -195,7 +194,7 @@ public class WroManager
       }
       // set ETag header
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-      
+
       os = response.getOutputStream();
       if (contentHashEntry.getRawContent() != null) {
         // Do not set content length because we don't know the length in case it is gzipped. This could cause an
