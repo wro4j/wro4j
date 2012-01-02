@@ -446,4 +446,11 @@ public class WroTestUtils {
       future.get();
     }
   }
+
+  /**
+   * @return a default {@link Injector} to be used by test classes.
+   */
+  public static Injector createInjector() {
+    return new Injector(new BaseWroManagerFactory().create());
+  }
 }

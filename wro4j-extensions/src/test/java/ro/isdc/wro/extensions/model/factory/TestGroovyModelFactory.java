@@ -21,11 +21,13 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -40,6 +42,10 @@ public class TestGroovyModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestGroovyModelFactory.class);
   private GroovyModelFactory factory;
 
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
 
   @Test(expected = WroRuntimeException.class)
   public void testInvalidStream() throws Exception {
