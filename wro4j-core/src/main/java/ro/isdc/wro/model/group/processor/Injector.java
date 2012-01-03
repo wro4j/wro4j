@@ -38,7 +38,6 @@ public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private WroManager wroManager;
   private UriLocatorFactory uriLocatorFactory;
-  private ProcessorsFactory processorsFactory;
   private GroupsProcessor groupsProcessor = new GroupsProcessor();
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
@@ -57,8 +56,6 @@ public final class Injector {
     this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(wroManager.getUriLocatorFactory(), this);
     wroManager.setUriLocatorFactory(this.uriLocatorFactory);
 
-    this.processorsFactory = new InjectorProcessorsFactoryDecorator(wroManager.getProcessorsFactory(), this);
-    wroManager.setProcessorsFactory(this.processorsFactory);
     //first initialize the map
     initMap();
 
@@ -71,7 +68,7 @@ public final class Injector {
     map.put(PreProcessorExecutor.class, preProcessorExecutor);
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(UriLocatorFactory.class, uriLocatorFactory);
-    map.put(ProcessorsFactory.class, processorsFactory);
+    map.put(ProcessorsFactory.class, wroManager.getProcessorsFactory());
     map.put(NamingStrategy.class, wroManager.getNamingStrategy());
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
     map.put(Injector.class, this);
