@@ -20,13 +20,12 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs version (1.1.2-SNAPSHOT) <br/>
- * committed at the following date: 2011-12-03 17:10:36.
+ * The underlying implementation use the uglifyJs version (1.2.3)
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
  * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
- * is compressed with googleClosure compressor (simple mode), because it is quite efficient and doesn't break the code.
+ * is compressed with packerJs by Dean Edwards.
  *
  * @author Alex Objelean
  * @since 1.3.1
