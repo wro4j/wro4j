@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
+import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -47,7 +48,7 @@ public class TestUglifyJsProcessor {
 
   @Test
   public void shouldUseReservedNames() throws IOException {
-    final ResourcePostProcessor processor = new UglifyJsProcessor() {
+    final ResourceProcessor processor = new UglifyJsProcessor() {
       @Override
       protected UglifyJs newEngine() {
         return super.newEngine().setReservedNames("name,value");
