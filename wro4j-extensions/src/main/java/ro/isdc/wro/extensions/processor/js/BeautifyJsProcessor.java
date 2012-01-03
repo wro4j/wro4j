@@ -70,7 +70,8 @@ public class BeautifyJsProcessor
     final String content = IOUtils.toString(reader);
     final UglifyJs engine = enginePool.getObject();
     try {
-      writer.write(engine.process(content));
+      final String filename = resource == null ? "noName.js" : resource.getUri();
+      writer.write(engine.process(filename, content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);

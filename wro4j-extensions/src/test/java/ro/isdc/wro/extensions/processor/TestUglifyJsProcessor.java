@@ -27,12 +27,17 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestUglifyJsProcessor {
   private File testFolder;
+
+
   @Before
   public void setUp() {
     testFolder = new File(ClassLoader.getSystemResource("test").getFile());
   }
+
+
   @Test
-  public void testFromFolder() throws IOException {
+  public void shouldUglifyFiles()
+    throws IOException {
     final ResourceProcessor processor = new UglifyJsProcessor();
     final URL url = getClass().getResource("uglify");
 
@@ -41,7 +46,24 @@ public class TestUglifyJsProcessor {
   }
 
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldUseReservedNames() throws IOException {
+    final ResourcePostProcessor processor = new UglifyJsProcessor() {
+      @Override
+      protected UglifyJs newEngine() {
+        return super.newEngine().setReservedNames("name,value");
+      }
+    };
+    final URL url = getClass().getResource("uglify");
+
+    final File testFolder = new File(url.getFile(), "testReservedNames");
+    final File expectedFolder = new File(url.getFile(), "expectedReservedNames");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
+  }
+
+
+  @Test
+  public void shouldBeThreadSafe()
+    throws Exception {
     final UglifyJsProcessor processor = new UglifyJsProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
