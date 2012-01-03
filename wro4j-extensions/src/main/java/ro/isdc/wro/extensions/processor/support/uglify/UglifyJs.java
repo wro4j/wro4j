@@ -44,7 +44,7 @@ public class UglifyJs {
   /**
    * Comma delimited variable names to have uglify not mangle
    */
-  private final String reservedNames;
+  private String reservedNames;
   private ScriptableObject scope;
 
 
@@ -52,9 +52,8 @@ public class UglifyJs {
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
    *        formatted).
    */
-  public UglifyJs(final boolean uglify, final String reservedNames) {
+  public UglifyJs(final boolean uglify) {
     this.uglify = uglify;
-    this.reservedNames = reservedNames;
   }
 
 
@@ -62,15 +61,7 @@ public class UglifyJs {
    * Factory method for creating the uglifyJs engine.
    */
   public static UglifyJs uglifyJs() {
-    return new UglifyJs(true, "");
-  }
-
-
-  /**
-   * Factory method for creating the uglifyJs engine.
-   */
-  public static UglifyJs uglifyJs(String reservedNames) {
-    return new UglifyJs(true, reservedNames);
+    return new UglifyJs(true);
   }
 
 
@@ -78,16 +69,28 @@ public class UglifyJs {
    * Factory method for creating the beautifyJs engine.
    */
   public static UglifyJs beautifyJs() {
-    return new UglifyJs(false, "");
+    return new UglifyJs(false);
   }
 
 
   /**
-   * Factory method for creating the beautifyJs engine.
+   * some libraries rely on certain names to be used, so this option allow you to exclude such names from the mangler.
+   * For example, to keep names require and $super intact you'd specify –reserved-names "require,$super".
+   *
+   * @param reservedNames the reservedNames to set
    */
-  public static UglifyJs beautifyJs(String reservedNames) {
-    return new UglifyJs(false, reservedNames);
+  public UglifyJs setReservedNames(final String reservedNames) {
+    this.reservedNames = reservedNames;
+    return this;
   }
+
+  /**
+   * @return not null value representing reservedNames.
+   */
+  private String getReservedNames() {
+    return this.reservedNames == null ? "" : reservedNames;
+  }
+
 
   /**
    * Initialize script builder for evaluation.
@@ -122,7 +125,7 @@ public class UglifyJs {
    * @param data js content to process.
    * @return packed js content.
    */
-  public String process(String filename, final String code)
+  public String process(final String filename, final String code)
     throws IOException {
     try {
       final StopWatch watch = new StopWatch();
@@ -131,7 +134,7 @@ public class UglifyJs {
       watch.stop();
       final String originalCode = WroUtil.toJSMultiLineString(code);
       final String invokeScript = String.format(IOUtils.toString(getClass().getResourceAsStream("invoke.js")),
-        originalCode, reservedNames, !uglify);
+        originalCode, getReservedNames(), !uglify);
       watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
 
