@@ -99,8 +99,6 @@ public class WroManager
   private GroupsProcessor groupsProcessor;
   @Inject
   private WroConfiguration configuration;
-  @Inject
-  private Context context;
 
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
@@ -138,7 +136,7 @@ public class WroManager
    * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
    */
   private boolean isProxyResourceRequest() {
-    final HttpServletRequest request = context.getRequest();
+    final HttpServletRequest request = Context.get().getRequest();
     return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
   }
 
@@ -155,8 +153,8 @@ public class WroManager
    */
   private void serveProcessedBundle()
     throws IOException {
-    final HttpServletRequest request = context.getRequest();
-    final HttpServletResponse response = context.getResponse();
+    final HttpServletRequest request = Context.get().getRequest();
+    final HttpServletResponse response = Context.get().getResponse();
 
     OutputStream os = null;
     try {
@@ -223,11 +221,11 @@ public class WroManager
    * Set the aggregatedFolderPath if required.
    */
   private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
-    if (ResourceType.CSS == type && context.getAggregatedFolderPath() == null) {
+    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
-      context.setAggregatedFolderPath(aggregatedFolder);
+      Context.get().setAggregatedFolderPath(aggregatedFolder);
     }
   }
 
@@ -320,8 +318,8 @@ public class WroManager
    */
   private void serveProxyResourceRequest()
     throws IOException {
-    final HttpServletRequest request = context.getRequest();
-    final OutputStream outputStream = context.getResponse().getOutputStream();
+    final HttpServletRequest request = Context.get().getRequest();
+    final OutputStream outputStream = Context.get().getResponse().getOutputStream();
 
     final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
     LOG.debug("locating stream for resourceId: {}", resourceId);
@@ -406,7 +404,7 @@ public class WroManager
    * @return true if Gzip is Supported
    */
   private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(context.getRequest());
+    return WroUtil.isGzipSupported(Context.get().getRequest());
   }
 
 
