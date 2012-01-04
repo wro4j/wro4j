@@ -132,7 +132,9 @@ public class WroFilter
    * Initialize {@link WroManagerFactory}.
    */
   private void initWroManagerFactory() {
-    this.wroManagerFactory = getWroManagerFactory();
+    if (this.wroManagerFactory == null) {
+      this.wroManagerFactory = getWroManagerFactory();
+    }
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
       // register cache change callback -> when cache is changed, update headers values.
       ((CacheChangeCallbackAware)wroManagerFactory).registerCacheChangeListener(new PropertyChangeListener() {
@@ -345,8 +347,11 @@ public class WroFilter
   private boolean matchesUrl(final String apiPath) {
     final HttpServletRequest request = Context.get().getRequest();
     final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
-    final Matcher m = pattern.matcher(request.getRequestURI());
-    return m.matches();
+    if (request.getRequestURI() != null) {
+      final Matcher m = pattern.matcher(request.getRequestURI());
+      return m.matches();
+    }
+    return false;
   }
 
   /**
@@ -398,9 +403,28 @@ public class WroFilter
 
 
   /**
-   * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.
+   * Allows external configuration of {@link WroManagerFactory} (ex: using spring IoC). When this value is set, the
+   * default {@link WroManagerFactory} initialization won't work anymore.<p/>
+   * Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.
    *
-   * @return {@link WroManagerFactory} object.
+   * @param wroManagerFactory the wroManagerFactory to set
+   */
+  public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
+    this.wroManagerFactory = wroManagerFactory;
+  }
+
+
+  /**
+   * Factory method for {@link WroManagerFactory}.
+   * <p/>
+   * Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
+   * is found a default implentation is used.
+   * </p>
+   * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
+   * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
+   *
+   *
+   * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory getWroManagerFactory() {
     if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
@@ -441,8 +465,12 @@ public class WroFilter
    * {@inheritDoc}
    */
   public void destroy() {
-    wroManagerFactory.destroy();
-    wroConfiguration.destroy();
+    if (wroManagerFactory != null) {
+      wroManagerFactory.destroy();
+    }
+    if (wroConfiguration != null) {
+      wroConfiguration.destroy();
+    }
     Context.destroy();
   }
 }

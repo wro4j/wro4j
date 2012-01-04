@@ -101,10 +101,22 @@ public class TestWroFilter {
 
 
   @Test(expected = WroRuntimeException.class)
-  public void testInvalidAppFactoryClassNameIsSet()
+  public void cannotAcceptInvalidAppFactoryClassNameIsSet()
     throws Exception {
+    filter = new WroFilter();
     Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
     filter.init(config);
+  }
+
+  @Test
+  public void shouldUseInitiallySetManagerEvenIfAnInvalidAppFactoryClassNameIsSet()
+    throws Exception {
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    filter.setWroManagerFactory(mockManagerFactory);
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
+    filter.init(config);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), Mockito.mock(FilterChain.class));
+    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
 
 
@@ -184,6 +196,25 @@ public class TestWroFilter {
     Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
       BaseWroManagerFactory.class.getName());
     filter.init(config);
+  }
+
+
+  /**
+   * Test that when setting WwroManagerFactory via setter, even if wroConfiguration has a different
+   * {@link WroManagerFactory} configured, the first one instance is used.
+   */
+  @Test
+  public void shouldUseCorrectWroManagerFactoryWhenOneIsSet()
+    throws Exception {
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
+      BaseWroManagerFactory.class.getName());
+
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    filter.setWroManagerFactory(mockManagerFactory);
+
+    filter.init(config);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), Mockito.mock(FilterChain.class));
+    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
 
 
