@@ -11,10 +11,10 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -33,7 +33,8 @@ import com.google.javascript.jscomp.Result;
 
 
 /**
- * Uses Google closure compiler for js minimization.
+ * Uses Google closure compiler for js minimization. <p/>
+ * In order to make this class {@link Context} agnostic, set the encoding explicitly using {@link GoogleClosureCompressorProcessor#setEncoding(String)}.
  *
  * @see http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html
  * @author Alex Objelean
@@ -42,7 +43,6 @@ import com.google.javascript.jscomp.Result;
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
   implements ResourcePostProcessor, ResourcePreProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(GoogleClosureCompressorProcessor.class);
   public static final String ALIAS_SIMPLE = "googleClosureSimple";
   public static final String ALIAS_ADVANCED = "googleClosureAdvanced";
   /**
@@ -50,6 +50,9 @@ public class GoogleClosureCompressorProcessor
    */
   private CompilationLevel compilationLevel;
   private CompilerOptions compilerOptions;
+  @Inject
+  private WroConfiguration config;
+  private String encoding;
 
   /**
    * Uses google closure compiler with default compilation level: {@link CompilationLevel#SIMPLE_OPTIMIZATIONS}
@@ -89,7 +92,7 @@ public class GoogleClosureCompressorProcessor
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
       final JSSourceFile[] input = new JSSourceFile[] {
         JSSourceFile.fromInputStream(fileName,
-        new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())))
+        new ByteArrayInputStream(content.getBytes(getEncoding())))
       };
       JSSourceFile[] externs = getExterns(resource);
       if (externs == null) {
@@ -106,6 +109,19 @@ public class GoogleClosureCompressorProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  private String getEncoding() {
+    return encoding == null ? config.getEncoding() : encoding;
+  }
+
+
+  /**
+   * @param encoding the encoding to set
+   */
+  public GoogleClosureCompressorProcessor setEncoding(final String encoding) {
+    this.encoding = encoding;
+    return this;
   }
 
 
@@ -146,7 +162,7 @@ public class GoogleClosureCompressorProcessor
      */
     options.setCodingConvention(new ClosureCodingConvention());
     //use the wro4j encoding by default
-    options.setOutputCharset(Context.get().getConfig().getEncoding());
+    options.setOutputCharset(getEncoding());
     //set it to warning, otherwise compiler will fail
     options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES,
       CheckLevel.WARNING);

@@ -98,7 +98,6 @@ public class WroManager
   @Inject
   private GroupsProcessor groupsProcessor;
 
-
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
@@ -152,8 +151,11 @@ public class WroManager
    */
   private void serveProcessedBundle()
     throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final HttpServletResponse response = Context.get().getResponse();
+    final Context context = Context.get();
+    final WroConfiguration configuration = context.getConfig();
+
+    final HttpServletRequest request = context.getRequest();
+    final HttpServletResponse response = context.getResponse();
 
     OutputStream os = null;
     try {
@@ -167,9 +169,8 @@ public class WroManager
       initAggregatedFolderPath(request, type);
 
       // reschedule cache & model updates
-      final WroConfiguration config = Context.get().getConfig();
-      cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
-      modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+      cacheSchedulerHelper.scheduleWithPeriod(configuration.getCacheUpdatePeriod());
+      modelSchedulerHelper.scheduleWithPeriod(configuration.getModelUpdatePeriod());
 
       final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
 
@@ -190,7 +191,7 @@ public class WroManager
        * <a href="http://code.google.com/p/wro4j/issues/detail?id=341">issue341</a>
        */
       if (type != null) {
-        response.setContentType(type.getContentType() + "; charset=" + Context.get().getConfig().getEncoding());
+        response.setContentType(type.getContentType() + "; charset=" + configuration.getEncoding());
       }
       // set ETag header
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
@@ -207,7 +208,7 @@ public class WroManager
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(contentHashEntry.getGzippedContent(), os);
         } else {
-          IOUtils.write(contentHashEntry.getRawContent(), os, Context.get().getConfig().getEncoding());
+          IOUtils.write(contentHashEntry.getRawContent(), os, configuration.getEncoding());
         }
       }
     } finally {
