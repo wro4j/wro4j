@@ -5,9 +5,11 @@ package ro.isdc.wro.manager.factory;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
@@ -22,6 +24,10 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestBaseWroManagerFactory {
   BaseWroManagerFactory factory;
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
   @Test
   public void defaultModelFactoryIsXml() {
     new BaseWroManagerFactory() {
@@ -33,15 +39,15 @@ public class TestBaseWroManagerFactory {
       }
     };
   }
-  
+
   @Test
   public void shouldCreateManager() throws Exception {
     factory = new BaseWroManagerFactory();
-    WroManager manager = factory.create();
+    final WroManager manager = factory.create();
     Assert.assertNotNull(manager);
     Assert.assertEquals(NoOpNamingStrategy.class, manager.getNamingStrategy().getClass());
   }
-  
+
   @Test
   public void shouldSetCallback() throws Exception {
     final LifecycleCallback callback = Mockito.spy(new LifecycleCallbackSupport());
@@ -51,9 +57,9 @@ public class TestBaseWroManagerFactory {
         manager.getCallbackRegistry().registerCallback(callback);
       }
     }.setModelFactory(WroUtil.factoryFor(new WroModel()));
-    WroManager manager = factory.create();
+    final WroManager manager = factory.create();
     manager.getModelFactory().create();
-    
+
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
   }

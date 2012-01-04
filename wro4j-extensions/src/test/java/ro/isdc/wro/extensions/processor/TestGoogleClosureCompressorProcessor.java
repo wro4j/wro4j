@@ -49,6 +49,7 @@ public class TestGoogleClosureCompressorProcessor {
       }
     };
     Context.set(Context.standaloneContext());
+    WroTestUtils.createInjector().inject(processor);
   }
 
   @Test
@@ -93,6 +94,8 @@ public class TestGoogleClosureCompressorProcessor {
       }
     };
     final StringWriter sw = new StringWriter();
+    WroTestUtils.createInjector().inject(processor);
+
     processor.process(new StringReader("function test( ) {}"), sw);
     Assert.assertEquals("", sw.toString());
   }
@@ -108,6 +111,8 @@ public class TestGoogleClosureCompressorProcessor {
         };
       }
     };
+    WroTestUtils.createInjector().inject(processor);
+
     final StringWriter sw = new StringWriter();
     processor.process(new StringReader("alert(1);"), sw);
     //will leave result unchanged, because the processing is not successful.

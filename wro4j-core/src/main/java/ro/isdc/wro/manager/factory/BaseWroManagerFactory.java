@@ -30,6 +30,7 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
@@ -113,7 +114,8 @@ public class BaseWroManagerFactory
       manager.setModelFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
         new ModelTransformerFactory(modelFactory).setTransformers(modelTransformers))));
 
-      final Injector injector = new Injector(manager);
+      final Injector injector = new InjectorBuilder(manager).build();
+      injector.inject(manager);
       injector.inject(modelFactory);
       //transformers also require injection
       for (final Transformer<WroModel> transformer : modelTransformers) {
@@ -135,7 +137,7 @@ public class BaseWroManagerFactory
   /**
    * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
    * callbacks. Default implementation does nothing.
-   * 
+   *
    * @param manager
    *          initialized instance of {@link WroManager}.
    */

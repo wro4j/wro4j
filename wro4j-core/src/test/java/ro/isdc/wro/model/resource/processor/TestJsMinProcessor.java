@@ -23,9 +23,12 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestJsMinProcessor {
+  private ResourcePreProcessor processor;
   @Before
   public void setUp() {
+    processor = new JSMinProcessor();
     Context.set(Context.standaloneContext());
+    WroTestUtils.createInjector().inject(processor);
   }
 
   @After
@@ -36,8 +39,6 @@ public class TestJsMinProcessor {
   @Test
   public void testFromFolder()
     throws IOException {
-    final ResourceProcessor processor = new JSMinProcessor();
-
     final URL url = getClass().getResource("jsmin");
 
     final File testFolder = new File(url.getFile(), "test");

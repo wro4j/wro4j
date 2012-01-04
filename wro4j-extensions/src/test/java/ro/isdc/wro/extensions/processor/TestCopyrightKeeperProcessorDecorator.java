@@ -22,16 +22,18 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCopyrightKeeperProcessorDecorator {
+  private ResourcePreProcessor processor;
   @Before
   public void setUp() {
+    final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
+    processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     Context.set(Context.standaloneContext());
+    WroTestUtils.createInjector().inject(decoratedProcessor);
   }
 
   @Test
   public void decorateJsMinProcessor()
       throws Exception {
-    final ResourceProcessor decoratedProcessor = new JSMinProcessor();
-    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     final URL url = getClass().getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");

@@ -38,6 +38,8 @@ public class GroupsProcessor {
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private ProcessorsFactory processorsFactory;
+  @Inject
+  private Injector injector;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
@@ -132,8 +134,10 @@ public class GroupsProcessor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
-      output = new StringWriter();
+      //inject all required properites
+      injector.inject(processor);
 
+      output = new StringWriter();
       decorateWithPostProcessCallback(processor).process(mergedResource, input, output);
   
 

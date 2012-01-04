@@ -42,6 +42,7 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
@@ -121,7 +122,7 @@ public class WroTestUtils {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor).addPostProcessor(processor));
     final WroManager manager = factory.create();
-    final Injector injector = new Injector(manager);
+    final Injector injector = new InjectorBuilder(manager).build();
     injector.inject(processor);
   }
 
@@ -265,7 +266,7 @@ public class WroTestUtils {
         });
         processedNumber++;
       } catch (final Exception e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: " + e.getCause());
       }
     }
     logSuccess(processedNumber);
@@ -342,7 +343,7 @@ public class WroTestUtils {
         });
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath());
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause());
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }
@@ -366,5 +367,12 @@ public class WroTestUtils {
     for (final Future<?> future : futures) {
       future.get();
     }
+  }
+
+  /**
+   * @return a default {@link Injector} to be used by test classes.
+   */
+  public static Injector createInjector() {
+    return new InjectorBuilder(new BaseWroManagerFactory().create()).build();
   }
 }

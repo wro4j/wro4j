@@ -34,7 +34,7 @@ public class TestCssUrlRewritingProcessor {
 
 
   @Before
-  public void init() {
+  public void setUp() {
     Context.set(Context.standaloneContext());
     processor = new CssUrlRewritingProcessor() {
       @Override
@@ -42,6 +42,7 @@ public class TestCssUrlRewritingProcessor {
         return "[WRO-PREFIX]?id=";
       }
     };
+    WroTestUtils.createInjector().inject(processor);
   }
 
 

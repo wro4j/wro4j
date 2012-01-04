@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
@@ -15,13 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.factory.InjectorResourceLocatorFactoryDecorator;
-import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
 
 
 /**
@@ -33,45 +27,14 @@ import ro.isdc.wro.model.resource.util.NamingStrategy;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private final WroManager wroManager;
-  private final ResourceLocatorFactory resourceLocatorFactory;
-  private final ProcessorsFactory processorsFactory;
-  private final GroupsProcessor groupsProcessor = new GroupsProcessor();
-  private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
-  private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
-  /**
-   * Mapping of classes to be annotated and the coresponding injected object.
-   */
-  private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+  private Map<Class<?>, Object> map;
 
   /**
-   * Creates the Injector and initialize the provided manager.
+   * Mapping of classes to be annotated and the corresponding injected object.
    */
-  public Injector(final WroManager wroManager) {
-    Validate.notNull(wroManager);
-    this.wroManager = wroManager;
-
-    this.resourceLocatorFactory = new InjectorResourceLocatorFactoryDecorator(wroManager.getResourceLocatorFactory(), this);
-    wroManager.setResourceLocatorFactory(this.resourceLocatorFactory);
-
-    this.processorsFactory = new InjectorProcessorsFactoryDecorator(wroManager.getProcessorsFactory(), this);
-    wroManager.setProcessorsFactory(this.processorsFactory);
-    //first initialize the map
-    initMap();
-
-    inject(preProcessorExecutor);
-    inject(groupsProcessor);
-    inject(wroManager);
-  }
-
-  private void initMap() {
-    map.put(PreProcessorExecutor.class, preProcessorExecutor);
-    map.put(GroupsProcessor.class, groupsProcessor);
-    map.put(ResourceLocatorFactory.class, resourceLocatorFactory);
-    map.put(ProcessorsFactory.class, processorsFactory);
-    map.put(NamingStrategy.class, wroManager.getNamingStrategy());
-    map.put(LifecycleCallbackRegistry.class, callbackRegistry);
-    map.put(Injector.class, this);
+  Injector(final Map<Class<?>, Object> map) {
+    Validate.notNull(map);
+    this.map = map;
   }
 
   /**
@@ -89,15 +52,15 @@ public final class Injector {
    * Check for each field from the passed object if @Inject annotation is present & inject the required field if
    * supported, otherwise warns about invalid usage.
    *
-   * @param processor object to check for annotation presence.
+   * @param object to check for annotation presence.
    */
-  private void processInjectAnnotation(final Object processor) {
-    LOG.debug("processInjectAnnotation for: {}", processor.getClass().getSimpleName());
+  private void processInjectAnnotation(final Object object) {
+    LOG.debug("processInjectAnnotation for: {}", object.getClass().getSimpleName());
     try {
-      final Collection<Field> fields = getAllFields(processor);
+      final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
-          if (!acceptAnnotatedField(processor, field)) {
+          if (!acceptAnnotatedField(object, field)) {
             final String message = "@Inject cannot be applied to field of type: " + field.getType();
             LOG.error(message + ". Supported types are: {}", map.keySet());
             throw new WroRuntimeException(message);
@@ -143,7 +106,12 @@ public final class Injector {
       field.setAccessible(true);
       for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
         if (entry.getKey().isAssignableFrom(field.getType())) {
-          field.set(object, entry.getValue());
+          Object value = entry.getValue();
+          //treat factories as a special case for lazy load of the objects.
+          if (value instanceof InjectorObjectFactory) {
+            value = ((InjectorObjectFactory<?>) value).create();
+          }
+          field.set(object, value);
           return accept = true;
         }
       }
