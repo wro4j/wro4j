@@ -9,6 +9,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -23,7 +24,8 @@ public class TestCssDataUriPreProcessor {
   private ResourceProcessor processor;
 
   @Before
-  public void init() {
+  public void setUp() {
+    Context.set(Context.standaloneContext());
     processor = new CssDataUriPreProcessor();
     //find a way to use a custom uriLocator
     WroTestUtils.initProcessor(processor);

@@ -22,10 +22,10 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCopyrightKeeperProcessorDecorator {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
   @Before
   public void setUp() {
-    final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
+    final ResourceProcessor decoratedProcessor = new JSMinProcessor();
     processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     Context.set(Context.standaloneContext());
     WroTestUtils.createInjector().inject(decoratedProcessor);

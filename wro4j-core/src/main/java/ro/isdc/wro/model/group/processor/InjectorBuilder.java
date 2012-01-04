@@ -13,8 +13,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
@@ -29,7 +28,8 @@ public class InjectorBuilder {
   private GroupsProcessor groupsProcessor = new GroupsProcessor();
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
-  private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
+  //TODO set a not null locatorFactory
+  private ResourceLocatorFactory resourceLocatorFactory = null;
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
   private Injector injector;
@@ -50,7 +50,7 @@ public class InjectorBuilder {
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
     //map.put(UriLocatorFactory.class, uriLocatorFactory);
-    map.put(UriLocatorFactory.class, uriLocatorFactory);
+    map.put(ResourceLocatorFactory.class, resourceLocatorFactory);
     map.put(ProcessorsFactory.class, processorsFactory);
     map.put(NamingStrategy.class, namingStrategy);
     map.put(Injector.class, new InjectorObjectFactory<Injector>() {
@@ -83,7 +83,7 @@ public class InjectorBuilder {
 
   public InjectorBuilder setWroManager(final WroManager manager) {
     Validate.notNull(manager);
-    uriLocatorFactory = manager.getUriLocatorFactory();
+    resourceLocatorFactory = manager.getResourceLocatorFactory();
     processorsFactory = manager.getProcessorsFactory();
     namingStrategy = manager.getNamingStrategy();
     return this;
@@ -100,8 +100,8 @@ public class InjectorBuilder {
   /**
    * @param uriLocatorFactory the uriLocatorFactory to set
    */
-  public InjectorBuilder setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
+  public InjectorBuilder setResourceLocatorFactory(final ResourceLocatorFactory resourceLocatorFactory) {
+    this.resourceLocatorFactory = resourceLocatorFactory;
     return this;
   }
 

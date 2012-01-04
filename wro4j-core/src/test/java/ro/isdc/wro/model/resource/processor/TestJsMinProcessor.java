@@ -23,7 +23,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestJsMinProcessor {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
   @Before
   public void setUp() {
     processor = new JSMinProcessor();
