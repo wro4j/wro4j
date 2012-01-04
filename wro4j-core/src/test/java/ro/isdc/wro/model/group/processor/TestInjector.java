@@ -10,7 +10,6 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
@@ -35,11 +34,6 @@ public class TestInjector {
   @Test(expected=NullPointerException.class)
   public void cannotAcceptNullManager() {
     injector = new Injector(null);
-  }
-
-  @Test(expected=NullPointerException.class)
-  public void cannotAcceptUninitializedManager() {
-    injector = new Injector(Mockito.mock(WroManager.class));
   }
 
   @Test
