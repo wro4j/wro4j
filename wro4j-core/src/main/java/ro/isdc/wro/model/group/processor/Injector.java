@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
@@ -15,15 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
 
 
 /**
@@ -35,48 +27,14 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private WroManager wroManager;
-  private GroupsProcessor groupsProcessor = new GroupsProcessor();
-  private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
-  private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
+  private Map<Class<?>, Object> map;
+
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
    */
-  private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
-
-  /**
-   * Creates the Injector and initialize the provided manager.
-   */
-  public Injector(final WroManager wroManager) {
-    Validate.notNull(wroManager);
-    this.wroManager = wroManager;
-    //first initialize the map
-    initMap();
-
-    inject(preProcessorExecutor);
-    inject(groupsProcessor);
-    inject(wroManager);
-  }
-
-  private void initMap() {
-    map.put(PreProcessorExecutor.class, preProcessorExecutor);
-    map.put(GroupsProcessor.class, groupsProcessor);
-    //map.put(UriLocatorFactory.class, uriLocatorFactory);
-    map.put(UriLocatorFactory.class, wroManager.getUriLocatorFactory());
-    map.put(ProcessorsFactory.class, wroManager.getProcessorsFactory());
-    map.put(NamingStrategy.class, wroManager.getNamingStrategy());
-    map.put(LifecycleCallbackRegistry.class, callbackRegistry);
-    map.put(Injector.class, this);
-    map.put(Context.class, new InjectorObjectFactory<Context>() {
-      public Context create() {
-        return Context.get();
-      }
-    });
-    map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
-      public WroConfiguration create() {
-        return Context.get().getConfig();
-      }
-    });
+  Injector(final Map<Class<?>, Object> map) {
+    Validate.notNull(map);
+    this.map = map;
   }
 
   /**
@@ -164,9 +122,4 @@ public final class Injector {
       }
     }
   }
-
-  /**
-   * A special type used for lazy object injection only in context of this class.
-   */
-  private static interface InjectorObjectFactory <T> extends ObjectFactory <T> {};
 }

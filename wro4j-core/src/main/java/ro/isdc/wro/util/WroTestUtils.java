@@ -42,6 +42,7 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
@@ -125,7 +126,7 @@ public class WroTestUtils {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
     final WroManager manager = factory.create();
-    final Injector injector = new Injector(manager);
+    final Injector injector = new InjectorBuilder(manager).build();
     injector.inject(processor);
   }
 
@@ -137,7 +138,7 @@ public class WroTestUtils {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor));
     final WroManager manager = factory.create();
-    final Injector injector = new Injector(manager);
+    final Injector injector = new InjectorBuilder(manager).build();
     injector.inject(processor);
   }
 
@@ -451,6 +452,6 @@ public class WroTestUtils {
    * @return a default {@link Injector} to be used by test classes.
    */
   public static Injector createInjector() {
-    return new Injector(new BaseWroManagerFactory().create());
+    return new InjectorBuilder(new BaseWroManagerFactory().create()).build();
   }
 }

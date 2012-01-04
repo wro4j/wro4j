@@ -63,7 +63,7 @@ public class TestPreProcessorExecutor {
    */
   private void initExecutor(final ResourcePreProcessor... preProcessors) {
     final WroManagerFactory wroManagerFactory = createWroManager(preProcessors);
-    final Injector injector = new Injector(wroManagerFactory.create());
+    final Injector injector = new InjectorBuilder(wroManagerFactory.create()).build();
     executor = new PreProcessorExecutor();
     injector.inject(executor);
   }

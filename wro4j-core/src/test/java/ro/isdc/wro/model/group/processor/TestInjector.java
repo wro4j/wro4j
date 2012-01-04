@@ -43,7 +43,7 @@ public class TestInjector {
 
   private void initializeValidInjector() {
     final WroManager manager = new BaseWroManagerFactory().create();
-    injector = new Injector(manager);
+    injector = new InjectorBuilder(manager).build();
   }
 
   @Test(expected=WroRuntimeException.class)
