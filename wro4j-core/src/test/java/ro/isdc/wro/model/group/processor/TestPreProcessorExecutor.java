@@ -173,7 +173,7 @@ public class TestPreProcessorExecutor {
 
   /**
    * This test should work when running at least on dual-core.
-   * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > 
+   * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))  
    */
   @Test
   public void preProcessingInParallelIsFaster()
