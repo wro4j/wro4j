@@ -95,12 +95,14 @@ public class PreProcessorExecutor {
    */
   private String runInParallel(final List<Resource> resources, final boolean minimize)
       throws IOException {
+    LOG.debug("Running preProcessing in Parallel");
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
       callables.add(new Callable<String>() {
         public String call()
             throws Exception {
+          LOG.debug("Callable started for resource: {} ...", resource);
           return applyPreProcessors(resource, minimize);
         }
       });
@@ -133,6 +135,7 @@ public class PreProcessorExecutor {
     if (executor == null) {
       // use at most the number of available processors (true parallelism)
       final int threadPoolSize = Runtime.getRuntime().availableProcessors();
+      LOG.debug("Parallel thread pool size: {}", threadPoolSize);
       executor = Executors.newFixedThreadPool(threadPoolSize,
           WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
     }
