@@ -17,7 +17,7 @@
 package ro.isdc.wro.model.resource.processor.support;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -35,7 +35,7 @@ public class Lessify {
 
 
   public String variablizeColors(String css) {
-    final Set<String> colors = new HashSet<String>();
+    final Set<String> colors = new LinkedHashSet<String>();
     css = conformColors(css);
     final Matcher m = PATTERN_COLOR.matcher(css);
     final Map<String, Integer> colorCount = new HashMap<String, Integer>();
