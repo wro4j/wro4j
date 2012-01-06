@@ -47,9 +47,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -72,7 +72,7 @@ public class CssCompressor {
 
   protected String mergeRules(final String inputCss) {
 
-    final Map ruleMap = new HashMap();
+    final Map ruleMap = new LinkedHashMap();
     final StringBuffer mergedCss = new StringBuffer();
 
     final Pattern p = Pattern.compile("([^\\{]*)\\{(.*?)\\}");
@@ -105,7 +105,7 @@ public class CssCompressor {
 
     final StringBuffer cssRule = new StringBuffer();
 
-    final Set ruleSet = new HashSet(Arrays.asList(inputCssRule.split(";")));
+    final Set ruleSet = new LinkedHashSet(Arrays.asList(inputCssRule.split(";")));
 
     for (final Iterator i = ruleSet.iterator(); i.hasNext();) {
       cssRule.append((String)i.next() + ";");
@@ -248,7 +248,7 @@ public class CssCompressor {
     m = p.matcher(css);
     sb = new StringBuffer();
 
-    final Map colorMap = new HashMap();
+    final Map colorMap = new LinkedHashMap();
     colorMap.put("C0C0C0", "silver");
     colorMap.put("800000", "maroon");
     colorMap.put("800080", "purple");

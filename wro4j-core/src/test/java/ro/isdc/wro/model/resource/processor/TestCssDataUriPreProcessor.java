@@ -26,6 +26,7 @@ public class TestCssDataUriPreProcessor {
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
+    Context.set(Context.standaloneContext());
     processor = new CssDataUriPreProcessor();
     //find a way to use a custom uriLocator
     WroTestUtils.initProcessor(processor);
