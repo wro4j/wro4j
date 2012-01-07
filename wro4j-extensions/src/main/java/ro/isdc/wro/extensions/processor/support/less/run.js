@@ -4,9 +4,7 @@ var lessIt = function(css) {
 
     parser.parse(css, function (e, root) {
     	result = css;
-    	if (root && root.toCSS) {
-    		result = root.toCSS();	
-    	}
+   		result = root.toCSS();	
     });
     return result;
 };
