@@ -62,7 +62,7 @@ public class CoffeeScript {
    * @return The stream of the CoffeeScript.
    */
   protected InputStream getCoffeeScriptAsStream() {
-    return getClass().getResourceAsStream("coffee-script-1.1.3-pre.js");
+    return getClass().getResourceAsStream("coffee-script-1.2.0.js");
   }
 
 

@@ -1,7 +1,10 @@
 (function() {
   var fs;
+
   fs = require('fs');
+
   option('-o', '--output [DIR]', 'directory for compiled code');
+
   task('build:parser', 'rebuild the Jison parser', function(options) {
     var code, dir;
     require('jison');
@@ -9,4 +12,5 @@
     dir = options.output || 'lib';
     return fs.writeFile("" + dir + "/parser.js", code);
   });
+
 }).call(this);
