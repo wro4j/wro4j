@@ -84,6 +84,7 @@ public class TestLessCssProcessor {
       };
     };
     final Reader reader = new InputStreamReader(getClass().getResourceAsStream("lesscss/giveErrors.less"));
-    processor.process(reader, new StringWriter());
+    final StringWriter writer = new StringWriter();
+    processor.process(reader, writer);
   }
 }
