@@ -1,9 +1,12 @@
 var lessIt = function(css) {
     var result;
-    var parser = new window.less.Parser();
+    var parser = new less.Parser({ optimization: 2 });
 
     parser.parse(css, function (e, root) {
-        result = root.toCSS();
+    	result = css;
+    	if (root && root.toCSS) {
+    		result = root.toCSS();	
+    	}
     });
     return result;
 };

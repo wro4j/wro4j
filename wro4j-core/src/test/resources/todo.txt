@@ -3,6 +3,6 @@
 # update uglify
 # update jsLint
 # update cssLint
-# refactor cssVariablize tests
 # make most of processors usable outside of wro4j context 
 # update coffeeScript to 1.1.3 - [FAIL]
+# refactor cssVariablize tests - [OK]
