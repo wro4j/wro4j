@@ -1,6 +1,6 @@
-# update jsHint
-# update jsLint
 # make most of processors usable outside of wro4j context
+# update jsHint - [OK]
+# update jsLint - [OK]
 # update coffeeScript to 1.1.3 - [OK]
 # refactor cssVariablize tests - [OK]
 # update less to 1.2.0 - [OK]
