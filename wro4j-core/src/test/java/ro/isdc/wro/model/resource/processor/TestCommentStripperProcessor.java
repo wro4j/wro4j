@@ -3,7 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
-import java.io.IOException;
+import java.io.File;
+import java.net.URL;
 
 import org.junit.Test;
 
@@ -20,9 +21,11 @@ public class TestCommentStripperProcessor {
   private final ResourceProcessor processor = new CommentStripperProcessor();
 
   @Test
-  public void test()
-      throws IOException {
-    WroTestUtils.compareProcessedResourceContents("classpath:ro/isdc/wro/processor/comment-input.js",
-      "classpath:ro/isdc/wro/processor/comment-output.js", processor);
+  public void testFromFolder()
+      throws Exception {
+    final URL url = getClass().getResource("commentStripper");
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 }

@@ -1,5 +1,6 @@
 (function() {
   var globals, name;
+
   globals = ((function() {
     var _results;
     _results = [];
@@ -8,4 +9,5 @@
     }
     return _results;
   })()).slice(0, 10);
+
 }).call(this);

@@ -14,7 +14,7 @@
     max-width: 480;
   }
 }
-@media all and (orientation:portrait) {
+@media all and (orientation: portrait) {
   aside {
     float: none;
   }

@@ -1,5 +1,6 @@
 (function() {
   var lyrics, num;
+
   if (this.studyingEconomics) {
     while (supply > demand) {
       buy();
@@ -8,7 +9,9 @@
       sell();
     }
   }
+
   num = 6;
+
   lyrics = (function() {
     var _results;
     _results = [];
@@ -17,4 +20,5 @@
     }
     return _results;
   })();
+
 }).call(this);

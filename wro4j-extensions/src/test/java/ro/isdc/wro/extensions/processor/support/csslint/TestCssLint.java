@@ -5,9 +5,6 @@ package ro.isdc.wro.extensions.processor.support.csslint;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.support.csslint.CssLint;
-import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
-
 
 /**
  * @author Alex Objelean
