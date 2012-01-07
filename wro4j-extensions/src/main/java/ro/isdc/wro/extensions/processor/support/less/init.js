@@ -14,3 +14,4 @@ var location = location || {
  */
 window.less = {}; 
 window.less.env = 'production';
+var exports = {};

@@ -1,4 +1,5 @@
 (function() {
+
   switch (day) {
     case "Mon":
       go(work);
@@ -22,4 +23,5 @@
     default:
       go(work);
   }
+
 }).call(this);

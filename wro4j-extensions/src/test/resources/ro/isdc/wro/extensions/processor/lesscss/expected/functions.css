@@ -1,5 +1,5 @@
 #functions {
-  color: color("evil red");
+  color: #eedd;
   width: increment(15);
   height: undefined("self");
   border-width: add(2, 3);

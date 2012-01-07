@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs version (1.2.3)
+ * The underlying implementation use the uglifyJs version (1.2.4)
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
