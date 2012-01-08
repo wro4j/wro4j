@@ -512,16 +512,19 @@ public class WroManager
 
 
   /**
-   *
    * @return The strategy used to rename bundled resources.
    */
   public final NamingStrategy getNamingStrategy() {
     return this.namingStrategy;
   }
 
+  /**
+   * This method is visible for testing only.
+   */
   GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
   }
+
 
   /**
    * @return the holder of registered callbacks. Use it to register custom callbacks.

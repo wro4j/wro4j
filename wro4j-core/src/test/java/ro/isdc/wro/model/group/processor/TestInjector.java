@@ -32,7 +32,7 @@ public class TestInjector {
   }
 
   @Test(expected=NullPointerException.class)
-  public void cannotAcceptNullManager() {
+  public void cannotAcceptNullMap() {
     injector = new Injector(null);
   }
 
@@ -75,7 +75,7 @@ public class TestInjector {
 
   @Test
   public void shouldInjectContext() throws Exception {
-    // Cannot reuse this part, because generic type is not inferred correcty at runtime
+    // Cannot reuse this part, because generic type is not inferred correctly at runtime
     initializeValidInjector();
     final Callable<?> inner = new Callable<Void>() {
       @Inject
