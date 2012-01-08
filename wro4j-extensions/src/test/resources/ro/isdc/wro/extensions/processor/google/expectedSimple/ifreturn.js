@@ -1,0 +1,1 @@
+function a(b){return 1==b?2:17};

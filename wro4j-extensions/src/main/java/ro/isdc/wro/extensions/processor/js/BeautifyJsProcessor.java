@@ -9,17 +9,19 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.uglify.UglifyJs;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
+import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -37,14 +39,19 @@ public class BeautifyJsProcessor
   /**
    * Engine.
    */
-  private final UglifyJs engine;
+  private final ObjectPoolHelper<UglifyJs> enginePool;
 
 
   /**
    * Default constructor. Instantiates uglifyJs engine.
    */
   public BeautifyJsProcessor() {
-    engine = newEngine();
+    enginePool = new ObjectPoolHelper<UglifyJs>(new ObjectFactory<UglifyJs>() {
+      @Override
+      public UglifyJs create() {
+        return newEngine();
+      }
+    });
   }
 
 
@@ -62,8 +69,10 @@ public class BeautifyJsProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final UglifyJs engine = enginePool.getObject();
     try {
-      writer.write(engine.process(content));
+      final String filename = resource == null ? "noName.js" : resource.getUri();
+      writer.write(engine.process(filename, content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
@@ -73,6 +82,7 @@ public class BeautifyJsProcessor
     } finally {
       reader.close();
       writer.close();
+      enginePool.returnObject(engine);
     }
   }
 

@@ -64,4 +64,53 @@ public interface WroConfigurationMBean {
 	 * Force reload of the model.
 	 */
 	void reloadModel();
+
+
+  /**
+   * After how many seconds the connection to servlet context and external url will be timed-out. This is useful to
+   * avoid memory leaks when connection pool responsible for cache and model reload is destroyed.
+   *
+   * @param seconds value in seconds.
+   */
+	void setConnectionTimeout(int seconds);
+
+	/**
+	 * @return the number of seconds to wait until connection will timeout.
+	 */
+	int getConnectionTimeout();
+
+  /**
+   * Whether gzipped content should be cached or not. In order to take effect, after changing this value, reload the
+   * cache.
+   *
+   * @param cache boolean flag.
+   */
+	void setCacheGzippedContent(boolean cache);
+
+	/**
+	 * @return true if the cacheGzippedContent flag is enabled.
+	 */
+	boolean isCacheGzippedContent();
+
+  /**
+   * Encoding to use when writing the processed result into the output stream.
+   *
+   * @param encoding name of the charset encoding to set.
+   */
+	void setEncoding(String encoding);
+
+	/**
+	 * @return currently used encoding.
+	 */
+	String getEncoding();
+
+	/**
+	 * @return if missing resources should be ignored.
+	 */
+	boolean isIgnoreMissingResources();
+
+	/**
+   * @return set the ignoreMissingResources flag.
+   */
+  void setIgnoreMissingResources(boolean ignore);
 }

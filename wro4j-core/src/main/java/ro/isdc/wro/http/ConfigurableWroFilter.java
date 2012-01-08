@@ -3,11 +3,23 @@
  */
 package ro.isdc.wro.http;
 
+import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.ObjectFactory;
 
 /**
@@ -18,6 +30,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @author Alex Objelean
  */
 public class ConfigurableWroFilter extends WroFilter {
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroFilter.class);
   /**
    * Properties to be injected with default values set. These values are deprecated. Prefer setting the "properties"
    * field instead.
@@ -80,6 +93,37 @@ public class ConfigurableWroFilter extends WroFilter {
       return mbeanName;
     }
     return super.newMBeanName();
+  }
+
+  /**
+   * The default implementation of ConfigurableWroFilter should allow setting of pre & post processors in configuration
+   * properties. This will work only if no custom {@link WroManagerFactory} is configured.
+   */
+  @Override
+  protected WroManagerFactory newWroManagerFactory() {
+    return new BaseWroManagerFactory() {
+      @Override
+      protected ProcessorsFactory newProcessorsFactory() {
+        final Map<String, ResourcePreProcessor> preProcessorsMap = ProcessorsUtils.createPreProcessorsMap();
+        final Map<String, ResourcePostProcessor> postProcessorsMap = ProcessorsUtils.createPostProcessorsMap();
+        LOG.debug("available preProcessors are: {}", preProcessorsMap.keySet());
+        LOG.debug("available postProcessors are: {}", preProcessorsMap.keySet());
+        //add processors from extensions module if one is available.
+        LOG.debug("trying to import processors from extensions module...");
+        try {
+          final Class<?> clazz = Class.forName("ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory");
+          final Method method = clazz.getMethod("pupulateMapWithExtensionsProcessors", Map.class);
+          method.invoke(null, preProcessorsMap);
+          method.invoke(null, postProcessorsMap);
+          LOG.debug("[OK] Extensions processors imported successfully: {}", preProcessorsMap.keySet());
+        } catch (final Exception e) {
+          LOG.debug("[FAIL] Failed to import processors from extensions module", e);
+        }
+
+        return new ConfigurableProcessorsFactory().setPreProcessorsMap(preProcessorsMap).setPostProcessorsMap(
+            postProcessorsMap).setProperties(properties);
+      }
+    };
   }
 
   /**

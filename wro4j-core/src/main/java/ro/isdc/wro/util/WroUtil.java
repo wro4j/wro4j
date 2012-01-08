@@ -9,8 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.TimeZone;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,16 +23,19 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -49,7 +52,7 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
@@ -62,6 +65,24 @@ public final class WroUtil {
     "(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
   private static final Pattern PATTERN_GZIP = Pattern.compile(
     "(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
+
+  private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
+
+  /**
+   * @return {@link ThreadFactory} with daemon threads.
+   */
+  public static ThreadFactory createDaemonThreadFactory(final String name) {
+    return new ThreadFactory() {
+      private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
+      private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+      public Thread newThread(final Runnable runnable) {
+        final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
+        thread.setDaemon(true);
+        return thread;
+      }
+    };
+  }
 
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
@@ -171,15 +192,17 @@ public final class WroUtil {
    * @return true if this request support gzip encoding.
    */
   public static boolean isGzipSupported(final HttpServletRequest request) {
-    final Enumeration<String> headerNames = request.getHeaderNames();
-    if (headerNames != null) {
-      while (headerNames.hasMoreElements()) {
-        final String headerName = headerNames.nextElement();
-        final Matcher m = PATTERN_ACCEPT_ENCODING.matcher(headerName);
-        if (m.find()) {
-          final String headerValue = request.getHeader(headerName);
-          final Matcher mValue = PATTERN_GZIP.matcher(headerValue);
-          return mValue.find();
+    if (request != null) {
+      final Enumeration<String> headerNames = request.getHeaderNames();
+      if (headerNames != null) {
+        while (headerNames.hasMoreElements()) {
+          final String headerName = headerNames.nextElement();
+          final Matcher m = PATTERN_ACCEPT_ENCODING.matcher(headerName);
+          if (m.find()) {
+            final String headerValue = request.getHeader(headerName);
+            final Matcher mValue = PATTERN_GZIP.matcher(headerValue);
+            return mValue.find();
+          }
         }
       }
     }
@@ -193,10 +216,23 @@ public final class WroUtil {
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
   public static String toJSMultiLineString(final String data) {
-    final String[] lines = data.split("\\n");
-    final StringBuffer result = new StringBuffer("[\"\"");
-    for (final String line : lines) {
-      result.append(", \"" + line.replace("\\","\\\\").replace("\"","\\\"").replaceAll("\\r|\\n", "") + "\"");
+    final String[] lines = data.split("\n");
+    final StringBuffer result = new StringBuffer("[");
+    if (lines.length == 0) {
+      result.append("\"\"");
+    }
+    for (int i = 0; i < lines.length; i++) {
+      final String line = lines[i];
+      result.append("\"");
+      result.append(line.replace("\\", "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
+      //this is used to force a single line to have at least one new line (otherwise cssLint fails).
+      if (lines.length == 1) {
+        result.append("\\n");
+      }
+      result.append("\"");
+      if (i < lines.length - 1) {
+        result.append(",");
+      }
     }
     result.append("].join(\"\\n\")");
     return result.toString();
@@ -214,42 +250,6 @@ public final class WroUtil {
 //  }
 
   /**
-   * Checks if request contains the header value with a given value.
-   *
-   * @param request to check
-   * @param header name of the header to check
-   * @param value of the header to check
-   */
-  @SuppressWarnings("unchecked")
-  private static boolean headerContains(final HttpServletRequest request, final String header, final String value) {
-    final Enumeration<String> headerValues = request.getHeaders(header);
-    if (headerValues != null) {
-      while (headerValues.hasMoreElements()) {
-        final String headerValue = headerValues.nextElement();
-        if (headerValue.indexOf(value) != -1) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * @return a {@link ThreadFactory} which produces only daemon threads.
-   */
-  public static ThreadFactory createDaemonThreadFactory() {
-    final ThreadFactory backingThreadFactory = Executors.defaultThreadFactory();
-    return new ThreadFactory() {
-      public Thread newThread(final Runnable runnable) {
-        final Thread thread = backingThreadFactory.newThread(runnable);
-        thread.setDaemon(true);
-        return thread;
-      }
-    };
-  }
-
-
-  /**
    * Returns the filter path read from the web.xml
    *
    * @param filterName the name of the searched filter.
@@ -258,12 +258,8 @@ public final class WroUtil {
    */
   public static String getFilterPath(final String filterName, final InputStream is)
     throws ServletException {
-    if (filterName == null) {
-      throw new IllegalArgumentException("filterName cannot be null!");
-    }
-    if (is == null) {
-      throw new IllegalArgumentException("InputStream cannot be null!");
-    }
+    Validate.notNull(filterName);
+    Validate.notNull(is);
     final String prefix = "filter";
     final String mapping = prefix + "-mapping";
 
@@ -285,12 +281,12 @@ public final class WroUtil {
       final NodeList nodes = (NodeList) result;
       for (int i = 0; i < nodes.getLength(); i++) {
         final Node node = nodes.item(i);
-        LOG.debug("node: " + node);
+        LOG.debug("\tnode: {}", node);
         if (filterName.equals(node.getTextContent())) {
           final Node filterMappingNode = node.getParentNode().getParentNode();
-          LOG.debug("filterMappingNode: " + filterMappingNode);
+          LOG.debug("filterMappingNode: {}", filterMappingNode);
           urlPattern = urlPatternExpression.evaluate(filterMappingNode);
-          LOG.debug("urlPattern: " + urlPattern);
+          LOG.debug("urlPattern: {}", urlPattern);
         }
       }
 
@@ -344,11 +340,40 @@ public final class WroUtil {
     };
   }
 
+
+  /**
+   * A simple way to create a {@link WroModelFactory}.
+   *
+   * @param model {@link WroModel} instance to be returned by the factory.
+   */
+  public static WroModelFactory factoryFor(final WroModel model) {
+    return new WroModelFactory() {
+      public WroModel create() {
+        return model;
+      }
+      public void destroy() {}
+    };
+  }
+
   public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
     return new ObjectFactory<T>() {
       public T create() {
         return object;
       }
     };
+  }
+
+
+  /**
+   * Wraps original exception into {@link WroRuntimeException} and throw it.
+   *
+   * @param e the exception to wrap.
+   */
+  public static void wrapWithWroRuntimeException(final Exception e) {
+    LOG.error("Exception occured: " + e.getClass(), e.getCause());
+    if (e instanceof WroRuntimeException) {
+      throw (WroRuntimeException) e;
+    }
+    throw new WroRuntimeException(e.getMessage(), e);
   }
 }

@@ -6,7 +6,7 @@ package ro.isdc.wro.config.factory;
 
 import java.util.Properties;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +47,8 @@ public class PropertyWroConfigurationFactory
       config.setWroManagerClassName(valueAsString(properties.get(ConfigConstants.managerFactoryClassName.name())));
       config.setMbeanName(valueAsString(properties.get(ConfigConstants.mbeanName.name())));
       config.setHeader(valueAsString(properties.get(ConfigConstants.header.name())));
+      config.setCacheGzippedContent(valueAsBoolean(properties.get(ConfigConstants.cacheGzippedContent.name()), false));
+      config.setParallelPreprocessing(valueAsBoolean(properties.get(ConfigConstants.parallelPreprocessing.name()), false));
     }
     LOG.debug("WroConfiguration created: {}", config);
     return config;

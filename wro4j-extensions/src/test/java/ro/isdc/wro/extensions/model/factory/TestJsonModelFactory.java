@@ -58,7 +58,7 @@ public class TestJsonModelFactory {
     factory = new JsonModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream() throws IOException {
-        return TestGroovyWroModelFactory.class.getResourceAsStream("wro.json");
+        return TestGroovyModelFactory.class.getResourceAsStream("wro.json");
       };
     };
     final WroModel model = factory.create();

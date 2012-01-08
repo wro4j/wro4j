@@ -10,9 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +56,12 @@ public final class WroModel {
    * @param groups
    *          the groups to set
    */
-  public final void setGroups(final Collection<Group> groups) {
+  public final WroModel setGroups(final Collection<Group> groups) {
     Validate.notNull(groups, "groups cannot be null!");
-    LOG.debug("setGroups: " + groups);
+    LOG.debug("setGroups: {}", groups);
     identifyDuplicateGroupNames(groups);
     this.groups = new HashSet<Group>(groups);
+    return this;
   }
 
 
@@ -92,17 +94,32 @@ public final class WroModel {
         return group;
       }
     }
-    throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + groups);
+    throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + getGroupNames(groups));
+  }
+  
+  /**
+   * This implementation would be simpler if java would have closures :).
+   * 
+   * @param groups
+   *          a collection of groups to get as string.
+   * @return a comma separated list of group names.
+   */
+  private String getGroupNames(final Collection<Group> groups) {
+    final Set<String> groupNames = new HashSet<String>();
+    for (final Group group : groups) {
+      groupNames.add(group.getName());
+    }
+    return StringUtils.join(groupNames, ", ");
   }
 
-  /**
+/**
    * Merge this model with another model. This is useful for supporting model imports.
    *
    * @param importedModel model to import.
    */
   public void merge(final WroModel importedModel) {
     Validate.notNull(importedModel, "imported model cannot be null!");
-    LOG.debug("merging importedModel: " + importedModel);
+    LOG.debug("merging importedModel: {}", importedModel);
     for (final String groupName : importedModel.getGroupNames()) {
       if (getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);
@@ -115,9 +132,10 @@ public final class WroModel {
    * Add a single group to the model.
    * @param group a not null {@link Group}.
    */
-  public void addGroup(final Group group) {
+  public WroModel addGroup(final Group group) {
     Validate.notNull(group);
     groups.add(group);
+    return this;
   }
 
   /**

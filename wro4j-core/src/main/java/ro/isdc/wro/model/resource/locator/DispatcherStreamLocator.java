@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletOutputStream;
@@ -22,9 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
 
@@ -35,21 +39,28 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public final class DispatcherStreamLocator {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
 
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
-   * the portal with multiple threads (web requests) that are combined with threads for wro4.
+   * the portal with multiple threads (web requests) that are combined with threads for wro4j.
+   *
+   *
+   * @return a valid stream for required location. This method will never return a null.
+   * @throws IOException if the stream cannot be located at the specified location.
    */
-  public synchronized InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
-      final String location)
-      throws IOException {
+  public InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
+    final String location)
+    throws IOException {
+    Validate.notNull(request);
+    Validate.notNull(response);
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
+    boolean warnOnEmptyStream = false;
+
+    // preserve context, in case it is unset during dispatching
+    final Context originalContext = Context.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher == null) {
@@ -61,7 +72,16 @@ public final class DispatcherStreamLocator {
 
         final String absolutePath = servletContextPath + location;
         final URL url = new URL(absolutePath);
-        return url.openStream();
+        final URLConnection conn = url.openConnection();
+        // setting these timeouts ensures the client does not deadlock indefinitely
+        // when the server has problems.
+        //TimeUnit.MILLISECONDS.con
+        final int timeout = (int) TimeUnit.MILLISECONDS.convert(Context.get().getConfig().getConnectionTimeout(),
+          TimeUnit.SECONDS);
+        LOG.debug("Computed timeout milliseconds: {}", timeout);
+        conn.setConnectTimeout(timeout);
+        conn.setReadTimeout(timeout);
+        return conn.getInputStream();
       }
       // Wrap request
       final ServletRequest wrappedRequest = getWrappedServletRequest(request, location);
@@ -70,6 +90,7 @@ public final class DispatcherStreamLocator {
       LOG.debug("dispatching request to location: " + location);
       // use dispatcher
       dispatcher.include(wrappedRequest, wrappedResponse);
+      warnOnEmptyStream = true;
       // force flushing - the content will be written to
       // BytArrayOutputStream. Otherwise exactly 32K of data will be
       // written.
@@ -79,14 +100,20 @@ public final class DispatcherStreamLocator {
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
-      LOG.debug("Error while dispatching the request for location " + location, e);
-      return null;
-    }
-    if (os.size() == 0) {
-      LOG.warn("Wrong or empty resource with location : " + location);
+      LOG.debug("[FAIL] Error while dispatching the request for location {}", location);
+      throw new IOException("Error while dispatching the request for location " + location);
+    } finally {
+      if (warnOnEmptyStream && os.size() == 0) {
+        LOG.warn("Wrong or empty resource with location: {}", location);
+      }
+      // Put the context back
+      if (!Context.isContextSet()) {
+        Context.set(originalContext);
+      }
     }
     return new ByteArrayInputStream(os.toByteArray());
   }
+
 
   /**
    * Build a wrapped servlet request which will be used for dispatching.
@@ -98,10 +125,12 @@ public final class DispatcherStreamLocator {
         return getContextPath() + location;
       }
 
+
       @Override
       public String getPathInfo() {
         return WroUtil.getPathInfoFromLocation(location);
       }
+
 
       @Override
       public String getServletPath() {
@@ -110,6 +139,7 @@ public final class DispatcherStreamLocator {
     };
     return wrappedRequest;
   }
+
 
   /**
    * Build a wrapped servlet response which will be used for dispatching.
@@ -130,6 +160,7 @@ public final class DispatcherStreamLocator {
        */
       private ServletOutputStream sos = new DelegatingServletOutputStream(os);
 
+
       /**
        * {@inheritDoc}
        */
@@ -139,6 +170,7 @@ public final class DispatcherStreamLocator {
         onError(sc, "");
         super.sendError(sc);
       }
+
 
       /**
        * {@inheritDoc}
@@ -150,23 +182,27 @@ public final class DispatcherStreamLocator {
         super.sendError(sc, msg);
       }
 
+
       /**
        * Use an empty stream to avoid container writing unwanted message when a resource is missing.
+       *
        * @param sc status code.
        * @param msg
        */
       private void onError(final int sc, final String msg) {
-        LOG.debug("Error detected with code: " + sc + " and message: " + msg);
+        LOG.debug("Error detected with code: {} and message: {}", sc, msg);
         final OutputStream emptyStream = new ByteArrayOutputStream();
         pw = new PrintWriter(emptyStream);
         sos = new DelegatingServletOutputStream(emptyStream);
       }
 
+
       @Override
       public ServletOutputStream getOutputStream()
-          throws IOException {
+        throws IOException {
         return sos;
       }
+
 
       /**
        * By default, redirect does not allow writing to output stream its content. In order to support this use-case, we
@@ -174,11 +210,11 @@ public final class DispatcherStreamLocator {
        */
       @Override
       public void sendRedirect(final String location)
-          throws IOException {
+        throws IOException {
         try {
-          LOG.debug("redirecting to: " + location);
+          LOG.debug("redirecting to: {}", location);
           final URL url = new URL(location);
-          final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+          final HttpURLConnection connection = (HttpURLConnection)url.openConnection();
           // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
           connection.setUseCaches(false);
           final InputStream is = connection.getInputStream();
@@ -190,9 +226,10 @@ public final class DispatcherStreamLocator {
         }
       }
 
+
       @Override
       public PrintWriter getWriter()
-          throws IOException {
+        throws IOException {
         return pw;
       }
     };

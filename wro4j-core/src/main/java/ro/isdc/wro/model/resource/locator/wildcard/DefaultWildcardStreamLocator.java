@@ -10,11 +10,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -26,7 +27,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.util.Transformer;
 
 
@@ -40,6 +40,10 @@ public class DefaultWildcardStreamLocator
     implements WildcardStreamLocator, WildcardExpandedHandlerAware {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWildcardStreamLocator.class);
   /**
+   * Character to distinguish wildcard inside the uri.
+   */
+  public static final String RECURSIVE_WILDCARD = "**";
+  /**
    * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?' character, it is considered
    * a wildcard.
    * <p>
@@ -48,27 +52,13 @@ public class DefaultWildcardStreamLocator
    */
   private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
   /**
-   * Character to distinguish wildcard inside the uri.
+   * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
    */
-  private static final String RECURSIVE_WILDCARD = "**";
-  /**
-   * Responsible for detecting duplicated resources.
-   */
-  private DuplicateResourceDetector duplicateResourceDetector;
   private Transformer<Collection<File>> wildcardExpanderHandler;
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
    */
   public DefaultWildcardStreamLocator() {
-  }
-
-  /**
-   * Creates a WildcardStream locator capable of detecting duplicate resources.
-   *
-   * @param duplicateResourceDetector
-   */
-  public DefaultWildcardStreamLocator(final DuplicateResourceDetector duplicateResourceDetector) {
-    this.duplicateResourceDetector = duplicateResourceDetector;
   }
 
   /**
@@ -111,13 +101,22 @@ public class DefaultWildcardStreamLocator
     }
 
     final String wildcard = FilenameUtils.getName(uri);
-    LOG.debug("uri: " + uri);
-    LOG.debug("folder: " + folder.getPath());
-    LOG.debug("wildcard: " + wildcard);
+    LOG.debug("uri: {}", uri);
+    LOG.debug("folder: {}", folder.getPath());
+    LOG.debug("wildcard: {}", wildcard);
 
     //maps resource uri's and corresponding file
-    //this map have to be ordered
+    //this map has to be ordered
     final Map<String, File> uriToFileMap = new TreeMap<String, File>();
+    /**
+     * Holds a set of all files (also folders, not only resources). This is useful for wildcard expander processing.
+     */
+    final Set<File> allFiles = new TreeSet<File>(new Comparator<File>() {
+        // File's natural ordering varies between platforms
+        public int compare(final File o1, final File o2) {
+            return o1.getPath().compareTo(o2.getPath());
+        }
+    });
 
     final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
     final String parentFolderPath = folder.getPath();
@@ -126,70 +125,61 @@ public class DefaultWildcardStreamLocator
       @Override
       public boolean accept(final File file) {
         final boolean accept = super.accept(file);
-        if (accept && !file.isDirectory()) {
-          final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
-          final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
-          uriToFileMap.put(resourceUri, file);
-          LOG.debug("foundUri: " + resourceUri);
+        if (accept) {
+          allFiles.add(file);
+          if (!file.isDirectory()) {
+            final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
+            final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
+            uriToFileMap.put(resourceUri, file);
+            LOG.debug("\tfoundUri: {}", resourceUri);
+          }
         }
         return accept;
       }
     };
     FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
 
-    //TODO remove duplicates if needed:
-    LOG.debug("map files: " + uriToFileMap.keySet());
-    //holds duplicates to be removed from the map
-    final List<String> duplicateResourceList = new ArrayList<String>();
-    for (final String resourceUri : uriToFileMap.keySet()) {
-      if (isDuplicateResourceUri(resourceUri)) {
-        LOG.warn("Duplicate resource detected: " + resourceUri);
-        duplicateResourceList.add(resourceUri);
-      }
-    }
-    //if (config.removeDuplicates) {
-    for (final String duplicateResourceUri : duplicateResourceList) {
-      uriToFileMap.remove(duplicateResourceUri);
-    }
+    LOG.debug("map files: {}", uriToFileMap.keySet());
 
     final Collection<File> files = uriToFileMap.values();
     if (files.isEmpty()) {
-      final String message = "No files found inside the " + folder.getPath() + " for wildcard: " + wildcard;
-      LOG.warn(message);
+      LOG.warn("No files found inside the {} for wildcard: {}", folder.getPath(), wildcard);
     }
-    if (wildcardExpanderHandler != null) {
-      wildcardExpanderHandler.transform(files);
-    }
-    handleFoundFiles(files);
+    handleFoundResources(files);
+    //trigger wildcardExpander processing
+    handleFoundAllFiles(allFiles);
     return files;
   }
 
 
   /**
-   * Used to do something with found collection of files before they are merged into a single stream. This is useful for
-   * testing.
+   * Uses the wildcardExpanderHandler to process the found files, also directories.
    *
-   * @param files a collection of found files after the wildcard has beed applied on searched folder.
+   * @param files a collection of found files after the wildcard has beed applied on the searched folder.
    */
-  protected void handleFoundFiles(final Collection<File> files) {
-    //do nothing
+  private void handleFoundAllFiles(final Set<File> allFiles) throws IOException {
+    if (wildcardExpanderHandler != null) {
+      try {
+        wildcardExpanderHandler.transform(allFiles);
+      } catch (final Exception e) {
+        //preserve exception type if the exception is already an IOException
+        if (e instanceof IOException) {
+          throw (IOException) e;
+        }
+        throw new IOException("Exception during expanding wildcard: " + e.getMessage());
+      }
+    }
   }
 
   /**
-   * Check if the resourceUri is already duplicated and afterwards add it to processed uri's.
+   * The default implementation does nothing. Useful for unit test to check if the order is as expected.
    *
-   * @return true if the resource is duplicated in the context of the current processing.
+   * @param files a collection of found resources after the wildcard has beed applied on the searched folder.
    */
-  private boolean isDuplicateResourceUri(final String resourceUri) {
-    if (duplicateResourceDetector == null) {
-      //when duplicateResourceDetector is not set (unit tests or using locators outside of wro4j), the duplication is assumed to not be enabled.
-      LOG.warn("DuplicateResourceDetector not enabled, assuming no duplicate found for: " + resourceUri);
-      return false;
-    }
-    final boolean result = duplicateResourceDetector.isDuplicateResourceUri(resourceUri);
-    duplicateResourceDetector.addResourceUri(resourceUri);
-    return result;
+  protected void handleFoundResources(final Collection<File> files) throws IOException {
   }
+
+
 
   /**
    * @param wildcard

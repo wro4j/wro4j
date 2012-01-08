@@ -8,7 +8,9 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
@@ -16,7 +18,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.JawrCssMinifier;
+import ro.isdc.wro.model.resource.processor.support.JawrCssMinifier;
 
 
 /**
@@ -30,7 +32,9 @@ import ro.isdc.wro.model.resource.processor.algorithm.JawrCssMinifier;
 @SupportedResourceType(ResourceType.CSS)
 public class JawrCssMinifierProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
-  public static final String ALIAS = "cssMinJawr";  /**
+  private static final Logger LOG = LoggerFactory.getLogger(JawrCssMinifierProcessor.class);
+  public static final String ALIAS = "cssMinJawr";  
+  /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
@@ -51,8 +55,10 @@ public class JawrCssMinifierProcessor
       writer.flush();
     } catch (final Exception e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      throw new IOException("Exception while applying " + getClass().getSimpleName() + " processor on the "
-          + resourceUri + " resource", e);
+      String message = "Exception while applying " + getClass().getSimpleName() + " processor on the "
+          + resourceUri + " resource";
+      LOG.error(message, e);
+      throw new IOException(message);
     } finally {
       reader.close();
       writer.close();

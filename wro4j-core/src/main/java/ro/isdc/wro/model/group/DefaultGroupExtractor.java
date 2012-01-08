@@ -6,7 +6,8 @@ package ro.isdc.wro.model.group;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,16 +56,14 @@ public class DefaultGroupExtractor
    * {@inheritDoc}
    */
   public ResourceType getResourceType(final HttpServletRequest request) {
-    if (request == null) {
-      throw new IllegalArgumentException("Uri cannot be NULL!");
-    }
+    Validate.notNull(request);
     final String uri = request.getRequestURI();
     final String extension = FilenameUtils.getExtension(uri);
     ResourceType type = null;
     try {
       type = ResourceType.valueOf(extension.toUpperCase());
     } catch (final IllegalArgumentException e) {
-      LOG.debug("Cannot identify resourceType for uri: " + uri);
+      LOG.debug("[FAIL] Cannot identify resourceType for uri: {}", uri);
     }
     return type;
   }

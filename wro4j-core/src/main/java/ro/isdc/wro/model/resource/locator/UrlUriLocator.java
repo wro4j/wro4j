@@ -12,9 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
@@ -27,12 +25,6 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
  * @created Created on Nov 10, 2008
  */
 public class UrlUriLocator extends WildcardUriLocatorSupport {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
-
-
   /**
    * {@inheritDoc}
    */
@@ -65,7 +57,6 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
   public InputStream locate(final String uri)
     throws IOException {
     Validate.notNull(uri, "uri cannot be NULL!");
-    LOG.debug("Reading uri: " + uri);
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);

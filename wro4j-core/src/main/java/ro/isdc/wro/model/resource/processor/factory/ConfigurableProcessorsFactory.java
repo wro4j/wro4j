@@ -4,20 +4,22 @@
 package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
 
 
 /**
@@ -115,12 +117,29 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
     final List<T> list = new ArrayList<T>();
     final List<String> tokenNames = getTokens(itemsAsString);
     for (final String tokenName : tokenNames) {
-      LOG.debug("tokenName: " + tokenName);
-      Validate.notEmpty(tokenName, "Invalid token name: " + tokenName);
-      final T processor = map.get(tokenName.trim());
+      LOG.debug("\ttokenName: {}", tokenName);
+      Validate.notEmpty(tokenName);
+      T processor = map.get(tokenName.trim());
       if (processor == null) {
-        throw new WroRuntimeException("Unknown processor name: " + tokenName + ". Available processors are: "
-          + map.keySet());
+
+        //extension check
+        LOG.debug("[FAIL] no processor found named: {}. Proceeding with extension check. ", tokenName);
+        final String[] tokens = tokenName.split("\\.");
+        LOG.debug("split tokens: {}", Arrays.toString(tokens));
+        if (tokens.length == 2) {
+          final String processorName = tokens[0].trim();
+          LOG.debug("processorName: {}", processorName);
+          processor = map.get(processorName);
+          if (processor != null && processor instanceof ResourcePreProcessor) {
+            final String extension = tokens[1].trim();
+            LOG.debug("adding Extension: {}", extension);
+            ExtensionsAwareProcessorDecorator.decorate((ResourcePreProcessor) processor).addExtension(extension);
+          }
+        }
+        if (processor == null) {
+          throw new WroRuntimeException("Unknown processor name: " + tokenName + ". Available processors are: "
+              + map.keySet()).logError();
+        }
       }
       list.add(processor);
     }

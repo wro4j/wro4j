@@ -13,10 +13,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
@@ -46,6 +47,8 @@ public class CssImportPreProcessor
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
+  @Inject
+  private WroConfiguration configuration;
   /**
    * List of processed resources, useful for detecting deep recursion.
    */
@@ -56,7 +59,7 @@ public class CssImportPreProcessor
   /**
    * {@inheritDoc}
    */
-  public synchronized void process(final Resource resource, final Reader reader, final Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     validate();
     try {
@@ -73,12 +76,8 @@ public class CssImportPreProcessor
    * Checks if required fields were injected.
    */
   private void validate() {
-    if (uriLocatorFactory == null) {
-      throw new IllegalStateException("No UriLocator was injected");
-    }
-    if (preProcessorExecutor == null) {
-      throw new IllegalStateException("No preProcessorExecutor was injected");
-    }
+    Validate.notNull(uriLocatorFactory);
+    Validate.notNull(preProcessorExecutor);
   }
 
 
@@ -101,10 +100,10 @@ public class CssImportPreProcessor
     //groupExtractor.isMinimized(Context.get().getRequest())
     sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
     if (!importsCollector.isEmpty()) {
-      LOG.debug("Imported resources found : " + importsCollector.size());
+      LOG.debug("Imported resources found : {}", importsCollector.size());
     }
     sb.append(IOUtils.toString(reader));
-    LOG.debug("importsCollector: " + importsCollector);
+    LOG.debug("importsCollector: {}", importsCollector);
     return removeImportStatements(sb.toString());
   }
 
@@ -131,7 +130,7 @@ public class CssImportPreProcessor
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
     final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()),
-      Context.get().getConfig().getEncoding());
+      configuration.getEncoding());
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));

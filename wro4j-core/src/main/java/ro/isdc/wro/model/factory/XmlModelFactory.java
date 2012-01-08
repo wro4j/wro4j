@@ -23,7 +23,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -160,8 +160,8 @@ public class XmlModelFactory
     throws IOException, SAXException {
     // create a SchemaFactory capable of understanding WXS schemas
     final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-    final Source schemaFile = new StreamSource(getResourceAsStream(XML_SCHEMA_FILE));
+    final InputStream schemaStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(XML_SCHEMA_FILE);
+    final Source schemaFile = new StreamSource(schemaStream);
     final Schema schema = factory.newSchema(schemaFile);
     return schema;
   }
@@ -187,14 +187,14 @@ public class XmlModelFactory
     for (int i = 0; i < importsList.getLength(); i++) {
       final Element element = (Element)importsList.item(i);
       final String name = element.getTextContent();
-      LOG.debug("processing import: " + name);
-      LOG.debug("processImports#uriLocatorFactory: " + uriLocatorFactory);
+      LOG.debug("processing import: {}", name);
+      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected InputStream getModelResourceAsStream()
           throws IOException {
-          LOG.debug("build model from import: " + name);
-          LOG.debug("uriLocatorFactory: " + uriLocatorFactory);
+          LOG.debug("build model from import: {}", name);
+          LOG.debug("uriLocatorFactory: {}", uriLocatorFactory);
           return uriLocatorFactory.locate(name);
         };
       };
@@ -245,7 +245,7 @@ public class XmlModelFactory
         + ". Recursion path: " + processingGroups);
     }
     processingGroups.add(name);
-    LOG.debug("\tgroupName=" + name);
+    LOG.debug("\tgroupName={}", name);
     // skip if this group is already parsed
     final Group parsedGroup = getGroupByName(name, groups);
     if (parsedGroup != null) {
@@ -325,14 +325,6 @@ public class XmlModelFactory
     }
   }
 
-
-  /**
-   * @return InputStream of the local resource from classpath.
-   */
-  protected static InputStream getResourceAsStream(final String fileName) {
-    return Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-  }
-
   /**
    * Checks if xml structure is valid.
    *
@@ -355,28 +347,4 @@ public class XmlModelFactory
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
   }
-
-//
-//  /**
-//   * @return lazily instantiated {@link UriLocatorFactory}.
-//   */
-//  private UriLocatorFactory getUriLocatorFactory() {
-//    if (uriLocatorFactory == null) {
-//      uriLocatorFactory = new SimpleUriLocatorFactory();
-//      // use locators with wildcard disabled - to avoid invalid xml parsing error
-//      uriLocatorFactory.addUriLocator(new ClasspathUriLocator() {
-//        @Override
-//        protected boolean disableWildcards() {
-//          return true;
-//        }
-//      });
-//      uriLocatorFactory.addUriLocator(new UrlUriLocator() {
-//        @Override
-//        protected boolean disableWildcards() {
-//          return true;
-//        }
-//      });
-//    }
-//    return uriLocatorFactory;
-//  }
 }

@@ -7,15 +7,18 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.algorithm.CssCompressor;
+import ro.isdc.wro.model.resource.processor.support.CssCompressor;
 
 
 /**
@@ -29,6 +32,7 @@ import ro.isdc.wro.model.resource.processor.algorithm.CssCompressor;
 @SupportedResourceType(ResourceType.CSS)
 public class CssCompressorProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(CssCompressorProcessor.class);
   public static final String ALIAS = "cssCompressor";
 
   /**
@@ -49,8 +53,10 @@ public class CssCompressorProcessor
       writer.flush();
     } catch (final Exception e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      throw new IOException("Exception while applying " + getClass().getSimpleName() + " processor on the "
-          + resourceUri + " resource", e);
+      String message = "Exception while applying " + getClass().getSimpleName() + " processor on the "
+          + resourceUri + " resource";
+      LOG.error(message, e);
+      throw new IOException(message);
     } finally {
       reader.close();
       writer.close();

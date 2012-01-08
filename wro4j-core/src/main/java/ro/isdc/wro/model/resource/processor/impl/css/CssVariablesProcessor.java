@@ -85,11 +85,10 @@ public class CssVariablesProcessor
     final Matcher m = PATTERN_VARIABLES_BODY.matcher(variablesBody);
     LOG.debug("parsing variables body");
     while (m.find()) {
-      LOG.debug("found:" + m.group());
       final String key = m.group(1);
       final String value = m.group(2);
       if (map.containsKey(key)) {
-        LOG.warn("A duplicate variable name found with name: " + key + " and value: " + value + ".");
+        LOG.warn("A duplicate variable name found with name: {} and value: {}.", key, value);
       }
       map.put(key, value);
     }

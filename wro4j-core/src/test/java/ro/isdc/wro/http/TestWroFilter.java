@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import junit.framework.Assert;
 
@@ -24,13 +25,17 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.ObjectFactory;
@@ -55,14 +60,6 @@ public class TestWroFilter {
     final ServletContext servletContext = Mockito.mock(ServletContext.class);
     Mockito.when(config.getServletContext()).thenReturn(servletContext);
     filter.init(config);
-  }
-
-
-  @After
-  public void tearDown() {
-    if (filter != null) {
-      filter.destroy();
-    }
   }
 
   /**
@@ -103,10 +100,22 @@ public class TestWroFilter {
 
 
   @Test(expected = WroRuntimeException.class)
-  public void testInvalidAppFactoryClassNameIsSet()
+  public void cannotAcceptInvalidAppFactoryClassNameIsSet()
     throws Exception {
+    filter = new WroFilter();
     Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
     filter.init(config);
+  }
+
+  @Test
+  public void shouldUseInitiallySetManagerEvenIfAnInvalidAppFactoryClassNameIsSet()
+    throws Exception {
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    filter.setWroManagerFactory(mockManagerFactory);
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
+    filter.init(config);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), Mockito.mock(FilterChain.class));
+    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
 
 
@@ -186,6 +195,25 @@ public class TestWroFilter {
     Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
       BaseWroManagerFactory.class.getName());
     filter.init(config);
+  }
+
+
+  /**
+   * Test that when setting WwroManagerFactory via setter, even if wroConfiguration has a different
+   * {@link WroManagerFactory} configured, the first one instance is used.
+   */
+  @Test
+  public void shouldUseCorrectWroManagerFactoryWhenOneIsSet()
+    throws Exception {
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
+      BaseWroManagerFactory.class.getName());
+
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    filter.setWroManagerFactory(mockManagerFactory);
+
+    filter.init(config);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), Mockito.mock(FilterChain.class));
+    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
 
 
@@ -508,28 +536,95 @@ public class TestWroFilter {
     verifyChainIsCalled(chain);
   }
 
-//
-//  @Test
-//  public void testReloadCacheCall()
-//      throws IOException {
-//    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-//    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_CACHE);
-//
-//    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-//        Mockito.mock(FilterConfig.class)));
-//    manager.process();
-//  }
-//
-//  @Test
-//  public void testReloadModelCall()
-//      throws IOException {
-//    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-//    Mockito.when(request.getRequestURI()).thenReturn(WroManager.API_RELOAD_MODEL);
-//
-//    Context.set(Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-//        Mockito.mock(FilterConfig.class)));
-//    manager.process();
-//  }
+
+  /**
+   * Proves that the model reload has effect.
+   */
+  @Test
+  public void modelShouldBeReloadedWhenReloadIsTriggered() throws Exception {
+    final WroManagerFactory wroManagerFactory = new BaseWroManagerFactory().setModelFactory(new WroModelFactory() {
+      private boolean wasCreated = false;
+      public WroModel create() {
+        if (!wasCreated) {
+          wasCreated = true;
+          //return model with no groups defined
+          return new WroModel();
+        }
+        //second time when created add one group
+        return new WroModel().addGroup(new Group("g1"));
+      }
+      public void destroy() {
+      }
+    });
+    Context.set(Context.standaloneContext());
+
+    final WroFilter filter = new WroFilter() {
+      @Override
+      protected WroManagerFactory getWroManagerFactory() {
+        return wroManagerFactory;
+      }
+      @Override
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+        return new ObjectFactory<WroConfiguration>() {
+          public WroConfiguration create() {
+            return Context.get().getConfig();
+          }
+        };
+      }
+    };
+    filter.init(Mockito.mock(FilterConfig.class));
+    final WroModelFactory modelFactory = wroManagerFactory.create().getModelFactory();
+
+    Assert.assertTrue(modelFactory.create().getGroups().isEmpty());
+
+    //reload model
+    Context.get().getConfig().reloadModel();
+    //the second time should have one group
+    Assert.assertEquals(1, modelFactory.create().getGroups().size());
+  }
+
+
+
+  @Test
+  public void testReloadCacheCall()
+      throws Exception {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_CACHE);
+
+    final ThreadLocal<Integer> status = new ThreadLocal<Integer>();
+    final HttpServletResponse response = new HttpServletResponseWrapper(Mockito.mock(HttpServletResponse.class,
+        Mockito.RETURNS_DEEP_STUBS)) {
+      @Override
+      public void setStatus(final int sc) {
+        status.set(sc);
+      }
+    };
+
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    filter.doFilter(Context.get().getRequest(), Context.get().getResponse(), Mockito.mock(FilterChain.class));
+
+    Assert.assertEquals(Integer.valueOf(HttpServletResponse.SC_OK), status.get());
+  }
+
+  @Test
+  public void testReloadModelCall()
+      throws Exception {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_MODEL);
+
+    final ThreadLocal<Integer> status = new ThreadLocal<Integer>();
+    final HttpServletResponse response = new HttpServletResponseWrapper(Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS)) {
+      @Override
+      public void setStatus(final int sc) {
+        status.set(sc);
+      }
+    };
+
+    Context.set(Context.webContext(request, response,
+        Mockito.mock(FilterConfig.class)));
+    filter.doFilter(Context.get().getRequest(), Context.get().getResponse(), Mockito.mock(FilterChain.class));
+    Assert.assertEquals(Integer.valueOf(HttpServletResponse.SC_OK), status.get());
+  }
 
   /**
    * Mocks the WroFilter.PARAM_CONFIGURATION init param with passed value.
@@ -541,16 +636,22 @@ public class TestWroFilter {
   class RequestBuilder {
     private final String requestUri;
 
-
     public RequestBuilder(final String requestUri) {
       this.requestUri = requestUri;
     }
-
 
     protected HttpServletRequest newRequest() {
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       Mockito.when(request.getRequestURI()).thenReturn(requestUri);
       return request;
     }
+  }
+
+  @After
+  public void tearDown() {
+    if (filter != null) {
+      filter.destroy();
+    }
+    Context.unset();
   }
 }

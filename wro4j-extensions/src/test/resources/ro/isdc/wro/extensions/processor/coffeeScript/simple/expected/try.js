@@ -1,4 +1,5 @@
 (function() {
+
   try {
     allHellBreaksLoose();
     catsAndDogsLivingTogether();
@@ -7,4 +8,5 @@
   } finally {
     cleanUp();
   }
+
 }).call(this);

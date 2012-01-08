@@ -1,0 +1,129 @@
+<plugin name='hibernate' version='1.3.7' grailsVersion='1.3 &gt; *'>
+  <author>Graeme Rocher</author>
+  <title>Hibernate for Grails</title>
+  <description>A plugin that provides integration between Grails and Hibernate through GORM</description>
+  <documentation>http://grails.org/doc/1.3.7</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>DataSource</resource>
+    <resource>org.grails.Behavior</resource>
+  </resources>
+  <dependencies>
+    <plugin name='dataSource' version='1.3 &gt; *' />
+    <plugin name='i18n' version='1.3 &gt; *' />
+    <plugin name='core' version='1.3 &gt; *' />
+    <plugin name='domainClass' version='1.3 &gt; *' />
+  </dependencies>
+  <behavior>
+    <method name='methodMissing' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.String' />
+      <argument type='java.lang.Object' />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.Map' />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.Boolean' />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.List' />
+    </method>
+    <method name='methodMissing' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.String' />
+      <argument type='java.lang.Object' />
+    </method>
+    <method name='save' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.Boolean' />
+    </method>
+    <method name='save' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.Map' />
+    </method>
+    <method name='save' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='merge' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.Map' />
+    </method>
+    <method name='merge' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='instanceOf' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.Class' />
+    </method>
+    <method name='delete' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='delete' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.Map' />
+    </method>
+    <method name='refresh' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='discard' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='attach' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='isAttached' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='isDirty' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='isDirty' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.String' />
+    </method>
+    <method name='getDirtyPropertyNames' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='getPersistentValue' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.String' />
+    </method>
+    <method name='lock' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.Map' />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.lang.Boolean' />
+    </method>
+    <method name='validate' artefact='Domain' type='org.grails.Behavior'>
+      <description />
+      <argument type='java.util.List' />
+    </method>
+    <property name='attached' type='org.grails.Behavior' artefact='Domain'>
+      <description />
+    </property>
+    <property name='dirty' type='org.grails.Behavior' artefact='Domain'>
+      <description />
+    </property>
+    <property name='dirtyPropertyNames' type='org.grails.Behavior' artefact='Domain'>
+      <description />
+    </property>
+    <property name='all' type='org.grails.Behavior' artefact='Domain'>
+      <description />
+    </property>
+  </behavior>
+</plugin>

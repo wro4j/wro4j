@@ -1,0 +1,1 @@
+a=func();b=c;for(a++;10>d;d++)alert(d);var c=1;for(g=2;10>d;d++)alert(d);for(var a=2,d=1;10>d;d++)alert(d);

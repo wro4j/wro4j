@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.factory;
 
+import org.apache.commons.lang3.Validate;
+
 import ro.isdc.wro.model.WroModel;
 
 
@@ -13,13 +15,11 @@ import ro.isdc.wro.model.WroModel;
  * @created 13 Mar 2011
  */
 public class WroModelFactoryDecorator
-  implements WroModelFactory {
-  private WroModelFactory decorated;
+    implements WroModelFactory {
+  private final WroModelFactory decorated;
 
   public WroModelFactoryDecorator(final WroModelFactory decorated) {
-    if (decorated == null) {
-      throw new IllegalArgumentException("Decorated WroModelFactory cannot be null!");
-    }
+    Validate.notNull(decorated);
     this.decorated = decorated;
   }
 
@@ -29,7 +29,6 @@ public class WroModelFactoryDecorator
   public WroModel create() {
     return decorated.create();
   }
-
 
   /**
    * {@inheritDoc}

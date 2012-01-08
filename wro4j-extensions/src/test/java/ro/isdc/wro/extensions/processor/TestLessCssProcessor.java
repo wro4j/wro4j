@@ -6,16 +6,18 @@ package ro.isdc.wro.extensions.processor;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.algorithm.less.LessCss;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -49,6 +51,27 @@ public class TestLessCssProcessor {
     }
   }
 
+  @Test
+  public void shouldBeThreadSafe() throws Exception {
+    final LessCssProcessor lessCss = new LessCssProcessor() {
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        throw e;
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          lessCss.process(new StringReader("#id {.class {color: red;}}"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
+  }
+
 
   @Test(expected=WroRuntimeException.class)
   public void testInvalidLessCss()
@@ -56,7 +79,7 @@ public class TestLessCssProcessor {
     final ResourcePostProcessor processor = new LessCssProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
-        LOG.debug("Exception message is: " + e.getMessage());
+        LOG.debug("[FAIL] Exception message is: {}", e.getMessage());
         throw e;
       };
     };

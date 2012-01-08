@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dojotoolkit.shrinksafe.Compressor;
 import org.mozilla.javascript.Context;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ import ro.isdc.wro.util.StopWatch;
 
 
 /**
- * YUICssCompressorProcessor - an adapter for YUI js compression utility for processing js resources.
+ * Compresses javascript code using compressor implemented by Dojo Shrinksafe utility.
  *
  * @author Alex Objelean
  * @created Created on Dec 4, 2008
@@ -56,7 +56,7 @@ public class DojoShrinksafeCompressorProcessor
     try {
       final String script = IOUtils.toString(reader);
       final String stripConsole = null; //normal, warn, all
-      LOG.debug("compressing script: " + StringUtils.abbreviate(script, 40));
+      LOG.debug("compressing script: {}", StringUtils.abbreviate(script, 40));
       final String out = Compressor.compressScript(script, 0, 0, stripConsole);
 
       writer.write(out);

@@ -5,11 +5,17 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
+import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -21,13 +27,61 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Apr 21, 2010
  */
 public class TestUglifyJsProcessor {
+  private File testFolder;
+
+
+  @Before
+  public void setUp() {
+    testFolder = new File(ClassLoader.getSystemResource("test").getFile());
+  }
+
+
   @Test
-  public void testFromFolder() throws IOException {
+  public void shouldUglifyFiles()
+    throws IOException {
     final ResourcePostProcessor processor = new UglifyJsProcessor();
     final URL url = getClass().getResource("uglify");
 
-    final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
+
+  @Test
+  public void shouldUseReservedNames() throws IOException {
+    final ResourcePostProcessor processor = new UglifyJsProcessor() {
+      @Override
+      protected UglifyJs newEngine() {
+        return super.newEngine().setReservedNames("name,value");
+      }
+    };
+    final URL url = getClass().getResource("uglify");
+
+    final File testFolder = new File(url.getFile(), "testReservedNames");
+    final File expectedFolder = new File(url.getFile(), "expectedReservedNames");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
+  }
+
+
+  @Test
+  public void shouldBeThreadSafe()
+    throws Exception {
+    final UglifyJsProcessor processor = new UglifyJsProcessor() {
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        throw e;
+      }
+    };
+    final Callable<Void> task = new Callable<Void>() {
+      public Void call() {
+        try {
+          processor.process(new StringReader("alert(1);"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    WroTestUtils.runConcurrently(task);
+  }
+
 }

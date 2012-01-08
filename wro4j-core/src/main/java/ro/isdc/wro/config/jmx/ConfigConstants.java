@@ -4,7 +4,7 @@
  */
 package ro.isdc.wro.config.jmx;
 
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
  * Hold the name of the properties.
@@ -35,6 +35,16 @@ public enum ConfigConstants {
    * DEPLOYMENT mode changing this flag will have no effect.
    */
   disableCache,
+  /**
+   * When true, will run in parallel pre processing of multiple resources. In theory this should improve the performance.
+   */
+  parallelPreprocessing,
+  /**
+   * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
+   * requests will use the cached gzipped content. Otherwise, the gzip operation will be performed for each request.
+   * This flag allow to control the memory vs processing power trade-off.
+   */
+  cacheGzippedContent,
   /**
    * Instructs wro4j to not throw an exception when a resource is missing.
    */

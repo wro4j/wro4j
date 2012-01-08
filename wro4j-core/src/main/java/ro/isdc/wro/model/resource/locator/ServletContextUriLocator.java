@@ -12,12 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -84,7 +85,7 @@ public class ServletContextUriLocator
   public InputStream locate(final String uri)
     throws IOException {
     Validate.notNull(uri, "URI cannot be NULL!");
-    LOG.debug("uri resource: " + uri);
+    LOG.debug("locate resource: {}", uri);
     final ServletContext servletContext = Context.get().getServletContext();
 
     try {
@@ -99,7 +100,19 @@ public class ServletContextUriLocator
         return getWildcardStreamLocator().locateStream(uri, new File(realPath));
       }
     } catch (final IOException e) {
-      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
+      /**
+       * This is a special case when no more attempts are required, since the required computation was achieved
+       * successfully. This solves the following <a
+       * href="http://code.google.com/p/wro4j/issues/detail?id=321">issue</a>.<p/>
+       * The problem was that in some situations,
+       * when the dispatcherStreamLocator was used to locate resources containing wildcard, the following message was
+       * printed to the console: <code>SEVERE: Servlet.service() for servlet default threw exception
+       * java.io.FileNotFoundException.</code>
+       */
+      if (e instanceof NoMoreAttemptsIOException) {
+        throw e;
+      }
+      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
         + "\".\n Trying to locate the stream without the wildcard.");
     }
 
@@ -108,13 +121,16 @@ public class ServletContextUriLocator
     final HttpServletResponse response = Context.get().getResponse();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
-    InputStream inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
-    if (inputStream == null) {
+    InputStream inputStream = null;
+    try {
+      inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
+    } catch (final IOException e) {
+      LOG.debug("retrieving servletContext stream for uri: {}", uri);
       inputStream = servletContext.getResourceAsStream(uri);
-    }
-    if (inputStream == null) {
-      LOG.error("Exception while reading resource from " + uri);
-      throw new IOException("Exception while reading resource from " + uri);
+      if (inputStream == null) {
+        LOG.error("Exception while reading resource from " + uri);
+        throw new IOException("Exception while reading resource from " + uri);
+      }
     }
     return inputStream;
   }

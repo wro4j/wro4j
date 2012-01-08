@@ -1,5 +1,6 @@
 (function() {
   var countdown, num;
+
   countdown = (function() {
     var _results;
     _results = [];
@@ -8,4 +9,5 @@
     }
     return _results;
   })();
+
 }).call(this);

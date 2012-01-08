@@ -35,4 +35,8 @@
   <group name="g4">
     <js>classpath:ro/isdc/wro/maven/plugin/js/*.js</js>
   </group>
+  
+  <group name="invalidWildcardResource">
+    <js>/invalid/path/to/resource/*.js</js>
+  </group>
 </groups>

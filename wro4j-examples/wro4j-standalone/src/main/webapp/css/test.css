@@ -1,0 +1,9 @@
+.parentFolder {
+	background: url(../img/image.png);	
+}
+.subfolder {
+  background: url(img/image.png);  
+}
+.sameFolder {
+  background: url(image.png);  
+}

@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.algorithm.DataUriGenerator;
+import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 
 
 /**
@@ -52,17 +53,14 @@ public class CssDataUriPreProcessor
    */
   @Override
   protected String replaceImageUrl(final String cssUri, final String imageUrl) {
-    if (uriLocatorFactory == null) {
-      throw new IllegalStateException("No UriLocatorFactory was injected!");
-    }
-    LOG.debug("replace url for image: " + imageUrl + ", from css: " + cssUri);
+    Validate.notNull(uriLocatorFactory);
+    LOG.debug("replace url for image: {} from css: {}", imageUrl, cssUri);
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     final String fileName = FilenameUtils.getName(imageUrl);
     String fullPath = cleanImageUrl;
     /**
      * Allow dataUri transformation of absolute url's using http(s) protocol. All url's protocola are intentionally not
-     * allowed, because it could be a potential security issue. For instance:
-     * <code>
+     * allowed, because it could be a potential security issue. For instance: <code>
      * .class {
      *   background: url(file:/path/to/secure/file.png);
      * }
@@ -70,14 +68,14 @@ public class CssDataUriPreProcessor
      * This should not be allowed.
      */
     if (!cleanImageUrl.startsWith("http")) {
-      fullPath =FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
+      fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
     try {
       final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
       if (replaceWithDataUri(dataUri)) {
         result = dataUri;
-        LOG.debug("dataUri replacement: " + StringUtils.abbreviate(dataUri, 30));
+        LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));
       }
     } catch (final IOException e) {
       LOG.warn("Couldn't extract dataUri from:" + fullPath + ", because: " + e.getMessage());
@@ -102,7 +100,7 @@ public class CssDataUriPreProcessor
   protected boolean replaceWithDataUri(final String dataUri) throws UnsupportedEncodingException {
     final byte[] bytes = dataUri.getBytes("UTF8");
     final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
-    LOG.debug("dataUri size: " + bytes.length/1024 + "KB, limit exceeded: " + exceedLimit);
+    LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length/1024, exceedLimit);
     return !exceedLimit;
   }
 

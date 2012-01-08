@@ -9,12 +9,10 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.DuplicateResourceDetector;
 import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -33,8 +31,6 @@ public class ClasspathUriLocator
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
-  @Inject
-  private DuplicateResourceDetector duplicateResourceDetector;
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
@@ -64,7 +60,6 @@ public class ClasspathUriLocator
   public InputStream locate(final String uri)
       throws IOException {
     Validate.notNull(uri, "URI cannot be NULL!");
-    LOG.debug("Reading uri: " + uri);
     // replace prefix & clean path by removing '..' characters if exists and
     // normalizing the location to use.
     final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, "")).trim();
@@ -84,7 +79,7 @@ public class ClasspathUriLocator
    */
   private InputStream locateWildcardStream(final String uri, final String location)
       throws IOException {
-    LOG.debug("wildcard detected for location: " + location);
+    LOG.debug("wildcard detected for location: {}", location);
     // prefix with '/' because we use class relative resource retrieval. Using ClassLoader.getSystemResource doesn't
     // work well.
     final String fullPath = "/" + FilenameUtils.getFullPathNoEndSeparator(location);
@@ -107,7 +102,7 @@ public class ClasspathUriLocator
    */
   @Override
   public WildcardStreamLocator newWildcardStreamLocator() {
-    return new JarWildcardStreamLocator(duplicateResourceDetector) {
+    return new JarWildcardStreamLocator() {
       @Override
       public boolean hasWildcard(final String uri) {
         return !disableWildcards() && super.hasWildcard(uri);

@@ -27,7 +27,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +37,8 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
-import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -122,6 +122,7 @@ public class WroFilter
     wroConfiguration = newWroConfigurationFactory().create();
     initWroManagerFactory();
     initHeaderValues();
+    registerChangeListeners();
     initJMX();
     doInit(config);
   }
@@ -131,10 +132,12 @@ public class WroFilter
    * Initialize {@link WroManagerFactory}.
    */
   private void initWroManagerFactory() {
-    this.wroManagerFactory = getWroManagerFactory();
+    if (this.wroManagerFactory == null) {
+      this.wroManagerFactory = getWroManagerFactory();
+    }
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
       // register cache change callback -> when cache is changed, update headers values.
-      ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
+      ((CacheChangeCallbackAware)wroManagerFactory).registerCacheChangeListener(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
           // update header values
           initHeaderValues();
@@ -148,7 +151,6 @@ public class WroFilter
    */
   private void initJMX() {
     try {
-      registerChangeListeners();
       if (wroConfiguration.isJmxEnabled()) {
         final MBeanServer mbeanServer = getMBeanServer();
         final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
@@ -212,7 +214,8 @@ public class WroFilter
         // reset cache headers when any property is changed in order to avoid browser caching
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged();
+          final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
+          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged(value);
         }
       }
     });
@@ -220,7 +223,8 @@ public class WroFilter
       public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
-          ((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged();
+          final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
+          ((WroConfigurationChangeListener)wroManagerFactory).onModelPeriodChanged(value);
         }
       }
     });
@@ -258,7 +262,7 @@ public class WroFilter
           + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
       }
     }
-    LOG.debug("Header Values: " + headersMap);
+    LOG.debug("Header Values: {}", headersMap);
   }
 
 
@@ -268,13 +272,12 @@ public class WroFilter
    * @param header value to parse.
    */
   private void parseHeader(final String header) {
-    LOG.debug("parseHeader: " + header);
+    LOG.debug("parseHeader: {}", header);
     final String headerName = header.substring(0, header.indexOf(":"));
     if (!headersMap.containsKey(headerName)) {
       headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
     }
   }
-
 
   /**
    * Custom filter initialization - can be used for extended classes.
@@ -297,12 +300,16 @@ public class WroFilter
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
       // TODO move API related checks into separate class and determine filter mapping for better mapping
-      if (shouldReloadCache(request)) {
+      if (shouldReloadCache()) {
         Context.get().getConfig().reloadCache();
         WroUtil.addNoCacheHeaders(response);
-      } else if (shouldReloadModel(request)) {
+        //set explicitly status OK for unit testing
+        response.setStatus(HttpServletResponse.SC_OK);
+      } else if (shouldReloadModel()) {
         Context.get().getConfig().reloadModel();
         WroUtil.addNoCacheHeaders(response);
+        //set explicitly status OK for unit testing
+        response.setStatus(HttpServletResponse.SC_OK);
       } else {
         processRequest(request, response);
         onRequestProcessed();
@@ -323,24 +330,28 @@ public class WroFilter
   /**
    * @return true if reload model must be triggered.
    */
-  private boolean shouldReloadModel(final HttpServletRequest request) {
-    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_MODEL);
+  private boolean shouldReloadModel() {
+    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_MODEL);
   }
 
   /**
    * @return true if reload cache must be triggered.
    */
-  private boolean shouldReloadCache(final HttpServletRequest request) {
-    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_CACHE);
+  private boolean shouldReloadCache() {
+    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_CACHE);
   }
 
   /**
    * Check if the request path matches the provided api path.
    */
-  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
+  private boolean matchesUrl(final String apiPath) {
+    final HttpServletRequest request = Context.get().getRequest();
     final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
-    final Matcher m = pattern.matcher(request.getRequestURI());
-    return m.matches();
+    if (request.getRequestURI() != null) {
+      final Matcher m = pattern.matcher(request.getRequestURI());
+      return m.matches();
+    }
+    return false;
   }
 
   /**
@@ -392,14 +403,33 @@ public class WroFilter
 
 
   /**
-   * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.
+   * Allows external configuration of {@link WroManagerFactory} (ex: using spring IoC). When this value is set, the
+   * default {@link WroManagerFactory} initialization won't work anymore.<p/>
+   * Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.
    *
-   * @return {@link WroManagerFactory} object.
+   * @param wroManagerFactory the wroManagerFactory to set
+   */
+  public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
+    this.wroManagerFactory = wroManagerFactory;
+  }
+
+
+  /**
+   * Factory method for {@link WroManagerFactory}.
+   * <p/>
+   * Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
+   * is found a default implentation is used.
+   * </p>
+   * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
+   * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
+   *
+   *
+   * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory getWroManagerFactory() {
     if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
       // If no context param was specified we return the default factory
-      return new BaseWroManagerFactory();
+      return newWroManagerFactory();
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;
@@ -412,6 +442,14 @@ public class WroFilter
         throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
       }
     }
+  }
+
+  /**
+   * @return default implementation of {@link WroManagerFactory} when none is provided explicitly through
+   *         wroConfiguration option.
+   */
+  protected WroManagerFactory newWroManagerFactory() {
+    return new BaseWroManagerFactory();
   }
 
 
@@ -427,8 +465,12 @@ public class WroFilter
    * {@inheritDoc}
    */
   public void destroy() {
-    wroConfiguration.destroy();
+    if (wroManagerFactory != null) {
+      wroManagerFactory.destroy();
+    }
+    if (wroConfiguration != null) {
+      wroConfiguration.destroy();
+    }
     Context.destroy();
-    wroManagerFactory.destroy();
   }
 }

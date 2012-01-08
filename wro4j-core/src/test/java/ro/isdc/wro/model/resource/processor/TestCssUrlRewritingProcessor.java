@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -25,19 +28,21 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 3, 2008
  */
 public class TestCssUrlRewritingProcessor {
-  private ResourcePreProcessor processor;
+  private CssUrlRewritingProcessor processor;
 
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
 
 
   @Before
-  public void init() {
+  public void setUp() {
+    Context.set(Context.standaloneContext());
     processor = new CssUrlRewritingProcessor() {
       @Override
       protected String getUrlPrefix() {
         return "[WRO-PREFIX]?id=";
       }
     };
+    WroTestUtils.createInjector().inject(processor);
   }
 
 
@@ -102,6 +107,23 @@ public class TestCssUrlRewritingProcessor {
 
 
   /**
+   * Test a servletContext css resource.
+   */
+  @Test
+  public void processServletContextResourceTypeWithAggregatedFolderSet()
+    throws IOException {
+    Context.get().setAggregatedFolderPath("wro/css");
+    WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
+      "classpath:cssUrlRewriting-servletContext-aggregatedFolderSet-outcome.css", new ResourcePostProcessor() {
+        public void process(final Reader reader, final Writer writer)
+          throws IOException {
+          processor.process(createMockResource("/static/img/" + CSS_INPUT_NAME), reader, writer);
+        }
+      });
+  }
+
+
+  /**
    * Test a resource which is located inside WEB-INF protected folder.
    */
   @Test
@@ -130,5 +152,12 @@ public class TestCssUrlRewritingProcessor {
           processor.process(createMockResource("http://www.site.com/static/css/" + CSS_INPUT_NAME), reader, writer);
         }
       });
+  }
+
+  @Test
+  public void checkUrlIsAllowed() throws Exception {
+    processClasspathResourceType();
+    Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
+    Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
   }
 }

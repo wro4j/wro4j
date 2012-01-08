@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
     final boolean autoDetectWroFile = FilenameUtils.normalize(context.getWroFile().getPath()).contains(
       FilenameUtils.normalize(DEFAULT_WRO_FILE));
     if (!autoDetectWroFile) {
-      LOG.info("autoDetect is " + autoDetectWroFile + " because wroFile: " + context.getWroFile()
+      LOG.debug("autoDetect is " + autoDetectWroFile + " because wroFile: " + context.getWroFile()
         + " is not the same as the default one: " + DEFAULT_WRO_FILE);
     }
     return new SmartWroModelFactory().setWroFile(context.getWroFile()).setAutoDetectWroFile(autoDetectWroFile);
@@ -82,7 +82,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
     final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
-    LOG.debug("auto detect wroFile: " + autoDetectWroFile);
+    LOG.debug("auto detect wroFile: {}", autoDetectWroFile);
     factoryList.add(newXmlModelFactory());
     factoryList.add(newGroovyModelFactory());
     factoryList.add(newJsonModelFactory());
@@ -104,8 +104,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
   }
 
 
-  private GroovyWroModelFactory newGroovyModelFactory() {
-    return new GroovyWroModelFactory() {
+  private GroovyModelFactory newGroovyModelFactory() {
+    return new GroovyModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {
@@ -135,15 +135,16 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
   /**
    * Handles the resource model auto detection.
    */
-  private InputStream createAutoDetectedStream(final String defaultFileName) throws IOException {
+  private InputStream createAutoDetectedStream(final String defaultFileName)
+    throws IOException {
     try {
       Validate.notNull(wroFile, "Cannot call this method if wroFile is null!");
       if (autoDetectWroFile) {
         final File file = new File(wroFile.getParentFile(), defaultFileName);
-        LOG.info("loading autodetected wro file: " + file);
+        LOG.debug("\tloading autodetected wro file: " + file);
         return new FileInputStream(file);
       }
-      LOG.info("loading wroFile: " + wroFile);
+      LOG.debug("loading wroFile: " + wroFile);
       return new FileInputStream(wroFile);
     } catch (final FileNotFoundException e) {
       // When auto detect is turned on, do not skip trying.. because the auto detection assume that the wro file name
@@ -164,20 +165,25 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
     if (factoryList == null) {
       factoryList = newWroModelFactoryFactoryList();
     }
+    //Holds the details about model creation which are logged only when no model can be created
+    final StringBuffer logMessageBuffer = new StringBuffer();
     for (final WroModelFactory factory : factoryList) {
       try {
         final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
-        LOG.info("Trying to use {} for model creation", getClassName(factoryClass));
+        logMessageBuffer.append("Using " + getClassName(factoryClass) + " for model creation..\n");
         return factory.create();
       } catch (final WroRuntimeException e) {
-        LOG.info("Model creation using {} failed. Trying another ...", getClassName(factory.getClass()));
-        LOG.debug("Exception occured while building the model using: " + getClassName(factory.getClass()), e);
-        //stop trying with other factories if the reason is IOException
+        logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
+          + " failed. Trying another ...\n");
+        logMessageBuffer.append("[FAIL] Exception occured while building the model using: "
+          + getClassName(factory.getClass()) + " " + e.getMessage());
+        // stop trying with other factories if the reason is IOException
         if (!autoDetectWroFile && e.getCause() instanceof IOException) {
           throw e;
         }
       }
     }
+    LOG.error(logMessageBuffer.toString());
     throw new WroRuntimeException("Cannot create model using any of provided factories");
   }
 
@@ -205,7 +211,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
 
   /**
    * In order to keep backward compatibility for building the model . The idea is if this field is false, then the exact
-   * file will be used to create the model, otherwise, wro model file is autodetected based on the parent folder where
+   * file will be used to create the model, otherwise, wro model file is auto-detected based on the parent folder where
    * the wroFile is located.
    *
    * @param autoDetectWroFile the autoDetectWroFile to set

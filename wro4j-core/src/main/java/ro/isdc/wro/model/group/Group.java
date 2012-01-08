@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public final class Group {
   /**
    * Resources of the group.
    */
-  private List<Resource> resources = new ArrayList<Resource>();
+  private final List<Resource> resources = new ArrayList<Resource>();
 
   /**
    * To be used by JSON serializer.
@@ -69,69 +69,46 @@ public final class Group {
     return false;
   }
 
-
   /**
-   * @return the name
+   * @return true if the resourceToCheck is already contained in this group.
    */
-  public String getName() {
-    return name;
+  private boolean hasResource(final Resource resourceToCheck) {
+    for (final Resource resource : resources) {
+      if (resource.equals(resourceToCheck)) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  /**
-   * @return the readonly list of resources.
-   */
-  public List<Resource> getResources() {
-    return Collections.unmodifiableList(resources);
-  }
 
   /**
-   * Add a {@link Resource} to the collection of resources associated with this group.
+   * Replace one resource with a list of other resources. The use case is related to wildcard expander functionality,
+   * when resources containing wildcard are replaced with a list of wildcard-free resources. The order of resources is
+   * preserved.
    *
-   * @param resource
-   * @return
+   * @param resource to replace.
+   * @param expandedResources a list of resources to replace. If this list is empty, the result is similar to removing
+   *        the resource from the group.
+   * @throws IllegalArgumentException when a missing resources is to be replaced.
    */
-  public Group addResource(final Resource resource) {
-    resources.add(resource);
-    return this;
-  }
-
-  /**
-   * This method will replace all earlier defined resources with the provided list of resources.
-   *
-   * @param resources
-   *          the resources to set.
-   */
-  public final void setResources(final List<Resource> resources) {
-    this.resources = resources;
-  }
-
-
-  /**
-   * Replace one resource with a list of other resources. The use case is related to wildcard exploder functionality,
-   * when resources containing wildcards are replaced with simple resources. The order of resources is preserved.
-   *
-   * @param resource
-   *          to replace.
-   * @param explodedResources
-   *          a list of resources to replace. If this list is empty, the result is similar to removing the resource from
-   *          the group.
-   * @throws IllegalArgumentException
-   *           when a missing resources is to be replaced.
-   */
-  public void replace(final Resource resource, final List<Resource> explodedResources) {
-    LOG.debug("replace resource {} with exploded resources: {}", resource, explodedResources);
+  public void replace(final Resource resource, final List<Resource> expandedResources) {
+    LOG.debug("replacing resource {} with expanded resources: {}", resource, expandedResources);
     Validate.notNull(resource);
-    Validate.notNull(explodedResources);
+    Validate.notNull(expandedResources);
     boolean found = false;
     final List<Resource> result = new ArrayList<Resource>();
     for (final Resource resourceItem : resources) {
       if (resourceItem.equals(resource)) {
         found = true;
-        for (final Resource explodedResource : explodedResources) {
+        for (final Resource expandedResource : expandedResources) {
           //preserve minimize flag.
-          explodedResource.setMinimize(resource.isMinimize());
+          expandedResource.setMinimize(resource.isMinimize());
+          //use only resources which do not already exist in the group
+          if (!hasResource(expandedResource)) {
+            result.add(expandedResource);
+          }
         }
-        result.addAll(explodedResources);
       } else {
         result.add(resourceItem);
       }
@@ -143,6 +120,70 @@ public final class Group {
     }
     //update resources with newly built list.
     setResources(result);
+  }
+
+  /**
+   * @param type
+   *          of resources to collect.
+   * @return a group containing filtered resources. The created group has the same name.
+   */
+  public final Group collectResourcesOfType(final ResourceType type) {
+    final List<Resource> allResources = new ArrayList<Resource>();
+    allResources.addAll(getResources());
+
+    // retain only resources of needed type
+    final List<Resource> filteredResources = new ArrayList<Resource>();
+    for (final Resource resource : getResources()) {
+      if (type == resource.getType()) {
+        if (filteredResources.contains(resource)) {
+          LOG.warn("Duplicated resource detected: " + resource + ". This resource won't be included more than once!");
+        } else {
+          filteredResources.add(resource);
+        }
+      }
+    }
+    
+    final Group filteredGroup = new Group(getName());
+    filteredGroup.setResources(filteredResources);
+    return filteredGroup;
+  }
+  
+  /**
+   * @return the readonly list of resources.
+   */
+  public List<Resource> getResources() {
+    // use a new list to avoid ConcurrentModificationException when the Group#replace method is called.
+    return Collections.unmodifiableList(new ArrayList<Resource>(resources));
+  }
+
+  /**
+   * Add a {@link Resource} to the collection of resources associated with this group.
+   *
+   * @param resource
+   * @return
+   */
+  public Group addResource(final Resource resource) {
+    Validate.notNull(resource);
+    if (!hasResource(resource)) {
+      resources.add(resource);
+    } else {
+      LOG.warn("Resource {} is already contained in this group, skiping it.", resource);
+    }
+    return this;
+  }
+
+  /**
+   * This method will replace all earlier defined resources with the provided list of resources.
+   *
+   * @param resources
+   *          the resources to set.
+   */
+  public final void setResources(final List<Resource> resources) {
+    Validate.notNull(resources);
+    this.resources.clear();
+    for (final Resource resource : resources) {
+      addResource(resource);
+    }
   }
 
   /**
@@ -158,7 +199,13 @@ public final class Group {
     return false;
   }
 
-
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
+  
   /**
    * {@inheritDoc}
    */

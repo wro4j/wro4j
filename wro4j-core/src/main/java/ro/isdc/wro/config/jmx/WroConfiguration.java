@@ -8,12 +8,12 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
 /**
@@ -54,6 +54,13 @@ public final class WroConfiguration
    * this flag will have no effect. By default this value is false.
    */
   private boolean disableCache = false;
+
+  /**
+   * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
+   * requests will use the cached gzipped content. Otherwise, the gzip operation will be performed for each request.
+   * This flag allow to control the memory vs processing power trade-off.
+   */
+  private boolean cacheGzippedContent = false;
   /**
    * Allow to turn jmx on or off. By default this value is true.
    */
@@ -74,6 +81,16 @@ public final class WroConfiguration
    * The parameter used to specify headers to put into the response, used mainly for caching.
    */
   private String header;
+  /**
+   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend too
+   * much time on slow end-point.
+   */
+  private int connectionTimeout = 2;
+  /**
+   * When true, will run in parallel preprocessing of multiple resources. In theory this should improve the performance.
+   * By default this flag is false, because this feature is experimental.
+   */
+  private boolean parallelPreprocessing = false;
   /**
    * Listeners for the change of cache & model period properties.
    */
@@ -162,7 +179,7 @@ public final class WroConfiguration
    */
   private void reloadCacheWithNewValue(final Long newValue) {
     final long newValueAsPrimitive = newValue == null ? getModelUpdatePeriod() : newValue;
-    LOG.debug("invoking " + cacheUpdatePeriodListeners.size() + " listeners");
+    LOG.debug("invoking {} listeners", cacheUpdatePeriodListeners.size());
     for (final PropertyChangeListener listener : cacheUpdatePeriodListeners) {
       final PropertyChangeEvent event = new PropertyChangeEvent(
         this, "cache", getCacheUpdatePeriod(), newValueAsPrimitive);
@@ -287,6 +304,22 @@ public final class WroConfiguration
 
 
   /**
+   * @return the cacheGzippedContent
+   */
+  public boolean isCacheGzippedContent() {
+    return this.cacheGzippedContent;
+  }
+
+
+  /**
+   * @param cacheGzippedContent the cacheGzippedContent to set
+   */
+  public void setCacheGzippedContent(final boolean cacheGzippedContent) {
+    this.cacheGzippedContent = cacheGzippedContent;
+  }
+
+
+  /**
    * Perform the cleanup, clear the listeners.
    */
   public void destroy() {
@@ -301,7 +334,6 @@ public final class WroConfiguration
   public String getEncoding() {
     return this.encoding;
   }
-
 
   /**
    * @param encoding the encoding to set
@@ -356,6 +388,40 @@ public final class WroConfiguration
    */
   public void setHeader(final String header) {
     this.header = header;
+  }
+
+  /**
+   * @return the connectionTimeout
+   */
+  public int getConnectionTimeout() {
+    return this.connectionTimeout;
+  }
+
+
+  /**
+   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend
+   * too much time on slow end-point.
+   *
+   * @param connectionTimeout the connectionTimeout to set
+   */
+  public void setConnectionTimeout(final int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
+
+  /**
+   * @return the parallelPreprocessing
+   */
+  public boolean isParallelPreprocessing() {
+    return this.parallelPreprocessing;
+  }
+
+
+  /**
+   * @param parallelPreprocessing the parallelPreprocessing to set
+   */
+  public void setParallelPreprocessing(final boolean parallelPreprocessing) {
+    this.parallelPreprocessing = parallelPreprocessing;
   }
 
 

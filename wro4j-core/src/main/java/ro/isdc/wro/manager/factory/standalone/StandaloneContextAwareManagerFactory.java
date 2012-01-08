@@ -4,8 +4,8 @@
  */
 package ro.isdc.wro.manager.factory.standalone;
 
-import ro.isdc.wro.manager.WroManagerFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategyAware;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 /**
  * An implementation of {@link WroManagerFactory} aware about the run context.
@@ -13,12 +13,17 @@ import ro.isdc.wro.model.resource.util.NamingStrategyAware;
  * @author Alex Objelean
  */
 public interface StandaloneContextAwareManagerFactory
-  extends WroManagerFactory, NamingStrategyAware {
+  extends WroManagerFactory {
   /**
    * Called by standalone process for initialization. It is responsibility of the implementor to take care of
    * {@link StandaloneContext} in order to initialize the internals.
    *
    * @param standaloneContext {@link StandaloneContext} holding properties associated with current context.
    */
-  public void initialize(StandaloneContext standaloneContext);
+  void initialize(StandaloneContext standaloneContext);
+  /**
+   * set the processor factory to be used by the {@link WroManagerFactory} created by this factory.
+   * @param processorsFactory
+   */
+  void setProcessorsFactory(ProcessorsFactory processorsFactory);
 }

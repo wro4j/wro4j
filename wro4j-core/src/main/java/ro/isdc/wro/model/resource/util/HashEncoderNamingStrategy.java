@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
  * The simplest implementation of {@link NamingStrategy} which encodes the hash code into the name of the
  * resource. For instance: For <code>group.js</code> -> <code>group-<hashcode>.js</code>. This implementation uses by
- * default {@link MD5HashBuilder} implementation.
+ * default {@link CRC32HashBuilder} implementation.
  *
  * @author Alex Objelean
  * @created 15 Aug 2010
