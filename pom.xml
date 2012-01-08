@@ -205,6 +205,12 @@
         <groupId>org.dojotoolkit</groupId>
         <artifactId>dojo-shrinksafe</artifactId>
         <version>1.6.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>      
       <!-- Unit tests -->
       <dependency>

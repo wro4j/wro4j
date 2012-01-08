@@ -61,7 +61,7 @@ public class RhinoScriptBuilder {
     final ScriptableObject scope = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
       script = getClass().getResourceAsStream("commons.js");
-      context.evaluateReader(scope, new InputStreamReader(script), "common.js", 1, null);
+      context.evaluateReader(scope, new InputStreamReader(script), "commons.js", 1, null);
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
     } finally {

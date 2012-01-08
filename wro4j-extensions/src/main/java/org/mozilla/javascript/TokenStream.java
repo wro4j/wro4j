@@ -45,8 +45,7 @@
 
 package org.mozilla.javascript;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 
 /**
  * This class implements the JavaScript scanner.
@@ -60,7 +59,7 @@ import java.io.Reader;
  * @author Brendan Eich
  */
 
-class TokenStream1
+class TokenStream
 {
     /*
      * For chars - because we need something out-of-range
@@ -72,8 +71,8 @@ class TokenStream1
 
     private final static char BYTE_ORDER_MARK = '\uFEFF';
 
-    TokenStream1(final Parser1 parser, final Reader sourceReader, final String sourceString,
-                final int lineno)
+    TokenStream(Parser parser, Reader sourceReader, String sourceString,
+                int lineno)
     {
         this.parser = parser;
         this.lineno = lineno;
@@ -94,10 +93,10 @@ class TokenStream1
      * TokenStream; if getToken has been called since the passed token
      * was scanned, the op or string printed may be incorrect.
      */
-    String tokenToString(final int token)
+    String tokenToString(int token)
     {
         if (Token.printTrees) {
-            final String name = Token.name(token);
+            String name = Token.name(token);
 
             switch (token) {
             case Token.STRING:
@@ -114,12 +113,12 @@ class TokenStream1
         return "";
     }
 
-    static boolean isKeyword(final String s)
+    static boolean isKeyword(String s)
     {
         return Token.EOF != stringToKeyword(s);
     }
 
-    private static int stringToKeyword(final String name)
+    private static int stringToKeyword(String name)
     {
 // #string_id_map#
 // The following assumes that Token.EOF == 0
@@ -189,7 +188,7 @@ class TokenStream1
             Id_volatile      = Token.RESERVED;
 
         int id;
-        final String s = name;
+        String s = name;
 // #generated# Last update: 2007-04-18 13:53:30 PDT
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
@@ -296,7 +295,7 @@ class TokenStream1
     }
 
     final String getSourceString() { return sourceString; }
-
+    
     final int getLineno() { return lineno; }
 
     final String getString() { return string; }
@@ -411,7 +410,7 @@ class TokenStream1
                 }
                 ungetChar(c);
 
-                final String str = getStringFromBuffer();
+                String str = getStringFromBuffer();
                 if (!containsEscape) {
                     // OPT we shouldn't have to make a string (object!) to
                     // check if it's a keyword.
@@ -510,7 +509,7 @@ class TokenStream1
                     }
                 }
                 ungetChar(c);
-                final String numString = getStringFromBuffer();
+                String numString = getStringFromBuffer();
                 this.string = numString;
 
                 double dval;
@@ -519,7 +518,7 @@ class TokenStream1
                         // Use Java conversion to number from string...
                         dval = Double.valueOf(numString).doubleValue();
                     }
-                    catch (final NumberFormatException ex) {
+                    catch (NumberFormatException ex) {
                         parser.addError("msg.caught.nfe");
                         return Token.ERROR;
                     }
@@ -542,7 +541,7 @@ class TokenStream1
                 stringBufferTop = 0;
 
                 c = getChar();
-            strLoop: while (c != quoteChar) {
+                while (c != quoteChar) {
                     if (c == '\n' || c == EOF_CHAR) {
                         ungetChar(c);
                         tokenEnd = cursor;
@@ -552,93 +551,51 @@ class TokenStream1
 
                     if (c == '\\') {
                         // We've hit an escaped character
-                        int escapeVal;
 
                         c = getChar();
+
                         switch (c) {
-                        case 'b': c = '\b'; break;
-                        case 'f': c = '\f'; break;
-                        case 'n': c = '\n'; break;
-                        case 'r': c = '\r'; break;
-                        case 't': c = '\t'; break;
 
-                        // \v a late addition to the ECMA spec,
-                        // it is not in Java, so use 0xb
-                        case 'v': c = 0xb; break;
+                            case '\\': // backslash
+                            case 'b':  // backspace
+                            case 'f':  // form feed
+                            case 'n':  // line feed
+                            case 'r':  // carriage return
+                            case 't':  // horizontal tab
+                            case 'v':  // vertical tab
+                            case 'd':  // octal sequence
+                            case 'u':  // unicode sequence
+                            case 'x':  // hexadecimal sequence
+                                // Only keep the '\' character for those
+                                // characters that need to be escaped...
+                                // Don't escape quoting characters...
+                                addToString('\\');
+                                addToString(c);
+                                break;
 
-                        case 'u':
-                            // Get 4 hex digits; if the u escape is not
-                            // followed by 4 hex digits, use 'u' + the
-                            // literal character sequence that follows.
-                            final int escapeStart = stringBufferTop;
-                            addToString('u');
-                            escapeVal = 0;
-                            for (int i = 0; i != 4; ++i) {
-                                c = getChar();
-                                escapeVal = Kit.xDigitToInt(c, escapeVal);
-                                if (escapeVal < 0) {
-                                    continue strLoop;
+                            case '\n':
+                                // Remove line terminator after escape
+                                break;
+
+                            default:
+                                if (isDigit(c)) {
+                                    // Octal representation of a character.
+                                    // Preserve the escaping (see Y! bug #1637286)
+                                    addToString('\\');
                                 }
                                 addToString(c);
-                            }
-                            // prepare for replace of stored 'u' sequence
-                            // by escape value
-                            stringBufferTop = escapeStart;
-                            c = escapeVal;
-                            break;
-                        case 'x':
-                            // Get 2 hex digits, defaulting to 'x'+literal
-                            // sequence, as above.
-                            c = getChar();
-                            escapeVal = Kit.xDigitToInt(c, 0);
-                            if (escapeVal < 0) {
-                                addToString('x');
-                                continue strLoop;
-                            } else {
-                                final int c1 = c;
-                                c = getChar();
-                                escapeVal = Kit.xDigitToInt(c, escapeVal);
-                                if (escapeVal < 0) {
-                                    addToString('x');
-                                    addToString(c1);
-                                    continue strLoop;
-                                } else {
-                                    // got 2 hex digits
-                                    c = escapeVal;
-                                }
-                            }
-                            break;
-
-                        case '\n':
-                            // Remove line terminator after escape to follow
-                            // SpiderMonkey and C/C++
-                            c = getChar();
-                            continue strLoop;
-
-                        default:
-                            if ('0' <= c && c < '8') {
-                                int val = c - '0';
-                                c = getChar();
-                                if ('0' <= c && c < '8') {
-                                    val = 8 * val + c - '0';
-                                    c = getChar();
-                                    if ('0' <= c && c < '8' && val <= 037) {
-                                        // c is 3rd char of octal sequence only
-                                        // if the resulting val <= 0377
-                                        val = 8 * val + c - '0';
-                                        c = getChar();
-                                    }
-                                }
-                                ungetChar(c);
-                                c = val;
-                            }
+                                break;
                         }
+
+                    } else {
+
+                        addToString(c);
                     }
-                    addToString(c);
+
                     c = getChar();
                 }
 
-                final String str = getStringFromBuffer();
+                String str = getStringFromBuffer();
                 this.string = (String)allStrings.intern(str);
                 return Token.STRING;
             }
@@ -785,6 +742,7 @@ class TokenStream1
                 // is it a /* or /** comment?
                 if (matchChar('*')) {
                     boolean lookForSlash = false;
+                    StringBuffer sb = new StringBuffer();
                     tokenBeg = cursor - 2;
                     if (matchChar('*')) {
                         lookForSlash = true;
@@ -798,12 +756,30 @@ class TokenStream1
                             tokenEnd = cursor - 1;
                             parser.addError("msg.unterminated.comment");
                             return Token.COMMENT;
-                        } else if (c == '*') {
+                        }
+                        sb.append((char) c);
+                        if (c == '*') {
                             lookForSlash = true;
                         } else if (c == '/') {
                             if (lookForSlash) {
                                 tokenEnd = cursor;
-                                return Token.COMMENT;
+                                sb.delete(sb.length()-2, sb.length());
+                                String s1 = sb.toString();
+                                String s2 = s1.trim();
+                                if (s1.startsWith("!")) {
+                                    // Remove the leading '!' ** EDIT actually don't remove it:
+                                    // http://yuilibrary.com/projects/yuicompressor/ticket/2528008
+                                    // this.string = s1.substring(1);
+                                    this.string = s1;
+                                    return Token.COMMENT;
+                                } else if (s2.startsWith("@cc_on") ||
+                                           s2.startsWith("@if")    ||
+                                           s2.startsWith("@elif")  ||
+                                           s2.startsWith("@else")  ||
+                                           s2.startsWith("@end")) {
+                                    this.string = s1;
+                                    return Token.COMMENT;
+                                }
                             }
                         } else {
                             lookForSlash = false;
@@ -865,7 +841,7 @@ class TokenStream1
         }
     }
 
-    private static boolean isAlpha(final int c)
+    private static boolean isAlpha(int c)
     {
         // Use 'Z' < 'a'
         if (c <= 'Z') {
@@ -875,7 +851,7 @@ class TokenStream1
         }
     }
 
-    static boolean isDigit(final int c)
+    static boolean isDigit(int c)
     {
         return '0' <= c && c <= '9';
     }
@@ -884,7 +860,7 @@ class TokenStream1
      * \v, I think.)  note that code in getChar() implicitly accepts
      * '\r' == \u000D as well.
      */
-    static boolean isJSSpace(final int c)
+    static boolean isJSSpace(int c)
     {
         if (c <= 127) {
             return c == 0x20 || c == 0x9 || c == 0xC || c == 0xB;
@@ -894,7 +870,7 @@ class TokenStream1
         }
     }
 
-    private static boolean isJSFormatChar(final int c)
+    private static boolean isJSFormatChar(int c)
     {
         return c > 127 && Character.getType((char)c) == Character.FORMAT;
     }
@@ -902,10 +878,10 @@ class TokenStream1
     /**
      * Parser calls the method when it gets / or /= in literal context.
      */
-    void readRegExp(final int startToken)
+    void readRegExp(int startToken)
         throws IOException
     {
-        final int start = tokenBeg;
+        int start = tokenBeg;
         stringBufferTop = 0;
         if (startToken == Token.ASSIGN_DIV) {
             // Miss-scanned /=
@@ -934,7 +910,7 @@ class TokenStream1
             }
             addToString(c);
         }
-        final int reEnd = stringBufferTop;
+        int reEnd = stringBufferTop;
 
         while (true) {
             if (matchChar('g'))
@@ -960,7 +936,7 @@ class TokenStream1
     }
 
     String readAndClearRegExpFlags() {
-        final String flags = this.regExpFlags;
+        String flags = this.regExpFlags;
         this.regExpFlags = null;
         return flags;
     }
@@ -1136,7 +1112,7 @@ class TokenStream1
     /**
      *
      */
-    private boolean readQuotedString(final int quote) throws IOException
+    private boolean readQuotedString(int quote) throws IOException
     {
         for (int c = getChar(); c != EOF_CHAR; c = getChar()) {
             addToString(c);
@@ -1254,23 +1230,23 @@ class TokenStream1
         return new String(stringBuffer, 0, stringBufferTop);
     }
 
-    private void addToString(final int c)
+    private void addToString(int c)
     {
-        final int N = stringBufferTop;
+        int N = stringBufferTop;
         if (N == stringBuffer.length) {
-            final char[] tmp = new char[stringBuffer.length * 2];
+            char[] tmp = new char[stringBuffer.length * 2];
             System.arraycopy(stringBuffer, 0, tmp, 0, N);
             stringBuffer = tmp;
         }
         stringBuffer[N] = (char)c;
         stringBufferTop = N + 1;
     }
-
+    
     private boolean canUngetChar() {
         return ungetCursor == 0 || ungetBuffer[ungetCursor - 1] != '\n';
     }
 
-    private void ungetChar(final int c)
+    private void ungetChar(int c)
     {
         // can not unread past across line boundary
         if (ungetCursor != 0 && ungetBuffer[ungetCursor - 1] == '\n')
@@ -1279,9 +1255,9 @@ class TokenStream1
         cursor--;
     }
 
-    private boolean matchChar(final int test) throws IOException
+    private boolean matchChar(int test) throws IOException
     {
-        final int c = getCharIgnoreLineEnd();
+        int c = getCharIgnoreLineEnd();
         if (c == test) {
             tokenEnd = cursor;
             return true;
@@ -1293,7 +1269,7 @@ class TokenStream1
 
     private int peekChar() throws IOException
     {
-        final int c = getChar();
+        int c = getChar();
         ungetChar(c);
         return c;
     }
@@ -1400,7 +1376,7 @@ class TokenStream1
         }
     }
 
-    private void ungetCharIgnoreLineEnd(final int c)
+    private void ungetCharIgnoreLineEnd(int c)
     {
         ungetBuffer[ungetCursor++] = c;
         cursor--;
@@ -1434,7 +1410,7 @@ class TokenStream1
                 --lineEnd;
             } else {
                 for (; lineEnd != sourceEnd; ++lineEnd) {
-                    final int c = sourceString.charAt(lineEnd);
+                    int c = sourceString.charAt(lineEnd);
                     if (ScriptRuntime.isJSLineTerminator(c)) {
                         break;
                     }
@@ -1453,7 +1429,7 @@ class TokenStream1
                     if (i == sourceEnd) {
                         try {
                             if (!fillSourceBuffer()) { break; }
-                        } catch (final IOException ioe) {
+                        } catch (IOException ioe) {
                             // ignore it, we're already displaying an error...
                             break;
                         }
@@ -1461,7 +1437,7 @@ class TokenStream1
                         // line buffer and change lineStart
                         i = lineStart + lineLength;
                     }
-                    final int c = sourceBuffer[i];
+                    int c = sourceBuffer[i];
                     if (ScriptRuntime.isJSLineTerminator(c)) {
                         break;
                     }
@@ -1482,12 +1458,12 @@ class TokenStream1
                 sourceCursor -= lineStart;
                 lineStart = 0;
             } else {
-                final char[] tmp = new char[sourceBuffer.length * 2];
+                char[] tmp = new char[sourceBuffer.length * 2];
                 System.arraycopy(sourceBuffer, 0, tmp, 0, sourceEnd);
                 sourceBuffer = tmp;
             }
         }
-        final int n = sourceReader.read(sourceBuffer, sourceEnd,
+        int n = sourceReader.read(sourceBuffer, sourceEnd,
                                   sourceBuffer.length - sourceEnd);
         if (n < 0) {
             return false;
@@ -1536,7 +1512,7 @@ class TokenStream1
         markCommentStart("");
     }
 
-    private void markCommentStart(final String prefix) {
+    private void markCommentStart(String prefix) {
         if (parser.compilerEnv.isRecordingComments() && sourceReader != null) {
             commentPrefix = prefix;
             commentCursor = sourceCursor - 1;
@@ -1553,7 +1529,7 @@ class TokenStream1
             return sourceString.substring(tokenBeg, tokenEnd);
         } else {
             if (!isMarkingComment()) Kit.codeBug();
-            final StringBuilder comment = new StringBuilder(commentPrefix);
+            StringBuilder comment = new StringBuilder(commentPrefix);
             comment.append(sourceBuffer, commentCursor,
                 getTokenLength() - commentPrefix.length());
             commentCursor = -1;
@@ -1579,7 +1555,7 @@ class TokenStream1
 
     private char[] stringBuffer = new char[128];
     private int stringBufferTop;
-    private final ObjToIntMap allStrings = new ObjToIntMap(50);
+    private ObjToIntMap allStrings = new ObjToIntMap(50);
 
     // Room to backtrace from to < on failed match of the last - in <!--
     private final int[] ungetBuffer = new int[3];
@@ -1617,7 +1593,7 @@ class TokenStream1
     private boolean xmlIsTagContent;
     private int xmlOpenTagsCount;
 
-    private final Parser1 parser;
+    private Parser parser;
 
     private String commentPrefix = "";
     private int commentCursor = -1;
