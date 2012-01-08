@@ -21,9 +21,14 @@ import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
 
+
 /**
- * @author Admin
+ * Responsible for building the {@link Injector}. It can build an {@link Injector} without needing a {@link WroManager},
+ * but just by providing required dependencies.
  *
+ * @author Alex Objelean
+ * @since 1.4.3
+ * @created 6 Jan 2012
  */
 public class InjectorBuilder {
   private GroupsProcessor groupsProcessor = new GroupsProcessor();
@@ -75,6 +80,7 @@ public class InjectorBuilder {
     //first initialize the map
     initMap();
     injector = new Injector(Collections.unmodifiableMap(map));
+    //process dependencies for several fields too.
     injector.inject(preProcessorExecutor);
     injector.inject(groupsProcessor);
 
@@ -89,6 +95,7 @@ public class InjectorBuilder {
     return this;
   }
 
+
   /**
    * @param namingStrategy the namingStrategy to set
    */
@@ -97,6 +104,7 @@ public class InjectorBuilder {
     return this;
   }
 
+
   /**
    * @param uriLocatorFactory the uriLocatorFactory to set
    */
@@ -104,6 +112,7 @@ public class InjectorBuilder {
     this.uriLocatorFactory = uriLocatorFactory;
     return this;
   }
+
 
   /**
    * @param processorsFactory the processorsFactory to set
@@ -115,7 +124,17 @@ public class InjectorBuilder {
 
 
   /**
+   * @param preProcessorExecutor the preProcessorExecutor to set
+   */
+  public InjectorBuilder setPreProcessorExecutor(final PreProcessorExecutor preProcessorExecutor) {
+    this.preProcessorExecutor = preProcessorExecutor;
+    return this;
+  }
+
+  /**
    * A special type used for lazy object injection only in context of this class.
    */
-  static interface InjectorObjectFactory <T> extends ObjectFactory <T> {};
+  static interface InjectorObjectFactory<T>
+    extends ObjectFactory<T> {
+  };
 }
