@@ -26,7 +26,7 @@ public class TestDefaultResourceLocatorFactory {
     factory = DefaultResourceLocatorFactory.contextAwareFactory();
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected=NullPointerException.class)
   public void testNullUri() throws Exception {
     factory.locate(null);
   }

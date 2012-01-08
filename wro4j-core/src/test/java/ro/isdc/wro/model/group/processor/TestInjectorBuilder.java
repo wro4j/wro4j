@@ -14,7 +14,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 
@@ -50,7 +50,7 @@ public class TestInjectorBuilder {
     Assert.assertNull(sample.namingStrategy);
     Assert.assertNotNull(sample.preProcessorExecutor);
     Assert.assertNull(sample.processorsFactory);
-    Assert.assertNull(sample.uriLocatorFactor);
+    Assert.assertNull(sample.resourceLocatorFactor);
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -66,7 +66,7 @@ public class TestInjectorBuilder {
     Assert.assertNotNull(sample.namingStrategy);
     Assert.assertNotNull(sample.preProcessorExecutor);
     Assert.assertNotNull(sample.processorsFactory);
-    Assert.assertNotNull(sample.uriLocatorFactor);
+    Assert.assertNotNull(sample.resourceLocatorFactor);
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -77,9 +77,9 @@ public class TestInjectorBuilder {
     final NamingStrategy namingStrategy = Mockito.mock(NamingStrategy.class);
     final PreProcessorExecutor preProcessorExecutor = Mockito.mock(PreProcessorExecutor.class);
     final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    final ResourceLocatorFactory resourceLocatorFactory = Mockito.mock(ResourceLocatorFactory.class);
     final Injector injector = new InjectorBuilder().setNamingStrategy(namingStrategy).setPreProcessorExecutor(
-      preProcessorExecutor).setProcessorsFactory(processorsFactory).setUriLocatorFactory(uriLocatorFactory).build();
+      preProcessorExecutor).setProcessorsFactory(processorsFactory).setResourceLocatorFactory(resourceLocatorFactory).build();
     Assert.assertNotNull(injector);
 
     final Sample sample = new Sample();
@@ -87,7 +87,7 @@ public class TestInjectorBuilder {
     Assert.assertSame(namingStrategy, sample.namingStrategy);
     Assert.assertSame(preProcessorExecutor, sample.preProcessorExecutor);
     Assert.assertSame(processorsFactory, sample.processorsFactory);
-    Assert.assertSame(uriLocatorFactory, sample.uriLocatorFactor);
+    Assert.assertSame(resourceLocatorFactory, sample.resourceLocatorFactor);
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -100,7 +100,7 @@ public class TestInjectorBuilder {
 
   private static class Sample {
     @Inject
-    UriLocatorFactory uriLocatorFactor;
+    ResourceLocatorFactory resourceLocatorFactor;
     @Inject
     ProcessorsFactory processorsFactory;
     @Inject

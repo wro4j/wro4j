@@ -13,6 +13,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -34,7 +35,7 @@ public class InjectorBuilder {
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
   //TODO set a not null locatorFactory
-  private ResourceLocatorFactory resourceLocatorFactory = null;
+  private ResourceLocatorFactory resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
   private Injector injector;

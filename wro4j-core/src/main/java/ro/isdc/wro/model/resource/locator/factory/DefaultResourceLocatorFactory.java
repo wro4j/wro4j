@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +47,7 @@ public abstract class DefaultResourceLocatorFactory
    * {@inheritDoc}
    */
   public ResourceLocator locate(final String uri) {
-    if (uri == null) {
-      throw new IllegalArgumentException("uri cannot be null!");
-    }
+    Validate.notNull(uri);
     if (uri.startsWith(ClasspathResourceLocator.PREFIX)) {
       return new ClasspathResourceLocator(uri);
     }
