@@ -30,8 +30,8 @@ import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -100,10 +100,22 @@ public class TestWroFilter {
 
 
   @Test(expected = WroRuntimeException.class)
-  public void testInvalidAppFactoryClassNameIsSet()
+  public void cannotAcceptInvalidAppFactoryClassNameIsSet()
     throws Exception {
+    filter = new WroFilter();
     Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
     filter.init(config);
+  }
+
+  @Test
+  public void shouldUseInitiallySetManagerEvenIfAnInvalidAppFactoryClassNameIsSet()
+    throws Exception {
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    filter.setWroManagerFactory(mockManagerFactory);
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
+    filter.init(config);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), Mockito.mock(FilterChain.class));
+    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
 
 
@@ -183,6 +195,25 @@ public class TestWroFilter {
     Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
       BaseWroManagerFactory.class.getName());
     filter.init(config);
+  }
+
+
+  /**
+   * Test that when setting WwroManagerFactory via setter, even if wroConfiguration has a different
+   * {@link WroManagerFactory} configured, the first one instance is used.
+   */
+  @Test
+  public void shouldUseCorrectWroManagerFactoryWhenOneIsSet()
+    throws Exception {
+    Mockito.when(config.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
+      BaseWroManagerFactory.class.getName());
+
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    filter.setWroManagerFactory(mockManagerFactory);
+
+    filter.init(config);
+    filter.doFilter(Mockito.mock(HttpServletRequest.class), Mockito.mock(HttpServletResponse.class), Mockito.mock(FilterChain.class));
+    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
 
 

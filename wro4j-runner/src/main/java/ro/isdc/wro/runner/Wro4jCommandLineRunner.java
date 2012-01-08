@@ -41,7 +41,7 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
@@ -69,6 +69,8 @@ public class Wro4jCommandLineRunner {
 
   @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
+  @Option(name = "--parallel", usage = "Turns on the parallel preProcessing of resources. This value is false by default.")
+  private boolean parallelPreprocessing;
   @Option(name = "--targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
   private String targetGroups;
   @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
@@ -197,7 +199,8 @@ public class Wro4jCommandLineRunner {
 
       // init context
       final WroConfiguration config = new WroConfiguration();
-      config.setParallelPreprocessing(true);
+      //
+      config.setParallelPreprocessing(parallelPreprocessing);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
       Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());

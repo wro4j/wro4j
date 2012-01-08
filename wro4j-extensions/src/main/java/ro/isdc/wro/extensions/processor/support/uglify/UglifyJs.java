@@ -20,13 +20,12 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs version (1.1.2-SNAPSHOT) <br/>
- * committed at the following date: 2011-12-03 17:10:36.
+ * The underlying implementation use the uglifyJs version (1.2.4)
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
  * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
- * is compressed with googleClosure compressor (simple mode), because it is quite efficient and doesn't break the code.
+ * is compressed with packerJs by Dean Edwards.
  *
  * @author Alex Objelean
  * @since 1.3.1
@@ -41,6 +40,10 @@ public class UglifyJs {
    * If true, the script is uglified, otherwise it is beautified.
    */
   private final boolean uglify;
+  /**
+   * Comma delimited variable names to have uglify not mangle
+   */
+  private String reservedNames;
   private ScriptableObject scope;
 
 
@@ -67,6 +70,26 @@ public class UglifyJs {
   public static UglifyJs beautifyJs() {
     return new UglifyJs(false);
   }
+
+
+  /**
+   * some libraries rely on certain names to be used, so this option allow you to exclude such names from the mangler.
+   * For example, to keep names require and $super intact you'd specify –reserved-names "require,$super".
+   *
+   * @param reservedNames the reservedNames to set
+   */
+  public UglifyJs setReservedNames(final String reservedNames) {
+    this.reservedNames = reservedNames;
+    return this;
+  }
+
+  /**
+   * @return not null value representing reservedNames.
+   */
+  private String getReservedNames() {
+    return this.reservedNames == null ? "" : reservedNames;
+  }
+
 
   /**
    * Initialize script builder for evaluation.
@@ -101,18 +124,17 @@ public class UglifyJs {
    * @param data js content to process.
    * @return packed js content.
    */
-  public String process(final String code)
+  public String process(final String filename, final String code)
     throws IOException {
     try {
       final StopWatch watch = new StopWatch();
-      watch.start("init");
+      watch.start("init " + filename);
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
-      watch.start(uglify ? "uglify" : "beautify");
-
       final String originalCode = WroUtil.toJSMultiLineString(code);
       final String invokeScript = String.format(IOUtils.toString(getClass().getResourceAsStream("invoke.js")),
-        originalCode, !uglify);
+        originalCode, getReservedNames(), !uglify);
+      watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
 
       watch.stop();

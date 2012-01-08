@@ -7,18 +7,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.factory.InjectorUriLocatorFactoryDecorator;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
 
 
 /**
@@ -30,34 +27,14 @@ import ro.isdc.wro.model.resource.util.NamingStrategy;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private final WroManager wroManager;
-  private final UriLocatorFactory uriLocatorFactory;
-  private PreProcessorExecutor preProcessorExecutor;
-  private final ProcessorsFactory processorsFactory;
-  private final GroupsProcessor groupsProcessor;
+  private Map<Class<?>, Object> map;
+
   /**
-   * Creates the Injector and initialize the provided manager.
+   * Mapping of classes to be annotated and the corresponding injected object.
    */
-  public Injector(final WroManager wroManager) {
-    Validate.notNull(wroManager);
-    this.wroManager = wroManager;
-    this.groupsProcessor = new GroupsProcessor();
-
-    this.uriLocatorFactory = new InjectorUriLocatorFactoryDecorator(wroManager.getUriLocatorFactory(), this);
-    wroManager.setUriLocatorFactory(this.uriLocatorFactory);
-
-    this.processorsFactory = new InjectorProcessorsFactoryDecorator(wroManager.getProcessorsFactory(), this);
-    wroManager.setProcessorsFactory(this.processorsFactory);
-
-    inject(wroManager);
-  }
-
-  private PreProcessorExecutor getPreProcessorExecutor() {
-    if (preProcessorExecutor == null) {
-      preProcessorExecutor = new PreProcessorExecutor();
-      inject(preProcessorExecutor);
-    }
-    return preProcessorExecutor;
+  Injector(final Map<Class<?>, Object> map) {
+    Validate.notNull(map);
+    this.map = map;
   }
 
   /**
@@ -75,17 +52,18 @@ public final class Injector {
    * Check for each field from the passed object if @Inject annotation is present & inject the required field if
    * supported, otherwise warns about invalid usage.
    *
-   * @param processor object to check for annotation presence.
+   * @param object to check for annotation presence.
    */
-  private void processInjectAnnotation(final Object processor) {
-    LOG.debug("processInjectAnnotation for: {}", processor.getClass().getSimpleName());
+  private void processInjectAnnotation(final Object object) {
+    LOG.debug("processInjectAnnotation for: {}", object.getClass().getSimpleName());
     try {
-      final Collection<Field> fields = getAllFields(processor);
+      final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
-          if (!acceptAnnotatedField(processor, field)) {
-            throw new WroRuntimeException("@Inject cannot be applied field of type: "
-              + field.getType());
+          if (!acceptAnnotatedField(object, field)) {
+            final String message = "@Inject cannot be applied to field of type: " + field.getType();
+            LOG.error(message + ". Supported types are: {}", map.keySet());
+            throw new WroRuntimeException(message);
           }
         }
       }
@@ -126,35 +104,21 @@ public final class Injector {
     try {
       // accept even private modifiers
       field.setAccessible(true);
-      if (UriLocatorFactory.class.isAssignableFrom(field.getType())) {
-        field.set(object, uriLocatorFactory);
-        return accept = true;
-      }
-      if (ProcessorsFactory.class.isAssignableFrom(field.getType())) {
-        field.set(object, processorsFactory);
-        return accept = true;
-      }
-      if (PreProcessorExecutor.class.isAssignableFrom(field.getType())) {
-        field.set(object, getPreProcessorExecutor());
-        return accept = true;
-      }
-      if (NamingStrategy.class.isAssignableFrom(field.getType())) {
-        field.set(object, wroManager.getNamingStrategy());
-        return accept = true;
-      }
-      if (GroupsProcessor.class.isAssignableFrom(field.getType())) {
-        field.set(object, groupsProcessor);
-        inject(groupsProcessor);
-        return accept = true;
-      }
-      if (Injector.class.isAssignableFrom(field.getType())) {
-        field.set(object, this);
-        return accept = true;
+      for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
+        if (entry.getKey().isAssignableFrom(field.getType())) {
+          Object value = entry.getValue();
+          //treat factories as a special case for lazy load of the objects.
+          if (value instanceof InjectorObjectFactory) {
+            value = ((InjectorObjectFactory<?>) value).create();
+          }
+          field.set(object, value);
+          return accept = true;
+        }
       }
       return accept;
     } finally {
       if (accept) {
-        LOG.debug("\t[OK] Injected field of type: {}", field.getType().getSimpleName());
+        LOG.debug("\t[OK] Injected {} -> {}", object.getClass().getName(), field.getType().getSimpleName());
       }
     }
   }

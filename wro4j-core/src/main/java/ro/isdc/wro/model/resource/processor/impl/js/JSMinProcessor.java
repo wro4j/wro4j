@@ -16,13 +16,15 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.support.JSMin;
 
 
@@ -39,23 +41,25 @@ public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
   public static final String ALIAS = "jsMin";
+  @Inject
+  private WroConfiguration configuration;
+  private String encoding;
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      final String encoding = Context.get().getConfig().getEncoding();
-
-      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, encoding)) {};
-      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, encoding));
+      final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, getEncoding())) {};
+      final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, getEncoding()));
       final JSMin jsmin = new JSMin(is, os);
 
       jsmin.jsmin();
       is.close();
       os.close();
 		} catch (final Exception e) {
-      throw new IOException(e.getMessage(), e);
+		  LOG.error("Exception occured while using processor: " + ALIAS, e);
+      throw new IOException(e.getMessage());
     } finally {
       reader.close();
       writer.close();
@@ -69,5 +73,20 @@ public class JSMinProcessor implements ResourcePreProcessor,
       final Writer writer) throws IOException {
     // resource Uri doesn't matter.
     process(null, reader, writer);
+  }
+
+  /**
+   * @return the encoding
+   */
+  private String getEncoding() {
+    return this.encoding == null ? configuration.getEncoding() : encoding;
+  }
+
+  /**
+   * @param encoding the encoding to set
+   */
+  public JSMinProcessor setEncoding(final String encoding) {
+    this.encoding = encoding;
+    return this;
   }
 }

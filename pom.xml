@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.2</version>
+  <version>1.4.3</version>
   <packaging>pom</packaging>  
   
   <name>Web Resource Optimizer Parent</name>
@@ -79,13 +79,13 @@
   
     
   <modules>		
-    <module>wro4j-core</module>    
-    
+    <module>wro4j-core</module>        
     <module>wro4j-extensions</module>
-    <module>wro4j-maven-plugin</module>
-    <module>wro4j-runner</module>       		
+    <module>wro4j-maven-plugin</module>    
+    <module>wro4j-runner</module>      
+    <!-- 		
   	<module>wro4j-examples</module>        		
-    
+    -->
   </modules>
 
   <dependencyManagement>

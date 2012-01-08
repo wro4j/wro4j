@@ -13,8 +13,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
 /**
@@ -22,10 +21,6 @@ import ro.isdc.wro.manager.WroManagerFactory;
  * should be accessible even outside of the request cycle.
  *
  * @author Alex Objelean
- */
-/**
- * @author Admin
- *
  */
 public final class WroConfiguration
   implements WroConfigurationMBean {
@@ -198,7 +193,6 @@ public final class WroConfiguration
    */
   public void reloadModel() {
     LOG.debug("reloadModel");
-    LOG.debug("Context.isContextSet(): {}", Context.isContextSet());
     reloadModelWithNewValue(null);
   }
 

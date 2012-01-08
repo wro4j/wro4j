@@ -55,7 +55,7 @@ exports.ast_squeeze_more = ast_squeeze_more;
   //parse code and get the initial AST
   var ast = jsp.parse(orig_code);
   //get a new AST with mangled names
-  ast = exports.ast_mangle(ast);
+  ast = exports.ast_mangle(ast, { except: '%s'.split(',')});
   //get an AST with compression optimizations
   ast = exports.ast_squeeze(ast);
   ast = exports.ast_squeeze_more(ast);

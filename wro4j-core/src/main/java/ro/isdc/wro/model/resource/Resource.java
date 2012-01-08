@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.resource;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -60,6 +61,19 @@ public class Resource {
     return new Resource(uri, type);
   }
 
+
+  /**
+   * Creates a resource and set the correct {@link ResourceType} based on uri extension. If resourceType cannot be
+   * identified an exception is thrown.
+   *
+   * @param uri of the resource to create.
+   * @return Resource with the provided uri and correct type.
+   */
+  public static Resource create(final String uri) {
+    final String resourceExtension = FilenameUtils.getExtension(uri);
+    final ResourceType type = ResourceType.get(resourceExtension);
+    return new Resource(uri, type);
+  }
 
   /**
    * Perform a cleaning of the uri by trimming it and removing last '/' character if exists.

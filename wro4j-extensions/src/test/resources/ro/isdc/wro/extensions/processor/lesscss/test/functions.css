@@ -1,6 +1,6 @@
 #functions {
   @var: 10;
-  color: color("evil red"); // #660000
+  color: color("red"); // #660000
   width: increment(15);
   height: undefined("self");
   border-width: add(2, 3);

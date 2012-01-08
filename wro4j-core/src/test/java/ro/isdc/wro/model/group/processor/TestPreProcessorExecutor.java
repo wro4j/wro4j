@@ -20,8 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -63,7 +64,7 @@ public class TestPreProcessorExecutor {
    */
   private void initExecutor(final ResourcePreProcessor... preProcessors) {
     final WroManagerFactory wroManagerFactory = createWroManager(preProcessors);
-    final Injector injector = new Injector(wroManagerFactory.create());
+    final Injector injector = new InjectorBuilder(wroManagerFactory.create()).build();
     executor = new PreProcessorExecutor();
     injector.inject(executor);
   }
@@ -170,20 +171,37 @@ public class TestPreProcessorExecutor {
   }
 
 
+  /**
+   * This test should work when running at least on dual-core.
+   * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))  
+   */
   @Test
   public void preProcessingInParallelIsFaster()
     throws Exception {
     final StopWatch watch = new StopWatch();
-    watch.start("processAndMerge");
-    initExecutor(createSlowPreProcessor(200), createSlowPreProcessor(200), createSlowPreProcessor(200));
+    WroConfiguration config = Context.get().getConfig(); 
+    watch.start("parallel preProcessing");
+    config.setParallelPreprocessing(true);
+    initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
     final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
       Resource.create("r2", ResourceType.JS));
-    final String result = executor.processAndMerge(resources, true);
-    Assert.assertEquals("", result);
+    executor.processAndMerge(resources, true);
     watch.stop();
+    long parallelExecution = watch.getLastTaskTimeMillis();
+    
+    config.setParallelPreprocessing(false);
+    watch.start("sequential preProcessing");
+    executor.processAndMerge(resources, true);
+    watch.stop();
+    long sequentialExecution = watch.getLastTaskTimeMillis();
+    
+    String message = "Processing details: \n" + watch.prettyPrint();
+    LOG.debug(message);
+    
     // prove that running in parallel is faster
-
-    Assert.assertTrue("Processing took: " + watch.getTotalTimeMillis(), watch.getTotalTimeMillis() < 1000);
+    //delta is for executor warm up.
+    long delta = 100;
+    Assert.assertTrue(sequentialExecution > parallelExecution + delta);
   }
 
 

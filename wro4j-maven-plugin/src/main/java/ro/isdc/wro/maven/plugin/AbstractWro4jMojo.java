@@ -18,7 +18,7 @@ import org.codehaus.classworlds.ClassRealm;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
-import ro.isdc.wro.manager.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;

@@ -37,8 +37,10 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.http.HttpHeader;
 import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -70,7 +72,12 @@ public class TestWroManager {
    */
   private static final class WroManagerProcessor
     implements ResourcePreProcessor {
-    private final WroManager manager = new BaseWroManagerFactory().create();
+    private final WroManagerFactory managerFactory = new BaseWroManagerFactory() {
+      @Override
+      protected void onAfterInitializeManager(final WroManager manager) {
+        manager.getCallbackRegistry().registerCallback(new PerformanceLoggerCallback());
+      };
+    };
 
 
     public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -105,6 +112,7 @@ public class TestWroManager {
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
+      final WroManager manager = managerFactory.create();
       manager.setModelFactory(new WroModelFactoryDecorator(getValidModelFactory()) {
         @Override
         public WroModel create() {
@@ -121,7 +129,7 @@ public class TestWroManager {
     }
   }
 
-  private WroManager manager;
+  private WroManagerFactory managerFactory;
 
 
   @Before
@@ -129,8 +137,7 @@ public class TestWroManager {
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
       Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
-    manager = factory.create();
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
   }
 
   private class GenericTestBuilder {
@@ -153,7 +160,7 @@ public class TestWroManager {
 
       onBeforeProcess();
 
-      manager.process();
+      managerFactory.create().process();
 
       // compare written bytes to output stream with the content from specified css.
       final InputStream expectedInputStream = new UnclosableBufferedInputStream(
@@ -219,8 +226,7 @@ public class TestWroManager {
   public void testNoProcessorWroManagerFactory()
     throws IOException {
     final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
-    manager = factory.create();
-    manager.setModelFactory(getValidModelFactory());
+
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
 
@@ -230,7 +236,11 @@ public class TestWroManager {
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
+    final WroManager manager = factory.create();
+    manager.setModelFactory(getValidModelFactory());
+
     manager.process();
+
     // compare written bytes to output stream with the content from specified css.
     WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
       new ByteArrayInputStream(out.toByteArray()));
@@ -321,7 +331,7 @@ public class TestWroManager {
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-    manager.process();
+    managerFactory.create().process();
   }
 
 
@@ -337,7 +347,8 @@ public class TestWroManager {
     config.setModelUpdatePeriod(1);
     config.setCacheUpdatePeriod(1);
     Context.set(context, config);
-    manager.process();
+
+    managerFactory.create().process();
     // let scheduler run a while
     Thread.sleep(1300);
   }
@@ -358,7 +369,8 @@ public class TestWroManager {
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-    manager.process();
+
+    managerFactory.create().process();
     // allow thread to do its job
     Thread.sleep(500);
   }
@@ -371,7 +383,7 @@ public class TestWroManager {
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-    manager.process();
+    managerFactory.create().process();
 
     Assert.assertEquals("/wro4j/wro/", Context.get().getAggregatedFolderPath());
   }
@@ -384,7 +396,7 @@ public class TestWroManager {
 
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-    manager.process();
+    managerFactory.create().process();
 
     Assert.assertEquals("/wro4j/wro/path/to/", Context.get().getAggregatedFolderPath());
   }
@@ -410,13 +422,14 @@ public class TestWroManager {
     Context.set(
       Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
         Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
-    manager.process();
+    managerFactory.create().process();
   }
 
 
   @Test
   public void testCRC32Fingerprint()
     throws Exception {
+    final WroManager manager = managerFactory.create();
     manager.setHashBuilder(new CRC32HashBuilder());
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
@@ -426,6 +439,7 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
     throws Exception {
+    final WroManager manager = managerFactory.create();
     manager.setHashBuilder(new MD5HashBuilder());
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
@@ -435,13 +449,14 @@ public class TestWroManager {
   @Test
   public void testSHA1DefaultHashBuilder()
     throws Exception {
+    final WroManager manager = managerFactory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("51e6de8dde498cb0bf082b2cd80323fca19eef5/g3.css?minimize=true", path);
   }
 
   @After
   public void tearDown() {
-    manager.destroy();
+    managerFactory.destroy();
     Context.unset();
   }
 }

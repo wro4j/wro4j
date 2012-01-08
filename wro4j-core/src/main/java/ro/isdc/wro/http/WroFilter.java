@@ -37,8 +37,8 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
-import ro.isdc.wro.manager.WroManagerFactory;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -132,10 +132,12 @@ public class WroFilter
    * Initialize {@link WroManagerFactory}.
    */
   private void initWroManagerFactory() {
-    this.wroManagerFactory = getWroManagerFactory();
+    if (this.wroManagerFactory == null) {
+      this.wroManagerFactory = getWroManagerFactory();
+    }
     if (wroManagerFactory instanceof CacheChangeCallbackAware) {
       // register cache change callback -> when cache is changed, update headers values.
-      ((CacheChangeCallbackAware)wroManagerFactory).registerCallback(new PropertyChangeListener() {
+      ((CacheChangeCallbackAware)wroManagerFactory).registerCacheChangeListener(new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent evt) {
           // update header values
           initHeaderValues();
@@ -298,12 +300,12 @@ public class WroFilter
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
       // TODO move API related checks into separate class and determine filter mapping for better mapping
-      if (shouldReloadCache(request)) {
+      if (shouldReloadCache()) {
         Context.get().getConfig().reloadCache();
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
         response.setStatus(HttpServletResponse.SC_OK);
-      } else if (shouldReloadModel(request)) {
+      } else if (shouldReloadModel()) {
         Context.get().getConfig().reloadModel();
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
@@ -328,24 +330,28 @@ public class WroFilter
   /**
    * @return true if reload model must be triggered.
    */
-  private boolean shouldReloadModel(final HttpServletRequest request) {
-    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_MODEL);
+  private boolean shouldReloadModel() {
+    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_MODEL);
   }
 
   /**
    * @return true if reload cache must be triggered.
    */
-  private boolean shouldReloadCache(final HttpServletRequest request) {
-    return Context.get().getConfig().isDebug() && matchesUrl(request, API_RELOAD_CACHE);
+  private boolean shouldReloadCache() {
+    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_CACHE);
   }
 
   /**
    * Check if the request path matches the provided api path.
    */
-  private boolean matchesUrl(final HttpServletRequest request, final String apiPath) {
+  private boolean matchesUrl(final String apiPath) {
+    final HttpServletRequest request = Context.get().getRequest();
     final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
-    final Matcher m = pattern.matcher(request.getRequestURI());
-    return m.matches();
+    if (request.getRequestURI() != null) {
+      final Matcher m = pattern.matcher(request.getRequestURI());
+      return m.matches();
+    }
+    return false;
   }
 
   /**
@@ -397,9 +403,28 @@ public class WroFilter
 
 
   /**
-   * Factory method for {@link WroManagerFactory}. Override this method, in order to change the way filter use factory.
+   * Allows external configuration of {@link WroManagerFactory} (ex: using spring IoC). When this value is set, the
+   * default {@link WroManagerFactory} initialization won't work anymore.<p/>
+   * Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.
    *
-   * @return {@link WroManagerFactory} object.
+   * @param wroManagerFactory the wroManagerFactory to set
+   */
+  public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
+    this.wroManagerFactory = wroManagerFactory;
+  }
+
+
+  /**
+   * Factory method for {@link WroManagerFactory}.
+   * <p/>
+   * Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
+   * is found a default implentation is used.
+   * </p>
+   * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
+   * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
+   *
+   *
+   * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory getWroManagerFactory() {
     if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
@@ -440,8 +465,12 @@ public class WroFilter
    * {@inheritDoc}
    */
   public void destroy() {
-    wroManagerFactory.destroy();
-    wroConfiguration.destroy();
+    if (wroManagerFactory != null) {
+      wroManagerFactory.destroy();
+    }
+    if (wroConfiguration != null) {
+      wroConfiguration.destroy();
+    }
     Context.destroy();
   }
 }
