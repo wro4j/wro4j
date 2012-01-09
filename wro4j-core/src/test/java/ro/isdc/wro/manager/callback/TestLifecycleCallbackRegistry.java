@@ -70,13 +70,13 @@ public class TestLifecycleCallbackRegistry {
 
     registry.onAfterPostProcess();
     Mockito.verify(callback).onAfterPostProcess();
-    
+
     registry.onBeforeMerge();
     Mockito.verify(callback).onBeforeMerge();
-    
+
     registry.onAfterMerge();
     Mockito.verify(callback).onAfterMerge();
-    
+
     registry.onProcessingComplete();
     Mockito.verify(callback).onProcessingComplete();
   }
@@ -85,7 +85,7 @@ public class TestLifecycleCallbackRegistry {
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
     final LifecycleCallback simpleCallback = Mockito.spy(new LifecycleCallbackSupport());
-    
+
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePreProcess();
@@ -146,7 +146,7 @@ public class TestLifecycleCallbackRegistry {
 
     final WroManager manager = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(
       modelFactory).create();
-    manager.getCallbackRegistry().registerCallback(callback);
+    manager.registerCallback(callback);
     manager.process();
 
     Mockito.verify(callback).onBeforeModelCreated();
@@ -154,7 +154,7 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(callback).onBeforeMerge();
     Mockito.verify(callback).onAfterMerge();
     Mockito.verify(callback).onProcessingComplete();
-    
+
     Mockito.verifyNoMoreInteractions(callback);
   }
 }
