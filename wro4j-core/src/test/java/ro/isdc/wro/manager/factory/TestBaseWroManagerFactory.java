@@ -54,7 +54,7 @@ public class TestBaseWroManagerFactory {
     factory = new BaseWroManagerFactory() {
       @Override
       protected void onAfterInitializeManager(final WroManager manager) {
-        manager.getCallbackRegistry().registerCallback(callback);
+        manager.registerCallback(callback);
       }
     }.setModelFactory(WroUtil.factoryFor(new WroModel()));
     final WroManager manager = factory.create();

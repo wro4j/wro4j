@@ -91,7 +91,7 @@ public class TestInjector {
   }
 
   @Test(expected=WroRuntimeException.class)
-  public void cannotInjectContextOutsideOfContextScope() throws Exception {
+  public void canInjectContextOutsideOfContextScope() throws Exception {
     //remove the context explicitly
     Context.unset();
     shouldInjectContext();

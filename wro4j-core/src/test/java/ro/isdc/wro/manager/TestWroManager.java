@@ -75,7 +75,7 @@ public class TestWroManager {
     private final WroManagerFactory managerFactory = new BaseWroManagerFactory() {
       @Override
       protected void onAfterInitializeManager(final WroManager manager) {
-        manager.getCallbackRegistry().registerCallback(new PerformanceLoggerCallback());
+        manager.registerCallback(new PerformanceLoggerCallback());
       };
     };
 
