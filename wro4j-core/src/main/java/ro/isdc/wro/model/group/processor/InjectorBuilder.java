@@ -80,6 +80,7 @@ public class InjectorBuilder {
     //first initialize the map
     initMap();
     injector = new Injector(Collections.unmodifiableMap(map));
+
     //process dependencies for several fields too.
     injector.inject(preProcessorExecutor);
     injector.inject(groupsProcessor);
