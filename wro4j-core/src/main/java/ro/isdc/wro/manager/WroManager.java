@@ -544,6 +544,7 @@ public class WroManager
    * @param callback {@link LifecycleCallback} to register.
    */
   public final void registerCallback(final LifecycleCallback callback) {
+    Validate.notNull(callback);
     callbackRegistry.registerCallback(callback);
   }
 
