@@ -286,16 +286,22 @@ public class WroTestUtils {
     logSuccess(processedNumber);
   }
   
-  /*
+  /**
    * Process and compare the files which a located in different folders.
-   * @param sourceFolder folder where the source files are located.
-   * @param targetFolder folder where the target files are located.
-   * @param fileFilter filter used to select files to process.
-   * @param toTargetFileName {@link Transformer} used to identify the target file name based on source file name.
-   * @param preProcessor {@link ResourcePreProcessor} used to process the source files.
+   * 
+   * @param sourceFolder
+   *          folder where the source files are located.
+   * @param targetFolder
+   *          folder where the target files are located.
+   * @param fileFilter
+   *          filter used to select files to process.
+   * @param toTargetFileName
+   *          {@link Transformer} used to identify the target file name based on source file name.
+   * @param preProcessor
+   *          {@link ResourcePreProcessor} used to process the source files.
    * @throws IOException
    */
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+  private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
       final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourceProcessor preProcessor)
       throws IOException {
     LOG.debug("sourceFolder: {}", sourceFolder);
