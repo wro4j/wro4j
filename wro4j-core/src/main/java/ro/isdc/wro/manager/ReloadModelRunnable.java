@@ -38,6 +38,7 @@ public final class ReloadModelRunnable
         throw new InterruptedException();
       }
       wroManagerReference.get().getModelFactory().create();
+      wroManagerReference.get().getCacheStrategy().clear();
     } catch (final InterruptedException e) {
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.debug("Interrupted exception occured: ", e);
