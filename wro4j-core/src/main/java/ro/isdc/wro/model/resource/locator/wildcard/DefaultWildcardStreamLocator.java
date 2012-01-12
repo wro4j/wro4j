@@ -27,7 +27,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.util.Transformer;
+import ro.isdc.wro.util.Function;
 
 
 /**
@@ -54,7 +54,7 @@ public class DefaultWildcardStreamLocator
   /**
    * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
    */
-  private Transformer<Collection<File>> wildcardExpanderHandler;
+  private Function<Collection<File>, Void> wildcardExpanderHandler;
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
    */
@@ -160,7 +160,7 @@ public class DefaultWildcardStreamLocator
   private void handleFoundAllFiles(final Set<File> allFiles) throws IOException {
     if (wildcardExpanderHandler != null) {
       try {
-        wildcardExpanderHandler.transform(allFiles);
+        wildcardExpanderHandler.apply(allFiles);
       } catch (final Exception e) {
         //preserve exception type if the exception is already an IOException
         if (e instanceof IOException) {
@@ -194,7 +194,7 @@ public class DefaultWildcardStreamLocator
   /**
    * {@inheritDoc}
    */
-  public void setWildcardExpanderHandler(final Transformer<Collection<File>> handler) {
+  public void setWildcardExpanderHandler(final Function<Collection<File>, Void> handler) {
     this.wildcardExpanderHandler = handler;
   }
 }

@@ -33,6 +33,7 @@ import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -242,7 +243,6 @@ public class WroTestUtils {
       Transformers.extensionTransformer(targetFileExtension), processor);
   }
 
-
   /**
    * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourcePostProcessor) Same as
    *      {@link WroTestUtils#compareSameFolderByExtension(File, String, String, ResourcePostProcessor)}, but let you
@@ -318,7 +318,7 @@ public class WroTestUtils {
       throw new IllegalStateException("No files compared. Check if there is at least one resource to compare");
     }
     LOG.debug("===============");
-    LOG.debug("Successfully compared: {} files.", size);
+    LOG.debug("Successfully processed: {} files.", size);
     LOG.debug("===============");
   }
 
@@ -380,7 +380,30 @@ public class WroTestUtils {
       }
     });
   }
-
+  
+  /**
+   * Applies a function for each file from a folder. The folder should contain at least one file to process, otherwise
+   * an exception will be thrown.
+   * 
+   * @param folder
+   *          {@link File} representing the folder where the files will be used from processing.
+   * @param function
+   *          {@link Function} to apply on each found file.
+   */
+  public static void forEachFileInFolder(final File folder, final Function<File, Void> function) {
+    Validate.notNull(function);
+    final Collection<File> files = FileUtils.listFiles(folder, TrueFileFilter.TRUE, FalseFileFilter.INSTANCE);
+    int processedNumber = 0;
+    for (final File file : files) {
+      try {
+        function.apply(file);
+      } catch (Exception e) {
+        throw new RuntimeException("Problem while applying function on file: " + file, e);
+      }
+      processedNumber++;      
+    }
+    logSuccess(processedNumber);
+  }
 
   /**
    * Process and compare the files which a located in different folders.
