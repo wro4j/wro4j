@@ -45,7 +45,6 @@ public class LessCss {
         final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
         final String SCRIPT_RUN = "run.js";
         final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
-        // .newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT)
         builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
           getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
         scope = builder.getScope();
