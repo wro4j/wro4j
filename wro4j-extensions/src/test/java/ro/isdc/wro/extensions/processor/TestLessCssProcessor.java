@@ -4,12 +4,15 @@
 package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,6 +22,8 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -72,9 +77,13 @@ public class TestLessCssProcessor {
     WroTestUtils.runConcurrently(task);
   }
 
-
-  @Test(expected=WroRuntimeException.class)
-  public void testInvalidLessCss()
+  /**
+   * Test that processing invalid less css produces exceptions
+   *
+   * @throws Exception
+   */
+  @Test
+  public void shouldFailWhenInvalidLessCssIsProcessed()
       throws Exception {
     final ResourceProcessor processor = new LessCssProcessor() {
       @Override
@@ -83,7 +92,21 @@ public class TestLessCssProcessor {
         throw e;
       };
     };
-    final Reader reader = new InputStreamReader(getClass().getResourceAsStream("lesscss/giveErrors.less"));
-    processor.process(null, reader, new StringWriter());
+    final URL url = getClass().getResource("lesscss");
+
+    final File testFolder = new File(url.getFile(), "invalid");
+    WroTestUtils.forEachFileInFolder(testFolder, new Function<File, Void>() {
+      @Override
+      public Void apply(final File input)
+          throws Exception {
+        try {
+          processor.process(null, new FileReader(input), new StringWriter());
+          Assert.fail("Expected to fail, but didn't");
+        } catch (WroRuntimeException e) {
+          //expected to throw exception, continue 
+        }
+        return null;
+      }
+    });
   }
 }

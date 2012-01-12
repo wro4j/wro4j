@@ -24,6 +24,7 @@ import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardExpandedHandlerAware;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
+import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.Transformer;
 
 
@@ -135,8 +136,8 @@ public class WildcardExpanderModelTransformer
     final WildcardExpandedHandlerAware expandedHandler = ((WildcardExpandedHandlerAware)((AbstractResourceLocator)resourceLocator).getWildcardStreamLocator());
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
-    expandedHandler.setWildcardExpanderHandler(new Transformer<Collection<File>>() {
-      public Collection<File> transform(final Collection<File> input)
+    expandedHandler.setWildcardExpanderHandler(new Function<Collection<File>, Void>() {
+      public Void apply(final Collection<File> input)
         throws Exception {
         LOG.debug("\texpanded Files: {}", input);
         for (final File file : input) {
@@ -167,11 +168,11 @@ public class WildcardExpanderModelTransformer
   /**
    * create the handler which expand the resources containing wildcard.
    */
-  public Transformer<Collection<File>> createExpanderHandler(final Group group, final Resource resource,
+  public Function<Collection<File>, Void> createExpanderHandler(final Group group, final Resource resource,
     final String baseNameFolder) {
     LOG.debug("createExpanderHandler using baseNameFolder: {}\n for resource {}", baseNameFolder, resource);
-    final Transformer<Collection<File>> handler = new Transformer<Collection<File>>() {
-      public Collection<File> transform(final Collection<File> files) {
+    final Function<Collection<File>, Void> handler = new Function<Collection<File>, Void>() {
+      public Void apply(final Collection<File> files) {
         if (baseNameFolder == null) {
           // replacing group with empty list since the original uri has no associated resources.
           //No BaseNameFolder found
@@ -192,9 +193,7 @@ public class WildcardExpanderModelTransformer
           }
           LOG.debug("\treplace resource {}", resource);
           group.replace(resource, expandedResources);
-
         }
-        // Because there is actually no transformation, here it doesn't matter what we return.
         return null;
       }
     };
