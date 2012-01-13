@@ -8,10 +8,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -20,6 +25,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -95,4 +104,29 @@ public class TestJarWildcardStreamLocator {
     throws IOException {
     jarStreamLocator.locateStream("com/test/app/*.js", new File("test.jpg"));
   }
+  
+
+  @Test
+  public void testWildcardResourcesOrderedAlphabetically() throws IOException {
+    jarStreamLocator = new JarWildcardStreamLocator() {
+      @Override
+      protected void handleFoundResources(final Collection<File> files) {
+        final Collection<String> filenameList = new ArrayList<String>();
+        for (final File file : files) {
+          filenameList.add(file.getName());
+        }
+        Assert.assertEquals(Arrays.toString(new String[] {
+          "tools.expose-1.0.5.js", "tools.overlay-1.1.2.js", "tools.overlay.apple-1.0.1.js", "tools.overlay.gallery-1.0.0.js"
+        }), Arrays.toString(filenameList.toArray()));
+      };
+    };
+    final UriLocator uriLocator = new ClasspathUriLocator() {
+      @Override
+      public WildcardStreamLocator newWildcardStreamLocator() {
+        return jarStreamLocator;
+      }
+    };
+    uriLocator.locate("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.js");
+  }
+
 }
