@@ -50,7 +50,7 @@ public class PreProcessorExecutor {
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private ProcessorsFactory processorsFactory;
-  @Inject
+  @Inject 
   private WroConfiguration configuration;
   @Inject
   private Injector injector;
