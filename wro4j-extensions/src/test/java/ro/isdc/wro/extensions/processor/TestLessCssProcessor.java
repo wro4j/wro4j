@@ -5,8 +5,7 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -102,11 +101,21 @@ public class TestLessCssProcessor {
         try {
           processor.process(null, new FileReader(input), new StringWriter());
           Assert.fail("Expected to fail, but didn't");
-        } catch (WroRuntimeException e) {
-          //expected to throw exception, continue 
+        } catch (final WroRuntimeException e) {
+          //expected to throw exception, continue
         }
         return null;
       }
     });
+  }
+
+  @Test
+  public void shouldBePossibleToExtendLessCssWithDifferentScriptStream() {
+    new LessCss() {
+      @Override
+      protected InputStream getScriptAsStream() {
+        return LessCss.class.getResourceAsStream(LessCss.DEFAULT_LESS_JS);
+      }
+    }.less("#id {}");
   }
 }

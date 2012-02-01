@@ -52,7 +52,7 @@ public class JsonHPack {
    * @return stream of the less.js script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream("json.hpack.min.js");
+    return JsonHPack.class.getResourceAsStream("json.hpack.min.js");
   }
 
 

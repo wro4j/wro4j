@@ -35,7 +35,7 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
+  public static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
@@ -99,7 +99,7 @@ public class UglifyJs {
     RhinoScriptBuilder builder = null;
     try {
       if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().addJSON().evaluateChain(getClass().getResourceAsStream("init.js"),
+        builder = RhinoScriptBuilder.newChain().addJSON().evaluateChain(UglifyJs.class.getResourceAsStream("init.js"),
           "initScript").evaluateChain(getScriptAsStream(), DEFAULT_UGLIFY_JS);
         scope = builder.getScope();
       } else {
@@ -116,7 +116,7 @@ public class UglifyJs {
    * @return the stream of the uglify script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_UGLIFY_JS);
+    return UglifyJs.class.getResourceAsStream(DEFAULT_UGLIFY_JS);
   }
 
 
@@ -132,7 +132,7 @@ public class UglifyJs {
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       final String originalCode = WroUtil.toJSMultiLineString(code);
-      final String invokeScript = String.format(IOUtils.toString(getClass().getResourceAsStream("invoke.js")),
+      final String invokeScript = String.format(IOUtils.toString(UglifyJs.class.getResourceAsStream("invoke.js")),
         originalCode, getReservedNames(), !uglify);
       watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");

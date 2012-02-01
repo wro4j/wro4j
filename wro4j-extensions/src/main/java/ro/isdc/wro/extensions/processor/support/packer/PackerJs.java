@@ -44,7 +44,7 @@ public class PackerJs {
    * @return Stream for base2.js
    */
   protected InputStream getStreamForBase2() {
-    return getClass().getResourceAsStream("base2.min.js");
+    return PackerJs.class.getResourceAsStream("base2.min.js");
   }
 
   /**
@@ -53,7 +53,7 @@ public class PackerJs {
    * @return Stream for packer.js
    */
   protected InputStream getStreamForPacker() {
-    return getClass().getResourceAsStream("packer.min.js");
+    return PackerJs.class.getResourceAsStream("packer.min.js");
   }
 
   /**

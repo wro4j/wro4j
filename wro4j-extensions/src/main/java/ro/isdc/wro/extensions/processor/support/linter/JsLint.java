@@ -26,7 +26,7 @@ public class JsLint extends AbstractLinter {
   @Override
   protected InputStream getScriptAsStream() {
     //this resource is packed with packerJs compressor
-    return getClass().getResourceAsStream(DEFAULT_JSLINT_JS);
+    return JsLint.class.getResourceAsStream(DEFAULT_JSLINT_JS);
   }
 
   /**
