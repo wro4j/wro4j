@@ -35,7 +35,7 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
+  public static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
