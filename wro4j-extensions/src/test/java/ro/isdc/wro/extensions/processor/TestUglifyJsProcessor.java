@@ -5,6 +5,7 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -84,4 +85,13 @@ public class TestUglifyJsProcessor {
     WroTestUtils.runConcurrently(task);
   }
 
+  @Test
+  public void shouldBePossibleToExtendLessCssWithDifferentScriptStream() throws Exception {
+    new UglifyJs(true) {
+      @Override
+      protected InputStream getScriptAsStream() {
+        return UglifyJs.class.getResourceAsStream(UglifyJs.DEFAULT_UGLIFY_JS);
+      }
+    }.process("filename","alert(1);");
+  }
 }

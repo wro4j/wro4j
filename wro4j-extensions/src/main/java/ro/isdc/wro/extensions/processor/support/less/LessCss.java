@@ -31,7 +31,9 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  private static final String DEFAULT_LESS_JS = "less-1.2.0.min.js";
+  public static final String DEFAULT_LESS_JS = "less-1.2.0.min.js";
+  private static final String SCRIPT_RUN = "run.js";
+  private static final String SCRIPT_INIT = "init.js";
   private ScriptableObject scope;
 
   /**
@@ -41,10 +43,8 @@ public class LessCss {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        final String SCRIPT_INIT = "init.js";
-        final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
-        final String SCRIPT_RUN = "run.js";
-        final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
+        final InputStream initStream = LessCss.class.getResourceAsStream(SCRIPT_INIT);
+        final InputStream runStream = LessCss.class.getResourceAsStream(SCRIPT_RUN);
         builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
           getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
         scope = builder.getScope();
@@ -64,7 +64,7 @@ public class LessCss {
    * @return stream of the less.js script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_LESS_JS);
+    return LessCss.class.getResourceAsStream(DEFAULT_LESS_JS);
   }
 
 
