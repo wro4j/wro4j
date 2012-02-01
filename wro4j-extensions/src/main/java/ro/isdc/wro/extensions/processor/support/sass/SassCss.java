@@ -29,7 +29,7 @@ public class SassCss {
   /**
    * The name of the sass script to be used by default.
    */
-  private static final String DEFAULT_SASS_JS = "sass-0.5.0.min.js";
+  public static final String DEFAULT_SASS_JS = "sass-0.5.0.min.js";
   private ScriptableObject scope;
 
   /**
@@ -56,7 +56,7 @@ public class SassCss {
    * @return the stream of the uglify script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_SASS_JS);
+    return SassCss.class.getResourceAsStream(DEFAULT_SASS_JS);
   }
 
   /**

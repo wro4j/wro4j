@@ -67,7 +67,7 @@ public class CssLint {
    * @return the stream of the csslint script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_CSSLINT_JS);
+    return CssLint.class.getResourceAsStream(DEFAULT_CSSLINT_JS);
   }
 
 
