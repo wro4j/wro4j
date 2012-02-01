@@ -1,0 +1,6 @@
+#inner1 {
+  background: url(img/pinguin.png) no-repeat;
+}
+#inner1 ul li {
+  background: url(../img/adobe-reader.png) no-repeat;
+}
