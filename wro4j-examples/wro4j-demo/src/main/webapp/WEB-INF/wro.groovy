@@ -77,4 +77,8 @@ groups {
   testPage {
     wildcard()
   }
+  
+  bug {
+    css("classpath:ro/isdc/wro/resources/**.css")
+  }
 }
