@@ -88,9 +88,24 @@ public class TestCssLintMojo {
   }
 
   @Test
-  public void testResourceWithUndefVariables()
+  public void shouldAnalyzeValidResources()
     throws Exception {
-    mojo.setTargetGroups("undef");
+    mojo.setTargetGroups("valid");
+    mojo.execute();
+  }
+
+  @Test(expected=MojoExecutionException.class)
+  public void shouldAnalyzeInvalidResources()
+    throws Exception {
+    mojo.setTargetGroups("invalidResources");
+    mojo.execute();
+  }
+
+  @Test
+  public void shouldNotFailWhenAnalyzeInvalidResources()
+    throws Exception {
+    mojo.setFailNever(true);
+    mojo.setTargetGroups("invalidResources");
     mojo.execute();
   }
 
