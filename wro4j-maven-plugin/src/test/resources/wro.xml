@@ -13,6 +13,7 @@
   
   <group name="invalidResources">
     <js>classpath:ro/isdc/wro/maven/plugin/js/invalid.js</js>
+    <css>classpath:ro/isdc/wro/maven/plugin/css/invalid.css</css>
   </group>
   
   <group name="undef">
