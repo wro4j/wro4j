@@ -14,5 +14,4 @@ groups {
   uglifyJs {
     js("/libraries/uglifyJs/**")
   }
-
 }

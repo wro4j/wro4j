@@ -80,10 +80,9 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     //perform processing
-    getLog().info("ManagerFactory: " + getManagerFactory().create());
     getManagerFactory().create().process();
 
-    getLog().info("Success processing group: " + group);
+    getLog().debug("Processing group: " + group + " [OK]");
   }
 
   /**
