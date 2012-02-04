@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -104,15 +105,15 @@ public class TestJarWildcardStreamLocator {
     throws IOException {
     jarStreamLocator.locateStream("com/test/app/*.js", new File("test.jpg"));
   }
-  
+
 
   @Test
   public void testWildcardResourcesOrderedAlphabetically() throws IOException {
     jarStreamLocator = new JarWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final Collection<File> files) {
+      protected void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
         final Collection<String> filenameList = new ArrayList<String>();
-        for (final File file : files) {
+        for (final File file : map.values()) {
           filenameList.add(file.getName());
         }
         Assert.assertEquals(Arrays.toString(new String[] {

@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator.wildcard;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,7 +34,7 @@ import ro.isdc.wro.util.Function;
 
 /**
  * Default implementation of {@link WildcardStreamLocator}.
- * 
+ *
  * @author Alex Objelean
  * @created May 8, 2010
  */
@@ -52,29 +54,37 @@ public class DefaultWildcardStreamLocator
    */
   private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
   /**
+   * Ensures File's natural ordering across different platforms.
+   */
+  private static final Comparator<File> ALPHABETIC_FILE_COMPARATOR = new Comparator<File>() {
+    public int compare(final File o1, final File o2) {
+      return o1.getPath().compareTo(o2.getPath());
+    }
+  };
+  /**
    * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
    */
   private Function<Collection<File>, Void> wildcardExpanderHandler;
-  
+
   /**
    * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
    */
   public DefaultWildcardStreamLocator() {
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean hasWildcard(final String uri) {
     return uri.matches(WILDCARD_REGEX);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public InputStream locateStream(final String uri, final File folder)
       throws IOException {
-    final Collection<File> files = findMatchedFiles(uri, folder);
+    final Collection<File> files = findMatchedFiles(new WildcardContext(uri, folder));
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     for (final File file : files) {
       final InputStream is = new FileInputStream(file);
@@ -83,12 +93,77 @@ public class DefaultWildcardStreamLocator
     }
     return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
-  
+
+
+  /**
+   * Creates a {@link IOFileFilter} which collects found files into a collection and also populates a map with found
+   * resources and corresponding files.
+   *
+   * @param wildcardContext
+   * @param allFiles - where all found files and folders are collected.
+   * @param uriToFileMap - mapping between found resources and corresponding files.
+   */
+  @SuppressWarnings("serial")
+  private IOFileFilter createWildcardFileFilter(final WildcardContext wildcardContext, final Collection<File> allFiles,
+    final Map<String, File> uriToFileMap) {
+    notNull(wildcardContext);
+    notNull(allFiles);
+    notNull(uriToFileMap);
+    return new WildcardFileFilter(wildcardContext.getWildcard()) {
+      @Override
+      public boolean accept(final File file) {
+        final boolean accept = super.accept(file);
+        if (accept) {
+          allFiles.add(file);
+          if (!file.isDirectory()) {
+            final String relativeFilePath = file.getPath().replace(wildcardContext.getFolder().getPath(), "");
+            final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(wildcardContext.getUri());
+            final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
+            uriToFileMap.put(resourceUri, file);
+            LOG.debug("\tfoundUri: {}", resourceUri);
+          }
+        }
+        return accept;
+      }
+    };
+  }
+
   /**
    * @return a collection of files found inside a given folder for a search uri which contains a wildcard.
    */
-  private Collection<File> findMatchedFiles(final String uri, final File folder)
+  private Collection<File> findMatchedFiles(final WildcardContext wildcardContext)
       throws IOException {
+    validate(wildcardContext);
+
+    // maps resource uri's and corresponding file this map has to be ordered
+    final Map<String, File> uriToFileMap = new TreeMap<String, File>();
+    // Holds a set of all files (also folders, not only resources). This is useful for wildcard expander processing.
+    final Set<File> allFilesAndFolders = new TreeSet<File>(ALPHABETIC_FILE_COMPARATOR);
+    final IOFileFilter fileFilter = createWildcardFileFilter(wildcardContext, allFilesAndFolders, uriToFileMap);
+    FileUtils.listFiles(wildcardContext.getFolder(), fileFilter, getFolderFilter(wildcardContext.getWildcard()));
+
+    LOG.debug("map files: {}", uriToFileMap.keySet());
+
+    final Collection<File> files = uriToFileMap.values();
+    handleFoundResources(uriToFileMap, wildcardContext);
+    // trigger wildcardExpander processing
+    triggerWildcardExpander(allFilesAndFolders);
+
+    return files;
+  }
+
+
+  /**
+   * Validates arguments used by {@link DefaultWildcardStreamLocator#findMatchedFiles(String, File)} method.
+   *
+   * @throws IOException if supplied arguments are invalid or cannot be handled by this locator.
+   */
+  private void validate(final WildcardContext wildcardContext)
+    throws IOException {
+    notNull(wildcardContext);
+    final String uri = wildcardContext.getUri();
+    final File folder = wildcardContext.getFolder();
+
     if (uri == null || folder == null || !folder.isDirectory()) {
       final StringBuffer message = new StringBuffer("Invalid folder provided");
       if (folder != null) {
@@ -100,65 +175,19 @@ public class DefaultWildcardStreamLocator
     if (!hasWildcard(uri)) {
       throw new IOException("No wildcard detected for the uri: " + uri);
     }
-    
-    final String wildcard = FilenameUtils.getName(uri);
     LOG.debug("uri: {}", uri);
     LOG.debug("folder: {}", folder.getPath());
-    LOG.debug("wildcard: {}", wildcard);
-    
-    // maps resource uri's and corresponding file
-    // this map has to be ordered
-    final Map<String, File> uriToFileMap = new TreeMap<String, File>();
-    /**
-     * Holds a set of all files (also folders, not only resources). This is useful for wildcard expander processing.
-     */
-    final Set<File> allFiles = new TreeSet<File>(new Comparator<File>() {
-      // File's natural ordering varies between platforms
-      public int compare(final File o1, final File o2) {
-        return o1.getPath().compareTo(o2.getPath());
-      }
-    });
-    
-    final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(uri);
-    final String parentFolderPath = folder.getPath();
-    
-    final IOFileFilter fileFilter = new IOFileFilterDecorator(new WildcardFileFilter(wildcard)) {
-      @Override
-      public boolean accept(final File file) {
-        final boolean accept = super.accept(file);
-        if (accept) {
-          allFiles.add(file);
-          if (!file.isDirectory()) {
-            final String relativeFilePath = file.getPath().replace(parentFolderPath, "");
-            final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
-            uriToFileMap.put(resourceUri, file);
-            LOG.debug("\tfoundUri: {}", resourceUri);
-          }
-        }
-        return accept;
-      }
-    };
-    FileUtils.listFiles(folder, fileFilter, getFolderFilter(wildcard));
-    
-    LOG.debug("map files: {}", uriToFileMap.keySet());
-    
-    final Collection<File> files = uriToFileMap.values();
-    if (files.isEmpty()) {
-      LOG.warn("No files found inside the {} for wildcard: {}", folder.getPath(), wildcard);
-    }
-    handleFoundResources(files);
-    // trigger wildcardExpander processing
-    handleFoundAllFiles(allFiles);
-    return files;
+    LOG.debug("wildcard: {}", wildcardContext.getWildcard());
+
   }
-  
+
   /**
    * Uses the wildcardExpanderHandler to process the found files, also directories.
-   * 
+   *
    * @param files
    *          a collection of found files after the wildcard has beed applied on the searched folder.
    */
-  private final void handleFoundAllFiles(final Set<File> allFiles)
+  private final void triggerWildcardExpander(final Set<File> allFiles)
       throws IOException {
     if (wildcardExpanderHandler != null) {
       try {
@@ -172,17 +201,22 @@ public class DefaultWildcardStreamLocator
       }
     }
   }
-  
+
+
   /**
    * The default implementation does nothing. Useful for unit test to check if the order is as expected.
-   * 
-   * @param files
-   *          a collection of found resources after the wildcard has beed applied on the searched folder.
+   *
+   * @param uriToFileMap The map of resource uri's and corresponding found files.
+   * @param wildcardContext the context of the wildcard resources search
    */
-  protected void handleFoundResources(final Collection<File> files)
+  protected void handleFoundResources(final Map<String, File> uriToFileMap, final WildcardContext wildcardContext)
       throws IOException {
+    if (uriToFileMap.isEmpty()) {
+      LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
+        wildcardContext.getWildcard());
+    }
   }
-  
+
   /**
    * @param wildcard
    *          to use to determine if the folder filter should be recursive or not.
@@ -192,7 +226,7 @@ public class DefaultWildcardStreamLocator
     final boolean recursive = wildcard.contains(RECURSIVE_WILDCARD);
     return recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE;
   }
-  
+
   /**
    * {@inheritDoc}
    */
