@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -91,9 +92,10 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardResourcesOrderedAlphabetically() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final Collection<File> files) {
+      protected void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
         final Collection<String> filenameList = new ArrayList<String>();
-        for (final File file : files) {
+
+        for (final File file : map.values()) {
           filenameList.add(file.getName());
         }
         Assert.assertEquals(Arrays.toString(new String[] {
@@ -114,8 +116,8 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardLocator() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final java.util.Collection<File> files) {
-        Assert.assertEquals(2, files.size());
+      protected void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
+        Assert.assertEquals(2, map.size());
       };
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
