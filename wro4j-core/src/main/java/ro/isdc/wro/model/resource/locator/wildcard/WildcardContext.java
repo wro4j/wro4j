@@ -31,6 +31,9 @@ public final class WildcardContext {
   public File getFolder() {
     return this.folder;
   }
+  /**
+   * @return the part of the uri containing the wildcard.
+   */
   public String getWildcard() {
     return FilenameUtils.getName(uri);
   }
