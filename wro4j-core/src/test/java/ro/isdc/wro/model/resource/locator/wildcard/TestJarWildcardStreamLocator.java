@@ -125,7 +125,7 @@ public class TestJarWildcardStreamLocator {
   public void shouldOrderedAlphabeticallyWildcardResources() throws IOException {
     final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
     final UriLocator uriLocator = createJarLocator(filenameListHolder);
-    uriLocator.locate("classpath:com/**.css");
+    uriLocator.locate("classpath:com/app/**.css");
     final Collection<String> filenameList = filenameListHolder.get();
     Assert.assertNotNull(filenameList);
     Assert.assertEquals(Arrays.toString(new String[] {
@@ -133,6 +133,18 @@ public class TestJarWildcardStreamLocator {
     }), Arrays.toString(filenameList.toArray()));
   }
 
+  @Test
+  public void shouldFindAllChildFoldersAndFiles() throws IOException {
+    final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
+    final UriLocator uriLocator = createJarLocator(filenameListHolder);
+    uriLocator.locate("classpath:com/app/**");
+    final Collection<String> filenameList = filenameListHolder.get();
+    Assert.assertNotNull(filenameList);
+    Assert.assertEquals(
+      Arrays.toString(new String[] { "com/app/level1/", "com/app/level1/level2/", "com/app/level1/level2/styles/",
+          "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css" }),
+      Arrays.toString(filenameList.toArray()));
+  }
 
   /**
    * @return creates an instance of {@link UriLocator} which uses {@link JarWildcardStreamLocator} for locating
@@ -152,11 +164,6 @@ public class TestJarWildcardStreamLocator {
           filenameList.add(entry.getName());
         }
         filenameListHolder.set(filenameList);
-      }
-      @Override
-      void triggerWildcardExpander(final Collection<File> allFiles)
-        throws IOException {
-        System.out.println("allFiles: " + allFiles);
       }
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
