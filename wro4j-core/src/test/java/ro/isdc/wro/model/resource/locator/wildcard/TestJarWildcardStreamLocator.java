@@ -135,17 +135,16 @@ public class TestJarWildcardStreamLocator {
 
 
   /**
-   * @param filenameListHolder
-   * @return
+   * @return creates an instance of {@link UriLocator} which uses {@link JarWildcardStreamLocator} for locating
+   *         resources containing wildcards. Also it uses a jar file from test resources.
    */
   private UriLocator createJarLocator(final ThreadLocal<Collection<String>> filenameListHolder) {
-    jarStreamLocator = new JarWildcardStreamLocator() {
+    final JarWildcardStreamLocator jarStreamLocator = new JarWildcardStreamLocator() {
       @Override
       File getJarFile(final File folder) {
         //Use a jar from test resources
         return new File(TestJarWildcardStreamLocator.class.getResource("resources.jar").getFile());
-      };
-
+      }
       @Override
       void handleFoundResources(final Collection<JarEntry> entries, final WildcardContext wildcardContext) throws IOException {
         final Collection<String> filenameList = new ArrayList<String>();
@@ -153,7 +152,12 @@ public class TestJarWildcardStreamLocator {
           filenameList.add(entry.getName());
         }
         filenameListHolder.set(filenameList);
-      };
+      }
+      @Override
+      void triggerWildcardExpander(final Collection<File> allFiles)
+        throws IOException {
+        System.out.println("allFiles: " + allFiles);
+      }
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
       @Override
@@ -164,4 +168,8 @@ public class TestJarWildcardStreamLocator {
     return uriLocator;
   }
 
+  @Test
+  public void shouldGetJarFileFromFile() {
+    Assert.assertEquals("path\\to\\file", jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath());
+  }
 }
