@@ -142,14 +142,10 @@ public class DefaultWildcardStreamLocator
     final IOFileFilter fileFilter = createWildcardFileFilter(wildcardContext, allFilesAndFolders, uriToFileMap);
     FileUtils.listFiles(wildcardContext.getFolder(), fileFilter, getFolderFilter(wildcardContext.getWildcard()));
 
-    LOG.debug("map files: {}", uriToFileMap.keySet());
-
-    final Collection<File> files = uriToFileMap.values();
     handleFoundResources(uriToFileMap, wildcardContext);
-    // trigger wildcardExpander processing
     triggerWildcardExpander(allFilesAndFolders);
 
-    return files;
+    return uriToFileMap.values();
   }
 
 
@@ -206,11 +202,13 @@ public class DefaultWildcardStreamLocator
   /**
    * The default implementation does nothing. Useful for unit test to check if the order is as expected.
    *
-   * @param uriToFileMap The map of resource uri's and corresponding found files.
+   * @param uriToFileMap The map of resource uri's and corresponding files.
    * @param wildcardContext the context of the wildcard resources search
+   * @VisibleForTestOnly
    */
-  protected void handleFoundResources(final Map<String, File> uriToFileMap, final WildcardContext wildcardContext)
+  void handleFoundResources(final Map<String, File> uriToFileMap, final WildcardContext wildcardContext)
       throws IOException {
+    LOG.debug("map files: {}", uriToFileMap.keySet());
     if (uriToFileMap.isEmpty()) {
       LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
         wildcardContext.getWildcard());
