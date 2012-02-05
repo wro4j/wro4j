@@ -142,7 +142,8 @@ public class JarWildcardStreamLocator
     final List<File> allFiles = new ArrayList<File>();
     for (final JarEntry entry : jarEntryList) {
       final String entryName = entry.getName();
-      final boolean isSupportedEntry = entryName.startsWith(classPath)
+      //ignore the parent folder itself and accept only child resources
+      final boolean isSupportedEntry = entryName.startsWith(classPath) && !entryName.equals(classPath)
         && accept(entryName, wildcardContext.getWildcard());
       if (isSupportedEntry) {
         allFiles.add(new File(entryName));
