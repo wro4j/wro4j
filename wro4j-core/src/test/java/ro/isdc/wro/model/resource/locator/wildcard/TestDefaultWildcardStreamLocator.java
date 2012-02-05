@@ -92,7 +92,7 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardResourcesOrderedAlphabetically() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
+      void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
         final Collection<String> filenameList = new ArrayList<String>();
 
         for (final File file : map.values()) {
@@ -116,7 +116,7 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardLocator() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
+      void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
         Assert.assertEquals(2, map.size());
       };
     };

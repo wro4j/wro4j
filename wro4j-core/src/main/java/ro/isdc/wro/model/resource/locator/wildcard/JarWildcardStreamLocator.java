@@ -128,7 +128,7 @@ public class JarWildcardStreamLocator
    */
   private InputStream locateStreamFromJar(final String uri, final File jarPath)
       throws IOException {
-    LOG.debug("\t\tLocating stream from jar");
+    LOG.debug("Locating stream from jar: {}", jarPath);
     final WildcardContext wildcardContext = new WildcardContext(uri, jarPath);
     String classPath = FilenameUtils.getPath(uri);
 
@@ -142,6 +142,7 @@ public class JarWildcardStreamLocator
     for (final JarEntry entry : jarEntryList) {
       final boolean isSupportedEntry = entry.getName().startsWith(classPath) && accept(entry, wildcardContext.getWildcard());
       if (isSupportedEntry) {
+        LOG.debug("\tfound jar entry: {}", entry.getName());
         filteredJarEntryList.add(entry);
       }
     }
@@ -171,5 +172,4 @@ public class JarWildcardStreamLocator
         wildcardContext.getWildcard());
     }
   }
-
 }
