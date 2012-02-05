@@ -359,10 +359,6 @@ public final class StringUtils {
 
   /**
    * Joins string fragments using the specified separator
-   *
-   * @param separator
-   * @param fragments
-   * @return combined fragments
    */
   private static String join(final String separator, final String... fragments) {
     if (fragments.length < 1) {

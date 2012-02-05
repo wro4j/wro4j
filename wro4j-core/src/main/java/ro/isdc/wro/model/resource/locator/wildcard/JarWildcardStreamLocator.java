@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -54,6 +55,7 @@ public class JarWildcardStreamLocator
   @Override
   public InputStream locateStream(final String uri, final File folder)
       throws IOException {
+    Validate.notNull(folder);
     final File jarPath = getJarFile(folder);
     if (isSupported(jarPath)) {
       return locateStreamFromJar(uri, jarPath);
@@ -75,9 +77,10 @@ public class JarWildcardStreamLocator
   }
 
   /**
+   * @VisibleForTestOnly
    * @return the File corresponding to the folder from inside the jar.
    */
-  private File getJarFile(final File folder) {
+  File getJarFile(final File folder) {
     return new File(StringUtils.substringAfter(StringUtils.substringBeforeLast(folder.getPath(), "!"),
         "file:"));
   }
@@ -106,13 +109,9 @@ public class JarWildcardStreamLocator
    *           If the file cannot be opened because an {@link IOException}.
    *  @VisibleForTestOnly
    */
-  JarFile open(final File jarFile) {
-    try {
-      Validate.isTrue(jarFile.exists(), "The JAR file must exists.");
-      return new JarFile(jarFile);
-    } catch (final IOException ex) {
-      throw new IllegalArgumentException("Cannot read the JAR file: " + jarFile, ex);
-    }
+  JarFile open(final File jarFile) throws IOException {
+    Validate.isTrue(jarFile.exists(), "The JAR file must exists.");
+    return new JarFile(jarFile);
   }
 
   /**
@@ -130,8 +129,8 @@ public class JarWildcardStreamLocator
   private InputStream locateStreamFromJar(final String uri, final File jarPath)
       throws IOException {
     LOG.debug("\t\tLocating stream from jar");
+    final WildcardContext wildcardContext = new WildcardContext(uri, jarPath);
     String classPath = FilenameUtils.getPath(uri);
-    final String wildcard = FilenameUtils.getName(uri);
 
     if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
       classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
@@ -141,18 +140,36 @@ public class JarWildcardStreamLocator
     final List<JarEntry> jarEntryList = Collections.list(file.entries());
     final List<JarEntry> filteredJarEntryList = new ArrayList<JarEntry>();
     for (final JarEntry entry : jarEntryList) {
-      final boolean isSupportedEntry = entry.getName().startsWith(classPath) && accept(entry, wildcard);
+      final boolean isSupportedEntry = entry.getName().startsWith(classPath) && accept(entry, wildcardContext.getWildcard());
       if (isSupportedEntry) {
         filteredJarEntryList.add(entry);
       }
     }
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+    handleFoundResources(filteredJarEntryList, wildcardContext);
     for (final JarEntry entry : filteredJarEntryList) {
-        final InputStream is = file.getInputStream(entry);
-        IOUtils.copy(is, out);
-        is.close();
+      final InputStream is = file.getInputStream(entry);
+      IOUtils.copy(is, out);
+      is.close();
     }
     return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
+
+  /**
+   * The default implementation does nothing. Useful for unit test to check if the order is as expected.
+   *
+   * @param uriToFileMap The map of resource uri's and corresponding files.
+   * @param wildcardContext the context of the wildcard resources search
+   * @VisibleForTestOnly
+   */
+  void handleFoundResources(final Collection<JarEntry> entries, final WildcardContext wildcardContext)
+      throws IOException {
+    LOG.debug("map files: {}", entries);
+    if (entries.isEmpty()) {
+      LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
+        wildcardContext.getWildcard());
+    }
+  }
+
 }

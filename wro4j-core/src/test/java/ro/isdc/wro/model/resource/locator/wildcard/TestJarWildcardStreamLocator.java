@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -74,6 +72,12 @@ public class TestJarWildcardStreamLocator {
   }
 
 
+  @Test(expected = NullPointerException.class)
+  public void cannotLocateStreamWithNullFolder()
+    throws Exception {
+    jarStreamLocator.locateStream("", null);
+  }
+
   @Test
   public void testLocateJarStream()
     throws IOException {
@@ -109,16 +113,21 @@ public class TestJarWildcardStreamLocator {
 
   @Test
   public void testWildcardResourcesOrderedAlphabetically() throws IOException {
+    final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
     jarStreamLocator = new JarWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final Map<String, File> map, final WildcardContext wildcardContext) {
+      File getJarFile(final File folder) {
+        //Use a jar from test resources
+        return new File(TestJarWildcardStreamLocator.class.getResource("resources.jar").getFile());
+      };
+
+      @Override
+      void handleFoundResources(final Collection<JarEntry> entries, final WildcardContext wildcardContext) throws IOException {
         final Collection<String> filenameList = new ArrayList<String>();
-        for (final File file : map.values()) {
-          filenameList.add(file.getName());
+        for (final JarEntry entry : entries) {
+          filenameList.add(entry.getName());
         }
-        Assert.assertEquals(Arrays.toString(new String[] {
-          "tools.expose-1.0.5.js", "tools.overlay-1.1.2.js", "tools.overlay.apple-1.0.1.js", "tools.overlay.gallery-1.0.0.js"
-        }), Arrays.toString(filenameList.toArray()));
+        filenameListHolder.set(filenameList);
       };
     };
     final UriLocator uriLocator = new ClasspathUriLocator() {
@@ -127,7 +136,12 @@ public class TestJarWildcardStreamLocator {
         return jarStreamLocator;
       }
     };
-    uriLocator.locate("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.js");
+    uriLocator.locate("classpath:com/**.css");
+    final Collection<String> filenameList = filenameListHolder.get();
+    Assert.assertNotNull(filenameList);
+    Assert.assertEquals(Arrays.toString(new String[] {
+      "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css"
+    }), Arrays.toString(filenameList.toArray()));
   }
 
 }
