@@ -95,8 +95,8 @@ public class JarWildcardStreamLocator
    *          Wildcard to match. It cannot be null or empty.
    * @return <code>true</code> if the expression matches, <code>false</code> otherwise.
    */
-  private boolean accept(final JarEntry entry, final String wildcard) {
-    return FilenameUtils.wildcardMatch(entry.getName(), wildcard);
+  private boolean accept(final String entryName, final String wildcard) {
+    return FilenameUtils.wildcardMatch(entryName, wildcard);
   }
 
   /**
@@ -139,16 +139,21 @@ public class JarWildcardStreamLocator
     final JarFile file = open(jarPath);
     final List<JarEntry> jarEntryList = Collections.list(file.entries());
     final List<JarEntry> filteredJarEntryList = new ArrayList<JarEntry>();
+    final List<File> allFiles = new ArrayList<File>();
     for (final JarEntry entry : jarEntryList) {
-      final boolean isSupportedEntry = entry.getName().startsWith(classPath) && accept(entry, wildcardContext.getWildcard());
+      final String entryName = entry.getName();
+      final boolean isSupportedEntry = entryName.startsWith(classPath)
+        && accept(entryName, wildcardContext.getWildcard());
       if (isSupportedEntry) {
-        LOG.debug("\tfound jar entry: {}", entry.getName());
+        allFiles.add(new File(entryName));
+        LOG.debug("\tfound jar entry: {}", entryName);
         filteredJarEntryList.add(entry);
       }
     }
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     handleFoundResources(filteredJarEntryList, wildcardContext);
+    triggerWildcardExpander(allFiles);
     for (final JarEntry entry : filteredJarEntryList) {
       final InputStream is = file.getInputStream(entry);
       IOUtils.copy(is, out);
@@ -166,7 +171,7 @@ public class JarWildcardStreamLocator
    */
   void handleFoundResources(final Collection<JarEntry> entries, final WildcardContext wildcardContext)
       throws IOException {
-    LOG.debug("map files: {}", entries);
+    LOG.debug("found files: {}", entries);
     if (entries.isEmpty()) {
       LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
         wildcardContext.getWildcard());

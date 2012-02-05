@@ -39,7 +39,7 @@ import ro.isdc.wro.util.Function;
  * @created May 8, 2010
  */
 public class DefaultWildcardStreamLocator
-    implements WildcardStreamLocator, WildcardExpandedHandlerAware {
+    implements WildcardStreamLocator, WildcardExpanderHandlerAware {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWildcardStreamLocator.class);
   /**
    * Character to distinguish wildcard inside the uri.
@@ -174,16 +174,16 @@ public class DefaultWildcardStreamLocator
     LOG.debug("uri: {}", uri);
     LOG.debug("folder: {}", folder.getPath());
     LOG.debug("wildcard: {}", wildcardContext.getWildcard());
-
   }
 
   /**
-   * Uses the wildcardExpanderHandler to process the found files, also directories.
+   * Uses the wildcardExpanderHandler to process all found files and directories.
    *
    * @param files
-   *          a collection of found files after the wildcard has beed applied on the searched folder.
+   *          a collection of all files and folders found during wildcard matching.
+   * @VisibleForTestOnly
    */
-  private final void triggerWildcardExpander(final Set<File> allFiles)
+  void triggerWildcardExpander(final Collection<File> allFiles)
       throws IOException {
     if (wildcardExpanderHandler != null) {
       try {

@@ -79,6 +79,6 @@ groups {
   }
   
   bug {
-    css("classpath:ro/isdc/wro/resources/**.css")
+    css("classpath:com/app/**.css")
   }
 }
