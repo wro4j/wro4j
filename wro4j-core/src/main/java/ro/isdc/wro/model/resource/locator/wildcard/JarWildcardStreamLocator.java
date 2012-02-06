@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -153,29 +152,12 @@ public class JarWildcardStreamLocator
     }
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    handleFoundResources(filteredJarEntryList, wildcardContext);
-    triggerWildcardExpander(allFiles);
+    triggerWildcardExpander(allFiles, wildcardContext);
     for (final JarEntry entry : filteredJarEntryList) {
       final InputStream is = file.getInputStream(entry);
       IOUtils.copy(is, out);
       is.close();
     }
     return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
-  }
-
-  /**
-   * The default implementation does nothing. Useful for unit test to check if the order is as expected.
-   *
-   * @param uriToFileMap The map of resource uri's and corresponding files.
-   * @param wildcardContext the context of the wildcard resources search
-   * @VisibleForTestOnly
-   */
-  void handleFoundResources(final Collection<JarEntry> entries, final WildcardContext wildcardContext)
-      throws IOException {
-    LOG.debug("found files: {}", entries);
-    if (entries.isEmpty()) {
-      LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
-        wildcardContext.getWildcard());
-    }
   }
 }

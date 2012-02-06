@@ -141,7 +141,7 @@ public class TestJarWildcardStreamLocator {
     final Collection<String> filenameList = filenameListHolder.get();
     Assert.assertNotNull(filenameList);
     Assert.assertEquals(
-      Arrays.toString(new String[] { "com/app/level1/", "com/app/level1/level2/", "com/app/level1/level2/styles/",
+      Arrays.toString(new String[] { "com/app/level1", "com/app/level1/level2", "com/app/level1/level2/styles",
           "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css" }),
       Arrays.toString(filenameList.toArray()));
   }
@@ -158,10 +158,11 @@ public class TestJarWildcardStreamLocator {
         return new File(TestJarWildcardStreamLocator.class.getResource("resources.jar").getFile());
       }
       @Override
-      void handleFoundResources(final Collection<JarEntry> entries, final WildcardContext wildcardContext) throws IOException {
+      void triggerWildcardExpander(final Collection<File> allFiles, final WildcardContext wildcardContext)
+        throws IOException {
         final Collection<String> filenameList = new ArrayList<String>();
-        for (final JarEntry entry : entries) {
-          filenameList.add(entry.getName());
+        for (final File entry : allFiles) {
+          filenameList.add(entry.getPath().replace("\\", "/"));
         }
         filenameListHolder.set(filenameList);
       }

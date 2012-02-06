@@ -14,13 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -101,27 +98,18 @@ public class DefaultWildcardStreamLocator
    *
    * @param wildcardContext
    * @param allFiles - where all found files and folders are collected.
-   * @param uriToFileMap - mapping between found resources and corresponding files.
    */
   @SuppressWarnings("serial")
-  private IOFileFilter createWildcardFileFilter(final WildcardContext wildcardContext, final Collection<File> allFiles,
-    final Map<String, File> uriToFileMap) {
+  private IOFileFilter createWildcardCollectorFileFilter(final WildcardContext wildcardContext, final Collection<File> allFiles) {
     notNull(wildcardContext);
     notNull(allFiles);
-    notNull(uriToFileMap);
     return new WildcardFileFilter(wildcardContext.getWildcard()) {
       @Override
       public boolean accept(final File file) {
         final boolean accept = super.accept(file);
         if (accept) {
+          LOG.debug("\tfound resource: {}", file.getPath());
           allFiles.add(file);
-          if (!file.isDirectory()) {
-            final String relativeFilePath = file.getPath().replace(wildcardContext.getFolder().getPath(), "");
-            final String uriFolder = FilenameUtils.getFullPathNoEndSeparator(wildcardContext.getUri());
-            final String resourceUri = uriFolder + relativeFilePath.replace('\\', '/');
-            uriToFileMap.put(resourceUri, file);
-            LOG.debug("\tfoundUri: {}", resourceUri);
-          }
         }
         return accept;
       }
@@ -135,17 +123,14 @@ public class DefaultWildcardStreamLocator
       throws IOException {
     validate(wildcardContext);
 
-    // maps resource uri's and corresponding file this map has to be ordered
-    final Map<String, File> uriToFileMap = new TreeMap<String, File>();
     // Holds a set of all files (also folders, not only resources). This is useful for wildcard expander processing.
-    final Set<File> allFilesAndFolders = new TreeSet<File>(ALPHABETIC_FILE_COMPARATOR);
-    final IOFileFilter fileFilter = createWildcardFileFilter(wildcardContext, allFilesAndFolders, uriToFileMap);
+    final Set<File> allFiles = new TreeSet<File>(ALPHABETIC_FILE_COMPARATOR);
+    final IOFileFilter fileFilter = createWildcardCollectorFileFilter(wildcardContext, allFiles);
     FileUtils.listFiles(wildcardContext.getFolder(), fileFilter, getFolderFilter(wildcardContext.getWildcard()));
 
-    handleFoundResources(uriToFileMap, wildcardContext);
-    triggerWildcardExpander(allFilesAndFolders);
+    triggerWildcardExpander(allFiles, wildcardContext);
 
-    return uriToFileMap.values();
+    return allFiles;
   }
 
 
@@ -183,8 +168,13 @@ public class DefaultWildcardStreamLocator
    *          a collection of all files and folders found during wildcard matching.
    * @VisibleForTestOnly
    */
-  void triggerWildcardExpander(final Collection<File> allFiles)
+  void triggerWildcardExpander(final Collection<File> allFiles, final WildcardContext wildcardContext)
       throws IOException {
+    LOG.debug("wildcard resources: {}", allFiles);
+    if (allFiles.isEmpty()) {
+      LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
+        wildcardContext.getWildcard());
+    }
     if (wildcardExpanderHandler != null) {
       try {
         wildcardExpanderHandler.apply(allFiles);
@@ -195,23 +185,6 @@ public class DefaultWildcardStreamLocator
         }
         throw new IOException("Exception during expanding wildcard: " + e.getMessage());
       }
-    }
-  }
-
-
-  /**
-   * The default implementation does nothing. Useful for unit test to check if the order is as expected.
-   *
-   * @param uriToFileMap The map of resource uri's and corresponding files.
-   * @param wildcardContext the context of the wildcard resources search
-   * @VisibleForTestOnly
-   */
-  void handleFoundResources(final Map<String, File> uriToFileMap, final WildcardContext wildcardContext)
-      throws IOException {
-    LOG.debug("map files: {}", uriToFileMap.keySet());
-    if (uriToFileMap.isEmpty()) {
-      LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
-        wildcardContext.getWildcard());
     }
   }
 
