@@ -52,7 +52,7 @@ public class FileSystemResourceLocator extends AbstractResourceLocator {
     throws IOException {
     final String folder = FilenameUtils.getFullPath(file.getPath());
     // remove '../' & normalize the path.
-    final String pathToUse = StringUtils.normalizePath(folder + relativePath);
+    final String pathToUse = StringUtils.cleanPath(folder + relativePath);
     return new FileSystemResourceLocator(new File(pathToUse));
   }
 }

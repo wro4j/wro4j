@@ -124,7 +124,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
   public ResourceLocator createRelative(final String relativePath) {
     final String folder = FilenameUtils.getFullPath(location);
     // remove '../' & normalize the path.
-    final String pathToUse = StringUtils.normalizePath(folder + relativePath);
+    final String pathToUse = StringUtils.cleanPath(folder + relativePath);
     return new ClasspathResourceLocator(PREFIX + pathToUse);
   }
 }

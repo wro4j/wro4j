@@ -26,8 +26,7 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
 
 /**
@@ -113,9 +112,14 @@ public class TestJarWildcardStreamLocator {
   @Test
   public void shouldFindNoResourcesWhenNoneExist() throws IOException {
     final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
-    final UriLocator uriLocator = createJarLocator(filenameListHolder);
+    final JarWildcardStreamLocator jarStreamLocator = createJarLocator(filenameListHolder);
     //there are no js resources in the jar
-    uriLocator.locate("classpath:com/**.js");
+    new ClasspathResourceLocator("classpath:com/**.js") {
+      @Override
+      public WildcardStreamLocator newWildcardStreamLocator() {
+        return jarStreamLocator;
+      }
+    }.getInputStream();
     final Collection<String> filenameList = filenameListHolder.get();
     Assert.assertNotNull(filenameList);
     Assert.assertTrue(filenameList.isEmpty());
@@ -124,8 +128,14 @@ public class TestJarWildcardStreamLocator {
   @Test
   public void shouldOrderedAlphabeticallyWildcardResources() throws IOException {
     final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
-    final UriLocator uriLocator = createJarLocator(filenameListHolder);
-    uriLocator.locate("classpath:com/app/**.css");
+    final JarWildcardStreamLocator jarStreamLocator = createJarLocator(filenameListHolder);
+    //there are no js resources in the jar
+    new ClasspathResourceLocator("classpath:com/app/**.css") {
+      @Override
+      public WildcardStreamLocator newWildcardStreamLocator() {
+        return jarStreamLocator;
+      }
+    }.getInputStream();
     final Collection<String> filenameList = filenameListHolder.get();
     Assert.assertNotNull(filenameList);
     Assert.assertEquals(Arrays.toString(new String[] {
@@ -136,8 +146,14 @@ public class TestJarWildcardStreamLocator {
   @Test
   public void shouldFindAllChildFoldersAndFiles() throws IOException {
     final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
-    final UriLocator uriLocator = createJarLocator(filenameListHolder);
-    uriLocator.locate("classpath:com/app/**");
+    final JarWildcardStreamLocator jarStreamLocator = createJarLocator(filenameListHolder);
+    //there are no js resources in the jar
+    new ClasspathResourceLocator("classpath:com/app/**") {
+      @Override
+      public WildcardStreamLocator newWildcardStreamLocator() {
+        return jarStreamLocator;
+      }
+    }.getInputStream();
     final Collection<String> filenameList = filenameListHolder.get();
     Assert.assertNotNull(filenameList);
     Assert.assertEquals(
@@ -150,7 +166,7 @@ public class TestJarWildcardStreamLocator {
    * @return creates an instance of {@link UriLocator} which uses {@link JarWildcardStreamLocator} for locating
    *         resources containing wildcards. Also it uses a jar file from test resources.
    */
-  private UriLocator createJarLocator(final ThreadLocal<Collection<String>> filenameListHolder) {
+  private JarWildcardStreamLocator createJarLocator(final ThreadLocal<Collection<String>> filenameListHolder) {
     final JarWildcardStreamLocator jarStreamLocator = new JarWildcardStreamLocator() {
       @Override
       File getJarFile(final File folder) {
@@ -167,13 +183,7 @@ public class TestJarWildcardStreamLocator {
         filenameListHolder.set(filenameList);
       }
     };
-    final UriLocator uriLocator = new ClasspathUriLocator() {
-      @Override
-      public WildcardStreamLocator newWildcardStreamLocator() {
-        return jarStreamLocator;
-      }
-    };
-    return uriLocator;
+    return jarStreamLocator;
   }
 
   @Test

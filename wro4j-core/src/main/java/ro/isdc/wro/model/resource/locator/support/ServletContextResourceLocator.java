@@ -99,7 +99,7 @@ public class ServletContextResourceLocator
       throws IOException {
     final String folder = FilenameUtils.getFullPath(path);
     // remove '../' & normalize the path.
-    final String pathToUse = StringUtils.normalizePath(folder + relativePath);
+    final String pathToUse = StringUtils.cleanPath(folder + relativePath);
     return new ServletContextResourceLocator(servletContext, pathToUse);
   }
 }

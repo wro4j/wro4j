@@ -95,7 +95,7 @@ public class WildcardExpanderModelTransformer
             final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware)wildcardStreamLocator;
             LOG.debug("Expanding resource: {}", resource.getUri());
 
-            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory);
+            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory, expandedHandler);
             LOG.debug("baseNameFolder: {}", baseNameFolder);
 
             expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
@@ -122,8 +122,8 @@ public class WildcardExpanderModelTransformer
    * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
    * {@link WildcardExpanderHandlerAware} to get the baseName.
    */
-  private String computeBaseNameFolder(final Resource resource, final UriLocator uriLocator,
-    final WildcardExpanderHandlerAware expandedHandler) {
+  private String computeBaseNameFolder(final Resource resource, final ResourceLocatorFactory resourceLocatorFactory,
+    final WildcardExpanderHandlerAware expanderHandler) {
     // Find the baseName
     // add a recursive wildcard to trigger the wildcard detection. The simple wildcard ('*') is not enough because it
     // won't work for folders containing only directories with no files.
@@ -132,15 +132,13 @@ public class WildcardExpanderModelTransformer
       + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
     LOG.debug("resourcePath: {}", resourcePath);
 
-    final ResourceLocator resourceLocator = resourceLocatorFactory.locate(resourcePath);
-    //TODO get rid of this ugly casts
-    final WildcardExpandedHandlerAware expandedHandler = ((WildcardExpandedHandlerAware)((AbstractResourceLocator)resourceLocator).getWildcardStreamLocator());
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
-    expandedHandler.setWildcardExpanderHandler(createBaseNameComputerFunction(baseNameFolderHolder));
+    expanderHandler.setWildcardExpanderHandler(createBaseNameComputerFunction(baseNameFolderHolder));
 
     try {
-      uriLocator.locate(resourcePath);
+      LOG.debug("locating baseName using resourcePath: {}", resourcePath);
+      resourceLocatorFactory.locate(resourcePath).getInputStream();
     } catch (final Exception e) {
       LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
           e.getMessage());
@@ -165,21 +163,8 @@ public class WildcardExpanderModelTransformer
         // use this to skip wildcard stream detection, we are only interested in the baseName
         throw new NoMoreAttemptsIOException("BaseNameFolder computed successfully, skip further wildcard processing..");
       }
-    });
-
-    try {
-      LOG.debug("locating baseName using resourcePath: {}", resourcePath);
-      resourceLocator.getInputStream();
-    } catch (final Exception e) {
-      LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
-          e.getMessage());
-    }
-    if (baseNameFolderHolder.get() == null) {
-      LOG.debug("[FAIL] Cannot compute baseName folder for resource: {}", resource);
-    }
-    return baseNameFolderHolder.get();
+    };
   }
-
 
   /**
    * create the handler which expand the resources containing wildcard.
