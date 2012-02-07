@@ -230,27 +230,6 @@ public class StopWatch {
     return sb.toString();
   }
 
-
-  /**
-   * Return an informative string describing all tasks performed For custom reporting, call <code>getTaskInfo()</code>
-   * and use the task info directly.
-   */
-  @Override
-  public String toString() {
-    final StringBuffer sb = new StringBuffer(shortSummary());
-    if (this.keepTaskList) {
-      final TaskInfo[] tasks = getTaskInfo();
-      for (final TaskInfo task : tasks) {
-        sb.append("; [" + task.getTaskName() + "] took " + task.getTimeMillis());
-        final long percent = Math.round((100.0 * task.getTimeSeconds()) / getTotalTimeSeconds());
-        sb.append(" = " + percent + "%");
-      }
-    } else {
-      sb.append("; no task info kept");
-    }
-    return sb.toString();
-  }
-
   /**
    * Inner class to hold data about one task executed within the stop watch.
    */

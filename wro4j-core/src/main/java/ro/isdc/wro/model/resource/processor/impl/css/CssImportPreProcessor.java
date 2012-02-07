@@ -161,7 +161,7 @@ public class CssImportPreProcessor
   private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
     final String folder = FilenameUtils.getFullPath(relativeResource.getUri());
     // remove '../' & normalize the path.
-    final String absoluteImportUrl = StringUtils.normalizePath(folder + importUrl);
+    final String absoluteImportUrl = StringUtils.cleanPath(folder + importUrl);
     return absoluteImportUrl;
   }
 }

@@ -91,9 +91,9 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardResourcesOrderedAlphabetically() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final Collection<File> files) {
+      void triggerWildcardExpander(final Collection<File> allFiles, final WildcardContext wildcardContext) throws IOException {
         final Collection<String> filenameList = new ArrayList<String>();
-        for (final File file : files) {
+        for (final File file : allFiles) {
           filenameList.add(file.getName());
         }
         Assert.assertEquals(Arrays.toString(new String[] {
@@ -114,8 +114,8 @@ public class TestDefaultWildcardStreamLocator {
   public void testWildcardLocator() throws IOException {
     locator = new DefaultWildcardStreamLocator() {
       @Override
-      protected void handleFoundResources(final java.util.Collection<File> files) {
-        Assert.assertEquals(2, files.size());
+      void triggerWildcardExpander(final Collection<File> allFiles, final WildcardContext wildcardContext) throws IOException {
+        Assert.assertEquals(2, allFiles.size());
       };
     };
     final ResourceLocator classpathLocator = new ClasspathResourceLocator("classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/*.css") {

@@ -46,4 +46,25 @@ public class TestResource {
     Assert.assertNotNull(resource);
     Assert.assertEquals(ResourceType.CSS, resource.getType());
   }
+
+  @Test(expected=NullPointerException.class)
+  public void cannotSetNullType() {
+    final Resource resource = new Resource();
+    resource.setType(null);
+  }
+
+  @Test(expected=NullPointerException.class)
+  public void cannotSetNullUri() {
+    final Resource resource = new Resource();
+    resource.setUri(null);
+  }
+
+  @Test
+  public void shouldSetMinimizeFlag() {
+    final Resource resource = Resource.create("resource.js");
+    resource.setMinimize(true);
+    Assert.assertTrue(resource.isMinimize());
+    resource.setMinimize(false);
+    Assert.assertFalse(resource.isMinimize());
+  }
 }

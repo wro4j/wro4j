@@ -80,7 +80,7 @@ public class Wro4jCommandLineRunner {
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
-  private final File destinationFolder = new File(System.getProperty("user.dir"), "wro");
+  private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
   @Option(name = "-c", aliases = { "--compressor", "--preProcessors" }, metaVar = "COMPRESSOR", usage = "Comma separated list of processors")
   private String processorsList;
 
@@ -313,16 +313,6 @@ public class Wro4jCommandLineRunner {
     return runContext;
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-  }
-
-
   /**
    * Creates the map of known processors.
    */
@@ -349,5 +339,21 @@ public class Wro4jCommandLineRunner {
       }
     });
     return map;
+  }
+
+  /**
+   * @param destinationFolder the destinationFolder to set
+   * @VisibleForTestOnly
+   */
+  void setDestinationFolder(final File destinationFolder) {
+    this.destinationFolder = destinationFolder;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }
