@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
-import ro.isdc.wro.model.resource.locator.wildcard.WildcardExpandedHandlerAware;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardExpanderHandlerAware;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.util.Function;
@@ -89,9 +89,9 @@ public class WildcardExpanderModelTransformer
 
           //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
           if (wildcardStreamLocator.hasWildcard(resource.getUri())
-            && wildcardStreamLocator instanceof WildcardExpandedHandlerAware) {
+            && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
 
-            final WildcardExpandedHandlerAware expandedHandler = (WildcardExpandedHandlerAware)wildcardStreamLocator;
+            final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware)wildcardStreamLocator;
             LOG.debug("Expanding resource: {}", resource.getUri());
 
             final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
@@ -119,10 +119,10 @@ public class WildcardExpanderModelTransformer
 
   /**
    * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
-   * {@link WildcardExpandedHandlerAware} to get the baseName.
+   * {@link WildcardExpanderHandlerAware} to get the baseName.
    */
   private String computeBaseNameFolder(final Resource resource, final UriLocator uriLocator,
-    final WildcardExpandedHandlerAware expandedHandler) {
+    final WildcardExpanderHandlerAware expandedHandler) {
     // Find the baseName
     // add a recursive wildcard to trigger the wildcard detection. The simple wildcard ('*') is not enough because it
     // won't work for folders containing only directories with no files.
@@ -132,7 +132,22 @@ public class WildcardExpanderModelTransformer
     LOG.debug("resourcePath: {}", resourcePath);
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
-    expandedHandler.setWildcardExpanderHandler(new Function<Collection<File>, Void>() {
+    expandedHandler.setWildcardExpanderHandler(createBaseNameComputerFunction(baseNameFolderHolder));
+
+    try {
+      uriLocator.locate(resourcePath);
+    } catch (final Exception e) {
+      LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
+          e.getMessage());
+    }
+    if (baseNameFolderHolder.get() == null) {
+      LOG.debug("[FAIL] Cannot compute baseName folder for resource: {}", resource);
+    }
+    return baseNameFolderHolder.get();
+  }
+
+  private Function<Collection<File>, Void> createBaseNameComputerFunction(final ThreadLocal<String> baseNameFolderHolder) {
+    return new Function<Collection<File>, Void>() {
       public Void apply(final Collection<File> input)
         throws Exception {
         LOG.debug("\texpanded Files: {}", input);
@@ -145,18 +160,7 @@ public class WildcardExpanderModelTransformer
         // use this to skip wildcard stream detection, we are only interested in the baseName
         throw new NoMoreAttemptsIOException("BaseNameFolder computed successfully, skip further wildcard processing..");
       }
-    });
-
-    try {
-      uriLocator.locate(resourcePath);
-    } catch (final Exception e) {
-      LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
-          e.getMessage());
-    }
-    if (baseNameFolderHolder.get() == null) {
-      LOG.debug("[FAIL] Cannot compute baseName folder for resource: {}", resource);
-    }
-    return baseNameFolderHolder.get();
+    };
   }
 
 
@@ -175,10 +179,11 @@ public class WildcardExpanderModelTransformer
           group.replace(resource, new ArrayList<Resource>());
         } else {
           final List<Resource> expandedResources = new ArrayList<Resource>();
+          LOG.debug("baseNameFolder: {}", baseNameFolder);
           for (final File file : files) {
             final String resourcePath = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
-            LOG.debug("resourcePath: {}", resourcePath);
-
+            LOG.debug("\tresourcePath: {}", resourcePath);
+            LOG.debug("\tfile path: {}", file.getPath());
             final String computedResourceUri = resourcePath
               + StringUtils.removeStart(file.getPath(), baseNameFolder).replace('\\', '/');
 

@@ -77,4 +77,7 @@ groups {
   testPage {
     wildcard()
   }
+  jar {
+    css("classpath:com/app/**.css")
+  }
 }

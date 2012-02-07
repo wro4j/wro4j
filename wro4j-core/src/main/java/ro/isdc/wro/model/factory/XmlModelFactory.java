@@ -15,7 +15,6 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -137,12 +136,8 @@ public class XmlModelFactory
       document = factory.newDocumentBuilder().parse(configResource);
       validate(document);
       document.getDocumentElement().normalize();
-    } catch (final IOException e) {
-      throw new WroRuntimeException("Cannot find XML to parse", e);
-    } catch (final SAXException e) {
-      throw new WroRuntimeException("The wro configuration file contains errors: " + e.getMessage(), e);
-    } catch (final ParserConfigurationException e) {
-      throw new WroRuntimeException("Parsing error", e);
+    } catch (final Exception e) {
+      throw new WroRuntimeException("Cannot build model from XML", e);
     }
     processGroups(document);
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
