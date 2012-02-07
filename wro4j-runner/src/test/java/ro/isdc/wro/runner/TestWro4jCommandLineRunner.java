@@ -181,6 +181,9 @@ public class TestWro4jCommandLineRunner {
 
     //invoke runner
     new Wro4jCommandLineRunner() {
+      {{
+        setDestinationFolder(destinationFolder);
+      }}
       @Override
       protected File newDefaultWroFile() {
         return new File(contextFolderFile, "wro.xml");
