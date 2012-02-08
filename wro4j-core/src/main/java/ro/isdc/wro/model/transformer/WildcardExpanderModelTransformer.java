@@ -88,17 +88,17 @@ public class WildcardExpanderModelTransformer
           final WildcardStreamLocator wildcardStreamLocator = ((AbstractResourceLocator)resourceLocator).getWildcardStreamLocator();
 
           // TODO should we probably handle the situation when wildcard is present, but the implementation is not
-          // expandedHandledAware?
+          // expanderHandlerAware?
           if (wildcardStreamLocator.hasWildcard(resource.getUri())
             && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
 
-            final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware)wildcardStreamLocator;
+            final WildcardExpanderHandlerAware expanderHandler = (WildcardExpanderHandlerAware)wildcardStreamLocator;
             LOG.debug("Expanding resource: {}", resource.getUri());
 
-            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory, expandedHandler);
+            final String baseNameFolder = computeBaseNameFolder(resource, resourceLocatorFactory, expanderHandler);
             LOG.debug("baseNameFolder: {}", baseNameFolder);
 
-            expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
+            expanderHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
             try {
               // trigger the wildcard replacement
               resourceLocator.getInputStream();
@@ -107,7 +107,7 @@ public class WildcardExpanderModelTransformer
               LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
             } finally {
               // remove the handler, it is not needed anymore
-              expandedHandler.setWildcardExpanderHandler(null);
+              expanderHandler.setWildcardExpanderHandler(null);
             }
           }
         }
