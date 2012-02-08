@@ -203,7 +203,6 @@ public class TestWroManager {
   /**
    * Ignored because it fails when running the test from command line.
    */
-  //@Ignore
   @Test
   public void testFromFolder()
     throws Exception {
@@ -213,7 +212,6 @@ public class TestWroManager {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
-    //WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
 

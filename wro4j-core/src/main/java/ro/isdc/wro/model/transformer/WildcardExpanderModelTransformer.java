@@ -87,27 +87,27 @@ public class WildcardExpanderModelTransformer
     LOG.debug("Transformed model: {}", model);
     return model;
   }
-
+  
+  /**
+   * Process each resource and replace it with a collection of resources if it contains wildcard.
+   */
   private void processResource(final Group group, final Resource resource) {
     final ResourceLocator resourceLocator = resourceLocatorFactory.locate(resource.getUri());
     
     if (resourceLocator instanceof AbstractResourceLocator) {
       LOG.debug("Expanding resource: {}", resource.getUri());
-      
-      final String baseNameFolder = computeBaseNameFolder(resource);
-      LOG.debug("baseNameFolder: {}", baseNameFolder);
-      if (resourceLocator instanceof AbstractResourceLocator) {
-        AbstractResourceLocator locator = (AbstractResourceLocator) resourceLocator;
-        if (locator.getWildcardStreamLocator().hasWildcard(resource.getUri())) {
-          locator.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
-          try {
-            // trigger the wildcard replacement
-            resourceLocator.getInputStream();
-          } catch (final IOException e) {
-            // log only
-            LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}",
-                resource.getUri());
-          }
+      AbstractResourceLocator locator = (AbstractResourceLocator) resourceLocator;
+      if (locator.getWildcardStreamLocator().hasWildcard(resource.getUri())) {
+        final String baseNameFolder = computeBaseNameFolder(resource);
+        LOG.debug("baseNameFolder: {}", baseNameFolder);        
+        locator.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
+        try {
+          // trigger the wildcard replacement
+          resourceLocator.getInputStream();
+        } catch (final IOException e) {
+          // log only
+          LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}",
+              resource.getUri());
         }
       }
     }
@@ -119,7 +119,6 @@ public class WildcardExpanderModelTransformer
    * {@link WildcardExpanderHandlerAware} to get the baseName.
    */
   private String computeBaseNameFolder(final Resource resource) {
-    // Find the baseName
     // add a recursive wildcard to trigger the wildcard detection. The simple wildcard ('*') is not enough because it
     // won't work for folders containing only directories with no files.
     LOG.debug("computeBaseNameFolder for resource {}", resource);
