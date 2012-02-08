@@ -368,15 +368,30 @@ public class WroTestUtils {
 
 
   /**
-   * Runs a task concurrently. Allows to test thread-safe behavior.
-   *
-   * @param task a {@link Callable} to run concurrently.
-   * @throws Exception if any of the executed tasks fails.
+   * Runs a task concurrently 10 times using a fixed size thread pool of 5 threads. Allows to test thread-safe behavior.
    */
   public static void runConcurrently(final Callable<Void> task) throws Exception {
-    final ExecutorService service = Executors.newFixedThreadPool(5);
+    runConcurrently(task, 5, 10);
+  }
+
+  /**
+   * Runs a task concurrently. Allows to test thread-safe behavior.
+   * 
+   * @param task
+   *          a {@link Callable} to run concurrently.
+   * @param threadPoolSize
+   *          the size of the thread pool.
+   * @param times
+   *          number of times the task will be executed.
+   * @throws Exception
+   *           if any of the executed tasks fails.
+   */
+  public static void runConcurrently(final Callable<Void> task, final int threadPoolSize, final int times) throws Exception { 
+    Validate.isTrue(threadPoolSize > 0);
+    Validate.isTrue(times > 0);
+    final ExecutorService service = Executors.newFixedThreadPool(threadPoolSize);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < times; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {

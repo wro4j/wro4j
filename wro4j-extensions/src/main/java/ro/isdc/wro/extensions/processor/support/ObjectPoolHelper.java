@@ -6,6 +6,8 @@ package ro.isdc.wro.extensions.processor.support;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -20,6 +22,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {
+  private static final Logger LOG = LoggerFactory.getLogger(ObjectPoolHelper.class);
   private static final int MAX_IDLE = 1;
   /**
    * Use WHEN_EXHAUSTED_GROW strategy, otherwise the pool object retrieval can fail. More details here:
@@ -34,6 +37,7 @@ public class ObjectPoolHelper<T> {
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
     final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
+    LOG.debug("using up to {} threads", maxActive);
     objectPool = new GenericObjectPool(new BasePoolableObjectFactory() {
       @Override
       public Object makeObject()

@@ -109,7 +109,14 @@ public class LessCssProcessor
   public static final String ALIAS = "lessCss";
 
   private ObjectPoolHelper<LessCss> enginePool;
+  private LessCss engine;
+  private boolean usePool = true;
+  
 
+  public LessCssProcessor setUsePool(boolean usePool) {
+    this.usePool = usePool;
+    return this;
+  }
 
   public LessCssProcessor() {
     enginePool = new ObjectPoolHelper<LessCss>(new ObjectFactory<LessCss>() {
@@ -159,7 +166,10 @@ public class LessCssProcessor
    * A getter used for lazy loading.
    */
   private LessCss getEngine() {
-    return enginePool.getObject();
+    if (usePool) {
+      return enginePool.getObject();
+    }
+    return new LessCss();
   }
 
 

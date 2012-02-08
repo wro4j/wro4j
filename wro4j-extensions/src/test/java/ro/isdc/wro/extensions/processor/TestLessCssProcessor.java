@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
@@ -20,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.Function;
@@ -121,25 +125,72 @@ public class TestLessCssProcessor {
   }
   
   @Test
-  public void benchmark() {
-    final LessCssProcessor processor = new LessCssProcessor();
+  public void benchmark() throws Exception {
+    int numberOfTests = 30;
+    int threadPoolSize = 8;
+    final List<Long> noPoolResults = new ArrayList<Long>();
+    final List<Long> usePoolResults = new ArrayList<Long>();
+    final List<Long> concurrentNoPoolResults = new ArrayList<Long>();
+    final List<Long> concurrentUsePoolResults = new ArrayList<Long>();
+
+    //usePool
+    for (int i = 0; i < numberOfTests; i++) {
+      usePoolResults.add(runBenchmark(new LessCssProcessor().setUsePool(true)));  
+    }
     
+    //noPool
+    for (int i = 0; i < numberOfTests; i++) {
+      noPoolResults.add(runBenchmark(new LessCssProcessor().setUsePool(false)));  
+    }
+
+    //concurrentUsePool
+    concurrentUsePoolResults.add(concurrentBenchmark(numberOfTests, threadPoolSize, true));
+    
+    // concurrentNoPool
+    concurrentNoPoolResults.add(concurrentBenchmark(numberOfTests, threadPoolSize, false));
+    
+    LOG.debug("noPool: {}", noPoolResults);
+    LOG.debug("usePoolResults: {}", usePoolResults);
+    LOG.debug("Without Pool: {}", concurrentNoPoolResults);
+    LOG.debug("With    Pool: {}", concurrentUsePoolResults);
+  }
+
+
+  private long concurrentBenchmark(int numberOfTests, int threadPoolSize, boolean usePool)
+      throws Exception {
+    final LessCssProcessor processor = new LessCssProcessor().setUsePool(usePool);
+    StopWatch watch = new StopWatch();
+    watch.start("less");
+    WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
+      public Void call()
+          throws Exception {
+        runBenchmark(processor);
+        return null;
+      }
+    }, threadPoolSize, numberOfTests);
+    watch.stop();
+    return watch.getTotalTimeMillis();
+  }
+
+
+  private long runBenchmark(final LessCssProcessor processor) {
     final URL url = getClass().getResource("lesscss");
     final File testFolder = new File(url.getFile(), "test");
-    StopWatch watch = new StopWatch();
+    final StopWatch watch = new StopWatch();
     watch.start("less");
     WroTestUtils.forEachFileInFolder(testFolder, new Function<File, Void>() {
       @Override
       public Void apply(final File input)
           throws Exception {
         try {
-          processor.process(null, new FileReader(input), new StringWriter());
+          processor.process(Resource.create(input.getName(), ResourceType.JS), new FileReader(input), new StringWriter());
         } catch (final WroRuntimeException e) {
         }
         return null;
       }
     });      
     watch.stop();
-    LOG.debug(watch.prettyPrint());
+    return watch.getTotalTimeMillis();
   }
 }
