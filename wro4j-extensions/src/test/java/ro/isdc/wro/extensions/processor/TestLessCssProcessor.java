@@ -23,6 +23,7 @@ import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.Function;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -117,5 +118,28 @@ public class TestLessCssProcessor {
         return LessCss.class.getResourceAsStream(LessCss.DEFAULT_LESS_JS);
       }
     }.less("#id {}");
+  }
+  
+  @Test
+  public void benchmark() {
+    final LessCssProcessor processor = new LessCssProcessor();
+    
+    final URL url = getClass().getResource("lesscss");
+    final File testFolder = new File(url.getFile(), "test");
+    StopWatch watch = new StopWatch();
+    watch.start("less");
+    WroTestUtils.forEachFileInFolder(testFolder, new Function<File, Void>() {
+      @Override
+      public Void apply(final File input)
+          throws Exception {
+        try {
+          processor.process(null, new FileReader(input), new StringWriter());
+        } catch (final WroRuntimeException e) {
+        }
+        return null;
+      }
+    });      
+    watch.stop();
+    LOG.debug(watch.prettyPrint());
   }
 }
