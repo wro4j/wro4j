@@ -84,9 +84,13 @@ public class DefaultWildcardStreamLocator
     final Collection<File> files = findMatchedFiles(new WildcardContext(uri, folder));
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     for (final File file : files) {
-      final InputStream is = new FileInputStream(file);
-      IOUtils.copy(is, out);
-      is.close();
+      if (file.isFile()) {
+        final InputStream is = new FileInputStream(file);
+        IOUtils.copy(is, out);
+        is.close();
+      } else {
+        LOG.debug("Ignoring folder: " + file);
+      }
     }
     return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }

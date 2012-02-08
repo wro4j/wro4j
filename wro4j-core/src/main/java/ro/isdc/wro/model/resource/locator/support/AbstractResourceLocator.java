@@ -5,11 +5,18 @@
  */
 package ro.isdc.wro.model.resource.locator.support;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardExpanderHandlerAware;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
+import ro.isdc.wro.util.Function;
 
 
 /**
@@ -20,6 +27,7 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
  */
 public abstract class AbstractResourceLocator
   implements ResourceLocator {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractResourceLocator.class);
   /**
    * Wildcard stream locator implementation.
    */
@@ -68,5 +76,17 @@ public abstract class AbstractResourceLocator
   public ResourceLocator createRelative(final String relativePath)
     throws IOException {
     throw new IOException("Cannot find relative resource for: " + relativePath);
+  }
+  
+  /**
+   * Sets the Exapnder handler on this locator if supported.
+   */
+  public final void setWildcardExpanderHandler(final Function<Collection<File>, Void> handler) {
+    //use getter to ensure we are using a not null instance
+    if (getWildcardStreamLocator() instanceof WildcardExpanderHandlerAware) {
+      ((WildcardExpanderHandlerAware) wildcardStreamLocator).setWildcardExpanderHandler(handler);
+    } else {
+      LOG.debug("[WARNING] The WildcardExpanderHandler won't be used because wildcardStreamLocator is not aware of ExpanderHandler!");
+    }
   }
 }
