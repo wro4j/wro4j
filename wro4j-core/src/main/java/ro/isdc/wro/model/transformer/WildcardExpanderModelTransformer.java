@@ -82,38 +82,45 @@ public class WildcardExpanderModelTransformer
     for (final Group group : model.getGroups()) {
       final List<Resource> resources = group.getResources();
       for (final Resource resource : resources) {
-        final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
-
-        if (uriLocator instanceof WildcardUriLocatorSupport) {
-          final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
-
-          //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
-          if (wildcardStreamLocator.hasWildcard(resource.getUri())
-            && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
-
-            final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware)wildcardStreamLocator;
-            LOG.debug("Expanding resource: {}", resource.getUri());
-
-            final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
-            LOG.debug("baseNameFolder: {}", baseNameFolder);
-
-            expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
-            try {
-              // trigger the wildcard replacement
-              uriLocator.locate(resource.getUri());
-            } catch (final IOException e) {
-              // log only
-              LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
-            } finally {
-              // remove the handler, it is not needed anymore
-              expandedHandler.setWildcardExpanderHandler(null);
-            }
-          }
-        }
+        processResource(group, resource);
       }
     }
     LOG.debug("Transformed model: {}", model);
     return model;
+  }
+
+  /**
+   * Process each resource and replace it with a collection of resources if it contains wildcard.
+   */
+  private void processResource(final Group group, final Resource resource) {
+    final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
+
+    if (uriLocator instanceof WildcardUriLocatorSupport) {
+      final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
+
+      //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
+      if (wildcardStreamLocator.hasWildcard(resource.getUri())
+        && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
+
+        final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware) wildcardStreamLocator;
+        LOG.debug("Expanding resource: {}", resource.getUri());
+
+        final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
+        LOG.debug("baseNameFolder: {}", baseNameFolder);
+
+        expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
+        try {
+          // trigger the wildcard replacement
+          uriLocator.locate(resource.getUri());
+        } catch (final IOException e) {
+          // log only
+          LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
+        } finally {
+          // remove the handler, it is not needed anymore
+          expandedHandler.setWildcardExpanderHandler(null);
+        }
+      }
+    }
   }
 
 
