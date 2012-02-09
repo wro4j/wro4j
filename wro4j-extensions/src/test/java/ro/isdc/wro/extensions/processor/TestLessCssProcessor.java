@@ -126,13 +126,17 @@ public class TestLessCssProcessor {
   
   @Test
   public void benchmark() throws Exception {
-    int numberOfTests = 30;
+    int numberOfTests = 10;
     int threadPoolSize = 8;
     final List<Long> noPoolResults = new ArrayList<Long>();
     final List<Long> usePoolResults = new ArrayList<Long>();
     final List<Long> concurrentNoPoolResults = new ArrayList<Long>();
     final List<Long> concurrentUsePoolResults = new ArrayList<Long>();
 
+    //warmUp
+//    concurrentBenchmark(5, 8, false);
+    
+    /*
     //usePool
     for (int i = 0; i < numberOfTests; i++) {
       usePoolResults.add(runBenchmark(new LessCssProcessor().setUsePool(true)));  
@@ -142,13 +146,14 @@ public class TestLessCssProcessor {
     for (int i = 0; i < numberOfTests; i++) {
       noPoolResults.add(runBenchmark(new LessCssProcessor().setUsePool(false)));  
     }
+    */
 
-    //concurrentUsePool
-    concurrentUsePoolResults.add(concurrentBenchmark(numberOfTests, threadPoolSize, true));
-    
     // concurrentNoPool
     concurrentNoPoolResults.add(concurrentBenchmark(numberOfTests, threadPoolSize, false));
     
+    //concurrentUsePool
+    concurrentUsePoolResults.add(concurrentBenchmark(numberOfTests, threadPoolSize, true));
+
     LOG.debug("noPool: {}", noPoolResults);
     LOG.debug("usePoolResults: {}", usePoolResults);
     LOG.debug("Without Pool: {}", concurrentNoPoolResults);

@@ -109,10 +109,14 @@ public class LessCssProcessor
   public static final String ALIAS = "lessCss";
 
   private ObjectPoolHelper<LessCss> enginePool;
-  private LessCss engine;
   private boolean usePool = true;
   
 
+  /**
+   * @param usePool
+   *          flag indicating that processor should use pool for reusing rhino wrapper. This value is true by default.
+   * @VisibleForTestsOnly          
+   */
   public LessCssProcessor setUsePool(boolean usePool) {
     this.usePool = usePool;
     return this;
