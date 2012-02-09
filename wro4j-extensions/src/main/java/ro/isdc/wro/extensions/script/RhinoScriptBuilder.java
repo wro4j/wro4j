@@ -56,7 +56,7 @@ public class RhinoScriptBuilder {
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
-    context.setLanguageVersion(Context.VERSION_1_7);
+    context.setLanguageVersion(Context.VERSION_1_8);
     InputStream script = null;
     final ScriptableObject scope = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
