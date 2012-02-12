@@ -117,7 +117,10 @@ public class XmlModelFactory
    * Used to detect recursive import processing.
    */
   private final Set<String> processedImports = new HashSet<String>();
-
+  /**
+   * Flag for enabling xml validation.
+   */
+  private boolean validateXml = true;
 
   /**
    * {@inheritDoc}
@@ -142,9 +145,12 @@ public class XmlModelFactory
       factory.setNamespaceAware(true);
       final Document document = factory.newDocumentBuilder().parse(getModelResourceAsStream());
       document.getDocumentElement().normalize();
-      validate(document);
+      if (isValidateXml()) {
+        validate(document);
+      }
       return document;
     } catch (final Exception e) {
+      LOG.error("Cannot build model from XML", e);
       throw new WroRuntimeException("Cannot build model from XML", e);
     }
   }
@@ -326,5 +332,22 @@ public class XmlModelFactory
   @Override
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
+  }
+
+
+  /**
+   * @return true if xml validation should be performed.
+   */
+  private boolean isValidateXml() {
+    return this.validateXml;
+  }
+
+
+  /**
+   * Allows disable the xml validation (which is true by default.
+   */
+  public XmlModelFactory setValidateXml(final boolean validateXml) {
+    this.validateXml = validateXml;
+    return this;
   }
 }
