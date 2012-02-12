@@ -63,4 +63,19 @@ public class TestBaseWroManagerFactory {
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
   }
+
+
+  @Test
+  public void shouldNotFailWhenReloadingModelOutsideOfContext() throws Exception {
+    Context.unset();
+    factory = new BaseWroManagerFactory();
+    factory.onModelPeriodChanged(0);
+  }
+
+  @Test
+  public void shouldNotFailWhenReloadingCacheOutsideOfContext() throws Exception {
+    Context.unset();
+    factory = new BaseWroManagerFactory();
+    factory.onCachePeriodChanged(0);
+  }
 }

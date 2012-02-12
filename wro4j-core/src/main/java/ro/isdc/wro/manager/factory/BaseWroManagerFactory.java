@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -209,7 +210,11 @@ public class BaseWroManagerFactory
    * {@inheritDoc}
    */
   public void onCachePeriodChanged(final long period) {
-    managerInitializer.get().onCachePeriodChanged(period);
+    try {
+      managerInitializer.get().onCachePeriodChanged(period);
+    } catch (final WroRuntimeException e) {
+      LOG.warn("[FAIL] Unable to reload cache, probably because invoked outside of context");
+    }
   }
 
 
@@ -217,9 +222,13 @@ public class BaseWroManagerFactory
    * {@inheritDoc}
    */
   public void onModelPeriodChanged(final long period) {
-    managerInitializer.get().onModelPeriodChanged(period);
-    // update cache too.
-    managerInitializer.get().getCacheStrategy().clear();
+    try {
+      managerInitializer.get().onModelPeriodChanged(period);
+      // update cache too.
+      managerInitializer.get().getCacheStrategy().clear();
+    } catch (final WroRuntimeException e) {
+      LOG.warn("[FAIL] Unable to reload model, probably because invoked outside of context");
+    }
   }
 
 
