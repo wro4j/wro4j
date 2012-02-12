@@ -293,11 +293,11 @@ public class WroTestUtils {
       }
     });
   }
-  
+
   /**
    * Applies a function for each file from a folder. The folder should contain at least one file to process, otherwise
    * an exception will be thrown.
-   * 
+   *
    * @param folder
    *          {@link File} representing the folder where the files will be used from processing.
    * @param function
@@ -310,10 +310,10 @@ public class WroTestUtils {
     for (final File file : files) {
       try {
         function.apply(file);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Problem while applying function on file: " + file, e);
       }
-      processedNumber++;      
+      processedNumber++;
     }
     logSuccess(processedNumber);
   }
@@ -376,7 +376,7 @@ public class WroTestUtils {
   public static void runConcurrently(final Callable<Void> task) throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {

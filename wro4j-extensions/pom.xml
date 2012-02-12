@@ -12,15 +12,6 @@
 	<packaging>jar</packaging>
 	<name>Web Resource Optimizer Extensions</name>
 
-    <!-- repository for sass-gems -->
-    <repositories>
-        <repository>
-            <id>n4u-repo</id>
-            <url>https://github.com/dmitrye/WroSassProcessor/raw/master/releases</url>
-        </repository>
-    </repositories>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -66,19 +57,14 @@
 			<groupId>org.dojotoolkit</groupId>
 			<artifactId>dojo-shrinksafe</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>sass-gems</groupId>
-            <artifactId>sass-gems</artifactId>
-            <version>3.1.12</version>
-        </dependency>
-		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId> 
-			<artifactId>gmaven-runtime-default</artifactId> <version>1.0-rc-3</version> 
-			</dependency> -->
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>sass-gems</groupId>
+      <artifactId>sass-gems</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.codehaus.gmaven.runtime</groupId>
 			<artifactId>gmaven-runtime-1.7</artifactId>

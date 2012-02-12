@@ -206,6 +206,16 @@
         <artifactId>dojo-shrinksafe</artifactId>
         <version>1.6.1</version>
       </dependency>      
+      <dependency>
+        <groupId>org.jruby</groupId>
+        <artifactId>jruby-complete</artifactId>
+        <version>1.6.6</version>
+      </dependency>
+      <dependency>
+        <groupId>sass-gems</groupId>
+        <artifactId>sass-gems</artifactId>
+        <version>3.1.12</version>
+      </dependency>      
       <!-- Unit tests -->
       <dependency>
         <groupId>junit</groupId>
@@ -430,4 +440,12 @@
     </repository>
   </repositories>
   -->
+  <!-- repository for sass-gems -->
+  <repositories>
+    <repository>
+      <id>n4u-repo</id>
+      <url>https://github.com/dmitrye/WroSassProcessor/raw/master/releases</url>
+    </repository>
+  </repositories>
+
 </project>
