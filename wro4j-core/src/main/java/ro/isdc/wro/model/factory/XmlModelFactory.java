@@ -344,7 +344,11 @@ public class XmlModelFactory
 
 
   /**
-   * Allows disable the xml validation (which is true by default.
+   * Allows disable the xml validation (which is true by default. Be aware that this is not a good idea to disable
+   * validation, because you cannot be sure that the model is built correctly. Disabling makes sense only when for some
+   * reason the xsd schema cannot be loaded on some environments. An example of issue can be found here:<br/>
+   * <a href="http://code.google.com/p/wro4j/issues/detail?id=371">Wro4j doesn't work on Websphere with 2 or more
+   * wars</a>
    */
   public XmlModelFactory setValidateXml(final boolean validateXml) {
     this.validateXml = validateXml;
