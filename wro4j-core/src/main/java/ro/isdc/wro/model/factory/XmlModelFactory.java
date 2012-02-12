@@ -15,12 +15,10 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -63,7 +61,7 @@ public class XmlModelFactory
   /**
    * Default xml to parse.
    */
-  private static final String XML_SCHEMA_FILE = "ro/isdc/wro/wro.xsd";
+  private static final String XML_SCHEMA_FILE = "wro.xsd";
 
   /**
    * Group tag used in xml.
@@ -119,26 +117,16 @@ public class XmlModelFactory
    * Used to detect recursive import processing.
    */
   private final Set<String> processedImports = new HashSet<String>();
-
+  /**
+   * Flag for enabling xml validation.
+   */
+  private boolean validateXml = true;
 
   /**
    * {@inheritDoc}
    */
   public WroModel create() {
-    Document document = null;
-    try {
-      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      final InputStream configResource = getModelResourceAsStream();
-      if (configResource == null) {
-        throw new WroRuntimeException("Could not locate config resource (" + DEFAULT_FILE_NAME + ")!");
-      }
-      document = factory.newDocumentBuilder().parse(configResource);
-      validate(document);
-      document.getDocumentElement().normalize();
-    } catch (final Exception e) {
-      throw new WroRuntimeException("Cannot build model from XML", e);
-    }
+    final Document document = createDocument();
     processGroups(document);
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
     final WroModel model = createModel();
@@ -149,16 +137,37 @@ public class XmlModelFactory
 
 
   /**
-   * @return Schema
+   * @return valid {@link Document} of the xml containing model representation.
    */
-  private Schema getSchema()
+  private Document createDocument() {
+    try {
+      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setNamespaceAware(true);
+      final Document document = factory.newDocumentBuilder().parse(getModelResourceAsStream());
+      document.getDocumentElement().normalize();
+      if (isValidateXml()) {
+        validate(document);
+      }
+      return document;
+    } catch (final Exception e) {
+      LOG.error("Cannot build model from XML", e);
+      throw new WroRuntimeException("Cannot build model from XML", e);
+    }
+  }
+
+  /**
+   * @param document xml document to validate.
+   */
+  private void validate(final Document document)
     throws IOException, SAXException {
-    // create a SchemaFactory capable of understanding WXS schemas
     final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    final InputStream schemaStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(XML_SCHEMA_FILE);
-    final Source schemaFile = new StreamSource(schemaStream);
-    final Schema schema = factory.newSchema(schemaFile);
-    return schema;
+    final Schema schema = factory.newSchema(new StreamSource(getSchemaStream()));
+    schema.newValidator().validate(new DOMSource(document));
+  }
+
+  private InputStream getSchemaStream() throws IOException {
+    //use the class located in same package where xsd is located
+    return WroRuntimeException.class.getResourceAsStream(XML_SCHEMA_FILE);
   }
 
 
@@ -305,9 +314,6 @@ public class XmlModelFactory
       // uri in this case is the group name
       final Element groupElement = allGroupElements.get(uri);
       resources.addAll(parseGroup(groupElement, groups));
-    } else {
-      // should not ever happen due to validation of xml.
-      throw new WroRuntimeException("Usupported resource type: " + tagName);
     }
     if (type != null) {
       final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
@@ -321,25 +327,31 @@ public class XmlModelFactory
   }
 
   /**
-   * Checks if xml structure is valid.
-   *
-   * @param document xml document to validate.
-   */
-  private void validate(final Document document)
-    throws IOException, SAXException {
-    final Schema schema = getSchema();
-    // create a Validator instance, which can be used to validate an instance
-    // document
-    final Validator validator = schema.newValidator();
-    // validate the DOM tree
-    validator.validate(new DOMSource(document));
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
+  }
+
+
+  /**
+   * @return true if xml validation should be performed.
+   */
+  private boolean isValidateXml() {
+    return this.validateXml;
+  }
+
+
+  /**
+   * Allows disable the xml validation (which is true by default. Be aware that this is not a good idea to disable
+   * validation, because you cannot be sure that the model is built correctly. Disabling makes sense only when for some
+   * reason the xsd schema cannot be loaded on some environments. An example of issue can be found here:<br/>
+   * <a href="http://code.google.com/p/wro4j/issues/detail?id=371">Wro4j doesn't work on Websphere with 2 or more
+   * wars</a>
+   */
+  public XmlModelFactory setValidateXml(final boolean validateXml) {
+    this.validateXml = validateXml;
+    return this;
   }
 }

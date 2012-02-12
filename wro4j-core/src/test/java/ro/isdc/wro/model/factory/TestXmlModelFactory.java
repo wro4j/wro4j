@@ -3,10 +3,11 @@
  */
 package ro.isdc.wro.model.factory;
 
+import static junit.framework.Assert.assertEquals;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -102,9 +103,9 @@ public class TestXmlModelFactory {
     final Group group = model.getGroupByName(model.getGroupNames().get(0));
     final List<Resource> resourceList = group.getResources();
     LOG.debug("resources: " + resourceList);
-    Assert.assertEquals(false, resourceList.get(0).isMinimize());
-    Assert.assertEquals(true, resourceList.get(1).isMinimize());
-    Assert.assertEquals(true, resourceList.get(2).isMinimize());
+    assertEquals(false, resourceList.get(0).isMinimize());
+    assertEquals(true, resourceList.get(1).isMinimize());
+    assertEquals(true, resourceList.get(2).isMinimize());
     LOG.debug("model: " + model);
   }
 
@@ -120,7 +121,7 @@ public class TestXmlModelFactory {
     WroTestUtils.init(factory);
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.create();
-    Assert.assertEquals(2, model.getGroupNames().size());
+    assertEquals(2, model.getGroupNames().size());
     LOG.debug("model: " + model);
   }
 
@@ -174,6 +175,20 @@ public class TestXmlModelFactory {
     };
     WroTestUtils.init(factory);
     factory.create();
+  }
+
+  @Test
+  public void shouldCreateEmptyModelWhenValidationDisabledAndXmlIsNotValid() {
+    factory = new XmlModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream() {
+        //get a class relative test resource
+        return new ByteArrayInputStream("<xml></xml>".getBytes());
+      }
+    }.setValidateXml(false);
+    WroTestUtils.init(factory);
+    //will create an empty model
+    assertEquals(new WroModel(), factory.create());
   }
 
   @Test(expected=SAXParseException.class)
