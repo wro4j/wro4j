@@ -87,19 +87,19 @@ public class WildcardExpanderModelTransformer
     LOG.debug("Transformed model: {}", model);
     return model;
   }
-  
+
   /**
    * Process each resource and replace it with a collection of resources if it contains wildcard.
    */
   private void processResource(final Group group, final Resource resource) {
     final ResourceLocator resourceLocator = resourceLocatorFactory.locate(resource.getUri());
-    
+
     if (resourceLocator instanceof AbstractResourceLocator) {
       LOG.debug("Expanding resource: {}", resource.getUri());
-      AbstractResourceLocator locator = (AbstractResourceLocator) resourceLocator;
+      final AbstractResourceLocator locator = (AbstractResourceLocator) resourceLocator;
       if (locator.getWildcardStreamLocator().hasWildcard(resource.getUri())) {
         final String baseNameFolder = computeBaseNameFolder(resource);
-        LOG.debug("baseNameFolder: {}", baseNameFolder);        
+        LOG.debug("baseNameFolder: {}", baseNameFolder);
         locator.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
         try {
           // trigger the wildcard replacement
@@ -112,41 +112,6 @@ public class WildcardExpanderModelTransformer
       }
     }
   }
-
-  /**
-   * Process each resource and replace it with a collection of resources if it contains wildcard.
-   */
-  private void processResource(final Group group, final Resource resource) {
-    final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
-
-    if (uriLocator instanceof WildcardUriLocatorSupport) {
-      final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
-
-      //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
-      if (wildcardStreamLocator.hasWildcard(resource.getUri())
-        && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
-
-        final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware) wildcardStreamLocator;
-        LOG.debug("Expanding resource: {}", resource.getUri());
-
-        final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
-        LOG.debug("baseNameFolder: {}", baseNameFolder);
-
-        expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
-        try {
-          // trigger the wildcard replacement
-          uriLocator.locate(resource.getUri());
-        } catch (final IOException e) {
-          // log only
-          LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
-        } finally {
-          // remove the handler, it is not needed anymore
-          expandedHandler.setWildcardExpanderHandler(null);
-        }
-      }
-    }
-  }
-
 
   /**
    * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
@@ -163,7 +128,7 @@ public class WildcardExpanderModelTransformer
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
     try {
-      ResourceLocator locator = resourceLocatorFactory.locate(resourcePath);
+      final ResourceLocator locator = resourceLocatorFactory.locate(resourcePath);
       if (locator instanceof AbstractResourceLocator) {
         ((AbstractResourceLocator) locator).setWildcardExpanderHandler(createBaseNameComputerFunction(baseNameFolderHolder));
       }

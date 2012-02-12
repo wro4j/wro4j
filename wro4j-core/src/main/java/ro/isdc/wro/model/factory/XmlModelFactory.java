@@ -144,7 +144,7 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final Document document = factory.newDocumentBuilder().parse(getModelResourceAsStream());
+      final Document document = factory.newDocumentBuilder().parse(getModelResourceLocator().getInputStream());
       document.getDocumentElement().normalize();
       if (isValidateXml()) {
         validate(document);

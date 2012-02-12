@@ -30,7 +30,7 @@ import ro.isdc.wro.util.StringUtils;
 public class ClasspathResourceLocator extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathResourceLocator.class);
   /**
-   * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
+   * Prefix of the resource uri used to check if the resource can be read by this {@link ResourceLocator} implementation.
    */
   public static final String PREFIX = "classpath:";
   /**

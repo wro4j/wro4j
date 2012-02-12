@@ -6,6 +6,7 @@ package ro.isdc.wro.model.factory;
 import static junit.framework.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
@@ -23,6 +24,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -170,15 +172,18 @@ public class TestXmlModelFactory {
     factory.create();
   }
 
-  @Test(expected=SAXParseException.class)
   @Test
   public void shouldCreateEmptyModelWhenValidationDisabledAndXmlIsNotValid() {
     factory = new XmlModelFactory() {
       @Override
-      protected InputStream getModelResourceAsStream() {
-        //get a class relative test resource
-        return new ByteArrayInputStream("<xml></xml>".getBytes());
-      }
+      protected ResourceLocator getModelResourceLocator() {
+        return new AbstractResourceLocator() {
+          public InputStream getInputStream()
+            throws IOException {
+            return new ByteArrayInputStream("<xml></xml>".getBytes());
+          }
+        };
+      };
     }.setValidateXml(false);
     WroTestUtils.init(factory);
     //will create an empty model
