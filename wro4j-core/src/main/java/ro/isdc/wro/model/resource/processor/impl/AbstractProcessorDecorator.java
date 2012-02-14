@@ -47,9 +47,9 @@ public abstract class AbstractProcessorDecorator
   }
 
   /**
-   * @return the decoratedProcessor
+   * @return the decorated processor.
    */
-  protected final ResourceProcessor getDecoratedProcessor() {
+  public final ResourceProcessor getDecoratedProcessor() {
     return decoratedProcessor;
   }
 

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
+import ro.isdc.wro.model.resource.processor.impl.AbstractProcessorDecorator;
 
 
 /**
@@ -68,6 +69,10 @@ public final class Injector {
           }
         }
       }
+      //handle special case like processor decorators
+      if (object instanceof AbstractProcessorDecorator) {
+        inject(((AbstractProcessorDecorator) object).getDecoratedProcessor());
+      }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);
       throw new WroRuntimeException("Exception while trying to process @Inject annotation", e);
@@ -103,7 +108,7 @@ public final class Injector {
     throws IllegalAccessException {
     boolean accept = false;
     try {
-      // accept even private modifiers
+      // accept private modifiers
       field.setAccessible(true);
       for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
         if (entry.getKey().isAssignableFrom(field.getType())) {
