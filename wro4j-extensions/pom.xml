@@ -15,10 +15,19 @@
     <!-- repository for sass-gems -->
     <repositories>
         <repository>
-            <id>n4u-repo</id>
-            <url>https://github.com/dmitrye/WroSassProcessor/raw/master/releases</url>
+            <id>rubygems-proxy</id>
+            <name>Rubygems Proxy</name>
+            <url>http://rubygems-proxy.torquebox.org/releases</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>fale</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
         </repository>
-    </repositories>
+     </repositories>
 
 
 	<dependencies>
@@ -71,12 +80,18 @@
             <artifactId>jruby-complete</artifactId>
             <version>1.6.1</version>
         </dependency>
-        <dependency>
-            <groupId>sass-gems</groupId>
-            <artifactId>sass-gems</artifactId>
-            <version>3.1.12</version>
-        </dependency>
-		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId> 
+        <!--<dependency>-->
+            <!--<groupId>sass-gems</groupId>-->
+            <!--<artifactId>sass-gems</artifactId>-->
+            <!--<version>3.1.12</version>-->
+        <!--</dependency>-->
+            <dependency>
+                <groupId>rubygems</groupId>
+                <artifactId>sass</artifactId>
+                <version>3.1.15</version>
+                <type>gem</type>
+            </dependency>
+		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId>
 			<artifactId>gmaven-runtime-default</artifactId> <version>1.0-rc-3</version> 
 			</dependency> -->
 		<dependency>

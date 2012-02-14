@@ -1,4 +1,4 @@
-package n4u.wro4j.extensions;
+package ro.isdc.wro.extensions.processor.css;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,9 +17,9 @@ import ro.isdc.wro.util.StopWatch;
 import java.io.*;
 
 @SupportedResourceType(ResourceType.CSS)
-public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProcessor {
+public class RubySassProcessor implements ResourcePreProcessor, ResourcePostProcessor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WroSassProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RubySassProcessor.class);
 
 
     public Options getOpt() {
@@ -29,7 +29,7 @@ public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProce
 
     protected Options opt = new Options();
 
-    public WroSassProcessor(){
+    public RubySassProcessor(){
     }
 
     /*** Pre Processor Method ***/
@@ -39,7 +39,7 @@ public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProce
         ScriptingContainer sc = new ScriptingContainer(LocalVariableBehavior.PERSISTENT);
 
         try {
-            LOG.info("[WroSassProcessor] Processing stream reader.");
+            LOG.info("[RubySassProcessor] Processing stream reader.");
             sc.runScriptlet(BuildUpdateScript(content, this.opt));
             String result = (String)sc.get("result");
             writer.write(result);
@@ -68,7 +68,7 @@ public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProce
      * Invoked when a processing exception occurs.
      */
     protected void onException(final WroRuntimeException e) {
-        LOG.warn("[WroSassProcessor] Error processing SASS stream: " + e.getMessage());
+        LOG.warn("[RubySassProcessor] Error processing SASS stream: " + e.getMessage());
     }
     
 
@@ -80,7 +80,7 @@ public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProce
         sb.append(":syntax => :scss");
         if(!opt.getFilePath().isEmpty()) sb.append(",load_paths => '" + opt.getFilePath() + "'");
 
-        LOG.info("[WroSassProcessor] START SCSS translation time: ");
+        LOG.info("[RubySassProcessor] START SCSS translation time: ");
         stopWatch.start("process SCSS");
         script.println("  require 'rubygems'                                            ");
         script.println("  require 'sass/plugin'                                         ");
@@ -90,7 +90,7 @@ public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProce
         script.println("  result = engine.render                                        ");
         script.flush();
         stopWatch.stop();
-        LOG.info("[WroSassProcessor] Finished processing SASS stream conversion.");
+        LOG.info("[RubySassProcessor] Finished processing SASS stream conversion.");
         LOG.debug(stopWatch.prettyPrint());
 
         return raw.toString();        
@@ -100,6 +100,24 @@ public class WroSassProcessor implements ResourcePreProcessor, ResourcePostProce
         return BuildUpdateScript(content, new Options());
     }
 
+    /**
+     * Created by IntelliJ IDEA.
+     * User: Dmitry.Erman
+     * Date: 1/4/12
+     * Time: 8:39 PM
+     * To change this template use File | Settings | File Templates.
+     */
+    public static class Options {
+        public String getFilePath() {
+            return filePath;
+        }
+
+        public void setFilePath(String filePath) {
+            this.filePath = filePath;
+        }
+
+        protected String filePath = "";
+    }
 }
 
 

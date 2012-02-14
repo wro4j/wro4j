@@ -1,4 +1,4 @@
-package n4u.wro4j.extensions;
+package ro.isdc.wro.extensions.processor;
 
 import org.junit.Test;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.net.URL;
 
 
-public class TestWroSassProcessor {
+public class TestRubySassProcessor {
     @Test
-    public void testWroSassPreProcessor()
+    public void testRubySassPreProcessor()
             throws IOException {
-        final URL url = getClass().getResource(".");
+        final URL url = getClass().getResource("rubysass");
         final ResourcePreProcessor processor = new SassCssProcessor();
 
         final File testFolder = new File(url.getFile(), "templates");
@@ -24,9 +24,9 @@ public class TestWroSassProcessor {
     }
 
     @Test
-    public void testWroSassPostProcessor()
+    public void testRubySassPostProcessor()
             throws IOException {
-        final URL url = getClass().getResource(".");
+        final URL url = getClass().getResource("rubysass");
         final ResourcePostProcessor processor = new SassCssProcessor();
 
         final File testFolder = new File(url.getFile(), "templates");
