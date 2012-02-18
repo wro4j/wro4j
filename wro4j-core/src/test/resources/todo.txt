@@ -1,6 +1,6 @@
 # make most of processors usable outside of wro4j context
 # update coffeeScript 
-# update less 
+# update less - [OK]
 # update uglify - [OK]
 # update cssLint - [OK]
 # update jsHint - [OK] 
