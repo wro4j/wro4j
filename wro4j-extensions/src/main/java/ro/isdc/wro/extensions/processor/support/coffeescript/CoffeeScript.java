@@ -34,7 +34,7 @@ public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
   private String[] options;
   private ScriptableObject scope;
-
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.2.0.min.js";
 
   /**
    * Initialize script builder for evaluation.
@@ -43,7 +43,7 @@ public class CoffeeScript {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), "coffee-script.js");
+        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), DEFAULT_COFFE_SCRIPT);
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);
@@ -62,7 +62,7 @@ public class CoffeeScript {
    * @return The stream of the CoffeeScript.
    */
   protected InputStream getCoffeeScriptAsStream() {
-    return CoffeeScript.class.getResourceAsStream("coffee-script-1.2.0.js");
+    return CoffeeScript.class.getResourceAsStream(DEFAULT_COFFE_SCRIPT);
   }
 
 

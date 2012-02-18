@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.RhinoException;
@@ -42,6 +43,10 @@ public class RhinoUtils {
     String message = "Could not execute the script because: ";
     if (e instanceof JavaScriptException) {
       message += toJson(((JavaScriptException) e).getValue());
+    } else if (e instanceof EcmaError) {
+      final EcmaError ecmaError = (EcmaError)e;
+      message += String.format("Error message: %s at line: %s. \nSource: %s", ecmaError.getErrorMessage(),
+        ecmaError.lineNumber(), ecmaError.lineSource());
     } else {
       message += e.getMessage();
     }
