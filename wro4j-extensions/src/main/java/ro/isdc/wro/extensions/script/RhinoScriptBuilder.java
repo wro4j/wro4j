@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.slf4j.Logger;
@@ -117,6 +118,9 @@ public class RhinoScriptBuilder {
       return this;
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
+      if (e instanceof RhinoException) {
+        LOG.error("RhinoException: " + RhinoUtils.createExceptionMessage((RhinoException) e));
+      }
       throw e;
     } finally {
       stream.close();
