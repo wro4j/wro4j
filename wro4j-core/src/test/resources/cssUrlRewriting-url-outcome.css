@@ -52,3 +52,7 @@
   background-image: url(http://www.site.com/static/css/path/to/image.png);
   background-image: url(http://www.site.com/static/css/path/to/image.png);
 }
+
+.specialCharacters {
+  background-image: url(http://www.site.com/static/css/path/with/$pecial/character.png);
+}
