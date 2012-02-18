@@ -43,7 +43,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Compiled pattern.
    */
-  protected static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
+  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
 
   /**
    * {@inheritDoc}
