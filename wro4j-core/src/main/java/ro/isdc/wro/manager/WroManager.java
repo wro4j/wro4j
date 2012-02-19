@@ -277,7 +277,6 @@ public class WroManager
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
       // find processed result for a group
-
       final WroModel model = modelFactory.create();
 
       if (model == null) {

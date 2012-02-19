@@ -254,7 +254,7 @@ public class BaseWroManagerFactory
    */
   protected WroModelFactory newModelFactory() {
     try {
-      LOG.info("Trying to use SmartWroModelFactory as default model factory");
+      LOG.debug("Trying to use SmartWroModelFactory as default model factory");
       final Class<? extends WroModelFactory> smartFactoryClass = Class.forName(
         "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
       return smartFactoryClass.newInstance();
