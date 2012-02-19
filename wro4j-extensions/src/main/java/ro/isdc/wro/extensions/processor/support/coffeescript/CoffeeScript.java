@@ -35,7 +35,6 @@ public class CoffeeScript {
   private String[] options;
   private ScriptableObject scope;
   private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.2.0.min.js";
-
   /**
    * Initialize script builder for evaluation.
    */
@@ -73,20 +72,21 @@ public class CoffeeScript {
    * @param data js content to process.
    */
   public String compile(final String data) {
+    final StopWatch watch = new StopWatch();
+    watch.start("init");
     try {
-      final StopWatch watch = new StopWatch();
-      watch.start("init");
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       watch.start("compile");
       final String compileScript = String.format("CoffeeScript.compile(%s, %s);", WroUtil.toJSMultiLineString(data),
         buildOptions());
       final String result = (String)builder.evaluate(compileScript, "CoffeeScript.compile");
-      watch.stop();
-      LOG.debug(watch.prettyPrint());
       return result;
     } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
+    } finally {
+      watch.stop();
+      LOG.debug(watch.prettyPrint());
     }
   }
 
