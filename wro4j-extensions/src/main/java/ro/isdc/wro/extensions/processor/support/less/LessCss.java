@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * This class is not thread-safe.<br/>
- * The underlying implementation use the less.js version <code>1.2.0</code> project: {@link https
+ * The underlying implementation use the less.js version <code>1.2.2</code> project: {@link https
  * ://github.com/cloudhead/less.js}.
  *
  * @author Alex Objelean
@@ -31,7 +31,9 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  private static final String DEFAULT_LESS_JS = "less-1.2.0.min.js";
+  public static final String DEFAULT_LESS_JS = "less-1.2.2.min.js";
+  private static final String SCRIPT_RUN = "run.js";
+  private static final String SCRIPT_INIT = "init.js";
   private ScriptableObject scope;
 
   /**
@@ -41,11 +43,8 @@ public class LessCss {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        final String SCRIPT_INIT = "init.js";
-        final InputStream initStream = getClass().getResourceAsStream(SCRIPT_INIT);
-        final String SCRIPT_RUN = "run.js";
-        final InputStream runStream = getClass().getResourceAsStream(SCRIPT_RUN);
-        // .newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT)
+        final InputStream initStream = LessCss.class.getResourceAsStream(SCRIPT_INIT);
+        final InputStream runStream = LessCss.class.getResourceAsStream(SCRIPT_RUN);
         builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
           getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
         scope = builder.getScope();
@@ -65,7 +64,7 @@ public class LessCss {
    * @return stream of the less.js script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_LESS_JS);
+    return LessCss.class.getResourceAsStream(DEFAULT_LESS_JS);
   }
 
 
@@ -85,7 +84,7 @@ public class LessCss {
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

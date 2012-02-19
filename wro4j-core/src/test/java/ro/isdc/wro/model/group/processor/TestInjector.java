@@ -18,6 +18,9 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**
  * @author Alex Objelean
@@ -91,7 +94,7 @@ public class TestInjector {
   }
 
   @Test(expected=WroRuntimeException.class)
-  public void cannotInjectContextOutsideOfContextScope() throws Exception {
+  public void canInjectContextOutsideOfContextScope() throws Exception {
     //remove the context explicitly
     Context.unset();
     shouldInjectContext();
@@ -112,6 +115,22 @@ public class TestInjector {
     injector.inject(inner);
     inner.call();
   }
+
+  private class TestProcessor extends JSMinProcessor {
+    @Inject
+    private Context context;
+  }
+
+  @Test
+  public void shouldInjectDecoratedProcessor() {
+    final TestProcessor testProcessor = new TestProcessor();
+    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(testProcessor);
+
+    final Injector injector = new InjectorBuilder().build();
+    injector.inject(processor);
+    Assert.assertNotNull(testProcessor.context);
+  }
+
 
   @After
   public void tearDown() {

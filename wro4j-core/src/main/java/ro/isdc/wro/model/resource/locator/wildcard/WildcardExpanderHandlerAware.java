@@ -6,7 +6,7 @@ package ro.isdc.wro.model.resource.locator.wildcard;
 import java.io.File;
 import java.util.Collection;
 
-import ro.isdc.wro.util.Transformer;
+import ro.isdc.wro.util.Function;
 
 
 /**
@@ -17,12 +17,11 @@ import ro.isdc.wro.util.Transformer;
  * @created 20 Jul 2011
  * @since 1.4.0
  */
-public interface WildcardExpandedHandlerAware {
+public interface WildcardExpanderHandlerAware {
   /**
    * Sets the handler to be used by the implementing class.
    *
-   * @param handler a {@link Transformer} which does the handler job. The {@link Transformer} is not the ideal interface
-   *        to be used, but it can be a temporary solution until a better one is found.
+   * @param handler a {@link Function} which does the handler job.
    */
-  void setWildcardExpanderHandler(Transformer<Collection<File>> handler);
+  void setWildcardExpanderHandler(Function<Collection<File>, Void> handler);
 }

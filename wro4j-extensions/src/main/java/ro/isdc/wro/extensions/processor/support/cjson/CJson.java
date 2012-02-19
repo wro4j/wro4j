@@ -53,7 +53,7 @@ public class CJson {
    * @return stream of the less.js script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream("cjson.min.js");
+    return CJson.class.getResourceAsStream("cjson.min.js");
   }
 
   /**

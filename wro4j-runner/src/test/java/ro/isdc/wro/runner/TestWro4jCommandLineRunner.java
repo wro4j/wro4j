@@ -79,6 +79,9 @@ public class TestWro4jCommandLineRunner {
 
   private void invokeRunner(final String[] args) throws Exception {
     new Wro4jCommandLineRunner() {
+      {{
+        setDestinationFolder(destinationFolder);
+      }}
       @Override
       protected void onException(final Exception e) {
         WroUtil.wrapWithWroRuntimeException(e);
@@ -91,24 +94,15 @@ public class TestWro4jCommandLineRunner {
   public void cssUrlRewriterShouldWorkProperly() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
 
-    setDestinationFolder(new File(contextFolder, "targetCssFolder"));
     final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format(
-      "--wroFile %s --contextFolder %s --destinationFolder %s -m --preProcessors " + processorsList,
+      "--wroFile %s --contextFolder %s -m --preProcessors " + processorsList,
         new Object[] {
-          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+          wroFile, contextFolder
     }).split(" ");
     invokeRunner(args);
-  }
-
-  /**
-   * Use this method for correct clean-up of resources.
-   */
-  private void setDestinationFolder(final File file) {
-    FileUtils.deleteQuietly(destinationFolder);
-    this.destinationFolder = file;
   }
 
   @Test
@@ -172,15 +166,16 @@ public class TestWro4jCommandLineRunner {
   public void shouldAcceptGroovyDSLUsingSmartModelFactory() {
     final File contextFolderFile = new File(getClass().getResource("").getFile(), "dsl");
     final String contextFolder = contextFolderFile.getAbsolutePath();
-    //final String wroFile = contextFolder + File.separator + "wro.xml";
 
-    //LOG.debug(wroFile);
     final String[] args = String.format("-m --contextFolder %s --destinationFolder %s", new Object[] {
       contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
 
     //invoke runner
     new Wro4jCommandLineRunner() {
+      {{
+        setDestinationFolder(destinationFolder);
+      }}
       @Override
       protected File newDefaultWroFile() {
         return new File(contextFolderFile, "wro.xml");

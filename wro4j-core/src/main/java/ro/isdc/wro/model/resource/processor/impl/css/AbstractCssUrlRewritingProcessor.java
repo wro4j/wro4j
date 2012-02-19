@@ -43,7 +43,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Compiled pattern.
    */
-  protected static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
+  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
 
   /**
    * {@inheritDoc}
@@ -101,7 +101,9 @@ public abstract class AbstractCssUrlRewritingProcessor
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
         LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
-        final String newReplacement = oldMatch.replace(urlContent, replacedUrl);
+        //prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
+        //from stackoverflow: @see http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
+        final String newReplacement = Matcher.quoteReplacement(oldMatch.replace(urlContent, replacedUrl));
         onUrlReplaced(replacedUrl);
         matcher.appendReplacement(sb, newReplacement);
       }

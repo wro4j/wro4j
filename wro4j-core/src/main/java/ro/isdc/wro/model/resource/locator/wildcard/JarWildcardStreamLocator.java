@@ -6,8 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -34,14 +35,17 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
  * For the moment this {@link WildcardStreamLocator} only supports a single wildcard.
  * </p>
  *
- * @author Matias Mirabelli &lt;matias.mirabelli@globant.com&gt;
+ * @author Matias Mirabelli <matias.mirabelli@globant.com>
  * @since 1.3.6
  */
-public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
+public class JarWildcardStreamLocator
+    extends DefaultWildcardStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(JarWildcardStreamLocator.class);
-
-  public JarWildcardStreamLocator() {
-  }
+  /**
+   * A {@link List} of file extensions including the final dot. Valid examples are: .jar, .war. By default it only
+   * supports .jar extension.
+   */
+  private static final List<String> SUPPORTED_EXTENSIONS = Arrays.asList(".jar");
 
   /**
    * Finds the specified URI pattern inside a JAR file. If the specified file isn't a valid JAR default strategy will be
@@ -49,100 +53,111 @@ public class JarWildcardStreamLocator extends DefaultWildcardStreamLocator {
    */
   @Override
   public InputStream locateStream(final String uri, final File folder)
-    throws IOException {
-    final File jarPath = new File(StringUtils.substringAfter(StringUtils.substringBeforeLast(folder.getPath(), "!"), "file:"));
-    LOG.debug("jarPath: {}", jarPath);
-    for (final String supportedExtension : getSupportedContainerExtensions()) {
-      LOG.debug("\tsupportedExtension: {}", supportedExtension);
-      if (jarPath.getPath().endsWith(supportedExtension)) {
-        LOG.debug("\t\tLocating stream from jar");
-        return locateStreamFromJar(uri, jarPath);
-      }
+      throws IOException {
+    Validate.notNull(folder);
+    final File jarPath = getJarFile(folder);
+    if (isSupported(jarPath)) {
+      return locateStreamFromJar(uri, jarPath);
     }
     return super.locateStream(uri, folder);
   }
 
-
   /**
-   * Returns a list of file extensions of all valid JAR files.
-   *
-   * @return A {@link List} of file extensions including the final dot. Valid examples are: .jar, .war. By default it
-   *         only supports .jar extension.
+   * @return true if the file is of a certain supported type.
    */
-  protected List<String> getSupportedContainerExtensions() {
-    return Arrays.asList(".jar");
+  private boolean isSupported(final File jarPath) {
+    LOG.debug("jarPath: {}", jarPath);
+    for (final String supportedExtension : SUPPORTED_EXTENSIONS) {
+      if (jarPath.getPath().endsWith(supportedExtension)) {
+        return true;
+      }
+    }
+    return false;
   }
 
+  /**
+   * @VisibleForTestOnly
+   * @return the File corresponding to the folder from inside the jar.
+   */
+  File getJarFile(final File folder) {
+    return new File(StringUtils.substringAfter(StringUtils.substringBeforeLast(folder.getPath(), "!"),
+        "file:"));
+  }
 
   /**
    * Validates an entry against a wildcard and determines whether the pattern matches or not. If the entry is accepted
    * this will be included in the result {@link InputStream}.
    *
-   * @param entry Entry to evaluate. It cannot be null.
-   * @param wildcard Wildcard to match. It cannot be null or empty.
-   *
+   * @param entry
+   *          Entry to evaluate. It cannot be null.
+   * @param wildcard
+   *          Wildcard to match. It cannot be null or empty.
    * @return <code>true</code> if the expression matches, <code>false</code> otherwise.
    */
-  protected boolean accept(final JarEntry entry, final String wildcard) {
-    return FilenameUtils.wildcardMatch(entry.getName(), wildcard);
+  private boolean accept(final String entryName, final String wildcard) {
+    return FilenameUtils.wildcardMatch(entryName, wildcard);
   }
-
 
   /**
    * Opens the specified JAR file and returns a valid handle.
    *
-   * @param jarFile Location of the valid JAR file to read. It cannot be null.
-   *
+   * @param jarFile
+   *          Location of the valid JAR file to read. It cannot be null.
    * @return A valid {@link JarFile} to read resources.
-   * @throws IllegalArgumentException If the file cannot be opened because an {@link IOException}.
+   * @throws IllegalArgumentException
+   *           If the file cannot be opened because an {@link IOException}.
+   *  @VisibleForTestOnly
    */
-  protected JarFile open(final File jarFile) {
-    try {
-      Validate.isTrue(jarFile.exists(), "The JAR file must exists.");
-
-      return new JarFile(jarFile);
-    } catch (final IOException ex) {
-      throw new IllegalArgumentException("Cannot read the JAR file: " + jarFile, ex);
-    }
+  JarFile open(final File jarFile) throws IOException {
+    Validate.isTrue(jarFile.exists(), "The JAR file must exists.");
+    return new JarFile(jarFile);
   }
-
 
   /**
    * Finds the specified wildcard-URI resource(s) inside a JAR file and returns an {@link InputStream} to read a bundle
    * of matching resources.
    *
-   * @param uri Resource(s) URI to match. It cannot be null or empty.
-   * @param jarPath A valid JAR file. It cannot be null.
-   *
+   * @param uri
+   *          Resource(s) URI to match. It cannot be null or empty.
+   * @param jarPath
+   *          A valid JAR file. It cannot be null.
    * @return A valid {@link InputStream} to read the bundle. Clients are responsible of closing this {@link InputStream}
-   *         .
-   *
-   * @throws IOException If there's any error reading the JAR file.
+   * @throws IOException
+   *           If there's any error reading the JAR file.
    */
-  protected final InputStream locateStreamFromJar(final String uri, final File jarPath)
-    throws IOException {
+  private InputStream locateStreamFromJar(final String uri, final File jarPath)
+      throws IOException {
+    LOG.debug("Locating stream from jar: {}", jarPath);
+    final WildcardContext wildcardContext = new WildcardContext(uri, jarPath);
     String classPath = FilenameUtils.getPath(uri);
-    final String wildcard = FilenameUtils.getName(uri);
 
     if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
       classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
     }
 
     final JarFile file = open(jarPath);
-
-    final Enumeration<JarEntry> entries = file.entries();
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-    while (entries.hasMoreElements()) {
-      final JarEntry entry = entries.nextElement();
-
-      if (entry.getName().startsWith(classPath) && accept(entry, wildcard)) {
-        final InputStream is = file.getInputStream(entry);
-        IOUtils.copy(is, out);
-        is.close();
+    final List<JarEntry> jarEntryList = Collections.list(file.entries());
+    final List<JarEntry> filteredJarEntryList = new ArrayList<JarEntry>();
+    final List<File> allFiles = new ArrayList<File>();
+    for (final JarEntry entry : jarEntryList) {
+      final String entryName = entry.getName();
+      //ignore the parent folder itself and accept only child resources
+      final boolean isSupportedEntry = entryName.startsWith(classPath) && !entryName.equals(classPath)
+        && accept(entryName, wildcardContext.getWildcard());
+      if (isSupportedEntry) {
+        allFiles.add(new File(entryName));
+        LOG.debug("\tfound jar entry: {}", entryName);
+        filteredJarEntryList.add(entry);
       }
     }
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+    triggerWildcardExpander(allFiles, wildcardContext);
+    for (final JarEntry entry : filteredJarEntryList) {
+      final InputStream is = file.getInputStream(entry);
+      IOUtils.copy(is, out);
+      is.close();
+    }
     return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
 }

@@ -17,4 +17,10 @@ public class TestStringUtils {
     final String result = StringUtils.cleanPath("/a/b/../d.txt");
     Assert.assertEquals("/a/d.txt", result);
   }
+
+  @Test
+  public void shouldCleanPathContainingMultipleDoubleDots() {
+    final String result = StringUtils.cleanPath("/a/b/../../d.txt");
+    Assert.assertEquals("/d.txt", result);
+  }
 }

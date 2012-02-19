@@ -33,6 +33,7 @@ import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,75 +217,6 @@ public class WroTestUtils {
     return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
   }
 
-
-  /**
-   * Process and compare files from the same folder. Use the extension to make distinction between the source files
-   * (files to process) and target files (files to compare with).
-   *
-   * @param sourceFolder the folder where the files to compare resides.
-   * @param sourceFileExtension the extension of the files used to process.
-   * @param targetFileExtension the extension of the files used to compare with the processed result.
-   * @param processor {@link ResourcePostProcessor} to apply on input files.
-   * @throws IOException
-   */
-  public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
-    final String targetFileExtension, final ResourcePostProcessor processor)
-    throws IOException {
-    compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension),
-      Transformers.extensionTransformer(targetFileExtension), processor);
-  }
-
-
-  public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
-    final String targetFileExtension, final ResourcePreProcessor processor)
-    throws IOException {
-    compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension),
-      Transformers.extensionTransformer(targetFileExtension), processor);
-  }
-
-
-  /**
-   * @see WroTestUtils#compareFromSameFolder(File, IOFileFilter, Transformer, ResourcePostProcessor) Same as
-   *      {@link WroTestUtils#compareSameFolderByExtension(File, String, String, ResourcePostProcessor)}, but let you
-   *      define the way target file name is named.
-   *
-   * @param sourceFolder
-   * @param sourceFileExtension
-   * @param toTargetFileName
-   * @param processor
-   * @throws IOException
-   */
-  public static void compareSameFolderByExtension(final File sourceFolder, final String sourceFileExtension,
-    final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
-    throws IOException {
-    compareFromSameFolder(sourceFolder, new WildcardFileFilter("*." + sourceFileExtension), toTargetFileName, processor);
-  }
-
-
-  /**
-   * Process and compare files from the same folder.
-   *
-   * @param sourceFolder the folder where the files to compare resides.
-   * @param sourceFileFilter the {@link IOFileFilter} used to select source files (files to be processed).
-   * @param toTargetFileName the {@link Transformer} which creates the name of the target file used to compare with the
-   *        source processed content.
-   * @param processor {@link ResourcePostProcessor} to apply on source files.
-   * @throws IOException
-   */
-  public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
-    final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
-    throws IOException {
-    // TODO create adaptor and use it
-    final ResourcePreProcessor preProcessor = new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
-        processor.process(reader, writer);
-      }
-    };
-    compareFromSameFolder(sourceFolder, sourceFileFilter, toTargetFileName, preProcessor);
-  }
-
-
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
     final Transformer<String> toTargetFileName, final ResourcePreProcessor processor)
     throws IOException {
@@ -318,20 +250,9 @@ public class WroTestUtils {
       throw new IllegalStateException("No files compared. Check if there is at least one resource to compare");
     }
     LOG.debug("===============");
-    LOG.debug("Successfully compared: {} files.", size);
+    LOG.debug("Successfully processed: {} files.", size);
     LOG.debug("===============");
   }
-
-
-  /**
-   * Process and compare the files which a located in different folders.
-   */
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
-    final IOFileFilter fileFilter, final ResourcePostProcessor processor)
-    throws IOException {
-    compareFromDifferentFolders(sourceFolder, targetFolder, fileFilter, Transformers.noOpTransformer(), processor);
-  }
-
 
   /**
    * Process and compare all the files from the sourceFolder and compare them with the files from the targetFolder.
@@ -342,14 +263,6 @@ public class WroTestUtils {
     compareFromDifferentFolders(sourceFolder, targetFolder, TrueFileFilter.TRUE, Transformers.noOpTransformer(),
         processor);
   }
-
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
-      final ResourcePostProcessor processor)
-      throws IOException {
-    compareFromDifferentFolders(sourceFolder, targetFolder, TrueFileFilter.TRUE, Transformers.noOpTransformer(),
-        processor);
-  }
-
 
   public static void compareFromDifferentFoldersByExtension(final File sourceFolder, final File targetFolder,
     final String extension, final ResourcePreProcessor processor)
@@ -369,7 +282,7 @@ public class WroTestUtils {
   }
 
 
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+  private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
     throws IOException {
     // TODO use ProcessorsUtils
@@ -380,7 +293,30 @@ public class WroTestUtils {
       }
     });
   }
-
+  
+  /**
+   * Applies a function for each file from a folder. The folder should contain at least one file to process, otherwise
+   * an exception will be thrown.
+   * 
+   * @param folder
+   *          {@link File} representing the folder where the files will be used from processing.
+   * @param function
+   *          {@link Function} to apply on each found file.
+   */
+  public static void forEachFileInFolder(final File folder, final Function<File, Void> function) {
+    Validate.notNull(function);
+    final Collection<File> files = FileUtils.listFiles(folder, TrueFileFilter.TRUE, FalseFileFilter.INSTANCE);
+    int processedNumber = 0;
+    for (final File file : files) {
+      try {
+        function.apply(file);
+      } catch (Exception e) {
+        throw new RuntimeException("Problem while applying function on file: " + file, e);
+      }
+      processedNumber++;      
+    }
+    logSuccess(processedNumber);
+  }
 
   /**
    * Process and compare the files which a located in different folders.
@@ -392,7 +328,7 @@ public class WroTestUtils {
    * @param preProcessor {@link ResourcePreProcessor} used to process the source files.
    * @throws IOException
    */
-  public static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
+  private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePreProcessor preProcessor)
     throws IOException {
     LOG.debug("sourceFolder: {}", sourceFolder);

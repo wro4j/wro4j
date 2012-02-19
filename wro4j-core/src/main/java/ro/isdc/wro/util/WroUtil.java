@@ -4,7 +4,6 @@
 package ro.isdc.wro.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Enumeration;
@@ -14,23 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.HttpHeader;
@@ -236,85 +226,6 @@ public final class WroUtil {
     }
     result.append("].join(\"\\n\")");
     return result.toString();
-  }
-
-  //This approach have some problems and won't be used. It appends extra ] character when the string contains ]] occurence.
-//  /**
-//   * Transforms a java multi-line string into javascript multi-line string.
-//   * This technique was found at {@link http://mook.wordpress.com/2005/10/30/multi-line-strings-in-javascript/}
-//   * @param data a string containing new lines.
-//   * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
-//   */
-//  public static String toJSMultiLineStringAsCDATA(final String data) {
-//    return "(<r><![CDATA[" + data + "]]></r>).toString()";
-//  }
-
-  /**
-   * Returns the filter path read from the web.xml
-   *
-   * @param filterName the name of the searched filter.
-   * @param is Stream of the web.xml file.
-   * @return the filterPath for the searched filterName with wildcard removed.
-   */
-  public static String getFilterPath(final String filterName, final InputStream is)
-    throws ServletException {
-    Validate.notNull(filterName);
-    Validate.notNull(is);
-    final String prefix = "filter";
-    final String mapping = prefix + "-mapping";
-
-    try {
-      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      final Document document = factory.newDocumentBuilder().parse(is);
-      document.getDocumentElement().normalize();
-
-      final XPathFactory xPathFactory = XPathFactory.newInstance();
-      final XPath xpath = xPathFactory.newXPath();
-      final XPathExpression filterNameExpression = xpath.compile("//filter-mapping/filter-name/text()");
-      final XPathExpression urlPatternExpression = xpath.compile("url-pattern/text()");
-
-      final Object result = filterNameExpression.evaluate(document, XPathConstants.NODESET);
-
-      String urlPattern = null;
-
-      final NodeList nodes = (NodeList) result;
-      for (int i = 0; i < nodes.getLength(); i++) {
-        final Node node = nodes.item(i);
-        LOG.debug("\tnode: {}", node);
-        if (filterName.equals(node.getTextContent())) {
-          final Node filterMappingNode = node.getParentNode().getParentNode();
-          LOG.debug("filterMappingNode: {}", filterMappingNode);
-          urlPattern = urlPatternExpression.evaluate(filterMappingNode);
-          LOG.debug("urlPattern: {}", urlPattern);
-        }
-      }
-
-      final String prefixUppered = Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1);
-
-      // Check for leading '/' and trailing '*'.
-      if (!urlPattern.startsWith("/") || !urlPattern.endsWith("*")) {
-        throw new IllegalArgumentException("<" + mapping + "> for WroFilter" + prefixUppered + " \"" + filterName
-          + "\" must start with '/' and end with '*'.");
-      }
-
-      // Strip trailing '*' and keep leading '/'.
-      return stripWildcard(urlPattern);
-    } catch (final Exception e) {
-      LOG.error(e.getMessage(), e);
-      throw new ServletException("Error finding <" + prefix + "> " + filterName + " in web.xml", e);
-    }
-  }
-
-
-  /**
-   * Strip trailing '*' and keep leading '/'
-   *
-   * @param result
-   * @return The stripped String
-   */
-  private static String stripWildcard(final String result) {
-    return result.substring(1, result.length() - 1);
   }
 
   /**

@@ -52,3 +52,7 @@
   background-image: url([WRO-PREFIX]?id=/WEB-INF/path/to/image.png);
   background-image: url([WRO-PREFIX]?id=/WEB-INF/path/to/image.png);
 }
+
+.specialCharacters {
+  background-image: url([WRO-PREFIX]?id=/WEB-INF/path/with/$pecial/character.png);
+}
