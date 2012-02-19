@@ -46,7 +46,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
   /**
    * flag indicating if the wroFile should be auto detected.
    */
-  private boolean autoDetectWroFile;
+  private boolean autoDetectWroFile = true;
 
 
   /**
@@ -165,25 +165,27 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
     if (factoryList == null) {
       factoryList = newWroModelFactoryFactoryList();
     }
-    //Holds the details about model creation which are logged only when no model can be created
-    final StringBuffer logMessageBuffer = new StringBuffer();
-    for (final WroModelFactory factory : factoryList) {
-      try {
-        final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
-        logMessageBuffer.append("Using " + getClassName(factoryClass) + " for model creation..\n");
-        return factory.create();
-      } catch (final WroRuntimeException e) {
-        logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
-          + " failed. Trying another ...\n");
-        logMessageBuffer.append("[FAIL] Exception occured while building the model using: "
-          + getClassName(factory.getClass()) + " " + e.getMessage());
-        // stop trying with other factories if the reason is IOException
-        if (!autoDetectWroFile && e.getCause() instanceof IOException) {
-          throw e;
+    if (factoryList != null) {
+      // Holds the details about model creation which are logged only when no model can be created
+      final StringBuffer logMessageBuffer = new StringBuffer();
+      for (final WroModelFactory factory : factoryList) {
+        try {
+          final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
+          logMessageBuffer.append(" Using " + getClassName(factoryClass) + " for model creation..\n");
+          return factory.create();
+        } catch (final WroRuntimeException e) {
+          logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
+            + " failed. Trying another ...\n");
+          logMessageBuffer.append("[FAIL] Exception occured while building the model using: "
+            + getClassName(factory.getClass()) + " " + e.getMessage());
+          // stop trying with other factories if the reason is IOException
+          if (!autoDetectWroFile && e.getCause() instanceof IOException) {
+            throw e;
+          }
         }
       }
+      LOG.error(logMessageBuffer.toString());
     }
-    LOG.error(logMessageBuffer.toString());
     throw new WroRuntimeException("Cannot create model using any of provided factories");
   }
 
