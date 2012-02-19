@@ -16,6 +16,8 @@
 package ro.isdc.wro.extensions.model.factory;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -94,5 +96,65 @@ public class TestSmartWroModelFactory {
     final File wroFile = new File("/path/to/invalid/wro.xml");
     factory = new SmartWroModelFactory().setWroFile(wroFile);
     Assert.assertNotNull(factory.create());
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void cannotCreateModelWhenNullListOfFactoriesProvided() throws Exception {
+    factory = new SmartWroModelFactory() {
+      @Override
+      protected List<WroModelFactory> newWroModelFactoryFactoryList() {
+        return null;
+      }
+    };
+    factory.create();
+  }
+
+  @Test
+  public void shouldCreateModelEvenWhenFirstAttemptFails() throws Exception {
+    factory = createTestSmartModelFactory();
+    Assert.assertNotNull(factory.create());
+  }
+
+  @Test(expected=WroRuntimeException.class)
+  public void shouldFailCreatingModelEvenWhenFirstAttemptFailsAndAutoDetectIsDisabled() throws Exception {
+    factory = createTestSmartModelFactory();
+    factory.setAutoDetectWroFile(false);
+    factory.create();
+  }
+
+
+  /**
+   * Creates a {@link SmartWroModelFactory} which is provided with a list of two {@link WroModelFactory}'s. The first
+   * one is failing, the second one is working.
+   */
+  private SmartWroModelFactory createTestSmartModelFactory() {
+    final WroModelFactory failingModelFactory = new WroModelFactory() {
+      @Override
+      public WroModel create() {
+        throw new WroRuntimeException("Cannot create model", new IOException("invalid model stream"));
+      }
+
+      @Override
+      public void destroy() {}
+    };
+    final WroModelFactory workingModelFactory = new WroModelFactory() {
+      @Override
+      public WroModel create() {
+        return new WroModel();
+      }
+
+      @Override
+      public void destroy() {}
+    };
+    final SmartWroModelFactory factory = new SmartWroModelFactory() {
+      @Override
+      protected List<WroModelFactory> newWroModelFactoryFactoryList() {
+        final List<WroModelFactory> list = new ArrayList<WroModelFactory>();
+        list.add(failingModelFactory);
+        list.add(workingModelFactory);
+        return list;
+      }
+    };
+    return factory;
   }
 }
