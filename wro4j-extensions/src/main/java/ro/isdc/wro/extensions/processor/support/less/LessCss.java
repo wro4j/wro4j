@@ -84,7 +84,7 @@ public class LessCss {
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
