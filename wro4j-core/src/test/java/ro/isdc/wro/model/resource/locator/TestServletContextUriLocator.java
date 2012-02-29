@@ -3,8 +3,7 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 
 import javax.servlet.RequestDispatcher;
@@ -121,6 +120,20 @@ public class TestServletContextUriLocator {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
     Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
     simulateRedirectWithLocation("http://INVALID/");
+  }
+    
+  @Test
+  public void shouldPreferServletContextBasedResolving() throws IOException {
+    InputStream is = new ByteArrayInputStream("a {}".getBytes());
+    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
+
+    ServletContextUriLocator locator = new ServletContextUriLocator();
+    locator.setUseDispatcherBasedLocatorFirst(false);
+
+    InputStream actualIs = locator.locate("test.css");
+
+    BufferedReader br = new BufferedReader(new InputStreamReader(actualIs));
+    Assert.assertEquals("a {}", br.readLine());
   }
 
 
