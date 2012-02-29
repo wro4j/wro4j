@@ -178,6 +178,6 @@ public class TestJarWildcardStreamLocator {
 
   @Test
   public void shouldGetJarFileFromFile() {
-    Assert.assertEquals("path\\to\\file", jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath());
+    Assert.assertEquals("path/to/file", jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath());
   }
 }

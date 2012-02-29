@@ -25,7 +25,7 @@ public class TestWildcardContext {
   public void shouldCreateContextWithNotNullArguments() {
     final WildcardContext context = new WildcardContext("path/to/uri", new File("/path/to/folder/"));
     Assert.assertEquals("path/to/uri", context.getUri());
-    Assert.assertEquals("\\path\\to\\folder", context.getFolder().getPath());
+    Assert.assertEquals("/path/to/folder", context.getFolder().getPath());
     Assert.assertEquals("uri", context.getWildcard());
   }
 }
