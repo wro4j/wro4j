@@ -49,8 +49,23 @@ public class ServletContextUriLocator
    * Locates a stream using request dispatcher.
    */
   private final DispatcherStreamLocator dispatcherStreamLocator = new DispatcherStreamLocator();
-
   /**
+   * Determines the order of dispatcher resource locator and servlet context based resource locator.
+   */
+  private boolean useDispatcherBasedLocatorFirst = true;
+
+  public ServletContextUriLocator() {
+  }
+
+  public ServletContextUriLocator(boolean useDispatcherBasedLocatorFirst) {
+   this.useDispatcherBasedLocatorFirst = useDispatcherBasedLocatorFirst;
+  }
+
+  public void setUseDispatcherBasedLocatorFirst(boolean useDispatcherBasedLocatorFirst) {
+    this.useDispatcherBasedLocatorFirst = useDispatcherBasedLocatorFirst;
+  }
+
+    /**
    * {@inheritDoc}
    */
   public boolean accept(final String uri) {
@@ -58,7 +73,7 @@ public class ServletContextUriLocator
   }
 
 
-  /**
+    /**
    * Check if a uri is a servletContext resource.
    *
    * @param uri to check.
@@ -86,10 +101,10 @@ public class ServletContextUriLocator
     throws IOException {
     Validate.notNull(uri, "URI cannot be NULL!");
     LOG.debug("locate resource: {}", uri);
-    final ServletContext servletContext = Context.get().getServletContext();
-
+    
     try {
       if (getWildcardStreamLocator().hasWildcard(uri)) {
+        final ServletContext servletContext = Context.get().getServletContext();
         final String fullPath = FilenameUtils.getFullPath(uri);
         final String realPath = servletContext.getRealPath(fullPath);
         if (realPath == null) {
@@ -116,22 +131,56 @@ public class ServletContextUriLocator
         + "\".\n Trying to locate the stream without the wildcard.");
     }
 
-    // first attempt
-    final HttpServletRequest request = Context.get().getRequest();
-    final HttpServletResponse response = Context.get().getResponse();
-    // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
-    // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
     InputStream inputStream = null;
-    try {
-      inputStream = dispatcherStreamLocator.getInputStream(request, response, uri);
-    } catch (final IOException e) {
-      LOG.debug("retrieving servletContext stream for uri: {}", uri);
-      inputStream = servletContext.getResourceAsStream(uri);
+    if (useDispatcherBasedLocatorFirst) {
+        inputStream = dispatcherFirstStreamLocator(uri);
+    } else {
+        inputStream = servletContextFirstStreamLocator(uri);
+    }
+      
+    validateInputStreamIsNotNull(inputStream, uri);
+    
+    return inputStream;
+  }
+
+    private InputStream servletContextFirstStreamLocator(String uri) throws IOException {
+        try {
+            return servletContextBasedStreamLocator(uri);
+        } catch (final IOException e) {
+            LOG.debug("retrieving servletContext stream for uri: {}", uri);
+            return dispatcherBasedStreamLocator(uri);
+        }
+    }
+
+    private InputStream dispatcherFirstStreamLocator(String uri) throws IOException {
+        try {
+            return dispatcherBasedStreamLocator(uri);
+        } catch (final IOException e) {
+            LOG.debug("retrieving servletContext stream for uri: {}", uri);
+            return servletContextBasedStreamLocator(uri);
+        }
+    }
+
+    private InputStream dispatcherBasedStreamLocator(String uri)
+      throws IOException {
+        final HttpServletRequest request = Context.get().getRequest();
+        final HttpServletResponse response = Context.get().getResponse();
+        // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
+        // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
+        return dispatcherStreamLocator.getInputStream(request, response, uri);
+    }
+
+    private InputStream servletContextBasedStreamLocator(String uri)
+      throws IOException {
+      final ServletContext servletContext = Context.get().getServletContext();
+      return servletContext.getResourceAsStream(uri);
+    }
+
+    private void validateInputStreamIsNotNull(InputStream inputStream, String uri)
+      throws IOException {
       if (inputStream == null) {
         LOG.error("Exception while reading resource from " + uri);
         throw new IOException("Exception while reading resource from " + uri);
       }
     }
-    return inputStream;
-  }
 }
