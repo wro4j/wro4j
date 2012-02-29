@@ -7,6 +7,7 @@ import java.io.File;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 
 /**
@@ -24,8 +25,8 @@ public class TestWildcardContext {
   @Test
   public void shouldCreateContextWithNotNullArguments() {
     final WildcardContext context = new WildcardContext("path/to/uri", new File("/path/to/folder/"));
-    Assert.assertEquals("path/to/uri", context.getUri());
-    Assert.assertEquals("/path/to/folder", context.getFolder().getPath());
+    Assert.assertEquals(FilenameUtils.separatorsToSystem("path/to/uri"), FilenameUtils.separatorsToSystem(context.getUri()));
+    Assert.assertEquals(FilenameUtils.separatorsToSystem("/path/to/folder"), context.getFolder().getPath());
     Assert.assertEquals("uri", context.getWildcard());
   }
 }
