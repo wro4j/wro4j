@@ -29,7 +29,7 @@ import ro.isdc.wro.config.Context;
  * @author Alex Objelean
  */
 public class TestServletContextUriLocator {
-  private UriLocator locator;
+  private ServletContextUriLocator locator;
 
 
   @Before
@@ -163,6 +163,11 @@ public class TestServletContextUriLocator {
     return is;
   }
 
+  @Test(expected=NullPointerException.class)
+  public void cannotSetNullLocatorStrategy() {
+    locator.setLocatorStrategy(null);
+  }
+  
   @After
   public void resetContext() {
     Context.unset();
