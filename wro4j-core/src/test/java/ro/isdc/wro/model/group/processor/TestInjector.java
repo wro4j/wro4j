@@ -18,7 +18,7 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
@@ -124,7 +124,7 @@ public class TestInjector {
   @Test
   public void shouldInjectDecoratedProcessor() {
     final TestProcessor testProcessor = new TestProcessor();
-    final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(testProcessor);
+    final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(testProcessor);
 
     final Injector injector = new InjectorBuilder().build();
     injector.inject(processor);

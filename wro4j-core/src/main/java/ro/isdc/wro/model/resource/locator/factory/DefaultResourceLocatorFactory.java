@@ -18,7 +18,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.DynamicServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
@@ -92,9 +91,7 @@ public abstract class DefaultResourceLocatorFactory
     return new DefaultResourceLocatorFactory() {
       @Override
       protected ResourceLocator newServletContextResourceLocator(final String uri) {
-        final Context ctx = Context.get();
-        return new DynamicServletContextResourceLocator(
-          ctx.getRequest(), ctx.getResponse(), ctx.getServletContext(), uri);
+        return new ServletContextResourceLocator(Context.get().getServletContext(), uri);
       }
     };
   }

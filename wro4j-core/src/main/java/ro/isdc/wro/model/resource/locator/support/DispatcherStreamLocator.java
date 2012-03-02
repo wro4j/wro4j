@@ -35,30 +35,30 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * A strategy which use ByteArray IO Streams and dispatch the request to a given location.
- *
+ * 
  * @author Alex Objelean
  */
 public final class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-
+  
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
    * the portal with multiple threads (web requests) that are combined with threads for wro4j.
-   *
-   *
+   * 
    * @return a valid stream for required location. This method will never return a null.
-   * @throws IOException if the stream cannot be located at the specified location.
+   * @throws IOException
+   *           if the stream cannot be located at the specified location.
    */
   public InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
-    final String location)
-    throws IOException {
+      final String location)
+      throws IOException {
     Validate.notNull(request);
     Validate.notNull(response);
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
-
+    
     // preserve context, in case it is unset during dispatching
     final Context originalContext = Context.get();
     try {
@@ -66,18 +66,18 @@ public final class DispatcherStreamLocator {
       if (dispatcher == null) {
         // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
         // the thread responsible for refreshing resources)
-
+        
         // Returns the part URL from the protocol name up to the query string and contextPath.
         final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-
+        
         final String absolutePath = servletContextPath + location;
         final URL url = new URL(absolutePath);
         final URLConnection conn = url.openConnection();
         // setting these timeouts ensures the client does not deadlock indefinitely
         // when the server has problems.
-        //TimeUnit.MILLISECONDS.con
+        // TimeUnit.MILLISECONDS.con
         final int timeout = (int) TimeUnit.MILLISECONDS.convert(Context.get().getConfig().getConnectionTimeout(),
-          TimeUnit.SECONDS);
+            TimeUnit.SECONDS);
         LOG.debug("Computed timeout milliseconds: {}", timeout);
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
@@ -113,8 +113,7 @@ public final class DispatcherStreamLocator {
     }
     return new ByteArrayInputStream(os.toByteArray());
   }
-
-
+  
   /**
    * Build a wrapped servlet request which will be used for dispatching.
    */
@@ -124,14 +123,12 @@ public final class DispatcherStreamLocator {
       public String getRequestURI() {
         return getContextPath() + location;
       }
-
-
+      
       @Override
       public String getPathInfo() {
         return WroUtil.getPathInfoFromLocation(location);
       }
-
-
+      
       @Override
       public String getServletPath() {
         return WroUtil.getServletPathFromLocation(location);
@@ -139,8 +136,7 @@ public final class DispatcherStreamLocator {
     };
     return wrappedRequest;
   }
-
-
+  
   /**
    * Build a wrapped servlet response which will be used for dispatching.
    */
@@ -154,39 +150,37 @@ public final class DispatcherStreamLocator {
        * PrintWrapper of wrapped response.
        */
       private PrintWriter pw = new PrintWriter(os);
-
+      
       /**
        * Servlet output stream of wrapped response.
        */
       private ServletOutputStream sos = new DelegatingServletOutputStream(os);
-
-
+      
       /**
        * {@inheritDoc}
        */
       @Override
       public void sendError(final int sc)
-        throws IOException {
+          throws IOException {
         onError(sc, "");
         super.sendError(sc);
       }
-
-
+      
       /**
        * {@inheritDoc}
        */
       @Override
       public void sendError(final int sc, final String msg)
-        throws IOException {
+          throws IOException {
         onError(sc, msg);
         super.sendError(sc, msg);
       }
-
-
+      
       /**
        * Use an empty stream to avoid container writing unwanted message when a resource is missing.
-       *
-       * @param sc status code.
+       * 
+       * @param sc
+       *          status code.
        * @param msg
        */
       private void onError(final int sc, final String msg) {
@@ -195,28 +189,35 @@ public final class DispatcherStreamLocator {
         pw = new PrintWriter(emptyStream);
         sos = new DelegatingServletOutputStream(emptyStream);
       }
-
-
+      
       @Override
       public ServletOutputStream getOutputStream()
-        throws IOException {
+          throws IOException {
         return sos;
       }
-
-
+      
       /**
        * By default, redirect does not allow writing to output stream its content. In order to support this use-case, we
        * need to open a new connection and read the content manually.
        */
       @Override
       public void sendRedirect(final String location)
-        throws IOException {
+          throws IOException {
         try {
           LOG.debug("redirecting to: {}", location);
           final URL url = new URL(location);
-          final HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+          final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
           // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
           connection.setUseCaches(false);
+          // setting these timeouts ensures the client does not deadlock indefinitely
+          // when the server has problems.
+          // TimeUnit.MILLISECONDS.con
+          final int timeout = (int) TimeUnit.MILLISECONDS.convert(Context.get().getConfig().getConnectionTimeout(),
+              TimeUnit.SECONDS);
+          LOG.debug("Computed timeout milliseconds: {}", timeout);
+          connection.setConnectTimeout(timeout);
+          connection.setReadTimeout(timeout);
+          
           final InputStream is = connection.getInputStream();
           IOUtils.copy(is, sos);
           is.close();
@@ -225,11 +226,10 @@ public final class DispatcherStreamLocator {
           throw e;
         }
       }
-
-
+      
       @Override
       public PrintWriter getWriter()
-        throws IOException {
+          throws IOException {
         return pw;
       }
     };
