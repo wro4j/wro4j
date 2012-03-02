@@ -128,7 +128,7 @@ public class TestServletContextUriLocator {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
     ServletContextUriLocator locator = new ServletContextUriLocator();
-    locator.setUseDispatcherBasedLocatorFirst(false);
+    locator.setLocatorStrategy(ServletContextUriLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
 
     InputStream actualIs = locator.locate("test.css");
 
