@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletOutputStream;
@@ -29,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
 
@@ -66,22 +65,11 @@ public final class DispatcherStreamLocator {
       if (dispatcher == null) {
         // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
         // the thread responsible for refreshing resources)
-
         // Returns the part URL from the protocol name up to the query string and contextPath.
         final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-
         final String absolutePath = servletContextPath + location;
-        final URL url = new URL(absolutePath);
-        final URLConnection conn = url.openConnection();
-        // setting these timeouts ensures the client does not deadlock indefinitely
-        // when the server has problems.
-        //TimeUnit.MILLISECONDS.con
-        final int timeout = (int) TimeUnit.MILLISECONDS.convert(Context.get().getConfig().getConnectionTimeout(),
-          TimeUnit.SECONDS);
-        LOG.debug("Computed timeout milliseconds: {}", timeout);
-        conn.setConnectTimeout(timeout);
-        conn.setReadTimeout(timeout);
-        return conn.getInputStream();
+
+        return getLocationStream(absolutePath);
       }
       // Wrap request
       final ServletRequest wrappedRequest = getWrappedServletRequest(request, location);
@@ -114,6 +102,25 @@ public final class DispatcherStreamLocator {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
+
+  /**
+   * Opens a connection for a given location and retrive the stream. The connection will be configured with correct
+   * timout based on values from {@link WroConfiguration}.
+   */
+  private InputStream getLocationStream(final String location) throws IOException {
+    Validate.notNull(location);
+    final int timeout = Context.get().getConfig().getConnectionTimeout();
+    final URL url = new URL(location);
+    final URLConnection connection = url.openConnection();
+    // avoid jar file locking on Windows.
+    connection.setUseCaches(false);
+    // setting these timeouts ensures the client does not deadlock indefinitely
+    // when the server has problems.
+    LOG.debug("Computed timeout milliseconds: {}", timeout);
+    connection.setConnectTimeout(timeout);
+    connection.setReadTimeout(timeout);
+    return connection.getInputStream();
+  }
 
   /**
    * Build a wrapped servlet request which will be used for dispatching.
@@ -213,15 +220,11 @@ public final class DispatcherStreamLocator {
         throws IOException {
         try {
           LOG.debug("redirecting to: {}", location);
-          final URL url = new URL(location);
-          final HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-          // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
-          connection.setUseCaches(false);
-          final InputStream is = connection.getInputStream();
+          final InputStream is = getLocationStream(location);
           IOUtils.copy(is, sos);
           is.close();
         } catch (final IOException e) {
-          LOG.warn("Invalid response for location: " + location);
+          LOG.warn("{}: Invalid response for location: {}", e.getClass().getName(), location);
           throw e;
         }
       }
