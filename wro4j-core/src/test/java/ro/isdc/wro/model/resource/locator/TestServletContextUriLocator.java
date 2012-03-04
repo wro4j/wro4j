@@ -3,7 +3,11 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.servlet.RequestDispatcher;
@@ -21,6 +25,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 
 
 /**
@@ -34,10 +39,14 @@ public class TestServletContextUriLocator {
 
   @Before
   public void initContext() {
+    final Context mockContext = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
     locator = new ServletContextUriLocator();
-    final Context context = Mockito.mock(Context.class, Mockito.RETURNS_DEEP_STUBS);
-    Context.set(context);
+    final WroConfiguration config = new WroConfiguration();
+    config.setConnectionTimeout(100);
+    Mockito.when(mockContext.getConfig()).thenReturn(config);
+    Context.set(mockContext);
   }
+
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullUri()
@@ -47,36 +56,48 @@ public class TestServletContextUriLocator {
 
 
   @Test
-  public void testWildcard1Resources() throws IOException {
+  public void testWildcard1Resources()
+    throws IOException {
     locator.locate(createUri("/css/*.css"));
   }
 
+
   @Test
-  public void testWildcard2Resources() throws IOException {
+  public void testWildcard2Resources()
+    throws IOException {
     locator.locate(createUri("/css/*.cs?"));
   }
 
+
   @Test
-  public void testWildcard3Resources() throws IOException {
+  public void testWildcard3Resources()
+    throws IOException {
     locator.locate(createUri("/css/*.???"));
   }
 
+
   @Test
-  public void testRecursiveWildcardResources() throws IOException {
+  public void testRecursiveWildcardResources()
+    throws IOException {
     locator.locate(createUri("/css/**.css"));
   }
 
+
   @Test
-  public void testWildcardInexistentResources() throws IOException {
+  public void testWildcardInexistentResources()
+    throws IOException {
     locator.locate(createUri("/css/**.NOTEXIST"));
   }
 
-  private String createUri(final String uri) throws IOException {
+
+  private String createUri(final String uri)
+    throws IOException {
     final URL url = Thread.currentThread().getContextClassLoader().getResource("ro/isdc/wro/model/resource/locator/");
     Mockito.when(Context.get().getServletContext().getRealPath(Mockito.anyString())).thenReturn(url.getPath());
-    //Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
+    // Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
     return uri;
   }
+
 
   @Test
   public void testSomeUri()
@@ -84,6 +105,7 @@ public class TestServletContextUriLocator {
     final InputStream is = locator.locate("resourcePath");
     Assert.assertNotNull(is);
   }
+
 
   /**
    * Make this test method to follow a flow which throws IOException
@@ -95,9 +117,10 @@ public class TestServletContextUriLocator {
     Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
 
     final InputStream is = locator.locate("/css/resourcePath.css");
-    //the response should be empty
+    // the response should be empty
     Assert.assertEquals(-1, is.read());
   }
+
 
   /**
    * Simulates a resource which redirects to some valid location.
@@ -111,47 +134,51 @@ public class TestServletContextUriLocator {
     Assert.assertNotSame(-1, is.read());
   }
 
+
   /**
    * Simulates a resource which redirects to some valid location.
    */
-  @Test(expected=IOException.class)
+  @Test(expected = IOException.class)
   public void testRedirectingResourceToInvalidLocation()
     throws Exception {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(null);
     Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
     simulateRedirectWithLocation("http://INVALID/");
   }
-    
+
+
   @Test
-  public void shouldPreferServletContextBasedResolving() throws IOException {
-    InputStream is = new ByteArrayInputStream("a {}".getBytes());
+  public void shouldPreferServletContextBasedResolving()
+    throws IOException {
+    final InputStream is = new ByteArrayInputStream("a {}".getBytes());
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
-    ServletContextUriLocator locator = new ServletContextUriLocator();
+    final ServletContextUriLocator locator = new ServletContextUriLocator();
     locator.setLocatorStrategy(ServletContextUriLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
 
-    InputStream actualIs = locator.locate("test.css");
+    final InputStream actualIs = locator.locate("test.css");
 
-    BufferedReader br = new BufferedReader(new InputStreamReader(actualIs));
+    final BufferedReader br = new BufferedReader(new InputStreamReader(actualIs));
     Assert.assertEquals("a {}", br.readLine());
   }
 
 
   private InputStream simulateRedirectWithLocation(final String location)
-      throws IOException {
+    throws IOException {
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(Context.get().getResponse()).thenReturn(response);
 
     final RequestDispatcher requestDispatcher = new RequestDispatcher() {
       public void include(final ServletRequest request, final ServletResponse response)
-          throws ServletException, IOException {
-        final HttpServletResponse res = (HttpServletResponse) response;
-        //valid resource
+        throws ServletException, IOException {
+        final HttpServletResponse res = (HttpServletResponse)response;
+        // valid resource
         res.sendRedirect(location);
       }
 
+
       public void forward(final ServletRequest request, final ServletResponse response)
-          throws ServletException, IOException {
+        throws ServletException, IOException {
         throw new UnsupportedOperationException();
       }
     };
@@ -159,15 +186,17 @@ public class TestServletContextUriLocator {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(Context.get().getRequest()).thenReturn(request);
     Mockito.when(request.getRequestDispatcher(Mockito.anyString())).thenReturn(requestDispatcher);
-    final InputStream is = locator.locate("/doesntMatter");
+    final InputStream is = locator.locate(location);
     return is;
   }
 
-  @Test(expected=NullPointerException.class)
+
+  @Test(expected = NullPointerException.class)
   public void cannotSetNullLocatorStrategy() {
     locator.setLocatorStrategy(null);
   }
-  
+
+
   @After
   public void resetContext() {
     Context.unset();
