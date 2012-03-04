@@ -82,10 +82,10 @@ public final class WroConfiguration
    */
   private String header;
   /**
-   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend too
-   * much time on slow end-point.
+   * Timeout (milliseconds) of the url connection for external resources. This is used to ensure that locator doesn't
+   * spend too much time on slow end-point.
    */
-  private int connectionTimeout = 2;
+  private int connectionTimeout = 2000;
   /**
    * When true, will run in parallel preprocessing of multiple resources. In theory this should improve the performance.
    * By default this flag is false, because this feature is experimental.
@@ -94,10 +94,10 @@ public final class WroConfiguration
   /**
    * Listeners for the change of cache & model period properties.
    */
-  private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(
-    1);
-  private final transient List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(
-    1);
+  private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners =
+    new ArrayList<PropertyChangeListener>(1);
+  private final transient List<PropertyChangeListener> modelUpdatePeriodListeners =
+    new ArrayList<PropertyChangeListener>(1);
 
 
   /**
