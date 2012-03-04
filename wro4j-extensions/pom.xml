@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-    <version>1.4.4-SNAPSHOT</version>
+    <version>1.4.4-EI-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wro4j-extensions</artifactId>
@@ -16,6 +16,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wro4j-core</artifactId>
+      <version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

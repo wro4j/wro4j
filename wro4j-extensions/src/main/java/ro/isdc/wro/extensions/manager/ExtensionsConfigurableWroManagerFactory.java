@@ -7,10 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
-import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
-import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.css.*;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
@@ -74,6 +71,7 @@ public class ExtensionsConfigurableWroManagerFactory
     map.put(PackerJsProcessor.ALIAS, (T) new PackerJsProcessor());
     map.put(LessCssProcessor.ALIAS, (T) new LessCssProcessor());
     map.put(SassCssProcessor.ALIAS, (T) new SassCssProcessor());
+    map.put(RubySassCssProcessor.ALIAS, (T) new RubySassCssProcessor());
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, (T) new GoogleClosureCompressorProcessor());
     map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(
         CompilationLevel.ADVANCED_OPTIMIZATIONS));
