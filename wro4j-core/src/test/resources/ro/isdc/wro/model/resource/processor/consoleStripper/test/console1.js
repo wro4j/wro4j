@@ -4,4 +4,3 @@ function f1() {
   c = a + b;
   console.log(c);c = c + 2;
 }
-console.info("completed");
