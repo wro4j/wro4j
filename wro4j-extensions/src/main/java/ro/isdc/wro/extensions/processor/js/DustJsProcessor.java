@@ -34,7 +34,13 @@ public class DustJsProcessor implements ResourcePreProcessor, ResourcePostProces
     final String content = IOUtils.toString(reader);
     final DustJs dustJs = enginePool.getObject();
     final String name = resource == null ? "" : getFileName(resource.getUri());
-    writer.write(dustJs.compile(content, name));
+    try {
+      writer.write(dustJs.compile(content, name));
+    } finally {
+      reader.close();
+      writer.close();
+      enginePool.returnObject(dustJs);
+    }
   }
 
   private String getFileName(String uri) {
