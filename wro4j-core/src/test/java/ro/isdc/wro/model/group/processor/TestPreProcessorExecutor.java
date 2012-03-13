@@ -204,6 +204,16 @@ public class TestPreProcessorExecutor {
     Assert.assertTrue(sequentialExecution > parallelExecution + delta);
   }
 
+  @Test
+  public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
+    throws Exception {
+    final List<Resource> resources = new ArrayList<Resource>();
+    Resource resource = Resource.create("resource.js");
+    resource.setMinimize(false);
+    resources.add(resource);
+    final String result = executor.processAndMerge(resources, true);
+    Assert.assertEquals("", result);
+  }
 
   @After
   public void tearDown() {
