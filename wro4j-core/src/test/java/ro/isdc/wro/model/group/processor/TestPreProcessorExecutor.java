@@ -27,6 +27,8 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -173,13 +175,13 @@ public class TestPreProcessorExecutor {
 
   /**
    * This test should work when running at least on dual-core.
-   * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))  
+   * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))
    */
   @Test
   public void preProcessingInParallelIsFaster()
     throws Exception {
     final StopWatch watch = new StopWatch();
-    WroConfiguration config = Context.get().getConfig(); 
+    WroConfiguration config = Context.get().getConfig();
     watch.start("parallel preProcessing");
     config.setParallelPreprocessing(true);
     initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
@@ -188,16 +190,16 @@ public class TestPreProcessorExecutor {
     executor.processAndMerge(resources, true);
     watch.stop();
     long parallelExecution = watch.getLastTaskTimeMillis();
-    
+
     config.setParallelPreprocessing(false);
     watch.start("sequential preProcessing");
     executor.processAndMerge(resources, true);
     watch.stop();
     long sequentialExecution = watch.getLastTaskTimeMillis();
-    
+
     String message = "Processing details: \n" + watch.prettyPrint();
     LOG.debug(message);
-    
+
     // prove that running in parallel is faster
     //delta is for executor warm up.
     long delta = 100;
@@ -208,11 +210,18 @@ public class TestPreProcessorExecutor {
   public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
     throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
-    Resource resource = Resource.create("resource.js");
+    Resource resource = Resource.create("classpath:1.js");
     resource.setMinimize(false);
     resources.add(resource);
-    final String result = executor.processAndMerge(resources, true);
-    Assert.assertEquals("", result);
+    ResourcePreProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        Assert.fail("Should not minimize");
+      }
+    });
+    initExecutor(preProcessor);
+    executor.processAndMerge(resources, true);
   }
 
   @After

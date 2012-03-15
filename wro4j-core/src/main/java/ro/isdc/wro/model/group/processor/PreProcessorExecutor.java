@@ -228,7 +228,7 @@ public class PreProcessorExecutor {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
+        final boolean applyProcessor = resource.isMinimize() || !ProcessorsUtils.isMinimizeAwareProcessor(processor);
         if (applyProcessor) {
           LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
           try {
