@@ -1,18 +1,28 @@
 package ro.isdc.wro.extensions.processor.support.dustjs;
 
-import org.mozilla.javascript.ScriptableObject;
-import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.util.WroUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.mozilla.javascript.ScriptableObject;
+
+import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.util.WroUtil;
+
+
+/**
+ * Dust is a JavaScript templating engine designed to provide a clean separation between presentation and logic without
+ * sacrificing ease of use. It is particularly well-suited for asynchronous and streaming applications.
+ *
+ * @author Eivind Barstad Waaler
+ * @since 1.4.5
+ * @created 8 Mar 2012
+ */
 public class DustJs {
   private static final String DEFAULT_DUST_JS = "dust-full-0.3.0.min.js";
 
   private ScriptableObject scope;
 
-  public String compile(String content, String name) {
+  public String compile(final String content, final String name) {
     final RhinoScriptBuilder builder = initScriptBuilder();
     final String compileScript = String.format("dust.compile(%s, '%s');", WroUtil.toJSMultiLineString(content), name);
     return (String) builder.evaluate(compileScript, "dust.compile");
