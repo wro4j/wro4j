@@ -29,6 +29,8 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -210,6 +212,23 @@ public class TestPreProcessorExecutor {
     Assert.assertTrue(sequentialExecution > parallelExecution + delta);
   }
 
+  @Test
+  public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
+    throws Exception {
+    final List<Resource> resources = new ArrayList<Resource>();
+    Resource resource = Resource.create("classpath:1.js");
+    resource.setMinimize(false);
+    resources.add(resource);
+    ResourcePreProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        Assert.fail("Should not minimize");
+      }
+    });
+    initExecutor(preProcessor);
+    executor.processAndMerge(resources, true);
+  }
 
   @After
   public void tearDown() {
