@@ -191,8 +191,9 @@ public class TestXmlModelFactory {
     assertEquals(new WroModel(), factory.create());
   }
 
-  @Test(expected=SAXParseException.class)
-  public void testWildcardImports() throws Throwable {
+  @Test(expected = SAXParseException.class)
+  public void testWildcardImports()
+      throws Throwable {
     try {
       factory = new XmlModelFactory() {
         @Override
