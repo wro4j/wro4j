@@ -80,5 +80,5 @@ public class ExtensionsConfigurableWroManagerFactory
     map.put(JsHintProcessor.ALIAS, new JsHintProcessor());
     map.put(CssLintProcessor.ALIAS, new CssLintProcessor());
     map.put(JsLintProcessor.ALIAS, new JsLintProcessor());
-  }
+    map.put(DustJsProcessor.ALIAS, new DustJsProcessor());  }
 }
