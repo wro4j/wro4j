@@ -10,8 +10,7 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.dustjs.DustJs;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
 
@@ -23,7 +22,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.5
  * @created 8 Mar 2012
  */
-public class DustJsProcessor implements ResourcePreProcessor, ResourcePostProcessor {
+public class DustJsProcessor implements ResourceProcessor {
   public static final String ALIAS = "DustJs";
 
   private final ObjectPoolHelper<DustJs> enginePool;
@@ -41,15 +40,7 @@ public class DustJsProcessor implements ResourcePreProcessor, ResourcePostProces
    * {@inheritDoc}
    */
   @Override
-  public void process(Reader reader, Writer writer) throws IOException {
-    process(null, reader, writer);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void process(Resource resource, Reader reader, Writer writer) throws IOException {
+  public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
     final String content = IOUtils.toString(reader);
     final DustJs dustJs = enginePool.getObject();
     final String name = resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
