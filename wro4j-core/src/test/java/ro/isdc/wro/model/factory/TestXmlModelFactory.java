@@ -194,7 +194,7 @@ public class TestXmlModelFactory {
    * When a wildcard uri is used to import wro.xml, the resulted xml to parse won't be valid, because it will contain
    * merged content.
    */
-  @Test(expected=SAXParseException.class)
+  @Test(expected = SAXParseException.class)
   public void testWildcardImports() throws Throwable {
     try {
       factory = new XmlModelFactory() {
