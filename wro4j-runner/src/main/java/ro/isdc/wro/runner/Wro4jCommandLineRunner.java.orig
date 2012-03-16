@@ -45,7 +45,12 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
+<<<<<<< HEAD
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+=======
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+>>>>>>> issue395
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
@@ -282,9 +287,8 @@ public class Wro4jCommandLineRunner {
     if (postProcessorsList != null) {
       props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessorsList);
     }
-    return new ConfigurableProcessorsFactory().setProperties(props).setPreProcessorsMap(createProcessorsMap()).setPostProcessorsMap(
-        createProcessorsMap());
-  }
+    return new ConfigurableProcessorsFactory().setProperties(props).setPreProcessorsMap(createPreProcessorsMap()).setPostProcessorsMap(createPostProcessorsMap());
+ }
 
 
   /**
@@ -302,8 +306,20 @@ public class Wro4jCommandLineRunner {
   /**
    * Creates the map of known pre processors.
    */
-  protected Map<String, ResourceProcessor> createProcessorsMap() {
+  protected Map<String, ResourceProcessor> createPreProcessorsMap() {
     final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
+    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
+    map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
+    return map;
+  }
+
+
+  /**
+   * Creates the map of known post processors.
+   */
+  protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
+    final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
     ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
     map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
