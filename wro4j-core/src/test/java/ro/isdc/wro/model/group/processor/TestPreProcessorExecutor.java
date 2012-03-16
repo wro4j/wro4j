@@ -26,7 +26,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
@@ -85,8 +84,8 @@ public class TestPreProcessorExecutor {
    * Creates a slow pre processor which sleeps for a given amount of milliseconds and doesn't change the processed
    * content.
    */
-  private ResourcePreProcessor createSlowPreProcessor(final long time) {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createSlowPreProcessor(final long time) {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
         try {
@@ -99,8 +98,8 @@ public class TestPreProcessorExecutor {
   }
 
 
-  private ResourcePreProcessor createProcessorUsingMissingResource() {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createProcessorUsingMissingResource() {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
         LOG.debug("executing processor which will throw IOException");
@@ -215,11 +214,9 @@ public class TestPreProcessorExecutor {
   @Test
   public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
     throws Exception {
-    final List<Resource> resources = new ArrayList<Resource>();
     Resource resource = Resource.create("classpath:1.js");
     resource.setMinimize(false);
-    resources.add(resource);
-    ResourcePreProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
+    ResourceProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -227,7 +224,8 @@ public class TestPreProcessorExecutor {
       }
     });
     initExecutor(preProcessor);
-    executor.processAndMerge(resources, true);
+    Group group = new Group("group").addResource(resource);
+    executor.processAndMerge(group, true);
   }
 
   @After
