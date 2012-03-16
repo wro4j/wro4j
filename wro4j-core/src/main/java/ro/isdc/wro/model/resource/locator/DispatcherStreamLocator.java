@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.util.WroUtil;
 
 
