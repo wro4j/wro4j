@@ -35,7 +35,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 
 /**
  * @author Alex Objelean
@@ -186,7 +186,7 @@ public class TestSmartWroModelFactory {
         list.add(new CustomWroModel() {
           @Override
           public WroModel create() {
-            Assert.assertNotNull("Should have an injected locator!", uriLocatorFactory);
+            Assert.assertNotNull("Should have an injected locator!", locatorFactory);
             return new WroModel();
           }
         });
@@ -199,7 +199,7 @@ public class TestSmartWroModelFactory {
 
   private static class CustomWroModel implements WroModelFactory {
     @Inject
-    UriLocatorFactory uriLocatorFactory;
+    ResourceLocatorFactory locatorFactory;
     @Override
     public WroModel create() {
       return null;
