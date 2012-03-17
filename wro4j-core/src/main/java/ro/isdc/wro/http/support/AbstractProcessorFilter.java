@@ -1,19 +1,18 @@
 package ro.isdc.wro.http.support;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,19 +70,8 @@ public abstract class AbstractProcessorFilter
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
-      HttpServletResponse wrappedResponse = new HttpServletResponseWrapper(response) {
-        /**
-         * PrintWrapper of wrapped response.
-         */
-//        private PrintWriter pw = new PrintWriter(os);
-//
-//        /**
-//         * Servlet output stream of wrapped response.
-//         */
-//        private ServletOutputStream sos = new DelegatingServletOutputStream(os);
-
-
-      };
+      final OutputStream os = new ByteArrayOutputStream();
+      HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
       chain.doFilter(Context.get().getRequest(), wrappedResponse);
     } catch (final Exception ex) {
       // should never happen
