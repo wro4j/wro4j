@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.http.cache;
+package ro.isdc.wro.cache;
 
 import junit.framework.Assert;
 
