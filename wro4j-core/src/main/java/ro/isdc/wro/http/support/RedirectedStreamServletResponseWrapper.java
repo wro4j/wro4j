@@ -1,5 +1,6 @@
 package ro.isdc.wro.http.support;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,11 +41,18 @@ public class RedirectedStreamServletResponseWrapper
   /**
    * Used to locate external resources. No wildcard handling is required.
    */
-  private UriLocator externalResourceLocator = new UrlUriLocator() {
-    protected boolean disableWildcards() {
-      return true;
+  private UriLocator externalResourceLocator = newExternalResourceLocator();
+
+  /**
+   * @return {@link UriLocator} responsible for resolving external resources.
+   */
+  protected UriLocator newExternalResourceLocator() {
+    return new UrlUriLocator() {
+      protected boolean disableWildcards() {
+        return true;
+      };
     };
-  };
+  }
   
   /**
    * @param outputStream
@@ -55,10 +63,12 @@ public class RedirectedStreamServletResponseWrapper
   public RedirectedStreamServletResponseWrapper(final OutputStream outputStream, final HttpServletResponse response) {
     super(response);
     Validate.notNull(outputStream);
+    // wrap stream for buffering
+    OutputStream os = new BufferedOutputStream(outputStream);
     // Both servletOutputStream and PrintWriter must be overriden in order to be sure that dispatched servlet will write
     // to the pipe.
-    printWriter = new PrintWriter(outputStream);
-    servletOutputStream = new DelegatingServletOutputStream(outputStream);
+    printWriter = new PrintWriter(os);
+    servletOutputStream = new DelegatingServletOutputStream(os);
   }
   
   /**
@@ -113,6 +123,7 @@ public class RedirectedStreamServletResponseWrapper
       final InputStream is = externalResourceLocator.locate(location);
       IOUtils.copy(is, servletOutputStream);
       is.close();
+      servletOutputStream.close();
     } catch (final IOException e) {
       LOG.warn("{}: Invalid response for location: {}", e.getClass().getName(), location);
       throw e;
