@@ -17,6 +17,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +69,9 @@ public abstract class AbstractProcessorFilter
       HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
       
       chain.doFilter(req, wrappedResponse);
-      
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
       doProcess(reader, response.getWriter());
+      response.flushBuffer();
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally { 
@@ -79,26 +80,32 @@ public abstract class AbstractProcessorFilter
   }
 
   /**
-   * Applies configured processor on the intercepted stream.  
+   * Applies configured processor on the intercepted stream.
    */
-  private void doProcess(final Reader reader, final Writer writer) throws IOException {
+  private void doProcess(final Reader reader, final Writer writer)
+      throws IOException {
     Reader input = reader;
     Writer output = null;
-    final StopWatch stopWatch = new StopWatch();
-    Injector injector = new InjectorBuilder().build();
-    for (final ResourcePreProcessor processor : processorsList()) {
-      stopWatch.start("Using " + processor.getClass().getSimpleName());
-      //inject all required properites
-      injector.inject(processor);
-
-      output = new StringWriter();
-      processor.process(null, input, output);
-
-      input = new StringReader(output.toString());
-      stopWatch.stop();
+    try {
+      final StopWatch stopWatch = new StopWatch();
+      Injector injector = new InjectorBuilder().build();
+      for (final ResourcePreProcessor processor : processorsList()) {
+        stopWatch.start("Using " + processor.getClass().getSimpleName());
+        // inject all required properites
+        injector.inject(processor);
+        
+        output = new StringWriter();
+        processor.process(null, input, output);
+        
+        input = new StringReader(output.toString());
+        stopWatch.stop();
+      }
+      LOG.debug(stopWatch.prettyPrint());
+      writer.write(output.toString());
+    } finally {
+      reader.close();
+      writer.close();
     }
-    LOG.debug(stopWatch.prettyPrint());
-    writer.write(output.toString());
   }
 
   /**
