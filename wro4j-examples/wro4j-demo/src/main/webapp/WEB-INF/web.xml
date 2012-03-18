@@ -22,6 +22,17 @@
   </filter-mapping>
 
   <filter>
+    <filter-name>lessFilter</filter-name>
+    <filter-class>ro.isdc.wro.extensions.http.LessCssFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>lessFilter</filter-name>
+    <url-pattern>*.less</url-pattern>
+  </filter-mapping>  
+  
+
+  <filter>
     <filter-name>WebResourceOptimizer</filter-name>
     <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
   </filter>

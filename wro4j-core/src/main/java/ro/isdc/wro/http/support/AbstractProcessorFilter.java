@@ -2,7 +2,10 @@ package ro.isdc.wro.http.support;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -20,7 +23,10 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.StopWatch;
 
 /**
  * Allows configuration of a list of processors to be applied on the    
@@ -39,8 +45,15 @@ public abstract class AbstractProcessorFilter
   public final void init(final FilterConfig config)
     throws ServletException {
     this.filterConfig = config;
+    doInit(config);
   }
   
+  /**
+   * Allows custom initialization.
+   */
+  protected void doInit(final FilterConfig config) {
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -51,14 +64,43 @@ public abstract class AbstractProcessorFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
-      chain.doFilter(req, res);
+      final ByteArrayOutputStream os = new ByteArrayOutputStream();
+      HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
+      
+      chain.doFilter(req, wrappedResponse);
+      
+      final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
+      doProcess(reader, response.getWriter());
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
-    } finally {
+    } finally { 
       Context.unset();
     }
   }
-  
+
+  /**
+   * Applies configured processor on the intercepted stream.  
+   */
+  private void doProcess(final Reader reader, final Writer writer) throws IOException {
+    Reader input = reader;
+    Writer output = null;
+    final StopWatch stopWatch = new StopWatch();
+    Injector injector = new InjectorBuilder().build();
+    for (final ResourcePreProcessor processor : processorsList()) {
+      stopWatch.start("Using " + processor.getClass().getSimpleName());
+      //inject all required properites
+      injector.inject(processor);
+
+      output = new StringWriter();
+      processor.process(null, input, output);
+
+      input = new StringReader(output.toString());
+      stopWatch.stop();
+    }
+    LOG.debug(stopWatch.prettyPrint());
+    writer.write(output.toString());
+  }
+
   /**
    * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
    * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
@@ -70,9 +112,7 @@ public abstract class AbstractProcessorFilter
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
-      final OutputStream os = new ByteArrayOutputStream();
-      HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
-      chain.doFilter(Context.get().getRequest(), wrappedResponse);
+      chain.doFilter(Context.get().getRequest(), response);
     } catch (final Exception ex) {
       // should never happen
       LOG.error("Error while chaining the request: " + HttpServletResponse.SC_NOT_FOUND);
@@ -83,4 +123,10 @@ public abstract class AbstractProcessorFilter
    * @return a list of processors to apply for this filter.
    */
   protected abstract List<ResourcePreProcessor> processorsList();
+
+  /**
+   * {@inheritDoc}
+   */
+  public void destroy() {
+  }
 }
