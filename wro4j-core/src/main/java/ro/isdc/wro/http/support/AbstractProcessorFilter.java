@@ -2,6 +2,7 @@ package ro.isdc.wro.http.support;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -16,6 +17,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -38,7 +40,7 @@ import ro.isdc.wro.util.StopWatch;
  */
 public abstract class AbstractProcessorFilter
     implements Filter {
-  private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractProcessorFilter.class);
   private FilterConfig filterConfig;
   /**
    * {@inheritDoc}
@@ -65,13 +67,17 @@ public abstract class AbstractProcessorFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
+      IOUtils.write("\nBefore chain!\n", response.getOutputStream());
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
-      HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
-      
-      chain.doFilter(req, wrappedResponse);
+      System.out.println(response.getOutputStream());
+      final HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
+      chain.doFilter(request, wrappedResponse); 
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
-      doProcess(reader, response.getWriter());
+      
+      doProcess(reader, new OutputStreamWriter(os));
+      IOUtils.write(os.toByteArray(), response.getOutputStream());
       response.flushBuffer();
+      response.getOutputStream().close();
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally { 
