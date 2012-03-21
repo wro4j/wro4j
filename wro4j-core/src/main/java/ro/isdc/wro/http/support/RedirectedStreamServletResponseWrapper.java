@@ -1,6 +1,5 @@
 package ro.isdc.wro.http.support;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,13 +62,26 @@ public class RedirectedStreamServletResponseWrapper
   public RedirectedStreamServletResponseWrapper(final OutputStream outputStream, final HttpServletResponse response) {
     super(response);
     Validate.notNull(outputStream);
-    // wrap stream for buffering
-    OutputStream os = new BufferedOutputStream(outputStream);
-    // Both servletOutputStream and PrintWriter must be overriden in order to be sure that dispatched servlet will write
+    // Both servletOutputStream and PrintWriter must be overridden in order to be sure that dispatched servlet will write
     // to the pipe.
-    printWriter = new PrintWriter(os);
-    servletOutputStream = new DelegatingServletOutputStream(os);
+    printWriter = new PrintWriter(outputStream);
+    servletOutputStream = new DelegatingServletOutputStream(outputStream) {
+      @Override
+      public void close()
+          throws IOException {
+       System.out.println("close");
+        super.close();
+      }
+      @Override
+      public void flush()
+          throws IOException {
+        System.out.println("flush");
+        super.flush();
+      }
+    };
   }
+  
+  
   
   /**
    * {@inheritDoc}
@@ -105,12 +117,6 @@ public class RedirectedStreamServletResponseWrapper
     servletOutputStream = new DelegatingServletOutputStream(emptyStream);
   }
   
-  @Override
-  public ServletOutputStream getOutputStream()
-      throws IOException {
-    return servletOutputStream;
-  }
-  
   /**
    * By default, redirect does not allow writing to output stream its content. In order to support this use-case, we
    * need to open a new connection and read the content manually.
@@ -129,10 +135,18 @@ public class RedirectedStreamServletResponseWrapper
       throw e;
     }
   }
-  
+
+  @Override
+  public ServletOutputStream getOutputStream()
+      throws IOException {
+    return servletOutputStream;
+  }
+    
   @Override
   public PrintWriter getWriter()
       throws IOException {
     return printWriter;
   }
+  
+  
 }
