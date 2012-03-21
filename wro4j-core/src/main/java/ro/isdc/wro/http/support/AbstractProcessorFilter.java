@@ -2,12 +2,12 @@ package ro.isdc.wro.http.support;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,7 +17,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -67,15 +65,17 @@ public abstract class AbstractProcessorFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig));
-      IOUtils.write("\nBefore chain!\n", response.getOutputStream());
+      //response.setHeader("ETag", "" + UUID.randomUUID());
+      response.setContentType("text/css" + "; charset=UTF-8");
+      //write one character to avoid closed connection issue
+      IOUtils.write("\n", response.getOutputStream());
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
-      System.out.println(response.getOutputStream());
       final HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
       chain.doFilter(request, wrappedResponse); 
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
-      
-      doProcess(reader, new OutputStreamWriter(os));
-      IOUtils.write(os.toByteArray(), response.getOutputStream());
+      StringWriter writer = new StringWriter();
+      doProcess(reader, writer);
+      IOUtils.write(writer.toString(), response.getOutputStream());
       response.flushBuffer();
       response.getOutputStream().close();
     } catch (final RuntimeException e) {
