@@ -38,7 +38,7 @@ public class RedirectedStreamServletResponseWrapper
    */
   private ServletOutputStream servletOutputStream;
   /**
-   * Used to locate external resources. No wildcard handling is required.
+   * Used to locate external resources. 
    */
   private UriLocator externalResourceLocator = newExternalResourceLocator();
 
@@ -47,6 +47,9 @@ public class RedirectedStreamServletResponseWrapper
    */
   protected UriLocator newExternalResourceLocator() {
     return new UrlUriLocator() {
+      /**
+       * No wildcard handling is required.
+       */
       protected boolean disableWildcards() {
         return true;
       };
@@ -65,23 +68,8 @@ public class RedirectedStreamServletResponseWrapper
     // Both servletOutputStream and PrintWriter must be overridden in order to be sure that dispatched servlet will write
     // to the pipe.
     printWriter = new PrintWriter(outputStream);
-    servletOutputStream = new DelegatingServletOutputStream(outputStream) {
-      @Override
-      public void close()
-          throws IOException {
-       System.out.println("close");
-        super.close();
-      }
-      @Override
-      public void flush()
-          throws IOException {
-        System.out.println("flush");
-        super.flush();
-      }
-    };
+    servletOutputStream = new DelegatingServletOutputStream(outputStream);
   }
-  
-  
   
   /**
    * {@inheritDoc}
@@ -147,6 +135,4 @@ public class RedirectedStreamServletResponseWrapper
       throws IOException {
     return printWriter;
   }
-  
-  
 }
