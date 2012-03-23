@@ -6,7 +6,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -19,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.mockito.cglib.core.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +29,8 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
 /**
- * Allows configuration of a list of processors to be applied on the    
- * 
+ * Allows configuration of a list of processors to be applied on the
+ *
  * @author Alex Objelean
  * @since 1.4.5
  * @created 17 Mar 2012
@@ -49,7 +47,7 @@ public abstract class AbstractProcessorsFilter
     this.filterConfig = config;
     doInit(config);
   }
-  
+
   /**
    * Allows custom initialization.
    */
@@ -68,9 +66,9 @@ public abstract class AbstractProcessorsFilter
       Context.set(Context.webContext(request, response, filterConfig));
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
       final HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
-      chain.doFilter(request, wrappedResponse); 
+      chain.doFilter(request, wrappedResponse);
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
-       
+
       final StringWriter writer = new StringWriter();
       doProcess(reader, writer);
       // it is important to update the contentLength to new value, otherwise the transfer can be closed without all
@@ -79,7 +77,7 @@ public abstract class AbstractProcessorsFilter
       IOUtils.write(writer.toString(), response.getOutputStream());
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
-    } finally { 
+    } finally {
       Context.unset();
     }
   }
@@ -102,10 +100,10 @@ public abstract class AbstractProcessorsFilter
           stopWatch.start("Using " + processor.getClass().getSimpleName());
           // inject all required properites
           injector.inject(processor);
-          
+
           output = new StringWriter();
           processor.process(null, input, output);
-          
+
           input = new StringReader(output.toString());
           stopWatch.stop();
         }

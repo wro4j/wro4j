@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import ro.isdc.wro.config.Context;
 
 /**
  * Tests if {@link UrlUriLocator} works properly.
@@ -23,8 +26,14 @@ public class TestUrlUriLocator {
   private UriLocator uriLocator;
 
   @Before
-  public void init() {
+  public void setUp() {
     uriLocator = new UrlUriLocator();
+    Context.set(Context.standaloneContext());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test(expected=NullPointerException.class)
