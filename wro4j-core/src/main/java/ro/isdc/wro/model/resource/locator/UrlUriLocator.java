@@ -13,7 +13,10 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
 
@@ -25,13 +28,14 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
  * @created Created on Nov 10, 2008
  */
 public class UrlUriLocator extends WildcardUriLocatorSupport {
+  private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
+
   /**
    * {@inheritDoc}
    */
   public boolean accept(final String uri) {
     return isValid(uri);
   }
-
 
   /**
    * Check if a uri is a URL resource.
@@ -63,9 +67,17 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
       return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
     }
     final URL url = new URL(uri);
-    final URLConnection con = url.openConnection();
-    // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
-    con.setUseCaches(false);
-    return new BufferedInputStream(con.getInputStream());
+    final URLConnection connection = url.openConnection();
+    // avoid jar file locking on Windows.
+    connection.setUseCaches(false);
+    
+    final int timeout = Context.get().getConfig().getConnectionTimeout();
+    // setting these timeouts ensures the client does not deadlock indefinitely
+    // when the server has problems.
+    LOG.debug("Computed timeout milliseconds: {}", timeout);
+    connection.setConnectTimeout(timeout);
+    connection.setReadTimeout(timeout);
+    
+    return new BufferedInputStream(connection.getInputStream());
   }
 }
