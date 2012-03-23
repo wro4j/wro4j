@@ -2,7 +2,7 @@
  * Copyright (C) 2009.
  * All rights reserved.
  */
-package ro.isdc.wro.http;
+package ro.isdc.wro.http.support;
 
 /**
  * Enumerates Http Headers used by wro4j.

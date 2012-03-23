@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010. All rights reserved.
  */
-package ro.isdc.wro.http;
+package ro.isdc.wro.http.support;
 
 import ro.isdc.wro.WroRuntimeException;
 
