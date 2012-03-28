@@ -21,7 +21,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -64,6 +63,7 @@ public class TestLessCssProcessor {
       }
     };
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
           lessCss.process(null, new StringReader("#id {.class {color: red;}}"), new StringWriter());
