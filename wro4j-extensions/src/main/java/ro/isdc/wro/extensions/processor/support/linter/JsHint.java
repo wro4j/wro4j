@@ -18,7 +18,7 @@ public class JsHint extends AbstractLinter {
   /**
    * The name of the jshint script to be used by default.
    */
-  private static final String DEFAULT_JSHINT_JS = "jshint.min.js";
+  private static final String DEFAULT_JSHINT_JS = "jshint.js";
 
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.
