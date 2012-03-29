@@ -28,7 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * CssLint script engine utility. The underlying implementation uses CSSLint script utility {@link https
- * ://github.com/stubbornella/csslint} - version 0.9.6.
+ * ://github.com/stubbornella/csslint} - version 0.9.7.
  *
  * @author Alex Objelean
  * @since 1.3.8
@@ -39,8 +39,8 @@ public class CssLint {
   /**
    * The name of the csslint script to be used by default.
    */
-  private static final String DEFAULT_CSSLINT_JS = "csslint-0.9.6.min.js";
-  private OptionsBuilder optionsBuilder = new OptionsBuilder();
+  private static final String DEFAULT_CSSLINT_JS = "csslint-0.9.7.min.js";
+  private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
    */
