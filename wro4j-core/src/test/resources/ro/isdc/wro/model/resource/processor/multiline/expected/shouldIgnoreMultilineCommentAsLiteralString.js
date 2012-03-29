@@ -1,0 +1,1 @@
+alert("one /*");alert("two */ three");
