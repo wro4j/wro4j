@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static ro.isdc.wro.extensions.processor.support.uglify.UglifyJs.Type.UGLIFY;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,6 +75,7 @@ public class TestUglifyJsProcessor {
       }
     };
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
           processor.process(null, new StringReader("alert(1);"), new StringWriter());
@@ -87,7 +90,7 @@ public class TestUglifyJsProcessor {
 
   @Test
   public void shouldBePossibleToExtendLessCssWithDifferentScriptStream() throws Exception {
-    new UglifyJs(true) {
+    new UglifyJs(UGLIFY) {
       @Override
       protected InputStream getScriptAsStream() {
         return UglifyJs.class.getResourceAsStream(UglifyJs.DEFAULT_UGLIFY_JS);
