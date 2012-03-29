@@ -15,20 +15,29 @@ public class TestJsHint {
   @Test
   public void testSetNullOptions()
     throws Exception {
-    jsHint.setOptions(null);
+    final String options = null;
+    jsHint.setOptions(options);
     jsHint.validate("");
   }
 
 
   @Test
-  public void testWithNoOptions()
+  public void shouldValidateWithNoOptions()
     throws Exception {
     jsHint.validate("");
   }
 
 
   @Test
-  public void testWithSeveralOptions()
+  public void shouldValidateWithMultipleOptions()
+    throws Exception {
+    jsHint.setOptions("undef,eqeqeq");
+    jsHint.validate("");
+  }
+
+
+  @Test(expected = LinterException.class)
+  public void shouldNotAcceptBadOptions()
     throws Exception {
     jsHint.setOptions("1,2");
     jsHint.validate("");
@@ -36,21 +45,21 @@ public class TestJsHint {
 
 
   @Test(expected = LinterException.class)
-  public void testInvalidScript()
+  public void shouldValidateInvalidScript()
     throws Exception {
     jsHint.validate("al ert(1)");
   }
 
 
   @Test
-  public void testValidScript()
+  public void shouldValidateValidScript()
     throws Exception {
     jsHint.validate("$(function(){})(jQuery);");
   }
 
 
   @Test(expected = LinterException.class)
-  public void testWithUndefOption()
+  public void shouldValidateWithUndefOption()
     throws Exception {
     jsHint.setOptions("undef");
     jsHint.validate("$(function(){})(jQuery);");
@@ -58,14 +67,14 @@ public class TestJsHint {
 
 
   @Test(expected = LinterException.class)
-  public void testEqeqOption()
+  public void shouldValidateWithEqeqeqOption()
     throws Exception {
     jsHint.setOptions("eqeqeq");
     jsHint.validate("var j = 1;var i = j == 0 ? j + 1 : j - 1;");
   }
 
   @Test(expected = LinterException.class)
-  public void testEqeqOption2()
+  public void shouldValidateWithEqeqOption2()
     throws Exception {
     jsHint.setOptions("eqeqeq");
     jsHint.validate("if (text == 0) {win.location.href = link; }");
