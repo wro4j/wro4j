@@ -6,7 +6,6 @@ package ro.isdc.wro.manager;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,6 @@ public final class ReloadCacheRunnable
       for (final Group group : groups) {
         for (final ResourceType resourceType : ResourceType.values()) {
           if (group.hasResourcesOfType(resourceType)) {
-            final Collection<Group> groupAsList = new HashSet<Group>();
-            groupAsList.add(group);
             // TODO check if request parameter can be fetched here without errors.
             // groupExtractor.isMinimized(Context.get().getRequest())
             final Boolean[] minimizeValues = new Boolean[] { true, false };

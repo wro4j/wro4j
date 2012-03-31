@@ -142,17 +142,20 @@ public class ServletContextUriLocator
       LOG.warn("Couldn't localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
-
+    
     InputStream inputStream = null;
-    if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
-      inputStream = dispatcherFirstStreamLocator(uri);
-    } else {
-      inputStream = servletContextFirstStreamLocator(uri);
+    try {
+      if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
+        inputStream = dispatcherFirstStreamLocator(uri);
+      } else {
+        inputStream = servletContextFirstStreamLocator(uri);
+      }
+      validateInputStreamIsNotNull(inputStream, uri);
+      return inputStream;
+    } catch (IOException e) {
+      LOG.warn("Wrong or empty resource with location: {}", uri);
+      throw e;
     }
-
-    validateInputStreamIsNotNull(inputStream, uri);
-
-    return inputStream;
   }
 
   private InputStream servletContextFirstStreamLocator(final String uri)
