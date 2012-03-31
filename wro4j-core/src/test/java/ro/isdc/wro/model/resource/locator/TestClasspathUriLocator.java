@@ -24,7 +24,7 @@ public class TestClasspathUriLocator {
   /**
    * UriLocator to test.
    */
-  private UriLocator uriLocator;
+  private ClasspathUriLocator uriLocator;
 
   @Before
   public void init() {
@@ -47,9 +47,9 @@ public class TestClasspathUriLocator {
       throws IOException {
     Assert.assertNotNull(uriLocator.locate(createUri(" test.css ")));
   }
-
-  @Test
-  public void testWildcardInexistentResources()
+  
+  @Test(expected = IOException.class)
+  public void cannotDetectInexistentResourcesWithWildcard()
       throws IOException {
     uriLocator.locate(createUri("*.NOTEXIST"));
   }
@@ -64,19 +64,25 @@ public class TestClasspathUriLocator {
   @Test
   public void testWildcard2Resources()
       throws IOException {
-    uriLocator.locate(createUri("*.cs?"));
+    uriLocator.locate(createUri("ro/isdc/wro/http/*.cs?"));
   }
 
   @Test
   public void testWildcard3Resources()
       throws IOException {
-    uriLocator.locate(createUri("*.???"));
+    uriLocator.locate(createUri("ro/isdc/wro/http/*.???"));
   }
 
   @Test
-  public void testRecursiveWildcardResources()
+  public void shouldLocateRecursiveWildcardResources()
       throws IOException {
-    uriLocator.locate(createUri("**.css"));
+    uriLocator.locate(createUri("ro/isdc/wro/http/**.css"));
+  }
+  
+  @Test(expected = IOException.class)
+  public void shouldNotLocateWildcardResourcesWhenWildcardIsDisabled()
+      throws IOException {
+    uriLocator.setEnableWildcards(false).locate(createUri("**.css"));
   }
 
   @Test

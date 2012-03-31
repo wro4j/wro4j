@@ -105,7 +105,7 @@ public class ClasspathUriLocator
     return new JarWildcardStreamLocator() {
       @Override
       public boolean hasWildcard(final String uri) {
-        return !disableWildcards() && super.hasWildcard(uri);
+        return isEnableWildcards() && super.hasWildcard(uri);
       }
     };
   }

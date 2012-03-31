@@ -56,6 +56,10 @@ public class GroupsProcessor {
     Validate.notNull(type);
     try {
       final Group filteredGroup = group.collectResourcesOfType(type);
+      if (filteredGroup.getResources().isEmpty()) {
+        LOG.warn("No resources found in group: {}", group.getName());
+        throw new WroRuntimeException("No resources found in group: " + group.getName());
+      }
       final String result = decorateWithMergeCallback(preProcessorExecutor).processAndMerge(
           filteredGroup.getResources(), minimize);
       return doPostProcess(type, result, minimize);
