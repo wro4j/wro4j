@@ -58,6 +58,8 @@ public class GroupsProcessor {
     Validate.notNull(group);
     Validate.notNull(type);
     try {
+      //mark this group as used.
+      group.markAsUsed();
       final Group filteredGroup = group.collectResourcesOfType(type);
       if (filteredGroup.getResources().isEmpty()) {
         LOG.warn("No resources found in group: {} and resource type: {}", group.getName(), type);
