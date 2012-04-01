@@ -42,7 +42,7 @@ public final class ReloadCacheRunnable
       }
       final WroModel model = wroManagerReference.get().modelFactory.create();
       // process groups & put update cache
-      final Collection<Group> groups = model.getGroups();
+      final Collection<Group> groups = model.getUsedGroups();
       // update cache for all resources
       for (final Group group : groups) {
         for (final ResourceType resourceType : ResourceType.values()) {
