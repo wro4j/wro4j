@@ -36,10 +36,23 @@ public final class WroModel {
   private Set<Group> groups = new HashSet<Group>();
 
   /**
-   * @return the readonly collection of groups.
+   * @return a readonly collection of groups.
    */
   public final Collection<Group> getGroups() {
     return Collections.unmodifiableSet(groups);
+  }
+  
+  /**
+   * @return a readonly collection of groups which were used for processing (used flag marked as true).
+   */
+  public final Collection<Group> getUsedGroups() {
+    Set<Group> usedGroups = new HashSet<Group>();
+    for (Group group : groups) {
+      if (group.isUsed()) {
+        usedGroups.add(group);
+      }
+    }
+    return Collections.unmodifiableSet(usedGroups);
   }
 
   /**

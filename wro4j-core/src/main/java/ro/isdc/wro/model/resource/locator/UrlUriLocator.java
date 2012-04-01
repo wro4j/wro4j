@@ -16,7 +16,8 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
 
@@ -29,7 +30,8 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
  */
 public class UrlUriLocator extends WildcardUriLocatorSupport {
   private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
-
+  @Inject
+  private WroConfiguration config;
   /**
    * {@inheritDoc}
    */
@@ -71,7 +73,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     // avoid jar file locking on Windows.
     connection.setUseCaches(false);
     
-    final int timeout = Context.get().getConfig().getConnectionTimeout();
+    final int timeout = getConnectionTimeout();
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.
     LOG.debug("Computed timeout milliseconds: {}", timeout);
@@ -79,5 +81,12 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     connection.setReadTimeout(timeout);
     
     return new BufferedInputStream(connection.getInputStream());
+  }
+  
+  /**
+   * @return connection timeout in milliseconds. By default uses connection timeout from {@link WroConfiguration}.
+   */
+  private int getConnectionTimeout() {
+    return config != null ? config.getConnectionTimeout() : WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
   }
 }

@@ -18,7 +18,6 @@ import java.util.jar.JarFile;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
