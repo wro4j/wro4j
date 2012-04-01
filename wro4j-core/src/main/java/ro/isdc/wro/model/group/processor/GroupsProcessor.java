@@ -58,8 +58,8 @@ public class GroupsProcessor {
     Validate.notNull(group);
     Validate.notNull(type);
     try {
-      LOG.debug("Starting processing group [{}] and resources of type: [{}]", group.getName(), type);
-      //mark this group as used.
+      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + minimize, group.getName(), type);
+      // mark this group as used.
       group.markAsUsed();
       final Group filteredGroup = group.collectResourcesOfType(type);
       if (filteredGroup.getResources().isEmpty()) {
