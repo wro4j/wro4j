@@ -96,6 +96,11 @@ public final class WroConfiguration
    */
   private boolean parallelPreprocessing = false;
   /**
+   * When a group is empty and this flag is false, the processing will fail. This is useful for runtime solution to
+   * allow filter chaining when there is nothing to process for a given request.
+   */
+  private boolean ignoreEmptyGroup = true;
+  /**
    * Listeners for the change of cache & model period properties.
    */
   private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners =
@@ -426,6 +431,22 @@ public final class WroConfiguration
    */
   public void setParallelPreprocessing(final boolean parallelPreprocessing) {
     this.parallelPreprocessing = parallelPreprocessing;
+  }
+
+  /**
+   * @return value of the flag responsible for handling empty group behavior.
+   */
+  public boolean isIgnoreEmptyGroup() {
+    return ignoreEmptyGroup;
+  }
+
+  /**
+   * @param ignoreEmptyGroup
+   *          flag for turning on/off failure when there is an empty group (nothing to process). This value is true by
+   *          default, meaning that empty group will produce empty result (no exception).
+   */
+  public void setIgnoreEmptyGroup(boolean ignoreEmptyGroup) {
+    this.ignoreEmptyGroup = ignoreEmptyGroup;
   }
 
 

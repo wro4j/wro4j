@@ -1,1 +1,1 @@
-var a=2E3;var b=0.0020;var c=2.0E-5;
+var a=2E3;var b=0.002;var c=2.0E-5;
