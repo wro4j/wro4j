@@ -404,7 +404,9 @@ public class TestWroManager {
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/noResources.css");
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    WroConfiguration config = new WroConfiguration();
+    config.setIgnoreEmptyGroup(false);
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     
     WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
