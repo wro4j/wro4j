@@ -101,6 +101,20 @@ public class TestDefaultGroupExtractor {
     Assert.assertEquals("otherGroup", groupExtractor.getGroupName(request));
     Assert.assertEquals(ResourceType.JS, groupExtractor.getResourceType(request));
   }
+  
+  @Test
+  public void shouldExtractGroupWhenUrlIsRewritten() {
+    final HttpServletRequest request = mockRequestForUri("/contextPath/wro/my.css;jsessionid=blahblah");
+    Assert.assertEquals("my", groupExtractor.getGroupName(request));
+    Assert.assertEquals(ResourceType.CSS, groupExtractor.getResourceType(request));
+  }
+  
+  @Test
+  public void shouldExtractGroupWhenUrlHasParameters() {
+    final HttpServletRequest request = mockRequestForUri("/contextPath/wro/my.css?param=blahblah");
+    Assert.assertEquals("my", groupExtractor.getGroupName(request));
+    Assert.assertEquals(ResourceType.CSS, groupExtractor.getResourceType(request));
+  }
 
   @Test
   public void testWithInvalidUriType() {

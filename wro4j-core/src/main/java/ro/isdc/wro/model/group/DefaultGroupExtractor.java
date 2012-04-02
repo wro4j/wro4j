@@ -57,7 +57,8 @@ public class DefaultGroupExtractor
    */
   public ResourceType getResourceType(final HttpServletRequest request) {
     Validate.notNull(request);
-    final String uri = request.getRequestURI();
+    String uri = request.getRequestURI();
+    uri = uri.replaceFirst("(.*)(:?;.*)", "$1");
     final String extension = FilenameUtils.getExtension(uri);
     ResourceType type = null;
     try {
