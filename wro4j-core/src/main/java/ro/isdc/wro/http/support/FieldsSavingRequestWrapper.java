@@ -1,4 +1,4 @@
-package ro.isdc.wro.http;
+package ro.isdc.wro.http.support;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;

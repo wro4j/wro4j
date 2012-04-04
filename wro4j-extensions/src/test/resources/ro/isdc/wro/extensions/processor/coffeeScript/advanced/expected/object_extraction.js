@@ -1,5 +1,5 @@
 (function() {
-  var city, futurists, name, street, _ref, _ref2;
+  var city, futurists, name, street, _ref, _ref1;
 
   futurists = {
     sculptor: "Umberto Boccioni",
@@ -10,6 +10,6 @@
     }
   };
 
-  _ref = futurists.poet, name = _ref.name, (_ref2 = _ref.address, street = _ref2[0], city = _ref2[1]);
+  _ref = futurists.poet, name = _ref.name, (_ref1 = _ref.address, street = _ref1[0], city = _ref1[1]);
 
 }).call(this);

@@ -52,9 +52,9 @@ public abstract class AbstractProcessorDecorator
   }
 
   /**
-   * @return the decoratedProcessor
+   * @return the decorated processor.
    */
-  protected final ResourcePreProcessor getDecoratedProcessor() {
+  public final ResourcePreProcessor getDecoratedProcessor() {
     return decoratedProcessor;
   }
 

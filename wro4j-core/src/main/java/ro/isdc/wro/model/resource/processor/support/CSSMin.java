@@ -153,7 +153,8 @@ class Property
   public Property(final String property) throws Exception {
     try {
       // Parse the property.
-      final String[] parts = property.split(":"); // Split "color: red" to ["color", " red"]
+      //final String[] parts = property.split(":"); // Split "color: red" to ["color", " red"]
+      final String[] parts = property.split(":", 2); // Split "color: red" to ["color", " red"]
       if (parts.length < 2) {
         throw new Exception("Warning: Incomplete property: " + property);
       }
