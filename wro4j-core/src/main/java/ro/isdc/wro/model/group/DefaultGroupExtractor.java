@@ -57,16 +57,22 @@ public class DefaultGroupExtractor
    */
   public ResourceType getResourceType(final HttpServletRequest request) {
     Validate.notNull(request);
-    String uri = request.getRequestURI();
-    uri = uri.replaceFirst("(.*)(:?;.*)", "$1");
-    final String extension = FilenameUtils.getExtension(uri);
+    final String uri = request.getRequestURI();
     ResourceType type = null;
     try {
-      type = ResourceType.valueOf(extension.toUpperCase());
+      type = ResourceType.get(getExtensionFromUri(uri));
     } catch (final IllegalArgumentException e) {
       LOG.debug("[FAIL] Cannot identify resourceType for uri: {}", uri);
     }
     return type;
+  }
+
+  /**
+   * The uri is cleaned up (the ;jsessionID is removed).
+   * @return the extension of the resource. 
+   */
+  private String getExtensionFromUri(final String uri) {
+    return FilenameUtils.getExtension(uri.replaceFirst("(.*)(;.*)", "$1"));
   }
 
   /**
