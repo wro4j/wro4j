@@ -78,16 +78,6 @@
   </properties>
   
     
-  <modules>		
-    <module>wro4j-core</module>        
-    <module>wro4j-extensions</module>
-    <module>wro4j-maven-plugin</module>    
-    <module>wro4j-runner</module>      
-    <!-- 		
-  	<module>wro4j-examples</module>        		
-    -->
-  </modules>
-
   <dependencyManagement>
     <dependencies>
       <!-- Project Dependencies -->
@@ -350,9 +340,22 @@
   </reporting>
   <profiles>
     <profile>
-      <id>release-profile</id>
-
+      <id>dev</id>
       <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>   
+        <module>wro4j-core</module>          
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+        <module>wro4j-runner</module>           
+        <module>wro4j-examples</module>           
+      </modules>
+    </profile>  
+    <profile>
+      <id>release-profile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
         <property>
           <name>release</name>
           <value>true</value>
