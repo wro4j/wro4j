@@ -191,9 +191,12 @@ public class PreProcessorExecutor {
       final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, configuration.getEncoding());
       is.close();
+      if (StringUtils.isEmpty(result)) {
+        throw new IOException("Empty resource detected: " + resource.getUri());
+      }
       return result;
     } catch (final IOException e) {
-      LOG.warn("Invalid resource found: " + resource);
+      LOG.warn("Invalid resource found: {}", resource);
       if (configuration.isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
@@ -228,7 +231,7 @@ public class PreProcessorExecutor {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        final boolean applyProcessor = resource.isMinimize() || !processor.getClass().isAnnotationPresent(Minimize.class);
+        final boolean applyProcessor = resource.isMinimize() || !ProcessorsUtils.isMinimizeAwareProcessor(processor);
         if (applyProcessor) {
           LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
           try {

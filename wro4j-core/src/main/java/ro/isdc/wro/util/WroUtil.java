@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.http.HttpHeader;
+import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
@@ -181,6 +181,7 @@ public final class WroUtil {
    *
    * @return true if this request support gzip encoding.
    */
+  @SuppressWarnings("unchecked")
   public static boolean isGzipSupported(final HttpServletRequest request) {
     if (request != null) {
       final Enumeration<String> headerNames = request.getHeaderNames();

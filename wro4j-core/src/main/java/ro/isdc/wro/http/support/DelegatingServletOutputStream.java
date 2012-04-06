@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.http;
+package ro.isdc.wro.http.support;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +14,7 @@ import javax.servlet.ServletOutputStream;
  * @author Alex Objelean
  * @created Created on Nov 14, 2008
  */
-public final class DelegatingServletOutputStream extends ServletOutputStream {
+public class DelegatingServletOutputStream extends ServletOutputStream {
   /**
    * Target {@link OutputStream} object.
    */

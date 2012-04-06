@@ -24,7 +24,7 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.1.3-pre</code> (commited at 2011-09-18 06:52:30)
+ * The underlying implementation use the coffee-script version <code>1.2.1-pre</code> (commited at 2012-03-03 20:52:43)
  * project: {@link https ://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
@@ -34,7 +34,7 @@ public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
   private String[] options;
   private ScriptableObject scope;
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.2.0.min.js";
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.min.js";
   /**
    * Initialize script builder for evaluation.
    */

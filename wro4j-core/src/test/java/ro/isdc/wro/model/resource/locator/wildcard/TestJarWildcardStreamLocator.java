@@ -18,6 +18,7 @@ import java.util.jar.JarFile;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -178,6 +179,8 @@ public class TestJarWildcardStreamLocator {
 
   @Test
   public void shouldGetJarFileFromFile() {
-    Assert.assertEquals("path\\to\\file", jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath());
+    final String actual = jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath();
+    final String expected = FilenameUtils.separatorsToSystem("path/to/file");
+    Assert.assertEquals(expected, actual);
   }
 }

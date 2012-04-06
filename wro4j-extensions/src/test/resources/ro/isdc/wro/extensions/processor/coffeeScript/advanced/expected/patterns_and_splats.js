@@ -1,6 +1,6 @@
 (function() {
   var close, contents, open, tag, _i, _ref,
-    __slice = Array.prototype.slice;
+    __slice = [].slice;
 
   tag = "<impossible>";
 

@@ -2,13 +2,12 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.http.cache;
+package ro.isdc.wro.cache;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.model.resource.ResourceType;
 
 /**

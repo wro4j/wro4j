@@ -22,6 +22,8 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 
 
 /**
@@ -37,7 +39,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    * The default location of the wro model file.
    */
   private static final String DEFAULT_WRO_FILE = "/src/main/webapp/WEB-INF/wro.xml";
-
+  @Inject
+  private Injector injector;
   private List<WroModelFactory> factoryList;
   /**
    * The exact file where the model is located.
@@ -170,6 +173,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
       final StringBuffer logMessageBuffer = new StringBuffer();
       for (final WroModelFactory factory : factoryList) {
         try {
+          //use injector for aggregated modelFactories
+          injector.inject(factory);
           final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
           logMessageBuffer.append(" Using " + getClassName(factoryClass) + " for model creation..\n");
           return factory.create();
