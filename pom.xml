@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.5-SNAPSHOT</version>
+  <version>1.4.5</version>
   <packaging>pom</packaging>  
   
   <name>Web Resource Optimizer Parent</name>
@@ -78,16 +78,6 @@
   </properties>
   
     
-  <modules>		
-    <module>wro4j-core</module>        
-    <module>wro4j-extensions</module>
-    <module>wro4j-maven-plugin</module>    
-    <module>wro4j-runner</module>      
-    <!-- 		
-  	<module>wro4j-examples</module>        		
-    -->
-  </modules>
-
   <dependencyManagement>
     <dependencies>
       <!-- Project Dependencies -->
@@ -350,9 +340,22 @@
   </reporting>
   <profiles>
     <profile>
-      <id>release-profile</id>
-
+      <id>dev</id>
       <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>   
+        <module>wro4j-core</module>          
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+        <module>wro4j-runner</module>           
+        <module>wro4j-examples</module>           
+      </modules>
+    </profile>  
+    <profile>
+      <id>release-profile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
         <property>
           <name>release</name>
           <value>true</value>
@@ -408,12 +411,12 @@
         <repository>
           <id>sonatype-nexus-staging</id>
           <name>Nexus Release Repository</name>
-          <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>        
         <snapshotRepository>
           <id>sonatype-nexus-snapshots</id>
           <name>Sonatype Nexus Snapshots</name>
-          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
       </distributionManagement>      
     </profile>
