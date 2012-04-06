@@ -58,7 +58,7 @@ public final class Group {
   }
 
   /**
-   * Mark this group as being used. Once the used flag was changed, it can be reverted.
+   * Mark this group as being used. Once the used flag was changed, it can't be reverted.
    */
   public void markAsUsed() {
     LOG.debug("Marking group [{}] as used", this.name);
