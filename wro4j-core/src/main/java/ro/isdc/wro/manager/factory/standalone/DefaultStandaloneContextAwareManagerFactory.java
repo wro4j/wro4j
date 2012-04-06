@@ -1,10 +1,5 @@
 package ro.isdc.wro.manager.factory.standalone;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.Validate;

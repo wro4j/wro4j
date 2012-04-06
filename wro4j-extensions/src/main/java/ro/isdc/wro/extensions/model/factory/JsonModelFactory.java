@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.AbstractWroModelFactory;
-import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

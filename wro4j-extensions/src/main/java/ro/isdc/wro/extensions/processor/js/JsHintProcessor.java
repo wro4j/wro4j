@@ -8,7 +8,6 @@ import ro.isdc.wro.extensions.processor.support.linter.AbstractLinter;
 import ro.isdc.wro.extensions.processor.support.linter.JsHint;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 /**

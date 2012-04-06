@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +11,6 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.processor.Minimize;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
