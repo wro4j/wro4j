@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.locator;
+package ro.isdc.wro.model.resource.locator.support;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,10 +28,6 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
  */
 public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-  /**
-   * Used to locate external resources. No wildcard handling is required.
-   */
-  private ResourceLocator externalUriLocator = newExternalResourceLocator();
   
   /**
    * @param location
@@ -48,20 +44,21 @@ public class DispatcherStreamLocator {
 
     final String absolutePath = computeServletContextPath(request) + location;
     LOG.debug("Locating resource: {}", absolutePath);
-    return externalUriLocator.locate(absolutePath);
+    return newExternalResourceLocator(absolutePath).getInputStream();
   }
 
+
+  /**
+   * @return {@link ResourceLocator} responsible for retrieving stream for an external location.
+   */
+  protected ResourceLocator newExternalResourceLocator(final String location) {
+    return new UrlResourceLocator(location).setEnableWildcards(false);
+  }
+  
   /**
    * @return the part URL from the protocol name up to the query string and contextPath.
    */
   private String computeServletContextPath(final HttpServletRequest request) {
     return request.getRequestURL().toString().replace(request.getServletPath(), "");
-  }
-  
-  /**
-   * @return {@link ResourceLocator} used to retrieve stream for absolute location .
-   */
-  protected ResourceLocator newExternalResourceLocator() {
-    return new UrlResourceLocator().setEnableWildcards(false);
   }
 }

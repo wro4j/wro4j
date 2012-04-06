@@ -18,10 +18,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 
 
@@ -31,8 +29,6 @@ import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 public class TestDispatcherStreamLocator {
   @Mock
   private HttpServletRequest mockRequest;
-  @Mock
-  private RequestDispatcher mockDispatcher;
   @Mock
   private HttpServletResponse mockResponse;
   private DispatcherStreamLocator locator;
@@ -75,10 +71,9 @@ public class TestDispatcherStreamLocator {
       throws Exception {
     locator = new DispatcherStreamLocator() {
       @Override
-      protected UriLocator newExternalUriLocator() {
-        return new UrlUriLocator() {
-          @Override
-          public InputStream locate(String uri)
+      protected ResourceLocator newExternalResourceLocator(final String location) {
+        return new AbstractResourceLocator() {
+          public InputStream getInputStream()
               throws IOException {
             return new ByteArrayInputStream("some content".getBytes());
           }

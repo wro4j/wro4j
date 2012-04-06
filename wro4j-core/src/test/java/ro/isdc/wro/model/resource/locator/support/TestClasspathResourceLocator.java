@@ -65,11 +65,10 @@ public class TestClasspathResourceLocator {
     Assert.assertNotSame(0, uriLocator.lastModified());
   }
 
-  @Test
+  @Test(expected = IOException.class)
   public void testWildcardInexistentResources() throws IOException {
     uriLocator = new ClasspathResourceLocator(createUri("*.NOTEXIST"));
-    Assert.assertNotNull(uriLocator.getInputStream());
-    Assert.assertEquals(0, uriLocator.lastModified());
+    uriLocator.getInputStream();
   }
 
   @Test
@@ -81,27 +80,27 @@ public class TestClasspathResourceLocator {
 
   @Test
   public void testWildcard2Resources() throws IOException {
-    uriLocator = new ClasspathResourceLocator(createUri("*.cs?"));
-    uriLocator.getInputStream();
+    uriLocator = new ClasspathResourceLocator(createUri("ro/isdc/wro/http/*.cs?"));
+    Assert.assertNotNull(uriLocator.getInputStream());
     Assert.assertEquals(0, uriLocator.lastModified());
   }
 
   @Test
   public void testWildcard3Resources() throws IOException {
-    uriLocator = new ClasspathResourceLocator(createUri("*.???"));
-    uriLocator.getInputStream();
+    uriLocator = new ClasspathResourceLocator(createUri("ro/isdc/wro/http/*.???"));
+    Assert.assertNotNull(uriLocator.getInputStream());
   }
 
   @Test
   public void testWildcard4Resources() throws IOException {
     uriLocator = new ClasspathResourceLocator(createUri("ro/isdc/wro/http/**.cs?"));
-    uriLocator.getInputStream();
+    Assert.assertNotNull(uriLocator.getInputStream());
   }
 
 
   @Test
   public void testRecursiveWildcardResources() throws IOException {
-    uriLocator = new ClasspathResourceLocator(createUri("**.css"));
+    uriLocator = new ClasspathResourceLocator(createUri("ro/isdc/wro/http/**.css"));
     uriLocator.getInputStream();
   }
 

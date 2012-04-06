@@ -126,7 +126,7 @@ public class ServletContextResourceLocator
       } else {
         inputStream = servletContextFirstStreamLocator(path);
       }
-      validateInputStreamIsNotNull(inputStream, uri);
+      validateInputStreamIsNotNull(inputStream, path);
       return inputStream;
     } catch (IOException e) {
       LOG.warn("Wrong or empty resource with location: {}", path);
