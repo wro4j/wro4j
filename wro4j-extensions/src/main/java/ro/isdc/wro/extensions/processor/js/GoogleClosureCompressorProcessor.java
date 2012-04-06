@@ -111,7 +111,11 @@ public class GoogleClosureCompressorProcessor
   }
 
   private String getEncoding() {
-    return encoding == null ? config.getEncoding() : encoding;
+    if (encoding == null) {
+      //use config is available to get encoding
+      this.encoding = config == null ? WroConfiguration.DEFAULT_ENCODING : config.getEncoding();
+    }
+    return encoding;
   }
 
 

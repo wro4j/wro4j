@@ -7,8 +7,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
-
 
 /**
  * @author Alex Objelean

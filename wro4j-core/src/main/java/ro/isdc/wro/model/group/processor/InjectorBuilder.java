@@ -55,7 +55,6 @@ public class InjectorBuilder {
     map.put(PreProcessorExecutor.class, preProcessorExecutor);
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
-    //map.put(UriLocatorFactory.class, uriLocatorFactory);
     map.put(ResourceLocatorFactory.class, resourceLocatorFactory);
     map.put(ProcessorsFactory.class, processorsFactory);
     map.put(NamingStrategy.class, namingStrategy);

@@ -30,7 +30,7 @@ public class TestWroModel {
   private WroModel model;
   private WroModelFactory factory;
   @Before
-  public void init() {
+  public void setUp() {
     final Context context = Context.standaloneContext();
     Context.set(context);
     model = buildValidModel();
@@ -76,5 +76,24 @@ public class TestWroModel {
     //the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.create();
     return model;
+  }
+  
+  @Test
+  public void shouldHaveNoUsedGroupsByDefault() {
+    Assert.assertTrue(model.getUsedGroups().isEmpty());
+  }
+  
+  @Test
+  public void shouldReturnCorrectCollectionOfUsedGroups() {
+    final WroModel model = new WroModel();
+    final Group g1 = new Group("g1");
+    final Group g2 = new Group("g2");
+    model.addGroup(g1);
+    model.addGroup(g2);
+    Assert.assertEquals(2, model.getGroups().size());
+    Assert.assertEquals(0, model.getUsedGroups().size());
+    
+    g1.markAsUsed();
+    Assert.assertEquals(1, model.getUsedGroups().size());
   }
 }

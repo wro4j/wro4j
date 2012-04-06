@@ -126,6 +126,7 @@ public final class WroUtil {
    *
    * @return true if this request support gzip encoding.
    */
+  @SuppressWarnings("unchecked")
   public static boolean isGzipSupported(final HttpServletRequest request) {
     if (request != null) {
       final Enumeration<String> headerNames = request.getHeaderNames();

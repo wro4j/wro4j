@@ -41,16 +41,8 @@ public class RedirectedStreamServletResponseWrapper
   /**
    * @return {@link UriLocator} responsible for resolving external resources.
    */
-  protected ResourceLocator newExternalResourceLocator(final String location) {
-    return new UrlResourceLocator(location) {
-      /**
-       * No wildcard handling is required.
-       */
-      @Override
-      protected boolean disableWildcards() {
-        return true;
-      };
-    };
+  protected UriLocator newExternalResourceLocator() {
+    return new UrlUriLocator().setEnableWildcards(false);
   }
 
   /**

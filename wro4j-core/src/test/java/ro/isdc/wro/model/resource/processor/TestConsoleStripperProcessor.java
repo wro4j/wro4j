@@ -3,13 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
-import org.junit.Test;
-import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
-import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
-import ro.isdc.wro.util.WroTestUtils;
-
 import java.io.File;
 import java.net.URL;
+
+import org.junit.Test;
+
+import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**

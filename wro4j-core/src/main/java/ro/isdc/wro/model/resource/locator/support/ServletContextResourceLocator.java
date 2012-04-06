@@ -120,15 +120,18 @@ public class ServletContextResourceLocator
     }
     
     InputStream inputStream = null;
-    if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
-      inputStream = dispatcherFirstStreamLocator(path);
-    } else {
-      inputStream = servletContextFirstStreamLocator(path);
+    try {
+      if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
+        inputStream = dispatcherFirstStreamLocator(path);
+      } else {
+        inputStream = servletContextFirstStreamLocator(path);
+      }
+      validateInputStreamIsNotNull(inputStream, uri);
+      return inputStream;
+    } catch (IOException e) {
+      LOG.warn("Wrong or empty resource with location: {}", path);
+      throw e;
     }
-    
-    validateInputStreamIsNotNull(inputStream, path);
-    
-    return inputStream;
   }
   
   /**

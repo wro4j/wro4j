@@ -3,7 +3,9 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +42,6 @@ public class TestDispatcherStreamLocator {
     MockitoAnnotations.initMocks(this);
     Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("/resource.js"));
     Mockito.when(mockRequest.getServletPath()).thenReturn("");
-    Context.set(Context.standaloneContext());
     locator = new DispatcherStreamLocator();
   }
 
@@ -69,30 +70,21 @@ public class TestDispatcherStreamLocator {
     Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "http://www.google.com"));
   }
 
-  @Test(expected=IOException.class)
-  public void testDispatchIncludeHasNoValidResource()
-      throws Exception {
-    Mockito.when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
-    Mockito.doAnswer(new Answer<Void>() {
-      public Void answer(final InvocationOnMock invocation)
-          throws Throwable {
-        throw new IOException("Include doesn't work... nothing found");
-      }
-    }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
-    locator.getInputStream(mockRequest, mockResponse, "/static/*.js");
-  }
-
   @Test
-  public void testDispatchIncludeReturnsValidResource()
+  public void shouldLocateRelativeResource()
       throws Exception {
-    Mockito.when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
-    Mockito.doAnswer(new Answer<Void>() {
-      public Void answer(final InvocationOnMock invocation)
-          throws Throwable {
-        //do nothing
-        return null;
+    locator = new DispatcherStreamLocator() {
+      @Override
+      protected UriLocator newExternalUriLocator() {
+        return new UrlUriLocator() {
+          @Override
+          public InputStream locate(String uri)
+              throws IOException {
+            return new ByteArrayInputStream("some content".getBytes());
+          }
+        };
       }
-    }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
-    Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "/static/*.js"));
+    };
+    Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "/static/relative.js"));
   }
 }

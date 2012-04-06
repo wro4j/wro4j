@@ -26,6 +26,11 @@ import ro.isdc.wro.model.resource.ResourceType;
 public final class Group {
   private static final Logger LOG = LoggerFactory.getLogger(Group.class);
   /**
+   * Flag indicating if this group used for processing. Require to achieve lazy group processing functionality. By
+   * default this value is false (not processed). The group can be marked as used by invoking {@link Group#markAsUsed()}
+   */
+  private boolean used = false;
+  /**
    * Group name.
    */
   private String name;
@@ -52,6 +57,21 @@ public final class Group {
     this.name = name;
   }
 
+  /**
+   * Mark this group as being used. Once the used flag was changed, it can be reverted.
+   */
+  public void markAsUsed() {
+    LOG.debug("Marking group [{}] as used", this.name);
+    used = true;
+  }
+  
+  
+  /**
+   * @return true if this group was used for processing.
+   */
+  public boolean isUsed() {
+    return used;
+  }
 
   /**
    * Check if the group has at least one resource of some type.

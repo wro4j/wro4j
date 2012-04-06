@@ -36,19 +36,19 @@ public class DispatchResourceServlet extends HttpServlet {
 
     //In this case we hardcode 3 resources served by wro, in a production we would inspect the requestUri and would extract combo groups
 
-    String location = "/wro/dwr.js";
+    String location = "/resource/dynamic.js";
 
 
     InputStream stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
     combo.append(IOUtils.toString(stream));
 
-    location = "/wro/wildcard.js";
-    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
-    combo.append(IOUtils.toString(stream));
-
-    location = "/wro/wicket.js";
-    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
-    combo.append(IOUtils.toString(stream));
+//    location = "/wro/wildcard.js";
+//    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
+//    combo.append(IOUtils.toString(stream));
+//
+//    location = "/wro/wicket.js";
+//    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
+//    combo.append(IOUtils.toString(stream));
 
     resp.getWriter().write(combo.toString());
     resp.setContentType(ResourceType.JS.getContentType());

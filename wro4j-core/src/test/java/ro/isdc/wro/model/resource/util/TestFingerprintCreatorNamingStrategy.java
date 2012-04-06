@@ -11,10 +11,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.util.HashBuilder;
-import ro.isdc.wro.model.resource.util.HashEncoderNamingStrategy;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-
 /**
  * Test class for {@link FingerprintCreatorNamingStrategy}
  *

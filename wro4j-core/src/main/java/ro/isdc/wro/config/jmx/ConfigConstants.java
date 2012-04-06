@@ -50,6 +50,11 @@ public enum ConfigConstants {
    */
   ignoreMissingResources,
   /**
+   * When a group is empty and this flag is false, the processing will fail. This is useful for runtime solution to
+   * allow filter chaining when there is nothing to process for a given request.
+   */
+  ignoreEmptyGroup,
+  /**
    * Encoding to use when reading and writing bytes from/to stream
    */
   encoding,
@@ -64,5 +69,10 @@ public enum ConfigConstants {
   /**
    * The parameter used to specify headers to put into the response, used mainly for caching.
    */
-  header
+  header,
+  /**
+   * After how many seconds the connection to servlet context and external url will be timed-out. This is useful to
+   * avoid memory leaks when connection pool responsible for cache and model reload is destroyed.
+   */
+  connectionTimeout
 }

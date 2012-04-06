@@ -28,7 +28,11 @@ public final class WroConfiguration
   /**
    * Default encoding to use.
    */
-  private static final String DEFAULT_ENCODING = "UTF-8";
+  public static final String DEFAULT_ENCODING = "UTF-8";
+  /**
+   * Default value for connectionTimeout property.
+   */
+  public static int DEFAULT_CONNECTION_TIMEOUT = 2000;
   /**
    * How often to run a thread responsible for refreshing the cache.
    */
@@ -85,12 +89,17 @@ public final class WroConfiguration
    * Timeout (milliseconds) of the url connection for external resources. This is used to ensure that locator doesn't
    * spend too much time on slow end-point.
    */
-  private int connectionTimeout = 2000;
+  private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
   /**
    * When true, will run in parallel preprocessing of multiple resources. In theory this should improve the performance.
    * By default this flag is false, because this feature is experimental.
    */
   private boolean parallelPreprocessing = false;
+  /**
+   * When a group is empty and this flag is false, the processing will fail. This is useful for runtime solution to
+   * allow filter chaining when there is nothing to process for a given request.
+   */
+  private boolean ignoreEmptyGroup = true;
   /**
    * Listeners for the change of cache & model period properties.
    */
@@ -422,6 +431,22 @@ public final class WroConfiguration
    */
   public void setParallelPreprocessing(final boolean parallelPreprocessing) {
     this.parallelPreprocessing = parallelPreprocessing;
+  }
+
+  /**
+   * @return value of the flag responsible for handling empty group behavior.
+   */
+  public boolean isIgnoreEmptyGroup() {
+    return ignoreEmptyGroup;
+  }
+
+  /**
+   * @param ignoreEmptyGroup
+   *          flag for turning on/off failure when there is an empty group (nothing to process). This value is true by
+   *          default, meaning that empty group will produce empty result (no exception).
+   */
+  public void setIgnoreEmptyGroup(boolean ignoreEmptyGroup) {
+    this.ignoreEmptyGroup = ignoreEmptyGroup;
   }
 
 
