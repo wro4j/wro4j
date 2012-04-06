@@ -1,5 +1,5 @@
 groups {
-/*  
+  
   encoding {
     js("/static/js/encoding/*.js")
   }
@@ -74,7 +74,6 @@ groups {
   testPage {
     wildcard()
   }
-  */
   test {
     css("/static/css/webapp.css")
   }
