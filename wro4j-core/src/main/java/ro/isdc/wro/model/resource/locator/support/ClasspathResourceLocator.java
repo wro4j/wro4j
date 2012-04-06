@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.StringUtils;
 
 
@@ -88,18 +89,29 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     // work well.
     final String fullPath = "/" + FilenameUtils.getFullPathNoEndSeparator(location);
     URL url = getClass().getResource(fullPath);
-    if (url == null) {
+    LOG.debug("Attempting to find resource {} at the following location: {}", uri, fullPath);
+    try {
+      return locateWildcardStream(uri, url);
+    } catch (IOException e) {
+      //do not attempt unless exception is of this type
+      if (e instanceof NoMoreAttemptsIOException) {
+        throw e;
+      }
       // try once more, in order to treat classpath resources located in the currently built project.
       url = getClass().getResource("");
+      LOG.debug("Attempting to find resource {} at the following URL: {}", uri, url);
+      return locateWildcardStream(uri, url);
     }
+  }
+  
+  private InputStream locateWildcardStream(final String uri, URL url)
+      throws IOException {
     if (url == null) {
-      final String message = "Couldn't get URL for the following path: " + fullPath;
-      LOG.warn(message);
-      throw new IOException(message);
+      LOG.debug("Failed to locate stream for {} because URL is null", uri);
+      throw new IOException("Cannot locate stream for null URL");
     }
     return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
   }
-
 
   /**
    * Builds a {@link JarWildcardStreamLocator} in order to get resources from the full classpath.
@@ -113,7 +125,6 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
       }
     };
   }
-
 
   /**
    * This implementation creates a ClassPathResource, applying the given path
