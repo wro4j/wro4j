@@ -19,30 +19,31 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+
 /**
  * A processor using the ruby sass engine:
- * User: Simon van der Sluis
- * Date: 2/03/12
+ * 
+ * @author Simon van der Sluis
+ * @since 1.4.6
+ * @created 2/03/12
  */
 @SupportedResourceType(ResourceType.CSS)
 public class RubySassCssProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor
-{
+    implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(RubySassCssProcessor.class);
-
+  
   public static final String ALIAS = "rubySassCss";
-
+  
   /**
    * Engine.
    */
   private RubySassEngine engine;
-
+  
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException
-  {
+      throws IOException {
     final String content = IOUtils.toString(reader);
     try {
       writer.write(getEngine().process(content));
@@ -57,14 +58,13 @@ public class RubySassCssProcessor
       writer.close();
     }
   }
-
+  
   /**
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {
   }
-
-
+  
   /**
    * A getter used for lazy loading.
    */
@@ -74,8 +74,7 @@ public class RubySassCssProcessor
     }
     return engine;
   }
-
-
+  
   /**
    * {@inheritDoc}
    */
@@ -83,5 +82,5 @@ public class RubySassCssProcessor
       throws IOException {
     process(null, reader, writer);
   }
-
+  
 }

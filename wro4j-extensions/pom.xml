@@ -62,14 +62,15 @@
 			<groupId>org.dojotoolkit</groupId>
 			<artifactId>dojo-shrinksafe</artifactId>
 		</dependency>
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>sass-gems</groupId>
-      <artifactId>sass-gems</artifactId>
-    </dependency>
+	    <dependency>
+	      <groupId>org.jruby</groupId>
+	      <artifactId>jruby-complete</artifactId>
+	    </dependency>
+	    <dependency>
+	      <groupId>sass-gems</groupId>
+	      <artifactId>sass-gems</artifactId>
+	      <version>3.1.12</version>
+	    </dependency>
 		<dependency>
 			<groupId>org.codehaus.gmaven.runtime</groupId>
 			<artifactId>gmaven-runtime-1.7</artifactId>
