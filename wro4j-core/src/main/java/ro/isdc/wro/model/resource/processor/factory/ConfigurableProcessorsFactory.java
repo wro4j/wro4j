@@ -165,14 +165,14 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   }
 
   /**
-   * @return a default map of preprocessors.
+   * @return a default map of preProcessors.
    */
   public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
     return new HashMap<String, ResourcePreProcessor>();
   }
 
   /**
-   * @return a default map of postprocessors.
+   * @return a default map of postProcessors.
    */
   public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
     return new HashMap<String, ResourcePostProcessor>();
