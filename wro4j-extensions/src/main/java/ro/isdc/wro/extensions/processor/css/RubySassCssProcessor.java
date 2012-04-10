@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2012. All rights reserved.
+ */
 package ro.isdc.wro.extensions.processor.css;
 
 import org.apache.commons.io.IOUtils;
@@ -17,7 +20,8 @@ import java.io.Reader;
 import java.io.Writer;
 
 /**
- * User: simon
+ * A processor using the ruby sass engine:
+ * User: Simon van der Sluis
  * Date: 2/03/12
  */
 @SupportedResourceType(ResourceType.CSS)

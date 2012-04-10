@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.4-EI-SNAPSHOT</version>
+  <version>1.4.4-SNAPSHOT</version>
   <packaging>pom</packaging>  
   
   <name>Web Resource Optimizer Parent</name>
@@ -418,7 +418,7 @@
           </plugin>
         </plugins>
       </build>
-      <!--distributionManagement>
+      <distributionManagement>
         <repository>
           <id>sonatype-nexus-staging</id>
           <name>Nexus Release Repository</name>
@@ -429,7 +429,7 @@
           <name>Sonatype Nexus Snapshots</name>
           <url>http://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-      </distributionManagement-->
+      </distributionManagement>      
     </profile>
   </profiles>  
   <!-- Repository for third party libraries 
@@ -447,18 +447,5 @@
       <url>https://github.com/dmitrye/WroSassProcessor/raw/master/releases</url>
     </repository>
   </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>releases</id>
-      <name>Internal Releases</name>
-      <url>http://ci-server-01:8081/nexus/content/repositories/releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>snapshots</id>
-      <name>Internal Snapshots</name>
-      <url>http://ci-server-01:8081/nexus/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
 
 </project>
