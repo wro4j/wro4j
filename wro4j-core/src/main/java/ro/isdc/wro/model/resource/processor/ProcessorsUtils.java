@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.Validate;
 
@@ -147,27 +148,30 @@ public class ProcessorsUtils {
     return map;
   }
 
-
   public static Map<String, ResourcePostProcessor> createPostProcessorsMap() {
+    final Map<String, ResourcePreProcessor> preProcessorsMap = new HashMap<String, ResourcePreProcessor>();
+    populateProcessorsMap(preProcessorsMap);
+    
     final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
-    populateProcessorsMap(map);
+    for (Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
+      map.put(entry.getKey(), ProcessorsUtils.toPostProcessor(entry.getValue()));
+    }
     return map;
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> void populateProcessorsMap(final Map<String, T> map) {
-    map.put(CssUrlRewritingProcessor.ALIAS, (T) new CssUrlRewritingProcessor());
-    map.put(CssImportPreProcessor.ALIAS, (T) new CssImportPreProcessor());
-    map.put(CssVariablesProcessor.ALIAS, (T) new CssVariablesProcessor());
-    map.put(CssCompressorProcessor.ALIAS, (T) new CssCompressorProcessor());
-    map.put(SemicolonAppenderPreProcessor.ALIAS, (T) new SemicolonAppenderPreProcessor());
-    map.put(CssDataUriPreProcessor.ALIAS, (T) new CssDataUriPreProcessor());
-    map.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, (T) new DuplicatesAwareCssDataUriPreProcessor());
-    map.put(JawrCssMinifierProcessor.ALIAS, (T) new JawrCssMinifierProcessor());
-    map.put(CssMinProcessor.ALIAS, (T) new CssMinProcessor());
-    map.put(JSMinProcessor.ALIAS, (T) new JSMinProcessor());
-    map.put(VariablizeColorsCssProcessor.ALIAS, (T) new VariablizeColorsCssProcessor());
-    map.put(ConformColorsCssProcessor.ALIAS, (T) new ConformColorsCssProcessor());
-    map.put(MultiLineCommentStripperProcessor.ALIAS, (T) new MultiLineCommentStripperProcessor());
+  private static void populateProcessorsMap(final Map<String, ResourcePreProcessor> map) {
+    map.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
+    map.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
+    map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
+    map.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
+    map.put(CssDataUriPreProcessor.ALIAS, new CssDataUriPreProcessor());
+    map.put(DuplicatesAwareCssDataUriPreProcessor.ALIAS_DUPLICATE, new DuplicatesAwareCssDataUriPreProcessor());
+    map.put(JawrCssMinifierProcessor.ALIAS, new JawrCssMinifierProcessor());
+    map.put(CssMinProcessor.ALIAS, new CssMinProcessor());
+    map.put(JSMinProcessor.ALIAS, new JSMinProcessor());
+    map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
+    map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
+    map.put(MultiLineCommentStripperProcessor.ALIAS, new MultiLineCommentStripperProcessor());
   }
 }

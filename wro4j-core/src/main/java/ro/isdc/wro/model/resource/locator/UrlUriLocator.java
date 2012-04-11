@@ -76,7 +76,6 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     final int timeout = getConnectionTimeout();
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.
-    LOG.debug("Computed timeout milliseconds: {}", timeout);
     connection.setConnectTimeout(timeout);
     connection.setReadTimeout(timeout);
     

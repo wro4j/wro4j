@@ -65,7 +65,7 @@ public class ConfigurableWroManagerFactory
   @Override
   protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
     final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsPostProcessors(map);
     return map;
   }
   /**
