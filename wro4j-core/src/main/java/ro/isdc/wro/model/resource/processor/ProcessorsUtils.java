@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,9 +11,9 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.processor.Minimize;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.impl.AbstractProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -96,33 +93,36 @@ public class ProcessorsUtils {
     }
     return found;
   }
+  
+  /**
+   * @param processor
+   *          to check for supported resource type.
+   * @return the array of supported resources the processor can process.
+   */
+  public static <T> ResourceType[] getSupportedResourceTypes(final T processor) {
+    final SupportedResourceType supportedType = getSupportedResourceType(processor);
+    return supportedType == null ? ResourceType.values() : new ResourceType[] {
+      supportedType.value()
+    };
+  }
+  
 
   /**
    * Transforms a preProcessor into a postProcessor.
    *
-   * @param preProcessor {@link ResourcePreProcessor} to transform.
+   * @param processor {@link ResourcePreProcessor} to transform.
    */
-  public static ResourcePostProcessor toPostProcessor(final ResourcePreProcessor preProcessor) {
-    return new ResourcePostProcessor() {
-      public void process(final Reader reader, final Writer writer)
-        throws IOException {
-        preProcessor.process(null, reader, writer);
-      }
-    };
+  public static ResourcePostProcessor toPostProcessor(final ResourcePreProcessor processor) {
+    return new AbstractProcessorDecorator(processor);
   }
 
   /**
    * Transforms a postProcessor into a preProcessor.
    *
-   * @param postProcessor {@link ResourcePostProcessor} to transform.
+   * @param processor {@link ResourcePostProcessor} to transform.
    */
-  public static ResourcePreProcessor toPreProcessor(final ResourcePostProcessor postProcessor) {
-    return new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
-        postProcessor.process(reader, writer);
-      }
-    };
+  public static ResourcePreProcessor toPreProcessor(final ResourcePostProcessor processor) {
+    return new AbstractProcessorDecorator(processor);
   }
 
   /**

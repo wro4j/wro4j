@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -11,13 +14,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
@@ -53,7 +55,7 @@ public class TestProcessorsUtils {
     final Collection<ResourcePreProcessor> input = Collections.EMPTY_LIST;
     final Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS,
       input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
   }
 
   @Test
@@ -62,11 +64,11 @@ public class TestProcessorsUtils {
       new JSMinProcessor(), new CssMinProcessor()
     });
     Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.JS, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, null, input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
   }
 
 
@@ -76,11 +78,11 @@ public class TestProcessorsUtils {
       new CssMinProcessor(), new AnyTypeProcessor()
     });
     Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input);
-    Assert.assertEquals(2, output.size());
+    assertEquals(2, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.JS, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, null, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
   }
 
 
@@ -90,11 +92,11 @@ public class TestProcessorsUtils {
       CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor())
     });
     Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.JS, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, null, input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
   }
 
   @Test
@@ -103,11 +105,11 @@ public class TestProcessorsUtils {
       CopyrightKeeperProcessorDecorator.decorate(new CssMinProcessor())
     });
     Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.JS, input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, null, input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
   }
 
 
@@ -118,11 +120,11 @@ public class TestProcessorsUtils {
       CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor())
     });
     Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.JS, input);
-    Assert.assertEquals(2, output.size());
+    assertEquals(2, output.size());
     output = ProcessorsUtils.filterProcessorsToApply(true, null, input);
-    Assert.assertEquals(1, output.size());
+    assertEquals(1, output.size());
   }
 
   /**
@@ -135,7 +137,7 @@ public class TestProcessorsUtils {
       new JSMinProcessor()
     });
     final Collection<ResourcePreProcessor> output = ProcessorsUtils.filterProcessorsToApply(false, ResourceType.JS, input);
-    Assert.assertEquals(0, output.size());
+    assertEquals(0, output.size());
   }
 
   @Test
@@ -145,16 +147,16 @@ public class TestProcessorsUtils {
       new CssMinProcessor(), new MinimizeAwareProcessor(), new JSMinProcessor()
     });
     Collection<ResourcePreProcessor> actual = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.JS, input);
-    Assert.assertEquals(3, actual.size());
+    assertEquals(3, actual.size());
 
     actual = ProcessorsUtils.filterProcessorsToApply(false, ResourceType.JS, input);
-    Assert.assertEquals(1, actual.size());
+    assertEquals(1, actual.size());
 
     actual = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input);
-    Assert.assertEquals(3, actual.size());
+    assertEquals(3, actual.size());
 
     actual = ProcessorsUtils.filterProcessorsToApply(false, ResourceType.CSS, input);
-    Assert.assertEquals(1, actual.size());
+    assertEquals(1, actual.size());
   }
 
   @Test
@@ -165,9 +167,23 @@ public class TestProcessorsUtils {
         CopyrightKeeperProcessorDecorator.decorate(new CssImportPreProcessor()) });
 
     final Iterator<ResourcePreProcessor> iterator = ProcessorsUtils.filterProcessorsToApply(true, ResourceType.CSS, input).iterator();
-    Assert.assertEquals(AnyTypeProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(CssMinProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(MinimizeAwareProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(CopyrightKeeperProcessorDecorator.class, iterator.next().getClass());
+    assertEquals(AnyTypeProcessor.class, iterator.next().getClass());
+    assertEquals(CssMinProcessor.class, iterator.next().getClass());
+    assertEquals(MinimizeAwareProcessor.class, iterator.next().getClass());
+    assertEquals(CopyrightKeeperProcessorDecorator.class, iterator.next().getClass());
+  }
+  
+  @Test
+  public void shouldPreserveProcessorMetadataAfterTransform() {
+    final ResourcePostProcessor postProcessor = ProcessorsUtils.toPostProcessor(new JSMinProcessor());
+    assertTrue(Arrays.equals(new ResourceType[] {ResourceType.JS}, ProcessorsUtils.getSupportedResourceTypes(postProcessor)));
+    assertTrue(ProcessorsUtils.isMinimizeAwareProcessor(postProcessor));
+  }
+  
+  @Test
+  public void shouldComputeCorrectlySupportedResourceTypes() {
+    assertTrue(Arrays.equals(new ResourceType[] {ResourceType.JS}, ProcessorsUtils.getSupportedResourceTypes(new JSMinProcessor())));
+    assertTrue(Arrays.equals(new ResourceType[] {ResourceType.CSS}, ProcessorsUtils.getSupportedResourceTypes(new CssMinProcessor())));
+    assertTrue(Arrays.equals(ResourceType.values(), ProcessorsUtils.getSupportedResourceTypes(new CommentStripperProcessor())));
   }
 }

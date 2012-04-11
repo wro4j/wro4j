@@ -304,7 +304,7 @@ public class Wro4jCommandLineRunner {
    */
   protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
     final Map<String, ResourcePreProcessor> map = ProcessorsUtils.createPreProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
     map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
     return map;
@@ -316,7 +316,7 @@ public class Wro4jCommandLineRunner {
    */
   protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
     final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
     map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
     return map;

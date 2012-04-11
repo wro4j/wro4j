@@ -15,15 +15,12 @@ import ro.isdc.wro.util.LazyInitializer;
  * @author Alex Objelean
  * @since 1.4.6
  */
-public class LazyProcessorDecorator
+public final class LazyProcessorDecorator
     extends AbstractProcessorDecoratorSupport {
-  /**
-   * Decorated processor.
-   */
   private LazyInitializer<ResourcePreProcessor> processorInitializer;
-
-  public LazyProcessorDecorator(final LazyInitializer<ResourcePreProcessor> preProcessor) {
-    this.processorInitializer = preProcessor;
+  
+  public LazyProcessorDecorator(final LazyInitializer<ResourcePreProcessor> processor) {
+    this.processorInitializer = processor;
   }
   
   @Override
