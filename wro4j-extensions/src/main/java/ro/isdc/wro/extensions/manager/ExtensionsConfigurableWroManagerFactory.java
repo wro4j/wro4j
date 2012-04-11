@@ -42,15 +42,15 @@ public class ExtensionsConfigurableWroManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
+  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
     pupulateMapWithExtensionsProcessors(map);
   }
-
+  
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void contributePreProcessors(final Map<String, ResourcePreProcessor> map) {
+  protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {
     pupulateMapWithExtensionsProcessors(map);
   }
 

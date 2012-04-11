@@ -5,12 +5,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.MinimizeAware;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 import ro.isdc.wro.util.LazyInitializer;
 
 
@@ -21,43 +16,26 @@ import ro.isdc.wro.util.LazyInitializer;
  * @since 1.4.6
  */
 public class LazyProcessorDecorator
-implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware {
+    extends AbstractProcessorDecoratorSupport {
   /**
    * Decorated processor.
    */
-  private LazyInitializer<ResourcePreProcessor> decoratedProcessor;
+  private LazyInitializer<ResourcePreProcessor> processorInitializer;
 
   public LazyProcessorDecorator(final LazyInitializer<ResourcePreProcessor> preProcessor) {
-    this.decoratedProcessor = preProcessor;
+    this.processorInitializer = preProcessor;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final SupportedResourceType getSupportedResourceType() {
-    return ProcessorsUtils.getSupportedResourceType(decoratedProcessor.get());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final boolean isMinimize() {
-    return ProcessorsUtils.isMinimizeAwareProcessor(decoratedProcessor.get());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
+  
+  @Override
+  protected ResourcePreProcessor getDecoratedProcessor() {
+    return processorInitializer.get();
   }
   
   /**
    * {@inheritDoc}
    */
-  public void process(Resource resource, Reader reader, Writer writer)
+  public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    decoratedProcessor.get().process(resource, reader, writer);
+    processorInitializer.get().process(resource, reader, writer);
   }
 }
