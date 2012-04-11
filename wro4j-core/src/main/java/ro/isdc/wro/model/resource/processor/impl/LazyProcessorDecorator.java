@@ -13,6 +13,13 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 import ro.isdc.wro.util.LazyInitializer;
 
+
+/**
+ * Decorates a {@link LazyInitializer} which creates a processor.
+ * 
+ * @author Alex Objelean
+ * @since 1.4.6
+ */
 public class LazyProcessorDecorator
 implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware {
   /**
