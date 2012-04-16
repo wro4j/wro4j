@@ -22,6 +22,7 @@ import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroUtil;
 
@@ -45,7 +46,7 @@ public class TestWro4jCommandLineRunner {
 
 
   @Test
-  public void processWrongArgument()
+  public void cannotProcessWrongArgument()
     throws Exception {
     try {
       final String[] args = new String[] { "-wrongArgument" };
@@ -57,7 +58,7 @@ public class TestWro4jCommandLineRunner {
   }
 
   @Test
-  public void processNoArguments() throws Exception {
+  public void cannotProcessNoArguments() throws Exception {
     try {
       invokeRunner("".split(" "));
     } catch (final Exception e) {
@@ -83,7 +84,7 @@ public class TestWro4jCommandLineRunner {
         setDestinationFolder(destinationFolder);
       }}
       @Override
-      protected void onException(final Exception e) {
+      protected void onRunnerException(final Exception e) {
         WroUtil.wrapWithWroRuntimeException(e);
       }
     }.doMain(args);
@@ -91,7 +92,7 @@ public class TestWro4jCommandLineRunner {
 
 
   @Test
-  public void cssUrlRewriterShouldWorkProperly() throws Exception {
+  public void shouldApplyCssUrlRewriterProperly() throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
 
     final String wroFile = contextFolder + File.separator + "wro.xml";
@@ -106,22 +107,32 @@ public class TestWro4jCommandLineRunner {
   }
 
   @Test
-  public void useSeveralProcessors() throws Exception {
+  public void shouldUseMultiplePreProcessors() throws Exception {
+    invokeMultipleProcessors("--preProcessors");
+  }
+  
+  @Test
+  public void shouldUseMultiplePostProcessors() throws Exception {
+    invokeMultipleProcessors("--postProcessors");
+  }
+
+  private void invokeMultipleProcessors(final String processorsType)
+      throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
     final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
-      JSMinProcessor.ALIAS, CssUrlRewritingProcessor.ALIAS);
+      JSMinProcessor.ALIAS, CssVariablesProcessor.ALIAS);
     final String[] args = String.format(
-      "--wroFile %s --contextFolder %s --destinationFolder %s -m --preProcessors " + processorsList,
+      "--wroFile %s --contextFolder %s --destinationFolder %s -m %s " + processorsList,
         new Object[] {
-          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+          wroFile, contextFolder, destinationFolder.getAbsolutePath(), processorsType
     }).split(" ");
     invokeRunner(args);
   }
 
   @Test
-  public void useCssLint() throws Exception {
+  public void shouldApplyCssLint() throws Exception {
     try {
       final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
       final String wroFile = contextFolder + File.separator + "wro.xml";
@@ -137,7 +148,7 @@ public class TestWro4jCommandLineRunner {
 
 
   @Test
-  public void useJsHint()
+  public void shouldApplyJsHint()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
@@ -150,7 +161,7 @@ public class TestWro4jCommandLineRunner {
   }
 
   @Test
-  public void processTestWroXml()
+  public void shouldProcessTestWroXml()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
@@ -181,7 +192,7 @@ public class TestWro4jCommandLineRunner {
         return new File(contextFolderFile, "wro.xml");
       }
       @Override
-      protected void onException(final Exception e) {
+      protected void onRunnerException(final Exception e) {
         LOG.error("Exception occured: ", e.getCause());
         throw new RuntimeException(e);
       }

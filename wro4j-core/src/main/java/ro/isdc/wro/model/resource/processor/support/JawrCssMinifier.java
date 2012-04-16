@@ -1,16 +1,19 @@
 /**
- * Copyright Alex Objelean
+ * Copyright 2007-2011 Jordi Hernández Sellés, Ibrahim Chaehoi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
+
 package ro.isdc.wro.model.resource.processor.support;
 
-/**
- * Copyright 2007 Jordi Hern�ndez Sell�s Licensed under the Apache License, Version 2.0 (the "License"); you may not use
- * this file except in compliance with the License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific language governing permissions and limitations under the
- * License.
- */
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,21 +24,22 @@ import java.util.regex.Pattern;
 /**
  * Minifies CSS files by removing expendable whitespace and comments.
  *
- * @author Jordi Hern�ndez Sell�s
+ * @author Jordi Hernández Sellés
  */
 public class JawrCssMinifier {
-
   // This regex captures comments
   private static final String COMMENT_REGEX = "(/\\*[^*]*\\*+([^/][^*]*\\*+)*/)";
 
   // Captures CSS strings
-  // private static final String QUOTED_CONTENT_REGEX = "('(\\\\'|[^'])*?')|(\"(\\\\\"|[^\"])*?\")";
+  // private static final String QUOTED_CONTENT_REGEX =
+  // "('(\\\\'|[^'])*?')|(\"(\\\\\"|[^\"])*?\")";
   private static final String QUOTED_CONTENT_REGEX = "(([\"'])(?!data:|(\\s*\\)))(?:\\\\?+.)*?\\2)";
 
   // A placeholder string to replace and restore CSS strings
   private static final String STRING_PLACEHOLDER = "______'JAWR_STRING'______";
 
-  // Captured CSS rules (requires replacing CSS strings with a placeholder, or quoted braces will fool it.
+  // Captured CSS rules (requires replacing CSS strings with a placeholder, or
+  // quoted braces will fool it.
   private static final String RULES_REGEX = "([^\\{\\}]*)(\\{[^\\{\\}]*})";
 
   // Captures newlines and tabs
@@ -43,17 +47,14 @@ public class JawrCssMinifier {
 
   // This regex captures, in order:
   // (\\s*\\{\\s*)|(\\s*\\}\\s*)|(\\s*\\(\\s*)|(\\s*;\\s*)|(\\s*\\))
-  // brackets, parentheses,colons and semicolons and any spaces around them (except spaces AFTER a parentheses closing
+  // brackets, parentheses,colons and semicolons and any spaces around them
+  // (except spaces AFTER a parentheses closing
   // symbol),
   // and ( +) occurrences of one or more spaces.
   /**
-   * There is a special case when the space should not be removed when preceeded by and keyword. Ex:
-   * <code>
-   * @media only screen and (max-width:767px){
-   * }
-   * </code>
-   * <p/>
-   * More details about this issue, here: {@link http://code.google.com/p/wro4j/issues/detail?id=231#makechanges}
+   * There is a special case when the space should not be removed when preceeded by and keyword. Ex: <code>
+   *
+   * @media only screen and (max-width:767px){ } </code>
    */
   private static final String SPACES_REGEX = "(?ims)(\\s*\\{\\s*)|(\\s*\\}\\s*)|((?<!\\sand)\\s*\\(\\s*)|(\\s*;\\s*)|(\\s*:\\s*)|(\\s*\\))|( +)";
 
@@ -87,12 +88,13 @@ public class JawrCssMinifier {
       return sb.toString();
     }
 
+
     abstract String matchCallback(Matcher matcher);
   }
 
+
   /**
-   * @param data
-   *          CSS to minify
+   * @param data CSS to minify
    * @return StringBuffer Minified CSS.
    */
   public StringBuffer minifyCSS(final StringBuffer data) {
@@ -100,10 +102,11 @@ public class JawrCssMinifier {
     String compressed = COMMENTS_PATTERN.matcher(data.toString()).replaceAll("");
 
     // Temporarily replace the strings with a placeholder
-    final List strings = new ArrayList();
+    final List<String> strings = new ArrayList<String>();
     final Matcher stringMatcher = QUOTED_CONTENT_PATTERN.matcher(compressed);
 
     compressed = new MatcherProcessorCallback() {
+      @Override
       String matchCallback(final Matcher matcher) {
         final String match = matcher.group();
         strings.add(match);
@@ -114,6 +117,7 @@ public class JawrCssMinifier {
     // Grab all rules and replace whitespace in selectors
     final Matcher rulesmatcher = RULES_PATTERN.matcher(compressed);
     compressed = new MatcherProcessorCallback() {
+      @Override
       String matchCallback(final Matcher matcher) {
         final String match = matcher.group(1);
         final String spaced = NEW_LINES_TAB_PATTERN.matcher(match.toString()).replaceAll(SPACE).trim();
@@ -127,6 +131,7 @@ public class JawrCssMinifier {
     // Match all empty space we can minify
     final Matcher matcher = SPACES_PATTERN.matcher(compressed);
     compressed = new MatcherProcessorCallback() {
+      @Override
       String matchCallback(final Matcher matcher) {
         String replacement = SPACE;
         final String match = matcher.group();
@@ -150,25 +155,24 @@ public class JawrCssMinifier {
 
     // Restore all Strings
     final Matcher restoreMatcher = STRING_PLACE_HOLDE_PATTERN.matcher(compressed);
-    final Iterator it = strings.iterator();
+    final Iterator<String> it = strings.iterator();
     compressed = new MatcherProcessorCallback() {
+      @Override
       String matchCallback(final Matcher matcher) {
 
-        final String replacement = (String) it.next();
-        return adaptReplacementToMatcher(replacement);
+        final String replacement = it.next();
+        return replacement;
       }
     }.processWithMatcher(restoreMatcher);
 
     return new StringBuffer(compressed);
   }
 
+
   /**
    * Fixes a bad problem with regular expression replacement strings. Replaces \ and $ for escaped versions for regex
    * replacement. This was somehow fixed in java 5 (a similar method was added). Since Jawr supports 1.4, this method is
    * used instead.
-   *
-   * @param replacement
-   * @return
    */
   private static String adaptReplacementToMatcher(final String replacement) {
     // Double the backslashes, so they are left as they are after replacement.
@@ -177,5 +181,4 @@ public class JawrCssMinifier {
     result = result.replaceAll("\\$", "\\\\\\$");
     return result;
   }
-
 }

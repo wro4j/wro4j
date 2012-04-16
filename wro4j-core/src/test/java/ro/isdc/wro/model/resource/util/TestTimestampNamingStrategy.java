@@ -18,13 +18,10 @@
 
 package ro.isdc.wro.model.resource.util;
 
-import static junit.framework.Assert.*;
-
+import static junit.framework.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 /**
  * Test class for {@link TimestampNamingStrategy}

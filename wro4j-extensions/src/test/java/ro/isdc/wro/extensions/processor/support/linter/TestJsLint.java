@@ -15,24 +15,32 @@ public class TestJsLint {
   @Test
   public void testSetNullOptions()
     throws Exception {
-    jsLint.setOptions(null);
+    final String options = null;
+    jsLint.setOptions(options);
     jsLint.validate("");
   }
 
 
   @Test
-  public void testWithNoOptions()
+  public void shouldValidateWithNoOptions()
     throws Exception {
     jsLint.validate("");
   }
 
 
   @Test
-  public void testWithSeveralOptions()
+  public void shouldValidateWithMultipleOptions()
     throws Exception {
-    jsLint.setOptions("1,2");
+    jsLint.setOptions("undef,eqeqeq");
     jsLint.validate("");
   }
+
+  @Test
+  public void shouldAcceptBadOptions()
+      throws Exception {
+      jsLint.setOptions("1,2");
+      jsLint.validate("");
+    }
 
 
   @Test(expected = LinterException.class)

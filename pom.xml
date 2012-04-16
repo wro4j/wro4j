@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.4</version>
+  <version>1.4.6-SNAPSHOT</version>
   <packaging>pom</packaging>  
   
   <name>Web Resource Optimizer Parent</name>
@@ -64,7 +64,7 @@
     <commons-io.version>2.1</commons-io.version>
     <commons-lang.version>3.1</commons-lang.version>
     <commons-pool.version>1.6</commons-pool.version>
-    <closure.version>r1741</closure.version>
+    <closure.version>r1810</closure.version>
     <slf4j.version>1.6.4</slf4j.version>    
     <maven.version>3.0.3</maven.version>    
     <mockito.version>1.9.0</mockito.version>
@@ -78,16 +78,6 @@
   </properties>
   
     
-  <modules>		
-    <module>wro4j-core</module>        
-    <module>wro4j-extensions</module>
-    <module>wro4j-maven-plugin</module>    
-    <module>wro4j-runner</module>      
-    <!-- 		
-  	<module>wro4j-examples</module>        		
-    -->
-  </modules>
-
   <dependencyManagement>
     <dependencies>
       <!-- Project Dependencies -->
@@ -240,14 +230,10 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-      <version>${mockito.version}</version>
     </dependency>    
   </dependencies>
 
@@ -354,9 +340,22 @@
   </reporting>
   <profiles>
     <profile>
-      <id>release-profile</id>
-
+      <id>dev</id>
       <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>   
+        <module>wro4j-core</module>          
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+        <module>wro4j-runner</module>           
+        <module>wro4j-examples</module>           
+      </modules>
+    </profile>  
+    <profile>
+      <id>release-profile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
         <property>
           <name>release</name>
           <value>true</value>
@@ -412,12 +411,12 @@
         <repository>
           <id>sonatype-nexus-staging</id>
           <name>Nexus Release Repository</name>
-          <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>        
         <snapshotRepository>
           <id>sonatype-nexus-snapshots</id>
           <name>Sonatype Nexus Snapshots</name>
-          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
       </distributionManagement>      
     </profile>
