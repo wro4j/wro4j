@@ -16,7 +16,7 @@ public class TestRubySassProcessor {
     public void testRubySassPreProcessor()
             throws IOException {
         final URL url = getClass().getResource("rubysass");
-        final ResourcePreProcessor processor = new SassCssProcessor();
+        final ResourcePreProcessor processor = new SassCssProcessor(SassCssProcessor.Engines.RUBY);
 
         final File testFolder = new File(url.getFile(), "templates");
         final File expectedFolder = new File(url.getFile(), "results");
@@ -27,7 +27,7 @@ public class TestRubySassProcessor {
     public void testRubySassPostProcessor()
             throws IOException {
         final URL url = getClass().getResource("rubysass");
-        final ResourcePostProcessor processor = new SassCssProcessor();
+        final ResourcePostProcessor processor = new SassCssProcessor(SassCssProcessor.Engines.RUBY);
 
         final File testFolder = new File(url.getFile(), "templates");
         final File expectedFolder = new File(url.getFile(), "results");

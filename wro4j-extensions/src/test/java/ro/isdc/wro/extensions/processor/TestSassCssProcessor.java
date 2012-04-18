@@ -3,15 +3,14 @@
  */
 package ro.isdc.wro.extensions.processor;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
 import org.junit.Test;
-
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 
 /**

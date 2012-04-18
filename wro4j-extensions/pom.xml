@@ -5,30 +5,12 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-    <version>1.4.5-SNAPSHOT</version>
+    <version>1.4.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wro4j-extensions</artifactId>
 	<packaging>jar</packaging>
 	<name>Web Resource Optimizer Extensions</name>
-
-    <!-- repository for sass-gems -->
-    <repositories>
-        <repository>
-            <id>rubygems-proxy</id>
-            <name>Rubygems Proxy</name>
-            <url>http://rubygems-proxy.torquebox.org/releases</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>fale</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
-     </repositories>
-
 
 	<dependencies>
 		<dependency>
@@ -78,19 +60,13 @@
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-complete</artifactId>
-            <version>1.6.1</version>
+            <version>1.6.7</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>sass-gems</groupId>-->
-            <!--<artifactId>sass-gems</artifactId>-->
-            <!--<version>3.1.12</version>-->
-        <!--</dependency>-->
-            <dependency>
-                <groupId>rubygems</groupId>
-                <artifactId>sass</artifactId>
-                <version>3.1.15</version>
-                <type>gem</type>
-            </dependency>
+        <dependency>
+            <groupId>me.n4u.sass</groupId>
+            <artifactId>sass-gems</artifactId>
+            <version>3.1.15</version>
+        </dependency>
 		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId>
 			<artifactId>gmaven-runtime-default</artifactId> <version>1.0-rc-3</version> 
 			</dependency> -->
