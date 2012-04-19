@@ -33,6 +33,7 @@ public class SassCssProcessor
   implements ResourcePreProcessor, ResourcePostProcessor{
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
   public static final String ALIAS = "sassCss";
+  public static final String ALIAS_RUBY = "rubySassCss";
 
 
     /**

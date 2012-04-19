@@ -28,25 +28,25 @@ public class ObjectPoolHelper<T> {
   private static final byte EXHAUSTED_ACTION = GenericObjectPool.WHEN_EXHAUSTED_GROW;
   private static final long MAX_WAIT = 1000L * 5L;
   // Allows using the objects from the pool in a thread-safe fashion.
-  private GenericObjectPool objectPool;
+  private GenericObjectPool<T> objectPool;
 
 
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
     final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
-    objectPool = new GenericObjectPool(new BasePoolableObjectFactory() {
+    objectPool = new GenericObjectPool(new BasePoolableObjectFactory<T>() {
       @Override
-      public Object makeObject()
+      public T makeObject()
         throws Exception {
         return objectFactory.create();
       }
     }, maxActive, EXHAUSTED_ACTION, MAX_WAIT, MAX_IDLE);
   }
 
-  @SuppressWarnings("unchecked")
+
   public T getObject() {
     try {
-      return (T) objectPool.borrowObject();
+      return objectPool.borrowObject();
     } catch (final Exception e) {
       // should never happen
       throw new RuntimeException("Cannot get object from the pool", e);
