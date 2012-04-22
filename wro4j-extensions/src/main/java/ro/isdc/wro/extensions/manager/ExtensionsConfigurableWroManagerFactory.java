@@ -26,10 +26,10 @@ import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.LazyProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -67,7 +67,7 @@ public class ExtensionsConfigurableWroManagerFactory
     final Map<String, ResourcePreProcessor> preProcessorsMap = new HashMap<String, ResourcePreProcessor>();
     populateMapWithExtensionsProcessors(preProcessorsMap);
     for (Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
-      map.put(entry.getKey(), ProcessorsUtils.toPostProcessor(entry.getValue()));
+      map.put(entry.getKey(), new ProcessorDecorator(entry.getValue()));
     }
   }
   

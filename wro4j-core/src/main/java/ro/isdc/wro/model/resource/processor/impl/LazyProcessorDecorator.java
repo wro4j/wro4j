@@ -6,6 +6,7 @@ import java.io.Writer;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.AbstractProcessorDecoratorSupport;
 import ro.isdc.wro.util.LazyInitializer;
 
 

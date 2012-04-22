@@ -1,4 +1,5 @@
 /**
+
  * Copyright Alex Objelean
  */
 package ro.isdc.wro.model.resource.processor;
@@ -11,10 +12,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.impl.AbstractProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -28,6 +26,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 /**
  * Contains divers utility methods applied on processors.
@@ -37,45 +36,12 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  */
 public class ProcessorsUtils {
   /**
-   * @param <T>
-   * @param processor the processor to check.
-   * @return true if the processor is {@link MinimizeAware}.
-   */
-  public static <T> boolean isMinimizeAwareProcessor(final T processor) {
-    if (processor instanceof MinimizeAware) {
-      return ((MinimizeAware)processor).isMinimize();
-    }
-    return processor.getClass().isAnnotationPresent(Minimize.class);
-  }
-
-  /**
-   * Identifies the {@link SupportedResourceType} of the provided processor.
-   *
-   * @param <T>
-   * @param processor to check.
-   * @return The {@link SupportedResourceType} of the processor.
-   */
-  public static <T> SupportedResourceType getSupportedResourceType(final T processor) {
-    SupportedResourceType supportedType = processor.getClass().getAnnotation(SupportedResourceType.class);
-    /**
-     * This is a special case for processors which implement {@link SupportedResourceTypeProvider} interface. This is
-     * useful for decorator processors which needs to "inherit" the {@link SupportedResourceType} of the decorated
-     * processor.
-     */
-    if (processor instanceof SupportedResourceTypeAware) {
-      supportedType = ((SupportedResourceTypeAware) processor).getSupportedResourceType();
-    }
-    return supportedType;
-  }
-
-  /**
    * This method is visible for testing only.
-   * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor} or null (any).
-   * @param type {@link ResourceType} to apply for searching on available processors.
+   * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor}.
+   * @param type {@link ResourceType} to apply for searching on available processors. This value cannot be null.
    * @param availableProcessors a list where to perform the search.
    * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:
    *        <ul>
-   *          <li>If you search by null (any) type - you'll get only processors which can be applied on any resource (not any particular type)</li>
    *          <li>If you search by JS type - you'll get processors which can be applied on JS resources & any (null) resources </li>
    *          <li>If you search by CSS type - you'll get processors which can be applied on CSS resources & any (null) resources </li>
    *        </ul>
@@ -83,47 +49,14 @@ public class ProcessorsUtils {
   public static <T> Collection<T> filterProcessorsToApply(final boolean minimize, final ResourceType type,
     final Collection<T> availableProcessors) {
     Validate.notNull(availableProcessors);
+    Validate.notNull(type);
     final Collection<T> found = new ArrayList<T>();
     for (final T processor : availableProcessors) {
-      final SupportedResourceType supportedType = getSupportedResourceType(processor);
-      final boolean isTypeSatisfied = supportedType == null || (supportedType != null && type == supportedType.value());
-      final boolean isMinimizedSatisfied = minimize == true || !isMinimizeAwareProcessor(processor);
-      if (isTypeSatisfied && isMinimizedSatisfied) {
+      if (new ProcessorDecorator(processor).isEligible(minimize, type)) {
         found.add(processor);
       }
     }
     return found;
-  }
-  
-  /**
-   * @param processor
-   *          to check for supported resource type.
-   * @return the array of supported resources the processor can process.
-   */
-  public static <T> ResourceType[] getSupportedResourceTypes(final T processor) {
-    final SupportedResourceType supportedType = getSupportedResourceType(processor);
-    return supportedType == null ? ResourceType.values() : new ResourceType[] {
-      supportedType.value()
-    };
-  }
-  
-
-  /**
-   * Transforms a preProcessor into a postProcessor.
-   *
-   * @param processor {@link ResourcePreProcessor} to transform.
-   */
-  public static ResourcePostProcessor toPostProcessor(final ResourcePreProcessor processor) {
-    return new AbstractProcessorDecorator(processor);
-  }
-
-  /**
-   * Transforms a postProcessor into a preProcessor.
-   *
-   * @param processor {@link ResourcePostProcessor} to transform.
-   */
-  public static ResourcePreProcessor toPreProcessor(final ResourcePostProcessor processor) {
-    return new AbstractProcessorDecorator(processor);
   }
 
   /**
@@ -135,7 +68,7 @@ public class ProcessorsUtils {
     T found = null;
     for (final ResourcePreProcessor processor : preProcessors) {
       if (processorClass.isInstance(processor)) {
-        found = (T)processor;
+        found = (T) processor;
         return found;
       }
     }
@@ -154,7 +87,7 @@ public class ProcessorsUtils {
     
     final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
     for (Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
-      map.put(entry.getKey(), ProcessorsUtils.toPostProcessor(entry.getValue()));
+      map.put(entry.getKey(), new ProcessorDecorator(entry.getValue()));
     }
     return map;
   }
