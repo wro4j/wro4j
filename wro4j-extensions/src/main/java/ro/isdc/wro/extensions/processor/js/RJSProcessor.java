@@ -40,14 +40,26 @@ public class RJSProcessor implements ResourcePreProcessor {
   public static final String ALIAS = "rjs";
   private final String baseUrl;
   private final List<String> paths;
+  private final List<String> additonalOptions = new ArrayList<String>(1);
 
 
-  public RJSProcessor(String baseUrl, Map<String,String> pathsMap) {
+  /**
+   * @param baseUrl parent directory from which all dependencies are based
+   * @param pathsMap aliases to dependencies kept in directories
+   * @param additionalOptions additional options passed directly as r.js arguments
+   */
+  public RJSProcessor(String baseUrl, Map<String,String> pathsMap, String ... additionalOptions) {
     this.baseUrl = baseUrl;
     // parse map into commandline format for r.js
     this.paths = new ArrayList<String>(pathsMap.size());
     for (String key : pathsMap.keySet()) {
       paths.add("paths." + key + "=" + pathsMap.get(key));
+    }
+    // raw additional options
+    if (additonalOptions != null) {
+      for (String option : additionalOptions) {
+        this.additonalOptions.add(option);
+      }
     }
   }
 
@@ -63,6 +75,7 @@ public class RJSProcessor implements ResourcePreProcessor {
         "optimize=none"
     );
     args.addAll(paths);
+    args.addAll(additonalOptions);
     try {
       new RJS().compile(args.toArray(new Object[args.size()]));
       writer.write(FileUtils.readFileToString(out));
