@@ -40,7 +40,7 @@ public class RJSProcessor implements ResourcePreProcessor {
   public static final String ALIAS = "rjs";
   private final String baseUrl;
   private final List<String> paths;
-  private final List<String> additonalOptions = new ArrayList<String>(1);
+  private final List<String> additionalOptions = new ArrayList<String>(1);
 
 
   /**
@@ -56,9 +56,9 @@ public class RJSProcessor implements ResourcePreProcessor {
       paths.add("paths." + key + "=" + pathsMap.get(key));
     }
     // raw additional options
-    if (additonalOptions != null) {
+    if (additionalOptions != null) {
       for (String option : additionalOptions) {
-        this.additonalOptions.add(option);
+        this.additionalOptions.add(option);
       }
     }
   }
@@ -75,7 +75,7 @@ public class RJSProcessor implements ResourcePreProcessor {
         "optimize=none"
     );
     args.addAll(paths);
-    args.addAll(additonalOptions);
+    args.addAll(additionalOptions);
     try {
       new RJS().compile(args.toArray(new Object[args.size()]));
       writer.write(FileUtils.readFileToString(out));

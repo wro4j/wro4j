@@ -1,6 +1,5 @@
 package ro.isdc.wro.extensions.processor;
 
-import java.io.File;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -10,7 +9,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -65,7 +63,6 @@ public class TestRJSProcessor {
         new InputStreamReader(getClass().getResourceAsStream(filename)),
         resultWriter);
     String expected = IOUtils.toString(getClass().getResource("/test/requirejs/testpaths-expected.js"));
-    FileUtils.write(new File("/tmp/out.js"), resultWriter.toString());
     Assert.assertEquals(expected, resultWriter.toString());
   }
 
@@ -88,7 +85,6 @@ public class TestRJSProcessor {
         new InputStreamReader(getClass().getResourceAsStream(filename)),
         resultWriter);
     String expected = IOUtils.toString(getClass().getResource("/test/requirejs/testplugins-expected.js"));
-    FileUtils.write(new File("/tmp/out.js"), resultWriter.toString());
     Assert.assertEquals(expected, resultWriter.toString());
   }
 }
