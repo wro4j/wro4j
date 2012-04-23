@@ -1,6 +1,6 @@
 (function() {
   var awardMedals, contenders, gold, rest, silver,
-    __slice = Array.prototype.slice;
+    __slice = [].slice;
 
   gold = silver = rest = "unknown";
 

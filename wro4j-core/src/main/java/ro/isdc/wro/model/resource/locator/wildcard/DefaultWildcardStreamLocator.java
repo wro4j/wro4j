@@ -62,13 +62,7 @@ public class DefaultWildcardStreamLocator
    * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
    */
   private Function<Collection<File>, Void> wildcardExpanderHandler;
-
-  /**
-   * Creates a WildcardStream locator which doesn't care about detecting duplicate resources.
-   */
-  public DefaultWildcardStreamLocator() {
-  }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -176,8 +170,9 @@ public class DefaultWildcardStreamLocator
       throws IOException {
     LOG.debug("wildcard resources: {}", allFiles);
     if (allFiles.isEmpty()) {
-      LOG.warn("No files found inside the {} for wildcard: {}", wildcardContext.getFolder().getPath(),
-        wildcardContext.getWildcard());
+      final String message = String.format("No resource found for wildcard: %s", wildcardContext.getWildcard());
+      LOG.warn(message);
+      throw new IOException(message);
     }
     if (wildcardExpanderHandler != null) {
       try {

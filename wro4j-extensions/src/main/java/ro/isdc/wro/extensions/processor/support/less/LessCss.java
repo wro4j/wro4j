@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * This class is not thread-safe.<br/>
- * The underlying implementation use the less.js version <code>1.2.0</code> project: {@link https
+ * The underlying implementation use the less.js version <code>1.2.2</code> project: {@link https
  * ://github.com/cloudhead/less.js}.
  *
  * @author Alex Objelean
@@ -31,7 +31,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  public static final String DEFAULT_LESS_JS = "less-1.2.0.min.js";
+  public static final String DEFAULT_LESS_JS = "less-1.3.0.min.js";
   private static final String SCRIPT_RUN = "run.js";
   private static final String SCRIPT_INIT = "init.js";
   private ScriptableObject scope;
@@ -44,7 +44,7 @@ public class LessCss {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
         final InputStream initStream = LessCss.class.getResourceAsStream(SCRIPT_INIT);
-        final InputStream runStream = LessCss.class.getResourceAsStream(SCRIPT_RUN);
+        final InputStream runStream = getRunScriptAsStream();
         builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
           getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
         scope = builder.getScope();
@@ -58,6 +58,13 @@ public class LessCss {
       LOG.error("Processing error:" + e.getMessage(), e);
       throw new WroRuntimeException("Processing error", e);
     }
+  }
+
+  /**
+   * @return the stream of the script responsible for invoking the less transformation javascript code.
+   */
+  protected InputStream getRunScriptAsStream() {
+    return LessCss.class.getResourceAsStream(SCRIPT_RUN);
   }
 
   /**
@@ -84,7 +91,7 @@ public class LessCss {
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
     } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

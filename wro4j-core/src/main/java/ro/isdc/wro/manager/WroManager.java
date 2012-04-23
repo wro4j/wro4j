@@ -28,8 +28,8 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.HttpHeader;
-import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.http.support.HttpHeader;
+import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
@@ -277,7 +277,6 @@ public class WroManager
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
       // find processed result for a group
-
       final WroModel model = modelFactory.create();
 
       if (model == null) {

@@ -21,6 +21,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -150,7 +151,6 @@ public class XmlModelFactory
       }
       return document;
     } catch (final Exception e) {
-      LOG.error("Cannot build model from XML", e);
       throw new WroRuntimeException("Cannot build model from XML", e);
     }
   }
@@ -189,10 +189,10 @@ public class XmlModelFactory
     final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
     LOG.debug("number of imports: {}", importsList.getLength());
     for (int i = 0; i < importsList.getLength(); i++) {
-      final Element element = (Element)importsList.item(i);
+      final Element element = (Element) importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: {}", name);
-      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
+      Validate.notNull(uriLocatorFactory, "The Locator cannot be null!");
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected InputStream getModelResourceAsStream()

@@ -14,7 +14,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.FieldsSavingRequestWrapper;
+import ro.isdc.wro.http.support.FieldsSavingRequestWrapper;
 import ro.isdc.wro.model.resource.ResourceType;
 
 
