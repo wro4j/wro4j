@@ -3,38 +3,34 @@ package ro.isdc.wro.extensions.processor.support.sass;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.jruby.embed.EvalFailedException;
-import org.jruby.embed.LocalVariableBehavior;
-import org.jruby.embed.ScriptingContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.StopWatch;
 
 
 /**
  * A Sass processor using ruby gems.
- *
+ * 
  * @author Dmitry Erman
- * @since 1.4.4
  * @created 12 Feb 2012
+ * @since 1.4.4
  */
 public class RubySassEngine {
   private static final Logger LOG = LoggerFactory.getLogger(RubySassEngine.class);
-  private final DestroyableLazyInitializer<ScriptingContainer> scriptingContainerInitializer = new DestroyableLazyInitializer<ScriptingContainer>() {
-    @Override
-    protected ScriptingContainer initialize() {
-      return new ScriptingContainer(LocalVariableBehavior.PERSISTENT);
-    }
-  };
-
+  
   /**
    * Transforms a sass content into css using Sass ruby engine.
-   * @param content the Sass content to process.
+   * 
+   * @param content
+   *          the Sass content to process.
    */
   public String process(final String content) {
     if (StringUtils.isEmpty(content)) {
@@ -43,22 +39,23 @@ public class RubySassEngine {
     try {
       final StopWatch stopWatch = new StopWatch();
       stopWatch.start("process SCSS");
-      scriptingContainerInitializer.get().runScriptlet(buildUpdateScript(content));
+      final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
+      String result = rubyEngine.eval(buildUpdateScript(content)).toString();
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
-      return (String)scriptingContainerInitializer.get().get("result");
-    } catch (final EvalFailedException e) {
+      return result;
+    } catch (final ScriptException e) {
       throw new WroRuntimeException(e.getMessage(), e);
     }
   }
-
-
+  
   private String buildUpdateScript(final String content) {
     Validate.notNull(content);
     final StringWriter raw = new StringWriter();
     final PrintWriter script = new PrintWriter(raw);
     final StringBuilder sb = new StringBuilder();
     sb.append(":syntax => :scss");
+    
     script.println("  require 'rubygems'                                            ");
     script.println("  require 'sass/plugin'                                         ");
     script.println("  require 'sass/engine'                                         ");

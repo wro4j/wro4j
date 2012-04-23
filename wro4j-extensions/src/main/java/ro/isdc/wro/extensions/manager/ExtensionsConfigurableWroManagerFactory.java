@@ -75,6 +75,7 @@ public class ExtensionsConfigurableWroManagerFactory
     map.put(PackerJsProcessor.ALIAS, (T) new PackerJsProcessor());
     map.put(LessCssProcessor.ALIAS, (T) new LessCssProcessor());
     map.put(SassCssProcessor.ALIAS, (T) new SassCssProcessor());
+    map.put(SassCssProcessor.ALIAS_RUBY, (T) new SassCssProcessor(SassCssProcessor.Engines.RUBY));
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, (T) new GoogleClosureCompressorProcessor());
     map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(
         CompilationLevel.ADVANCED_OPTIMIZATIONS));
