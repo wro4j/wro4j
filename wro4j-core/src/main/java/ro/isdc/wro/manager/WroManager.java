@@ -98,6 +98,8 @@ public class WroManager
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private GroupsProcessor groupsProcessor;
+  @Inject
+  private WroConfiguration config;
 
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -141,7 +143,7 @@ public class WroManager
 
 
   private boolean isGzipAllowed() {
-    return Context.get().getConfig().isGzipEnabled() && isGzipSupported();
+    return config.isGzipEnabled() && isGzipSupported();
   }
 
 
@@ -286,7 +288,7 @@ public class WroManager
 
       final String content = groupsProcessor.process(group, type, minimize);
       contentHashEntry = getContentHashEntryByContent(content);
-      if (!Context.get().getConfig().isDisableCache()) {
+      if (!config.isDisableCache()) {
         cacheStrategy.put(cacheEntry, contentHashEntry);
       }
     }

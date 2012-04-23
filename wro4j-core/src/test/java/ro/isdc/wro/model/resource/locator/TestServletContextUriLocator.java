@@ -28,6 +28,7 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 
 
 /**

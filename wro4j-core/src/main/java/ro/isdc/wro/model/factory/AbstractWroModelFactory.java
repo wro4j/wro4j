@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 
 /**
  * To be used by the implementations which load the model from a resource provided as stream.
@@ -20,7 +21,8 @@ import ro.isdc.wro.config.Context;
  */
 public abstract class AbstractWroModelFactory
   implements WroModelFactory {
-
+  @Inject
+  private Context context;
   /**
    * Override this method, in order to provide different xml definition file name.
    *
@@ -29,7 +31,7 @@ public abstract class AbstractWroModelFactory
    */
   protected InputStream getModelResourceAsStream()
     throws IOException {
-    final ServletContext servletContext = Context.get().getServletContext();
+    final ServletContext servletContext = context.getServletContext();
     //Don't allow NPE, throw a more detailed exception
     if (servletContext == null) {
       throw new WroRuntimeException(
