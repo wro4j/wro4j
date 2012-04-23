@@ -63,7 +63,7 @@ public class GroupsProcessor {
       group.markAsUsed();
       final Group filteredGroup = group.collectResourcesOfType(type);
       if (filteredGroup.getResources().isEmpty()) {
-        LOG.warn("No resources found in group: {} and resource type: {}", group.getName(), type);
+        LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), type);
         if (!config.isIgnoreEmptyGroup()) {
           throw new WroRuntimeException("No resources found in group: " + group.getName());
         }
