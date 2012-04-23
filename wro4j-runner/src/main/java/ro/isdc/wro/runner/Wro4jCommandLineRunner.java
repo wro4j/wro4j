@@ -205,12 +205,12 @@ public class Wro4jCommandLineRunner {
       // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
       fos.close();
-      LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
       // delete empty files
       if (destinationFile.length() == 0) {
-        LOG.info("No content found for group: {}", group);
+        LOG.debug("No content found for group: {}", group);
         destinationFile.delete();
       } else {
+        LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
         LOG.info("{} ({}bytes) has been created!", destinationFile.getAbsolutePath(), destinationFile.length());
       }
     } finally {
