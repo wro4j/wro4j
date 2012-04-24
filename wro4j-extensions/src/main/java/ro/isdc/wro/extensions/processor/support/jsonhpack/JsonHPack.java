@@ -26,22 +26,14 @@ import ro.isdc.wro.util.WroUtil;
 public class JsonHPack {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPack.class);
   private static final String DEFAULT_JS = "json.hpack.min.js";
-  private ScriptableObject scope;
 
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      RhinoScriptBuilder builder = null;
-      if (scope == null) {
-        builder = RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
-          getScriptAsStream(), DEFAULT_JS);
-        scope = builder.getScope();
-      } else {
-        builder = RhinoScriptBuilder.newChain(scope);
-      }
-      return builder;
+      return RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
+        getScriptAsStream(), DEFAULT_JS);
     } catch (final Exception e) {
       LOG.error("Processing error:" + e.getMessage(), e);
       throw new WroRuntimeException("Processing error", e);
@@ -72,8 +64,7 @@ public class JsonHPack {
     }
 
     try {
-
-      final String execute = "JSON.stringify(JsonHPack.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
+      final String execute = "JSON.stringify(JSON.hunpack(eval(" + WroUtil.toJSMultiLineString(data) + ")));";
       final Object result = builder.evaluate(execute, "unpack");
 
       String resultAsString = String.valueOf(result);
@@ -110,7 +101,7 @@ public class JsonHPack {
     }
 
     try {
-      final String execute = "JSON.stringify(JsonHPack.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
+      final String execute = "JSON.stringify(JSON.hpack(eval(" + WroUtil.toJSMultiLineString(data) + "), 4));";
       final Object result = builder.evaluate(execute, "pack");
       String resultAsString = String.valueOf(result);
       if (!isEnclosedInArray) {

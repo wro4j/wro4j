@@ -57,7 +57,7 @@ public class TestLessCssProcessor {
 
   @Test
   public void shouldBeThreadSafe() throws Exception {
-    final LessCssProcessor lessCss = new LessCssProcessor() {
+    final LessCssProcessor processor = new LessCssProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
         throw e;
@@ -66,7 +66,7 @@ public class TestLessCssProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          lessCss.process(new StringReader("#id {.class {color: red;}}"), new StringWriter());
+          processor.process(new StringReader("#id {.class {color: red;}}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
