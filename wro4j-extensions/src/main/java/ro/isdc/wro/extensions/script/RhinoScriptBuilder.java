@@ -57,12 +57,12 @@ public class RhinoScriptBuilder {
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
-    context.setLanguageVersion(Context.VERSION_1_7);
+    context.setLanguageVersion(Context.VERSION_1_8);
     InputStream script = null;
     final ScriptableObject scope = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
       script = getClass().getResourceAsStream("commons.js");
-      context.evaluateReader(scope, new InputStreamReader(script), "common.js", 1, null);
+      context.evaluateReader(scope, new InputStreamReader(script), "commons.js", 1, null);
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
     } finally {
