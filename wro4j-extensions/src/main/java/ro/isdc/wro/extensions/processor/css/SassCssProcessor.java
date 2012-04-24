@@ -19,6 +19,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -32,11 +33,22 @@ public class SassCssProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
   public static final String ALIAS = "sassCss";
-  public static final String ALIAS_RUBY = "rubySassCss";
-  
   
   private ObjectPoolHelper<SassCss> enginePool;
 
+  /**
+   * default constructor that sets the engine used to RHINO for backwards compatibility.
+   */
+  public SassCssProcessor() {
+    enginePool = new ObjectPoolHelper<SassCss>(new ObjectFactory<SassCss>() {
+      @Override
+      public SassCss create() {
+        return newEngine();
+      }
+    });
+  }
+  
+  
   /**
    * {@inheritDoc}
    */
