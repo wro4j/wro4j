@@ -53,8 +53,6 @@ public class PreProcessorExecutor {
   private ProcessorsFactory processorsFactory;
   @Inject
   private WroConfiguration configuration;
-  @Inject
-  private Injector injector;
   /**
    * Runs the preProcessing in parallel.
    */
@@ -167,9 +165,6 @@ public class PreProcessorExecutor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
       stopWatch.start("Processor: " + processor.getClass().getSimpleName());
-      //inject all required properites
-      injector.inject(processor);
-
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);

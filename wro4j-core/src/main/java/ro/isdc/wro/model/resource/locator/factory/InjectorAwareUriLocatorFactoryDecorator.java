@@ -36,7 +36,9 @@ public final class InjectorAwareUriLocatorFactoryDecorator
   public UriLocator getInstance(final String uri) {
     final UriLocator instance = super.getInstance(uri);
     //TODO avoid multiple inject call for the same instance?
-    injector.inject(instance);
+    if (instance != null) {
+      injector.inject(instance);
+    }
     return instance;
   }
   

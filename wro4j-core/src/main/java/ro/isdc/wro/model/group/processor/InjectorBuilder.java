@@ -16,6 +16,7 @@ import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.InjectorAwareProcessorsFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
@@ -65,7 +66,11 @@ public class InjectorBuilder {
         return new InjectorAwareUriLocatorFactoryDecorator(uriLocatorFactory, injector);
       }
     });
-    map.put(ProcessorsFactory.class, processorsFactory);
+    map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
+      public ProcessorsFactory create() {
+        return new InjectorAwareProcessorsFactoryDecorator(processorsFactory, injector);
+      }
+    });
     map.put(NamingStrategy.class, namingStrategy);
     map.put(Context.class, new InjectorObjectFactory<Context>() {
       public Context create() {
