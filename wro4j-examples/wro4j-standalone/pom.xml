@@ -5,7 +5,7 @@
   <parent>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-examples</artifactId>
-    <version>1.4.4-SNAPSHOT</version>
+    <version>1.4.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>wro4j-standalone</artifactId>
@@ -39,11 +39,11 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.2-SNAPSHOT</version>
+        <version>1.4.1</version>
         <executions>
           <execution>
             <goals>
-              <goal>run</goal>
+              <goal>csslint</goal>
               <!--
               <goal>jshint</goal>
                             
@@ -53,12 +53,14 @@
           </execution>
         </executions>
         <configuration>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
+          <options>ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes,vendor-prefix,zero-units</options>
           <ignoreMissingResources>true</ignoreMissingResources>          
-          <failNever>true</failNever>
+          <failNever>false</failNever>
           <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/bundle/</cssDestinationFolder>
-          <extraConfigFile>c:/path/wro.proprties</extraConfigFile>
           <!--
+
+          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
+          <extraConfigFile>c:/path/wro.proprties</extraConfigFile>
           <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>          
           <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
           <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>

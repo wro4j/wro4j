@@ -96,8 +96,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
-    getLog().info("wroManagerFactory: " + this.wroManagerFactory);
-    getLog().info("extraConfig: " + extraConfigFile);
+    getLog().debug("wroManagerFactory: " + this.wroManagerFactory);
+    getLog().debug("extraConfig: " + extraConfigFile);
 
 
     extendPluginClasspath();

@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -35,10 +36,23 @@ public final class WroModel {
   private Set<Group> groups = new HashSet<Group>();
 
   /**
-   * @return the readonly collection of groups.
+   * @return a readonly collection of groups.
    */
   public final Collection<Group> getGroups() {
     return Collections.unmodifiableSet(groups);
+  }
+  
+  /**
+   * @return a readonly collection of groups which were used for processing (used flag marked as true).
+   */
+  public final Collection<Group> getUsedGroups() {
+    Set<Group> usedGroups = new HashSet<Group>();
+    for (Group group : groups) {
+      if (group.isUsed()) {
+        usedGroups.add(group);
+      }
+    }
+    return Collections.unmodifiableSet(usedGroups);
   }
 
   /**
@@ -96,10 +110,10 @@ public final class WroModel {
     }
     throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + getGroupNames(groups));
   }
-  
+
   /**
    * This implementation would be simpler if java would have closures :).
-   * 
+   *
    * @param groups
    *          a collection of groups to get as string.
    * @return a comma separated list of group names.
@@ -136,6 +150,14 @@ public final class WroModel {
     Validate.notNull(group);
     groups.add(group);
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    return EqualsBuilder.reflectionEquals(this, obj, true);
   }
 
   /**

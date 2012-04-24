@@ -9,12 +9,14 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.linter.OptionsBuilder;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
@@ -26,7 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * CssLint script engine utility. The underlying implementation uses CSSLint script utility {@link https
- * ://github.com/stubbornella/csslint} - version 0.9.1.
+ * ://github.com/stubbornella/csslint} - version 0.9.7.
  *
  * @author Alex Objelean
  * @since 1.3.8
@@ -37,7 +39,8 @@ public class CssLint {
   /**
    * The name of the csslint script to be used by default.
    */
-  private static final String DEFAULT_CSSLINT_JS = "csslint.min.js";
+  private static final String DEFAULT_CSSLINT_JS = "csslint-0.9.7.min.js";
+  private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
    */
@@ -67,7 +70,7 @@ public class CssLint {
    * @return the stream of the csslint script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_CSSLINT_JS);
+    return CssLint.class.getResourceAsStream(DEFAULT_CSSLINT_JS);
   }
 
 
@@ -107,30 +110,8 @@ public class CssLint {
   }
 
 
-  /**
-   * @param data script to process.
-   * @param options options to set as true
-   * @return Script used to pack and return the packed result.
-   */
   private String buildCssLintScript(final String data, final String... options) {
-    //TODO use OptionsBuilder
-    final StringBuffer sb = new StringBuffer("{");
-    if (options != null) {
-      for (int i = 0; i < options.length; i++) {
-        sb.append("\"" + options[i] + "\": 1");
-        if (i < options.length - 1) {
-          sb.append(",");
-        }
-      }
-    }
-    sb.append("}");
-    /**
-     * Handle the following <a href="https://github.com/stubbornella/csslint/issues/79">issue</a>.
-     */
-    final boolean noOptions = options == null || options.length == 0;
-    final String optionsAsString = noOptions ? "" : "," + sb.toString();
-    //return "var result = CSSLint.verify(" + data + "," + sb.toString() + ").messages;";
-    return "var result = CSSLint.verify(" + data + optionsAsString + ").messages;";
+    return String.format("var result = CSSLint.verify(%s,%s).messages", data, optionsBuilder.build(options));
   }
 
 
@@ -139,7 +120,12 @@ public class CssLint {
    */
   public CssLint setOptions(final String ... options) {
     LOG.debug("setOptions: {}", options);
-    this.options = options == null ? new String[] {} : options;
+    if (options != null) {
+      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
+    } else {
+      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
+    }
+
     return this;
   }
 }

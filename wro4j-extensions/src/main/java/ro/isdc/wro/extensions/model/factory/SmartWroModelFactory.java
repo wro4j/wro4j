@@ -22,6 +22,8 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 
 
 /**
@@ -37,7 +39,8 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    * The default location of the wro model file.
    */
   private static final String DEFAULT_WRO_FILE = "/src/main/webapp/WEB-INF/wro.xml";
-
+  @Inject
+  private Injector injector;
   private List<WroModelFactory> factoryList;
   /**
    * The exact file where the model is located.
@@ -46,7 +49,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
   /**
    * flag indicating if the wroFile should be auto detected.
    */
-  private boolean autoDetectWroFile;
+  private boolean autoDetectWroFile = true;
 
 
   /**
@@ -165,25 +168,29 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
     if (factoryList == null) {
       factoryList = newWroModelFactoryFactoryList();
     }
-    //Holds the details about model creation which are logged only when no model can be created
-    final StringBuffer logMessageBuffer = new StringBuffer();
-    for (final WroModelFactory factory : factoryList) {
-      try {
-        final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
-        logMessageBuffer.append("Using " + getClassName(factoryClass) + " for model creation..\n");
-        return factory.create();
-      } catch (final WroRuntimeException e) {
-        logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
-          + " failed. Trying another ...\n");
-        logMessageBuffer.append("[FAIL] Exception occured while building the model using: "
-          + getClassName(factory.getClass()) + " " + e.getMessage());
-        // stop trying with other factories if the reason is IOException
-        if (!autoDetectWroFile && e.getCause() instanceof IOException) {
-          throw e;
+    if (factoryList != null) {
+      // Holds the details about model creation which are logged only when no model can be created
+      final StringBuffer logMessageBuffer = new StringBuffer();
+      for (final WroModelFactory factory : factoryList) {
+        try {
+          //use injector for aggregated modelFactories
+          injector.inject(factory);
+          final Class<? extends WroModelFactory> factoryClass = factory.getClass().asSubclass(WroModelFactory.class);
+          logMessageBuffer.append(" Using " + getClassName(factoryClass) + " for model creation..\n");
+          return factory.create();
+        } catch (final WroRuntimeException e) {
+          logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
+            + " failed. Trying another ...\n");
+          logMessageBuffer.append("[FAIL] Exception occured while building the model using: "
+            + getClassName(factory.getClass()) + " " + e.getMessage());
+          // stop trying with other factories if the reason is IOException
+          if (!autoDetectWroFile && e.getCause() instanceof IOException) {
+            throw e;
+          }
         }
       }
+      LOG.error(logMessageBuffer.toString());
     }
-    LOG.error(logMessageBuffer.toString());
     throw new WroRuntimeException("Cannot create model using any of provided factories");
   }
 

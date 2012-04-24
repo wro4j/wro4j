@@ -13,9 +13,9 @@ import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
- * TestMultiLineCommentStripperPostProcessor.java.
+ * TestCommentStripperProcessor.java.
  *
- * @author Alex Objelean
+ * @author Ivar Conradi Østhus
  */
 public class TestCommentStripperProcessor {
   private final ResourcePostProcessor processor = new CommentStripperProcessor();

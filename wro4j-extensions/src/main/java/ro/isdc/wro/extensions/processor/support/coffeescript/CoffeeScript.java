@@ -24,7 +24,7 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.1.3-pre</code> (commited at 2011-09-18 06:52:30)
+ * The underlying implementation use the coffee-script version <code>1.2.1-pre</code> (commited at 2012-03-03 20:52:43)
  * project: {@link https ://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
@@ -34,8 +34,7 @@ public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
   private String[] options;
   private ScriptableObject scope;
-
-
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.min.js";
   /**
    * Initialize script builder for evaluation.
    */
@@ -43,7 +42,7 @@ public class CoffeeScript {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), "coffee-script.js");
+        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), DEFAULT_COFFE_SCRIPT);
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);
@@ -62,7 +61,7 @@ public class CoffeeScript {
    * @return The stream of the CoffeeScript.
    */
   protected InputStream getCoffeeScriptAsStream() {
-    return getClass().getResourceAsStream("coffee-script-1.2.0.js");
+    return CoffeeScript.class.getResourceAsStream(DEFAULT_COFFE_SCRIPT);
   }
 
 
@@ -73,20 +72,21 @@ public class CoffeeScript {
    * @param data js content to process.
    */
   public String compile(final String data) {
+    final StopWatch watch = new StopWatch();
+    watch.start("init");
     try {
-      final StopWatch watch = new StopWatch();
-      watch.start("init");
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       watch.start("compile");
       final String compileScript = String.format("CoffeeScript.compile(%s, %s);", WroUtil.toJSMultiLineString(data),
         buildOptions());
       final String result = (String)builder.evaluate(compileScript, "CoffeeScript.compile");
-      watch.stop();
-      LOG.debug(watch.prettyPrint());
       return result;
     } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
+      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
+    } finally {
+      watch.stop();
+      LOG.debug(watch.prettyPrint());
     }
   }
 

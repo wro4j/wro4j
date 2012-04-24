@@ -1,6 +1,6 @@
 (function() {
   var cubes, list, math, num, number, opposite, race, square,
-    __slice = Array.prototype.slice;
+    __slice = [].slice;
 
   number = 42;
 

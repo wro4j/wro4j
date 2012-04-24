@@ -20,20 +20,23 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {
-  private static final int MAX_ACTIVE = 4;
   private static final int MAX_IDLE = 1;
-  private static final byte EXHAUSTED_ACTION = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
+  /**
+   * Use WHEN_EXHAUSTED_GROW strategy, otherwise the pool object retrieval can fail. More details here:
+   * <a>http://code.google.com/p/wro4j/issues/detail?id=364</a>
+   */
+  private static final byte EXHAUSTED_ACTION = GenericObjectPool.WHEN_EXHAUSTED_GROW;
   private static final long MAX_WAIT = 1000L * 5L;
   // Allows using the objects from the pool in a thread-safe fashion.
-  private GenericObjectPool objectPool;
+  private GenericObjectPool<T> objectPool;
 
 
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
-    int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
-    objectPool = new GenericObjectPool(new BasePoolableObjectFactory() {
+    final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
+    objectPool = new GenericObjectPool<T>(new BasePoolableObjectFactory<T>() {
       @Override
-      public Object makeObject()
+      public T makeObject()
         throws Exception {
         return objectFactory.create();
       }
@@ -41,10 +44,9 @@ public class ObjectPoolHelper<T> {
   }
 
 
-  @SuppressWarnings("unchecked")
   public T getObject() {
     try {
-      return (T) objectPool.borrowObject();
+      return objectPool.borrowObject();
     } catch (final Exception e) {
       // should never happen
       throw new RuntimeException("Cannot get object from the pool", e);

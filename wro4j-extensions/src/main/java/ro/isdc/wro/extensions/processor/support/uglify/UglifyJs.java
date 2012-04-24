@@ -3,10 +3,13 @@
  */
 package ro.isdc.wro.extensions.processor.support.uglify;
 
+import static ro.isdc.wro.extensions.processor.support.uglify.UglifyJs.Type.UGLIFY;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -20,12 +23,11 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs version (1.2.4)
+ * The underlying implementation use the uglifyJs untagged version: 1.2.7
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
- * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
- * is compressed with packerJs by Dean Edwards.
+ * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js.
  *
  * @author Alex Objelean
  * @since 1.3.1
@@ -35,7 +37,7 @@ public class UglifyJs {
   /**
    * The name of the uglify script to be used by default.
    */
-  private static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
+  public static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
@@ -45,14 +47,20 @@ public class UglifyJs {
    */
   private String reservedNames;
   private ScriptableObject scope;
-
+  /**
+   * The type of processing supported by UglifyJs library. This enum replaces ugly boolean constructor parameter.
+   */
+  public static enum Type {
+    BEAUTIFY, UGLIFY
+  }
 
   /**
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
    *        formatted).
    */
-  public UglifyJs(final boolean uglify) {
-    this.uglify = uglify;
+  public UglifyJs(final Type uglifyType) {
+    Validate.notNull(uglifyType);
+    this.uglify = uglifyType == UGLIFY ? true : false;
   }
 
 
@@ -60,7 +68,7 @@ public class UglifyJs {
    * Factory method for creating the uglifyJs engine.
    */
   public static UglifyJs uglifyJs() {
-    return new UglifyJs(true);
+    return new UglifyJs(UGLIFY);
   }
 
 
@@ -68,7 +76,7 @@ public class UglifyJs {
    * Factory method for creating the beautifyJs engine.
    */
   public static UglifyJs beautifyJs() {
-    return new UglifyJs(false);
+    return new UglifyJs(Type.BEAUTIFY);
   }
 
 
@@ -99,7 +107,7 @@ public class UglifyJs {
     RhinoScriptBuilder builder = null;
     try {
       if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().addJSON().evaluateChain(getClass().getResourceAsStream("init.js"),
+        builder = RhinoScriptBuilder.newChain().addJSON().evaluateChain(UglifyJs.class.getResourceAsStream("init.js"),
           "initScript").evaluateChain(getScriptAsStream(), DEFAULT_UGLIFY_JS);
         scope = builder.getScope();
       } else {
@@ -116,7 +124,7 @@ public class UglifyJs {
    * @return the stream of the uglify script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream(DEFAULT_UGLIFY_JS);
+    return UglifyJs.class.getResourceAsStream(DEFAULT_UGLIFY_JS);
   }
 
 
@@ -132,7 +140,7 @@ public class UglifyJs {
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       final String originalCode = WroUtil.toJSMultiLineString(code);
-      final String invokeScript = String.format(IOUtils.toString(getClass().getResourceAsStream("invoke.js")),
+      final String invokeScript = String.format(IOUtils.toString(UglifyJs.class.getResourceAsStream("invoke.js")),
         originalCode, getReservedNames(), !uglify);
       watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");

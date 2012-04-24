@@ -35,7 +35,12 @@ public abstract class AbstractWroModelFactory
       throw new WroRuntimeException(
         "No servletContext is available. Probably you are running this code outside of the request cycle!");
     }
-    return servletContext.getResourceAsStream("/WEB-INF/" + getDefaultModelFilename());
+    final String resourceLocation = "/WEB-INF/" + getDefaultModelFilename();
+    final InputStream stream = servletContext.getResourceAsStream(resourceLocation);
+    if (stream == null) {
+      throw new IOException("Invalid resource requested: " + resourceLocation);
+    }
+    return stream;
   }
 
   /**

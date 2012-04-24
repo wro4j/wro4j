@@ -28,8 +28,9 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.HttpHeader;
-import ro.isdc.wro.http.UnauthorizedRequestException;
+import ro.isdc.wro.http.support.HttpHeader;
+import ro.isdc.wro.http.support.UnauthorizedRequestException;
+import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -276,7 +277,6 @@ public class WroManager
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
       // find processed result for a group
-
       final WroModel model = modelFactory.create();
 
       if (model == null) {
@@ -526,12 +526,25 @@ public class WroManager
 
 
   /**
+   * Use {@link WroManager#registerCallback(LifecycleCallback)} instead.
+   *
    * @return the holder of registered callbacks. Use it to register custom callbacks.
    */
+  @Deprecated
   public LifecycleCallbackRegistry getCallbackRegistry() {
     return callbackRegistry;
   }
 
+
+  /**
+   * Registers a callback.
+   *
+   * @param callback {@link LifecycleCallback} to register.
+   */
+  public final void registerCallback(final LifecycleCallback callback) {
+    Validate.notNull(callback);
+    callbackRegistry.registerCallback(callback);
+  }
 
   /**
    * @param namingStrategy the namingStrategy to set

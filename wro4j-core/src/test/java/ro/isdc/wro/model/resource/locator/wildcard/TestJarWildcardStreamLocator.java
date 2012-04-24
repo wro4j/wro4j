@@ -8,11 +8,17 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import junit.framework.Assert;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +26,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
 /**
@@ -64,6 +73,12 @@ public class TestJarWildcardStreamLocator {
   }
 
 
+  @Test(expected = NullPointerException.class)
+  public void cannotLocateStreamWithNullFolder()
+    throws Exception {
+    jarStreamLocator.locateStream("", null);
+  }
+
   @Test
   public void testLocateJarStream()
     throws IOException {
@@ -94,5 +109,78 @@ public class TestJarWildcardStreamLocator {
   public void testLocateJarStreamDelegateFail()
     throws IOException {
     jarStreamLocator.locateStream("com/test/app/*.js", new File("test.jpg"));
+  }
+
+  @Test
+  public void shouldFindNoResourcesWhenNoneExist() throws IOException {
+    final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
+    final UriLocator uriLocator = createJarLocator(filenameListHolder);
+    //there are no js resources in the jar
+    uriLocator.locate("classpath:com/**.js");
+    final Collection<String> filenameList = filenameListHolder.get();
+    Assert.assertNotNull(filenameList);
+    Assert.assertTrue(filenameList.isEmpty());
+  }
+
+  @Test
+  public void shouldOrderedAlphabeticallyWildcardResources() throws IOException {
+    final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
+    final UriLocator uriLocator = createJarLocator(filenameListHolder);
+    uriLocator.locate("classpath:com/app/**.css");
+    final Collection<String> filenameList = filenameListHolder.get();
+    Assert.assertNotNull(filenameList);
+    Assert.assertEquals(Arrays.toString(new String[] {
+      "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css"
+    }), Arrays.toString(filenameList.toArray()));
+  }
+
+  @Test
+  public void shouldFindAllChildFoldersAndFiles() throws IOException {
+    final ThreadLocal<Collection<String>> filenameListHolder = new ThreadLocal<Collection<String>>();
+    final UriLocator uriLocator = createJarLocator(filenameListHolder);
+    uriLocator.locate("classpath:com/app/**");
+    final Collection<String> filenameList = filenameListHolder.get();
+    Assert.assertNotNull(filenameList);
+    Assert.assertEquals(
+      Arrays.toString(new String[] { "com/app/level1", "com/app/level1/level2", "com/app/level1/level2/styles",
+          "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css" }),
+      Arrays.toString(filenameList.toArray()));
+  }
+
+  /**
+   * @return creates an instance of {@link UriLocator} which uses {@link JarWildcardStreamLocator} for locating
+   *         resources containing wildcards. Also it uses a jar file from test resources.
+   */
+  private UriLocator createJarLocator(final ThreadLocal<Collection<String>> filenameListHolder) {
+    final JarWildcardStreamLocator jarStreamLocator = new JarWildcardStreamLocator() {
+      @Override
+      File getJarFile(final File folder) {
+        //Use a jar from test resources
+        return new File(TestJarWildcardStreamLocator.class.getResource("resources.jar").getFile());
+      }
+      @Override
+      void triggerWildcardExpander(final Collection<File> allFiles, final WildcardContext wildcardContext)
+        throws IOException {
+        final Collection<String> filenameList = new ArrayList<String>();
+        for (final File entry : allFiles) {
+          filenameList.add(entry.getPath().replace("\\", "/"));
+        }
+        filenameListHolder.set(filenameList);
+      }
+    };
+    final UriLocator uriLocator = new ClasspathUriLocator() {
+      @Override
+      public WildcardStreamLocator newWildcardStreamLocator() {
+        return jarStreamLocator;
+      }
+    };
+    return uriLocator;
+  }
+
+  @Test
+  public void shouldGetJarFileFromFile() {
+    final String actual = jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath();
+    final String expected = FilenameUtils.separatorsToSystem("path/to/file");
+    Assert.assertEquals(expected, actual);
   }
 }

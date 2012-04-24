@@ -15,6 +15,7 @@ import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.DustJsProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
@@ -78,6 +79,7 @@ public class ExtensionsConfigurableWroManagerFactory
     map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, (T) new GoogleClosureCompressorProcessor(
         CompilationLevel.ADVANCED_OPTIMIZATIONS));
     map.put(CoffeeScriptProcessor.ALIAS, (T) new CoffeeScriptProcessor());
+    map.put(DustJsProcessor.ALIAS, (T) new DustJsProcessor());
     map.put(CJsonProcessor.ALIAS_PACK, (T) CJsonProcessor.packProcessor());
     map.put(CJsonProcessor.ALIAS_UNPACK, (T) CJsonProcessor.unpackProcessor());
     map.put(JsonHPackProcessor.ALIAS_PACK, (T) JsonHPackProcessor.packProcessor());

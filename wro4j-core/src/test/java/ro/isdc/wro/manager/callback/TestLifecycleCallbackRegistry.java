@@ -16,13 +16,14 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.WroUtil;
 
@@ -70,13 +71,13 @@ public class TestLifecycleCallbackRegistry {
 
     registry.onAfterPostProcess();
     Mockito.verify(callback).onAfterPostProcess();
-    
+
     registry.onBeforeMerge();
     Mockito.verify(callback).onBeforeMerge();
-    
+
     registry.onAfterMerge();
     Mockito.verify(callback).onAfterMerge();
-    
+
     registry.onProcessingComplete();
     Mockito.verify(callback).onProcessingComplete();
   }
@@ -85,7 +86,7 @@ public class TestLifecycleCallbackRegistry {
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
     final LifecycleCallback simpleCallback = Mockito.spy(new LifecycleCallbackSupport());
-    
+
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePreProcess();
@@ -130,7 +131,9 @@ public class TestLifecycleCallbackRegistry {
 
     Mockito.when(response.getOutputStream()).thenReturn(
       new DelegatingServletOutputStream(new WriterOutputStream(new StringWriter())));
+    Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(""));
     Mockito.when(request.getRequestURI()).thenReturn("");
+    Mockito.when(request.getServletPath()).thenReturn("");
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
 
@@ -142,19 +145,23 @@ public class TestLifecycleCallbackRegistry {
     Mockito.when(groupExtractor.getGroupName(Mockito.any(HttpServletRequest.class))).thenReturn(groupName);
     Mockito.when(groupExtractor.getResourceType(Mockito.any(HttpServletRequest.class))).thenReturn(ResourceType.JS);
 
-    final WroModelFactory modelFactory = WroUtil.factoryFor(new WroModel().addGroup(new Group(groupName)));
+    Group group = new Group(groupName);
+    group.addResource(Resource.create("classpath:1.js"));
+    final WroModelFactory modelFactory = WroUtil.factoryFor(new WroModel().addGroup(group));
 
     final WroManager manager = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(
       modelFactory).create();
-    manager.getCallbackRegistry().registerCallback(callback);
+    manager.registerCallback(callback);
     manager.process();
 
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
+    Mockito.verify(callback).onBeforePreProcess();
+    Mockito.verify(callback).onAfterPreProcess();
     Mockito.verify(callback).onBeforeMerge();
     Mockito.verify(callback).onAfterMerge();
     Mockito.verify(callback).onProcessingComplete();
-    
+
     Mockito.verifyNoMoreInteractions(callback);
   }
 }

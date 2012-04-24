@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-    <version>1.4.4-SNAPSHOT</version>
+    	<version>1.4.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wro4j-extensions</artifactId>
@@ -50,8 +50,8 @@
 			<artifactId>closure-compiler</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.mozilla</groupId>
-			<artifactId>rhino</artifactId>
+			<groupId>rhino</groupId>
+			<artifactId>js</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.dojotoolkit</groupId>

@@ -52,7 +52,7 @@ public class JsonHPack {
    * @return stream of the script.
    */
   protected InputStream getScriptAsStream() {
-    return getClass().getResourceAsStream("json.hpack.js");
+    return JsonHPack.class.getResourceAsStream("json.hpack.min.js");
   }
 
 

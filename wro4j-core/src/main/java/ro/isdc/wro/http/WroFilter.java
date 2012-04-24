@@ -36,6 +36,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -344,9 +345,9 @@ public class WroFilter
   /**
    * Check if the request path matches the provided api path.
    */
-  private boolean matchesUrl(final String apiPath) {
+  private boolean matchesUrl(final String path) {
     final HttpServletRequest request = Context.get().getRequest();
-    final Pattern pattern = Pattern.compile(".*" + apiPath + "[/]?", Pattern.CASE_INSENSITIVE);
+    final Pattern pattern = Pattern.compile(".*" + path + "[/]?", Pattern.CASE_INSENSITIVE);
     if (request.getRequestURI() != null) {
       final Matcher m = pattern.matcher(request.getRequestURI());
       return m.matches();

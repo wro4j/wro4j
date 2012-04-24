@@ -54,7 +54,6 @@ public class InjectorBuilder {
     map.put(PreProcessorExecutor.class, preProcessorExecutor);
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
-    //map.put(UriLocatorFactory.class, uriLocatorFactory);
     map.put(UriLocatorFactory.class, uriLocatorFactory);
     map.put(ProcessorsFactory.class, processorsFactory);
     map.put(NamingStrategy.class, namingStrategy);
@@ -80,6 +79,7 @@ public class InjectorBuilder {
     //first initialize the map
     initMap();
     injector = new Injector(Collections.unmodifiableMap(map));
+
     //process dependencies for several fields too.
     injector.inject(preProcessorExecutor);
     injector.inject(groupsProcessor);

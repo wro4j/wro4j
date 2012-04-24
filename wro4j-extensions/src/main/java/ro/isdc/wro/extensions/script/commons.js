@@ -2,7 +2,10 @@
  * Defines print function. Used for debugging.
  */
 function print(message) {
-	org.slf4j.LoggerFactory.getLogger("Rhino").debug(message);
+	try {
+		//this call can fail when no slf4j dependency exist in classpath
+		org.slf4j.LoggerFactory.getLogger("Rhino").debug(message);
+	} catch(e) {}	
 }
 // ecma-5.js
 //
