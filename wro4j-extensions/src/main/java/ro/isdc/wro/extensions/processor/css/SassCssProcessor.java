@@ -40,18 +40,6 @@ public class SassCssProcessor
   private ObjectPoolHelper<SassCss> enginePool;
   
   /**
-   * ENUM for supported engine types
-   */
-  public static enum Engines {
-    RHINO, RUBY
-  }
-  
-  /**
-   * Set private engine property.
-   */
-  private Engines engine;
-  
-  /**
    * default constructor that sets the engine used to RHINO for backwards compatibility.
    */
   public SassCssProcessor() {
@@ -61,7 +49,6 @@ public class SassCssProcessor
         return newEngine();
       }
     });
-    this.engine = Engines.RHINO;
   }
   
   /**
