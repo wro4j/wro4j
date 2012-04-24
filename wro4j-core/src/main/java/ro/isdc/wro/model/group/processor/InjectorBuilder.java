@@ -13,6 +13,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -54,14 +55,19 @@ public class InjectorBuilder {
     map.put(PreProcessorExecutor.class, preProcessorExecutor);
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
-    map.put(UriLocatorFactory.class, uriLocatorFactory);
-    map.put(ProcessorsFactory.class, processorsFactory);
-    map.put(NamingStrategy.class, namingStrategy);
     map.put(Injector.class, new InjectorObjectFactory<Injector>() {
       public Injector create() {
         return injector;
       }
     });
+    map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
+      public UriLocatorFactory create() {
+        //return uriLocatorFactory;
+        return new InjectorAwareUriLocatorFactoryDecorator(uriLocatorFactory, injector);
+      }
+    });
+    map.put(ProcessorsFactory.class, processorsFactory);
+    map.put(NamingStrategy.class, namingStrategy);
     map.put(Context.class, new InjectorObjectFactory<Context>() {
       public Context create() {
         return Context.get();
