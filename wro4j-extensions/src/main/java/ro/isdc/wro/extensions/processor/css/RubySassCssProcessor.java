@@ -32,7 +32,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class RubySassCssProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(RubySassCssProcessor.class);
-  
   public static final String ALIAS = "rubySassCss";
   
   /**

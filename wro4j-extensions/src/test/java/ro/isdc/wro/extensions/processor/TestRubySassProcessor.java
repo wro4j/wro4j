@@ -6,7 +6,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -17,7 +17,7 @@ public class TestRubySassProcessor {
     public void testRubySassPreProcessor()
             throws IOException {
         final URL url = getClass().getResource("rubysass");
-        final ResourcePreProcessor processor = new SassCssProcessor(SassCssProcessor.Engines.RUBY);
+        final ResourcePreProcessor processor = new RubySassCssProcessor();
 
         final File testFolder = new File(url.getFile(), "templates");
         final File expectedFolder = new File(url.getFile(), "results");
@@ -28,7 +28,7 @@ public class TestRubySassProcessor {
     public void testRubySassPostProcessor()
             throws IOException {
         final URL url = getClass().getResource("rubysass");
-        final ResourcePostProcessor processor = new SassCssProcessor(SassCssProcessor.Engines.RUBY);
+        final ResourcePostProcessor processor = new RubySassCssProcessor();
 
         final File testFolder = new File(url.getFile(), "templates");
         final File expectedFolder = new File(url.getFile(), "results");

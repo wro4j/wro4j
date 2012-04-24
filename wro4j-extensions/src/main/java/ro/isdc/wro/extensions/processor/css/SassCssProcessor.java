@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
+import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
 import ro.isdc.wro.extensions.processor.support.sass.SassCss;
 import ro.isdc.wro.model.resource.Resource;
@@ -20,6 +22,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -35,10 +38,8 @@ public class SassCssProcessor
   public static final String ALIAS = "sassCss";
   public static final String ALIAS_RUBY = "rubySassCss";
   
-  /**
-   * Private class definition for reflection use
-   */
-  private Class<?> clazz = SassCssProcessor.class;
+  
+  private ObjectPoolHelper<SassCss> enginePool;
   
   /**
    * ENUM for supported engine types
@@ -56,16 +57,13 @@ public class SassCssProcessor
    * default constructor that sets the engine used to RHINO for backwards compatibility.
    */
   public SassCssProcessor() {
+    enginePool = new ObjectPoolHelper<SassCss>(new ObjectFactory<SassCss>() {
+      @Override
+      public SassCss create() {
+        return newEngine();
+      }
+    });
     this.engine = Engines.RHINO;
-  }
-  
-  /**
-   * Overloaded constructor that accepts the engine to use for processing.
-   * 
-   * @param eg
-   */
-  public SassCssProcessor(Engines eg) {
-    this.engine = eg;
   }
   
   /**
@@ -74,17 +72,24 @@ public class SassCssProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
+    final SassCss engine = enginePool.getObject();
     try {
-      writer.write(processUsingEngine(content));
+      writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       writer.write(content);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + clazz.getClass().getSimpleName() + " processor on the " + resourceUri
+      LOG.warn("Exception while applying " + SassCss.class.getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
+      try {
+        enginePool.returnObject(engine);
+      } catch (final Exception e) {
+        //should never happen
+        LOG.error("Cannot return lessCss engine to the pool", e);
+      }
     }
   }
   
@@ -95,40 +100,13 @@ public class SassCssProcessor
   }
   
   /**
-   * Processor factory for use with multiple engines
-   * 
-   * @param content
-   * @return Processed string
-   */
-  private String processUsingEngine(String content) {
-    
-    switch (engine) {
-      case RUBY:
-        return processUsingRuby(content);
-      default:
-        return processUsingRhino(content);
-        
-    }
-  }
-  
-  /**
    * Method for processing with Rhino based engine
    * 
    * @param content
    * @return
    */
-  private String processUsingRhino(String content) {
-    return new SassCss().process(content);
-  }
-  
-  /**
-   * Method for processing with Ruby based engine
-   * 
-   * @param context
-   * @return
-   */
-  private String processUsingRuby(String context) {
-    return new RubySassEngine().process(context);
+  protected SassCss newEngine() {
+    return new SassCss();
   }
   
   /**
