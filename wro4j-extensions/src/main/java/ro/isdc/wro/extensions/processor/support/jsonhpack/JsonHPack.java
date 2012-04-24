@@ -6,7 +6,6 @@ package ro.isdc.wro.extensions.processor.support.jsonhpack;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

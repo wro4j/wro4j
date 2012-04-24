@@ -1,0 +1,10 @@
+/* style.css */
+#navbar {
+  width: 800px;
+  border-bottom: 2px solid #ce4dd6; }
+  #navbar li {
+    float: left;
+    width: 150px;
+    background-color: #e5a0e9; }
+    #navbar li:hover {
+      background-color: #d976e0; }
