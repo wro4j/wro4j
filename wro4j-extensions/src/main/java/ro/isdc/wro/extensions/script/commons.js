@@ -132,5 +132,5 @@ if (!Object.keys) {
 if (!String.prototype.trim) {
 	String.prototype.trim = function() {
 		return String(this).replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-	};
+	}
 }

@@ -77,7 +77,7 @@ public class JsonHPackProcessor
       onException(e);
       writer.write(content);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while  applying lessCss processor on the " + resourceUri
+      LOG.warn("Exception while applying hpack processor on the " + resourceUri
           + " resource, no processing applied...", e);
     } finally {
       reader.close();
