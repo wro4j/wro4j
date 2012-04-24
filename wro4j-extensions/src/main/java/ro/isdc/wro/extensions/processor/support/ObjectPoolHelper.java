@@ -34,7 +34,7 @@ public class ObjectPoolHelper<T> {
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
     final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
-    objectPool = new GenericObjectPool<T>(new BasePoolableObjectFactory<T>() {
+    objectPool = new GenericObjectPool(new BasePoolableObjectFactory<T>() {
       @Override
       public T makeObject()
         throws Exception {
