@@ -25,6 +25,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class JsonHPack {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPack.class);
+  private static final String DEFAULT_JS = "json.hpack.min.js";
   private ScriptableObject scope;
 
   /**
@@ -35,7 +36,7 @@ public class JsonHPack {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
         builder = RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
-          getScriptAsStream(), "json.hpack.js");
+          getScriptAsStream(), DEFAULT_JS);
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);
@@ -52,7 +53,7 @@ public class JsonHPack {
    * @return stream of the script.
    */
   protected InputStream getScriptAsStream() {
-    return JsonHPack.class.getResourceAsStream("json.hpack.min.js");
+    return JsonHPack.class.getResourceAsStream(DEFAULT_JS);
   }
 
 
