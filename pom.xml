@@ -192,9 +192,9 @@
         <version>${closure.version}</version>
       </dependency>	 
       <dependency>
-        <groupId>org.dojotoolkit</groupId>
+        <groupId>com.github.lltyk</groupId>
         <artifactId>dojo-shrinksafe</artifactId>
-        <version>1.6.1</version>
+        <version>1.7.2</version>
       </dependency>      
       <!-- Unit tests -->
       <dependency>
