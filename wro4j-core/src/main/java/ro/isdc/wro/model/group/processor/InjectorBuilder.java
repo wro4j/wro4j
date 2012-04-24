@@ -62,7 +62,6 @@ public class InjectorBuilder {
     });
     map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        //return uriLocatorFactory;
         return new InjectorAwareUriLocatorFactoryDecorator(uriLocatorFactory, injector);
       }
     });
