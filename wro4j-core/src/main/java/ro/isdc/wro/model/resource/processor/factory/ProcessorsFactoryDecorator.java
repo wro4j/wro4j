@@ -2,7 +2,8 @@ package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.Collection;
 
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import org.apache.commons.lang3.Validate;
+
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -13,18 +14,26 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created 24 Apr 2012
  * @since 1.4.6
  */
-
 public class ProcessorsFactoryDecorator
     implements ProcessorsFactory {
+  private final ProcessorsFactory decorated;
   
+  public ProcessorsFactoryDecorator(final ProcessorsFactory decorated) {
+    Validate.notNull(decorated);
+    this.decorated = decorated;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
   public Collection<ResourcePreProcessor> getPreProcessors() {
-    // TODO Auto-generated method stub
-    return null;
+    return decorated.getPreProcessors();
   }
-  
+
+  /**
+   * {@inheritDoc}
+   */
   public Collection<ResourcePostProcessor> getPostProcessors() {
-    // TODO Auto-generated method stub
-    return null;
+    return decorated.getPostProcessors();
   }
-  
 }
