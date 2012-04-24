@@ -118,6 +118,18 @@ public class WroTestUtils {
   }
   
   /**
+   * Compares files with the same name from sourceFolder against it's counterpart in targetFolder, but allows
+   * source and target files to have different extensions.
+   * TODO run tests in parallel
+   */
+  public static void compareFromDifferentFoldersByName(final File sourceFolder, final File targetFolder,
+     final String srcExtension, final String targetExtension, final ResourceProcessor processor)
+     throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
+        Transformers.extensionTransformer("css"), processor);
+  }
+  
+  /**
    * @return the injector
    */
   public static void initProcessor(final ResourceProcessor processor) {
@@ -264,7 +276,7 @@ public class WroTestUtils {
   }
   
   /**
-   * /** Applies a function for each file from a folder. The folder should contain at least one file to process,
+   * Applies a function for each file from a folder. The folder should contain at least one file to process,
    * otherwise an exception will be thrown.
    * 
    * @param folder
@@ -279,7 +291,7 @@ public class WroTestUtils {
     for (final File file : files) {
       try {
         function.apply(file);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Problem while applying function on file: " + file, e);
       }
       processedNumber++;
@@ -353,7 +365,7 @@ public class WroTestUtils {
       throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {

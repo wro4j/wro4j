@@ -125,7 +125,7 @@ public class LessCssProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
-    final LessCss lessCss = getEngine();
+    final LessCss lessCss = enginePool.getObject();
     try {
       writer.write(lessCss.less(content));
     } catch (final WroRuntimeException e) {
@@ -152,15 +152,6 @@ public class LessCssProcessor
    */
   protected void onException(final WroRuntimeException e) {
   }
-
-
-  /**
-   * A getter used for lazy loading.
-   */
-  private LessCss getEngine() {
-    return enginePool.getObject();
-  }
-
 
   /**
    * @return the {@link LessCss} engine implementation. Override it to provide a different version of the less.js

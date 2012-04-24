@@ -39,6 +39,8 @@ import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 public class TestJarWildcardStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(TestJarWildcardStreamLocator.class);
 
+  private static final String SEP = File.separator;
+
   private JarWildcardStreamLocator jarStreamLocator;
 
   private final String testInfo = "var foo = 'Hello World';";

@@ -383,7 +383,7 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>                         
+          </plugin>
           <plugin>
             <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
