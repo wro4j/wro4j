@@ -30,8 +30,12 @@ public final class InjectorAwareUriLocatorFactoryDecorator
     super(decorated);
     Validate.notNull(injector);
     this.injector = injector;
+    inject(decorated);
   }
-  
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UriLocator getInstance(final String uri) {
     final UriLocator instance = super.getInstance(uri);
@@ -42,6 +46,20 @@ public final class InjectorAwareUriLocatorFactoryDecorator
     return instance;
   }
   
+  /**
+   * Handles injection by inspecting decorated factories if required. 
+   */
+  private void inject(final UriLocatorFactory locatorFactory) {
+    Validate.notNull(locatorFactory);
+    injector.inject(locatorFactory);
+    if (locatorFactory instanceof UriLocatorFactoryDecorator) {
+      injector.inject(((UriLocatorFactoryDecorator) locatorFactory).getDecoratedObject());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InputStream locate(final String uri)
       throws IOException {
