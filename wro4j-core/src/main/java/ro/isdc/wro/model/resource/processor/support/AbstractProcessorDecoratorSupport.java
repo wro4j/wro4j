@@ -87,7 +87,7 @@ public abstract class AbstractProcessorDecoratorSupport
   /**
    * @return the array of supported resources the processor can process.
    */
-  public final <T> ResourceType[] getSupportedResourceTypes() {
+  public final ResourceType[] getSupportedResourceTypes() {
     final SupportedResourceType supportedType = getSupportedResourceType();
     return supportedType == null ? ResourceType.values() : new ResourceType[] {
       supportedType.value()

@@ -94,9 +94,12 @@ public class ProcessorDecorator
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {
     Validate.notNull(searchedType);
+    
     final SupportedResourceType supportedType = getSupportedResourceType();
-    final boolean isTypeSatisfied = supportedType == null || (supportedType != null && searchedType == supportedType.value());
+    final boolean isTypeSatisfied = supportedType == null
+        || (supportedType != null && searchedType == supportedType.value());
     final boolean isMinimizedSatisfied = minimize == true || !isMinimize();
+    
     return isTypeSatisfied && isMinimizedSatisfied;
   }
 }

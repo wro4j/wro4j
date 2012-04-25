@@ -20,11 +20,11 @@ public final class InjectorAwareProcessorsFactoryDecorator
     extends ProcessorsFactoryDecorator {
   private final Injector injector;
   
-  
   public InjectorAwareProcessorsFactoryDecorator(final ProcessorsFactory decorated, final Injector injector) {
     super(decorated);
     Validate.notNull(injector);
     this.injector = injector;
+    inject(decorated);
   }
 
   /**
@@ -54,10 +54,13 @@ public final class InjectorAwareProcessorsFactoryDecorator
   /**
    * Handles injection for decorators.
    */
-  private void inject(final ResourcePreProcessor processor) {
-    injector.inject(processor);
-    if (processor instanceof ProcessorDecorator) {
-      injector.inject(((ProcessorDecorator) processor).getDecoratedProcessor());
+  private void inject(final Object object) {
+    injector.inject(object);
+    if (object instanceof ProcessorDecorator) {
+      injector.inject(((ProcessorDecorator) object).getDecoratedProcessor());
+    }
+    if (object instanceof ProcessorsFactoryDecorator) {
+      injector.inject(((ProcessorsFactoryDecorator) object).getDecoratedObject());
     }
   }
 }

@@ -11,6 +11,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 
@@ -40,13 +41,29 @@ public class TestInjectorAwareUriLocatorFactoryDecorator {
   }
   
   @Test
-  public void test() {
+  public void shouldInjectFieldsOfTheDecoratedFactory() {
     final SampleUriLocatorFactory locatorFactory = new SampleUriLocatorFactory();
     new InjectorAwareUriLocatorFactoryDecorator(locatorFactory, injector);
     Assert.assertNotNull(locatorFactory.processorsFactory);
   }
   
+  @Test
+  public void shouldInjectFieldsOfAddedLocators() {
+    final SampleLocator locator = new SampleLocator();
+    final UriLocatorFactory sampleFactory = new SimpleUriLocatorFactory().addUriLocator(locator);
+    final UriLocatorFactory factory = new InjectorAwareUriLocatorFactoryDecorator(sampleFactory, injector);
+    //trigger injection processing
+    factory.getInstance("/uri");
+    Assert.assertNotNull(locator.processorsFactory);
+  }
+  
+  
   private static class SampleUriLocatorFactory extends SimpleUriLocatorFactory {
+    @Inject
+    ProcessorsFactory processorsFactory;
+  }
+  
+  private static class SampleLocator extends ServletContextUriLocator {
     @Inject
     ProcessorsFactory processorsFactory;
   }
