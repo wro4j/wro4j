@@ -69,7 +69,7 @@ public class PerformanceLoggerCallback
   @Override
   public void onProcessingComplete() {
     stopWatchIfRunning();
-    if (getWatch().getTaskCount() > 0) {
+    if (getWatch().isRunning() && getWatch().getTaskCount() > 0) {
       LOG.debug(getWatch().prettyPrint());
     }
   }

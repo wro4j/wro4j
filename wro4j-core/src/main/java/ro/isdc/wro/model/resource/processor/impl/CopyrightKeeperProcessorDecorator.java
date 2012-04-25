@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**
@@ -30,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.3.7
  */
 public class CopyrightKeeperProcessorDecorator
-  extends AbstractProcessorDecorator {
+  extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
 
   /** The url pattern */

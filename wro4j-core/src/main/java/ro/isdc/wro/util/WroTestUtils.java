@@ -48,7 +48,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -71,7 +70,7 @@ public class WroTestUtils {
   public static InputStream getPropertiesStream(final Properties properties) {
     final StringWriter propsAsString = new StringWriter();
     properties.list(new PrintWriter(propsAsString));
-    return new ByteArrayInputStream(propsAsString.toString().getBytes());
+    return new ByteArrayInputStream(propsAsString.toString().getBytes()); 
   }
 
 
@@ -88,14 +87,6 @@ public class WroTestUtils {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
     WroTestUtils.compare(resultReader, expectedReader, processor);
-  }
-
-
-  public static void compareProcessedResourceContents(final String inputResourceUri,
-    final String expectedContentResourceUri, final ResourcePreProcessor processor)
-    throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri,
-      ProcessorsUtils.toPostProcessor(processor));
   }
 
 
@@ -117,7 +108,8 @@ public class WroTestUtils {
   }
 
   public static void init(final WroModelFactory factory) {
-    new BaseWroManagerFactory().setModelFactory(factory).create();
+    WroManager manager = new BaseWroManagerFactory().setModelFactory(factory).create();
+    new InjectorBuilder(manager).build().inject(factory);
   }
 
   /**

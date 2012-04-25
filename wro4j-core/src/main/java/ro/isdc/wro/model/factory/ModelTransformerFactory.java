@@ -23,9 +23,13 @@ import ro.isdc.wro.util.Transformer;
  * @since 1.4.0
  */
 public class ModelTransformerFactory
-    extends WroModelFactoryDecorator {
+    extends WroModelFactoryDecorator implements ModelTransformersAware {
   private static final Logger LOG = LoggerFactory.getLogger(ModelTransformerFactory.class);
   private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
+  
+  /**
+   * Decorates a model factory.
+   */
   public ModelTransformerFactory(final WroModelFactory decorated) {
     super(decorated);
   }
@@ -37,6 +41,13 @@ public class ModelTransformerFactory
     Validate.notNull(modelTransformers);
     this.modelTransformers = modelTransformers;
     return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public List<? extends Transformer<WroModel>> getModelTransformers() {
+    return modelTransformers;
   }
 
   /**

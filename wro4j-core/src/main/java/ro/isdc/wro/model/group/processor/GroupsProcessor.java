@@ -41,8 +41,6 @@ public class GroupsProcessor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private Injector injector;
-  @Inject
   private WroConfiguration config;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
@@ -138,9 +136,6 @@ public class GroupsProcessor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
-      //inject all required properites
-      injector.inject(processor);
-
       output = new StringWriter();
       decorateWithPostProcessCallback(processor).process(input, output);
 
