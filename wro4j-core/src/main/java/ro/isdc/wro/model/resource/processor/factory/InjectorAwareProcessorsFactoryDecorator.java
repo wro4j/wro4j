@@ -7,6 +7,7 @@ import org.apache.commons.lang3.Validate;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 /**
  *  Responsible for injecting each processor with required fields before being used.
@@ -33,7 +34,7 @@ public final class InjectorAwareProcessorsFactoryDecorator
   public Collection<ResourcePreProcessor> getPreProcessors() {
     final Collection<ResourcePreProcessor> processors = super.getPreProcessors();
     for (ResourcePreProcessor processor : processors) {
-      injector.inject(processor);
+      inject(processor);
     }
     return processors;
   }
@@ -45,8 +46,18 @@ public final class InjectorAwareProcessorsFactoryDecorator
   public Collection<ResourcePostProcessor> getPostProcessors() {
     final Collection<ResourcePostProcessor> processors = super.getPostProcessors();
     for (ResourcePostProcessor processor : processors) {
-      injector.inject(processor);
+      inject(new ProcessorDecorator(processor));
     }
     return processors;
+  }
+  
+  /**
+   * Handles injection for decorators.
+   */
+  private void inject(final ResourcePreProcessor processor) {
+    injector.inject(processor);
+    if (processor instanceof ProcessorDecorator) {
+      injector.inject(((ProcessorDecorator) processor).getDecoratedProcessor());
+    }
   }
 }

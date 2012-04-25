@@ -98,7 +98,7 @@ public abstract class AbstractProcessorsFilter
       } else {
         for (final ResourcePreProcessor processor : processors) {
           stopWatch.start("Using " + processor.getClass().getSimpleName());
-          // inject all required properites
+          // inject all required properties
           injector.inject(processor);
 
           output = new StringWriter();

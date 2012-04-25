@@ -34,7 +34,6 @@ import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
@@ -63,10 +62,12 @@ public class WroManager
   /**
    * ResourcesModel factory.
    */
-  WroModelFactory modelFactory;
+  @Inject
+  private WroModelFactory modelFactory;
   /**
    * GroupExtractor.
    */
+  @Inject
   private GroupExtractor groupExtractor;
   /**
    * HashBuilder for creating a hash based on the processed content.
@@ -88,11 +89,14 @@ public class WroManager
    * Schedules the model update.
    */
   private final SchedulerHelper modelSchedulerHelper;
+  @Inject
   private ProcessorsFactory processorsFactory;
+  @Inject
   private UriLocatorFactory uriLocatorFactory;
   /**
    * Rename the file name based on its original name and content.
    */
+  @Inject
   private NamingStrategy namingStrategy;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
@@ -420,24 +424,9 @@ public class WroManager
     return this;
   }
 
-
-  /**
-   * @param modelFactory the modelFactory to set
-   */
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
-    // decorate with callback registry call
-    this.modelFactory = new WroModelFactoryDecorator(modelFactory) {
-      @Override
-      public WroModel create() {
-        callbackRegistry.onBeforeModelCreated();
-        try {
-          return super.create();
-        } finally {
-          callbackRegistry.onAfterModelCreated();
-        }
-      }
-    };
+    this.modelFactory = modelFactory;
     return this;
   }
 
@@ -455,7 +444,7 @@ public class WroManager
   /**
    * @param contentDigester the contentDigester to set
    */
-  public WroManager setHashBuilder(final HashBuilder contentDigester) {
+  public final WroManager setHashBuilder(final HashBuilder contentDigester) {
     Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
     return this;
@@ -465,7 +454,7 @@ public class WroManager
   /**
    * @return the modelFactory
    */
-  public WroModelFactory getModelFactory() {
+  public final WroModelFactory getModelFactory() {
     return modelFactory;
   }
 
@@ -473,7 +462,7 @@ public class WroManager
   /**
    * @return the processorsFactory used by this WroManager.
    */
-  public ProcessorsFactory getProcessorsFactory() {
+  public final ProcessorsFactory getProcessorsFactory() {
     return processorsFactory;
   }
 
@@ -481,16 +470,21 @@ public class WroManager
   /**
    * @param processorsFactory the processorsFactory to set
    */
-  public WroManager setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+  public final WroManager setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
     return this;
+  }
+
+
+  public final void setNamingStrategy(final NamingStrategy namingStrategy) {
+    this.namingStrategy = namingStrategy;
   }
 
 
   /**
    * @param uriLocatorFactory the uriLocatorFactory to set
    */
-  public WroManager setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
+  public final WroManager setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
     this.uriLocatorFactory = uriLocatorFactory;
     return this;
   }
@@ -499,7 +493,7 @@ public class WroManager
   /**
    * @return the cacheStrategy
    */
-  public CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
+  public final CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
     return cacheStrategy;
   }
 
@@ -507,10 +501,9 @@ public class WroManager
   /**
    * @return the uriLocatorFactory
    */
-  public UriLocatorFactory getUriLocatorFactory() {
+  public final UriLocatorFactory getUriLocatorFactory() {
     return uriLocatorFactory;
   }
-
 
   /**
    * @return The strategy used to rename bundled resources.
@@ -518,25 +511,15 @@ public class WroManager
   public final NamingStrategy getNamingStrategy() {
     return this.namingStrategy;
   }
+  
 
-  /**
-   * This method is visible for testing only.
-   */
-  GroupsProcessor getGroupsProcessor() {
+  public final GroupExtractor getGroupExtractor() {
+    return groupExtractor;
+  }
+
+  public final GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
   }
-
-
-  /**
-   * Use {@link WroManager#registerCallback(LifecycleCallback)} instead.
-   *
-   * @return the holder of registered callbacks. Use it to register custom callbacks.
-   */
-  @Deprecated
-  public LifecycleCallbackRegistry getCallbackRegistry() {
-    return callbackRegistry;
-  }
-
 
   /**
    * Registers a callback.
@@ -546,15 +529,6 @@ public class WroManager
   public final void registerCallback(final LifecycleCallback callback) {
     Validate.notNull(callback);
     callbackRegistry.registerCallback(callback);
-  }
-
-  /**
-   * @param namingStrategy the namingStrategy to set
-   */
-  public final WroManager setNamingStrategy(final NamingStrategy namingStrategy) {
-    Validate.notNull(namingStrategy);
-    this.namingStrategy = namingStrategy;
-    return this;
   }
 
   /**

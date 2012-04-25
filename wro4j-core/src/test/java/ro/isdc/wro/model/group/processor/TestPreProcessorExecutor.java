@@ -3,11 +3,19 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
@@ -15,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +46,28 @@ import ro.isdc.wro.util.StopWatch;
  */
 public class TestPreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(TestPreProcessorExecutor.class);
+  @Mock
+  private HttpServletRequest mockRequest;
+  @Mock
+  private HttpServletResponse mockResponse;
+  @Mock
+  private FilterConfig mockFilterConfig;
+  @Mock
+  private ServletContext mockServletContext;
 
   private PreProcessorExecutor executor;
 
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    initMocks(this);
+    
+    when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
+    when(mockRequest.getServletPath()).thenReturn("");
+    when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    
+    final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
+    Context.set(context);
     //force parallel execution
     Context.get().getConfig().setParallelPreprocessing(true);
     initExecutor();
@@ -157,7 +181,7 @@ public class TestPreProcessorExecutor {
   public void shouldNotFailWhenProcessingInvalidResource()
     throws IOException {
     initExecutor(createProcessorUsingMissingResource());
-    final List<Resource> resources = createResources(Resource.create("uri", ResourceType.JS));
+    final List<Resource> resources = createResources(Resource.create("/uri", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
     Assert.assertEquals("", result);
   }

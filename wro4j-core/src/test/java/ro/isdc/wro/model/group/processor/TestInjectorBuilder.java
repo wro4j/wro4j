@@ -22,16 +22,19 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactoryDecorator;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 /**
@@ -109,19 +112,24 @@ public class TestInjectorBuilder {
     final PreProcessorExecutor preProcessorExecutor = Mockito.mock(PreProcessorExecutor.class);
     final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
     final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
-    final Injector injector = new InjectorBuilder().setNamingStrategy(namingStrategy).setPreProcessorExecutor(
-      preProcessorExecutor).setProcessorsFactory(processorsFactory).setUriLocatorFactory(uriLocatorFactory).build();
+    
+    final WroManager manager = new BaseWroManagerFactory().create();
+    
+    final Injector injector = new InjectorBuilder(manager).setNamingStrategy(namingStrategy).setPreProcessorExecutor(
+        preProcessorExecutor).setProcessorsFactory(processorsFactory).setUriLocatorFactory(uriLocatorFactory).build();
     Assert.assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
     Assert.assertSame(namingStrategy, sample.namingStrategy);
     Assert.assertSame(preProcessorExecutor, sample.preProcessorExecutor);
-    Assert.assertSame(processorsFactory, sample.processorsFactory);
-    Assert.assertSame(uriLocatorFactory, ((UriLocatorFactoryDecorator) sample.uriLocatorFactor).getDecoratedFactory());
+    Assert.assertSame(processorsFactory, ((ProcessorsFactoryDecorator) sample.processorsFactory).getDecoratedObject());
+    Assert.assertSame(uriLocatorFactory, ((UriLocatorFactoryDecorator) sample.uriLocatorFactor).getDecoratedObject());
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
+    Assert.assertNotNull(sample.modelFactory);
+    Assert.assertNotNull(sample.groupExtractor);
   }
   
   @Test(expected = IOException.class)
@@ -155,5 +163,9 @@ public class TestInjectorBuilder {
     Injector injector;
     @Inject
     GroupsProcessor groupsProcessor;
+    @Inject
+    WroModelFactory modelFactory;
+    @Inject
+    GroupExtractor groupExtractor;
   }
 }

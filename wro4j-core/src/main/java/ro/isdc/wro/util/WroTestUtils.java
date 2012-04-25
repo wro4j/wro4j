@@ -70,7 +70,7 @@ public class WroTestUtils {
   public static InputStream getPropertiesStream(final Properties properties) {
     final StringWriter propsAsString = new StringWriter();
     properties.list(new PrintWriter(propsAsString));
-    return new ByteArrayInputStream(propsAsString.toString().getBytes());
+    return new ByteArrayInputStream(propsAsString.toString().getBytes()); 
   }
 
 
@@ -108,7 +108,8 @@ public class WroTestUtils {
   }
 
   public static void init(final WroModelFactory factory) {
-    new BaseWroManagerFactory().setModelFactory(factory).create();
+    WroManager manager = new BaseWroManagerFactory().setModelFactory(factory).create();
+    new InjectorBuilder(manager).build().inject(factory);
   }
 
   /**

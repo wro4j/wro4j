@@ -43,8 +43,12 @@ public final class InjectorAwareUriLocatorFactoryDecorator
   }
   
   @Override
-  public InputStream locate(String uri)
+  public InputStream locate(final String uri)
       throws IOException {
-    return getInstance(uri).locate(uri);
+    final UriLocator locator = getInstance(uri);
+    if (locator == null) {
+      throw new IOException("No locator is capable handling uri: " + uri);
+    }
+    return locator.locate(uri);
   }
 }
