@@ -151,11 +151,7 @@ public class Context {
   private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
     this.request = new FieldsSavingRequestWrapper(request);
     this.response = response;
-    if (filterConfig != null) {
-      this.servletContext = filterConfig.getServletContext();
-    } else {
-      this.servletContext = null;
-    }
+    this.servletContext = filterConfig != null ? filterConfig.getServletContext() : null;
     this.filterConfig = filterConfig;
   }
 
