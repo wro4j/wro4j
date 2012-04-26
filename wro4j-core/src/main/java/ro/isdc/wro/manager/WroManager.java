@@ -205,17 +205,16 @@ public class WroManager
 
       os = response.getOutputStream();
       if (contentHashEntry.getRawContent() != null) {
-        // Do not set content length because we don't know the length in case it is gzipped. This could cause an
-        // unnecessary overhead caused by some browsers which wait for the rest of the content-length until timeout.
-        // make the input stream encoding aware.
-        // use gziped response if supported
+        // use gziped response if supported & Set content length based on gzip flag
         if (isGzipAllowed()) {
+          response.setContentLength(contentHashEntry.getGzippedContent().length);
           // add gzip header and gzip response
           response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(contentHashEntry.getGzippedContent(), os);
         } else {
           IOUtils.write(contentHashEntry.getRawContent(), os, configuration.getEncoding());
+          response.setContentLength(contentHashEntry.getRawContent().length());
         }
       }
     } finally {
