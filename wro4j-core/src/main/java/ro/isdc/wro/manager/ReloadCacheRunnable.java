@@ -40,7 +40,7 @@ public final class ReloadCacheRunnable
         // invoke cacheChangeCallback
         wroManagerReference.get().cacheChangeListener.propertyChange(null);
       }
-      final WroModel model = wroManagerReference.get().modelFactory.create();
+      final WroModel model = wroManagerReference.get().getModelFactory().create();
       // process groups & put update cache
       final Collection<Group> groups = model.getUsedGroups();
       // update cache for all resources

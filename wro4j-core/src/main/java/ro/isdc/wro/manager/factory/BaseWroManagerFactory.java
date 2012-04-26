@@ -21,9 +21,6 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
-import ro.isdc.wro.model.factory.ModelTransformerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -111,17 +108,13 @@ public class BaseWroManagerFactory
       manager.setUriLocatorFactory(uriLocatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
-      // wrap modelFactory with several useful decorators
-      manager.setModelFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
-        new ModelTransformerFactory(modelFactory).setTransformers(modelTransformers))));
-
-      final Injector injector = new InjectorBuilder(manager).build();
+      manager.setModelFactory(modelFactory);
+      
+      final Injector injector = new InjectorBuilder(manager).setModelTransformers(
+          modelTransformers).build();
+      
       injector.inject(manager);
-      injector.inject(modelFactory);
-      //transformers also require injection
-      for (final Transformer<WroModel> transformer : modelTransformers) {
-        injector.inject(transformer);
-      }
+      
       onAfterInitializeManager(manager);
       return manager;
     }
@@ -334,6 +327,11 @@ public class BaseWroManagerFactory
    */
   public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
+  }
+  
+
+  public WroModelFactory getModelFactory() {
+    return modelFactory;
   }
 
   /**

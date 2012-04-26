@@ -302,12 +302,12 @@ public class WroFilter
 
       // TODO move API related checks into separate class and determine filter mapping for better mapping
       if (shouldReloadCache()) {
-        Context.get().getConfig().reloadCache();
+        wroConfiguration.reloadCache();
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
         response.setStatus(HttpServletResponse.SC_OK);
       } else if (shouldReloadModel()) {
-        Context.get().getConfig().reloadModel();
+        wroConfiguration.reloadModel();
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
         response.setStatus(HttpServletResponse.SC_OK);
@@ -332,14 +332,14 @@ public class WroFilter
    * @return true if reload model must be triggered.
    */
   private boolean shouldReloadModel() {
-    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_MODEL);
+    return wroConfiguration.isDebug() && matchesUrl(API_RELOAD_MODEL);
   }
 
   /**
    * @return true if reload cache must be triggered.
    */
   private boolean shouldReloadCache() {
-    return Context.get().getConfig().isDebug() && matchesUrl(API_RELOAD_CACHE);
+    return wroConfiguration.isDebug() && matchesUrl(API_RELOAD_CACHE);
   }
 
   /**

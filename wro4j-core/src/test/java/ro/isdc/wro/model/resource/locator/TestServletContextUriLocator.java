@@ -28,6 +28,8 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 
 
 /**
@@ -61,6 +63,16 @@ public class TestServletContextUriLocator {
     Context.set(context, config);
     
     locator = new ServletContextUriLocator();
+    
+    initLocator(locator);
+  }
+
+  /**
+   * Initialize the locator by injecting all required fields.
+   */
+  private void initLocator(final ServletContextUriLocator locator) {
+    Injector injector = new InjectorBuilder().build();
+    injector.inject(locator);
   }
 
   @Test(expected = NullPointerException.class)
@@ -127,6 +139,7 @@ public class TestServletContextUriLocator {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
     final ServletContextUriLocator locator = new ServletContextUriLocator();
+    initLocator(locator);
     locator.setLocatorStrategy(ServletContextUriLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
 
     final InputStream actualIs = locator.locate("test.css");

@@ -69,8 +69,8 @@
     <maven.version>3.0.3</maven.version>    
     <mockito.version>1.9.0</mockito.version>
     <junit.version>4.10</junit.version>    
-    <rhino.version>1.7R2</rhino.version>
-    
+    <rhino.version>1.7R3</rhino.version>
+     
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  
     <maven.compile.encoding>UTF-8</maven.compile.encoding>
@@ -182,8 +182,8 @@
       </dependency>
       <!-- Third Party Tools -->      
       <dependency>
-        <groupId>rhino</groupId>
-        <artifactId>js</artifactId>
+        <groupId>org.mozilla</groupId>
+        <artifactId>rhino</artifactId>
         <version>${rhino.version}</version>
       </dependency>
  	    <dependency>
@@ -192,9 +192,9 @@
         <version>${closure.version}</version>
       </dependency>	 
       <dependency>
-        <groupId>org.dojotoolkit</groupId>
+        <groupId>com.github.lltyk</groupId>
         <artifactId>dojo-shrinksafe</artifactId>
-        <version>1.6.1</version>
+        <version>1.7.2</version>
       </dependency>      
       <!-- Unit tests -->
       <dependency>
@@ -383,7 +383,7 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>                         
+          </plugin>
           <plugin>
             <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
