@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 
 
 /**
@@ -57,6 +59,12 @@ public class TestServletContextResourceLocator {
     final WroConfiguration config = new WroConfiguration();
     config.setConnectionTimeout(100);
     Context.set(context, config);
+  }
+  
+  private void useLocator(final ServletContextResourceLocator locator) {
+    Validate.notNull(locator);
+    this.locator = locator;
+    new InjectorBuilder().build().inject(locator);
   }
 
   @Test(expected = NullPointerException.class)
@@ -103,7 +111,7 @@ public class TestServletContextResourceLocator {
   @Test(expected = IOException.class)
   public void testWildcardInexistentResources()
       throws IOException {
-    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/**.NOTEXIST"));
+    useLocator(new ServletContextResourceLocator(mockServletContext, createUri("/css/**.NOTEXIST")));
     locator.getInputStream();
   }
 
@@ -118,7 +126,7 @@ public class TestServletContextResourceLocator {
   @Test(expected = IOException.class)
   public void testSomeUri()
       throws Exception {
-    locator = new ServletContextResourceLocator(mockServletContext, createUri("resourcePath"));
+    useLocator(new ServletContextResourceLocator(mockServletContext, createUri("resourcePath")));
     locator.getInputStream();
   }
 
@@ -131,7 +139,7 @@ public class TestServletContextResourceLocator {
     Mockito.when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
     Mockito.when(mockServletContext.getRequestDispatcher(Mockito.anyString())).thenReturn(null);
 
-    locator = new ServletContextResourceLocator(mockServletContext, "/css/resourcePath.css");
+    useLocator(new ServletContextResourceLocator(mockServletContext, "/css/resourcePath.css"));
     final InputStream is = locator.getInputStream();
     // the response should be empty
     Assert.assertEquals(-1, is.read());
@@ -143,7 +151,7 @@ public class TestServletContextResourceLocator {
     final InputStream is = new ByteArrayInputStream("a {}".getBytes());
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
-    locator = new ServletContextResourceLocator(mockServletContext, "test.css");
+    useLocator(new ServletContextResourceLocator(mockServletContext, "test.css"));
     locator.setLocatorStrategy(ServletContextResourceLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
 
     final InputStream actualIs = locator.getInputStream();

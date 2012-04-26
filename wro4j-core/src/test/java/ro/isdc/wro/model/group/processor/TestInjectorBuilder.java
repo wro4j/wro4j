@@ -82,8 +82,8 @@ public class TestInjectorBuilder {
     injector.inject(sample);
     Assert.assertNotNull(sample.namingStrategy);
     Assert.assertNotNull(sample.preProcessorExecutor);
-    Assert.assertNull(sample.processorsFactory);
-    Assert.assertNull(sample.resourceLocatorFactory);
+    Assert.assertNotNull(sample.processorsFactory);
+    Assert.assertNotNull(sample.resourceLocatorFactory);
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -139,7 +139,7 @@ public class TestInjectorBuilder {
     final Sample sample = new Sample();
     injector.inject(sample);
     //this will throw NullPointerException if the uriLocator is not injected.
-    sample.resourceLocatorFactory.locate("/path/to/servletContext/resource.js");
+    sample.resourceLocatorFactory.locate("/path/to/servletContext/resource.js").getInputStream();
   }
 
   @After

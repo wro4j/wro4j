@@ -154,6 +154,7 @@ public class InjectorBuilder {
     namingStrategy = manager.getNamingStrategy();
     modelFactory = manager.getModelFactory();
     groupExtractor = manager.getGroupExtractor();
+    
     return this;
   }
 

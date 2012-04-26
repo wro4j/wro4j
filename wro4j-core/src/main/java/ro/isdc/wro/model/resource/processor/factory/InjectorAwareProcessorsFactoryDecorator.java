@@ -45,7 +45,7 @@ public final class InjectorAwareProcessorsFactoryDecorator
   public Collection<ResourceProcessor> getPostProcessors() {
     final Collection<ResourceProcessor> processors = super.getPostProcessors();
     for (ResourceProcessor processor : processors) {
-      inject(new ProcessorDecorator(processor));
+      inject(processor);
     }
     return processors;
   }
