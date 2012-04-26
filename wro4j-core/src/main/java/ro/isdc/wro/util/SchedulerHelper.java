@@ -23,7 +23,7 @@ public class SchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(SchedulerHelper.class);
 
 
-  private DestroyableLazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new DestroyableLazyInitializer<ScheduledThreadPoolExecutor>() {
+  private LazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new LazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
       return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory(SchedulerHelper.this.name)) {
@@ -35,11 +35,10 @@ public class SchedulerHelper {
     }
   };
 
-    //Executors.newSingleThreadScheduledExecutor(createDaemonThreadFactory());
   /**
    * An initializer providing the runnable to schedule.
    */
-  private final DestroyableLazyInitializer<Runnable> lazyRunnable;
+  private final LazyInitializer<Runnable> lazyRunnable;
   /**
    * Period in seconds (how often a runnable should run).
    */
@@ -52,11 +51,11 @@ public class SchedulerHelper {
    */
   private ScheduledFuture<?> future;
 
-  private SchedulerHelper(final DestroyableLazyInitializer<Runnable> lazyRunnable) {
+  private SchedulerHelper(final LazyInitializer<Runnable> lazyRunnable) {
     this(lazyRunnable, null);
   }
 
-  private SchedulerHelper(final DestroyableLazyInitializer<Runnable> lazyRunnable, final String name) {
+  private SchedulerHelper(final LazyInitializer<Runnable> lazyRunnable, final String name) {
     Validate.notNull(lazyRunnable);
     this.name = name;
     this.lazyRunnable = lazyRunnable;
@@ -72,14 +71,14 @@ public class SchedulerHelper {
    *          the name associated with this {@link SchedulerHelper} (useful to detect if this class is causing a memory
    *          leak.
    */
-  public static SchedulerHelper create(final DestroyableLazyInitializer<Runnable> runnableFactory, final String name) {
+  public static SchedulerHelper create(final LazyInitializer<Runnable> runnableFactory, final String name) {
     return new SchedulerHelper(runnableFactory, name);
   }
 
   /**
    * @see SchedulerHelper#create(ObjectFactory, String)
    */
-  public static SchedulerHelper create(final DestroyableLazyInitializer<Runnable> runnableFactory) {
+  public static SchedulerHelper create(final LazyInitializer<Runnable> runnableFactory) {
     return new SchedulerHelper(runnableFactory);
   }
 

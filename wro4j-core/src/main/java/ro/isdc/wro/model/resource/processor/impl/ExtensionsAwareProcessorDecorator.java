@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 /**
  * Enforce decorated processors to be applied only on predefined extension. The extenions should be of this form: "js",
@@ -33,7 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * @since 1.4.1
  */
 public class ExtensionsAwareProcessorDecorator
-    extends AbstractProcessorDecorator {
+    extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(ExtensionsAwareProcessorDecorator.class);
   /**
    * Set of extensions  on which the decorated processor will be applied.

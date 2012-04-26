@@ -35,7 +35,7 @@ public class SassCssProcessor
   public static final String ALIAS = "sassCss";
   
   private ObjectPoolHelper<SassCss> enginePool;
-
+  
   /**
    * default constructor that sets the engine used to RHINO for backwards compatibility.
    */

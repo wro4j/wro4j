@@ -7,27 +7,21 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
  * Decorates a {@link ResourceLocator}.
- *
+ * 
  * @author Alex Objelean
  * @created 1 apr 2011
  * @since 1.4.0
  */
 public class ResourceLocatorDecorator
-  implements ResourceLocator {
-  /**
-   * {@link ResourceLocator} to decorate.
-   */
-  private ResourceLocator decorated;
-
+    extends AbstractDecorator<ResourceLocator>
+    implements ResourceLocator {
   public ResourceLocatorDecorator(final ResourceLocator decorated) {
-    if (decorated == null) {
-      throw new IllegalArgumentException("ResourceLocator cannot be null!");
-    }
-    this.decorated = decorated;
+    super(decorated);
   }
 
   /**
@@ -35,7 +29,7 @@ public class ResourceLocatorDecorator
    */
   public InputStream getInputStream()
     throws IOException {
-    return decorated.getInputStream();
+    return getDecoratedObject().getInputStream();
   }
 
 
@@ -43,7 +37,7 @@ public class ResourceLocatorDecorator
    * {@inheritDoc}
    */
   public long lastModified() {
-    return decorated.lastModified();
+    return getDecoratedObject().lastModified();
   }
 
 
@@ -52,7 +46,7 @@ public class ResourceLocatorDecorator
    */
   public ResourceLocator createRelative(final String relativePath)
     throws IOException {
-    return decorated.createRelative(relativePath);
+    return getDecoratedObject().createRelative(relativePath);
   }
 
 }

@@ -31,6 +31,7 @@ import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -53,8 +54,6 @@ public class PreProcessorExecutor {
   private ProcessorsFactory processorsFactory;
   @Inject
   private WroConfiguration configuration;
-  @Inject
-  private Injector injector;
   /**
    * Runs the preProcessing in parallel.
    */
@@ -168,9 +167,6 @@ public class PreProcessorExecutor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Processor: " + processor.getClass().getSimpleName());
-      //inject all required properites
-      injector.inject(processor);
-
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
@@ -234,7 +230,7 @@ public class PreProcessorExecutor {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        final boolean applyProcessor = resource.isMinimize() || !ProcessorsUtils.isMinimizeAwareProcessor(processor);
+        final boolean applyProcessor = resource.isMinimize() || !new ProcessorDecorator(processor).isMinimize();
         if (applyProcessor) {
           LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
           try {

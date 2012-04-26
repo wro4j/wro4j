@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.StringUtils;
@@ -46,7 +47,8 @@ public class ServletContextResourceLocator
    * Determines the order of dispatcher resource locator and servlet context based resource locator.
    */
   private LocatorStrategy locatorStrategy = LocatorStrategy.DISPATCHER_FIRST;
-  
+  @Inject
+  private Context context;
   /**
    * Available LocatorStrategies. DISPATCHER_FIRST is default option. This means this UriLocator will first try to
    * locate resource via the dispatcher stream locator. This will include dynamic resources produces by servlet's or
@@ -176,8 +178,8 @@ public class ServletContextResourceLocator
   
   private InputStream dispatcherBasedStreamLocator(final String uri)
       throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletRequest request = context.getRequest();
+    final HttpServletResponse response = context.getResponse();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
     return dispatcherStreamLocator.getInputStream(request, response, uri);
@@ -185,7 +187,7 @@ public class ServletContextResourceLocator
   
   private InputStream servletContextBasedStreamLocator(final String uri)
       throws IOException {
-    final ServletContext servletContext = Context.get().getServletContext();
+    final ServletContext servletContext = context.getServletContext();
     return servletContext.getResourceAsStream(uri);
   }
   

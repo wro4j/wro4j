@@ -23,7 +23,7 @@ import ro.isdc.wro.util.Function;
  * Implements most of the {@link ResourceLocator} methods and provides basic wildcard support.
  *
  * @author Alex Objelean
- * @since 1.4.0
+ * @since 1.5.0
  */
 public abstract class AbstractResourceLocator
   implements ResourceLocator {
@@ -77,7 +77,6 @@ public abstract class AbstractResourceLocator
   public long lastModified() {
     return 0;
   }
-
 
   /**
    * {@inheritDoc}

@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.factory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 
@@ -16,6 +17,8 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
  */
 public abstract class AbstractWroModelFactory
   implements WroModelFactory {
+  @Inject
+  private Context context;
   /**
    * Override this method, in order to provide different xml definition file name.
    *

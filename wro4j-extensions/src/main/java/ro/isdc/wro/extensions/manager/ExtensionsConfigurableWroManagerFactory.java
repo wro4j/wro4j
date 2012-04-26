@@ -26,24 +26,26 @@ import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.impl.LazyProcessorDecorator;
+import ro.isdc.wro.util.LazyInitializer;
 
 import com.google.javascript.jscomp.CompilationLevel;
 
 
 /**
  * An implementation of {@link ConfigurableWroManagerFactory} that adds processors defined in extensions module.
- *
+ * 
  * @author Alex Objelean
  */
 public class ExtensionsConfigurableWroManagerFactory
     extends ConfigurableWroManagerFactory {
-
+  
   /**
    * {@inheritDoc}
    */
   @Override
   protected void contributePostProcessors(final Map<String, ResourceProcessor> map) {
-    pupulateMapWithExtensionsProcessors(map);
+    populateMapWithExtensionsProcessors(map);
   }
 
 
@@ -52,36 +54,150 @@ public class ExtensionsConfigurableWroManagerFactory
    */
   @Override
   protected void contributePreProcessors(final Map<String, ResourceProcessor> map) {
-    pupulateMapWithExtensionsProcessors(map);
+    populateMapWithExtensionsProcessors(map);
   }
-
+  
   /**
-   * Populates a map of processors with processors existing in extensions module.
-   *
-   * @param map to populate.
+   * Populates a map of processors with processors existing in extensions module. Use lazy initializer to avoid unused
+   * dependency runtime requirement. Probably future implementation will use a different approach, by loading processors
+   * from configuration property file (ex: by scanning classpath or META-INF folder). Current implementation is good
+   * enough to load processors on demand.
+   * 
+   * @param map
+   *          to populate.
    */
-  public static void pupulateMapWithExtensionsProcessors(final Map<String, ResourceProcessor> map) {
+  public static void populateMapWithExtensionsProcessors(final Map<String, ResourceProcessor> map) {
     Validate.notNull(map);
-    map.put(YUICssCompressorProcessor.ALIAS, new YUICssCompressorProcessor());
-    map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, YUIJsCompressorProcessor.noMungeCompressor());
-    map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, YUIJsCompressorProcessor.doMungeCompressor());
-    map.put(DojoShrinksafeCompressorProcessor.ALIAS, new DojoShrinksafeCompressorProcessor());
-    map.put(UglifyJsProcessor.ALIAS_UGLIFY, new UglifyJsProcessor());
-    map.put(BeautifyJsProcessor.ALIAS_BEAUTIFY, new BeautifyJsProcessor());
-    map.put(PackerJsProcessor.ALIAS, new PackerJsProcessor());
-    map.put(LessCssProcessor.ALIAS, new LessCssProcessor());
-    map.put(SassCssProcessor.ALIAS, new SassCssProcessor());
-    map.put(RubySassCssProcessor.ALIAS, new RubySassCssProcessor());
-    map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new GoogleClosureCompressorProcessor());
-    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, new GoogleClosureCompressorProcessor(
-      CompilationLevel.ADVANCED_OPTIMIZATIONS));
-    map.put(CoffeeScriptProcessor.ALIAS, new CoffeeScriptProcessor());
-    map.put(CJsonProcessor.ALIAS_PACK, CJsonProcessor.packProcessor());
-    map.put(CJsonProcessor.ALIAS_UNPACK, CJsonProcessor.unpackProcessor());
-    map.put(JsonHPackProcessor.ALIAS_PACK, JsonHPackProcessor.packProcessor());
-    map.put(JsonHPackProcessor.ALIAS_UNPACK, JsonHPackProcessor.unpackProcessor());
-    map.put(JsHintProcessor.ALIAS, new JsHintProcessor());
-    map.put(CssLintProcessor.ALIAS, new CssLintProcessor());
-    map.put(JsLintProcessor.ALIAS, new JsLintProcessor());
-    map.put(DustJsProcessor.ALIAS, new DustJsProcessor());  }
+    map.put(YUICssCompressorProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new YUICssCompressorProcessor();
+      }
+    }));
+    map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, new LazyProcessorDecorator(
+        new LazyInitializer<ResourceProcessor>() {
+          @Override
+          protected ResourceProcessor initialize() {
+            return YUIJsCompressorProcessor.noMungeCompressor();
+          }
+        }));
+    map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, new LazyProcessorDecorator(
+        new LazyInitializer<ResourceProcessor>() {
+          @Override
+          protected ResourceProcessor initialize() {
+            return YUIJsCompressorProcessor.doMungeCompressor();
+          }
+        }));
+    map.put(DojoShrinksafeCompressorProcessor.ALIAS, new LazyProcessorDecorator(
+        new LazyInitializer<ResourceProcessor>() {
+          @Override
+          protected ResourceProcessor initialize() {
+            return new DojoShrinksafeCompressorProcessor();
+          }
+        }));
+    map.put(UglifyJsProcessor.ALIAS_UGLIFY, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new UglifyJsProcessor();
+      }
+    }));
+    map.put(BeautifyJsProcessor.ALIAS_BEAUTIFY, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new BeautifyJsProcessor();
+      }
+    }));
+    map.put(PackerJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new PackerJsProcessor();
+      }
+    }));
+    map.put(LessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new LessCssProcessor();
+      }
+    }));
+    map.put(SassCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new SassCssProcessor();
+      }
+    }));
+    map.put(RubySassCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new RubySassCssProcessor();
+      }
+    }));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new LazyProcessorDecorator(
+        new LazyInitializer<ResourceProcessor>() {
+          @Override
+          protected ResourceProcessor initialize() {
+            return new GoogleClosureCompressorProcessor(CompilationLevel.SIMPLE_OPTIMIZATIONS);
+          }
+        }));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_ADVANCED, new LazyProcessorDecorator(
+        new LazyInitializer<ResourceProcessor>() {
+          @Override
+          protected ResourceProcessor initialize() {
+            return new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS);
+          }
+        }));
+    map.put(CoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new CoffeeScriptProcessor();
+      }
+    }));
+    map.put(CJsonProcessor.ALIAS_PACK, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return CJsonProcessor.packProcessor();
+      }
+    }));
+    map.put(CJsonProcessor.ALIAS_UNPACK, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return CJsonProcessor.unpackProcessor();
+      }
+    }));
+    map.put(JsonHPackProcessor.ALIAS_PACK, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return JsonHPackProcessor.packProcessor();
+      }
+    }));
+    map.put(JsonHPackProcessor.ALIAS_UNPACK, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return JsonHPackProcessor.unpackProcessor();
+      }
+    }));
+    map.put(JsHintProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new JsHintProcessor();
+      }
+    }));
+    map.put(JsLintProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new JsLintProcessor();
+      }
+    }));
+    map.put(CssLintProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new CssLintProcessor();
+      }
+    }));
+    map.put(DustJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new DustJsProcessor();
+      }
+    }));
+  }
 }

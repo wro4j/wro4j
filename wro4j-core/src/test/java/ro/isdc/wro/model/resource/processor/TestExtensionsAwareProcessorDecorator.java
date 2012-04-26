@@ -15,6 +15,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -49,13 +50,13 @@ public class TestExtensionsAwareProcessorDecorator {
   public void testMinimizeAwareDecorator1() {
     final ResourceProcessor decoratedProcessor = new JSMinProcessor();
     final ResourceProcessor processor = ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor);
-    Assert.assertTrue(ProcessorsUtils.isMinimizeAwareProcessor(processor));
+    Assert.assertTrue(new ProcessorDecorator(processor).isMinimize());
   }
 
   @Test
   public void testMinimizeAwareDecorator2() {
     final ResourceProcessor decoratedProcessor = new CssUrlRewritingProcessor();
     final ResourceProcessor processor = ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor);
-    Assert.assertFalse(ProcessorsUtils.isMinimizeAwareProcessor(processor));
+    Assert.assertFalse(new ProcessorDecorator(processor).isMinimize());
   }
 }

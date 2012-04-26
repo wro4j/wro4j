@@ -27,6 +27,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**
@@ -155,9 +156,8 @@ public class TestConfigurableWroManagerFactory {
     factory.setConfigProperties(configProperties);
     Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(JSMinProcessor.class,
-      processorsFactory.getPostProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
+      ((ProcessorDecorator)processorsFactory.getPostProcessors().iterator().next()).getDecoratedProcessor().getClass());
   }
-
 
   @Test
   public void testConfigPropertiesWithMultipleValidPostProcessor() {
@@ -167,7 +167,7 @@ public class TestConfigurableWroManagerFactory {
     factory.setConfigProperties(configProperties);
     Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(JSMinProcessor.class,
-      processorsFactory.getPostProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
+        ((ProcessorDecorator)processorsFactory.getPostProcessors().iterator().next()).getDecoratedProcessor().getClass());
   }
 
 

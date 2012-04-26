@@ -54,7 +54,7 @@ public class ConfigurableWroManagerFactory
   @Override
   protected Map<String, ResourceProcessor> createPreProcessorsMap() {
     final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
     return map;
   }
 
@@ -64,7 +64,7 @@ public class ConfigurableWroManagerFactory
   @Override
   protected Map<String, ResourceProcessor> createPostProcessorsMap() {
     final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
     return map;
   }
   /**

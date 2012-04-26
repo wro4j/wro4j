@@ -304,7 +304,7 @@ public class Wro4jCommandLineRunner {
    */
   protected Map<String, ResourceProcessor> createProcessorsMap() {
     final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
     map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
     return map;

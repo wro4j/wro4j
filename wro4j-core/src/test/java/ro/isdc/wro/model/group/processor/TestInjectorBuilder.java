@@ -3,19 +3,37 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+import static ro.isdc.wro.config.Context.set;
+
+import java.io.IOException;
+
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactoryDecorator;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 /**
@@ -23,10 +41,25 @@ import ro.isdc.wro.model.resource.util.NamingStrategy;
  * @created 8 Jan 2012
  */
 public class TestInjectorBuilder {
-
+  @Mock
+  private HttpServletRequest mockRequest;
+  @Mock
+  private HttpServletResponse mockResponse;
+  @Mock
+  private FilterConfig mockFilterConfig;
+  @Mock
+  private ServletContext mockServletContext;
+  
+  
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    initMocks(this);
+    when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
+    when(mockRequest.getServletPath()).thenReturn("");
+    when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
+    set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
   }
 
   @Test(expected=NullPointerException.class)
@@ -41,16 +74,16 @@ public class TestInjectorBuilder {
 
   @Test
   public void shouldBuildInjectorWithValidWroManager() {
-    final WroManager manager = new WroManager();
+    final WroManager manager = new BaseWroManagerFactory().create();
     final Injector injector = new InjectorBuilder(manager).build();
     Assert.assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
-    Assert.assertNull(sample.namingStrategy);
+    Assert.assertNotNull(sample.namingStrategy);
     Assert.assertNotNull(sample.preProcessorExecutor);
     Assert.assertNull(sample.processorsFactory);
-    Assert.assertNull(sample.resourceLocatorFactor);
+    Assert.assertNull(sample.resourceLocatorFactory);
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -66,7 +99,7 @@ public class TestInjectorBuilder {
     Assert.assertNotNull(sample.namingStrategy);
     Assert.assertNotNull(sample.preProcessorExecutor);
     Assert.assertNotNull(sample.processorsFactory);
-    Assert.assertNotNull(sample.resourceLocatorFactor);
+    Assert.assertNotNull(sample.resourceLocatorFactory);
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -78,7 +111,10 @@ public class TestInjectorBuilder {
     final PreProcessorExecutor preProcessorExecutor = Mockito.mock(PreProcessorExecutor.class);
     final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
     final ResourceLocatorFactory resourceLocatorFactory = Mockito.mock(ResourceLocatorFactory.class);
-    final Injector injector = new InjectorBuilder().setNamingStrategy(namingStrategy).setPreProcessorExecutor(
+
+    final WroManager manager = new BaseWroManagerFactory().create();
+
+    final Injector injector = new InjectorBuilder(manager).setNamingStrategy(namingStrategy).setPreProcessorExecutor(
       preProcessorExecutor).setProcessorsFactory(processorsFactory).setResourceLocatorFactory(resourceLocatorFactory).build();
     Assert.assertNotNull(injector);
 
@@ -86,11 +122,24 @@ public class TestInjectorBuilder {
     injector.inject(sample);
     Assert.assertSame(namingStrategy, sample.namingStrategy);
     Assert.assertSame(preProcessorExecutor, sample.preProcessorExecutor);
-    Assert.assertSame(processorsFactory, sample.processorsFactory);
-    Assert.assertSame(resourceLocatorFactory, sample.resourceLocatorFactor);
+    Assert.assertSame(processorsFactory, ((ProcessorsFactoryDecorator) sample.processorsFactory).getDecoratedObject());
+    Assert.assertSame(resourceLocatorFactory, ((UriLocatorFactoryDecorator) sample.resourceLocatorFactory).getDecoratedObject());
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
+    Assert.assertNotNull(sample.modelFactory);
+    Assert.assertNotNull(sample.groupExtractor);
+  }
+  
+  @Test(expected = IOException.class)
+  public void shouldInjectEachLocatorProvidedByLocatorFactory() throws Exception {
+    final ResourceLocatorFactory resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
+    final Injector injector = new InjectorBuilder().setResourceLocatorFactory(resourceLocatorFactory).build();
+    
+    final Sample sample = new Sample();
+    injector.inject(sample);
+    //this will throw NullPointerException if the uriLocator is not injected.
+    sample.resourceLocatorFactory.locate("/path/to/servletContext/resource.js");
   }
 
   @After
@@ -100,7 +149,7 @@ public class TestInjectorBuilder {
 
   private static class Sample {
     @Inject
-    ResourceLocatorFactory resourceLocatorFactor;
+    ResourceLocatorFactory resourceLocatorFactory;
     @Inject
     ProcessorsFactory processorsFactory;
     @Inject
@@ -113,5 +162,9 @@ public class TestInjectorBuilder {
     Injector injector;
     @Inject
     GroupsProcessor groupsProcessor;
+    @Inject
+    WroModelFactory modelFactory;
+    @Inject
+    GroupExtractor groupExtractor;
   }
 }

@@ -19,9 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
@@ -48,7 +51,9 @@ public class TestWildcardExpanderModelTransformer {
     //create manager to force correct initialization.
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(processorsFactory);
-    factory.addModelTransformer(transformer).create();
+    final WroManager manager = factory.addModelTransformer(transformer).create();
+    final Injector injector = new InjectorBuilder(manager).build();
+    injector.inject(transformer);
   }
 
   @Test

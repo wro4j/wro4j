@@ -40,8 +40,6 @@ public class GroupsProcessor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private Injector injector;
-  @Inject
   private WroConfiguration config;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
@@ -110,11 +108,11 @@ public class GroupsProcessor {
       final boolean minimize)
       throws IOException {
     Validate.notNull(content);
-    final Collection<ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
+    final Collection<? extends ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
       LOG.warn("No processors defined. Please, check if your configuration is correct.");
     }
-    final Collection<ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resourceType, allPostProcessors);
+    final Collection<? extends ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resourceType, allPostProcessors);
     
     final String resourceName = group.getName() + "." + resourceType.name().toLowerCase();
     final Resource mergedResource = Resource.create(resourceName, resourceType);
@@ -134,7 +132,7 @@ public class GroupsProcessor {
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Resource mergedResource, final Collection<ResourceProcessor> processors,
+  private String applyPostProcessors(final Resource mergedResource, final Collection<? extends ResourceProcessor> processors,
     final String content)
       throws IOException {
     LOG.debug("postProcessors: {}", processors);
@@ -147,9 +145,6 @@ public class GroupsProcessor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
-      //inject all required properites
-      injector.inject(processor);
-
       output = new StringWriter();
       decorateWithPostProcessCallback(processor).process(mergedResource, input, output);
   
