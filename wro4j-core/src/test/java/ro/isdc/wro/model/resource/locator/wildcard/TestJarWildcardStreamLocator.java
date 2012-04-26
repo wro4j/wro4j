@@ -18,7 +18,6 @@ import java.util.jar.JarFile;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -40,6 +39,8 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  */
 public class TestJarWildcardStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(TestJarWildcardStreamLocator.class);
+
+  private static final String SEP = File.separator;
 
   private JarWildcardStreamLocator jarStreamLocator;
 

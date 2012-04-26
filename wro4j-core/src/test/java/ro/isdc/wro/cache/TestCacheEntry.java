@@ -8,7 +8,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.model.resource.ResourceType;
 
 /**

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -40,7 +41,7 @@ public class GroupsProcessor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private Injector injector;
+  private WroConfiguration config;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
@@ -55,7 +56,16 @@ public class GroupsProcessor {
     Validate.notNull(group);
     Validate.notNull(type);
     try {
+      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + minimize, group.getName(), type);
+      // mark this group as used.
+      group.markAsUsed();
       final Group filteredGroup = group.collectResourcesOfType(type);
+      if (filteredGroup.getResources().isEmpty()) {
+        LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), type);
+        if (!config.isIgnoreEmptyGroup()) {
+          throw new WroRuntimeException("No resources found in group: " + group.getName());
+        }
+      }
       final String result = decorateWithMergeCallback(preProcessorExecutor).processAndMerge(
           filteredGroup.getResources(), minimize);
       return doPostProcess(type, result, minimize);
@@ -126,9 +136,6 @@ public class GroupsProcessor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
-      //inject all required properites
-      injector.inject(processor);
-
       output = new StringWriter();
       decorateWithPostProcessCallback(processor).process(input, output);
 

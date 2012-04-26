@@ -5,6 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
@@ -13,13 +14,24 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
+import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
+import ro.isdc.wro.model.factory.InjectorAwareWroModelFactoryDecorator;
+import ro.isdc.wro.model.factory.ModelTransformerFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
+import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.InjectorAwareProcessorsFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.Transformer;
 
 
 /**
@@ -37,6 +49,13 @@ public class InjectorBuilder {
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
+  private WroModelFactory modelFactory = null;
+  private GroupExtractor groupExtractor = null;
+  /**
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
+   * processed.
+   */
+  private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
   private Injector injector;
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
@@ -54,13 +73,52 @@ public class InjectorBuilder {
     map.put(PreProcessorExecutor.class, preProcessorExecutor);
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
-    //map.put(UriLocatorFactory.class, uriLocatorFactory);
-    map.put(UriLocatorFactory.class, uriLocatorFactory);
-    map.put(ProcessorsFactory.class, processorsFactory);
-    map.put(NamingStrategy.class, namingStrategy);
+    map.put(GroupExtractor.class, groupExtractor);
     map.put(Injector.class, new InjectorObjectFactory<Injector>() {
       public Injector create() {
         return injector;
+      }
+    });
+    map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
+      public UriLocatorFactory create() {
+        return new InjectorAwareUriLocatorFactoryDecorator(uriLocatorFactory, injector);
+      }
+    });
+    map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
+      public ProcessorsFactory create() {
+        return new InjectorAwareProcessorsFactoryDecorator(processorsFactory, injector);
+      }
+    });
+    map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
+      public WroModelFactory create() {
+        return modelFactory != null ? new InjectorAwareWroModelFactoryDecorator(decorateModelFactory(modelFactory),
+            injector) : null;
+      }
+      
+      /**
+       * Decorates the model factory with callback registry calls & other useful factories.
+       */
+      private WroModelFactory decorateModelFactory(final WroModelFactory modelFactory) {
+        return new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
+            new WroModelFactoryDecorator(modelFactory) {
+              @Override
+              public WroModel create() {
+                callbackRegistry.onBeforeModelCreated();
+                try {
+                  return super.create();
+            } finally {
+              callbackRegistry.onAfterModelCreated();
+            }
+          }
+        }))).setTransformers(modelTransformers);
+      }
+    });
+    map.put(NamingStrategy.class, new InjectorObjectFactory<NamingStrategy>() {
+      public NamingStrategy create() {
+        if (namingStrategy != null) {
+          injector.inject(namingStrategy);
+        }
+        return namingStrategy;
       }
     });
     map.put(Context.class, new InjectorObjectFactory<Context>() {
@@ -93,6 +151,8 @@ public class InjectorBuilder {
     uriLocatorFactory = manager.getUriLocatorFactory();
     processorsFactory = manager.getProcessorsFactory();
     namingStrategy = manager.getNamingStrategy();
+    modelFactory = manager.getModelFactory();
+    groupExtractor = manager.getGroupExtractor();
     return this;
   }
 
@@ -131,7 +191,13 @@ public class InjectorBuilder {
     this.preProcessorExecutor = preProcessorExecutor;
     return this;
   }
+  
 
+  public InjectorBuilder setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
+    this.modelTransformers = modelTransformers;
+    return this;
+  }
+  
   /**
    * A special type used for lazy object injection only in context of this class.
    */

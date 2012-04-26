@@ -5,7 +5,7 @@
   <parent>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-examples</artifactId>
-    <version>1.4.5-SNAPSHOT</version>
+    <version>1.4.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>wro4j-standalone</artifactId>
@@ -55,7 +55,7 @@
         <configuration>
           <options>ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes,vendor-prefix,zero-units</options>
           <ignoreMissingResources>true</ignoreMissingResources>          
-          <failNever>false</failNever>
+          <failNever>true</failNever>
           <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/bundle/</cssDestinationFolder>
           <!--
 

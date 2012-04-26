@@ -6,7 +6,6 @@ package ro.isdc.wro.extensions.processor.support.jsonhpack;
 import java.io.InputStream;
 
 import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,22 +24,15 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class JsonHPack {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPack.class);
-  private ScriptableObject scope;
+  private static final String DEFAULT_JS = "json.hpack.min.js";
 
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      RhinoScriptBuilder builder = null;
-      if (scope == null) {
-        builder = RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
-          getScriptAsStream(), "script.js");
-        scope = builder.getScope();
-      } else {
-        builder = RhinoScriptBuilder.newChain(scope);
-      }
-      return builder;
+      return RhinoScriptBuilder.newClientSideAwareChain().addJSON().evaluateChain(
+        getScriptAsStream(), DEFAULT_JS);
     } catch (final Exception e) {
       LOG.error("Processing error:" + e.getMessage(), e);
       throw new WroRuntimeException("Processing error", e);
@@ -49,10 +41,10 @@ public class JsonHPack {
 
 
   /**
-   * @return stream of the less.js script.
+   * @return stream of the script.
    */
   protected InputStream getScriptAsStream() {
-    return JsonHPack.class.getResourceAsStream("json.hpack.min.js");
+    return JsonHPack.class.getResourceAsStream(DEFAULT_JS);
   }
 
 

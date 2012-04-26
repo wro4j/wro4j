@@ -48,7 +48,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -71,7 +70,7 @@ public class WroTestUtils {
   public static InputStream getPropertiesStream(final Properties properties) {
     final StringWriter propsAsString = new StringWriter();
     properties.list(new PrintWriter(propsAsString));
-    return new ByteArrayInputStream(propsAsString.toString().getBytes());
+    return new ByteArrayInputStream(propsAsString.toString().getBytes()); 
   }
 
 
@@ -88,14 +87,6 @@ public class WroTestUtils {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
     WroTestUtils.compare(resultReader, expectedReader, processor);
-  }
-
-
-  public static void compareProcessedResourceContents(final String inputResourceUri,
-    final String expectedContentResourceUri, final ResourcePreProcessor processor)
-    throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri,
-      ProcessorsUtils.toPostProcessor(processor));
   }
 
 
@@ -117,7 +108,8 @@ public class WroTestUtils {
   }
 
   public static void init(final WroModelFactory factory) {
-    new BaseWroManagerFactory().setModelFactory(factory).create();
+    WroManager manager = new BaseWroManagerFactory().setModelFactory(factory).create();
+    new InjectorBuilder(manager).build().inject(factory);
   }
 
   /**
@@ -281,6 +273,20 @@ public class WroTestUtils {
       Transformers.noOpTransformer(), processor);
   }
 
+  /**
+   * Compares files with the same name from sourceFolder against it's counterpart in targetFolder, but allows
+   * source and target files to have different extensions.
+   * TODO run tests in parallel
+   */
+  public static void compareFromDifferentFoldersByName(final File sourceFolder, final File targetFolder,
+     final String srcExtension, final String targetExtension, final ResourcePostProcessor processor)
+     throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
+        Transformers.extensionTransformer("css"), processor);
+  }
+
+
+
 
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
@@ -293,11 +299,11 @@ public class WroTestUtils {
       }
     });
   }
-  
+
   /**
    * Applies a function for each file from a folder. The folder should contain at least one file to process, otherwise
    * an exception will be thrown.
-   * 
+   *
    * @param folder
    *          {@link File} representing the folder where the files will be used from processing.
    * @param function
@@ -310,10 +316,10 @@ public class WroTestUtils {
     for (final File file : files) {
       try {
         function.apply(file);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Problem while applying function on file: " + file, e);
       }
-      processedNumber++;      
+      processedNumber++;
     }
     logSuccess(processedNumber);
   }
@@ -376,7 +382,7 @@ public class WroTestUtils {
   public static void runConcurrently(final Callable<Void> task) throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {

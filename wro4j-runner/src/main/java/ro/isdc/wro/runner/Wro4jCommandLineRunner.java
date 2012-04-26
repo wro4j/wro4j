@@ -205,12 +205,12 @@ public class Wro4jCommandLineRunner {
       // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
       fos.close();
-      LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
       // delete empty files
       if (destinationFile.length() == 0) {
-        LOG.info("No content found for group: {}", group);
+        LOG.debug("No content found for group: {}", group);
         destinationFile.delete();
       } else {
+        LOG.info("file size: {} -> {}bytes", destinationFile.getName(), destinationFile.length());
         LOG.info("{} ({}bytes) has been created!", destinationFile.getAbsolutePath(), destinationFile.length());
       }
     } finally {
@@ -304,7 +304,7 @@ public class Wro4jCommandLineRunner {
    */
   protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
     final Map<String, ResourcePreProcessor> map = ProcessorsUtils.createPreProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
     map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
     return map;
@@ -316,7 +316,7 @@ public class Wro4jCommandLineRunner {
    */
   protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
     final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.pupulateMapWithExtensionsProcessors(map);
+    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsPostProcessors(map);
     map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
     map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
     return map;

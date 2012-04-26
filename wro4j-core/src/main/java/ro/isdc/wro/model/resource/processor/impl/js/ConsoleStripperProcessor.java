@@ -1,18 +1,16 @@
 package ro.isdc.wro.model.resource.processor.impl.js;
 
-import org.apache.commons.io.IOUtils;
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
-import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
-import ro.isdc.wro.util.WroUtil;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.IOUtils;
+
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 /**
  * A preProcessor, responsible for removing console.log(..) and console.debug(..) statements.

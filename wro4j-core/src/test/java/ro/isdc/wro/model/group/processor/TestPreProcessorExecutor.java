@@ -3,11 +3,19 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
@@ -15,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +46,28 @@ import ro.isdc.wro.util.StopWatch;
  */
 public class TestPreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(TestPreProcessorExecutor.class);
+  @Mock
+  private HttpServletRequest mockRequest;
+  @Mock
+  private HttpServletResponse mockResponse;
+  @Mock
+  private FilterConfig mockFilterConfig;
+  @Mock
+  private ServletContext mockServletContext;
 
   private PreProcessorExecutor executor;
 
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    initMocks(this);
+    
+    when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
+    when(mockRequest.getServletPath()).thenReturn("");
+    when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    
+    final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
+    Context.set(context);
     //force parallel execution
     Context.get().getConfig().setParallelPreprocessing(true);
     initExecutor();
@@ -157,7 +181,7 @@ public class TestPreProcessorExecutor {
   public void shouldNotFailWhenProcessingInvalidResource()
     throws IOException {
     initExecutor(createProcessorUsingMissingResource());
-    final List<Resource> resources = createResources(Resource.create("uri", ResourceType.JS));
+    final List<Resource> resources = createResources(Resource.create("/uri", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
     Assert.assertEquals("", result);
   }
@@ -172,7 +196,6 @@ public class TestPreProcessorExecutor {
     Assert.assertEquals("", result);
   }
 
-
   /**
    * This test should work when running at least on dual-core.
    * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))
@@ -182,15 +205,23 @@ public class TestPreProcessorExecutor {
     throws Exception {
     final StopWatch watch = new StopWatch();
     WroConfiguration config = Context.get().getConfig();
-    watch.start("parallel preProcessing");
-    config.setParallelPreprocessing(true);
+
     initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
     final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
       Resource.create("r2", ResourceType.JS));
+
+    //warm up
+    config.setParallelPreprocessing(true);
+    executor.processAndMerge(resources, true);
+    
+    //parallel
+    watch.start("parallel preProcessing");
+    config.setParallelPreprocessing(true);
     executor.processAndMerge(resources, true);
     watch.stop();
     long parallelExecution = watch.getLastTaskTimeMillis();
-
+    
+    //sequential
     config.setParallelPreprocessing(false);
     watch.start("sequential preProcessing");
     executor.processAndMerge(resources, true);
@@ -201,9 +232,11 @@ public class TestPreProcessorExecutor {
     LOG.debug(message);
 
     // prove that running in parallel is faster
-    //delta is for executor warm up.
-    long delta = 100;
-    Assert.assertTrue(sequentialExecution > parallelExecution + delta);
+    // delta indicates the improvement relative to parallel execution (we use 90% relative improvement, but it normally
+    // should be about 100%).
+    double delta = parallelExecution * 0.9;
+    Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
+        sequentialExecution > parallelExecution + delta);
   }
 
   @Test
