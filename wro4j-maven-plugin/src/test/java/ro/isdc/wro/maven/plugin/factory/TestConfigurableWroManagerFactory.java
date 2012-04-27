@@ -1,9 +1,10 @@
-/*
- * Copyright (c) 2010. All rights reserved.
- */
-package ro.isdc.wro.manager.factory;
+package ro.isdc.wro.maven.plugin.factory;
 
-import java.util.List;
+import static ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS;
+import static ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS;
+
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +25,12 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.SimpleWroModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -33,15 +41,10 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
-
 /**
- * TestConfigurableWroManagerFactory.
- * 
  * @author Alex Objelean
- * @created Created on Jan 5, 2010
  */
 public class TestConfigurableWroManagerFactory {
-  private ConfigurableWroManagerFactory factory;
   @Mock
   private FilterConfig mockFilterConfig;
   @Mock
@@ -53,9 +56,24 @@ public class TestConfigurableWroManagerFactory {
   private HttpServletResponse mockResponse;
   
   public void initFactory(final FilterConfig filterConfig) {
+    initFactory(filterConfig, new Properties());
+  }
+  
+  public void initFactory(final FilterConfig filterConfig, final Properties properties) {
+    Validate.notNull(properties);
     Context.set(Context.webContext(mockRequest, mockResponse, filterConfig));
     
-    factory = new ConfigurableWroManagerFactory();
+    final ConfigurableWroManagerFactory factory = new ConfigurableWroManagerFactory() {
+      @Override
+      protected Properties createProperties() {
+        return properties;
+      }
+      @Override
+      protected WroModelFactory newModelFactory() {
+        return new SimpleWroModelFactory(new WroModel());
+      }
+    };
+    factory.initialize(new StandaloneContext());
     // create one instance for test
     final WroManager manager = factory.create();
     processorsFactory = manager.getProcessorsFactory();
@@ -73,15 +91,26 @@ public class TestConfigurableWroManagerFactory {
   public void tearDown() {
     Context.unset();
   }
+
   @Test
   public void testProcessorsExecutionOrder() {
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(
-        JSMinProcessor.ALIAS + "," + CssImportPreProcessor.ALIAS + "," + CssVariablesProcessor.ALIAS);
-    initFactory(mockFilterConfig);
-    final List<ResourceProcessor> list = (List<ResourceProcessor>) processorsFactory.getPreProcessors();
-    Assert.assertEquals(JSMinProcessor.class, list.get(0).getClass());
-    Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
-    Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
+    final Properties props = createProperties(PARAM_PRE_PROCESSORS, JSMinProcessor.ALIAS + ","
+        + CssImportPreProcessor.ALIAS + "," + CssVariablesProcessor.ALIAS);
+    initFactory(mockFilterConfig, props);
+    
+    final Collection<ResourceProcessor> list = processorsFactory.getPreProcessors();
+    
+    Assert.assertFalse(list.isEmpty());
+    Iterator<ResourceProcessor> iterator = list.iterator();
+    Assert.assertEquals(JSMinProcessor.class, iterator.next().getClass());
+    Assert.assertEquals(CssImportPreProcessor.class, iterator.next().getClass());
+    Assert.assertEquals(CssVariablesProcessor.class, iterator.next().getClass());
+  }
+
+  private Properties createProperties(final String key, final String value) {
+    Properties props = new Properties();
+    props.setProperty(key, value);
+    return props;
   }
   
   @Test
@@ -93,18 +122,13 @@ public class TestConfigurableWroManagerFactory {
   
   @Test(expected = WroRuntimeException.class)
   public void cannotUseInvalidPreProcessorsSet() {
-    final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    Mockito.when(filterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(
-        "INVALID1,INVALID2");
-    initFactory(filterConfig);
+    initFactory(mockFilterConfig, createProperties(PARAM_PRE_PROCESSORS, "INVALID1,INVALID2"));
     processorsFactory.getPreProcessors();
   }
   
   @Test
   public void testWhenValidPreProcessorsSet() {
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(
-        "cssUrlRewriting");
-    initFactory(mockFilterConfig);
+    initFactory(mockFilterConfig, createProperties(PARAM_PRE_PROCESSORS, "cssUrlRewriting"));
     Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
   }
   
@@ -117,17 +141,13 @@ public class TestConfigurableWroManagerFactory {
   
   @Test(expected = WroRuntimeException.class)
   public void cannotUseInvalidPostProcessorsSet() {
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn(
-        "INVALID1,INVALID2");
-    initFactory(mockFilterConfig);
+    initFactory(mockFilterConfig, createProperties(PARAM_POST_PROCESSORS, "INVALID1,INVALID2"));
     processorsFactory.getPostProcessors();
   }
   
   @Test
   public void testWhenValidPostProcessorsSet() {
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn(
-        "cssMinJawr, jsMin, cssVariables");
-    initFactory(mockFilterConfig);
+    initFactory(mockFilterConfig, createProperties(PARAM_POST_PROCESSORS, "cssMinJawr, jsMin, cssVariables"));
     Assert.assertEquals(3, processorsFactory.getPostProcessors().size());
   }
   
@@ -135,8 +155,7 @@ public class TestConfigurableWroManagerFactory {
   public void testConfigPropertiesWithValidPreProcessor() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
-    initFactory(mockFilterConfig);
-    factory.setConfigProperties(configProperties);
+    initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
     Assert.assertEquals(CssMinProcessor.class,
         processorsFactory.getPreProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
@@ -146,8 +165,7 @@ public class TestConfigurableWroManagerFactory {
   public void testConfigPropertiesWithValidPostProcessor() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin");
-    initFactory(mockFilterConfig);
-    factory.setConfigProperties(configProperties);
+    initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
   }
@@ -156,8 +174,7 @@ public class TestConfigurableWroManagerFactory {
   public void testConfigPropertiesWithMultipleValidPostProcessor() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin, cssMin");
-    initFactory(mockFilterConfig);
-    factory.setConfigProperties(configProperties);
+    initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
   }
@@ -166,16 +183,14 @@ public class TestConfigurableWroManagerFactory {
   public void testConfigPropertiesWithInvalidPreProcessor() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "INVALID");
-    initFactory(mockFilterConfig);
-    factory.setConfigProperties(configProperties);
+    initFactory(mockFilterConfig, configProperties);
     processorsFactory.getPreProcessors();
   }
   
   public void shouldUseExtensionAwareProcessorWhenProcessorNameContainsDotCharacter() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "jsMin.js");
-    initFactory(mockFilterConfig);
-    factory.setConfigProperties(configProperties);
+    initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
     Assert.assertTrue(processorsFactory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
   }
@@ -184,8 +199,8 @@ public class TestConfigurableWroManagerFactory {
   public void testConfigPropertiesWithInvalidPostProcessor() {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "INVALID");
-    initFactory(mockFilterConfig);
-    factory.setConfigProperties(configProperties);
+    initFactory(mockFilterConfig, configProperties);
     processorsFactory.getPostProcessors();
   }
+
 }

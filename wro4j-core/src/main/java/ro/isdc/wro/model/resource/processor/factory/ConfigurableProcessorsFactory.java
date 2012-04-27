@@ -4,13 +4,13 @@
 package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -111,28 +111,28 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    * @param map mapping between items and its implementations.
    * @return a list of items (processors).
    */
-  public static <T> List<T> getListOfItems(final String itemsAsString, final Map<String, T> map) {
+  @SuppressWarnings("unchecked")
+  private static List<ResourceProcessor> getListOfItems(final String itemsAsString, final Map<String, ResourceProcessor> map) {
     LOG.debug("itemsAsString: " + itemsAsString);
-    final List<T> list = new ArrayList<T>();
+    final List<ResourceProcessor> list = new ArrayList<ResourceProcessor>();
     final List<String> tokenNames = getTokens(itemsAsString);
     for (final String tokenName : tokenNames) {
       LOG.debug("\ttokenName: {}", tokenName);
       Validate.notEmpty(tokenName);
-      T processor = map.get(tokenName.trim());
+      ResourceProcessor processor = map.get(tokenName.trim());
       if (processor == null) {
 
         //extension check
         LOG.debug("[FAIL] no processor found named: {}. Proceeding with extension check. ", tokenName);
-        final String[] tokens = tokenName.split("\\.");
-        LOG.debug("split tokens: {}", Arrays.toString(tokens));
-        if (tokens.length == 2) {
-          final String processorName = tokens[0].trim();
+        final String extension = FilenameUtils.getExtension(tokenName);
+        boolean hasExtension = !StringUtils.isEmpty(extension);
+        if (hasExtension) {
+          final String processorName = FilenameUtils.getBaseName(tokenName);
           LOG.debug("processorName: {}", processorName);
           processor = map.get(processorName);
-          if (processor != null && processor instanceof ResourceProcessor) {
-            final String extension = tokens[1].trim();
+          if (processor != null) {
             LOG.debug("adding Extension: {}", extension);
-            ExtensionsAwareProcessorDecorator.decorate((ResourceProcessor) processor).addExtension(extension);
+            processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
           }
         }
         if (processor == null) {

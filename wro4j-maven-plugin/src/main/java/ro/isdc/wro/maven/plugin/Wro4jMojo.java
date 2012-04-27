@@ -73,7 +73,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private File buildFinalName;
-  //${project.build.directory}/${project.build.finalName}
   /**
    * @parameter expression="${groupNameMappingFile}"
    * @optional
