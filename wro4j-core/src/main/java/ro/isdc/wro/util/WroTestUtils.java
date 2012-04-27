@@ -41,6 +41,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -379,5 +380,19 @@ public class WroTestUtils {
    */
   public static Injector createInjector() {
     return new InjectorBuilder(new BaseWroManagerFactory().create()).build();
+  }
+  
+  /**
+   * Creates a model factory for a given model.
+   */
+  public static WroModelFactory simpleModelFactory(final WroModel model) {
+    Validate.notNull(model);
+    return new WroModelFactory() {
+      public WroModel create() {
+        return model;
+      }
+      public void destroy() {
+      }
+    };
   }
 }
