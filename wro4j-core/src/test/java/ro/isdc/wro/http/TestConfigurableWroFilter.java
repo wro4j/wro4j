@@ -33,10 +33,10 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.SimpleWroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -210,7 +210,7 @@ public class TestConfigurableWroFilter {
       final WroManagerFactory dummyModelFactory = new WroManagerFactory() {
         public WroManager create() {
           WroManager manager = factory.create();
-          manager.setModelFactory(new SimpleWroModelFactory(new WroModel().addGroup(new Group("some"))));
+          manager.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("some"))));
           return manager;
         }
         public void destroy() {
