@@ -355,7 +355,7 @@
     <profile>
       <id>release-profile</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
         <property>
           <name>release</name>
           <value>true</value>

@@ -3,9 +3,11 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 
 import junit.framework.Assert;
 
@@ -21,8 +23,6 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test for {@link CssUrlRewritingProcessor} class.
- * <p/>
- * TODO improve unit tests.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
@@ -45,6 +45,16 @@ public class TestCssUrlRewritingProcessor {
     WroTestUtils.createInjector().inject(processor);
   }
 
+  @Test
+  public void testFromFolder()
+      throws Exception {
+    final URL url = getClass().getResource("cssUrlRewriting");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css",
+        (ResourcePreProcessor) processor);
+  }
 
   /**
    * When background url contains a dataUri, the rewriting should have no effect.
