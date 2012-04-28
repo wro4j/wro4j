@@ -225,13 +225,7 @@ public final class WroUtil {
         result.append(",");
       }
     }
-    /**
-     * Probably we should use System.getProperty("line.separator"), but it is difficult to get system independent
-     * carriage return literally. Use windows specific crlf, because it works in windows, otherwise it won't work on
-     * windows only: (@see issue422)
-     */
-    final String lineSeparator = "\\r\\n";
-    result.append("].join(\"" + lineSeparator + "\")");
+    result.append("].join(\"\\n\")");
     return result.toString();
   }
 
