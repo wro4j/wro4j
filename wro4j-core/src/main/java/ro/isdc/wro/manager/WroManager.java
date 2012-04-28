@@ -32,9 +32,7 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
-import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
@@ -59,36 +57,15 @@ import ro.isdc.wro.util.WroUtil;
 public class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  /**
-   * ResourcesModel factory.
-   */
   @Inject
   private WroModelFactory modelFactory;
-  /**
-   * GroupExtractor.
-   */
   @Inject
   private GroupExtractor groupExtractor;
   /**
-   * HashBuilder for creating a hash based on the processed content.
-   */
-  private HashBuilder hashBuilder;
-  /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
+  @Inject
   CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  /**
-   * A callback to be notified about the cache change.
-   */
-  PropertyChangeListener cacheChangeListener;
-  /**
-   * Schedules the cache update.
-   */
-  private final SchedulerHelper cacheSchedulerHelper;
-  /**
-   * Schedules the model update.
-   */
-  private final SchedulerHelper modelSchedulerHelper;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
@@ -104,7 +81,23 @@ public class WroManager
   private GroupsProcessor groupsProcessor;
   @Inject
   private WroConfiguration config;
-
+  /**
+   * HashBuilder for creating a hash based on the processed content.
+   */
+  private HashBuilder hashBuilder;
+  /**
+   * A callback to be notified about the cache change.
+   */
+  PropertyChangeListener cacheChangeListener;
+  /**
+   * Schedules the cache update.
+   */
+  private final SchedulerHelper cacheSchedulerHelper;
+  /**
+   * Schedules the model update.
+   */
+  private final SchedulerHelper modelSchedulerHelper;
+  
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
@@ -281,15 +274,8 @@ public class WroManager
     if (contentHashEntry == null) {
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
-      // find processed result for a group
-      final WroModel model = modelFactory.create();
-
-      if (model == null) {
-        throw new WroRuntimeException("Cannot build a valid wro model");
-      }
-      final Group group = model.getGroupByName(groupName);
-
-      final String content = groupsProcessor.process(group, type, minimize);
+      final String content = groupsProcessor.process(cacheEntry);
+      
       contentHashEntry = getContentHashEntryByContent(content);
       if (!config.isDisableCache()) {
         cacheStrategy.put(cacheEntry, contentHashEntry);
@@ -301,6 +287,7 @@ public class WroManager
 
   /**
    * Creates a {@link ContentHashEntry} based on provided content.
+   * @VisibleForTesting
    */
   ContentHashEntry getContentHashEntryByContent(final String content)
     throws IOException {

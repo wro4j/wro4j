@@ -109,20 +109,19 @@ public class TestInjectorBuilder {
   @Test
   public void shouldBuildValidInjectorWithSomeFieldsSet() {
     final NamingStrategy namingStrategy = Mockito.mock(NamingStrategy.class);
-    final PreProcessorExecutor preProcessorExecutor = Mockito.mock(PreProcessorExecutor.class);
     final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
     final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
     
     final WroManager manager = new BaseWroManagerFactory().create();
     
-    final Injector injector = new InjectorBuilder(manager).setNamingStrategy(namingStrategy).setPreProcessorExecutor(
-        preProcessorExecutor).setProcessorsFactory(processorsFactory).setUriLocatorFactory(uriLocatorFactory).build();
+    final Injector injector = new InjectorBuilder(manager).setNamingStrategy(namingStrategy).setProcessorsFactory(
+        processorsFactory).setUriLocatorFactory(uriLocatorFactory).build();
     Assert.assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
     Assert.assertSame(namingStrategy, sample.namingStrategy);
-    Assert.assertSame(preProcessorExecutor, sample.preProcessorExecutor);
+    Assert.assertNotNull(sample.preProcessorExecutor);
     Assert.assertSame(processorsFactory, ((ProcessorsFactoryDecorator) sample.processorsFactory).getDecoratedObject());
     Assert.assertSame(uriLocatorFactory, ((UriLocatorFactoryDecorator) sample.uriLocatorFactor).getDecoratedObject());
     Assert.assertNotNull(sample.callbackRegistry);
@@ -130,6 +129,7 @@ public class TestInjectorBuilder {
     Assert.assertNotNull(sample.groupsProcessor);
     Assert.assertNotNull(sample.modelFactory);
     Assert.assertNotNull(sample.groupExtractor);
+    Assert.assertSame(manager.getCacheStrategy(), sample.cacheStrategy);
   }
   
   @Test(expected = IOException.class)
@@ -142,12 +142,12 @@ public class TestInjectorBuilder {
     //this will throw NullPointerException if the uriLocator is not injected.
     sample.uriLocatorFactor.locate("/path/to/servletContext/resource.js");
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
   private static class Sample {
     @Inject
     UriLocatorFactory uriLocatorFactor;
@@ -167,5 +167,7 @@ public class TestInjectorBuilder {
     WroModelFactory modelFactory;
     @Inject
     GroupExtractor groupExtractor;
+    @Inject
+    CacheStrategy<?, ?> cacheStrategy;
   }
 }

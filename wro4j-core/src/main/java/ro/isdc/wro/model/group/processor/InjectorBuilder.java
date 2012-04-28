@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
@@ -22,6 +26,7 @@ import ro.isdc.wro.model.factory.ModelTransformerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -52,6 +57,10 @@ public class InjectorBuilder {
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
+   * A cacheStrategy used for caching processed results. <GroupName, processed result>.
+   */
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and
    * processed.
    */
@@ -70,7 +79,11 @@ public class InjectorBuilder {
   }
 
   private void initMap() {
-    map.put(PreProcessorExecutor.class, preProcessorExecutor);
+    map.put(PreProcessorExecutor.class, new InjectorObjectFactory<PreProcessorExecutor>() {
+      public PreProcessorExecutor create() {
+        return decorate(preProcessorExecutor);
+      }
+    });
     map.put(GroupsProcessor.class, groupsProcessor);
     map.put(LifecycleCallbackRegistry.class, callbackRegistry);
     map.put(GroupExtractor.class, groupExtractor);
@@ -91,26 +104,8 @@ public class InjectorBuilder {
     });
     map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
-        return modelFactory != null ? new InjectorAwareWroModelFactoryDecorator(decorateModelFactory(modelFactory),
+        return modelFactory != null ? new InjectorAwareWroModelFactoryDecorator(decorate(modelFactory),
             injector) : null;
-      }
-      
-      /**
-       * Decorates the model factory with callback registry calls & other useful factories.
-       */
-      private WroModelFactory decorateModelFactory(final WroModelFactory modelFactory) {
-        return new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
-            new WroModelFactoryDecorator(modelFactory) {
-              @Override
-              public WroModel create() {
-                callbackRegistry.onBeforeModelCreated();
-                try {
-                  return super.create();
-            } finally {
-              callbackRegistry.onAfterModelCreated();
-            }
-          }
-        }))).setTransformers(modelTransformers);
       }
     });
     map.put(NamingStrategy.class, new InjectorObjectFactory<NamingStrategy>() {
@@ -131,8 +126,47 @@ public class InjectorBuilder {
         return Context.get().getConfig();
       }
     });
+    map.put(CacheStrategy.class, new InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>>() {
+      public CacheStrategy<CacheEntry, ContentHashEntry> create() {
+        return cacheStrategy;
+      }
+    });
   }
 
+  /**
+   * Decorates {@link PreProcessorExecutor} with callback invocations.
+   */
+  private PreProcessorExecutor decorate(final PreProcessorExecutor preProcessorExecutor) {
+    return new PreProcessorExecutor() {
+      @Override
+      public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
+        callbackRegistry.onBeforeMerge();
+        try {
+          return preProcessorExecutor.processAndMerge(resources, minimize);
+        } finally {
+          callbackRegistry.onAfterMerge();
+        }
+      }
+    };
+  }
+
+  /**
+   * Decorates the model factory with callback registry calls & other useful factories.
+   */
+  private WroModelFactory decorate(final WroModelFactory modelFactory) {
+    return new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
+        new WroModelFactoryDecorator(modelFactory) {
+          @Override
+          public WroModel create() {
+            callbackRegistry.onBeforeModelCreated();
+            try {
+              return super.create();
+        } finally {
+          callbackRegistry.onAfterModelCreated();
+        }
+      }
+    }))).setTransformers(modelTransformers);
+  }
 
   public Injector build() {
     //first initialize the map
@@ -153,6 +187,7 @@ public class InjectorBuilder {
     namingStrategy = manager.getNamingStrategy();
     modelFactory = manager.getModelFactory();
     groupExtractor = manager.getGroupExtractor();
+    cacheStrategy = manager.getCacheStrategy();
     return this;
   }
 

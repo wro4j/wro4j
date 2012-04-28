@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Group;
@@ -37,19 +38,10 @@ public class TestGroupsProcessor {
     injector.inject(victim);
   }
   
-  @Test(expected = NullPointerException.class)
-  public void cannotProcessNullGroup() {
-    victim.process(null, ResourceType.JS, true);
-  }
-  
-  @Test(expected = NullPointerException.class)
-  public void cannotProcessNullResourceType() {
-    victim.process(new Group("group"), null, true);
-  }
-  
   @Test
   public void shouldReturnEmptyStringWhenGroupHasNoResources() {
-    Assert.assertEquals(StringUtils.EMPTY, victim.process(new Group("group"), ResourceType.JS, true));
+    final CacheEntry key = new CacheEntry("group", ResourceType.JS, true);
+    Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
   }
   
   /**
@@ -60,7 +52,8 @@ public class TestGroupsProcessor {
     WroConfiguration config = new WroConfiguration();
     config.setIgnoreEmptyGroup(false);
     initVictim(config);
-    Assert.assertEquals(StringUtils.EMPTY, victim.process(new Group("group"), ResourceType.JS, true));
+    final CacheEntry key = new CacheEntry("group", ResourceType.JS, true);
+    Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
   }
 
 //
