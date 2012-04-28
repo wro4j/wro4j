@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 /**
  * A preProcessor, responsible for removing console.log(..) and console.debug(..) statements.
@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.JS)
 public class ConsoleStripperProcessor
-  implements ResourcePreProcessor {
+  implements ResourceProcessor {
   public static final String ALIAS = "consoleStripperProcessor";
 
   /**

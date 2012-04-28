@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestConsoleStripperProcessor {
-  private final ResourcePreProcessor processor = new ConsoleStripperProcessor();
+  private final ResourceProcessor processor = new ConsoleStripperProcessor();
 
   @Test
   public void testFromFolder()

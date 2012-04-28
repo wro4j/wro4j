@@ -49,7 +49,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
@@ -313,7 +312,7 @@ public class WroTestUtils {
    * @param toTargetFileName
    *          {@link Transformer} used to identify the target file name based on source file name.
    * @param preProcessor
-   *          {@link ResourcePreProcessor} used to process the source files.
+   *          {@link ResourceProcessor} used to process the source files.
    * @throws IOException
    */
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,

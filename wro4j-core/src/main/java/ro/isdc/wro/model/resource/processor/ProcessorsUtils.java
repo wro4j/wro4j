@@ -36,7 +36,6 @@ import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 public class ProcessorsUtils {
   /**
    * This method is visible for testing only.
-   * @param <T> processor type. Can be {@link ResourcePreProcessor}, {@link ResourcePostProcessor}.
    * @param type {@link ResourceType} to apply for searching on available processors. This value cannot be null.
    * @param availableProcessors a list where to perform the search.
    * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:

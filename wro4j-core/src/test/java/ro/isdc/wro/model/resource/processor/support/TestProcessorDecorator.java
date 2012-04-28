@@ -14,7 +14,6 @@ import org.junit.Test;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
@@ -106,7 +105,7 @@ public class TestProcessorDecorator {
 
   @Test
   public void shouldComputeEligibilityForProcessorWithNoTypeAndNotMinimizeAware() {
-    ResourcePreProcessor noOpProcessor = new ResourcePreProcessor() {
+    ResourceProcessor noOpProcessor = new ResourceProcessor() {
       public void process(Resource resource, Reader reader, Writer writer)
           throws IOException {
       }
