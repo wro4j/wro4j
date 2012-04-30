@@ -83,6 +83,7 @@ public class WroManager
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
+  @Inject
   private HashBuilder hashBuilder;
   /**
    * A callback to be notified about the cache change.

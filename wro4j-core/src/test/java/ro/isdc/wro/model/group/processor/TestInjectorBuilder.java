@@ -35,6 +35,7 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactoryDecorator;
+import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 
 /**
@@ -129,7 +130,8 @@ public class TestInjectorBuilder {
     Assert.assertNotNull(sample.groupsProcessor);
     Assert.assertNotNull(sample.modelFactory);
     Assert.assertNotNull(sample.groupExtractor);
-    Assert.assertSame(manager.getCacheStrategy(), sample.cacheStrategy);
+    Assert.assertNotNull(sample.cacheStrategy);
+    Assert.assertNotNull(sample.hashBuilder);
   }
   
   @Test(expected = IOException.class)
@@ -169,5 +171,7 @@ public class TestInjectorBuilder {
     GroupExtractor groupExtractor;
     @Inject
     CacheStrategy<?, ?> cacheStrategy;
+    @Inject
+    HashBuilder hashBuilder;
   }
 }

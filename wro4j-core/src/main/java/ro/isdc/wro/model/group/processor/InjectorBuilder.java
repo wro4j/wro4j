@@ -19,6 +19,7 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.SynchronizedCacheStrategyDecorator;
+import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.WroFilter;
@@ -42,6 +43,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
+import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 
@@ -63,16 +65,15 @@ public class InjectorBuilder {
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
-  private HashBuilder hashBuilder = null;
+  private HashBuilder hashBuilder = new SHA1HashBuilder();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
-   * A cacheStrategy used for caching processed results. <GroupName, processed result>.
+   * A cacheStrategy used for caching processed results.
    */
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
   /**
-   * A list of model transformers. Allows manager to mutate the model before it is being parsed and
-   * processed.
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
   private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
   private Injector injector;
@@ -188,7 +189,7 @@ public class InjectorBuilder {
   private PreProcessorExecutor decorate(final PreProcessorExecutor preProcessorExecutor) {
     return new PreProcessorExecutor() {
       @Override
-      public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
+      public String processAndMerge(final List<Resource> resources, final boolean minimize) {
         callbackRegistry.onBeforeMerge();
         try {
           return preProcessorExecutor.processAndMerge(resources, minimize);

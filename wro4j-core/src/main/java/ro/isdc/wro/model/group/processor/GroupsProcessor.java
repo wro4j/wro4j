@@ -56,43 +56,18 @@ public class GroupsProcessor {
   @Inject
   private WroConfiguration config;
   /**
-   * A cacheStrategy used for caching processed results. <GroupName, processed result>.
-   */
-  @Inject
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-  /**
-   * HashBuilder for creating a hash based on the processed content.
-   */
-  @Inject
-  private HashBuilder hashBuilder;
 
-  private ConcurrentMap<CacheEntry, Lock> locks = new ConcurrentHashMap<CacheEntry, Lock>();
   /**
    * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
    */
   public String process(final CacheEntry cacheEntry) {
     Validate.notNull(cacheEntry);
     try {
-      Lock lock = locks.putIfAbsent(cacheEntry, new ReentrantLock());
-      return doProcess(cacheEntry);
-    } catch (final IOException e) {
-      throw new WroRuntimeException("Exception while merging resources", e);
-    } finally {
-      callbackRegistry.onProcessingComplete();
-    }
-  }
-
-  /**
-   * Does the actual processing by applying pre processors and post processors.
-   */
-  protected String doProcess(final CacheEntry cacheEntry)
-      throws IOException {
     LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheEntry.isMinimize(),
         cacheEntry.getGroupName(), cacheEntry.getType());
     // find processed result for a group
@@ -114,6 +89,9 @@ public class GroupsProcessor {
     final String result = preProcessorExecutor.processAndMerge(
         filteredGroup.getResources(), cacheEntry.isMinimize());
     return doPostProcess(result, cacheEntry);
+    } finally {
+      callbackRegistry.onProcessingComplete();
+    }
   }
 
   /**
@@ -121,8 +99,7 @@ public class GroupsProcessor {
    * 
    * @return the post processed contents.
    */
-  private String doPostProcess(final String content, final CacheEntry cacheEntry)
-      throws IOException {
+  private String doPostProcess(final String content, final CacheEntry cacheEntry) {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
@@ -135,32 +112,35 @@ public class GroupsProcessor {
 
   /**
    * Apply resourcePostProcessors.
-   *
+   * 
    * @param processors
    *          a collection of processors to apply on the content from the supplied writer.
    * @param content
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
-      throws IOException {
+  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content) {
     LOG.debug("postProcessors: {}", processors);
-    if (processors.isEmpty()) {
-      return content;
+    try {
+      if (processors.isEmpty()) {
+        return content;
+      }
+      Reader input = new StringReader(content.toString());
+      Writer output = null;
+      final StopWatch stopWatch = new StopWatch();
+      for (final ResourcePostProcessor processor : processors) {
+        stopWatch.start("Using " + processor.getClass().getSimpleName());
+        output = new StringWriter();
+        decorateWithPostProcessCallback(processor).process(input, output);
+        
+        input = new StringReader(output.toString());
+        stopWatch.stop();
+      }
+      LOG.debug(stopWatch.prettyPrint());
+      return output.toString();
+    } catch (final IOException e) {
+      throw new WroRuntimeException("Exception while merging resources", e);
     }
-    Reader input = new StringReader(content.toString());
-    Writer output = null;
-    final StopWatch stopWatch = new StopWatch();
-    for (final ResourcePostProcessor processor : processors) {
-      stopWatch.start("Using " + processor.getClass().getSimpleName());
-      output = new StringWriter();
-      decorateWithPostProcessCallback(processor).process(input, output);
-
-      input = new StringReader(output.toString());
-      stopWatch.stop();
-    }
-    LOG.debug(stopWatch.prettyPrint());
-    return output.toString();
   }
 
 

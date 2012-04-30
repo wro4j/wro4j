@@ -87,7 +87,7 @@ public class TestSynchronizedCacheStrategyDecorator {
    */
   private void awaitTermination() {
     try {
-      executor.awaitTermination(300, TimeUnit.MILLISECONDS);
+      executor.awaitTermination(400, TimeUnit.MILLISECONDS);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
