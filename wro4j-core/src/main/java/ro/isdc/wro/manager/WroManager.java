@@ -4,7 +4,6 @@
 package ro.isdc.wro.manager;
 
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -172,12 +171,13 @@ public class WroManager
       cacheSchedulerHelper.scheduleWithPeriod(configuration.getCacheUpdatePeriod());
       modelSchedulerHelper.scheduleWithPeriod(configuration.getModelUpdatePeriod());
 
-      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
+      final CacheEntry cacheKey = new CacheEntry(groupName, type, minimize);
+      final ContentHashEntry cacheValue = cacheStrategy.get(cacheKey);
 
       // TODO move ETag check in wroManagerFactory
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       // enclose etag value in quotes to be compliant with the RFC
-      final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
+      final String etagValue = String.format("\"%s\"", cacheValue.getHash());
 
       if (etagValue != null && etagValue.equals(ifNoneMatch)) {
         LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
@@ -197,17 +197,17 @@ public class WroManager
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
       os = response.getOutputStream();
-      if (contentHashEntry.getRawContent() != null) {
+      if (cacheValue.getRawContent() != null) {
         // use gziped response if supported & Set content length based on gzip flag
         if (isGzipAllowed()) {
-          response.setContentLength(contentHashEntry.getGzippedContent().length);
+          response.setContentLength(cacheValue.getGzippedContent().length);
           // add gzip header and gzip response
           response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
           response.setHeader("Vary", "Accept-Encoding");
-          IOUtils.write(contentHashEntry.getGzippedContent(), os);
+          IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
-          IOUtils.write(contentHashEntry.getRawContent(), os, configuration.getEncoding());
-          response.setContentLength(contentHashEntry.getRawContent().length());
+          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
+          response.setContentLength(cacheValue.getRawContent().length());
         }
       }
     } finally {
@@ -237,14 +237,11 @@ public class WroManager
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
     final boolean minimize) {
-    try {
-      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, resourceType, minimize);
-      final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
-      // encode the fingerprint of the resource into the resource path
-      return formatVersionedResource(contentHashEntry.getHash(), groupUrl);
-    } catch (final IOException e) {
-      return "";
-    }
+    final CacheEntry key = new CacheEntry(groupName, resourceType, minimize);
+    final ContentHashEntry cacheValue = cacheStrategy.get(key);
+    final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
+    // encode the fingerprint of the resource into the resource path
+    return formatVersionedResource(cacheValue.getHash(), groupUrl);
   }
 
 
@@ -260,47 +257,6 @@ public class WroManager
   protected String formatVersionedResource(final String hash, final String resourcePath) {
     return String.format("%s/%s", hash, resourcePath);
   }
-
-
-  /**
-   * @return {@link ContentHashEntry} object.
-   */
-  private ContentHashEntry getContentHashEntry(final String groupName, final ResourceType type, final boolean minimize)
-    throws IOException {
-    final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
-    LOG.debug("Searching cache entry: {}", cacheEntry);
-    // Cache based on uri
-    ContentHashEntry key = cacheStrategy.get(cacheEntry);
-    if (key == null) {
-      LOG.debug("Cache is empty. Perform processing...");
-      // process groups & put result in the cache
-      final String content = groupsProcessor.process(cacheEntry);
-      
-      key = getContentHashEntryByContent(content);
-      if (!config.isDisableCache()) {
-        cacheStrategy.put(cacheEntry, key);
-      }
-    }
-    return key;
-  }
-
-
-  /**
-   * Creates a {@link ContentHashEntry} based on provided content.
-   * @VisibleForTesting
-   */
-  ContentHashEntry getContentHashEntryByContent(final String content)
-    throws IOException {
-    String hash = null;
-    if (content != null) {
-      LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 40));
-      hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
-    }
-    final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
-    LOG.debug("computed entry: {}", entry);
-    return entry;
-  }
-
 
   /**
    * Serve images and other external resources referred by bundled resources.
@@ -434,6 +390,11 @@ public class WroManager
     Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
     return this;
+  }
+
+  
+  public final HashBuilder getHashBuilder() {
+    return hashBuilder;
   }
 
 

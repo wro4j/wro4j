@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 
@@ -57,11 +56,9 @@ public final class ReloadCacheRunnable
                 throw new InterruptedException();
               }
               final WroManager wroManager = wroManagerReference.get();
-              final CacheEntry key = new CacheEntry(group.getName(), resourceType, minimize);
-              final String content = wroManager.getGroupsProcessor().process(key);
-              final CacheEntry cacheEntry = new CacheEntry(group.getName(), resourceType, minimize);
-              final ContentHashEntry contentHashEntry = wroManager.getContentHashEntryByContent(content);
-              wroManager.getCacheStrategy().put(cacheEntry, contentHashEntry);
+              final CacheEntry cacheKey = new CacheEntry(group.getName(), resourceType, minimize);
+              final ContentHashEntry contentHashEntry = wroManager.getCacheStrategy().get(cacheKey);
+              wroManager.getCacheStrategy().put(cacheKey, contentHashEntry);
             }
           }
         }
@@ -70,8 +67,6 @@ public final class ReloadCacheRunnable
       // Catch all exception in order to avoid situation when scheduler runs out of threads.
       LOG.error("Interrupted exception occured: ", e);
       Thread.currentThread().interrupt();
-    } catch (final IOException e) {
-      LOG.error("Exception occured during cache reload: ", e);
     } catch (final Exception e) {
       LOG.error("Exception occured during cache reload: ", e);
     }
