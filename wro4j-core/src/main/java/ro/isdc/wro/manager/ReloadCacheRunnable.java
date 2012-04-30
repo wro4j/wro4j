@@ -56,11 +56,12 @@ public final class ReloadCacheRunnable
                 LOG.debug("ReloadCacheRunnable was interrupted - stop processing!");
                 throw new InterruptedException();
               }
+              final WroManager wroManager = wroManagerReference.get();
               final CacheEntry key = new CacheEntry(group.getName(), resourceType, minimize);
-              final String content = wroManagerReference.get().getGroupsProcessor().process(key);
+              final String content = wroManager.getGroupsProcessor().process(key);
               final CacheEntry cacheEntry = new CacheEntry(group.getName(), resourceType, minimize);
-              final ContentHashEntry contentHashEntry = wroManagerReference.get().getContentHashEntryByContent(content);
-              wroManagerReference.get().cacheStrategy.put(cacheEntry, contentHashEntry);
+              final ContentHashEntry contentHashEntry = wroManager.getContentHashEntryByContent(content);
+              wroManager.getCacheStrategy().put(cacheEntry, contentHashEntry);
             }
           }
         }

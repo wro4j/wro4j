@@ -65,7 +65,7 @@ public class WroManager
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   @Inject
-  CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
@@ -270,18 +270,18 @@ public class WroManager
     final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
     LOG.debug("Searching cache entry: {}", cacheEntry);
     // Cache based on uri
-    ContentHashEntry contentHashEntry = cacheStrategy.get(cacheEntry);
-    if (contentHashEntry == null) {
+    ContentHashEntry key = cacheStrategy.get(cacheEntry);
+    if (key == null) {
       LOG.debug("Cache is empty. Perform processing...");
       // process groups & put result in the cache
       final String content = groupsProcessor.process(cacheEntry);
       
-      contentHashEntry = getContentHashEntryByContent(content);
+      key = getContentHashEntryByContent(content);
       if (!config.isDisableCache()) {
-        cacheStrategy.put(cacheEntry, contentHashEntry);
+        cacheStrategy.put(cacheEntry, key);
       }
     }
-    return contentHashEntry;
+    return key;
   }
 
 
