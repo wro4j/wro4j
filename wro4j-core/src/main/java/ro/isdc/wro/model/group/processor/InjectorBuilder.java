@@ -15,6 +15,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -22,9 +23,9 @@ import ro.isdc.wro.cache.SynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
@@ -85,6 +86,13 @@ public class InjectorBuilder {
   public InjectorBuilder() {
   }
 
+  /**
+   * Factory method which uses a managerFactory to initialize injected fields.
+   */
+  public static InjectorBuilder create(final WroManagerFactory managerFactory) {
+    return new InjectorBuilder(managerFactory.create());
+  }
+  
   public InjectorBuilder(final WroManager manager) {
     setWroManager(manager);
   }
@@ -153,13 +161,14 @@ public class InjectorBuilder {
     return new SynchronizedCacheStrategyDecorator<CacheEntry, ContentHashEntry>(cacheStrategy) {
       @Override
       protected ContentHashEntry loadValue(final CacheEntry key) {
-        return getContentHashEntryByContent(groupsProcessor.process(key));
+        final String content = groupsProcessor.process(key);
+        return computeCacheValueByContent(content);
       }
 
       /**
        * Creates a {@link ContentHashEntry} based on provided content.
        */
-      private ContentHashEntry getContentHashEntryByContent(final String content) {
+      private ContentHashEntry computeCacheValueByContent(final String content) {
         String hash = null;
         try {
           if (content != null) {
@@ -210,12 +219,16 @@ public class InjectorBuilder {
           public WroModel create() {
             callbackRegistry.onBeforeModelCreated();
             try {
-              return super.create();
-        } finally {
-          callbackRegistry.onAfterModelCreated();
-        }
-      }
-    }))).setTransformers(modelTransformers);
+              final WroModel model = super.create();
+              if (model == null) {
+                throw new WroRuntimeException("Cannot create valid model");
+              }
+              return model;
+            } finally {
+              callbackRegistry.onAfterModelCreated();
+            }
+          }
+        }))).setTransformers(modelTransformers);
   }
 
   public Injector build() {
@@ -230,7 +243,7 @@ public class InjectorBuilder {
     return injector;
   }
 
-  public InjectorBuilder setWroManager(final WroManager manager) {
+  private InjectorBuilder setWroManager(final WroManager manager) {
     Validate.notNull(manager);
     uriLocatorFactory = manager.getUriLocatorFactory();
     processorsFactory = manager.getProcessorsFactory();

@@ -13,8 +13,13 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -34,13 +39,18 @@ public class TestGroupsProcessor {
 
   private void initVictim(final WroConfiguration config) {
     Context.set(Context.standaloneContext(), config);
-    final Injector injector = new InjectorBuilder().build();
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     injector.inject(victim);
   }
   
   @Test
   public void shouldReturnEmptyStringWhenGroupHasNoResources() {
-    final CacheEntry key = new CacheEntry("group", ResourceType.JS, true);
+    final String groupName = "group";
+    WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group(groupName)));
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory);
+    final Injector injector = InjectorBuilder.create(managerFactory).build();
+    injector.inject(victim);
+    final CacheEntry key = new CacheEntry(groupName, ResourceType.JS, true);
     Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
   }
   

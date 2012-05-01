@@ -52,32 +52,29 @@ public class GroupsProcessor {
   private transient PreProcessorExecutor preProcessorExecutor;
 
   /**
-   * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
+   * @param cacheKey to process.
+   * @return processed content.
    */
-  public String process(final CacheEntry cacheEntry) {
-    Validate.notNull(cacheEntry);
+  public String process(final CacheEntry cacheKey) {
+    Validate.notNull(cacheKey);
     try {
-    LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheEntry.isMinimize(),
-        cacheEntry.getGroupName(), cacheEntry.getType());
+    LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
+        cacheKey.getGroupName(), cacheKey.getType());
     // find processed result for a group
     final WroModel model = modelFactory.create();
-    //TODO remove because this check can be performed in decorated modelFactory.
-    if (model == null) {
-      throw new WroRuntimeException("Cannot build a valid wro model");
-    }
-    final Group group = model.getGroupByName(cacheEntry.getGroupName());
+    final Group group = model.getGroupByName(cacheKey.getGroupName());
     // mark this group as used.
     group.markAsUsed();
-    final Group filteredGroup = group.collectResourcesOfType(cacheEntry.getType());
+    final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
     if (filteredGroup.getResources().isEmpty()) {
-      LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheEntry.getType());
+      LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
       if (!config.isIgnoreEmptyGroup()) {
         throw new WroRuntimeException("No resources found in group: " + group.getName());
       }
     }
     final String result = preProcessorExecutor.processAndMerge(
-        filteredGroup.getResources(), cacheEntry.isMinimize());
-    return doPostProcess(result, cacheEntry);
+        filteredGroup.getResources(), cacheKey.isMinimize());
+    return doPostProcess(result, cacheKey);
     } finally {
       callbackRegistry.onProcessingComplete();
     }
