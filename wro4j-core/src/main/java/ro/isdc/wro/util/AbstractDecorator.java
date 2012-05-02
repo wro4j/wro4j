@@ -24,4 +24,21 @@ public abstract class AbstractDecorator<T> {
   public final T getDecoratedObject() {
     return decorated;
   }
+  
+  /**
+   * @return the object which is was originally decorated and is not a decorator itself.
+   */
+  public final T getOriginalDecoratedObject() {
+    return getOriginalDecoratedObject(decorated);
+  }
+
+  
+  /**
+   * @return the object which is was originally decorated and is not a decorator itself.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T getOriginalDecoratedObject(T object) {
+    return (object instanceof AbstractDecorator) ? ((AbstractDecorator<T>) object).getDecoratedObject()
+        : object;
+  }
 }

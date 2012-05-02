@@ -39,7 +39,7 @@ public abstract class AbstractProcessorDecoratorSupport
    * Allow subclass override the way getSupportedResourceType is used. 
    */
   protected SupportedResourceType getSupportedResourceTypeInternal() {
-    return getSupportedResourceTypeForProcessor(getDecoratedProcessor());
+    return getSupportedResourceTypeForProcessor(getDecoratedObject());
   }
 
   /**
@@ -71,7 +71,7 @@ public abstract class AbstractProcessorDecoratorSupport
    * Allow subclass override the way isMinimized is used. 
    */
   protected boolean isMinimizeInternal() {
-    return isMinimizeForProcessor(getDecoratedProcessor());
+    return isMinimizeForProcessor(getDecoratedObject());
   }
 
   /**
@@ -99,7 +99,7 @@ public abstract class AbstractProcessorDecoratorSupport
    *         we need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
    *         removed in 1.5.0.
    */
-  protected abstract Object getDecoratedProcessor();
+  protected abstract Object getDecoratedObject();
 
   /**
    * {@inheritDoc}

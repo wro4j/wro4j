@@ -24,7 +24,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -34,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
@@ -62,7 +62,7 @@ public class TestConfigurableWroManagerFactory {
     // create one instance for test
     final WroManager manager = factory.create();
     processorsFactory = manager.getProcessorsFactory();
-    uriLocatorFactory = (SimpleUriLocatorFactory) ((UriLocatorFactoryDecorator) manager.getUriLocatorFactory()).getDecoratedObject();
+    uriLocatorFactory = (SimpleUriLocatorFactory) ((AbstractDecorator<?>) manager.getUriLocatorFactory()).getDecoratedObject();
   }
   
   @Before
@@ -204,7 +204,7 @@ public class TestConfigurableWroManagerFactory {
     Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(
         JSMinProcessor.class,
-        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedProcessor().getClass());
+        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
   }
   
   @Test
@@ -216,7 +216,7 @@ public class TestConfigurableWroManagerFactory {
     Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(
         JSMinProcessor.class,
-        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedProcessor().getClass());
+        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
   }
   
   @Test(expected = WroRuntimeException.class)

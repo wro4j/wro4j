@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
@@ -42,18 +44,18 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
 import ro.isdc.wro.model.resource.util.MD5HashBuilder;
+import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -69,17 +71,23 @@ public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
   
   /**
-   * A processor which which uses a {@link WroManager} during processor, in order to process a single group, which
+   * A processor which which uses a {@link WroManager} during processor, in order to process a single group, whose
    * resource is the pre processed resource of this processor.
    */
   private static final class WroManagerProcessor
       implements ResourcePreProcessor {
-    private final WroManagerFactory managerFactory = new BaseWroManagerFactory() {
-      @Override
-      protected void onAfterInitializeManager(final WroManager manager) {
-        manager.registerCallback(new PerformanceLoggerCallback());
+    
+    private WroManagerFactory createManagerFactory(final Resource resource) {
+      return new BaseWroManagerFactory() {
+        @Override
+        protected void onAfterInitializeManager(final WroManager manager) {
+          manager.registerCallback(new PerformanceLoggerCallback());
+        };
+        protected WroModelFactory newModelFactory() {
+          return WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("group").addResource(resource)));
+        }
       };
-    };
+    }
     
     public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
@@ -112,20 +120,7 @@ public class TestWroManager {
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
-      final WroManager manager = managerFactory.create();
-      manager.setModelFactory(new WroModelFactoryDecorator(getValidModelFactory()) {
-        @Override
-        public WroModel create() {
-          
-          final Group group = new Group("group");
-          group.setResources(Arrays.asList(new Resource[] {
-            resource
-          }));
-          final WroModel model = super.create();
-          model.setGroups(Arrays.asList(group));
-          return model;
-        }
-      });
+      final WroManager manager = createManagerFactory(resource).create();
       manager.setGroupExtractor(groupExtractor);
       manager.process();
     }
@@ -203,7 +198,6 @@ public class TestWroManager {
   /**
    * Ignored because it fails when running the test from command line.
    */
-  // @Ignore
   @Test
   public void testFromFolder()
       throws Exception {
@@ -213,7 +207,6 @@ public class TestWroManager {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
-    // WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
   
   /**
@@ -230,7 +223,7 @@ public class TestWroManager {
   @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
-    final WroManagerFactory factory = new NoProcessorsWroManagerFactory();
+    final WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
     
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -241,10 +234,7 @@ public class TestWroManager {
     
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
-    final WroManager manager = factory.create();
-    manager.setModelFactory(getValidModelFactory());
-    
-    manager.process();
+    factory.create().process();
     
     // compare written bytes to output stream with the content from specified css.
     WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
@@ -441,8 +431,8 @@ public class TestWroManager {
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    final WroManager manager = managerFactory.create();
-    manager.setHashBuilder(new CRC32HashBuilder());
+    final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+        new CRC32HashBuilder()).create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
@@ -450,8 +440,8 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    final WroManager manager = managerFactory.create();
-    manager.setHashBuilder(new MD5HashBuilder());
+    final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+        new MD5HashBuilder()).create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }
@@ -480,11 +470,13 @@ public class TestWroManager {
     final WroManager wroManager = managerFactory.create();
     wroManager.process();
     
-    Assert.assertNotNull(wroManager.getCacheStrategy().get(new CacheEntry("g3", ResourceType.CSS, true)));
+    // use original decorated object because the decorated one trigger the processing for each cache lookup.
+    final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager.getCacheStrategy());
+    Assert.assertNotNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
     
     final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager);
     reloadModelRunnable.run();
-    Assert.assertNull(wroManager.getCacheStrategy().get(new CacheEntry("g3", ResourceType.CSS, true)));
+    Assert.assertNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
   }
   
   @After

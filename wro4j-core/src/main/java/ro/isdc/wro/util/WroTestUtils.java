@@ -63,6 +63,13 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
+  /**
+   * 
+   * @return a {@link BaseWroManagerFactory} which uses an empty model.
+   */
+  public static BaseWroManagerFactory simpleManagerFactory() {
+    return new BaseWroManagerFactory().setModelFactory(simpleModelFactory(new WroModel()));
+  }
 
   /**
    * @param properties {@link Properties} object to get stream from.

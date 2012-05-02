@@ -31,6 +31,7 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
@@ -48,8 +49,10 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Contains all the factories used by optimizer in order to perform the logic.
- *
+ * Contains all the factories used by optimizer in order to perform the logic. This object should be created through
+ * {@link WroManagerFactory}, in order to ensure that all dependencies are injected properly. In other words, avoid
+ * setting the fields explicitly after creating a new instance of {@link WroManager}
+ * 
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */

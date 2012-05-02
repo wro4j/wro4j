@@ -24,19 +24,18 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactoryDecorator;
 import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
@@ -76,8 +75,7 @@ public class TestInjectorBuilder {
   
   @Test
   public void shouldBuildInjectorWithValidWroManager() {
-    final WroManager manager = new BaseWroManagerFactory().create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     Assert.assertNotNull(injector);
     
     final Sample sample = new Sample();
@@ -113,18 +111,20 @@ public class TestInjectorBuilder {
     final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
     final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
     
-    final WroManager manager = new BaseWroManagerFactory().create();
+    final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
+    managerFactroy.setNamingStrategy(namingStrategy);
+    managerFactroy.setProcessorsFactory(processorsFactory);
+    managerFactroy.setUriLocatorFactory(uriLocatorFactory);
     
-    final Injector injector = new InjectorBuilder(manager).setNamingStrategy(namingStrategy).setProcessorsFactory(
-        processorsFactory).setUriLocatorFactory(uriLocatorFactory).build();
+    final Injector injector = InjectorBuilder.create(managerFactroy).build();
     Assert.assertNotNull(injector);
     
     final Sample sample = new Sample();
     injector.inject(sample);
     Assert.assertSame(namingStrategy, sample.namingStrategy);
     Assert.assertNotNull(sample.preProcessorExecutor);
-    Assert.assertSame(processorsFactory, ((ProcessorsFactoryDecorator) sample.processorsFactory).getDecoratedObject());
-    Assert.assertSame(uriLocatorFactory, ((UriLocatorFactoryDecorator) sample.uriLocatorFactor).getDecoratedObject());
+    Assert.assertSame(processorsFactory, AbstractDecorator.getOriginalDecoratedObject(sample.processorsFactory));
+    Assert.assertSame(uriLocatorFactory, AbstractDecorator.getOriginalDecoratedObject(sample.uriLocatorFactor));
     Assert.assertNotNull(sample.callbackRegistry);
     Assert.assertSame(injector, sample.injector);
     Assert.assertNotNull(sample.groupsProcessor);
@@ -138,7 +138,8 @@ public class TestInjectorBuilder {
   public void shouldInjectEachLocatorProvidedByLocatorFactory()
       throws Exception {
     final UriLocatorFactory uriLocatorFactory = new DefaultUriLocatorFactory();
-    final Injector injector = new InjectorBuilder().setUriLocatorFactory(uriLocatorFactory).build();
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(uriLocatorFactory);
+    final Injector injector = InjectorBuilder.create(managerFactory).build();
     
     final Sample sample = new Sample();
     injector.inject(sample);

@@ -67,22 +67,18 @@ public class PreProcessorExecutor {
    *          whether minimize aware processors must be applied or not.
    * @return preProcessed merged content.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize) {
+  public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
     Validate.notNull(resources);
-    try {
-      final StringBuffer result = new StringBuffer();
-      if (shouldRunInParallel(resources)) {
-        result.append(runInParallel(resources, minimize));
-      } else {
-        for (final Resource resource : resources) {
-          LOG.debug("\tmerging resource: {}", resource);
-          result.append(applyPreProcessors(resource, minimize));
-        }
+    final StringBuffer result = new StringBuffer();
+    if (shouldRunInParallel(resources)) {
+      result.append(runInParallel(resources, minimize));
+    } else {
+      for (final Resource resource : resources) {
+        LOG.debug("\tmerging resource: {}", resource);
+        result.append(applyPreProcessors(resource, minimize));
       }
-      return result.toString();
-    } catch (final IOException e) {
-      throw new WroRuntimeException("Exception while merging resources", e);
     }
+    return result.toString();
   }
   
   private boolean shouldRunInParallel(final List<Resource> resources) {
@@ -223,6 +219,8 @@ public class PreProcessorExecutor {
   }
   
   /**
+   * TODO: move this decoration to {@link InjectorBuilder}.
+   * <p/>
    * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
    * doesn't require the minimization.
    */

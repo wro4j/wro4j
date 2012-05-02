@@ -14,7 +14,6 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
@@ -45,8 +44,7 @@ public class TestInjector {
   }
 
   private void initializeValidInjector() {
-    final WroManager manager = new BaseWroManagerFactory().create();
-    injector = new InjectorBuilder(manager).build();
+    injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }
 
   @Test(expected=WroRuntimeException.class)

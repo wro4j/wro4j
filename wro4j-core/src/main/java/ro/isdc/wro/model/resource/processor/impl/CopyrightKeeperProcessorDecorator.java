@@ -67,7 +67,7 @@ public class CopyrightKeeperProcessorDecorator
 
       LOG.debug("buffer: {}", copyrightBuffer);
       final Writer processedWriter = new StringWriter();
-      getDecoratedProcessor().process(resource, new StringReader(content), processedWriter);
+      getDecoratedObject().process(resource, new StringReader(content), processedWriter);
 
       final Matcher processedMatcher = PATTERN_COPYRIGHT.matcher(processedWriter.toString());
 

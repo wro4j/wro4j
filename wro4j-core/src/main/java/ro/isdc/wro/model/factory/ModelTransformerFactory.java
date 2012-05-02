@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.util.Transformer;
 
 /**
@@ -23,9 +25,11 @@ import ro.isdc.wro.util.Transformer;
  * @since 1.4.0
  */
 public class ModelTransformerFactory
-    extends WroModelFactoryDecorator implements ModelTransformersAware {
+    extends WroModelFactoryDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(ModelTransformerFactory.class);
   private List<? extends Transformer<WroModel>> modelTransformers = Collections.emptyList();
+  @Inject
+  private Injector injector;
   
   /**
    * Decorates a model factory.
@@ -37,7 +41,7 @@ public class ModelTransformerFactory
   /**
    * Set a list of transformers to apply on decorated model factory.
    */
-  public ModelTransformerFactory setTransformers(final List<? extends Transformer<WroModel>> modelTransformers) {
+  public ModelTransformerFactory setTransformers(final List<Transformer<WroModel>> modelTransformers) {
     Validate.notNull(modelTransformers);
     this.modelTransformers = modelTransformers;
     return this;
@@ -58,14 +62,12 @@ public class ModelTransformerFactory
     WroModel model = super.create();
     LOG.debug("using {} transformers", modelTransformers);
     for (final Transformer<WroModel> transformer : modelTransformers) {
+      injector.inject(transformer);
       LOG.debug("using transformer: {}", transformer.getClass());
-      //synchronize to avoid multiple replacement in concurrent environment
-      synchronized (this) {
-        try {
-          model = transformer.transform(model);
-        } catch (final Exception e) {
-          throw new WroRuntimeException("Exception during model transformation", e);
-        }
+      try {
+        model = transformer.transform(model);
+      } catch (final Exception e) {
+        throw new WroRuntimeException("Exception during model transformation", e);
       }
     }
     return model;

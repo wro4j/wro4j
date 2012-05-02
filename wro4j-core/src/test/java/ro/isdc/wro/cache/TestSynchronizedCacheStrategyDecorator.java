@@ -1,6 +1,5 @@
 package ro.isdc.wro.cache;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +18,7 @@ import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
  */
 public class TestSynchronizedCacheStrategyDecorator {
   private CacheStrategy<String, String> decorated;
-  private SynchronizedCacheStrategyDecorator<String, String> victim;
+  private AbstractSynchronizedCacheStrategyDecorator<String, String> victim;
   private ExecutorService executor;
   
   @Before
@@ -67,7 +66,7 @@ public class TestSynchronizedCacheStrategyDecorator {
 
   protected AtomicInteger createSlowCountingDecorator() {
     final AtomicInteger count = new AtomicInteger();
-    victim = new SynchronizedCacheStrategyDecorator<String, String>(decorated) {
+    victim = new AbstractSynchronizedCacheStrategyDecorator<String, String>(decorated) {
       @Override
       protected String loadValue(final String key) {
         try {

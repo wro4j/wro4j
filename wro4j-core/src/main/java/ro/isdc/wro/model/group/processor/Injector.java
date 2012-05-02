@@ -17,6 +17,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
@@ -68,9 +69,13 @@ public final class Injector {
           }
         }
       }
-      //handle special case like processor decorators
+      //handle special cases like decorators & processorDecorators
+      //TODO ProcessorDecorator should be instance of AbstractDecorator
       if (object instanceof ProcessorDecorator) {
-        inject(((ProcessorDecorator) object).getDecoratedProcessor());
+        inject(((ProcessorDecorator) object).getDecoratedObject());
+      }
+      if (object instanceof AbstractDecorator) {
+        inject(((AbstractDecorator<?>) object).getDecoratedObject());
       }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);

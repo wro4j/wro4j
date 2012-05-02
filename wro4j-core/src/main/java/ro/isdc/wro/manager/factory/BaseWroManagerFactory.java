@@ -109,13 +109,13 @@ public class BaseWroManagerFactory
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
+
+      //initialize before injection to allow injecto do its job properly
+      onAfterInitializeManager(manager);
       
       final Injector injector = new InjectorBuilder(manager).setModelTransformers(
           modelTransformers).build();
-      
       injector.inject(manager);
-      
-      onAfterInitializeManager(manager);
       return manager;
     }
   };

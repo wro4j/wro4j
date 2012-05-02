@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Ensure that the {@link SynchronizedCacheStrategyDecorator#loadValue(Object)} will be called only once for the same
+ * Ensure that the {@link AbstractSynchronizedCacheStrategyDecorator#loadValue(Object)} will be called only once for the same
  * key. This behavior is important for avoiding redundant execution of expensive computation in concurrent environment
  * which cause high memory and CPU consumption.
  * 
@@ -19,12 +19,12 @@ import org.slf4j.LoggerFactory;
  * @created 30 Apr 2012
  * @since 1.4.6
  */
-public abstract class SynchronizedCacheStrategyDecorator<K, V>
+public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     extends CacheStrategyDecorator<K, V> {
-  private static final Logger LOG = LoggerFactory.getLogger(SynchronizedCacheStrategyDecorator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSynchronizedCacheStrategyDecorator.class);
   private ConcurrentMap<K, ReadWriteLock> locks = new ConcurrentHashMap<K, ReadWriteLock>();
   
-  public SynchronizedCacheStrategyDecorator(final CacheStrategy<K, V> decorated) {
+  public AbstractSynchronizedCacheStrategyDecorator(final CacheStrategy<K, V> decorated) {
     super(decorated);
   }
   
@@ -48,7 +48,7 @@ public abstract class SynchronizedCacheStrategyDecorator<K, V>
         // this is necessary to ensure that the load wasn't invoked 
         value = getDecoratedObject().get(key);
         if (value == null) {
-          LOG.debug("Cache is empty. Perform processing...");
+          LOG.debug("Cache is empty. Loading new value...");
           value = loadValue(key);
           put(key, value);
         } 

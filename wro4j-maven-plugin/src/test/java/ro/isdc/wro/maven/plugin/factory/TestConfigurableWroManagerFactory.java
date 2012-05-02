@@ -168,7 +168,7 @@ public class TestConfigurableWroManagerFactory {
     Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(
         JSMinProcessor.class,
-        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedProcessor().getClass());
+        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
   }
   
   @Test
@@ -179,7 +179,7 @@ public class TestConfigurableWroManagerFactory {
     Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
     Assert.assertEquals(
         JSMinProcessor.class,
-        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedProcessor().getClass());
+        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
   }
   
   @Test(expected = WroRuntimeException.class)

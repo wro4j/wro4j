@@ -30,7 +30,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -50,42 +50,44 @@ public class GroupsProcessor {
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-
+  
   /**
-   * @param cacheKey to process.
+   * @param cacheKey
+   *          to process.
    * @return processed content.
    */
   public String process(final CacheEntry cacheKey) {
     Validate.notNull(cacheKey);
     try {
-    LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
-        cacheKey.getGroupName(), cacheKey.getType());
-    // find processed result for a group
-    final WroModel model = modelFactory.create();
-    final Group group = model.getGroupByName(cacheKey.getGroupName());
-    // mark this group as used.
-    group.markAsUsed();
-    final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
-    if (filteredGroup.getResources().isEmpty()) {
-      LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
-      if (!config.isIgnoreEmptyGroup()) {
-        throw new WroRuntimeException("No resources found in group: " + group.getName());
+      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
+          cacheKey.getGroupName(), cacheKey.getType());
+      // find processed result for a group
+      final WroModel model = modelFactory.create();
+      final Group group = model.getGroupByName(cacheKey.getGroupName());
+      // mark this group as used.
+      group.markAsUsed();
+      final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
+      if (filteredGroup.getResources().isEmpty()) {
+        LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
+        if (!config.isIgnoreEmptyGroup()) {
+          throw new WroRuntimeException("No resources found in group: " + group.getName());
+        }
       }
-    }
-    final String result = preProcessorExecutor.processAndMerge(
-        filteredGroup.getResources(), cacheKey.isMinimize());
-    return doPostProcess(result, cacheKey);
+      final String result = preProcessorExecutor.processAndMerge(filteredGroup.getResources(), cacheKey.isMinimize());
+      return doPostProcess(result, cacheKey);
+    } catch (final IOException e) {
+      throw new WroRuntimeException("Exception while merging resources", e);
     } finally {
       callbackRegistry.onProcessingComplete();
     }
   }
-
+  
   /**
    * Perform postProcessing.
    * 
    * @return the post processed contents.
    */
-  private String doPostProcess(final String content, final CacheEntry cacheEntry) {
+  private String doPostProcess(final String content, final CacheEntry cacheEntry) throws IOException {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
@@ -95,7 +97,7 @@ public class GroupsProcessor {
         cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
     return applyPostProcessors(processors, content);
   }
-
+  
   /**
    * Apply resourcePostProcessors.
    * 
@@ -105,33 +107,30 @@ public class GroupsProcessor {
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content) {
+  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
+      throws IOException {
     LOG.debug("postProcessors: {}", processors);
-    try {
-      if (processors.isEmpty()) {
-        return content;
-      }
-      Reader input = new StringReader(content.toString());
-      Writer output = null;
-      final StopWatch stopWatch = new StopWatch();
-      for (final ResourcePostProcessor processor : processors) {
-        stopWatch.start("Using " + processor.getClass().getSimpleName());
-        output = new StringWriter();
-        decorateWithPostProcessCallback(processor).process(input, output);
-        
-        input = new StringReader(output.toString());
-        stopWatch.stop();
-      }
-      LOG.debug(stopWatch.prettyPrint());
-      return output.toString();
-    } catch (final IOException e) {
-      throw new WroRuntimeException("Exception while merging resources", e);
+    if (processors.isEmpty()) {
+      return content;
     }
+    Reader input = new StringReader(content.toString());
+    Writer output = null;
+    final StopWatch stopWatch = new StopWatch();
+    for (final ResourcePostProcessor processor : processors) {
+      stopWatch.start("Using " + processor.getClass().getSimpleName());
+      output = new StringWriter();
+      decorateWithPostProcessCallback(processor).process(input, output);
+      
+      input = new StringReader(output.toString());
+      stopWatch.stop();
+    }
+    LOG.debug(stopWatch.prettyPrint());
+    return output.toString();
   }
-
 
   /**
    * TODO move to {@link InjectorBuilder}
+   * 
    * @return a decorated postProcessor which invokes callback methods.
    */
   private ResourcePostProcessor decorateWithPostProcessCallback(final ResourcePostProcessor processor) {
