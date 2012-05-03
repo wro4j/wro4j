@@ -69,6 +69,7 @@ public class PreProcessorExecutor {
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
     Validate.notNull(resources);
+    LOG.debug("process and merge resources: {}", resources);
     final StringBuffer result = new StringBuffer();
     if (shouldRunInParallel(resources)) {
       result.append(runInParallel(resources, minimize));

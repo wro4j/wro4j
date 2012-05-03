@@ -36,6 +36,7 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
    */
   @Override
   protected ContentHashEntry loadValue(final CacheEntry key) {
+    LOG.debug("load value in cache for key: " + key);
     final String content = groupsProcessor.process(key);
     return computeCacheValueByContent(content);
   }

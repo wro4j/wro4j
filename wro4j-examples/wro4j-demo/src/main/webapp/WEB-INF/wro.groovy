@@ -97,4 +97,7 @@ groups {
   less {
      css("/static/less/**")
   }
+  coffeeScript {
+     js("/static/coffee/**.coffee")
+  }
 }
