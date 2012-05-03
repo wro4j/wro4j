@@ -2,6 +2,7 @@ package ro.isdc.wro.util;
 
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 
 /**
@@ -25,7 +26,7 @@ public class InjectorAwareDecorator<T>
   /**
    * Handles injection for decorators.
    */
-  protected void inject(final T object) {
+  protected final void inject(final T object) {
     injector.inject(object);
     if (object instanceof AbstractDecorator) {
       injector.inject(((AbstractDecorator<?>) object).getDecoratedObject());

@@ -26,7 +26,6 @@ public final class InjectorAwareUriLocatorFactoryDecorator
    */
   public InjectorAwareUriLocatorFactoryDecorator(final UriLocatorFactory decorated, final Injector injector) {
     super(decorated, injector);
-    inject(decorated);
   }
 
   /**

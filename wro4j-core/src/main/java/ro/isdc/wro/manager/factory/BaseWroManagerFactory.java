@@ -110,11 +110,16 @@ public class BaseWroManagerFactory
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
 
-      //initialize before injection to allow injecto do its job properly
-      onAfterInitializeManager(manager);
       
       final Injector injector = new InjectorBuilder(manager).setModelTransformers(
           modelTransformers).build();
+      injector.inject(manager);
+      
+      //initialize before injection to allow injector do its job properly
+      onAfterInitializeManager(manager);
+      
+      // do injection again in case manager fields where mutated. This normally wouldn't happen if
+      // onAfterInitializeManager wouldn't exist. This is a subject of refactoring.
       injector.inject(manager);
       return manager;
     }

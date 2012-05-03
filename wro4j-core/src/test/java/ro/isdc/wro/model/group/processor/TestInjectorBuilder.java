@@ -90,8 +90,8 @@ public class TestInjectorBuilder {
   }
   
   @Test
-  public void shouldBuildValidInjectorWithDefaultConstructor() {
-    final Injector injector = new InjectorBuilder().build();
+  public void shouldBuildValidInjectorWithBaseWromanagerFactory() {
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     Assert.assertNotNull(injector);
     
     final Sample sample = new Sample();

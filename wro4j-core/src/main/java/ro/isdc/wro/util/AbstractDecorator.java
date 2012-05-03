@@ -38,7 +38,7 @@ public abstract class AbstractDecorator<T> {
    */
   @SuppressWarnings("unchecked")
   public static <T> T getOriginalDecoratedObject(T object) {
-    return (object instanceof AbstractDecorator) ? ((AbstractDecorator<T>) object).getDecoratedObject()
+    return (object instanceof AbstractDecorator) ? ((AbstractDecorator<T>) object).getOriginalDecoratedObject()
         : object;
   }
 }

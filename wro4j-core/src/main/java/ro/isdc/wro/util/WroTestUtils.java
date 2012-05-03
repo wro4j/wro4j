@@ -402,7 +402,7 @@ public class WroTestUtils {
    * @return a default {@link Injector} to be used by test classes.
    */
   public static Injector createInjector() {
-    return new InjectorBuilder(new BaseWroManagerFactory().create()).build();
+    return InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }
   
   /**

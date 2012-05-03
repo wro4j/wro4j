@@ -31,6 +31,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
@@ -206,17 +207,9 @@ public class TestConfigurableWroFilter {
   private static class SampleConfigurableWroFilter extends ConfigurableWroFilter {
     @Override
     protected WroManagerFactory newWroManagerFactory() {
-      final WroManagerFactory factory = super.newWroManagerFactory();
-      final WroManagerFactory dummyModelFactory = new WroManagerFactory() {
-        public WroManager create() {
-          WroManager manager = factory.create();
-          manager.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("some"))));
-          return manager;
-        }
-        public void destroy() {
-        }
-      };
-      return dummyModelFactory;
+      final BaseWroManagerFactory factory = (BaseWroManagerFactory) super.newWroManagerFactory();
+      factory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("some"))));
+      return factory;
     }
     
     @Override

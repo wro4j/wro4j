@@ -25,7 +25,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
 import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
-import ro.isdc.wro.model.factory.InjectorAwareWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.ModelTransformerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
@@ -113,9 +112,7 @@ public class InjectorBuilder {
     });
     map.put(GroupExtractor.class, new InjectorObjectFactory<GroupExtractor>() {
       public GroupExtractor create() {
-        if (groupExtractor != null) {
-          injector.inject(groupExtractor);
-        }
+        injector.inject(groupExtractor);
         return groupExtractor;
       }
     });
@@ -136,15 +133,14 @@ public class InjectorBuilder {
     });
     map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
-        return modelFactory != null ? new InjectorAwareWroModelFactoryDecorator(decorate(modelFactory),
-            injector) : null;
+        final WroModelFactory decorated = decorate(modelFactory);
+        injector.inject(decorated);
+        return decorated;
       }
     });
     map.put(NamingStrategy.class, new InjectorObjectFactory<NamingStrategy>() {
       public NamingStrategy create() {
-        if (namingStrategy != null) {
-          injector.inject(namingStrategy);
-        }
+        injector.inject(namingStrategy);
         return namingStrategy;
       }
     });
@@ -160,7 +156,7 @@ public class InjectorBuilder {
     });
     map.put(CacheStrategy.class, new InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>>() {
       public CacheStrategy<CacheEntry, ContentHashEntry> create() {
-        CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(cacheStrategy);
+        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(cacheStrategy);
         injector.inject(decorated);
         return decorated;
       }
@@ -176,6 +172,7 @@ public class InjectorBuilder {
    * Decorates {@link PreProcessorExecutor} with callback invocations.
    */
   private PreProcessorExecutor decorate(final PreProcessorExecutor preProcessorExecutor) {
+    //TODO create dedicated class and use AbstractDecorator
     return new PreProcessorExecutor() {
       @Override
       public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
@@ -194,6 +191,7 @@ public class InjectorBuilder {
    * Decorates the model factory with callback registry calls & other useful factories.
    */
   private WroModelFactory decorate(final WroModelFactory modelFactory) {
+    //TODO create dedicated class
     final WroModelFactory decorated = new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
         new WroModelFactoryDecorator(modelFactory) {
           @Override
@@ -210,7 +208,6 @@ public class InjectorBuilder {
             }
           }
         }))).setTransformers(modelTransformers);
-    injector.inject(decorated);
     return decorated;
   }
 
