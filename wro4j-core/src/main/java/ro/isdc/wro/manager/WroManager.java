@@ -7,6 +7,8 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,7 @@ import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
@@ -45,6 +48,7 @@ import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
+import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -88,6 +92,10 @@ public class WroManager
    */
   @Inject
   private HashBuilder hashBuilder;
+  /**
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
+   */
+  private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
   /**
    * A callback to be notified about the cache change.
    */
@@ -481,6 +489,17 @@ public class WroManager
     Validate.notNull(callback);
     callbackRegistry.registerCallback(callback);
   }
+  
+
+  public final List<Transformer<WroModel>> getModelTransformers() {
+    return modelTransformers;
+  }
+
+
+  public final void setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
+    this.modelTransformers = modelTransformers;
+  }
+
 
   /**
    * {@inheritDoc}

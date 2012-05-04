@@ -43,7 +43,9 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 /**
  * Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the description of all
  * groups.
- *
+ * <p/>
+ * This class is thread-safe (the create method is synchronized).
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -126,14 +128,18 @@ public class XmlModelFactory
   /**
    * {@inheritDoc}
    */
-  public WroModel create() {
-    final Document document = createDocument();
-    processGroups(document);
+  public synchronized WroModel create() {
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
-    final WroModel model = createModel();
-    processImports(document, model);
-    processedImports.clear();
-    return model;
+    try {
+      final Document document = createDocument();
+      processGroups(document);          
+      final WroModel model = createModel();
+      processImports(document, model);
+      return model;
+    } finally {
+      //clear the processed imports even when the model creation fails.
+      processedImports.clear();
+    }
   }
 
 

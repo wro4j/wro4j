@@ -46,13 +46,6 @@ public class ModelTransformerFactory
     this.modelTransformers = modelTransformers;
     return this;
   }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public List<? extends Transformer<WroModel>> getModelTransformers() {
-    return modelTransformers;
-  }
 
   /**
    * {@inheritDoc}

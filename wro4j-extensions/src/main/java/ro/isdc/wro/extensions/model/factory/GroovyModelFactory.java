@@ -31,7 +31,9 @@ import ro.isdc.wro.model.factory.AbstractWroModelFactory;
 
 /**
  * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
- *
+ * <p/>
+ * This class is thread-safe (the create method is synchronized).
+ * 
  * @author Romain Philibert
  * @created 19 Jul 2011
  * @since 1.4.0
@@ -49,7 +51,7 @@ public class GroovyModelFactory
    * {@inheritDoc}
    */
   @Override
-  public WroModel create() {
+  public synchronized WroModel create() {
     final Script script;
     try {
       script = new GroovyShell().parse(new InputStreamReader(getModelResourceAsStream()));

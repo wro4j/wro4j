@@ -337,7 +337,7 @@ public class TestWroManager {
     
     managerFactory.create().process();
     // let scheduler run a while
-    Thread.sleep(1300);
+    Thread.sleep(1100);
   }
   
   /**

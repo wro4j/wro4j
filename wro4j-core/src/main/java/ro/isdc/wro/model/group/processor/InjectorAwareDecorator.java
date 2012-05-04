@@ -1,9 +1,8 @@
-package ro.isdc.wro.util;
+package ro.isdc.wro.model.group.processor;
 
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.util.AbstractDecorator;
 
 /**
  * Responsible for injecting decorated object and its decorated "children" of {@link AbstractDecorator} type. 
@@ -19,18 +18,8 @@ public class InjectorAwareDecorator<T>
   public InjectorAwareDecorator(final T decorated, final Injector injector) {
     super(decorated);
     Validate.notNull(injector);
+    injector.inject(decorated);
     this.injector = injector;
-    inject(decorated);
-  }
-
-  /**
-   * Handles injection for decorators.
-   */
-  protected final void inject(final T object) {
-    injector.inject(object);
-    if (object instanceof AbstractDecorator) {
-      injector.inject(((AbstractDecorator<?>) object).getDecoratedObject());
-    }
   }
 
   protected final Injector getInjector() {

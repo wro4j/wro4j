@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorAwareDecorator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.util.InjectorAwareDecorator;
 
 
 /**

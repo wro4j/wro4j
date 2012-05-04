@@ -22,6 +22,8 @@ import com.google.gson.reflect.TypeToken;
  * TODO: validate duplicate groups & null resource type
  * <p/>
  * Creates {@link WroModel} from a json.
+ * <p/>
+ * This class is thread-safe (the create method is synchronized).
  *
  * @author Alex Objelean
  * @created 13 Mar 2011
@@ -39,7 +41,7 @@ public class JsonModelFactory
    * {@inheritDoc}
    */
   @Override
-  public WroModel create() {
+  public synchronized WroModel create() {
     try {
       final Type type = new TypeToken<WroModel>() {}.getType();
       final InputStream is = getModelResourceAsStream();

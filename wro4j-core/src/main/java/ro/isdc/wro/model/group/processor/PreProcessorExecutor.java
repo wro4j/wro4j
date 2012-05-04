@@ -67,19 +67,25 @@ public class PreProcessorExecutor {
    *          whether minimize aware processors must be applied or not.
    * @return preProcessed merged content.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
-    Validate.notNull(resources);
-    LOG.debug("process and merge resources: {}", resources);
-    final StringBuffer result = new StringBuffer();
-    if (shouldRunInParallel(resources)) {
-      result.append(runInParallel(resources, minimize));
-    } else {
-      for (final Resource resource : resources) {
-        LOG.debug("\tmerging resource: {}", resource);
-        result.append(applyPreProcessors(resource, minimize));
+  public String processAndMerge(final List<Resource> resources, final boolean minimize)
+      throws IOException {
+    callbackRegistry.onBeforeMerge();
+    try {
+      Validate.notNull(resources);
+      LOG.debug("process and merge resources: {}", resources);
+      final StringBuffer result = new StringBuffer();
+      if (shouldRunInParallel(resources)) {
+        result.append(runInParallel(resources, minimize));
+      } else {
+        for (final Resource resource : resources) {
+          LOG.debug("\tmerging resource: {}", resource);
+          result.append(applyPreProcessors(resource, minimize));
+        }
       }
+      return result.toString();
+    } finally {
+      callbackRegistry.onAfterMerge();
     }
-    return result.toString();
   }
   
   private boolean shouldRunInParallel(final List<Resource> resources) {

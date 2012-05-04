@@ -62,7 +62,7 @@ public class TestConfigurableWroManagerFactory {
     // create one instance for test
     final WroManager manager = factory.create();
     processorsFactory = manager.getProcessorsFactory();
-    uriLocatorFactory = (SimpleUriLocatorFactory) ((AbstractDecorator<?>) manager.getUriLocatorFactory()).getDecoratedObject();
+    uriLocatorFactory = (SimpleUriLocatorFactory) AbstractDecorator.getOriginalDecoratedObject(manager.getUriLocatorFactory());
   }
   
   @Before

@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -23,13 +21,9 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
-import ro.isdc.wro.model.factory.ModelTransformerFactory;
+import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.factory.WroModelFactoryDecorator;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -95,7 +89,8 @@ public class InjectorBuilder {
   private void initMap() {
     map.put(PreProcessorExecutor.class, new InjectorObjectFactory<PreProcessorExecutor>() {
       public PreProcessorExecutor create() {
-        return decorate(preProcessorExecutor);
+        injector.inject(preProcessorExecutor);
+        return preProcessorExecutor;
       }
     });
     map.put(GroupsProcessor.class, new InjectorObjectFactory<GroupsProcessor>() {
@@ -133,7 +128,7 @@ public class InjectorBuilder {
     });
     map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
-        final WroModelFactory decorated = decorate(modelFactory);
+        final WroModelFactory decorated = new DefaultWroModelFactoryDecorator(modelFactory, modelTransformers);
         injector.inject(decorated);
         return decorated;
       }
@@ -168,49 +163,6 @@ public class InjectorBuilder {
     });
   }
 
-  /**
-   * Decorates {@link PreProcessorExecutor} with callback invocations.
-   */
-  private PreProcessorExecutor decorate(final PreProcessorExecutor preProcessorExecutor) {
-    //TODO create dedicated class and use AbstractDecorator
-    return new PreProcessorExecutor() {
-      @Override
-      public String processAndMerge(final List<Resource> resources, final boolean minimize) throws IOException {
-        callbackRegistry.onBeforeMerge();
-        try {
-          injector.inject(preProcessorExecutor);
-          return preProcessorExecutor.processAndMerge(resources, minimize);
-        } finally {
-          callbackRegistry.onAfterMerge();
-        }
-      }
-    };
-  }
-
-  /**
-   * Decorates the model factory with callback registry calls & other useful factories.
-   */
-  private WroModelFactory decorate(final WroModelFactory modelFactory) {
-    //TODO create dedicated class
-    final WroModelFactory decorated = new ModelTransformerFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
-        new WroModelFactoryDecorator(modelFactory) {
-          @Override
-          public WroModel create() {
-            callbackRegistry.onBeforeModelCreated();
-            try {
-              final WroModel model = super.create();
-              if (model == null) {
-                throw new WroRuntimeException("Cannot create valid model");
-              }
-              return model;
-            } finally {
-              callbackRegistry.onAfterModelCreated();
-            }
-          }
-        }))).setTransformers(modelTransformers);
-    return decorated;
-  }
-
   public Injector build() {
     //first initialize the map
     initMap();
@@ -226,14 +178,10 @@ public class InjectorBuilder {
     groupExtractor = manager.getGroupExtractor();
     cacheStrategy = manager.getCacheStrategy();
     hashBuilder = manager.getHashBuilder();
+    modelTransformers = manager.getModelTransformers();
     return this;
   }
 
-  public InjectorBuilder setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
-    this.modelTransformers = modelTransformers;
-    return this;
-  }
-  
   /**
    * A special type used for lazy object injection only in context of this class.
    */
