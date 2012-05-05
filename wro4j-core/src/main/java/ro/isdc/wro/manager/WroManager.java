@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager;
 
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,7 +60,7 @@ import ro.isdc.wro.util.WroUtil;
  * @created Created on Oct 30, 2008
  */
 public class WroManager
-  implements WroConfigurationChangeListener, CacheChangeCallbackAware {
+  implements WroConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
   @Inject
   private WroModelFactory modelFactory;
@@ -96,10 +95,6 @@ public class WroManager
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
   private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
-  /**
-   * A callback to be notified about the cache change.
-   */
-  PropertyChangeListener cacheChangeListener;
   /**
    * Schedules the cache update.
    */
@@ -351,15 +346,6 @@ public class WroManager
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
     Validate.notNull(hashBuilder, "HashBuilder was not set!");
   }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public final void registerCacheChangeListener(final PropertyChangeListener cacheChangeListener) {
-    this.cacheChangeListener = cacheChangeListener;
-  }
-
 
   /**
    * @return true if Gzip is Supported
