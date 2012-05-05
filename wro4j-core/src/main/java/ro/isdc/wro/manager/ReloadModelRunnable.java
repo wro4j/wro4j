@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * A {@link Runnable} executed by scheduler to reload the model.
+ * A {@link Runnable} executed by scheduler to clear the model cache.
  *
  * @author Alex Objelean
  * @created 24 Oct 2011
@@ -27,22 +27,12 @@ public final class ReloadModelRunnable
     wroManagerReference = new WeakReference<WroManager>(wroManager);
   }
 
-
   public void run() {
     LOG.debug("Reloading Model....");
     try {
       // TODO: do not destroy, until the creation is done and the new model is different than the new one
       wroManagerReference.get().getModelFactory().destroy();
-      if (Thread.interrupted()) {
-        LOG.debug("ReloadModelRunnable was interrupted - stop processing!");
-        throw new InterruptedException();
-      }
-      wroManagerReference.get().getModelFactory().create();
       wroManagerReference.get().getCacheStrategy().clear();
-    } catch (final InterruptedException e) {
-      // Catch all exception in order to avoid situation when scheduler runs out of threads.
-      LOG.debug("Interrupted exception occured: ", e);
-      Thread.currentThread().interrupt();
     } catch (final Exception e) {
       LOG.error("Exception occured during cache reload: ", e);
     }
