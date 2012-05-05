@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheChangeCallbackAware;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -49,12 +47,8 @@ import ro.isdc.wro.util.Transformer;
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
-  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, ObjectFactory<WroManager> {
+  implements WroManagerFactory, WroConfigurationChangeListener, ObjectFactory<WroManager> {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
-  /**
-   * A callback to be notified about the cache change.
-   */
-  private PropertyChangeListener cacheChangeCallback;
 
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
@@ -104,7 +98,6 @@ public class BaseWroManagerFactory
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
       manager.setHashBuilder(hashBuilder);
-      manager.registerCacheChangeListener(cacheChangeCallback);
       manager.setResourceLocatorFactory(resourceLocatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
@@ -191,15 +184,6 @@ public class BaseWroManagerFactory
   protected HashBuilder newHashBuilder() {
     return new SHA1HashBuilder();
   }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void registerCacheChangeListener(final PropertyChangeListener cacheChangeListener) {
-    this.cacheChangeCallback = cacheChangeListener;
-  }
-
 
   /**
    * {@inheritDoc}

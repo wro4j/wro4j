@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheChangeCallbackAware;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
@@ -135,15 +134,6 @@ public class WroFilter
   private void initWroManagerFactory() {
     if (this.wroManagerFactory == null) {
       this.wroManagerFactory = getWroManagerFactory();
-    }
-    if (wroManagerFactory instanceof CacheChangeCallbackAware) {
-      // register cache change callback -> when cache is changed, update headers values.
-      ((CacheChangeCallbackAware)wroManagerFactory).registerCacheChangeListener(new PropertyChangeListener() {
-        public void propertyChange(final PropertyChangeEvent evt) {
-          // update header values
-          initHeaderValues();
-        }
-      });
     }
   }
 
