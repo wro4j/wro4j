@@ -38,12 +38,15 @@ import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
  * Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the description of all
  * groups.
- *
+ * <p/>
+ * This class is thread-safe (the create method is synchronized).
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -122,18 +125,34 @@ public class XmlModelFactory
    * Flag for enabling xml validation.
    */
   private boolean validateXml = true;
-
   /**
    * {@inheritDoc}
    */
-  public WroModel create() {
-    final Document document = createDocument();
-    processGroups(document);
+  public synchronized WroModel create() {
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
-    final WroModel model = createModel();
-    processImports(document, model);
-    processedImports.clear();
-    return model;
+    final StopWatch stopWatch = new StopWatch("Create Wro Model from XML");
+    try {
+      stopWatch.start("createDocument");
+      final Document document = createDocument();
+      stopWatch.stop();
+
+      stopWatch.start("processGroups");
+      processGroups(document);
+      stopWatch.stop();
+
+      stopWatch.start("createModel");
+      final WroModel model = createModel();
+      stopWatch.stop();
+
+      stopWatch.start("processImports");
+      processImports(document, model);
+      return model;
+    } finally {
+      //clear the processed imports even when the model creation fails.
+      processedImports.clear();
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
+    }
   }
 
 

@@ -25,8 +25,8 @@ public class YUIStandaloneManagerFactory extends ExtensionsStandaloneManagerFact
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-    factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
     factory.addPreProcessor(new YUICssCompressorProcessor());

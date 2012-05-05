@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -63,6 +63,13 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
+  /**
+   * 
+   * @return a {@link BaseWroManagerFactory} which uses an empty model.
+   */
+  public static BaseWroManagerFactory simpleManagerFactory() {
+    return new BaseWroManagerFactory().setModelFactory(simpleModelFactory(new WroModel()));
+  }
 
   /**
    * @param properties {@link Properties} object to get stream from.
@@ -109,8 +116,8 @@ public class WroTestUtils {
   }
 
   public static void init(final WroModelFactory factory) {
-    WroManager manager = new BaseWroManagerFactory().setModelFactory(factory).create();
-    new InjectorBuilder(manager).build().inject(factory);
+    WroManagerFactory managerFactroy = new BaseWroManagerFactory().setModelFactory(factory);
+    InjectorBuilder.create(managerFactroy).build().inject(factory);
   }
 
   /**
@@ -119,8 +126,7 @@ public class WroTestUtils {
   public static void initProcessor(final ResourcePreProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
-    final WroManager manager = factory.create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
 
@@ -131,8 +137,7 @@ public class WroTestUtils {
   public static void initProcessor(final ResourcePostProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor));
-    final WroManager manager = factory.create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
 
@@ -380,10 +385,10 @@ public class WroTestUtils {
    * @param task a {@link Callable} to run concurrently.
    * @throws Exception if any of the executed tasks fails.
    */
-  public static void runConcurrently(final Callable<Void> task) throws Exception {
+  public static void runConcurrently(final Callable<Void> task, final int times) throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < times; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {
@@ -392,10 +397,17 @@ public class WroTestUtils {
   }
 
   /**
+   * Run the task concurrently 100 times.
+   */
+  public static void runConcurrently(final Callable<Void> task) throws Exception {
+    runConcurrently(task, 100);
+  }
+  
+  /**
    * @return a default {@link Injector} to be used by test classes.
    */
   public static Injector createInjector() {
-    return new InjectorBuilder(new BaseWroManagerFactory().create()).build();
+    return InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }
   
   /**

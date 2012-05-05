@@ -40,7 +40,7 @@ import ro.isdc.wro.util.WroUtil;
  * String.
  * <p>
  * This is useful when you want to preProcess a resource which is not a part of the model (css import use-case).
- *
+ * 
  * @author Alex Objelean
  */
 public class PreProcessorExecutor {
@@ -57,42 +57,46 @@ public class PreProcessorExecutor {
    * Runs the preProcessing in parallel.
    */
   private ExecutorService executor;
-
+  
   /**
    * Apply preProcessors on resources and merge them.
-   *
+   * 
    * @param resources
    *          what are the resources to merge.
    * @param minimize
    *          whether minimize aware processors must be applied or not.
    * @return preProcessed merged content.
-   * @throws IOException
-   *           if IO error occurs while merging.
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
       throws IOException {
-    Validate.notNull(resources);
-    final StringBuffer result = new StringBuffer();
-    if (shouldRunInParallel(resources)) {
-      result.append(runInParallel(resources, minimize));
-    } else {
-      for (final Resource resource : resources) {
-        LOG.debug("\tmerging resource: {}", resource);
-        result.append(applyPreProcessors(resource, minimize));
+    callbackRegistry.onBeforeMerge();
+    try {
+      Validate.notNull(resources);
+      LOG.debug("process and merge resources: {}", resources);
+      final StringBuffer result = new StringBuffer();
+      if (shouldRunInParallel(resources)) {
+        result.append(runInParallel(resources, minimize));
+      } else {
+        for (final Resource resource : resources) {
+          LOG.debug("\tmerging resource: {}", resource);
+          result.append(applyPreProcessors(resource, minimize));
+        }
       }
+      return result.toString();
+    } finally {
+      callbackRegistry.onAfterMerge();
     }
-    return result.toString();
   }
-
+  
   private boolean shouldRunInParallel(final List<Resource> resources) {
     final boolean isParallel = configuration.isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
-
+  
   /**
    * runs the pre processors in parallel.
-   *
+   * 
    * @return merged and pre processed content.
    */
   private String runInParallel(final List<Resource> resources, final boolean minimize)
@@ -114,7 +118,7 @@ public class PreProcessorExecutor {
     for (final Callable<String> callable : callables) {
       futures.add(exec.submit(callable));
     }
-
+    
     for (final Future<String> future : futures) {
       try {
         result.append(future.get());
@@ -132,30 +136,31 @@ public class PreProcessorExecutor {
     }
     return result.toString();
   }
-
+  
   private ExecutorService getExecutorService() {
     if (executor == null) {
       // use at most the number of available processors (true parallelism)
       final int threadPoolSize = Runtime.getRuntime().availableProcessors();
       LOG.debug("Parallel thread pool size: {}", threadPoolSize);
       executor = Executors.newFixedThreadPool(threadPoolSize,
-        WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
+          WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
     }
     return executor;
   }
-
-
+  
   /**
    * Apply a list of preprocessors on a resource.
-   *
-   * @param resource the {@link Resource} on which processors will be applied
-   * @param processors the list of processor to apply on the resource.
+   * 
+   * @param resource
+   *          the {@link Resource} on which processors will be applied
+   * @param processors
+   *          the list of processor to apply on the resource.
    */
   private String applyPreProcessors(final Resource resource, final boolean minimize)
-    throws IOException {
+      throws IOException {
     // merge preProcessorsBy type and anyPreProcessors
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
-      resource.getType(), processorsFactory.getPreProcessors());
+        resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
     String resourceContent = getResourceContent(resource);
     if (processors.isEmpty()) {
@@ -174,15 +179,16 @@ public class PreProcessorExecutor {
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
-
-
+  
   /**
    * @return a Reader for the provided resource.
-   * @param resource {@link Resource} which content to return.
-   * @param resources the list of all resources processed in this context, used for duplicate resource detection.
+   * @param resource
+   *          {@link Resource} which content to return.
+   * @param resources
+   *          the list of all resources processed in this context, used for duplicate resource detection.
    */
   private String getResourceContent(final Resource resource)
-    throws IOException {
+      throws IOException {
     try {
       final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, configuration.getEncoding());
@@ -201,7 +207,7 @@ public class PreProcessorExecutor {
       }
     }
   }
-
+  
   /**
    * @return a decorated preProcessor which invokes callback methods.
    */
@@ -218,8 +224,10 @@ public class PreProcessorExecutor {
       }
     };
   }
-
+  
   /**
+   * TODO: move this decoration to {@link InjectorBuilder}.
+   * <p/>
    * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
    * doesn't require the minimization.
    */

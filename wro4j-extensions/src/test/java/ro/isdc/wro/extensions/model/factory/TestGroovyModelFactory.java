@@ -18,6 +18,7 @@ package ro.isdc.wro.extensions.model.factory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
@@ -31,6 +32,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test {@link GroovyModelFactory}
@@ -139,5 +141,23 @@ public class TestGroovyModelFactory {
       }
     };
     factory.create();
+  }
+  
+  @Test
+  public void shouldBeThreadSafe() throws Exception {
+    factory = new GroovyModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream() throws IOException {
+        return TestGroovyModelFactory.class.getResourceAsStream("wro.groovy");
+      };
+    }; 
+    WroTestUtils.init(factory);
+    WroTestUtils.runConcurrently(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        factory.create();
+        return null;
+      }
+    }, 10);
   }
 }

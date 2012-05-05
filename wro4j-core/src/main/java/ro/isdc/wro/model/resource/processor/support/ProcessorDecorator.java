@@ -51,7 +51,7 @@ public class ProcessorDecorator
   private ResourcePreProcessor toPreProcessor(final ResourcePostProcessor postProcessor) {
     return new AbstractProcessorDecoratorSupport() {
       @Override
-      protected Object getDecoratedProcessor() {
+      public Object getDecoratedObject() {
         return postProcessor;
       }
       public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -72,7 +72,7 @@ public class ProcessorDecorator
   /**
    * @return the decorated processor.
    */
-  public final ResourcePreProcessor getDecoratedProcessor() {
+  public final ResourcePreProcessor getDecoratedObject() {
     return decoratedProcessor;
   }
   

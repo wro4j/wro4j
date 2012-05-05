@@ -13,7 +13,7 @@ import ro.isdc.wro.util.AbstractDecorator;
  * @author Alex Objelean
  * @created 13 Mar 2011
  */
-public class WroModelFactoryDecorator  extends AbstractDecorator<WroModelFactory>
+public class WroModelFactoryDecorator extends AbstractDecorator<WroModelFactory>
     implements WroModelFactory {
 
   public WroModelFactoryDecorator(final WroModelFactory decorated) {

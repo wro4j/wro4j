@@ -4,10 +4,11 @@
 package ro.isdc.wro.manager;
 
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,9 +33,9 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
@@ -47,48 +48,30 @@ import ro.isdc.wro.model.resource.util.HashBuilder;
 import ro.isdc.wro.model.resource.util.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
+import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Contains all the factories used by optimizer in order to perform the logic.
- *
+ * Contains all the factories used by optimizer in order to perform the logic. This object should be created through
+ * {@link WroManagerFactory}, in order to ensure that all dependencies are injected properly. In other words, avoid
+ * setting the fields explicitly after creating a new instance of {@link WroManager}
+ * 
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
 public class WroManager
   implements WroConfigurationChangeListener, CacheChangeCallbackAware {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  /**
-   * ResourcesModel factory.
-   */
   @Inject
   private WroModelFactory modelFactory;
-  /**
-   * GroupExtractor.
-   */
   @Inject
   private GroupExtractor groupExtractor;
   /**
-   * HashBuilder for creating a hash based on the processed content.
-   */
-  private HashBuilder hashBuilder;
-  /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
-  CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  /**
-   * A callback to be notified about the cache change.
-   */
-  PropertyChangeListener cacheChangeListener;
-  /**
-   * Schedules the cache update.
-   */
-  private final SchedulerHelper cacheSchedulerHelper;
-  /**
-   * Schedules the model update.
-   */
-  private final SchedulerHelper modelSchedulerHelper;
+  @Inject
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
@@ -104,7 +87,28 @@ public class WroManager
   private GroupsProcessor groupsProcessor;
   @Inject
   private WroConfiguration config;
-
+  /**
+   * HashBuilder for creating a hash based on the processed content.
+   */
+  @Inject
+  private HashBuilder hashBuilder;
+  /**
+   * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
+   */
+  private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
+  /**
+   * A callback to be notified about the cache change.
+   */
+  PropertyChangeListener cacheChangeListener;
+  /**
+   * Schedules the cache update.
+   */
+  private final SchedulerHelper cacheSchedulerHelper;
+  /**
+   * Schedules the model update.
+   */
+  private final SchedulerHelper modelSchedulerHelper;
+  
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
@@ -179,12 +183,13 @@ public class WroManager
       cacheSchedulerHelper.scheduleWithPeriod(configuration.getCacheUpdatePeriod());
       modelSchedulerHelper.scheduleWithPeriod(configuration.getModelUpdatePeriod());
 
-      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, type, minimize);
+      final CacheEntry cacheKey = new CacheEntry(groupName, type, minimize);
+      final ContentHashEntry cacheValue = cacheStrategy.get(cacheKey);
 
       // TODO move ETag check in wroManagerFactory
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       // enclose etag value in quotes to be compliant with the RFC
-      final String etagValue = String.format("\"%s\"", contentHashEntry.getHash());
+      final String etagValue = String.format("\"%s\"", cacheValue.getHash());
 
       if (etagValue != null && etagValue.equals(ifNoneMatch)) {
         LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
@@ -204,17 +209,17 @@ public class WroManager
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
       os = response.getOutputStream();
-      if (contentHashEntry.getRawContent() != null) {
+      if (cacheValue.getRawContent() != null) {
         // use gziped response if supported & Set content length based on gzip flag
         if (isGzipAllowed()) {
-          response.setContentLength(contentHashEntry.getGzippedContent().length);
+          response.setContentLength(cacheValue.getGzippedContent().length);
           // add gzip header and gzip response
           response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
           response.setHeader("Vary", "Accept-Encoding");
-          IOUtils.write(contentHashEntry.getGzippedContent(), os);
+          IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
-          IOUtils.write(contentHashEntry.getRawContent(), os, configuration.getEncoding());
-          response.setContentLength(contentHashEntry.getRawContent().length());
+          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
+          response.setContentLength(cacheValue.getRawContent().length());
         }
       }
     } finally {
@@ -244,14 +249,11 @@ public class WroManager
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
     final boolean minimize) {
-    try {
-      final ContentHashEntry contentHashEntry = getContentHashEntry(groupName, resourceType, minimize);
-      final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
-      // encode the fingerprint of the resource into the resource path
-      return formatVersionedResource(contentHashEntry.getHash(), groupUrl);
-    } catch (final IOException e) {
-      return "";
-    }
+    final CacheEntry key = new CacheEntry(groupName, resourceType, minimize);
+    final ContentHashEntry cacheValue = cacheStrategy.get(key);
+    final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
+    // encode the fingerprint of the resource into the resource path
+    return formatVersionedResource(cacheValue.getHash(), groupUrl);
   }
 
 
@@ -267,53 +269,6 @@ public class WroManager
   protected String formatVersionedResource(final String hash, final String resourcePath) {
     return String.format("%s/%s", hash, resourcePath);
   }
-
-
-  /**
-   * @return {@link ContentHashEntry} object.
-   */
-  private ContentHashEntry getContentHashEntry(final String groupName, final ResourceType type, final boolean minimize)
-    throws IOException {
-    final CacheEntry cacheEntry = new CacheEntry(groupName, type, minimize);
-    LOG.debug("Searching cache entry: {}", cacheEntry);
-    // Cache based on uri
-    ContentHashEntry contentHashEntry = cacheStrategy.get(cacheEntry);
-    if (contentHashEntry == null) {
-      LOG.debug("Cache is empty. Perform processing...");
-      // process groups & put result in the cache
-      // find processed result for a group
-      final WroModel model = modelFactory.create();
-
-      if (model == null) {
-        throw new WroRuntimeException("Cannot build a valid wro model");
-      }
-      final Group group = model.getGroupByName(groupName);
-
-      final String content = groupsProcessor.process(group, type, minimize);
-      contentHashEntry = getContentHashEntryByContent(content);
-      if (!config.isDisableCache()) {
-        cacheStrategy.put(cacheEntry, contentHashEntry);
-      }
-    }
-    return contentHashEntry;
-  }
-
-
-  /**
-   * Creates a {@link ContentHashEntry} based on provided content.
-   */
-  ContentHashEntry getContentHashEntryByContent(final String content)
-    throws IOException {
-    String hash = null;
-    if (content != null) {
-      LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 40));
-      hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
-    }
-    final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
-    LOG.debug("computed entry: {}", entry);
-    return entry;
-  }
-
 
   /**
    * Serve images and other external resources referred by bundled resources.
@@ -449,6 +404,11 @@ public class WroManager
     return this;
   }
 
+  
+  public final HashBuilder getHashBuilder() {
+    return hashBuilder;
+  }
+
 
   /**
    * @return the modelFactory
@@ -529,6 +489,17 @@ public class WroManager
     Validate.notNull(callback);
     callbackRegistry.registerCallback(callback);
   }
+  
+
+  public final List<Transformer<WroModel>> getModelTransformers() {
+    return modelTransformers;
+  }
+
+
+  public final void setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
+    this.modelTransformers = modelTransformers;
+  }
+
 
   /**
    * {@inheritDoc}

@@ -14,6 +14,8 @@ import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
+import ro.isdc.wro.util.AbstractDecorator;
+import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
@@ -24,7 +26,7 @@ import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
  * @since 1.4.6
  */
 public abstract class AbstractProcessorDecoratorSupport
-  implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware {
+  implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, ObjectDecorator<Object> {
 
   /**
    * This method is final, because it intends to preserve the getSupportedResourceType flag of the decorated processor. You still can
@@ -39,7 +41,7 @@ public abstract class AbstractProcessorDecoratorSupport
    * Allow subclass override the way getSupportedResourceType is used. 
    */
   protected SupportedResourceType getSupportedResourceTypeInternal() {
-    return getSupportedResourceTypeForProcessor(getDecoratedProcessor());
+    return getSupportedResourceTypeForProcessor(getDecoratedObject());
   }
 
   /**
@@ -71,7 +73,7 @@ public abstract class AbstractProcessorDecoratorSupport
    * Allow subclass override the way isMinimized is used. 
    */
   protected boolean isMinimizeInternal() {
-    return isMinimizeForProcessor(getDecoratedProcessor());
+    return isMinimizeForProcessor(getDecoratedObject());
   }
 
   /**
@@ -99,7 +101,14 @@ public abstract class AbstractProcessorDecoratorSupport
    *         we need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
    *         removed in 1.5.0.
    */
-  protected abstract Object getDecoratedProcessor();
+  public abstract Object getDecoratedObject();
+  
+  /**
+   * {@inheritDoc}
+   */
+  public Object getOriginalDecoratedObject() {
+    return AbstractDecorator.getOriginalDecoratedObject(getDecoratedObject());
+  }
 
   /**
    * {@inheritDoc}

@@ -27,6 +27,7 @@ public class ObjectPoolHelper<T> {
    */
   private static final byte EXHAUSTED_ACTION = GenericObjectPool.WHEN_EXHAUSTED_GROW;
   private static final long MAX_WAIT = 1000L * 5L;
+  private static final long EVICTABLE_IDLE_TIME = 30000;
   // Allows using the objects from the pool in a thread-safe fashion.
   private GenericObjectPool<T> objectPool;
 
@@ -34,13 +35,15 @@ public class ObjectPoolHelper<T> {
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
     final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
-    objectPool = new GenericObjectPool(new BasePoolableObjectFactory<T>() {
+    objectPool = new GenericObjectPool<T>(new BasePoolableObjectFactory<T>() {
       @Override
       public T makeObject()
         throws Exception {
         return objectFactory.create();
       }
     }, maxActive, EXHAUSTED_ACTION, MAX_WAIT, MAX_IDLE);
+    // make object elligible for eviction after a predefined amount of time.
+    objectPool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
   }
 
 

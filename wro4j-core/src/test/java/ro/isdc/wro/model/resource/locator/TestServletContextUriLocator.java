@@ -28,6 +28,7 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 
@@ -71,7 +72,7 @@ public class TestServletContextUriLocator {
    * Initialize the locator by injecting all required fields.
    */
   private void initLocator(final ServletContextUriLocator locator) {
-    Injector injector = new InjectorBuilder().build();
+    Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     injector.inject(locator);
   }
 
