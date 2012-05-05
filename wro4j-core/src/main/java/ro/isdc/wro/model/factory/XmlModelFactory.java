@@ -38,6 +38,7 @@ import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -124,21 +125,33 @@ public class XmlModelFactory
    * Flag for enabling xml validation.
    */
   private boolean validateXml = true;
-
   /**
    * {@inheritDoc}
    */
   public synchronized WroModel create() {
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
+    final StopWatch stopWatch = new StopWatch("Create Wro Model from XML");
     try {
+      stopWatch.start("createDocument");
       final Document document = createDocument();
-      processGroups(document);          
+      stopWatch.stop();
+
+      stopWatch.start("processGroups");
+      processGroups(document);
+      stopWatch.stop();
+
+      stopWatch.start("createModel");
       final WroModel model = createModel();
+      stopWatch.stop();
+
+      stopWatch.start("processImports");
       processImports(document, model);
       return model;
     } finally {
       //clear the processed imports even when the model creation fails.
       processedImports.clear();
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
     }
   }
 

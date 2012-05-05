@@ -387,10 +387,10 @@ public class WroTestUtils {
    * @param task a {@link Callable} to run concurrently.
    * @throws Exception if any of the executed tasks fails.
    */
-  public static void runConcurrently(final Callable<Void> task) throws Exception {
+  public static void runConcurrently(final Callable<Void> task, final int times) throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < times; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {
@@ -398,6 +398,13 @@ public class WroTestUtils {
     }
   }
 
+  /**
+   * Run the task concurrently 100 times.
+   */
+  public static void runConcurrently(final Callable<Void> task) throws Exception {
+    runConcurrently(task, 100);
+  }
+  
   /**
    * @return a default {@link Injector} to be used by test classes.
    */
