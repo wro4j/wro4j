@@ -100,4 +100,8 @@ groups {
   coffeeScript {
      js("/static/coffee/**.coffee")
   }
+  
+  cssUrlRewriting {
+    css("/css/index.css");
+  }
 }
