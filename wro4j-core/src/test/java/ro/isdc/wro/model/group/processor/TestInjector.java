@@ -124,7 +124,7 @@ public class TestInjector {
     final TestProcessor testProcessor = new TestProcessor();
     final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(testProcessor);
 
-    final Injector injector = new InjectorBuilder().build();
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     injector.inject(processor);
     Assert.assertNotNull(testProcessor.context);
   }

@@ -30,6 +30,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Inject;
@@ -47,7 +48,7 @@ public class TestSmartWroModelFactory {
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    injector = new InjectorBuilder().build();
+    injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }
 
   @Test(expected = WroRuntimeException.class)

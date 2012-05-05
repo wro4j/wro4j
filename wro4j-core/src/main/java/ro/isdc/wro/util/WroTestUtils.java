@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -116,8 +116,8 @@ public class WroTestUtils {
   }
 
   public static void init(final WroModelFactory factory) {
-    WroManager manager = new BaseWroManagerFactory().setModelFactory(factory).create();
-    new InjectorBuilder(manager).build().inject(factory);
+    WroManagerFactory managerFactroy = new BaseWroManagerFactory().setModelFactory(factory);
+    InjectorBuilder.create(managerFactroy).build().inject(factory);
   }
 
   /**
@@ -126,8 +126,7 @@ public class WroTestUtils {
   public static void initProcessor(final ResourcePreProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
-    final WroManager manager = factory.create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
 
@@ -138,8 +137,7 @@ public class WroTestUtils {
   public static void initProcessor(final ResourcePostProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor));
-    final WroManager manager = factory.create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
 

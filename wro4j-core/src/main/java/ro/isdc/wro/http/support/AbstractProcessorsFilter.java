@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -91,8 +92,8 @@ public abstract class AbstractProcessorsFilter
     Writer output = null;
     try {
       final StopWatch stopWatch = new StopWatch();
-      Injector injector = new InjectorBuilder().build();
-      List<ResourcePreProcessor> processors = getProcessorsList();
+      Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
+      final List<ResourcePreProcessor> processors = getProcessorsList();
       if (processors == null || processors.isEmpty()) {
         IOUtils.copy(reader, writer);
       } else {

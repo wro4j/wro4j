@@ -71,6 +71,9 @@ public class InjectorBuilder {
    */
   private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
 
+  /**
+   * @deprecated prefer using factory method {@link InjectorBuilder#create(WroManagerFactory)}
+   */
   public InjectorBuilder() {
   }
 
