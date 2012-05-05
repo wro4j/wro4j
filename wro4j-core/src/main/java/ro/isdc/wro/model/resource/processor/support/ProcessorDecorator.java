@@ -42,7 +42,7 @@ public class ProcessorDecorator
   /**
    * @return the decorated processor.
    */
-  public final ResourceProcessor getDecoratedProcessor() {
+  public final ResourceProcessor getDecoratedObject() {
     return decoratedProcessor;
   }
   

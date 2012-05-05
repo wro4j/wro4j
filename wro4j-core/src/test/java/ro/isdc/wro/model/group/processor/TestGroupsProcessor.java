@@ -6,14 +6,21 @@ package ro.isdc.wro.model.group.processor;
 import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -24,43 +31,45 @@ import ro.isdc.wro.model.resource.ResourceType;
  */
 public class TestGroupsProcessor {
   private GroupsProcessor victim;
+  final String groupName = "group";
   
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     victim = new GroupsProcessor();
     initVictim(new WroConfiguration());
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   private void initVictim(final WroConfiguration config) {
     Context.set(Context.standaloneContext(), config);
-    final Injector injector = new InjectorBuilder().build();
+    
+    final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group(groupName)));
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory);
+    final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
-  }
-  
-  @Test(expected = NullPointerException.class)
-  public void cannotProcessNullGroup() {
-    victim.process(null, ResourceType.JS, true);
-  }
-  
-  @Test(expected = NullPointerException.class)
-  public void cannotProcessNullResourceType() {
-    victim.process(new Group("group"), null, true);
   }
   
   @Test
   public void shouldReturnEmptyStringWhenGroupHasNoResources() {
-    Assert.assertEquals(StringUtils.EMPTY, victim.process(new Group("group"), ResourceType.JS, true));
+    final CacheEntry key = new CacheEntry(groupName, ResourceType.JS, true);
+    Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
   }
   
   /**
    * Same as above, but with ignoreEmptyGroup config updated.
    */
   @Test(expected = WroRuntimeException.class)
-  public void shouldFailWhenGroupHasNoResources() {
+  public void shouldFailWhenGroupHasNoResourcesAndIgnoreEmptyGroupIsFalse() {
     WroConfiguration config = new WroConfiguration();
     config.setIgnoreEmptyGroup(false);
     initVictim(config);
-    Assert.assertEquals(StringUtils.EMPTY, victim.process(new Group("group"), ResourceType.JS, true));
+    final CacheEntry key = new CacheEntry("group", ResourceType.JS, true);
+    victim.process(key);
   }
 
 //

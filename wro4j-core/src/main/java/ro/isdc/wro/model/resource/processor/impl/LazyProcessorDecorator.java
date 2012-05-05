@@ -25,7 +25,7 @@ public final class LazyProcessorDecorator
   }
   
   @Override
-  protected ResourceProcessor getDecoratedProcessor() {
+  public ResourceProcessor getDecoratedObject() {
     return processorInitializer.get();
   }
   

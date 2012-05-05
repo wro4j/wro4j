@@ -32,6 +32,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**

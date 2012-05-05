@@ -18,9 +18,9 @@ import ro.isdc.wro.util.DestroyableLazyInitializer;
  */
 public class InMemoryCacheableWroModelFactory extends WroModelFactoryDecorator {
   /**
-   * Reference to cached model instance. Using volatile keyword fix the problem with double-checked locking in JDK 1.5.
+   * Reference to cached model instance. 
    */
-  private volatile WroModel model;
+  private WroModel model;
 
   public InMemoryCacheableWroModelFactory(final WroModelFactory decorated) {
     super(decorated);

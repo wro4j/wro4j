@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.locator.support.ResourceLocatorDecorator;
  * @since 1.5.0
  */
 public final class InjectorAwareResourceLocatorFactoryDecorator
-    extends UriLocatorFactoryDecorator {
+    extends ResourceLocatorFactoryDecorator {
   private final Injector injector;
   
   /**
@@ -37,8 +37,8 @@ public final class InjectorAwareResourceLocatorFactoryDecorator
   private void inject(final Object object) {
     Validate.notNull(object);
     injector.inject(object);
-    if (object instanceof UriLocatorFactoryDecorator) {
-      injector.inject(((UriLocatorFactoryDecorator) object).getDecoratedObject());
+    if (object instanceof ResourceLocatorFactoryDecorator) {
+      injector.inject(((ResourceLocatorFactoryDecorator) object).getDecoratedObject());
     }
     if (object instanceof ResourceLocatorDecorator) {
       injector.inject(((ResourceLocatorDecorator) object).getDecoratedObject());

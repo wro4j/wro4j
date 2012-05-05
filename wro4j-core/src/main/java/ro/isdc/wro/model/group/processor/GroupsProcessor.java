@@ -15,12 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -29,7 +31,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -40,6 +42,8 @@ public class GroupsProcessor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
+  private WroModelFactory modelFactory;
+  @Inject
   private WroConfiguration config;
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
@@ -47,85 +51,64 @@ public class GroupsProcessor {
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-
+  
 
   /**
-   * While processing the resources, if any exception occurs - it is wrapped in a RuntimeException.
+   * @param cacheKey
+   *          to process.
+   * @return processed content.
    */
-  public String process(final Group group, final ResourceType type, final boolean minimize) {
-    Validate.notNull(group);
-    Validate.notNull(type);
+  public String process(final CacheEntry cacheKey) {
+    Validate.notNull(cacheKey);
     try {
-      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + minimize, group.getName(), type);
+      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
+          cacheKey.getGroupName(), cacheKey.getType());
+      // find processed result for a group
+      final WroModel model = modelFactory.create();
+      final Group group = model.getGroupByName(cacheKey.getGroupName());
       // mark this group as used.
       group.markAsUsed();
-      final Group filteredGroup = group.collectResourcesOfType(type);
+      final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
       if (filteredGroup.getResources().isEmpty()) {
-        LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), type);
+        LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
         if (!config.isIgnoreEmptyGroup()) {
           throw new WroRuntimeException("No resources found in group: " + group.getName());
         }
       }
-      final String result = decorateWithMergeCallback(preProcessorExecutor).processAndMerge(
-          filteredGroup, minimize);
-      return doPostProcess(group, type, result, minimize);
+      final String result = preProcessorExecutor.processAndMerge(filteredGroup, cacheKey.isMinimize());
+      return doPostProcess(group, result, cacheKey);
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources", e);
     } finally {
       callbackRegistry.onProcessingComplete();
     }
   }
-
-  /**
-   * @return decorated {@link PreProcessorExecutor} which add callback calls.
-   */
-  private PreProcessorExecutor decorateWithMergeCallback(final PreProcessorExecutor executor) {
-    return new PreProcessorExecutor() {
-      @Override
-      public String processAndMerge(final Group group, final boolean minimize) throws IOException {
-        callbackRegistry.onBeforeMerge();
-        try {
-          return executor.processAndMerge(group, minimize);
-        } finally {
-          callbackRegistry.onAfterMerge();
-        }
-      }
-    };
-  }
-
+  
   /**
    * Perform postProcessing.
-   *
-   * @param resourceType
-   *          the type of the resources to process. This value will never be null.
-   * @param content
-   *          the merged content of all resources which were pre-processed.
-   * @param minimize
-   *          whether minimize aware post processor must be applied.
+   * 
    * @return the post processed contents.
    */
-  private String doPostProcess(final Group group, final ResourceType resourceType, final String content,
-      final boolean minimize)
-      throws IOException {
+  private String doPostProcess(final Group group, final String content, final CacheEntry cacheEntry) throws IOException {
     Validate.notNull(content);
     final Collection<? extends ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
       LOG.warn("No processors defined. Please, check if your configuration is correct.");
     }
-    final Collection<? extends ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resourceType, allPostProcessors);
+    final Collection<? extends ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(
+        cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
     
-    final String resourceName = group.getName() + "." + resourceType.name().toLowerCase();
-    final Resource mergedResource = Resource.create(resourceName, resourceType);
-    mergedResource.setMinimize(minimize);
-    mergedResource.setType(resourceType);
-    
-    final String output = applyPostProcessors(mergedResource, processors, content);
-    return output;
-  }
+    final String resourceName = group.getName() + "." + cacheEntry.getType().name().toLowerCase();
+    final Resource mergedResource = Resource.create(resourceName, cacheEntry.getType());
+    mergedResource.setMinimize(cacheEntry.isMinimize());
+    mergedResource.setType(cacheEntry.getType());
 
+    return applyPostProcessors(mergedResource, processors, content);
+  }
+  
   /**
    * Apply resourcePostProcessors.
-   *
+   * 
    * @param processors
    *          a collection of processors to apply on the content from the supplied writer.
    * @param content
@@ -148,7 +131,7 @@ public class GroupsProcessor {
       output = new StringWriter();
       decorateWithPostProcessCallback(processor).process(mergedResource, input, output);
   
-
+      
       input = new StringReader(output.toString());
       stopWatch.stop();
     }
@@ -156,8 +139,9 @@ public class GroupsProcessor {
     return output.toString();
   }
 
-
   /**
+   * TODO move to {@link InjectorBuilder}
+   * 
    * @return a decorated postProcessor which invokes callback methods.
    */
   private ResourceProcessor decorateWithPostProcessCallback(final ResourceProcessor processor) {

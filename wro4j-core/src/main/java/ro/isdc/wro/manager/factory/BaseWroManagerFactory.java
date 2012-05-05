@@ -109,13 +109,15 @@ public class BaseWroManagerFactory
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
+      manager.setModelTransformers(modelTransformers);
+
       
-      final Injector injector = new InjectorBuilder(manager).setModelTransformers(
-          modelTransformers).build();
-      
+      final Injector injector = new InjectorBuilder(manager).build();
       injector.inject(manager);
       
+      //initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);
+      
       return manager;
     }
   };
@@ -130,8 +132,9 @@ public class BaseWroManagerFactory
 
   /**
    * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
-   * callbacks. Default implementation does nothing.
-   *
+   * callbacks. Default implementation does nothing. Do not set anything else except callbacks in this method, otherwise
+   * the initialization will not be performed properly.
+   * 
    * @param manager
    *          initialized instance of {@link WroManager}.
    */
@@ -283,8 +286,7 @@ public class BaseWroManagerFactory
     this.hashBuilder = hashBuilder;
     return this;
   }
-
-
+  
   /**
    * @param modelTransformers the modelTransformers to set
    */

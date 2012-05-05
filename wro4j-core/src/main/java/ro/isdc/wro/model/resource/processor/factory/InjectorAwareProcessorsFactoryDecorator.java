@@ -9,7 +9,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 /**
- *  Responsible for injecting each processor with required fields before being used.
+ * Responsible for injecting each processor with required fields before being used.
  * 
  * @author Alex Objelean
  * @created 24 Apr 2012
@@ -18,7 +18,6 @@ import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 public final class InjectorAwareProcessorsFactoryDecorator
     extends ProcessorsFactoryDecorator {
   private final Injector injector;
-  
   public InjectorAwareProcessorsFactoryDecorator(final ProcessorsFactory decorated, final Injector injector) {
     super(decorated);
     Validate.notNull(injector);
@@ -29,7 +28,6 @@ public final class InjectorAwareProcessorsFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  @Override
   public Collection<ResourceProcessor> getPreProcessors() {
     final Collection<ResourceProcessor> processors = super.getPreProcessors();
     for (ResourceProcessor processor : processors) {
@@ -41,7 +39,6 @@ public final class InjectorAwareProcessorsFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  @Override
   public Collection<ResourceProcessor> getPostProcessors() {
     final Collection<ResourceProcessor> processors = super.getPostProcessors();
     for (ResourceProcessor processor : processors) {
@@ -56,7 +53,7 @@ public final class InjectorAwareProcessorsFactoryDecorator
   private void inject(final Object object) {
     injector.inject(object);
     if (object instanceof ProcessorDecorator) {
-      injector.inject(((ProcessorDecorator) object).getDecoratedProcessor());
+      injector.inject(((ProcessorDecorator) object).getDecoratedObject());
     }
     if (object instanceof ProcessorsFactoryDecorator) {
       injector.inject(((ProcessorsFactoryDecorator) object).getDecoratedObject());

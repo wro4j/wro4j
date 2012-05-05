@@ -91,7 +91,7 @@ public class TestPreProcessorExecutor {
    */
   private void initExecutor(final ResourceProcessor... preProcessors) {
     final WroManagerFactory wroManagerFactory = createWroManager(preProcessors);
-    final Injector injector = new InjectorBuilder(wroManagerFactory.create()).build();
+    final Injector injector = InjectorBuilder.create(wroManagerFactory).build();
     executor = new PreProcessorExecutor();
     injector.inject(executor);
   }
@@ -237,9 +237,9 @@ public class TestPreProcessorExecutor {
     LOG.debug(message);
 
     // prove that running in parallel is faster
-    // delta indicates the improvement relative to parallel execution (we use 90% relative improvement, but it normally
+    // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it normally
     // should be about 100%).
-    double delta = parallelExecution * 0.9;
+    double delta = parallelExecution * 0.8;
     Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
         sequentialExecution > parallelExecution + delta);
   }

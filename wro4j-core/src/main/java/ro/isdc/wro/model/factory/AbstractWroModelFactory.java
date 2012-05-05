@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.factory;
 
+import java.io.IOException;
+
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -23,6 +25,8 @@ public abstract class AbstractWroModelFactory
    * Override this method, in order to provide different xml definition file name.
    *
    * @return stream of the xml representation of the model.
+   * @throws IOException
+   *           if the stream couldn't be read.
    */
   protected ResourceLocator getModelResourceLocator() {
     return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + getDefaultModelFilename());

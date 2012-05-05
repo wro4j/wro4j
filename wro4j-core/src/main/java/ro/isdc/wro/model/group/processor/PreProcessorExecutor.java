@@ -61,30 +61,32 @@ public class PreProcessorExecutor {
   
   /**
    * Apply preProcessors on resources and merge them.
-   *
+   * 
    * @param resources
    *          what are the resources to merge.
    * @param minimize
    *          whether minimize aware processors must be applied or not.
    * @return preProcessed merged content.
-   * @throws IOException
-   *           if IO error occurs while merging.
    */
   public String processAndMerge(final Group group, final boolean minimize)
       throws IOException {
     Validate.notNull(group);
-    final List<Resource> resources = group.getResources();
-    
-    final StringBuffer result = new StringBuffer();
-    if (shouldRunInParallel(resources)) {
-      result.append(runInParallel(resources, minimize));
-    } else {
-      for (final Resource resource : resources) {
-        LOG.debug("\tmerging resource: {}", resource);
-        result.append(applyPreProcessors(resource, minimize));
+    callbackRegistry.onBeforeMerge();
+    try {
+      final List<Resource> resources = group.getResources();
+      final StringBuffer result = new StringBuffer();
+      if (shouldRunInParallel(group.getResources())) {
+        result.append(runInParallel(resources, minimize));
+      } else {
+        for (final Resource resource : resources) {
+          LOG.debug("\tmerging resource: {}", resource);
+          result.append(applyPreProcessors(resource, minimize));
+        }
       }
+      return result.toString();
+    } finally {
+      callbackRegistry.onAfterMerge();
     }
-    return result.toString();
   }
   
   private boolean shouldRunInParallel(final List<Resource> resources) {
@@ -95,7 +97,7 @@ public class PreProcessorExecutor {
   
   /**
    * runs the pre processors in parallel.
-   *
+   * 
    * @return merged and pre processed content.
    */
   private String runInParallel(final List<Resource> resources, final boolean minimize)
@@ -117,7 +119,7 @@ public class PreProcessorExecutor {
     for (final Callable<String> callable : callables) {
       futures.add(exec.submit(callable));
     }
-
+    
     for (final Future<String> future : futures) {
       try {
         result.append(future.get());
@@ -149,15 +151,17 @@ public class PreProcessorExecutor {
   
   /**
    * Apply a list of preprocessors on a resource.
-   *
-   * @param resource the {@link Resource} on which processors will be applied
-   * @param processors the list of processor to apply on the resource.
+   * 
+   * @param resource
+   *          the {@link Resource} on which processors will be applied
+   * @param processors
+   *          the list of processor to apply on the resource.
    */
   private String applyPreProcessors(final Resource resource, final boolean minimize)
-    throws IOException {
+      throws IOException {
     // merge preProcessorsBy type and anyPreProcessors
     final Collection<ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
-      resource.getType(), processorsFactory.getPreProcessors());
+        resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
     String resourceContent = getResourceContent(resource);
     if (processors.isEmpty()) {
@@ -223,6 +227,8 @@ public class PreProcessorExecutor {
   }
   
   /**
+   * TODO: move this decoration to {@link InjectorBuilder}.
+   * <p/>
    * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
    * doesn't require the minimization.
    */

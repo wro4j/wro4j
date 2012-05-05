@@ -2,6 +2,7 @@ package ro.isdc.wro.cache;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -26,6 +27,8 @@ public final class CacheEntry implements Serializable {
 	 * @param minimize true if the result should produce minimized version.
 	 */
 	public CacheEntry(final String groupName, final ResourceType type, final boolean minimize) {
+	  Validate.notNull(groupName);
+	  Validate.notNull(type);
 		this.groupName = groupName;
 		this.type = type;
 		this.minimize = minimize;

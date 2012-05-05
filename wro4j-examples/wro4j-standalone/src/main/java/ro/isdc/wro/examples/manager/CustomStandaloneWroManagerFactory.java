@@ -42,8 +42,8 @@ public class CustomStandaloneWroManagerFactory
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
-    factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     factory.addPreProcessor(new JSMinProcessor());
 

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.AbstractWroModelFactory;
+import ro.isdc.wro.util.StopWatch;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -22,6 +23,8 @@ import com.google.gson.reflect.TypeToken;
  * TODO: validate duplicate groups & null resource type
  * <p/>
  * Creates {@link WroModel} from a json.
+ * <p/>
+ * This class is thread-safe because it doesn't have any state..
  *
  * @author Alex Objelean
  * @created 13 Mar 2011
@@ -40,7 +43,9 @@ public class JsonModelFactory
    */
   @Override
   public WroModel create() {
+    final StopWatch stopWatch = new StopWatch("Create Wro Model from Groovy");
     try {
+      stopWatch.start("createModel");
       final Type type = new TypeToken<WroModel>() {}.getType();
       final InputStream is = getModelResourceLocator().getInputStream();
       if (is == null) {
@@ -54,6 +59,9 @@ public class JsonModelFactory
       return model;
     } catch (final Exception e) {
       throw new WroRuntimeException("Invalid model found!", e);
+    } finally {
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
     }
   }
 

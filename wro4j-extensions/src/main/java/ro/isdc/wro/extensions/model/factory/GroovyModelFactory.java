@@ -28,11 +28,14 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.AbstractWroModelFactory;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
  * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
- *
+ * <p/>
+ * This class is thread-safe because it doesn't have any state.
+ * 
  * @author Romain Philibert
  * @created 19 Jul 2011
  * @since 1.4.0
@@ -51,12 +54,18 @@ public class GroovyModelFactory
    */
   @Override
   public WroModel create() {
+    final StopWatch stopWatch = new StopWatch("Create Wro Model from Groovy");
     final Script script;
     try {
+      stopWatch.start("parseStream");
       final InputStream configResource = getModelResourceLocator().getInputStream();
       script = new GroovyShell().parse(new InputStreamReader(configResource));
       LOG.debug("Parsing groovy script to build the model");
+      stopWatch.stop();
+      
+      stopWatch.start("parseScript");
       final WroModel model = GroovyModelParser.parse(script);
+      stopWatch.stop();
       LOG.debug("groovy model: {}", model);
       if (model == null) {
         throw new WroRuntimeException("Invalid content provided, cannot build model!");
@@ -64,6 +73,8 @@ public class GroovyModelFactory
       return model;
     } catch (final IOException e) {
       throw new WroRuntimeException("Invalid model found!", e);
+    } finally {
+      LOG.debug(stopWatch.prettyPrint());
     }
   }
 

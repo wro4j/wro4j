@@ -5,19 +5,19 @@ import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
- * Simple decorator of {@link UriLocatorFactory}.
+ * Simple decorator of {@link ResourceLocatorFactory}.
  * 
  * @author Alex Objelean
  * @created 24 Apr 2012
  * @since 1.4.6
  */
-public class UriLocatorFactoryDecorator extends AbstractDecorator<ResourceLocatorFactory>
+public class ResourceLocatorFactoryDecorator extends AbstractDecorator<ResourceLocatorFactory>
     implements ResourceLocatorFactory {
   
   /**
    * Decorates an {@link UriLocatorFactory}.
    */
-  public UriLocatorFactoryDecorator(final ResourceLocatorFactory decorated) {
+  public ResourceLocatorFactoryDecorator(final ResourceLocatorFactory decorated) {
     super(decorated);
   }
   

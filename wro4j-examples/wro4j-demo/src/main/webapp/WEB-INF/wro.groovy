@@ -94,4 +94,14 @@ groups {
   jar {
     css("classpath:com/app/**.css")
   }
+  less {
+     css("/static/less/**")
+  }
+  coffeeScript {
+     js("/static/coffee/**.coffee")
+  }
+  
+  cssUrlRewriting {
+    css("/css/index.css");
+  }
 }

@@ -16,6 +16,7 @@
 package ro.isdc.wro.extensions.model.factory;
 
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
@@ -32,6 +33,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
+import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test {@link GroovyModelFactory}
@@ -140,5 +142,23 @@ public class TestGroovyModelFactory {
       }
     };
     factory.create();
+  }
+  
+  @Test
+  public void shouldBeThreadSafe() throws Exception {
+    factory = new GroovyModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("wro.groovy"));
+      }
+    }; 
+    WroTestUtils.init(factory);
+    WroTestUtils.runConcurrently(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        factory.create();
+        return null;
+      }
+    }, 10);
   }
 }

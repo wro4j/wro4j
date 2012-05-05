@@ -55,8 +55,8 @@ public class CustomWroManagerFactory
 
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
     //factory.addPreProcessor(getPlaceholderProcessor());
-    factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new CssUrlRewritingProcessor());
+    factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     //factory.addPreProcessor(new JSMinProcessor());
     factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());

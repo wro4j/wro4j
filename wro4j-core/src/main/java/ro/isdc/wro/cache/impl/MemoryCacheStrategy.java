@@ -42,7 +42,6 @@ public class MemoryCacheStrategy<K, V> implements CacheStrategy<K, V> {
    */
   public MemoryCacheStrategy(final Map<K, V> cacheHolder) {
     Validate.notNull(cacheHolder, "The cache map cannot be null.");
-
     map = Collections.synchronizedMap(cacheHolder);
   }
 

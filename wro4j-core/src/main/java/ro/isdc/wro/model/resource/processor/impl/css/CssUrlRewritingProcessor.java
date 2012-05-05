@@ -24,10 +24,8 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 
 /**
- * CssUrlRewritingProcessor.<br>
- * The algorithm requires two types of {@link UriLocator} objects, one for resolving url resources & one for
- * classpathresources. Both need to be injected using IoC when creating the instance of {@link CssUrlRewritingProcessor}
- * class.
+ * Note: When used together with {@link CssImportPreProcessor}, the {@link CssUrlRewritingProcessor} should come first,
+ * otherwise it will produce wrong results.
  * <p>
  * Rewrites background images url of the provided css content. This implementation takes care of most common cases such
  * as those described bellow:
@@ -102,18 +100,22 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
  * </tr>
  * </tbody>
  * </table>
- *
+ * <p/>
+ * The algorithm requires two types of {@link UriLocator} objects, one for resolving url resources & one for classpath
+ * resources. Both need to be injected using IoC when creating the instance of {@link CssUrlRewritingProcessor} class.
+ * 
  * @author Alex Objelean
  * @created Nov 19, 2008
  */
-public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
+public class CssUrlRewritingProcessor
+    extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
   public static final String ALIAS = "cssUrlRewriting";
   /**
    * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
    */
   public static final String PATH_RESOURCES = "wroResources";
-
+  
   /**
    * The name of resource id parameter.
    */
@@ -134,19 +136,19 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
   private String aggregatedPathPrefix;
   @Inject
   private Context context;
-
+  
   /**
    * The folder where the final css is located. This is important for computing image location after url rewriting.
-   *
-   * @param aggregatedFolderPath the aggregatedFolder to set
+   * 
+   * @param aggregatedFolderPath
+   *          the aggregatedFolder to set
    */
   private CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
     aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolderPath);
     LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
     return this;
   }
-
-
+  
   /**
    * {@inheritDoc}
    */
@@ -154,8 +156,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
   protected void onProcessCompleted() {
     LOG.debug("allowed urls: {}", allowedUrls);
   }
-
-
+  
   /**
    * {@inheritDoc}
    */
@@ -165,13 +166,14 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     LOG.debug("adding allowed url: {}", allowedUrl);
     allowedUrls.add(allowedUrl);
   }
-
-
+  
   /**
    * Replace provided url with the new url if needed.
-   *
-   * @param cssUri Uri of the parsed css.
-   * @param imageUrl to replace.
+   * 
+   * @param cssUri
+   *          Uri of the parsed css.
+   * @param imageUrl
+   *          to replace.
    * @return replaced url.
    */
   @Override
@@ -198,6 +200,7 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
   }
 
+
   /**
    * @return the path to be prefixed after css aggregation. This depends on the aggregated css destination folder. This
    *         is a fix for the following issue: {@link http://code.google.com/p/wro4j/issues/detail?id=259}
@@ -220,13 +223,14 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
     LOG.debug("computedPrefix: {}", computedPrefix);
     return computedPrefix;
   }
-
-
+  
   /**
    * Concatenates cssUri and imageUrl after few changes are applied to both input parameters.
-   *
-   * @param cssUri the URI of css resource.
-   * @param imageUrl the URL of image referred in css.
+   * 
+   * @param cssUri
+   *          the URI of css resource.
+   * @param imageUrl
+   *          the URL of image referred in css.
    * @return processed new location of image url.
    */
   private String computeNewImageLocation(final String cssUri, final String imageUrl) {
@@ -270,17 +274,17 @@ public class CssUrlRewritingProcessor extends AbstractCssUrlRewritingProcessor {
   }
 
   /**
-   * @param uri to check if is allowed.
+   * @param uri
+   *          to check if is allowed.
    * @return true if passed argument is contained in allowed list.
    */
   public final boolean isUriAllowed(final String uri) {
     return allowedUrls.contains(uri);
   }
-
-
+  
   /**
    * This method has protected modifier in order to be accessed by unit test class.
-   *
+   * 
    * @return urlPrefix value.
    */
   protected String getUrlPrefix() {
