@@ -101,6 +101,11 @@ public class WroServletContextListener
    * {@inheritDoc}
    */
   public void contextDestroyed(final ServletContextEvent servletContextEvent) {
+    LOG.debug("destroying servletContext: {}", getListenerName());
+    //remove all attributes from servlet context.
+    for (Attribute attribute : Attribute.values()) {
+      servletContext.removeAttribute(getAttributeName(attribute));      
+    }
   }
 
   /**

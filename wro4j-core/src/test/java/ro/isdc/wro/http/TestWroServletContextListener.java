@@ -24,19 +24,21 @@ import org.mockito.stubbing.Answer;
 public class TestWroServletContextListener {
   @Mock
   private ServletContextEvent mockServletContextEvent;
+  private final Map<String, Object> map = new HashMap<String, Object>();
   @Mock
   private ServletContext mockServletContext;
   private WroServletContextListener victim;
-  private Map<String, Object> servletContextAttributes = new HashMap<String, Object>();
+  
   @Before
   public void setUp() {
     initMocks(this);
+    map.clear();
+    
     when(mockServletContextEvent.getServletContext()).thenReturn(mockServletContext);
-    servletContextAttributes.clear();
     when(mockServletContext.getAttribute(Mockito.anyString())).then(new Answer<Object>() {
       public Object answer(final InvocationOnMock invocation)
           throws Throwable {
-        return servletContextAttributes.get((String) invocation.getArguments()[0]);
+        return map.get((String) invocation.getArguments()[0]);
       }
     });
     Mockito.doAnswer(new Answer<Object>() {
@@ -44,9 +46,17 @@ public class TestWroServletContextListener {
           throws Throwable {
         final String key = (String) invocation.getArguments()[0];
         final Object value = invocation.getArguments()[1];
-        return servletContextAttributes.put(key, value);
+        return map.put(key, value);
       }
     }).when(mockServletContext).setAttribute(Mockito.anyString(), Mockito.anyObject());
+    Mockito.doAnswer(new Answer<Object>() {
+      public Object answer(final InvocationOnMock invocation)
+          throws Throwable {
+        final Object value = invocation.getArguments()[0];
+        return map.remove(value);
+      }
+    }).when(mockServletContext).removeAttribute(Mockito.anyString());
+
     victim = new WroServletContextListener();
   }
 
@@ -59,6 +69,13 @@ public class TestWroServletContextListener {
   @Test(expected = IllegalStateException.class)
   public void shouldFailWhenMultipleListenersWithSameNameDefined() {
     victim.contextInitialized(mockServletContextEvent);
+    victim.contextInitialized(mockServletContextEvent);
+  }
+  
+  @Test
+  public void shouldNotFailWhenContextInitializedAndDestroyed() {
+    victim.contextInitialized(mockServletContextEvent);
+    victim.contextDestroyed(mockServletContextEvent);
     victim.contextInitialized(mockServletContextEvent);
   }
 }
