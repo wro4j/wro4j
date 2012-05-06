@@ -4,11 +4,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
  * A listener which loads wroConfiguration and stores it in servletContext.
@@ -28,9 +33,10 @@ public class WroServletContextListener
   private static final String CONTEXT_NAME = "name";
   private static final String DEFAULT_LISTENER_NAME = "default";
   private WroConfiguration configuration;
+  private WroManagerFactory managerFactory;
   private ServletContext servletContext;
   
-  public static enum Attribute {
+  private static enum Attribute {
     CONFIGURATION, WRO_MANAGER_FACTORY
   }
 
@@ -52,10 +58,39 @@ public class WroServletContextListener
       LOG.error(message);
       throw new IllegalStateException(message);
     }
+    
     this.configuration = createConfiguration();
+    this.managerFactory = createManagerFactory();
+    
     setAttributeValue(Attribute.CONFIGURATION, this.configuration);
+    setAttributeValue(Attribute.WRO_MANAGER_FACTORY, this.managerFactory);
   }
   
+  /**
+   * TODO this code is duplicated (in {@link WroFilter}). Find a way to reuse it.
+   */
+  private WroManagerFactory createManagerFactory() {
+    if (StringUtils.isEmpty(configuration.getWroManagerClassName())) {
+      // If no context param was specified we return the default factory
+      return newWroManagerFactory();
+    } else {
+      // Try to find the specified factory class
+      Class<?> factoryClass = null;
+      try {
+        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+          configuration.getWroManagerClassName());
+        // Instantiate the factory
+        return (WroManagerFactory)factoryClass.newInstance();
+      } catch (final Exception e) {
+        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
+      }
+    }
+  }
+
+  private WroManagerFactory newWroManagerFactory() {
+    return new BaseWroManagerFactory();
+  }
+
   /**
    * @return the value of the attribute stored in {@link ServletContext} for this listener.
    */
@@ -107,6 +142,31 @@ public class WroServletContextListener
       servletContext.removeAttribute(getAttributeName(attribute));      
     }
   }
+  
+  
+  /**
+   * Set the manager factory to be initialized by this listener. 
+   * 
+   * @param managerFactory
+   *          a not null manager instance.
+   */
+  public void setManagerFactory(final WroManagerFactory managerFactory) {
+    Validate.notNull(managerFactory);
+    this.managerFactory = managerFactory;
+  }
+
+
+  /**
+   * Set the configuration to be initialized by this listener. 
+   * 
+   * @param configuration
+   *          a not null configuration instance.
+   */
+  public void setConfiguration(final WroConfiguration configuration) {
+    Validate.notNull(configuration);
+    this.configuration = configuration;
+  }
+
 
   /**
    * @VisibleForTesting
@@ -114,5 +174,13 @@ public class WroServletContextListener
    */
   WroConfiguration getConfiguration() {
     return configuration;
+  }
+
+  /**
+   * @VisibleForTesting
+   * @return the {@link WroManagerFactory} object built by this listener.
+   */
+  WroManagerFactory getManagerFactory() {
+    return managerFactory;
   }
 }
