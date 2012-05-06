@@ -517,8 +517,7 @@ public class TestWroFilter {
     final WroFilter theFilter = new WroFilter() {
       @Override
       protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
-        final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
-        factory.setProperties(props);
+        final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(props);
         return factory;
       }
     };

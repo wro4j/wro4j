@@ -96,8 +96,7 @@ public class FilterConfigWroConfigurationFactory
    */
   public WroConfiguration create() {
     //decorated factory
-    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
-    factory.setProperties(initProperties());
+    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(initProperties());
     return factory.create();
   }
 }
