@@ -137,8 +137,8 @@ public class WroFilter
   private WroConfiguration createConfiguration() {
     // Extract config from servletContext (if already configured)
     //TODO use a named helper
-    final WroConfiguration configAttribute = (WroConfiguration) ServletContextAttributeHelper.create(filterConfig).getAttribute(
-        Attribute.CONFIGURATION);
+    final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
+    LOG.debug("config attribute: {}", configAttribute);
     return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
   }
 
@@ -148,8 +148,7 @@ public class WroFilter
   private WroManagerFactory createWroManagerFactory() {
     if (this.wroManagerFactory == null) {
       //TODO use a named helper
-      final WroManagerFactory managerFactoryAttribute = (WroManagerFactory) ServletContextAttributeHelper.create(
-          filterConfig).getAttribute(Attribute.MANAGER_FACTORY);
+      final WroManagerFactory managerFactoryAttribute = ServletContextAttributeHelper.create(filterConfig).getManagerFactory();
       LOG.debug("managerFactory attribute: {}", managerFactoryAttribute);
       return managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
     }

@@ -115,6 +115,20 @@ public class ServletContextAttributeHelper {
   }
   
   /**
+   * @return the {@link WroManagerFactory} stored in servletContext.
+   */
+  public WroManagerFactory getManagerFactory() {
+    return (WroManagerFactory) getAttribute(Attribute.MANAGER_FACTORY);
+  }
+  
+  /**
+   * @return the {@link WroConfiguration} stored in servletContext.
+   */
+  public WroConfiguration getWroConfiguration() {
+    return (WroConfiguration) getAttribute(Attribute.CONFIGURATION);
+  }
+  
+  /**
    * Sets the attribute into the servlet context. The name of the attribute will be computed for you.
    */
   public void setAttribute(final Attribute attribute, final Object object) {
