@@ -6,6 +6,9 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+
 
 /**
  * Encapsulates the details of storing/retrieving attributes from {@link ServletContext} for a given named listener. Use
@@ -30,7 +33,19 @@ public class ServletContextAttributeHelper {
    * Supported attributes.
    */
   public static enum Attribute {
-    CONFIGURATION, WRO_MANAGER_FACTORY
+    CONFIGURATION(WroConfiguration.class), WRO_MANAGER_FACTORY(WroManagerFactory.class);
+    private Class<?> type;
+    
+    private Attribute(final Class<?> type) {
+      this.type = type;
+    }
+    
+    /**
+     * @return true if the object is a valid subtype.
+     */
+    boolean isValid(final Object object) {
+      return object == null || type.isAssignableFrom(object.getClass());
+    }
   }
   
   /**
@@ -62,8 +77,10 @@ public class ServletContextAttributeHelper {
    * @param attribute
    *          type of attribute.
    * @return the name of the attribute used to store in servlet context.
+   * @VisibleForTesting
    */
-  private String getAttributeName(final Attribute attribute) {
+  String getAttributeName(final Attribute attribute) {
+    Validate.notNull(attribute);
     return WroServletContextListener.class.getName() + "-" + attribute.name() + "-" + this.name;
   }
   
@@ -79,7 +96,9 @@ public class ServletContextAttributeHelper {
    * Sets the attribute into the servlet context. The name of the attribute will be computed for you.
    */
   public void setAttribute(final Attribute attribute, final Object object) {
-    //TODO use type checking to be sure that a valid object is stored
+    Validate.notNull(attribute);
+    LOG.debug("setting attribute: {} with value: {}", attribute, object);
+    Validate.isTrue(attribute.isValid(object), object + " is not of valid subType for attribute: " + attribute);
     servletContext.setAttribute(getAttributeName(attribute), object);
   }
   
