@@ -72,17 +72,6 @@ public class WroTestUtils {
   }
 
   /**
-   * @param properties {@link Properties} object to get stream from.
-   * @return {@link InputStream} of the provided properties object.
-   */
-  public static InputStream getPropertiesStream(final Properties properties) {
-    final StringWriter propsAsString = new StringWriter();
-    properties.list(new PrintWriter(propsAsString));
-    return new ByteArrayInputStream(propsAsString.toString().getBytes()); 
-  }
-
-
-  /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
    *
    * @param inputResourceUri uri of the resource to process.

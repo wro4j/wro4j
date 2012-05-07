@@ -38,6 +38,7 @@ import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFacto
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -418,26 +419,20 @@ public class WroFilter
    * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory getWroManagerFactory() {
-    if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
-      // If no context param was specified we return the default factory
-      return newWroManagerFactory();
-    } else {
-      // Try to find the specified factory class
-      Class<?> factoryClass = null;
-      try {
-        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-          wroConfiguration.getWroManagerClassName());
-        // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
-      } catch (final Exception e) {
-        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
+    return new DefaultWroManagerFactory(wroConfiguration) {
+      @Override
+      protected WroManagerFactory newManagerFactory() {
+        return WroFilter.this.newWroManagerFactory();
       }
-    }
+    };
   }
 
   /**
    * @return default implementation of {@link WroManagerFactory} when none is provided explicitly through
    *         wroConfiguration option.
+   * @deprecated use {@link WroFilter#getWroManagerFactory()} or use an alternative way of configuring
+   *            {@link WroManagerFactory}, like through {@link WroConfiguration} or using
+   *            {@link WroServletContextListener}.
    */
   protected WroManagerFactory newWroManagerFactory() {
     return new BaseWroManagerFactory();

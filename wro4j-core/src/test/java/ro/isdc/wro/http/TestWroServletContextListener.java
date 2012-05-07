@@ -4,7 +4,6 @@ import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
@@ -90,13 +90,13 @@ public class TestWroServletContextListener {
   @Test
   public void shouldCreateBaseWroManagerFactoryByDefault() {
     victim.contextInitialized(mockServletContextEvent);
-    Assert.assertEquals(BaseWroManagerFactory.class, victim.getManagerFactory().getClass());
+    Assert.assertEquals(DefaultWroManagerFactory.class, victim.getManagerFactory().getClass());
   }
   
   @Test
   public void shouldCreateWroManagerFactorySpecifiedByWroConfiguration() {
     victim.contextInitialized(mockServletContextEvent);
-    Assert.assertEquals(BaseWroManagerFactory.class, victim.getManagerFactory().getClass());
+    Assert.assertEquals(DefaultWroManagerFactory.class, victim.getManagerFactory().getClass());
   }
   
   @Test(expected = NullPointerException.class)

@@ -4,21 +4,21 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
+import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
+
 /**
- * A listener which loads wroConfiguration and stores it in servletContext.
- *
+ * A listener which loads wroConfiguration and stores it in servletContext. If you want to have multiple listeners,
+ * extend this class and override the {@link WroServletContextListener#getListenerName()} to provide a unique name.
+ * 
  * @author Alex Objelean
  * @created 6 May 2012
  * @since 1.4.6
@@ -26,172 +26,114 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 public class WroServletContextListener
     implements ServletContextListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroServletContextListener.class);
-
-  /**
-   * An application can have multiple context listeners. Each listener can have its own name. If no name is provided, a
-   * default one is used.
-   */
-  private static final String CONTEXT_NAME = "name";
-  private static final String DEFAULT_LISTENER_NAME = "default";
+  public static final String DEFAULT_LISTENER_NAME = "default";
   private WroConfiguration configuration;
   private WroManagerFactory managerFactory;
   private ServletContext servletContext;
+  private ServletContextAttributeHelper attributeHelper;
   
-  private static enum Attribute {
-    CONFIGURATION, WRO_MANAGER_FACTORY
-  }
-
   /**
    * {@inheritDoc}
    */
-  public void contextInitialized(final ServletContextEvent event) {
+  public final void contextInitialized(final ServletContextEvent event) {
     this.servletContext = event.getServletContext();
+    attributeHelper = new ServletContextAttributeHelper(this.servletContext, getListenerName());
     initListener(event.getServletContext());
   }
   
-
   private void initListener(final ServletContext servletContext) {
-    final String listenerName = getListenerName();
-    LOG.debug("initializing listener with name: {}", listenerName);
-    if (getAttributeValue(Attribute.CONFIGURATION) != null) {
+    if (attributeHelper.getAttribute(Attribute.CONFIGURATION) != null) {
       final String message = "Cannot initialize context because there is already a listener present - withName: "
-          + listenerName + ". Check whether you have multiple listener* definitions in your web.xml!";
+          + getListenerName() + ". Check whether you have multiple listener* definitions in your web.xml!";
       LOG.error(message);
       throw new IllegalStateException(message);
     }
-    
+    // create configuration first because managerFactory require it during creation.
     this.configuration = createConfiguration();
     this.managerFactory = createManagerFactory();
+    LOG.debug("Loaded managerFactory: {}", this.managerFactory.getClass());
     
-    setAttributeValue(Attribute.CONFIGURATION, this.configuration);
-    setAttributeValue(Attribute.WRO_MANAGER_FACTORY, this.managerFactory);
+    attributeHelper.setAttribute(Attribute.CONFIGURATION, this.configuration);
+    attributeHelper.setAttribute(Attribute.WRO_MANAGER_FACTORY, this.managerFactory);
   }
   
-  /**
-   * @return the value of the attribute stored in {@link ServletContext} for this listener.
-   */
-  private Object getAttributeValue(final Attribute attribute) {
-    return servletContext.getAttribute(getAttributeName(attribute));
-  }
-  
-  /**
-   * Sets the attribute into the servlet context. The name of the attribute will be computed for you.
-   */
-  private void setAttributeValue(final Attribute attribute, final Object object) {
-    servletContext.setAttribute(getAttributeName(attribute), object);
-  }
-
-  /**
-   * @param attribute
-   *          type of attribute.
-   * @return the name of the attribute used to store in servlet context.
-   */
-  private String getAttributeName(final Attribute attribute) {
-    return WroServletContextListener.class.getName() + "-" + attribute.name() + "-" + getListenerName();
-  }
-
-
-  /**
-   * Retrieve the name listener name. Check the init param. If no value is provided a default value is used.
-   */
-  private String getListenerName() {
-    final String initParamName = servletContext.getInitParameter(CONTEXT_NAME); 
-    return initParamName == null ? DEFAULT_LISTENER_NAME : initParamName;
-  }
-
-
   /**
    * @return a not null {@link WroConfiguration} object.
    */
   private WroConfiguration createConfiguration() {
     return this.configuration != null ? this.configuration : newConfiguration();
   }
-
+  
   /**
    * Create the ContextLoader to use. Can be overridden in subclasses.
+   * 
    * @return the new ContextLoader
    */
   protected WroConfiguration newConfiguration() {
     return new ServletContextPropertyWroConfigurationFactory(servletContext).create();
   }
   
-
   private WroManagerFactory createManagerFactory() {
     return this.managerFactory != null ? this.managerFactory : newManagerFactory();
   }
-
-
+  
   /**
-   * TODO this code is duplicated (in {@link WroFilter}). Find a way to reuse it.
+   * @return default implementation of {@link WroManagerFactory}.
    */
   protected WroManagerFactory newManagerFactory() {
-    if (StringUtils.isEmpty(configuration.getWroManagerClassName())) {
-      // If no context param was specified we return the default factory
-      return new BaseWroManagerFactory();
-    } else {
-      // Try to find the specified factory class
-      Class<?> factoryClass = null;
-      try {
-        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-          configuration.getWroManagerClassName());
-        // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
-      } catch (final Exception e) {
-        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
-      }
-    }
+    return new DefaultWroManagerFactory(this.configuration);
   }
-
   
   /**
    * {@inheritDoc}
    */
-  public void contextDestroyed(final ServletContextEvent servletContextEvent) {
-    LOG.debug("destroying servletContext: {}", getListenerName());
-    //remove all attributes from servlet context.
-    for (Attribute attribute : Attribute.values()) {
-      servletContext.removeAttribute(getAttributeName(attribute));      
-    }
+  public final void contextDestroyed(final ServletContextEvent servletContextEvent) {
+    attributeHelper.clear();
   }
   
-  
   /**
-   * Set the manager factory to be initialized by this listener. 
+   * Set the manager factory to be initialized by this listener.
    * 
    * @param managerFactory
    *          a not null manager instance.
    */
-  public void setManagerFactory(final WroManagerFactory managerFactory) {
+  public final void setManagerFactory(final WroManagerFactory managerFactory) {
     Validate.notNull(managerFactory);
     this.managerFactory = managerFactory;
   }
-
-
+  
   /**
-   * Set the configuration to be initialized by this listener. 
+   * @return the name of the listener. Override it to provide a different name if you need to configure multiple
+   *         listener.
+   */
+  protected String getListenerName() {
+    return DEFAULT_LISTENER_NAME;
+  }
+  
+  /**
+   * Set the configuration to be initialized by this listener.
    * 
    * @param configuration
    *          a not null configuration instance.
    */
-  public void setConfiguration(final WroConfiguration configuration) {
+  public final void setConfiguration(final WroConfiguration configuration) {
     Validate.notNull(configuration);
     this.configuration = configuration;
   }
-
-
+  
   /**
    * @VisibleForTesting
    * @return the {@link WroConfiguration} object built by this listener.
    */
-  WroConfiguration getConfiguration() {
+  final WroConfiguration getConfiguration() {
     return configuration;
   }
-
+  
   /**
    * @VisibleForTesting
    * @return the {@link WroManagerFactory} object built by this listener.
    */
-  WroManagerFactory getManagerFactory() {
+  final WroManagerFactory getManagerFactory() {
     return managerFactory;
   }
 }
