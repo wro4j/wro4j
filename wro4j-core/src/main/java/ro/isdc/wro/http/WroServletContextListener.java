@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
+import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -67,31 +68,6 @@ public class WroServletContextListener
   }
   
   /**
-   * TODO this code is duplicated (in {@link WroFilter}). Find a way to reuse it.
-   */
-  private WroManagerFactory createManagerFactory() {
-    if (StringUtils.isEmpty(configuration.getWroManagerClassName())) {
-      // If no context param was specified we return the default factory
-      return newWroManagerFactory();
-    } else {
-      // Try to find the specified factory class
-      Class<?> factoryClass = null;
-      try {
-        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-          configuration.getWroManagerClassName());
-        // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
-      } catch (final Exception e) {
-        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
-      }
-    }
-  }
-
-  private WroManagerFactory newWroManagerFactory() {
-    return new BaseWroManagerFactory();
-  }
-
-  /**
    * @return the value of the attribute stored in {@link ServletContext} for this listener.
    */
   private Object getAttributeValue(final Attribute attribute) {
@@ -125,12 +101,47 @@ public class WroServletContextListener
 
 
   /**
+   * @return a not null {@link WroConfiguration} object.
+   */
+  private WroConfiguration createConfiguration() {
+    return this.configuration != null ? this.configuration : newConfiguration();
+  }
+
+  /**
    * Create the ContextLoader to use. Can be overridden in subclasses.
    * @return the new ContextLoader
    */
-  protected WroConfiguration createConfiguration() {
-    return new PropertyWroConfigurationFactory().create();
+  protected WroConfiguration newConfiguration() {
+    return new ServletContextPropertyWroConfigurationFactory(servletContext).create();
   }
+  
+
+  private WroManagerFactory createManagerFactory() {
+    return this.managerFactory != null ? this.managerFactory : newManagerFactory();
+  }
+
+
+  /**
+   * TODO this code is duplicated (in {@link WroFilter}). Find a way to reuse it.
+   */
+  protected WroManagerFactory newManagerFactory() {
+    if (StringUtils.isEmpty(configuration.getWroManagerClassName())) {
+      // If no context param was specified we return the default factory
+      return new BaseWroManagerFactory();
+    } else {
+      // Try to find the specified factory class
+      Class<?> factoryClass = null;
+      try {
+        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+          configuration.getWroManagerClassName());
+        // Instantiate the factory
+        return (WroManagerFactory)factoryClass.newInstance();
+      } catch (final Exception e) {
+        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
+      }
+    }
+  }
+
   
   /**
    * {@inheritDoc}

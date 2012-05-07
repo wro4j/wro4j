@@ -40,6 +40,7 @@ public class PropertyWroConfigurationFactory
     this.properties = props;
   }
   
+
   /**
    * {@inheritDoc}
    */

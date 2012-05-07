@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +22,12 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+
 
 /**
  * Test {@link WroServletContextListener} class.
+ * 
  * @author Alex Objelean
  */
 public class TestWroServletContextListener {
@@ -61,7 +65,6 @@ public class TestWroServletContextListener {
         return map.remove(value);
       }
     }).when(mockServletContext).removeAttribute(Mockito.anyString());
-
     victim = new WroServletContextListener();
   }
 
@@ -113,5 +116,42 @@ public class TestWroServletContextListener {
     victim.setConfiguration(configuration);
     victim.contextInitialized(mockServletContextEvent);
     Assert.assertSame(configuration, victim.getConfiguration());
+  }
+  
+
+  @Test
+  public void shouldUseOverridenConfiguration() {
+    final WroConfiguration configuration = new WroConfiguration();
+    victim = new WroServletContextListener() {
+      @Override
+      protected WroConfiguration newConfiguration() {
+        return configuration;
+      }
+    };
+    victim.contextInitialized(mockServletContextEvent);
+    Assert.assertSame(configuration, victim.getConfiguration());
+  }
+  
+
+  @Test
+  public void shouldUseTheWroManagerSet() {
+    WroManagerFactory managerFactory = new BaseWroManagerFactory();
+    victim.setManagerFactory(managerFactory);
+    victim.contextInitialized(mockServletContextEvent);
+    Assert.assertSame(managerFactory, victim.getManagerFactory());
+  }
+  
+
+  @Test
+  public void shouldUseOverridenManagerFactory() {
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory();
+    victim = new WroServletContextListener() {
+      @Override
+      protected WroManagerFactory newManagerFactory() {
+        return managerFactory;
+      }
+    };
+    victim.contextInitialized(mockServletContextEvent);
+    Assert.assertSame(managerFactory, victim.getManagerFactory());
   }
 }

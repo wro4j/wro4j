@@ -44,7 +44,7 @@ public class FilterConfigWroConfigurationFactory
   /**
    * Filter configuration from where init-params will be read in order to create {@link WroConfiguration} object.
    */
-  FilterConfig filterConfig;
+  private FilterConfig filterConfig;
 
   public FilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
     Validate.notNull(filterConfig);
@@ -94,9 +94,7 @@ public class FilterConfigWroConfigurationFactory
   /**
    * {@inheritDoc}
    */
-  public WroConfiguration create() {
-    //decorated factory
-    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(initProperties());
-    return factory.create();
+  public final WroConfiguration create() {
+    return new PropertyWroConfigurationFactory(initProperties()).create();
   }
 }

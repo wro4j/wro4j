@@ -43,19 +43,6 @@ public final class WroModel {
   }
   
   /**
-   * @return a readonly collection of groups which were used for processing (used flag marked as true).
-   */
-  public final Collection<Group> getUsedGroups() {
-    Set<Group> usedGroups = new HashSet<Group>();
-    for (Group group : groups) {
-      if (group.isUsed()) {
-        usedGroups.add(group);
-      }
-    }
-    return Collections.unmodifiableSet(usedGroups);
-  }
-
-  /**
    * @return a set of group names.
    */
   public final List<String> getGroupNames() {

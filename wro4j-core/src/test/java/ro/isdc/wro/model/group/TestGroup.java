@@ -81,19 +81,6 @@ public class TestGroup {
   }
   
   @Test
-  public void shouldBeNotUsedByDefault() {
-    final Group group = new Group("group");
-    Assert.assertFalse(group.isUsed());
-  }
-  
-  @Test
-  public void shouldBeUsedAfterMarkedAsUsed() {
-    final Group group = new Group("group");
-    group.markAsUsed();
-    Assert.assertTrue(group.isUsed());
-  }
-  
-  @Test
   public void shouldReplaceOnlyOneAndPreserveOtherResources() {
     final Group group = new Group("group");
     final Resource resource = Resource.create("/static/*", ResourceType.JS);
