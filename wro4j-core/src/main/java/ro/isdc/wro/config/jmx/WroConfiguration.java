@@ -152,7 +152,6 @@ public final class WroConfiguration
       reloadModelWithNewValue(period);
     }
     this.modelUpdatePeriod = period;
-
   }
 
 

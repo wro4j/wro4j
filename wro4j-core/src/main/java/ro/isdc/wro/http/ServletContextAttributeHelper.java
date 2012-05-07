@@ -1,5 +1,6 @@
 package ro.isdc.wro.http;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.Validate;
@@ -21,6 +22,17 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 public class ServletContextAttributeHelper {
   private static final Logger LOG = LoggerFactory.getLogger(WroServletContextListener.class);
   /**
+   * The name of the init param used to retrieve the name of the filter. This is useful when you want to have multiple
+   * filter declarations and a lister (of {@link WroServletContextListener} type) associated for each filter. This way
+   * you can ensure that each filter will use its own configurations.
+   * @VisibleForTesting
+   */
+  static final String INIT_PARAM_NAME = "name";
+  /**
+   * Default value of the name init param. This one is used when no value is defined.
+   */
+  static final String DEFAULT_NAME = "default";
+  /**
    * {@link ServletContext} where the attributes are stored.
    */
   private ServletContext servletContext;
@@ -33,7 +45,7 @@ public class ServletContextAttributeHelper {
    * Supported attributes.
    */
   public static enum Attribute {
-    CONFIGURATION(WroConfiguration.class), WRO_MANAGER_FACTORY(WroManagerFactory.class);
+    CONFIGURATION(WroConfiguration.class), MANAGER_FACTORY(WroManagerFactory.class);
     private Class<?> type;
     
     private Attribute(final Class<?> type) {
@@ -52,7 +64,17 @@ public class ServletContextAttributeHelper {
    * Uses default name for storing/retrieving attributes in {@link ServletContext}.
    */
   public ServletContextAttributeHelper(final ServletContext servletContext) {
-    this(servletContext, WroServletContextListener.DEFAULT_LISTENER_NAME);
+    this(servletContext, DEFAULT_NAME);
+  }
+  
+  /**
+   * Factory method which uses default name for storing/retrieving attributes in {@link ServletContext}.
+   */
+  public static ServletContextAttributeHelper create(final FilterConfig filterConfig) {
+    Validate.notNull(filterConfig);
+    final String nameFromParam = filterConfig.getInitParameter(INIT_PARAM_NAME);
+    final String name = nameFromParam != null ? nameFromParam : DEFAULT_NAME;
+    return new ServletContextAttributeHelper(filterConfig.getServletContext(), name);
   }
   
   /**
@@ -65,7 +87,7 @@ public class ServletContextAttributeHelper {
    */
   public ServletContextAttributeHelper(final ServletContext servletContext, final String name) {
     Validate.notNull(servletContext);
-    Validate.notNull(name);
+    Validate.notBlank(name);
     this.servletContext = servletContext;
     this.name = name;
     LOG.debug("initializing attributeHelper named: {}", name);
@@ -110,5 +132,13 @@ public class ServletContextAttributeHelper {
     for (Attribute attribute : Attribute.values()) {
       servletContext.removeAttribute(getAttributeName(attribute));
     }
+  }
+  
+  /**
+   * @VisibleForTesting
+   * @return the name of the listener used by this helper.
+   */
+  final String getName() {
+    return name;
   }
 }

@@ -38,7 +38,6 @@ import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFacto
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
@@ -75,7 +74,6 @@ public class WroFilter
    * API - reload model method call
    */
   public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
-
   /**
    * Filter config.
    */
@@ -139,11 +137,10 @@ public class WroFilter
   private WroConfiguration createConfiguration() {
     // Extract config from servletContext (if already configured)
     //TODO use a named helper
-    final WroConfiguration configAttribute = (WroConfiguration) new ServletContextAttributeHelper(
-        this.filterConfig.getServletContext()).getAttribute(Attribute.CONFIGURATION);
+    final WroConfiguration configAttribute = (WroConfiguration) ServletContextAttributeHelper.create(filterConfig).getAttribute(
+        Attribute.CONFIGURATION);
     return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
   }
-
 
   /**
    * Creates {@link WroManagerFactory}.
@@ -151,10 +148,12 @@ public class WroFilter
   private WroManagerFactory createWroManagerFactory() {
     if (this.wroManagerFactory == null) {
       //TODO use a named helper
-      final WroManagerFactory managerFactoryAttribute = (WroManagerFactory) new ServletContextAttributeHelper(
-          this.filterConfig.getServletContext()).getAttribute(Attribute.WRO_MANAGER_FACTORY);
-      return managerFactoryAttribute != null ? managerFactoryAttribute : getWroManagerFactory();
+      final WroManagerFactory managerFactoryAttribute = (WroManagerFactory) ServletContextAttributeHelper.create(
+          filterConfig).getAttribute(Attribute.MANAGER_FACTORY);
+      LOG.debug("managerFactory attribute: {}", managerFactoryAttribute);
+      return managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
     }
+    LOG.debug("created managerFactory: {}", wroManagerFactory);
     return this.wroManagerFactory;
   }
 
@@ -425,12 +424,20 @@ public class WroFilter
     this.wroManagerFactory = wroManagerFactory;
   }
 
+  /**
+   * @VisibleForTesting
+   * @return configured {@link WroManagerFactory} instance.
+   */
+  final WroManagerFactory getWroManagerFactory() {
+    return this.wroManagerFactory;
+  }
+
 
   /**
    * Factory method for {@link WroManagerFactory}.
    * <p/>
    * Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
-   * is found a default implentation is used.
+   * is found a default implementation is used.
    * </p>
    * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
    * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
@@ -438,29 +445,14 @@ public class WroFilter
    *
    * @return {@link WroManagerFactory} instance.
    */
-  protected WroManagerFactory getWroManagerFactory() {
-    return new DefaultWroManagerFactory(wroConfiguration) {
-      @Override
-      protected WroManagerFactory newManagerFactory() {
-        return WroFilter.this.newWroManagerFactory();
-      }
-    };
-  }
-
-  /**
-   * @return default implementation of {@link WroManagerFactory} when none is provided explicitly through
-   *         wroConfiguration option.
-   * @deprecated use {@link WroFilter#getWroManagerFactory()} or use an alternative way of configuring
-   *            {@link WroManagerFactory}, like through {@link WroConfiguration} or using
-   *            {@link WroServletContextListener}.
-   */
   protected WroManagerFactory newWroManagerFactory() {
-    return new BaseWroManagerFactory();
+    return new DefaultWroManagerFactory(wroConfiguration);
   }
 
 
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.
+   * @VisibleForTesting
    */
   public final WroConfiguration getWroConfiguration() {
     return this.wroConfiguration;

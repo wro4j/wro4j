@@ -26,7 +26,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 public class WroServletContextListener
     implements ServletContextListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroServletContextListener.class);
-  public static final String DEFAULT_LISTENER_NAME = "default";
   private WroConfiguration configuration;
   private WroManagerFactory managerFactory;
   private ServletContext servletContext;
@@ -54,7 +53,7 @@ public class WroServletContextListener
     LOG.debug("Loaded managerFactory: {}", this.managerFactory.getClass());
     
     attributeHelper.setAttribute(Attribute.CONFIGURATION, this.configuration);
-    attributeHelper.setAttribute(Attribute.WRO_MANAGER_FACTORY, this.managerFactory);
+    attributeHelper.setAttribute(Attribute.MANAGER_FACTORY, this.managerFactory);
   }
   
   /**
@@ -107,7 +106,7 @@ public class WroServletContextListener
    *         listener.
    */
   protected String getListenerName() {
-    return DEFAULT_LISTENER_NAME;
+    return ServletContextAttributeHelper.DEFAULT_NAME;
   }
   
   /**

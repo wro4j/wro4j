@@ -1,5 +1,6 @@
 package ro.isdc.wro.http;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
 import junit.framework.Assert;
@@ -10,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -21,11 +21,14 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 public class TestServletContextAttributeHelper {
   @Mock
   private ServletContext mockServletContext;
+  @Mock
+  private FilterConfig mockFilterConfig;
   private ServletContextAttributeHelper victim;
   
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     victim = new ServletContextAttributeHelper(mockServletContext, "value");
   }
   
@@ -37,6 +40,16 @@ public class TestServletContextAttributeHelper {
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullNameArgument() {
     victim = new ServletContextAttributeHelper(mockServletContext, null);
+  }
+  
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotAcceptEmptyNameArgument() {
+    victim = new ServletContextAttributeHelper(mockServletContext, "");
+  }
+  
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotAcceptBlankNameArgument() {
+    victim = new ServletContextAttributeHelper(mockServletContext, "   ");
   }
   
   @Test(expected = NullPointerException.class)
@@ -70,7 +83,7 @@ public class TestServletContextAttributeHelper {
   
   @Test(expected = IllegalArgumentException.class)
   public void cannotStoreAttributeOfInvalidType() {
-    victim.setAttribute(Attribute.WRO_MANAGER_FACTORY, "invalid type");
+    victim.setAttribute(Attribute.MANAGER_FACTORY, "invalid type");
   }
   
   @Test
@@ -78,9 +91,34 @@ public class TestServletContextAttributeHelper {
     victim.setAttribute(Attribute.CONFIGURATION, new WroConfiguration());
   }
   
-
   @Test
   public void shouldStoreAttributeOfValidSubType() {
-    victim.setAttribute(Attribute.WRO_MANAGER_FACTORY, new BaseWroManagerFactory());
+    victim.setAttribute(Attribute.MANAGER_FACTORY, new BaseWroManagerFactory());
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotUseNullFilterConfig() {
+    ServletContextAttributeHelper.create(null);
+  }
+  
+  @Test
+  public void shouldCreateInstanceWhenValidFilterNameIsProvided() {
+    final String filterName = "name";
+    Mockito.when(mockFilterConfig.getInitParameter(ServletContextAttributeHelper.INIT_PARAM_NAME)).thenReturn(filterName);
+    victim = ServletContextAttributeHelper.create(mockFilterConfig);
+    Assert.assertEquals(filterName, victim.getName());
+  }
+  
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldFailWhenInitParamNameIsBlank() {
+    Mockito.when(mockFilterConfig.getInitParameter(ServletContextAttributeHelper.INIT_PARAM_NAME)).thenReturn("  ");
+    victim = ServletContextAttributeHelper.create(mockFilterConfig);
+  }
+  
+  @Test
+  public void shouldUseDefaultNameWhenInitParamNameIsNull() {
+    Mockito.when(mockFilterConfig.getInitParameter(ServletContextAttributeHelper.INIT_PARAM_NAME)).thenReturn(null);
+    victim = ServletContextAttributeHelper.create(mockFilterConfig);
+    Assert.assertEquals(ServletContextAttributeHelper.DEFAULT_NAME, victim.getName());
   }
 }

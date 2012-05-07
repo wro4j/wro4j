@@ -9,7 +9,10 @@
   <listener>
     <listener-class>ro.isdc.wro.examples.guice.WroGuiceListener</listener-class>
   </listener>
-
+  
+  <listener>
+    <listener-class>ro.isdc.wro.http.WroServletContextListener</listener-class>
+  </listener>
 
   <filter>
     <filter-name>guiceFilter</filter-name>
