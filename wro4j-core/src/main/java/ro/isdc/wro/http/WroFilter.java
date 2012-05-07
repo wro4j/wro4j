@@ -36,6 +36,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
@@ -120,22 +121,41 @@ public class WroFilter
   public final void init(final FilterConfig config)
     throws ServletException {
     this.filterConfig = config;
-    wroConfiguration = newWroConfigurationFactory().create();
-    initWroManagerFactory();
+    this.wroConfiguration = createConfiguration();
+    this.wroManagerFactory = createWroManagerFactory();
+    createWroManagerFactory();
     initHeaderValues();
     registerChangeListeners();
     initJMX();
     doInit(config);
   }
 
+  /**
+   * Creates configuration by looking up in servletContext attributes. If none is found, a new one will be created using
+   * the configuration factory.
+   * 
+   * @return {@link WroConfiguration} object.
+   */
+  private WroConfiguration createConfiguration() {
+    // Extract config from servletContext (if already configured)
+    //TODO use a named helper
+    final WroConfiguration configAttribute = (WroConfiguration) new ServletContextAttributeHelper(
+        this.filterConfig.getServletContext()).getAttribute(Attribute.CONFIGURATION);
+    return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
+  }
+
 
   /**
-   * Initialize {@link WroManagerFactory}.
+   * Creates {@link WroManagerFactory}.
    */
-  private void initWroManagerFactory() {
+  private WroManagerFactory createWroManagerFactory() {
     if (this.wroManagerFactory == null) {
-      this.wroManagerFactory = getWroManagerFactory();
+      //TODO use a named helper
+      final WroManagerFactory managerFactoryAttribute = (WroManagerFactory) new ServletContextAttributeHelper(
+          this.filterConfig.getServletContext()).getAttribute(Attribute.WRO_MANAGER_FACTORY);
+      return managerFactoryAttribute != null ? managerFactoryAttribute : getWroManagerFactory();
     }
+    return this.wroManagerFactory;
   }
 
   /**
