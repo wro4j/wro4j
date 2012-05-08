@@ -6,6 +6,7 @@ package ro.isdc.wro.extensions.http;
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 
 import junit.framework.Assert;
 
@@ -34,19 +35,22 @@ import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactor
 public class TestConfigurableWroFilter {
   private static final Logger LOG = LoggerFactory.getLogger(TestConfigurableWroFilter.class);
   @Mock
-  private FilterConfig filterConfig;
+  private FilterConfig mockFilterConfig;
+  @Mock
+  private ServletContext mockServletContext;
   private ConfigurableWroFilter filter = null;
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     final ApplicationContext ctx = new ClassPathXmlApplicationContext("configurableWroFilter-context.xml");
     filter = (ConfigurableWroFilter)ctx.getBean("filter");
   }
 
   @Test
   public void shouldBeConfiguredBySpring() throws Exception {
-    filter.init(filterConfig);
+    filter.init(mockFilterConfig);
     final WroConfiguration config = filter.getWroConfiguration();
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(20, config.getModelUpdatePeriod());
@@ -67,7 +71,7 @@ public class TestConfigurableWroFilter {
   /**
    * To be reused by test from extensions module.
    */
-  public static void genericProcessorNameConfigurationTest(final String processorName)
+  public void genericProcessorNameConfigurationTest(final String processorName)
       throws Exception {
     final ThreadLocal<Exception> processorsCreationException = new ThreadLocal<Exception>();
     try {
@@ -87,8 +91,9 @@ public class TestConfigurableWroFilter {
       final Properties properties = new Properties();
       properties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, processorName);
       filter.setProperties(properties);
-      filter.init(Mockito.mock(FilterConfig.class));
+      filter.init(mockFilterConfig);
     } catch (final Exception e) {
+      LOG.error("exception occured", e);
       Assert.fail("Shouldn't fail with exception " + e.getMessage());
     }
     if (processorsCreationException.get() != null) {

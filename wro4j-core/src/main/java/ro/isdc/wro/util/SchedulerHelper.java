@@ -106,10 +106,6 @@ public class SchedulerHelper {
     return this;
   }
 
-  /**
-   * @param period
-   * @param timeUnit
-   */
   private synchronized void startScheduler(final long period, final TimeUnit timeUnit) {
     // let the running task to finish its job.
     cancelRunningTask();

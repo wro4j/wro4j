@@ -34,7 +34,6 @@ public class TestPropertyWroConfigurationFactory {
 
   @Test
   public void createDefaultConfig() {
-    factory.setProperties(null);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertNotNull(config);
@@ -58,9 +57,9 @@ public class TestPropertyWroConfigurationFactory {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheGzippedContent.name(), "INVALID_BOOLEAN");
     
-    factory.setProperties(props);
+    factory = new PropertyWroConfigurationFactory(props);
     final WroConfiguration config = factory.create();
-    
+
     Assert.assertEquals(false, config.isCacheGzippedContent());
   }
 
@@ -75,7 +74,9 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.parallelPreprocessing.name(), "true");
     props.setProperty(ConfigConstants.ignoreEmptyGroup.name(), "false");
     props.setProperty(ConfigConstants.connectionTimeout.name(), "5000");
-    factory.setProperties(props);
+    
+    factory = new PropertyWroConfigurationFactory(props);
+
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
@@ -93,7 +94,9 @@ public class TestPropertyWroConfigurationFactory {
   public void cannotAcceptInvalidLong() {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "INVALID_LONG");
-    factory.setProperties(props);
+    
+    factory = new PropertyWroConfigurationFactory(props);
+    
     factory.create();
   }
   
@@ -102,7 +105,9 @@ public class TestPropertyWroConfigurationFactory {
     final Properties props = new Properties();
     //The value is not a valid integer
     props.setProperty(ConfigConstants.connectionTimeout.name(), "9999999999999999999");
-    factory.setProperties(props);
+    
+    factory = new PropertyWroConfigurationFactory(props);
+    
     factory.create();
   }
 }

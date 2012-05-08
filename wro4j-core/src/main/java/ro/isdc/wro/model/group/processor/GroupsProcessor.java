@@ -64,8 +64,6 @@ public class GroupsProcessor {
       // find processed result for a group
       final WroModel model = modelFactory.create();
       final Group group = model.getGroupByName(cacheKey.getGroupName());
-      // mark this group as used.
-      group.markAsUsed();
       final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
       if (filteredGroup.getResources().isEmpty()) {
         LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());

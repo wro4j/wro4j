@@ -61,7 +61,6 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   @Override
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
-    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
     if (properties == null) {
       //when no
       properties = new Properties();
@@ -78,7 +77,7 @@ public class ConfigurableWroFilter extends WroFilter {
         properties.setProperty(ConfigConstants.mbeanName.name(), mbeanName);  
       }
     }
-    factory.setProperties(properties);
+    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(properties);
     return factory;
   }
   

@@ -37,7 +37,7 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -73,7 +73,6 @@ public class WroFilter
    * API - reload model method call
    */
   public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
-
   /**
    * Filter config.
    */
@@ -119,22 +118,41 @@ public class WroFilter
   public final void init(final FilterConfig config)
     throws ServletException {
     this.filterConfig = config;
-    wroConfiguration = newWroConfigurationFactory().create();
-    initWroManagerFactory();
+    this.wroConfiguration = createConfiguration();
+    this.wroManagerFactory = createWroManagerFactory();
+    createWroManagerFactory();
     initHeaderValues();
     registerChangeListeners();
     initJMX();
     doInit(config);
   }
 
+  /**
+   * Creates configuration by looking up in servletContext attributes. If none is found, a new one will be created using
+   * the configuration factory.
+   * 
+   * @return {@link WroConfiguration} object.
+   */
+  private WroConfiguration createConfiguration() {
+    // Extract config from servletContext (if already configured)
+    //TODO use a named helper
+    final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
+    LOG.debug("config attribute: {}", configAttribute);
+    return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
+  }
 
   /**
-   * Initialize {@link WroManagerFactory}.
+   * Creates {@link WroManagerFactory}.
    */
-  private void initWroManagerFactory() {
+  private WroManagerFactory createWroManagerFactory() {
     if (this.wroManagerFactory == null) {
-      this.wroManagerFactory = getWroManagerFactory();
+      //TODO use a named helper
+      final WroManagerFactory managerFactoryAttribute = ServletContextAttributeHelper.create(filterConfig).getManagerFactory();
+      LOG.debug("managerFactory attribute: {}", managerFactoryAttribute);
+      return managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
     }
+    LOG.debug("created managerFactory: {}", wroManagerFactory);
+    return this.wroManagerFactory;
   }
 
   /**
@@ -404,12 +422,20 @@ public class WroFilter
     this.wroManagerFactory = wroManagerFactory;
   }
 
+  /**
+   * @VisibleForTesting
+   * @return configured {@link WroManagerFactory} instance.
+   */
+  final WroManagerFactory getWroManagerFactory() {
+    return this.wroManagerFactory;
+  }
+
 
   /**
    * Factory method for {@link WroManagerFactory}.
    * <p/>
    * Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
-   * is found a default implentation is used.
+   * is found a default implementation is used.
    * </p>
    * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
    * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
@@ -417,35 +443,14 @@ public class WroFilter
    *
    * @return {@link WroManagerFactory} instance.
    */
-  protected WroManagerFactory getWroManagerFactory() {
-    if (StringUtils.isEmpty(wroConfiguration.getWroManagerClassName())) {
-      // If no context param was specified we return the default factory
-      return newWroManagerFactory();
-    } else {
-      // Try to find the specified factory class
-      Class<?> factoryClass = null;
-      try {
-        factoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-          wroConfiguration.getWroManagerClassName());
-        // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
-      } catch (final Exception e) {
-        throw new WroRuntimeException("Exception while loading WroManagerFactory class", e);
-      }
-    }
-  }
-
-  /**
-   * @return default implementation of {@link WroManagerFactory} when none is provided explicitly through
-   *         wroConfiguration option.
-   */
   protected WroManagerFactory newWroManagerFactory() {
-    return new BaseWroManagerFactory();
+    return new DefaultWroManagerFactory(wroConfiguration);
   }
 
 
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.
+   * @VisibleForTesting
    */
   public final WroConfiguration getWroConfiguration() {
     return this.wroConfiguration;
