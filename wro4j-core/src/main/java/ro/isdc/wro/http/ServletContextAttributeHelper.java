@@ -20,33 +20,38 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
  * <p/>
  * Usage scenario:
  * <ul>
- *   <li>
- *     When there is a single {@link WroFilter} configured in web.xml. In order to retrieve/store attributes in servlet context use:
- *     <pre>
- *       ServletContextAttributeHelper helper = new ServletContextAttributeHelper(servletContext);
- *       WroConfiguration config = helper.getWroConfiguration();
- *       WroManagerFactory managerFactory = helper.getManagerFactory();
- *     </pre>
- *   </li>
- *   <li>
- *     When there are multiple {@link WroFilter} configurations in web.xml (each should have a dedicated listener extended form {@link WroServletContextListener}).
- *     In order to retrieve/store attributes in servlet context use:
- *     <pre>
- *       String name = ..//the name of the filter (extracted from init-param called name). 
- *       ServletContextAttributeHelper helper = new ServletContextAttributeHelper(servletContext, name);
- *       WroConfiguration config = helper.getWroConfiguration();
- *       WroManagerFactory managerFactory = helper.getManagerFactory();
- *     </pre>
- *   </li>
- *   <li>
- *     When there are multiple {@link WroFilter} configurations in web.xml, you can retrieve/store attributes from within a filter using:
- *     <pre>
- *       ServletContextAttributeHelper helper = ServletContextAttributeHelper.create(filterConfig);
- *       WroConfiguration config = helper.getWroConfiguration();
- *       WroManagerFactory managerFactory = helper.getManagerFactory();
- *     </pre>
- *     This example is similar to previous, except that the name of the filter will be extracted in the factory method.
- *   </li>      
+ * <li>This is the most common use-case, when there is a single {@link WroFilter} and a
+ * {@link WroServletContextListener} configured in web.xml. In order to retrieve/store attributes in servlet context
+ * use:
+ * 
+ * <pre>
+ * {@link ServletContextAttributeHelper} helper = new {@link ServletContextAttributeHelper}(servletContext);
+ * {@link WroConfiguration} config = helper.getWroConfiguration();
+ * {@link WroManagerFactory} managerFactory = helper.getManagerFactory();
+ * </pre>
+ * 
+ * </li>
+ * <li>When there are multiple {@link WroFilter} configurations in web.xml (each should have a dedicated listener
+ * extended form {@link WroServletContextListener}). In order to retrieve/store attributes in servlet context use:
+ * 
+ * <pre>
+ *       String name = ..//the name of the filter (defined in init-param called name). 
+ *       {@link ServletContextAttributeHelper} helper = new {@link ServletContextAttributeHelper}(servletContext, name);
+ *       {@link WroConfiguration} config = helper.getWroConfiguration();
+ *       {@link WroManagerFactory} managerFactory = helper.getManagerFactory();
+ * </pre>
+ * 
+ * </li>
+ * <li>When there are multiple {@link WroFilter} configurations in web.xml, you can retrieve/store attributes from
+ * within a filter using:
+ * 
+ * <pre>
+ * {@link ServletContextAttributeHelper} helper = {@link ServletContextAttributeHelper}.create(filterConfig);
+ * {@link WroConfiguration} config = helper.getWroConfiguration();
+ * {@link WroManagerFactory} managerFactory = helper.getManagerFactory();
+ * </pre>
+ * 
+ * This example is similar to previous, except that the name of the filter will be extracted in the factory method.</li>
  * </ul>
  * 
  * @author Alex Objelean

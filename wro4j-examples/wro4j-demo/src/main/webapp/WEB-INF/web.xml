@@ -13,7 +13,7 @@
   <listener>
     <listener-class>ro.isdc.wro.http.WroServletContextListener</listener-class>
   </listener>
-
+  
   <filter>
     <filter-name>guiceFilter</filter-name>
     <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
@@ -28,10 +28,19 @@
     <filter-name>lessFilter</filter-name>
     <filter-class>ro.isdc.wro.extensions.http.LessCssFilter</filter-class>
   </filter>
-
-  <filter-mapping>
+    <filter-mapping>
     <filter-name>lessFilter</filter-name>
     <url-pattern>*.less</url-pattern>
+  </filter-mapping>
+  
+  
+  <filter>
+    <filter-name>coffeeScriptFilter</filter-name>
+    <filter-class>ro.isdc.wro.extensions.http.CoffeeScriptFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>coffeeScriptFilter</filter-name>
+    <url-pattern>*.coffee</url-pattern>
   </filter-mapping>  
   
 

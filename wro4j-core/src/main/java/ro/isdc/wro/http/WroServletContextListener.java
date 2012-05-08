@@ -16,7 +16,8 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
  * A listener which loads wroConfiguration and stores it in servletContext. If you want to have multiple listeners,
- * extend this class and override the {@link WroServletContextListener#getListenerName()} to provide a unique name.
+ * extend this class and override the {@link WroServletContextListener#getListenerName()} to provide a unique non-empty
+ * name (defaulted to "default").
  * 
  * @author Alex Objelean
  * @created 6 May 2012
@@ -42,7 +43,8 @@ public class WroServletContextListener
   private void initListener(final ServletContext servletContext) {
     if (attributeHelper.getWroConfiguration() != null || attributeHelper.getManagerFactory() != null) {
       final String message = "Cannot initialize context because there is already a listener present - withName: "
-          + getListenerName() + ". Check whether you have multiple listener* definitions in your web.xml!";
+          + getListenerName()
+          + ". Check whether you have multiple listener* (of type WroServletContextListener) definitions in your web.xml!";
       LOG.error(message);
       throw new IllegalStateException(message);
     }
