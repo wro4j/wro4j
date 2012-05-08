@@ -1,4 +1,4 @@
-package ro.isdc.wro.http;
+package ro.isdc.wro.http.support;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.http.WroServletContextListener;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
@@ -70,7 +72,7 @@ public class ServletContextAttributeHelper {
   /**
    * Default value of the name init param. This one is used when no value is defined.
    */
-  static final String DEFAULT_NAME = "default";
+  public static final String DEFAULT_NAME = "default";
   /**
    * {@link ServletContext} where the attributes are stored.
    */
