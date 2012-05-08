@@ -1,4 +1,4 @@
-package ro.isdc.wro.http;
+package ro.isdc.wro.http.support;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -12,8 +12,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
+import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.http.support.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
  * @author Alex Objelean
@@ -120,5 +122,28 @@ public class TestServletContextAttributeHelper {
     Mockito.when(mockFilterConfig.getInitParameter(ServletContextAttributeHelper.INIT_PARAM_NAME)).thenReturn(null);
     victim = ServletContextAttributeHelper.create(mockFilterConfig);
     Assert.assertEquals(ServletContextAttributeHelper.DEFAULT_NAME, victim.getName());
+  }
+  
+
+  @Test
+  public void shouldLoadWroConfigurationFromServletContextAttribute() throws Exception {
+    WroFilter filter = new WroFilter();
+    final WroConfiguration expectedConfig = new WroConfiguration();
+    ServletContextAttributeHelper helper = new ServletContextAttributeHelper(mockServletContext);
+    Mockito.when(mockServletContext.getAttribute(helper.getAttributeName(Attribute.CONFIGURATION))).thenReturn(expectedConfig);
+    filter.init(mockFilterConfig);
+    Assert.assertSame(expectedConfig, filter.getWroConfiguration());
+  }
+  
+  @Test
+  public void shouldLoadWroManagerFactoryFromServletContextAttribute() throws Exception {
+    WroFilter filter = new WroFilter();
+    final WroManagerFactory expectedManagerFactory = new BaseWroManagerFactory();
+    ServletContextAttributeHelper helper = new ServletContextAttributeHelper(mockServletContext);
+    Mockito.when(mockServletContext.getAttribute(helper.getAttributeName(Attribute.MANAGER_FACTORY))).thenReturn(expectedManagerFactory);
+    //reset it because it was initialized in test setup.
+    filter.setWroManagerFactory(null);
+    filter.init(mockFilterConfig);
+    Assert.assertSame(expectedManagerFactory, filter.getWroManagerFactory());
   }
 }
