@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.ContextPropagatingCallable;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
@@ -105,13 +106,14 @@ public class PreProcessorExecutor {
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
-      callables.add(new Callable<String>() {
+      //decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
+      callables.add(new ContextPropagatingCallable<String>(new Callable<String>() {
         public String call()
             throws Exception {
           LOG.debug("Callable started for resource: {} ...", resource);
           return applyPreProcessors(resource, minimize);
         }
-      });
+      }));
     }
     final ExecutorService exec = getExecutorService();
     final List<Future<String>> futures = new ArrayList<Future<String>>();

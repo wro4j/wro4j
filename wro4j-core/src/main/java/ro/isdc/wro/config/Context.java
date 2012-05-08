@@ -3,6 +3,11 @@
  */
 package ro.isdc.wro.config;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.support.FieldsSavingRequestWrapper;
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -24,12 +32,16 @@ import ro.isdc.wro.model.resource.ResourceType;
  * @author Alex Objelean
  */
 public class Context {
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
   /**
-   * Thread local holding CURRENT context. This instance is of {@link InheritableThreadLocal} type because the
-   * {@link Context} should be accessible from within new threads created by executor (ex: when parallelPreprocessing is
-   * set to true).
+   * Maps correlationId with a Context.
    */
-  private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
+  private static final Map<String, Context> CONTEXT_MAP = Collections.synchronizedMap(new HashMap<String, Context>());
+  /**
+   * Holds a correlationId, created in {@link WroFilter}. A correlationId will be associated with a {@link Context}
+   * object.
+   */
+  private static ThreadLocal<String> CORRELATION_ID = new ThreadLocal<String>();
   private WroConfiguration config;
   /**
    * Request.
@@ -93,14 +105,17 @@ public class Context {
    */
   public static Context get() {
     validateContext();
-    return CURRENT.get();
+    final String correlationId = CORRELATION_ID.get();
+    LOG.debug("correlationId: {}", correlationId);
+    LOG.debug("contextMap: {}", CONTEXT_MAP);
+    return CONTEXT_MAP.get(correlationId);
   }
 
   /**
    * @return true if the call is done during wro4j request cycle. In other words, if the context is set.
    */
   public static boolean isContextSet() {
-    return CURRENT.get() != null;
+    return CORRELATION_ID.get() != null && CONTEXT_MAP.get(CORRELATION_ID.get()) != null;
   }
 
 
@@ -108,12 +123,14 @@ public class Context {
    * Checks if the {@link Context} is accessible from current request cycle.
    */
   private static void validateContext() {
-    if (CURRENT.get() == null) {
+    if (!isContextSet()) {
       throw new WroRuntimeException("No context associated with CURRENT request cycle!");
     }
   }
 
-
+  /**
+   * Set a context with default configuration to current thread.
+   */
   public static void set(final Context context) {
     set(context, new WroConfiguration());
   }
@@ -127,8 +144,18 @@ public class Context {
   public static void set(final Context context, final WroConfiguration config) {
     Validate.notNull(context);
     Validate.notNull(config);
-    CURRENT.set(context);
-    CURRENT.get().setConfig(config);
+    context.setConfig(config);
+
+    final String correlationId = generateCorrelationId();
+    CORRELATION_ID.set(correlationId);
+    CONTEXT_MAP.put(correlationId, context);
+  }
+  
+  /**
+   * @return a string representation of an unique id used to store Context in a map.
+   */
+  private static String generateCorrelationId() {
+    return UUID.randomUUID().toString();
   }
 
 
@@ -136,7 +163,11 @@ public class Context {
    * Remove context from the local thread.
    */
   public static void unset() {
-    CURRENT.remove();
+    final String correlationId = CORRELATION_ID.get();
+    if (correlationId != null) {
+      CONTEXT_MAP.remove(correlationId);
+    }
+    CORRELATION_ID.remove();
   }
 
 
@@ -150,6 +181,7 @@ public class Context {
    * Constructor.
    */
   private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
+    //TODO check if decorating is necessary
     this.request = new FieldsSavingRequestWrapper(request);
     this.response = response;
     this.servletContext = filterConfig != null ? filterConfig.getServletContext() : null;
@@ -215,6 +247,8 @@ public class Context {
    */
   public static void destroy() {
     unset();
+    //remove all context objects stored in map
+    CONTEXT_MAP.clear();
   }
 
 
@@ -224,5 +258,33 @@ public class Context {
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
+  /**
+   * Set the correlationId to the current thread.
+   */
+  public static void setCorrelationId(final String correlationId) {
+    Validate.notNull(correlationId);
+    CORRELATION_ID.set(correlationId);
+  }
+  
+  /**
+   * Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
+   * with the correlationId. In order to remove context, call {@link Context#unset()}.
+   * <p/>
+   * Unsetting correlationId is useful when you create child threads which needs to access the correlationId from the
+   * parent thread. This simulates the {@link InheritableThreadLocal} functionality.
+   */
+  public static void unsetCorrelationId(final String correlationId) {
+    Validate.notNull(correlationId);
+    CORRELATION_ID.set(correlationId);
+  }
+  
+  /**
+   * @return the correlationId associated with this thread.
+   */
+  public static String getCorrelationId() {
+    validateContext();
+    return CORRELATION_ID.get();
   }
 }
