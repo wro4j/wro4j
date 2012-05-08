@@ -25,11 +25,12 @@ import ro.isdc.wro.model.resource.ResourceType;
  */
 public class Context {
   /**
-   * Thread local holding CURRENT context. This instance is of {@link InheritableThreadLocal} type because threads
-   * created by this thread should be able to access the {@link Context}.
+   * Thread local holding CURRENT context. This instance is of {@link InheritableThreadLocal} type because the
+   * {@link Context} should be accessible from within new threads created by executor (ex: when parallelPreprocessing is
+   * set to true).
    */
   private static final ThreadLocal<Context> CURRENT = new InheritableThreadLocal<Context>();
-  private WroConfiguration wroConfig;
+  private WroConfiguration config;
   /**
    * Request.
    */
@@ -56,7 +57,7 @@ public class Context {
    * @return {@link WroConfiguration} singleton instance.
    */
   public WroConfiguration getConfig() {
-    return wroConfig;
+    return config;
   }
 
 
@@ -66,7 +67,7 @@ public class Context {
    * sets the {@link WroConfiguration} singleton instance.
    */
   public void setConfig(final WroConfiguration config) {
-    wroConfig = config;
+    this.config = config;
   }
 
 

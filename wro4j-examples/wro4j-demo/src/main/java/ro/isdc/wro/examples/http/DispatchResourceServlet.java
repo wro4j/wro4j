@@ -29,6 +29,7 @@ public class DispatchResourceServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
+    
     final DispatcherStreamLocator streamLocator = new DispatcherStreamLocator();
 
     //contains a merge response of combo groups content.

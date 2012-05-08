@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
-import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
@@ -115,7 +115,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     // default location is /WEB-INF/wro.properties
     final Properties props = new Properties();
     try {
-      props.load(PropertiesAndFilterConfigWroConfigurationFactory.defaultConfigPropertyStream(Context.get().getFilterConfig()));
+      return new ServletContextPropertyWroConfigurationFactory(Context.get().getServletContext()).createProperties();
     } catch (final Exception e) {
       LOG.debug("No configuration property file found.");
     }
