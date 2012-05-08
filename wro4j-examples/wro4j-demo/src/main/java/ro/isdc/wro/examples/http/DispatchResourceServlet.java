@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import ro.isdc.wro.http.ServletContextAttributeHelper;
-import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
-import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.DispatcherStreamLocator;
 

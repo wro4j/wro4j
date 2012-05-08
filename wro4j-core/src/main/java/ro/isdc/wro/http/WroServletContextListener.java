@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
@@ -41,7 +40,7 @@ public class WroServletContextListener
   }
   
   private void initListener(final ServletContext servletContext) {
-    if (attributeHelper.getAttribute(Attribute.CONFIGURATION) != null) {
+    if (attributeHelper.getWroConfiguration() != null || attributeHelper.getManagerFactory() != null) {
       final String message = "Cannot initialize context because there is already a listener present - withName: "
           + getListenerName() + ". Check whether you have multiple listener* definitions in your web.xml!";
       LOG.error(message);
@@ -52,8 +51,8 @@ public class WroServletContextListener
     this.managerFactory = createManagerFactory();
     LOG.debug("Loaded managerFactory: {}", this.managerFactory.getClass());
     
-    attributeHelper.setAttribute(Attribute.CONFIGURATION, this.configuration);
-    attributeHelper.setAttribute(Attribute.MANAGER_FACTORY, this.managerFactory);
+    attributeHelper.setWroConfiguration(this.configuration);
+    attributeHelper.setManagerFactory(this.managerFactory);
   }
   
   /**

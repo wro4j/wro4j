@@ -12,8 +12,42 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
 /**
- * Encapsulates the details of storing/retrieving attributes from {@link ServletContext} for a given named listener. Use
- * this class to retrieve wro4j related attributes, instead of hard-coding the name of the attribute to retrieve.
+ * Encapsulates the details of storing/retrieving attributes from {@link ServletContext}. <br/>
+ * This class know how to handle multiple {@link WroFilter} & {@link WroServletContextListener} configurations, by
+ * setting the attributes with a unique key computed based on provided name (using
+ * {@link ServletContextAttributeHelper#getName()}. Use this class to retrieve wro4j related attributes, instead of
+ * hard-coding the name of the attribute to retrieve.
+ * <p/>
+ * Usage scenario:
+ * <ul>
+ *   <li>
+ *     When there is a single {@link WroFilter} configured in web.xml. In order to retrieve/store attributes in servlet context use:
+ *     <pre>
+ *       ServletContextAttributeHelper helper = new ServletContextAttributeHelper(servletContext);
+ *       WroConfiguration config = helper.getWroConfiguration();
+ *       WroManagerFactory managerFactory = helper.getManagerFactory();
+ *     </pre>
+ *   </li>
+ *   <li>
+ *     When there are multiple {@link WroFilter} configurations in web.xml (each should have a dedicated listener extended form {@link WroServletContextListener}).
+ *     In order to retrieve/store attributes in servlet context use:
+ *     <pre>
+ *       String name = ..//the name of the filter (extracted from init-param called name). 
+ *       ServletContextAttributeHelper helper = new ServletContextAttributeHelper(servletContext, name);
+ *       WroConfiguration config = helper.getWroConfiguration();
+ *       WroManagerFactory managerFactory = helper.getManagerFactory();
+ *     </pre>
+ *   </li>
+ *   <li>
+ *     When there are multiple {@link WroFilter} configurations in web.xml, you can retrieve/store attributes from within a filter using:
+ *     <pre>
+ *       ServletContextAttributeHelper helper = ServletContextAttributeHelper.create(filterConfig);
+ *       WroConfiguration config = helper.getWroConfiguration();
+ *       WroManagerFactory managerFactory = helper.getManagerFactory();
+ *     </pre>
+ *     This example is similar to previous, except that the name of the filter will be extracted in the factory method.
+ *   </li>      
+ * </ul>
  * 
  * @author Alex Objelean
  * @created 7 May 2012
@@ -43,8 +77,9 @@ public class ServletContextAttributeHelper {
   
   /**
    * Supported attributes.
+   * @VisibleForTesting
    */
-  public static enum Attribute {
+  static enum Attribute {
     CONFIGURATION(WroConfiguration.class), MANAGER_FACTORY(WroManagerFactory.class);
     private Class<?> type;
     
@@ -101,15 +136,16 @@ public class ServletContextAttributeHelper {
    * @return the name of the attribute used to store in servlet context.
    * @VisibleForTesting
    */
-  String getAttributeName(final Attribute attribute) {
+  final String getAttributeName(final Attribute attribute) {
     Validate.notNull(attribute);
     return WroServletContextListener.class.getName() + "-" + attribute.name() + "-" + this.name;
   }
   
   /**
    * @return the value of the attribute stored in {@link ServletContext} for this listener.
+   * @VisibleForTesting
    */
-  public Object getAttribute(final Attribute attribute) {
+  final Object getAttribute(final Attribute attribute) {
     Validate.notNull(attribute);
     return servletContext.getAttribute(getAttributeName(attribute));
   }
@@ -131,12 +167,28 @@ public class ServletContextAttributeHelper {
   /**
    * Sets the attribute into the servlet context. The name of the attribute will be computed for you.
    */
-  public void setAttribute(final Attribute attribute, final Object object) {
+  final void setAttribute(final Attribute attribute, final Object object) {
     Validate.notNull(attribute);
     LOG.debug("setting attribute: {} with value: {}", attribute, object);
     Validate.isTrue(attribute.isValid(object), object + " is not of valid subType for attribute: " + attribute);
     servletContext.setAttribute(getAttributeName(attribute), object);
   }
+
+  /**
+   * Set the configuration object as a servletContext attribute. 
+   */
+  public void setWroConfiguration(final WroConfiguration config) {
+    setAttribute(Attribute.CONFIGURATION, config);
+  }
+  
+
+  /**
+   * Set the configuration object as a servletContext attribute. 
+   */
+  public void setManagerFactory(final WroManagerFactory managerFactory) {
+    setAttribute(Attribute.MANAGER_FACTORY, managerFactory);
+  }
+  
   
   /**
    * Remove all attributes from {@link ServletContext}.

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
-import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
