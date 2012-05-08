@@ -37,6 +37,7 @@ import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
+import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
@@ -426,7 +427,7 @@ public class WroFilter
    * @VisibleForTesting
    * @return configured {@link WroManagerFactory} instance.
    */
-  final WroManagerFactory getWroManagerFactory() {
+  public final WroManagerFactory getWroManagerFactory() {
     return this.wroManagerFactory;
   }
 

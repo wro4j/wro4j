@@ -31,7 +31,6 @@ import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -648,26 +647,6 @@ public class TestWroFilter {
       Mockito.when(request.getRequestURI()).thenReturn(requestUri);
       return request;
     }
-  }
-  
-  @Test
-  public void shouldLoadWroConfigurationFromServletContextAttribute() throws Exception {
-    final WroConfiguration expectedConfig = new WroConfiguration();
-    ServletContextAttributeHelper helper = new ServletContextAttributeHelper(mockServletContext);
-    Mockito.when(mockServletContext.getAttribute(helper.getAttributeName(Attribute.CONFIGURATION))).thenReturn(expectedConfig);
-    filter.init(mockFilterConfig);
-    Assert.assertSame(expectedConfig, filter.getWroConfiguration());
-  }
-  
-  @Test
-  public void shouldLoadWroManagerFactoryFromServletContextAttribute() throws Exception {
-    final WroManagerFactory expectedManagerFactory = new BaseWroManagerFactory();
-    ServletContextAttributeHelper helper = new ServletContextAttributeHelper(mockServletContext);
-    Mockito.when(mockServletContext.getAttribute(helper.getAttributeName(Attribute.MANAGER_FACTORY))).thenReturn(expectedManagerFactory);
-    //reset it because it was initialized in test setup.
-    filter.setWroManagerFactory(null);
-    filter.init(mockFilterConfig);
-    Assert.assertSame(expectedManagerFactory, filter.getWroManagerFactory());
   }
   
   @After
