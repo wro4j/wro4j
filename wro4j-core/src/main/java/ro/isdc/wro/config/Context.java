@@ -274,9 +274,8 @@ public class Context {
    * Unsetting correlationId is useful when you create child threads which needs to access the correlationId from the
    * parent thread. This simulates the {@link InheritableThreadLocal} functionality.
    */
-  public static void unsetCorrelationId(final String correlationId) {
-    Validate.notNull(correlationId);
-    CORRELATION_ID.set(correlationId);
+  public static void unsetCorrelationId() {
+    CORRELATION_ID.remove();
   }
   
   /**
