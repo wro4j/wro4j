@@ -27,7 +27,7 @@ public class ContextPropagatingCallable<T>
     try {
       return decorated.call();
     } finally {
-      Context.unsetCorrelationId(correlationId);
+      Context.unsetCorrelationId();
     }
   }
 }
