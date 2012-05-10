@@ -9,8 +9,10 @@ import java.io.InputStream;
 /**
  * Apply JsHint script checking utility.
  * <p/>
- * Using untagged version (commited: 2012-03-28 22:19:31)
- *
+ * Using untagged version (commited: 2012-05-08 08:39:11). <br/>
+ * The jshint script was slightly modified, by removing the part where the arguments are processed, since it is not
+ * used.
+ * 
  * @author Alex Objelean
  * @since 1.3.5
  */

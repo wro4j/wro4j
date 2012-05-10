@@ -6,7 +6,9 @@
 
   opposite = true;
 
-  if (opposite) number = -42;
+  if (opposite) {
+    number = -42;
+  }
 
   square = function(x) {
     return x * x;
@@ -28,7 +30,9 @@
     return print(winner, runners);
   };
 
-  if (typeof elvis !== "undefined" && elvis !== null) alert("I knew it!");
+  if (typeof elvis !== "undefined" && elvis !== null) {
+    alert("I knew it!");
+  }
 
   cubes = (function() {
     var _i, _len, _results;

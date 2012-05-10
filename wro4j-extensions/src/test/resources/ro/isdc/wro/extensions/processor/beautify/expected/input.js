@@ -19,18 +19,18 @@
             }, d.interval);
         }, k = function(a, b) {
             return b.hoverIntent_t = clearTimeout(b.hoverIntent_t), b.hoverIntent_s = 0, d.out.apply(b, [ a ]);
-        }, l = function(a) {
-            var b = (a.type == "mouseover" ? a.fromElement : a.toElement) || a.relatedTarget;
-            while (b && b != this) try {
-                b = b.parentNode;
-            } catch (c) {
-                b = this;
+        }, l = function(b) {
+            var c = (b.type == "mouseover" ? b.fromElement : b.toElement) || b.relatedTarget;
+            while (c && c != this) try {
+                c = c.parentNode;
+            } catch (a) {
+                c = this;
             }
-            if (b == this) return !1;
-            var e = jQuery.extend({}, a), f = this;
-            f.hoverIntent_t && (f.hoverIntent_t = clearTimeout(f.hoverIntent_t)), a.type == "mouseover" ? (g = e.pageX, h = e.pageY, c(f).bind("mousemove", i), f.hoverIntent_s != 1 && (f.hoverIntent_t = setTimeout(function() {
+            if (c == this) return !1;
+            var e = jQuery.extend({}, b), f = this;
+            f.hoverIntent_t && (f.hoverIntent_t = clearTimeout(f.hoverIntent_t)), b.type == "mouseover" ? (g = e.pageX, h = e.pageY, a(f).bind("mousemove", i), f.hoverIntent_s != 1 && (f.hoverIntent_t = setTimeout(function() {
                 j(e, f);
-            }, d.interval))) : (c(f).unbind("mousemove", i), f.hoverIntent_s == 1 && (f.hoverIntent_t = setTimeout(function() {
+            }, d.interval))) : (a(f).unbind("mousemove", i), f.hoverIntent_s == 1 && (f.hoverIntent_t = setTimeout(function() {
                 k(e, f);
             }, d.timeout)));
         };
