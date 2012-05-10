@@ -24,7 +24,7 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.2.1-pre</code> (commited at 2012-03-03 20:52:43)
+ * The underlying implementation use the coffee-script version <code>1.3.1</code> 
  * project: {@link https ://github.com/jashkenas/coffee-script}.
  *
  * @author Alex Objelean
