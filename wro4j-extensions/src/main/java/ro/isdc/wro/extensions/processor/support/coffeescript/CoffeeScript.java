@@ -34,7 +34,7 @@ public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
   private String[] options;
   private ScriptableObject scope;
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.js";
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.min.js";
   /**
    * Initialize script builder for evaluation.
    */
