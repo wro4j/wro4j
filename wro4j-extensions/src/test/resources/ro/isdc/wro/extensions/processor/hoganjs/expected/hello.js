@@ -1,0 +1,1 @@
+function(c,p,i){var _=this;_.b(i=i||"");_.b("Hello ");_.b(_.v(_.f("name",c,p,0)));_.b("! You have ");_.b(_.v(_.f("count",c,p,0)));_.b(" new messages.");_.b("\n");return _.fl();;}
