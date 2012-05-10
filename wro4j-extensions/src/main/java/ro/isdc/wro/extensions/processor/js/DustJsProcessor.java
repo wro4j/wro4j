@@ -1,19 +1,16 @@
 package ro.isdc.wro.extensions.processor.js;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.dustjs.DustJs;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * A processor for dustJs template framework. Uses <a href="http://akdubya.github.com/dustjs/">dustjs</a> library to
@@ -23,8 +20,8 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.5
  * @created 8 Mar 2012
  */
-public class DustJsProcessor implements ResourcePreProcessor, ResourcePostProcessor {
-  public static final String ALIAS = "DustJs";
+public class DustJsProcessor implements ResourcePreProcessor {
+  public static final String ALIAS = "dustJs";
 
   private final ObjectPoolHelper<DustJs> enginePool;
 
@@ -35,14 +32,6 @@ public class DustJsProcessor implements ResourcePreProcessor, ResourcePostProces
         return new DustJs();
       }
     });
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void process(Reader reader, Writer writer) throws IOException {
-    process(null, reader, writer);
   }
 
   /**
