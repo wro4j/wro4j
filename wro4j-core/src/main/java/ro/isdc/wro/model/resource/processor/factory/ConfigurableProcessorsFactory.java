@@ -4,13 +4,13 @@
 package ro.isdc.wro.model.resource.processor.factory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -112,6 +112,7 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    * @param map mapping between items and its implementations.
    * @return a list of items (processors).
    */
+  @SuppressWarnings("unchecked")
   public static <T> List<T> getListOfItems(final String itemsAsString, final Map<String, T> map) {
     LOG.debug("itemsAsString: " + itemsAsString);
     final List<T> list = new ArrayList<T>();
@@ -124,16 +125,15 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
 
         //extension check
         LOG.debug("[FAIL] no processor found named: {}. Proceeding with extension check. ", tokenName);
-        final String[] tokens = tokenName.split("\\.");
-        LOG.debug("split tokens: {}", Arrays.toString(tokens));
-        if (tokens.length == 2) {
-          final String processorName = tokens[0].trim();
+        final String extension = FilenameUtils.getExtension(tokenName);
+        boolean hasExtension = !StringUtils.isEmpty(extension);
+        if (hasExtension) {
+          final String processorName = FilenameUtils.getBaseName(tokenName);
           LOG.debug("processorName: {}", processorName);
           processor = map.get(processorName);
           if (processor != null && processor instanceof ResourcePreProcessor) {
-            final String extension = tokens[1].trim();
             LOG.debug("adding Extension: {}", extension);
-            ExtensionsAwareProcessorDecorator.decorate((ResourcePreProcessor) processor).addExtension(extension);
+            processor = (T) ExtensionsAwareProcessorDecorator.decorate((ResourcePreProcessor) processor).addExtension(extension);
           }
         }
         if (processor == null) {
@@ -165,14 +165,14 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
   }
 
   /**
-   * @return a default map of preprocessors.
+   * @return a default map of preProcessors.
    */
   public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
     return new HashMap<String, ResourcePreProcessor>();
   }
 
   /**
-   * @return a default map of postprocessors.
+   * @return a default map of postProcessors.
    */
   public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
     return new HashMap<String, ResourcePostProcessor>();

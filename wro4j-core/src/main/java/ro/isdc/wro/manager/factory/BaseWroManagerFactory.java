@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +17,8 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
-import ro.isdc.wro.manager.CacheChangeCallbackAware;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.FallbackAwareWroModelFactory;
-import ro.isdc.wro.model.factory.InMemoryCacheableWroModelFactory;
-import ro.isdc.wro.model.factory.ModelTransformerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -52,12 +47,8 @@ import ro.isdc.wro.util.Transformer;
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
-  implements WroManagerFactory, WroConfigurationChangeListener, CacheChangeCallbackAware, ObjectFactory<WroManager> {
+  implements WroManagerFactory, WroConfigurationChangeListener, ObjectFactory<WroManager> {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
-  /**
-   * A callback to be notified about the cache change.
-   */
-  private PropertyChangeListener cacheChangeCallback;
 
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
@@ -107,22 +98,19 @@ public class BaseWroManagerFactory
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
       manager.setHashBuilder(hashBuilder);
-      manager.registerCacheChangeListener(cacheChangeCallback);
       manager.setUriLocatorFactory(uriLocatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
-      // wrap modelFactory with several useful decorators
-      manager.setModelFactory(new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(
-        new ModelTransformerFactory(modelFactory).setTransformers(modelTransformers))));
+      manager.setModelFactory(modelFactory);
+      manager.setModelTransformers(modelTransformers);
 
+      
       final Injector injector = new InjectorBuilder(manager).build();
       injector.inject(manager);
-      injector.inject(modelFactory);
-      //transformers also require injection
-      for (final Transformer<WroModel> transformer : modelTransformers) {
-        injector.inject(transformer);
-      }
+      
+      //initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);
+      
       return manager;
     }
   };
@@ -137,8 +125,9 @@ public class BaseWroManagerFactory
 
   /**
    * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
-   * callbacks. Default implementation does nothing.
-   *
+   * callbacks. Default implementation does nothing. Do not set anything else except callbacks in this method, otherwise
+   * the initialization will not be performed properly.
+   * 
    * @param manager
    *          initialized instance of {@link WroManager}.
    */
@@ -196,15 +185,6 @@ public class BaseWroManagerFactory
   protected HashBuilder newHashBuilder() {
     return new SHA1HashBuilder();
   }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void registerCacheChangeListener(final PropertyChangeListener cacheChangeListener) {
-    this.cacheChangeCallback = cacheChangeListener;
-  }
-
 
   /**
    * {@inheritDoc}
@@ -334,6 +314,11 @@ public class BaseWroManagerFactory
    */
   public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
+  }
+  
+
+  public WroModelFactory getModelFactory() {
+    return modelFactory;
   }
 
   /**

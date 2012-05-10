@@ -34,7 +34,6 @@ public class TestPropertyWroConfigurationFactory {
 
   @Test
   public void createDefaultConfig() {
-    factory.setProperties(null);
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertNotNull(config);
@@ -44,9 +43,13 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(false, config.isDisableCache());
     Assert.assertEquals(true, config.isGzipEnabled());
     Assert.assertEquals(true, config.isIgnoreMissingResources());
+    Assert.assertEquals(true, config.isIgnoreEmptyGroup());
     Assert.assertEquals(true, config.isJmxEnabled());
     Assert.assertEquals(false, config.isCacheGzippedContent());
     Assert.assertEquals(false, config.isParallelPreprocessing());
+    Assert.assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
+    Assert.assertEquals(WroConfiguration.DEFAULT_ENCODING, config.getEncoding());
+    Assert.assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
   }
 
   @Test
@@ -54,9 +57,9 @@ public class TestPropertyWroConfigurationFactory {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheGzippedContent.name(), "INVALID_BOOLEAN");
     
-    factory.setProperties(props);
+    factory = new PropertyWroConfigurationFactory(props);
     final WroConfiguration config = factory.create();
-    
+
     Assert.assertEquals(false, config.isCacheGzippedContent());
   }
 
@@ -69,7 +72,11 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.gzipResources.name(), "false");
     props.setProperty(ConfigConstants.cacheGzippedContent.name(), "true");
     props.setProperty(ConfigConstants.parallelPreprocessing.name(), "true");
-    factory.setProperties(props);
+    props.setProperty(ConfigConstants.ignoreEmptyGroup.name(), "false");
+    props.setProperty(ConfigConstants.connectionTimeout.name(), "5000");
+    
+    factory = new PropertyWroConfigurationFactory(props);
+
     final WroConfiguration config = factory.create();
     LOG.debug("config: {}", config);
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
@@ -78,6 +85,8 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(false, config.isGzipEnabled());
     Assert.assertEquals(true, config.isCacheGzippedContent());
     Assert.assertEquals(true, config.isParallelPreprocessing());
+    Assert.assertEquals(false, config.isIgnoreEmptyGroup());
+    Assert.assertEquals(5000, config.getConnectionTimeout());
   }
 
 
@@ -85,9 +94,20 @@ public class TestPropertyWroConfigurationFactory {
   public void cannotAcceptInvalidLong() {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "INVALID_LONG");
-    factory.setProperties(props);
-    final WroConfiguration config = factory.create();
-    LOG.debug("config: {}", config);
-    Assert.assertEquals(0, config.getCacheUpdatePeriod());
+    
+    factory = new PropertyWroConfigurationFactory(props);
+    
+    factory.create();
+  }
+  
+  @Test(expected = WroRuntimeException.class)
+  public void cannotSetInvalidConnectionTimeout() {
+    final Properties props = new Properties();
+    //The value is not a valid integer
+    props.setProperty(ConfigConstants.connectionTimeout.name(), "9999999999999999999");
+    
+    factory = new PropertyWroConfigurationFactory(props);
+    
+    factory.create();
   }
 }

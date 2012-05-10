@@ -21,6 +21,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -37,12 +38,15 @@ import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
  * Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the description of all
  * groups.
- *
+ * <p/>
+ * This class is thread-safe (the create method is synchronized).
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -121,18 +125,34 @@ public class XmlModelFactory
    * Flag for enabling xml validation.
    */
   private boolean validateXml = true;
-
   /**
    * {@inheritDoc}
    */
-  public WroModel create() {
-    final Document document = createDocument();
-    processGroups(document);
+  public synchronized WroModel create() {
     // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
-    final WroModel model = createModel();
-    processImports(document, model);
-    processedImports.clear();
-    return model;
+    final StopWatch stopWatch = new StopWatch("Create Wro Model from XML");
+    try {
+      stopWatch.start("createDocument");
+      final Document document = createDocument();
+      stopWatch.stop();
+
+      stopWatch.start("processGroups");
+      processGroups(document);
+      stopWatch.stop();
+
+      stopWatch.start("createModel");
+      final WroModel model = createModel();
+      stopWatch.stop();
+
+      stopWatch.start("processImports");
+      processImports(document, model);
+      return model;
+    } finally {
+      //clear the processed imports even when the model creation fails.
+      processedImports.clear();
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
+    }
   }
 
 
@@ -188,10 +208,10 @@ public class XmlModelFactory
     final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
     LOG.debug("number of imports: {}", importsList.getLength());
     for (int i = 0; i < importsList.getLength(); i++) {
-      final Element element = (Element)importsList.item(i);
+      final Element element = (Element) importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: {}", name);
-      LOG.debug("processImports#uriLocatorFactory: {}", uriLocatorFactory);
+      Validate.notNull(uriLocatorFactory, "The Locator cannot be null!");
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected InputStream getModelResourceAsStream()

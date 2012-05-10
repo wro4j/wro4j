@@ -18,7 +18,10 @@ public abstract class WildcardUriLocatorSupport
    * Wildcard stream locator implementation.
    */
   private WildcardStreamLocator wildcardStreamLocator;
-
+  /**
+   * Flag used to enable/disable wildcards.
+   */
+  private boolean enableWildcards = true;
   /**
    * @return default implementation of {@link WildcardStreamLocator}.
    */
@@ -26,7 +29,7 @@ public abstract class WildcardUriLocatorSupport
     return new DefaultWildcardStreamLocator() {
       @Override
       public boolean hasWildcard(final String uri) {
-        return !disableWildcards() && super.hasWildcard(uri);
+        return enableWildcards && super.hasWildcard(uri);
       }
     };
   }
@@ -44,7 +47,15 @@ public abstract class WildcardUriLocatorSupport
   /**
    * Allows disabling wildcard support. By default wildcard support is enabled.
    */
-  protected boolean disableWildcards() {
-    return false;
+  public WildcardUriLocatorSupport setEnableWildcards(boolean enableWildcards) {
+    this.enableWildcards = enableWildcards;
+    return this;
+  }
+
+  /**
+   * @return when false, the locator will ignore wildcard resources.
+   */
+  public boolean isEnableWildcards() {
+    return enableWildcards;
   }
 }

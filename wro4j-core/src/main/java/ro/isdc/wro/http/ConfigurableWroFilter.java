@@ -61,7 +61,6 @@ public class ConfigurableWroFilter extends WroFilter {
    */
   @Override
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
-    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory();
     if (properties == null) {
       //when no
       properties = new Properties();
@@ -71,12 +70,17 @@ public class ConfigurableWroFilter extends WroFilter {
       properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), String.valueOf(cacheUpdatePeriod));
       properties.setProperty(ConfigConstants.modelUpdatePeriod.name(), String.valueOf(modelUpdatePeriod));
       properties.setProperty(ConfigConstants.disableCache.name(), String.valueOf(disableCache));
-      properties.setProperty(ConfigConstants.encoding.name(), String.valueOf(encoding));
+      if (encoding != null) {
+        properties.setProperty(ConfigConstants.encoding.name(), encoding);
+      }
+      if (mbeanName != null) {
+        properties.setProperty(ConfigConstants.mbeanName.name(), mbeanName);  
+      }
     }
-    factory.setProperties(properties);
+    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(properties);
     return factory;
   }
-
+  
   /**
    * @param disableCache the disableCache to set
    */

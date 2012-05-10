@@ -3,9 +3,8 @@
  */
 package ro.isdc.wro.model.factory;
 
-import org.apache.commons.lang3.Validate;
-
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
@@ -14,26 +13,24 @@ import ro.isdc.wro.model.WroModel;
  * @author Alex Objelean
  * @created 13 Mar 2011
  */
-public class WroModelFactoryDecorator
+public class WroModelFactoryDecorator extends AbstractDecorator<WroModelFactory>
     implements WroModelFactory {
-  private final WroModelFactory decorated;
 
   public WroModelFactoryDecorator(final WroModelFactory decorated) {
-    Validate.notNull(decorated);
-    this.decorated = decorated;
+    super(decorated);
   }
 
   /**
    * {@inheritDoc}
    */
   public WroModel create() {
-    return decorated.create();
+    return getDecoratedObject().create();
   }
 
   /**
    * {@inheritDoc}
    */
   public void destroy() {
-    decorated.destroy();
+    getDecoratedObject().destroy();
   }
 }

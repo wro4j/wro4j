@@ -22,6 +22,8 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -48,7 +50,9 @@ public class TestWildcardExpanderModelTransformer {
     //create manager to force correct initialization.
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(processorsFactory);
-    factory.addModelTransformer(transformer).create();
+    factory.addModelTransformer(transformer);
+    final Injector injector = InjectorBuilder.create(factory).build();
+    injector.inject(transformer);
   }
 
   @Test

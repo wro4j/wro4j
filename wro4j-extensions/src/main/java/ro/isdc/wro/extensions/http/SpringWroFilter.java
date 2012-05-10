@@ -66,7 +66,7 @@ public final class SpringWroFilter extends ConfigurableWroFilter {
    * {@inheritDoc}
    */
   @Override
-  protected WroManagerFactory getWroManagerFactory() {
+  protected WroManagerFactory newWroManagerFactory() {
     return factory;
   }
 }

@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.DelegatingServletOutputStream;
+import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -73,7 +73,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @optional
    */
   private File buildFinalName;
-  //${project.build.directory}/${project.build.finalName}
   /**
    * @parameter expression="${groupNameMappingFile}"
    * @optional
@@ -223,12 +222,12 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
       fos.close();
-      getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
       // delete empty files
       if (destinationFile.length() == 0) {
-        getLog().info("No content found for group: " + group);
+        getLog().debug("No content found for group: " + group);
         destinationFile.delete();
       } else {
+        getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
         getLog().info(
           destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
       }

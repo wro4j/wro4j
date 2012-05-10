@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**
@@ -30,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.3.7
  */
 public class CopyrightKeeperProcessorDecorator
-  extends AbstractProcessorDecorator {
+  extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
 
   /** The url pattern */
@@ -66,7 +67,7 @@ public class CopyrightKeeperProcessorDecorator
 
       LOG.debug("buffer: {}", copyrightBuffer);
       final Writer processedWriter = new StringWriter();
-      getDecoratedProcessor().process(resource, new StringReader(content), processedWriter);
+      getDecoratedObject().process(resource, new StringReader(content), processedWriter);
 
       final Matcher processedMatcher = PATTERN_COPYRIGHT.matcher(processedWriter.toString());
 

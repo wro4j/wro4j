@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
-import ro.isdc.wro.model.resource.processor.impl.AbstractProcessorDecorator;
+import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
@@ -68,9 +68,9 @@ public final class Injector {
           }
         }
       }
-      //handle special case like processor decorators
-      if (object instanceof AbstractProcessorDecorator) {
-        inject(((AbstractProcessorDecorator) object).getDecoratedProcessor());
+      //handle special cases like decorators. Perform recursive injection 
+      if (object instanceof ObjectDecorator) {
+        inject(((ObjectDecorator<?>) object).getDecoratedObject());
       }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);

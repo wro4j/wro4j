@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**
@@ -34,7 +35,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.4.1
  */
 public class ExtensionsAwareProcessorDecorator
-    extends AbstractProcessorDecorator {
+    extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(ExtensionsAwareProcessorDecorator.class);
   /**
    * Set of extensions  on which the decorated processor will be applied.
@@ -73,14 +74,14 @@ public class ExtensionsAwareProcessorDecorator
       final String resourceExtension = FilenameUtils.getExtension(resource.getUri());
       if (extensions.contains(resourceExtension)) {
         LOG.debug("[OK] Process resource {} with extension: {}", resource.getUri(), resourceExtension);
-        getDecoratedProcessor().process(resource, reader, writer);
+        getDecoratedObject().process(resource, reader, writer);
       } else {
         LOG.debug("[SKIP] Process resource with extension: {}", resource.getUri(), resourceExtension);
         IOUtils.copy(reader, writer);
       }
     } else {
       LOG.debug("When used as a postProcessor, decorated processor is applied");
-      getDecoratedProcessor().process(resource, reader, writer);
+      getDecoratedObject().process(resource, reader, writer);
     }
   }
 

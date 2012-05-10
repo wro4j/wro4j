@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.jsonhpack.JsonHPack;
-import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -79,7 +78,7 @@ public class JsonHPackProcessor
       onException(e);
       writer.write(content);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while  applying lessCss processor on the " + resourceUri
+      LOG.warn("Exception while applying hpack processor on the " + resourceUri
           + " resource, no processing applied...", e);
     } finally {
       reader.close();

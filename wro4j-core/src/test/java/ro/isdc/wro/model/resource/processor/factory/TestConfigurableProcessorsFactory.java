@@ -3,12 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
 
 /**
  * @author Alex Objelean
@@ -31,8 +33,8 @@ public class TestConfigurableProcessorsFactory {
 
   @Test
   public void testEmptyProcessors() {
-    Assert.assertEquals(Collections.EMPTY_LIST, factory.getPreProcessors());
-    Assert.assertEquals(Collections.EMPTY_LIST, factory.getPostProcessors());
+    assertEquals(Collections.EMPTY_LIST, factory.getPreProcessors());
+    assertEquals(Collections.EMPTY_LIST, factory.getPostProcessors());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -59,7 +61,7 @@ public class TestConfigurableProcessorsFactory {
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "valid");
     factory.setPreProcessorsMap(map);
     factory.setProperties(props);
-    Assert.assertEquals(1, factory.getPreProcessors().size());
+    assertEquals(1, factory.getPreProcessors().size());
   }
 
   @Test
@@ -70,22 +72,42 @@ public class TestConfigurableProcessorsFactory {
     props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "valid");
     factory.setPostProcessorsMap(map);
     factory.setProperties(props);
-    Assert.assertEquals(1, factory.getPostProcessors().size());
+    assertEquals(1, factory.getPostProcessors().size());
   }
 
-
   @Test
-  public void shouldDecorateWithExtensionAwareProcessorDecorator() {
+  public void cannotAcceptExtensionAwareConfigurationForPostProcessors() {
     final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
     final String extension = "js";
     final String processorName = "valid";
+    map.put(processorName, Mockito.mock(ResourcePreProcessor.class));
+    final Properties props = new Properties();
+    props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS,
+        String.format("%s.%s", processorName, extension));
+    factory.setPreProcessorsMap(map);
+    factory.setProperties(props);
+    assertEquals(0, factory.getPreProcessors().size());
+  }
+
+  @Test
+  public void shouldDecorateWithExtensionAwareProcessorDecorator() {
+    genericShouldDecorateWithExtension("valid", "js");
+  }
+
+  @Test
+  public void shouldDecorateWithExtensionAwareProcessorDecoratorWhenProcessorNameContainsDots() {
+    genericShouldDecorateWithExtension("valid.processor.name", "js");
+  }
+
+  private void genericShouldDecorateWithExtension(final String processorName, final String extension) {
+    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
     map.put(processorName, Mockito.mock(ResourcePreProcessor.class));
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS,
         String.format("%s.%s", processorName, extension));
     factory.setPreProcessorsMap(map);
     factory.setProperties(props);
-    Assert.assertEquals(1, factory.getPreProcessors().size());
+    assertEquals(1, factory.getPreProcessors().size());
+    assertTrue(factory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
   }
-
 }

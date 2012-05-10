@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.DispatcherStreamLocator;
@@ -25,13 +23,13 @@ import ro.isdc.wro.model.resource.locator.DispatcherStreamLocator;
  */
 @SuppressWarnings("serial")
 public class DispatchResourceServlet extends HttpServlet {
-  private static final Logger LOG = LoggerFactory.getLogger(DispatchResourceServlet.class);
   /**
    * {@inheritDoc}
    */
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
+    
     final DispatcherStreamLocator streamLocator = new DispatcherStreamLocator();
 
     //contains a merge response of combo groups content.
@@ -39,19 +37,19 @@ public class DispatchResourceServlet extends HttpServlet {
 
     //In this case we hardcode 3 resources served by wro, in a production we would inspect the requestUri and would extract combo groups
 
-    String location = "/wro/dwr.js";
+    String location = "/resource/dynamic.js";
 
 
     InputStream stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
     combo.append(IOUtils.toString(stream));
 
-    location = "/wro/wildcard.js";
-    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
-    combo.append(IOUtils.toString(stream));
-
-    location = "/wro/wicket.js";
-    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
-    combo.append(IOUtils.toString(stream));
+//    location = "/wro/wildcard.js";
+//    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
+//    combo.append(IOUtils.toString(stream));
+//
+//    location = "/wro/wicket.js";
+//    stream = streamLocator.getInputStream(wrapRequestForNoGzip(req), resp, location);
+//    combo.append(IOUtils.toString(stream));
 
     resp.getWriter().write(combo.toString());
     resp.setContentType(ResourceType.JS.getContentType());

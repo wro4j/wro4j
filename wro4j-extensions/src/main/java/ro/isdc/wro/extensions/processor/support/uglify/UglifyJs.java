@@ -3,10 +3,13 @@
  */
 package ro.isdc.wro.extensions.processor.support.uglify;
 
+import static ro.isdc.wro.extensions.processor.support.uglify.UglifyJs.Type.UGLIFY;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -20,12 +23,11 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs untagged version: 1.2.6-SNAPSHOT (commited at 2012-02-16 21:30:46)
+ * The underlying implementation use the uglifyJs untagged version: 1.2.7 (last commit date: 2012-05-08 21:35:42).
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
- * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js. The final version
- * is compressed with packerJs by Dean Edwards.
+ * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js.
  *
  * @author Alex Objelean
  * @since 1.3.1
@@ -45,14 +47,20 @@ public class UglifyJs {
    */
   private String reservedNames;
   private ScriptableObject scope;
-
+  /**
+   * The type of processing supported by UglifyJs library. This enum replaces ugly boolean constructor parameter.
+   */
+  public static enum Type {
+    BEAUTIFY, UGLIFY
+  }
 
   /**
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
    *        formatted).
    */
-  public UglifyJs(final boolean uglify) {
-    this.uglify = uglify;
+  public UglifyJs(final Type uglifyType) {
+    Validate.notNull(uglifyType);
+    this.uglify = uglifyType == UGLIFY ? true : false;
   }
 
 
@@ -60,7 +68,7 @@ public class UglifyJs {
    * Factory method for creating the uglifyJs engine.
    */
   public static UglifyJs uglifyJs() {
-    return new UglifyJs(true);
+    return new UglifyJs(UGLIFY);
   }
 
 
@@ -68,7 +76,7 @@ public class UglifyJs {
    * Factory method for creating the beautifyJs engine.
    */
   public static UglifyJs beautifyJs() {
-    return new UglifyJs(false);
+    return new UglifyJs(Type.BEAUTIFY);
   }
 
 

@@ -52,7 +52,6 @@ public final class Group {
     this.name = name;
   }
 
-
   /**
    * Check if the group has at least one resource of some type.
    *

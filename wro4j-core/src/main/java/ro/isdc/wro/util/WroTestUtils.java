@@ -4,20 +4,17 @@
 package ro.isdc.wro.util;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,8 +36,9 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -48,7 +46,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -63,17 +60,13 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
-
   /**
-   * @param properties {@link Properties} object to get stream from.
-   * @return {@link InputStream} of the provided properties object.
+   * 
+   * @return a {@link BaseWroManagerFactory} which uses an empty model.
    */
-  public static InputStream getPropertiesStream(final Properties properties) {
-    final StringWriter propsAsString = new StringWriter();
-    properties.list(new PrintWriter(propsAsString));
-    return new ByteArrayInputStream(propsAsString.toString().getBytes());
+  public static BaseWroManagerFactory simpleManagerFactory() {
+    return new BaseWroManagerFactory().setModelFactory(simpleModelFactory(new WroModel()));
   }
-
 
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
@@ -88,14 +81,6 @@ public class WroTestUtils {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
     WroTestUtils.compare(resultReader, expectedReader, processor);
-  }
-
-
-  public static void compareProcessedResourceContents(final String inputResourceUri,
-    final String expectedContentResourceUri, final ResourcePreProcessor processor)
-    throws IOException {
-    compareProcessedResourceContents(inputResourceUri, expectedContentResourceUri,
-      ProcessorsUtils.toPostProcessor(processor));
   }
 
 
@@ -117,7 +102,8 @@ public class WroTestUtils {
   }
 
   public static void init(final WroModelFactory factory) {
-    new BaseWroManagerFactory().setModelFactory(factory).create();
+    WroManagerFactory managerFactroy = new BaseWroManagerFactory().setModelFactory(factory);
+    InjectorBuilder.create(managerFactroy).build().inject(factory);
   }
 
   /**
@@ -126,8 +112,7 @@ public class WroTestUtils {
   public static void initProcessor(final ResourcePreProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
-    final WroManager manager = factory.create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
 
@@ -138,8 +123,7 @@ public class WroTestUtils {
   public static void initProcessor(final ResourcePostProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor));
-    final WroManager manager = factory.create();
-    final Injector injector = new InjectorBuilder(manager).build();
+    final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
 
@@ -281,6 +265,20 @@ public class WroTestUtils {
       Transformers.noOpTransformer(), processor);
   }
 
+  /**
+   * Compares files with the same name from sourceFolder against it's counterpart in targetFolder, but allows
+   * source and target files to have different extensions.
+   * TODO run tests in parallel
+   */
+  public static void compareFromDifferentFoldersByName(final File sourceFolder, final File targetFolder,
+     final String srcExtension, final String targetExtension, final ResourcePostProcessor processor)
+     throws IOException {
+    compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
+        Transformers.extensionTransformer("css"), processor);
+  }
+
+
+
 
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
@@ -293,11 +291,11 @@ public class WroTestUtils {
       }
     });
   }
-  
+
   /**
    * Applies a function for each file from a folder. The folder should contain at least one file to process, otherwise
    * an exception will be thrown.
-   * 
+   *
    * @param folder
    *          {@link File} representing the folder where the files will be used from processing.
    * @param function
@@ -310,10 +308,10 @@ public class WroTestUtils {
     for (final File file : files) {
       try {
         function.apply(file);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException("Problem while applying function on file: " + file, e);
       }
-      processedNumber++;      
+      processedNumber++;
     }
     logSuccess(processedNumber);
   }
@@ -373,10 +371,10 @@ public class WroTestUtils {
    * @param task a {@link Callable} to run concurrently.
    * @throws Exception if any of the executed tasks fails.
    */
-  public static void runConcurrently(final Callable<Void> task) throws Exception {
+  public static void runConcurrently(final Callable<Void> task, final int times) throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < times; i++) {
       futures.add(service.submit(task));
     }
     for (final Future<?> future : futures) {
@@ -385,9 +383,30 @@ public class WroTestUtils {
   }
 
   /**
+   * Run the task concurrently 100 times.
+   */
+  public static void runConcurrently(final Callable<Void> task) throws Exception {
+    runConcurrently(task, 100);
+  }
+  
+  /**
    * @return a default {@link Injector} to be used by test classes.
    */
   public static Injector createInjector() {
-    return new InjectorBuilder(new BaseWroManagerFactory().create()).build();
+    return InjectorBuilder.create(new BaseWroManagerFactory()).build();
+  }
+  
+  /**
+   * Creates a model factory for a given model.
+   */
+  public static WroModelFactory simpleModelFactory(final WroModel model) {
+    Validate.notNull(model);
+    return new WroModelFactory() {
+      public WroModel create() {
+        return model;
+      }
+      public void destroy() {
+      }
+    };
   }
 }

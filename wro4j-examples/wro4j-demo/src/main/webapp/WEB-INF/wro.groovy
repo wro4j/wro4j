@@ -18,8 +18,6 @@ groups {
   jsp {
     css("/WEB-INF/jsp/css.jsp")
   }
-  dynamicResource {
-  }
   placeholder {
     css("/static/css/placeholder/*.css")
   }
@@ -69,7 +67,6 @@ groups {
     js("http://code.jquery.com/jquery-1.6.js")
   }
   all {
-    dynamicResource()
     uniform()
     groupRef("jquery-mobile")
     groupRef('WEBINF-css')
@@ -77,7 +74,34 @@ groups {
   testPage {
     wildcard()
   }
+  test {
+    css("/static/css/webapp.css")
+  }
+  redirect {
+    js("/resource/redirect.js")
+  }
+  dispatch {
+    js("/resource/dispatch.js")
+  }
+  external {
+    js("/external/any.js")
+  }
+  
+  dynamic {
+    js("/resource/dynamic.js")
+  }
+  
   jar {
     css("classpath:com/app/**.css")
+  }
+  less {
+     css("/static/less/**")
+  }
+  coffeeScript {
+     js("/static/coffee/**.coffee")
+  }
+  
+  cssUrlRewriting {
+    css("/css/index.css");
   }
 }

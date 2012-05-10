@@ -3,7 +3,24 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import junit.framework.Assert;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -13,96 +30,48 @@ import org.junit.Test;
  * @created Created on Jan 5, 2010
  */
 public class TestGroupsProcessor {
+  private GroupsProcessor victim;
+  final String groupName = "group";
+  
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+    victim = new GroupsProcessor();
+    initVictim(new WroConfiguration());
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
+  private void initVictim(final WroConfiguration config) {
+    Context.set(Context.standaloneContext(), config);
+    
+    final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group(groupName)));
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory);
+    final Injector injector = InjectorBuilder.create(managerFactory).build();
+    injector.inject(victim);
+  }
+  
   @Test
-  public void justPass() {}
-//  private GroupsProcessor groupsProcessor;
-//
-//  @Before
-//  public void init() {
-//    groupsProcessor = new GroupsProcessor();
-//  }
-//
-////  @Test
-////  public void testNoProcessorsSet() {
-////  	Assert.assertTrue(groupsProcessor.getPostProcessorsByType(null).isEmpty());
-////  }
-////
-////  /**
-////   * Test if getPostProcessorsByType is implemented correctly
-////   */
-////  @Test
-////  public void testMixedPreProcessors() {
-////    final Collection<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
-////    processors.add(new CssMinProcessor());
-////    processors.add(new BomStripperPreProcessor());
-////    groupsProcessor.setResourcePreProcessors(processors);
-////    Assert.assertEquals(1, groupsProcessor.getPreProcessorsByType(null).size());
-////    Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
-////    Assert.assertEquals(1, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
-////  }
-////
-////  /**
-////   * Test if getPostProcessorsByType is implemented correctly
-////   */
-////  @Test
-////  public void testMixedPostProcessors() {
-////    final Collection<ResourcePostProcessor> processors = new ArrayList<ResourcePostProcessor>();
-////    processors.add(new CssMinProcessor());
-////    processors.add(new CommentStripperProcessor());
-////    groupsProcessor.setResourcePostProcessors(processors);
-////    Assert.assertEquals(1, groupsProcessor.getPostProcessorsByType(null).size());
-////    Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.CSS).size());
-////    Assert.assertEquals(1, groupsProcessor.getPostProcessorsByType(ResourceType.JS).size());
-////  }
-////
-////  /**
-////   * Test if getPostProcessorsByType is implemented correctly
-////   */
-////  @Test
-////  public void testGetPostProcessorsByType1() {
-////  	final Collection<ResourcePostProcessor> processors = new ArrayList<ResourcePostProcessor>();
-////  	processors.add(new CssMinProcessor());
-////  	processors.add(new JSMinProcessor());
-////  	processors.add(new CssVariablesProcessor());
-////  	groupsProcessor.setResourcePostProcessors(processors);
-////  	Assert.assertEquals(0, groupsProcessor.getPostProcessorsByType(null).size());
-////  	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.CSS).size());
-////  	Assert.assertEquals(1, groupsProcessor.getPostProcessorsByType(ResourceType.JS).size());
-////  }
-////
-////  @Test
-////  public void testGetPostProcessorsByNullType2() {
-////  	final Collection<ResourcePostProcessor> processors = new ArrayList<ResourcePostProcessor>();
-////  	processors.add(new MultiLineCommentStripperProcessor());
-////  	processors.add(new SingleLineCommentStripperProcessor());
-////  	groupsProcessor.setResourcePostProcessors(processors);
-////  	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(null).size());
-////  	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.CSS).size());
-////  	Assert.assertEquals(2, groupsProcessor.getPostProcessorsByType(ResourceType.JS).size());
-////  }
-////
-////  @Test
-////  public void testGetPreProcessorsByNullType1() {
-////  	final Collection<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
-////  	processors.add(new CssMinProcessor());
-////  	processors.add(new JSMinProcessor());
-////  	processors.add(new CssVariablesProcessor());
-////  	groupsProcessor.setResourcePreProcessors(processors);
-////  	Assert.assertEquals(0, groupsProcessor.getPreProcessorsByType(null).size());
-////  	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
-////  	Assert.assertEquals(1, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
-////  }
-////
-////  @Test
-////  public void testGetPreProcessorsByNullType2() {
-////  	final Collection<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
-////  	processors.add(new MultiLineCommentStripperProcessor());
-////  	processors.add(new SingleLineCommentStripperProcessor());
-////  	groupsProcessor.setResourcePreProcessors(processors);
-////  	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(null).size());
-////  	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.CSS).size());
-////  	Assert.assertEquals(2, groupsProcessor.getPreProcessorsByType(ResourceType.JS).size());
-////  }
+  public void shouldReturnEmptyStringWhenGroupHasNoResources() {
+    final CacheEntry key = new CacheEntry(groupName, ResourceType.JS, true);
+    Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
+  }
+  
+  /**
+   * Same as above, but with ignoreEmptyGroup config updated.
+   */
+  @Test(expected = WroRuntimeException.class)
+  public void shouldFailWhenGroupHasNoResourcesAndIgnoreEmptyGroupIsFalse() {
+    WroConfiguration config = new WroConfiguration();
+    config.setIgnoreEmptyGroup(false);
+    initVictim(config);
+    final CacheEntry key = new CacheEntry("group", ResourceType.JS, true);
+    victim.process(key);
+  }
+
 //
 //  @Test
 //  public void injectAnnotationOnPreProcessorField() {
@@ -131,11 +100,6 @@ public class TestGroupsProcessor {
 //      }
 //    };
 //    groupsProcessor.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
-//  }
-//
-//  @Test(expected=IllegalArgumentException.class)
-//  public void cannotAcceptNullArguments() {
-//    groupsProcessor.process(null, null, true);
 //  }
 //
 //

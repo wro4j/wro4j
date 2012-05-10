@@ -29,7 +29,7 @@ public class TestWroModel {
   private WroModel model;
   private WroModelFactory factory;
   @Before
-  public void init() {
+  public void setUp() {
     final Context context = Context.standaloneContext();
     Context.set(context);
     model = buildValidModel();

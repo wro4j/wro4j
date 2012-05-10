@@ -10,30 +10,35 @@ import javax.servlet.ServletContext;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
+
 
 /**
  * To be used by the implementations which load the model from a resource provided as stream.
- *
+ * 
  * @author Alex Objelean
  * @created 9 Aug 2011
  * @since 1.4.0
  */
 public abstract class AbstractWroModelFactory
-  implements WroModelFactory {
-
+    implements WroModelFactory {
+  @Inject
+  private Context context;
+  
   /**
    * Override this method, in order to provide different xml definition file name.
-   *
+   * 
    * @return stream of the xml representation of the model.
-   * @throws IOException if the stream couldn't be read.
+   * @throws IOException
+   *           if the stream couldn't be read.
    */
   protected InputStream getModelResourceAsStream()
-    throws IOException {
-    final ServletContext servletContext = Context.get().getServletContext();
-    //Don't allow NPE, throw a more detailed exception
+      throws IOException {
+    final ServletContext servletContext = context.getServletContext();
+    // Don't allow NPE, throw a more detailed exception
     if (servletContext == null) {
       throw new WroRuntimeException(
-        "No servletContext is available. Probably you are running this code outside of the request cycle!");
+          "No servletContext is available. Probably you are running this code outside of the request cycle!");
     }
     final String resourceLocation = "/WEB-INF/" + getDefaultModelFilename();
     final InputStream stream = servletContext.getResourceAsStream(resourceLocation);
@@ -42,15 +47,16 @@ public abstract class AbstractWroModelFactory
     }
     return stream;
   }
-
+  
   /**
    * @return the default name of the file describing the wro model.
    */
   protected abstract String getDefaultModelFilename();
-
+  
   /**
    * {@inheritDoc}
    */
-  public void destroy() {}
-
+  public void destroy() {
+  }
+  
 }

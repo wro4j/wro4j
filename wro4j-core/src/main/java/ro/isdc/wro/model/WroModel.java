@@ -36,12 +36,12 @@ public final class WroModel {
   private Set<Group> groups = new HashSet<Group>();
 
   /**
-   * @return the readonly collection of groups.
+   * @return a readonly collection of groups.
    */
   public final Collection<Group> getGroups() {
     return Collections.unmodifiableSet(groups);
   }
-
+  
   /**
    * @return a set of group names.
    */
@@ -95,7 +95,8 @@ public final class WroModel {
         return group;
       }
     }
-    throw new InvalidGroupNameException("There is no such group: '" + name + "'. Available groups are: " + getGroupNames(groups));
+    throw new InvalidGroupNameException(String.format("There is no such group: '%s'. Available groups are: %s", name,
+        getGroupNames(groups)));
   }
 
   /**
@@ -110,7 +111,7 @@ public final class WroModel {
     for (final Group group : groups) {
       groupNames.add(group.getName());
     }
-    return StringUtils.join(groupNames, ", ");
+    return String.format("[%s]", StringUtils.join(groupNames, ", "));
   }
 
 /**
