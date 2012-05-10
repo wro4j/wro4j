@@ -1,7 +1,7 @@
 # coffeeScript 
 # less - [OK]
 # uglify - [OK]
-# cssLint -
+# cssLint - [OK]
 # jsHint -  
 # jsLint - 
 # dustJs
