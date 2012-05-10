@@ -23,6 +23,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
@@ -94,5 +95,6 @@ public class ProcessorsUtils {
     map.put(VariablizeColorsCssProcessor.ALIAS, new VariablizeColorsCssProcessor());
     map.put(ConformColorsCssProcessor.ALIAS, new ConformColorsCssProcessor());
     map.put(MultiLineCommentStripperProcessor.ALIAS, new MultiLineCommentStripperProcessor());
+    map.put(ConsoleStripperProcessor.ALIAS, new ConsoleStripperProcessor());
   }
 }
