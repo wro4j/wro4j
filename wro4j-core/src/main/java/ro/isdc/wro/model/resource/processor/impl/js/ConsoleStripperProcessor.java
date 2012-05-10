@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 @SupportedResourceType(ResourceType.JS)
 public class ConsoleStripperProcessor
   implements ResourcePreProcessor {
-  public static final String ALIAS = "consoleStripperProcessor";
+  public static final String ALIAS = "consoleStripper";
 
   /**
    * Matches console statements
