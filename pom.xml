@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.6-SNAPSHOT</version>
+  <version>1.4.6</version>
   <packaging>pom</packaging>  
   
   <name>Web Resource Optimizer Parent</name>
