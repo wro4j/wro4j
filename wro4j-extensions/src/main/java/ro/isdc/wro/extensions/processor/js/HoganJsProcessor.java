@@ -41,7 +41,7 @@ public class HoganJsProcessor implements ResourcePreProcessor {
     final String content = IOUtils.toString(reader);
     final HoganJs hoganJs = enginePool.getObject();
     try {
-      writer.write(hoganJs.compile(content));
+      writer.write(hoganJs.compile(content, null));
     } finally {
       enginePool.returnObject(hoganJs);
       reader.close();

@@ -43,7 +43,7 @@ public class DustJsProcessor implements ResourcePreProcessor {
     final DustJs dustJs = enginePool.getObject();
     final String name = resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
     try {
-      writer.write(dustJs.compile(content, name));
+      writer.write(dustJs.compile(content, String.format("'%s'", name)));
     } finally {
       enginePool.returnObject(dustJs);
       reader.close();
