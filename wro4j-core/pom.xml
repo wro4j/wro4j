@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-		<version>1.4.6</version>
+    <version>1.4.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wro4j-core</artifactId>
 	<packaging>jar</packaging>
-	<name>Web Resource Optimizer Core</name>
+	<name>wro4j core</name>
 
 	<dependencies>
     <dependency>

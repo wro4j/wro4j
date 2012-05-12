@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-examples</artifactId>
-		<version>1.4.6</version>
+		<version>1.4.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wro4j-demo</artifactId>
 	<packaging>war</packaging>
-	<name>Wro4j Demo project</name>
+	<name>wro4j demo</name>
 
 	<properties>
 		<wicket.version>1.5.2</wicket.version>
