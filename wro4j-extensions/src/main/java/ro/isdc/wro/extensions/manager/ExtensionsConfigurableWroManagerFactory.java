@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.DustJsProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
@@ -197,6 +198,12 @@ public class ExtensionsConfigurableWroManagerFactory
       @Override
       protected ResourceProcessor initialize() {
         return new DustJsProcessor();
+      }
+    }));
+    map.put(HoganJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new HoganJsProcessor();
       }
     }));
   }
