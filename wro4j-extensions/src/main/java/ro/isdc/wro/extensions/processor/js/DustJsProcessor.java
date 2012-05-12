@@ -1,9 +1,12 @@
 package ro.isdc.wro.extensions.processor.js;
 
 import org.apache.commons.io.FilenameUtils;
-import ro.isdc.wro.extensions.processor.support.JsTemplateCompiler;
+
 import ro.isdc.wro.extensions.processor.support.dustjs.DustJs;
+import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
 
 /**
  * A processor for dustJs template framework. Uses <a href="http://akdubya.github.com/dustjs/">dustjs</a> library to
@@ -13,11 +16,12 @@ import ro.isdc.wro.model.resource.Resource;
  * @since 1.4.5
  * @created 8 Mar 2012
  */
+@SupportedResourceType(ResourceType.JS)
 public class DustJsProcessor extends JsTemplateCompilerProcessor {
   public static final String ALIAS = "dustJs";
 
   @Override
-  protected JsTemplateCompiler createCompiler() {
+  protected AbstractJsTemplateCompiler createCompiler() {
     return new DustJs();
   }
 

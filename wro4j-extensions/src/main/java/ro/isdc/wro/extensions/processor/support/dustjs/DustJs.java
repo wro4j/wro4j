@@ -1,6 +1,9 @@
 package ro.isdc.wro.extensions.processor.support.dustjs;
 
-import ro.isdc.wro.extensions.processor.support.JsTemplateCompiler;
+import java.io.InputStream;
+
+import ro.isdc.wro.extensions.processor.support.less.LessCss;
+import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
 
 /**
@@ -11,14 +14,20 @@ import ro.isdc.wro.extensions.processor.support.JsTemplateCompiler;
  * @since 1.4.5
  * @created 8 Mar 2012
  */
-public class DustJs extends JsTemplateCompiler {
+public class DustJs extends AbstractJsTemplateCompiler {
   private static final String DEFAULT_DUST_JS = "dust-full-0.3.0.min.js";
-
+  
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected String getCompilerPath() {
-    return DEFAULT_DUST_JS;
+  protected InputStream getCompilerAsStream() {
+    return DustJs.class.getResourceAsStream(DEFAULT_DUST_JS);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected String getCompileCommand() {
     return "dust.compile";

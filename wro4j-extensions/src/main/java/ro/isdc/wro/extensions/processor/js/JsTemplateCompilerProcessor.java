@@ -1,8 +1,8 @@
 package ro.isdc.wro.extensions.processor.js;
 
 import org.apache.commons.io.IOUtils;
-import ro.isdc.wro.extensions.processor.support.JsTemplateCompiler;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
+import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
@@ -11,13 +11,20 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+/**
+ * A base class for template processors like: dustJS or hoganJS.
+ *  
+ * @author Eivind Barstad Waaler
+ * @since 1.4.7
+ * @created 11 May 2012
+ */
 public abstract class JsTemplateCompilerProcessor implements ResourcePreProcessor {
-  private final ObjectPoolHelper<JsTemplateCompiler> enginePool;
+  private final ObjectPoolHelper<AbstractJsTemplateCompiler> enginePool;
 
   public JsTemplateCompilerProcessor() {
-    enginePool = new ObjectPoolHelper<JsTemplateCompiler>(new ObjectFactory<JsTemplateCompiler>() {
+    enginePool = new ObjectPoolHelper<AbstractJsTemplateCompiler>(new ObjectFactory<AbstractJsTemplateCompiler>() {
       @Override
-      public JsTemplateCompiler create() {
+      public AbstractJsTemplateCompiler create() {
         return createCompiler();
       }
     });
@@ -29,7 +36,7 @@ public abstract class JsTemplateCompilerProcessor implements ResourcePreProcesso
   @Override
   public void process(Resource resource, Reader reader, Writer writer) throws IOException {
     final String content = IOUtils.toString(reader);
-    final JsTemplateCompiler jsCompiler = enginePool.getObject();
+    final AbstractJsTemplateCompiler jsCompiler = enginePool.getObject();
     try {
       writer.write(jsCompiler.compile(content, getArgument(resource)));
     } finally {
@@ -39,9 +46,17 @@ public abstract class JsTemplateCompilerProcessor implements ResourcePreProcesso
     }
   }
 
-  protected String getArgument(Resource resource) {
+  /**
+   * @param resource
+   *          {@link Resource} being processed by compiler.
+   * @return arguments consumed by the js compile script.
+   */
+  protected String getArgument(final Resource resource) {
     return null;
   }
 
-  protected abstract JsTemplateCompiler createCompiler();
+  /**
+   * @return the {@link AbstractJsTemplateCompiler} responsible for compiling the template.
+   */
+  protected abstract AbstractJsTemplateCompiler createCompiler();
 }
