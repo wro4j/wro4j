@@ -10,7 +10,7 @@
 
 	<artifactId>wro4j-extensions</artifactId>
 	<packaging>jar</packaging>
-	<name>Web Resource Optimizer Extensions</name>
+	<name>wro4j extensions</name>
 
 	<dependencies>
 		<dependency>

@@ -10,7 +10,7 @@
 
 	<artifactId>wro4j-core</artifactId>
 	<packaging>jar</packaging>
-	<name>Web Resource Optimizer Core</name>
+	<name>wro4j core</name>
 
 	<dependencies>
     <dependency>

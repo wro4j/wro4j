@@ -10,7 +10,7 @@
   
   <artifactId>wro4j-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>Web Resource Optimizer Maven Plugin</name>
+  <name>wro4j maven plugin</name>
 
   <dependencies>
     <dependency>

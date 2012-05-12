@@ -10,7 +10,7 @@
 
   <artifactId>wro4j-standalone</artifactId>
   <packaging>war</packaging>
-  <name>wro4j standalone example project</name>
+  <name>wro4j standalone example</name>
 
 	<properties>
 		<project_charset>UTF-8</project_charset>
