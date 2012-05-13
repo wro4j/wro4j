@@ -248,15 +248,6 @@ public class Context {
     CONTEXT_MAP.clear();
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-  }
-
   /**
    * Set the correlationId to the current thread.
    */
@@ -283,4 +274,14 @@ public class Context {
     validateContext();
     return CORRELATION_ID.get();
   }
+  
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+
 }
