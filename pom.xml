@@ -7,7 +7,7 @@
   <version>1.4.7-SNAPSHOT</version>
   <packaging>pom</packaging>  
   
-  <name>Web Resource Optimizer Parent</name>
+  <name>wro4j parent</name>
   <inceptionYear>2008</inceptionYear>
   <url>http://code.google.com/p/wro4j/</url>
   
