@@ -27,51 +27,52 @@ import java.util.Properties;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+
 /**
+ * Proves that the code responsible for populating configurableWroManagerFactory with extensions processors does its job
+ * correctly (using reflection) when extension module is available.
+ * 
  * @author Simon van der Sluis
  * @created Created on May 14, 2012
  */
-public class TestConfigurableWroFilterWithExtensions
-{
-
-    private static final Logger LOG = LoggerFactory.getLogger(TestConfigurableWroFilterWithExtensions.class);
-    @Mock
-    private HttpServletRequest mockRequest;
-    @Mock
-    private HttpServletResponse mockResponse;
-    @Mock
-    private FilterChain mockFilterChain;
-    @Mock
-    private FilterConfig mockFilterConfig;
-    @Mock
-    private ServletContext mockServletContext;
-    @Mock
-    private ServletOutputStream mockServletOutputStream;
-
-    @Before
-    public void setUp() throws Exception {
-      MockitoAnnotations.initMocks(this);
-      when(mockRequest.getRequestURI()).thenReturn("/some.js");
-      when(mockResponse.getOutputStream()).thenReturn(mockServletOutputStream);
-      when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-      Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
-    }
-
+public class TestConfigurableWroFilterWithExtensions {
+  @Mock
+  private HttpServletRequest mockRequest;
+  @Mock
+  private HttpServletResponse mockResponse;
+  @Mock
+  private FilterConfig mockFilterConfig;
+  @Mock
+  private ServletContext mockServletContext;
+  @Mock
+  private ServletOutputStream mockServletOutputStream;
+  
+  @Before
+  public void setUp()
+      throws Exception {
+    MockitoAnnotations.initMocks(this);
+    when(mockRequest.getRequestURI()).thenReturn("/some.js");
+    when(mockResponse.getOutputStream()).thenReturn(mockServletOutputStream);
+    when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+  }
+  
   @Test
-  public void extensionProcessorsShouldBeAvailable() throws Exception {
+  public void extensionProcessorsShouldBeAvailable()
+      throws Exception {
     ConfigurableWroFilter filter = new ConfigurableWroFilter();
     final Properties properties = new Properties();
     properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, CoffeeScriptProcessor.ALIAS);
     filter.setProperties(properties);
     filter.init(mockFilterConfig);
-
+    
     WroManagerFactory factory = filter.newWroManagerFactory();
     WroManager wroManager = factory.create();
-
+    
     ProcessorsFactory processorsFactory = wroManager.getProcessorsFactory();
     Collection<ResourcePostProcessor> postProcessors = processorsFactory.getPostProcessors();
-
+    
     assertEquals(1, postProcessors.size());
   }
-
+  
 }
