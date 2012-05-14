@@ -116,7 +116,7 @@ public class ConfigurableWroFilter extends WroFilter {
         LOG.debug("trying to import processors from extensions module...");
         try {
           final Class<?> clazz = Class.forName("ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory");
-          final Method method = clazz.getMethod("pupulateMapWithExtensionsProcessors", Map.class);
+          final Method method = clazz.getMethod("populateMapWithExtensionsProcessors", Map.class);
           method.invoke(null, preProcessorsMap);
           method.invoke(null, postProcessorsMap);
           LOG.debug("[OK] Extensions processors imported successfully: {}", preProcessorsMap.keySet());
