@@ -38,6 +38,7 @@ import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFacto
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
+import ro.isdc.wro.http.support.WroModelToJsonHelper;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
@@ -74,6 +75,11 @@ public class WroFilter
    * API - reload model method call
    */
   public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
+
+  /**
+   * API - get wroModel as Json
+   */
+  public static final String API_WRO_MODEL = "/wroApi/model";
   /**
    * Filter config.
    */
@@ -320,6 +326,8 @@ public class WroFilter
         WroUtil.addNoCacheHeaders(response);
         //set explicitly status OK for unit testing
         response.setStatus(HttpServletResponse.SC_OK);
+      } else if(isJsonApiRequest(request)) {
+        processJsonApiRequest(request, response);
       } else {
         processRequest(request, response);
         onRequestProcessed();
@@ -329,6 +337,15 @@ public class WroFilter
     } finally {
       Context.unset();
     }
+  }
+
+  private void processJsonApiRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    WroModelToJsonHelper.produceJson(response, wroManagerFactory);
+  }
+
+  private boolean isJsonApiRequest(HttpServletRequest request) {
+    String uri = request.getRequestURI();
+    return wroConfiguration.isDebug() && uri != null && uri.endsWith(API_WRO_MODEL);
   }
 
   /**
