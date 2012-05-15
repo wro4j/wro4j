@@ -1,0 +1,9 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+$gw-column: 100px;          // Column Width
+$gw-gutter: 40px;           // Gutter Width
+
+div {
+  width: grid-width(4);     // returns 520px;
+  margin-left: $gw-gutter;  // returns 40px;
+}

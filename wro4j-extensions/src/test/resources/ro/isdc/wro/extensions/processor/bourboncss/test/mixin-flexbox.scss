@@ -1,0 +1,18 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.parent {
+  @include display-box;
+  @include box-align(start);
+  @include box-orient(horizontal);
+  @include box-pack(start);
+}
+
+div.parent > div.child {
+  @include box-flex(2);
+}
+
+// Alternative custom shorthand mixin.
+div.parent {
+  @include box($orient: horizontal, $pack: center, $align: stretch); // defaults
+  @include box(vertical, start, stretch);
+}

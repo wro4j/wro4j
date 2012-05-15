@@ -1,0 +1,17 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.linearone {
+  @include linear-gradient(#1e5799, #2989d8);
+}
+
+div.lineartwo {
+  @include linear-gradient(top, #8fdce5, #3dc3d1);
+}
+
+div.linearthree {
+  @include linear-gradient(top, #8fdce5, #3dc3d1, $fallback: red);
+}
+
+div.linearfour {
+  @include linear-gradient(50deg, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
+}

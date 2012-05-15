@@ -1,0 +1,24 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.scaleUp {
+  // Increment Up GR with positive value
+  font-size: modular-scale(14px, 1, 1.618);
+  // returns: 22.652px
+}
+
+div.scaleDown {
+  // Increment Down GR with negative value
+  font-size: modular-scale(14px,  -1, 1.618);
+  // returns: 8.653px
+}
+
+// Can be used with ceil(round up) or floor(round down)
+div.scaleFloor {
+  font-size: floor(modular-scale(14px, 1, 1.618));
+  // returns: 22px
+}
+
+div.scaleCeil {
+  font-size: ceil(modular-scale(14px, 1, 1.618));
+  // returns: 23px
+}

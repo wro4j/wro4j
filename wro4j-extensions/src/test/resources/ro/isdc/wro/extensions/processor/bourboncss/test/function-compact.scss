@@ -1,0 +1,12 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+$name-1: 1px;
+$name-2: false;
+$name-3: false;
+$name-4: false;
+
+$full:  compact($name-1, $name-2, $name-3, $name-4);
+
+div.compacted {
+  border: $full;
+}

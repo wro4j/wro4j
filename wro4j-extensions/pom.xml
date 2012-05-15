@@ -58,16 +58,22 @@
 			<artifactId>dojo-shrinksafe</artifactId>
 			<version>1.7.2</version>
 		</dependency>
-        <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.6.7</version>
-        </dependency>
-        <dependency>
-            <groupId>me.n4u.sass</groupId>
-            <artifactId>sass-gems</artifactId>
-            <version>3.1.15</version>
-        </dependency>
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <version>1.6.7</version>
+    </dependency>
+    <dependency>
+      <groupId>me.n4u.sass</groupId>
+      <artifactId>sass-gems</artifactId>
+      <version>3.1.16</version>
+    </dependency>
+    <!-- TODO - proper name for bourbon-gems -->
+    <dependency>
+      <groupId>me.n4u.bourbon</groupId>
+      <artifactId>bourbon-gems</artifactId>
+      <version>2.1.0</version>
+    </dependency>
 		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId>
 			<artifactId>gmaven-runtime-default</artifactId> <version>1.0-rc-3</version> 
 			</dependency> -->

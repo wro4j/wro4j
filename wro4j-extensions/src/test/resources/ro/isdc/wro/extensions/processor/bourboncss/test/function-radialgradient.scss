@@ -1,0 +1,13 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.one {
+  @include background-image(radial-gradient(#1e5799, #3dc3d1));
+}
+
+div.two {
+  @include background-image(radial-gradient(50% 50%, circle cover, #1e5799, #3dc3d1));
+}
+
+div.three {
+  @include background-image(radial-gradient(50% 50%, circle cover, #eee 10%, #1e5799 30%, #efefef));
+}

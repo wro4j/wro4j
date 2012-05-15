@@ -1,0 +1,26 @@
+div.normal {
+  @font-face {
+    font-family: nobile;
+    src: url("/fonts/nobile.eot");
+    src: url("/fonts/nobile.eot?#iefix") format("embedded-opentype"), url("/fonts/nobile.woff") format("woff"), url("/fonts/nobile.ttf") format("truetype"), url("/fonts/nobile.svg#nobile") format("svg");
+    font-weight: normal;
+    font-style: normal; }
+ }
+
+div.bold {
+  @font-face {
+    font-family: nobile;
+    src: url("/fonts/nobile_bold.eot");
+    src: url("/fonts/nobile_bold.eot?#iefix") format("embedded-opentype"), url("/fonts/nobile_bold.woff") format("woff"), url("/fonts/nobile_bold.ttf") format("truetype"), url("/fonts/nobile_bold.svg#nobile") format("svg");
+    font-weight: bold;
+    font-style: normal; }
+ }
+
+div.italic {
+  @font-face {
+    font-family: nobile;
+    src: url("/fonts/nobile_italic.eot");
+    src: url("/fonts/nobile_italic.eot?#iefix") format("embedded-opentype"), url("/fonts/nobile_italic.woff") format("woff"), url("/fonts/nobile_italic.ttf") format("truetype"), url("/fonts/nobile_italic.svg#nobile") format("svg");
+    font-weight: normal;
+    font-style: italic; }
+ }

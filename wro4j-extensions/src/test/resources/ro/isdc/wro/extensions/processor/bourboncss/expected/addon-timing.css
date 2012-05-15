@@ -1,0 +1,6 @@
+div.timing {
+  -webkit-transition: all, 5s, cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -moz-transition: all, 5s, cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -ms-transition: all, 5s, cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -o-transition: all, 5s, cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transition: all, 5s, cubic-bezier(0.6, 0.04, 0.98, 0.335); }

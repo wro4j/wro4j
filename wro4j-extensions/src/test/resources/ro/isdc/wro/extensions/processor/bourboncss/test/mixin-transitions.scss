@@ -1,0 +1,14 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.transitionAll {
+  @include transition (all 2.0s ease-in-out);
+}
+
+div.transitionOpacity {
+  @include transition (opacity 1.0s ease-in 0s, width 2.0s ease-in 2s);
+}
+
+// Transition a vendor-prefixed property (transform)
+div.transitionVendor {
+  @include transition (transition-property-names((transform, color, background), moz) 1.0s ease-in 0s);
+}

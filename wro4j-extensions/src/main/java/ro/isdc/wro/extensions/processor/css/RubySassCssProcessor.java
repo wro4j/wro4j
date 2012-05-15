@@ -68,7 +68,7 @@ public class RubySassCssProcessor
   /**
    * A getter used for lazy loading.
    */
-  private RubySassEngine getEngine() {
+  protected RubySassEngine getEngine() {
     if (engine == null) {
       engine = new RubySassEngine();
     }

@@ -1,0 +1,5 @@
+div.test {
+  -webkit-border-image: url(/images/border.png) 27 repeat;
+  -moz-border-image: url(/images/border.png) 27 repeat;
+  -o-border-image: url(/images/border.png) 27 repeat;
+  border-image: url(/images/border.png) 27 repeat; }

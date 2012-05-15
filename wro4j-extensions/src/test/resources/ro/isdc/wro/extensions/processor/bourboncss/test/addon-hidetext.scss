@@ -1,0 +1,6 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.hide {
+  @include hide-text;
+  background-image: url(logo.png);
+}
