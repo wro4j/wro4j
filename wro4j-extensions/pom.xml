@@ -68,10 +68,9 @@
       <artifactId>sass-gems</artifactId>
       <version>3.1.16</version>
     </dependency>
-    <!-- TODO - proper name for bourbon-gems -->
     <dependency>
-      <groupId>me.n4u.bourbon</groupId>
-      <artifactId>bourbon-gems</artifactId>
+      <groupId>com.edmi</groupId>
+      <artifactId>bourbon-gem-jar</artifactId>
       <version>2.1.0</version>
     </dependency>
 		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId>
