@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.http.support.FieldsSavingRequestWrapper;
 import ro.isdc.wro.model.resource.ResourceType;
 
 
@@ -179,7 +180,7 @@ public class Context {
    * Constructor.
    */
   private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
-    this.request = request;
+    this.request = new FieldsSavingRequestWrapper(request);
     this.response = response;
     this.servletContext = filterConfig != null ? filterConfig.getServletContext() : null;
     this.filterConfig = filterConfig;
