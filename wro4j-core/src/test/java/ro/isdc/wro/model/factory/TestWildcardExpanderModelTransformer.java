@@ -4,6 +4,10 @@
  */
 package ro.isdc.wro.model.factory;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -27,8 +31,13 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
+import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -108,6 +117,26 @@ public class TestWildcardExpanderModelTransformer {
     final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: {}", changedModel);
     Assert.assertEquals(3, changedModel.getGroupByName("group").getResources().size());
+  }
+
+  @Test
+  public void testExpandWildcardRootDir() throws Exception {
+    final String uri = "/**.js";
+    Resource resource = Resource.create(uri, ResourceType.JS);
+	Group group = new Group("group").addResource(resource);
+
+    String baseNameFolder = WroUtil.toPackageAsFolder(getClass());
+	Function<Collection<File>, Void> expanderHandler = transformer.createExpanderHandler(group, resource, baseNameFolder);
+	File mockFile1 = Mockito.mock(File.class);
+	Mockito.when(mockFile1.getPath()).thenReturn(baseNameFolder+"/js1.js");
+	File mockFile2 = Mockito.mock(File.class);
+	Mockito.when(mockFile2.getPath()).thenReturn(baseNameFolder+"/js2.js");
+    
+	expanderHandler.apply(Arrays.asList(mockFile1, mockFile2));
+    LOG.debug("group: {}", group);
+    Assert.assertEquals(2, group.getResources().size());
+    Assert.assertEquals("/js1.js", group.getResources().get(0).getUri());
+    Assert.assertEquals("/js2.js", group.getResources().get(1).getUri());
   }
 
   @Test

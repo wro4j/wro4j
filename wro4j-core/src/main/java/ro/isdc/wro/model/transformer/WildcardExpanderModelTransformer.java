@@ -188,7 +188,7 @@ public class WildcardExpanderModelTransformer
           final List<Resource> expandedResources = new ArrayList<Resource>();
           LOG.debug("baseNameFolder: {}", baseNameFolder);
           for (final File file : files) {
-            final String resourcePath = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
+            final String resourcePath = getFullPathNoEndSeparator(resource);
             LOG.debug("\tresourcePath: {}", resourcePath);
             LOG.debug("\tfile path: {}", file.getPath());
             final String computedResourceUri = resourcePath
@@ -203,6 +203,14 @@ public class WildcardExpanderModelTransformer
         }
         return null;
       }
+
+	private String getFullPathNoEndSeparator(final Resource resource) {
+		String result = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
+		if (result!=null && 1==result.length() && 0==FilenameUtils.indexOfLastSeparator(result))
+			return "";
+		
+		return result;
+	}
     };
     return handler;
   }
