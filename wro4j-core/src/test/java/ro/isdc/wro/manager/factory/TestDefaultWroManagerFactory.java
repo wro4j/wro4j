@@ -4,6 +4,7 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -55,5 +56,21 @@ public class TestDefaultWroManagerFactory {
     WroConfiguration config = new WroConfiguration();
     config.setWroManagerClassName("invalid.class.name.ManagerFactory");
     victim = new DefaultWroManagerFactory(config);
+  }
+  
+  @Test
+  public void shouldInvokeListenerMethods() {
+    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
+    victim = new DefaultWroManagerFactory(new WroConfiguration()) {
+      @Override
+      protected WroManagerFactory newManagerFactory() {
+        return mockManagerFactory;
+      }
+    };
+    victim.onCachePeriodChanged(0);
+    Mockito.verify(mockManagerFactory).onCachePeriodChanged(0);
+    
+    victim.onModelPeriodChanged(0);
+    Mockito.verify(mockManagerFactory).onModelPeriodChanged(0);
   }
 }
