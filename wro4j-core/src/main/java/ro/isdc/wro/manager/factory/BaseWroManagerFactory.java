@@ -16,7 +16,6 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -35,7 +34,6 @@ import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
 import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
-import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 
 
@@ -47,7 +45,7 @@ import ro.isdc.wro.util.Transformer;
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
-  implements WroManagerFactory, WroConfigurationChangeListener, ObjectFactory<WroManager> {
+  implements WroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
 
   private GroupExtractor groupExtractor;
