@@ -50,35 +50,35 @@ import ro.isdc.wro.util.Transformer;
  * <p/>
  * This model transformation is also known as wildcard expander, because it mutates the model after it is built by
  * adding resources to the group which contains resources with wildcard uri.
- *
+ * 
  * @author Alex Objelean
  * @created 18 Jul 2011
  * @since 1.4.0
  */
 @SuppressWarnings("serial")
 public class WildcardExpanderModelTransformer
-  implements Transformer<WroModel> {
+    implements Transformer<WroModel> {
   private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderModelTransformer.class);
-
+  
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-
-
+  
   /**
    * An instance of IOException having a special purpose: to skip subsequent attempts to localize a stream.
    */
-  public static class NoMoreAttemptsIOException extends IOException {
+  public static class NoMoreAttemptsIOException
+      extends IOException {
     public NoMoreAttemptsIOException(final String message) {
       super(message);
     }
   }
-
+  
   /**
    * {@inheritDoc}
    */
   public WroModel transform(final WroModel input) {
     final WroModel model = input;
-
+    
     for (final Group group : model.getGroups()) {
       final List<Resource> resources = group.getResources();
       for (final Resource resource : resources) {
@@ -88,33 +88,35 @@ public class WildcardExpanderModelTransformer
     LOG.debug("Transformed model: {}", model);
     return model;
   }
-
+  
   /**
    * Process each resource and replace it with a collection of resources if it contains wildcard.
    */
   private void processResource(final Group group, final Resource resource) {
     final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
-
+    
     if (uriLocator instanceof WildcardUriLocatorSupport) {
-      final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport)uriLocator).getWildcardStreamLocator();
-
-      //TODO should we probably handle the situation when wildcard is present, but the implementation is not expandedHandledAware?
+      final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport) uriLocator).getWildcardStreamLocator();
+      
+      // TODO should we probably handle the situation when wildcard is present, but the implementation is not
+      // expandedHandledAware?
       if (wildcardStreamLocator.hasWildcard(resource.getUri())
-        && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
-
+          && wildcardStreamLocator instanceof WildcardExpanderHandlerAware) {
+        
         final WildcardExpanderHandlerAware expandedHandler = (WildcardExpanderHandlerAware) wildcardStreamLocator;
         LOG.debug("Expanding resource: {}", resource.getUri());
-
+        
         final String baseNameFolder = computeBaseNameFolder(resource, uriLocator, expandedHandler);
         LOG.debug("baseNameFolder: {}", baseNameFolder);
-
+        
         expandedHandler.setWildcardExpanderHandler(createExpanderHandler(group, resource, baseNameFolder));
         try {
           // trigger the wildcard replacement
           uriLocator.locate(resource.getUri());
         } catch (final IOException e) {
           // log only
-          LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}", resource.getUri());
+          LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}",
+              resource.getUri());
         } finally {
           // remove the handler, it is not needed anymore
           expandedHandler.setWildcardExpanderHandler(null);
@@ -122,41 +124,40 @@ public class WildcardExpanderModelTransformer
       }
     }
   }
-
-
+  
   /**
    * Computes the file name of the folder where the resource is located. The implementation uses a trick by invoking the
    * {@link WildcardExpanderHandlerAware} to get the baseName.
    */
   private String computeBaseNameFolder(final Resource resource, final UriLocator uriLocator,
-    final WildcardExpanderHandlerAware expandedHandler) {
+      final WildcardExpanderHandlerAware expandedHandler) {
     // Find the baseName
     // add a recursive wildcard to trigger the wildcard detection. The simple wildcard ('*') is not enough because it
     // won't work for folders containing only directories with no files.
     LOG.debug("computeBaseNameFolder for resource {}", resource);
     final String resourcePath = FilenameUtils.getFullPath(resource.getUri())
-      + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
+        + DefaultWildcardStreamLocator.RECURSIVE_WILDCARD;
     LOG.debug("resourcePath: {}", resourcePath);
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
     expandedHandler.setWildcardExpanderHandler(createBaseNameComputerFunction(baseNameFolderHolder));
-
+    
     try {
       uriLocator.locate(resourcePath);
     } catch (final Exception e) {
-      LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}", resourcePath,
-          e.getMessage());
+      LOG.debug("[FAIL] Exception caught during wildcard expanding for resource: {}\n with exception message {}",
+          resourcePath, e.getMessage());
     }
     if (baseNameFolderHolder.get() == null) {
       LOG.debug("[FAIL] Cannot compute baseName folder for resource: {}", resource);
     }
     return baseNameFolderHolder.get();
   }
-
+  
   private Function<Collection<File>, Void> createBaseNameComputerFunction(final ThreadLocal<String> baseNameFolderHolder) {
     return new Function<Collection<File>, Void>() {
       public Void apply(final Collection<File> input)
-        throws Exception {
+          throws Exception {
         LOG.debug("\texpanded Files: {}", input);
         for (final File file : input) {
           LOG.debug("\tsetting baseNameFolder: {}", file.getParent());
@@ -169,19 +170,18 @@ public class WildcardExpanderModelTransformer
       }
     };
   }
-
-
+  
   /**
    * create the handler which expand the resources containing wildcard.
    */
   public Function<Collection<File>, Void> createExpanderHandler(final Group group, final Resource resource,
-    final String baseNameFolder) {
+      final String baseNameFolder) {
     LOG.debug("createExpanderHandler using baseNameFolder: {}\n for resource {}", baseNameFolder, resource);
     final Function<Collection<File>, Void> handler = new Function<Collection<File>, Void>() {
       public Void apply(final Collection<File> files) {
         if (baseNameFolder == null) {
           // replacing group with empty list since the original uri has no associated resources.
-          //No BaseNameFolder found
+          // No BaseNameFolder found
           LOG.warn("The resource {} is probably invalid, removing it from the group.", resource);
           group.replace(resource, new ArrayList<Resource>());
         } else {
@@ -192,8 +192,8 @@ public class WildcardExpanderModelTransformer
             LOG.debug("\tresourcePath: {}", resourcePath);
             LOG.debug("\tfile path: {}", file.getPath());
             final String computedResourceUri = resourcePath
-              + StringUtils.removeStart(file.getPath(), baseNameFolder).replace('\\', '/');
-
+                + StringUtils.removeStart(file.getPath(), baseNameFolder).replace('\\', '/');
+            
             final Resource expandedResource = Resource.create(computedResourceUri, resource.getType());
             LOG.debug("\texpanded resource: {}", expandedResource);
             expandedResources.add(expandedResource);
@@ -203,14 +203,19 @@ public class WildcardExpanderModelTransformer
         }
         return null;
       }
-
-	private String getFullPathNoEndSeparator(final Resource resource) {
-		String result = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
-		if (result!=null && 1==result.length() && 0==FilenameUtils.indexOfLastSeparator(result))
-			return "";
-		
-		return result;
-	}
+      
+      /**
+       * This method fixes the problem when a resource in a group uses deep wildcard and starts at the root.
+       * <p/>
+       * Find more details <a href="https://github.com/alexo/wro4j/pull/44">here</a>.
+       */
+      private String getFullPathNoEndSeparator(final Resource resource) {
+        String result = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
+        if (result != null && 1 == result.length() && 0 == FilenameUtils.indexOfLastSeparator(result))
+          return "";
+        
+        return result;
+      }
     };
     return handler;
   }
