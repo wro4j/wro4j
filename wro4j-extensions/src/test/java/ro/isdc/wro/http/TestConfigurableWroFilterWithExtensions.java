@@ -1,31 +1,29 @@
 package ro.isdc.wro.http;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.ConfigConstants;
-import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
-import javax.servlet.FilterChain;
+import java.util.Collection;
+import java.util.Properties;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Properties;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
+import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 
 /**
@@ -70,7 +68,7 @@ public class TestConfigurableWroFilterWithExtensions {
     WroManager wroManager = factory.create();
     
     ProcessorsFactory processorsFactory = wroManager.getProcessorsFactory();
-    Collection<ResourcePostProcessor> postProcessors = processorsFactory.getPostProcessors();
+    Collection<ResourceProcessor> postProcessors = processorsFactory.getPostProcessors();
     
     assertEquals(1, postProcessors.size());
   }

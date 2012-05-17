@@ -16,6 +16,7 @@
 	<properties>
 		<wicket.version>1.5.2</wicket.version>
 		<gae.version>1.5.4</gae.version>
+		<jetty.version>8.0.0.M1</jetty.version>
 		<dwr.version>3.0.M1</dwr.version>
 		<guice.version>3.0</guice.version>
 		<project_charset>UTF-8</project_charset>
@@ -176,6 +177,17 @@
 				<version>0.5.6</version>
 				<configuration>
 					<port>81</port>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty.version}</version>
+				<configuration>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<webAppConfig>
+						<contextPath>/</contextPath>
+					</webAppConfig>
 				</configuration>
 			</plugin>
 		</plugins>

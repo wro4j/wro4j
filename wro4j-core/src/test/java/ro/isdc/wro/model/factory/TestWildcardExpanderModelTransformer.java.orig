@@ -70,7 +70,12 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void testGroupWithNoWildcard() {
     final WroModel model = new WroModel();
+<<<<<<< HEAD
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/file1.js", WroUtil.toPackageAsFolder(getClass()));
+=======
+    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/file1.js",
+        WroUtil.toPackageAsFolder(getClass()));
+>>>>>>> 1.4.x
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     final WroModel changedModel = transformer.transform(model);
@@ -83,7 +88,12 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void testGroupWithInvalidResource() {
     final WroModel model = new WroModel();
+<<<<<<< HEAD
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/INVALID.*", WroUtil.toPackageAsFolder(getClass()));
+=======
+    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/INVALID.*",
+        WroUtil.toPackageAsFolder(getClass()));
+>>>>>>> 1.4.x
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     final WroModel changedModel = transformer.transform(model);
@@ -93,7 +103,12 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void testExpandWildcardWithASingleResource() {
     final WroModel model = new WroModel();
+<<<<<<< HEAD
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/?cript1.js", WroUtil.toPackageAsFolder(getClass()));
+=======
+    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/?cript1.js",
+        WroUtil.toPackageAsFolder(getClass()));
+>>>>>>> 1.4.x
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     
@@ -105,7 +120,12 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void testExpandWildcardWithMultipleResources() {
     final WroModel model = new WroModel();
+<<<<<<< HEAD
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/*.js", WroUtil.toPackageAsFolder(getClass()));
+=======
+    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/*.js",
+        WroUtil.toPackageAsFolder(getClass()));
+>>>>>>> 1.4.x
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     
@@ -139,15 +159,27 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void shouldCorrectlyDetectFilesFromFoldersWithDirectoriesOnlyAsChildren() {
     final WroModel model = new WroModel();
+<<<<<<< HEAD
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/subfolder/**.js", WroUtil.toPackageAsFolder(getClass()));
+=======
+    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/subfolder/**.js",
+        WroUtil.toPackageAsFolder(getClass()));
+>>>>>>> 1.4.x
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     
     final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: {}", changedModel);
+<<<<<<< HEAD
 
     final String resultPathPrefix = String.format("%s%s/expander/subfolder", ClasspathResourceLocator.PREFIX, WroUtil.toPackageAsFolder(getClass()));
 
+=======
+    
+    final String resultPathPrefix = String.format("%s%s/expander/subfolder", ClasspathUriLocator.PREFIX,
+        WroUtil.toPackageAsFolder(getClass()));
+    
+>>>>>>> 1.4.x
     Assert.assertEquals(2, changedModel.getGroupByName("group").getResources().size());
     Assert.assertEquals(resultPathPrefix + "/folder1/script1.js",
         changedModel.getGroupByName("group").getResources().get(0).getUri());
@@ -158,7 +190,12 @@ public class TestWildcardExpanderModelTransformer {
   @Test
   public void wildcardResourcesAreOrderedAlphabetically() {
     final WroModel model = new WroModel();
+<<<<<<< HEAD
     final String uri = String.format(ClasspathResourceLocator.PREFIX + "%s/expander/order/**.js", WroUtil.toPackageAsFolder(getClass()));
+=======
+    final String uri = String.format(ClasspathUriLocator.PREFIX + "%s/expander/order/**.js",
+        WroUtil.toPackageAsFolder(getClass()));
+>>>>>>> 1.4.x
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     
