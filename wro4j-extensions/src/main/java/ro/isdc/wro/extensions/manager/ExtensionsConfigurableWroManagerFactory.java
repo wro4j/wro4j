@@ -9,11 +9,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
-import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
-import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
-import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.css.*;
 import ro.isdc.wro.extensions.processor.js.*;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -133,6 +129,12 @@ public class ExtensionsConfigurableWroManagerFactory
       @Override
       protected ResourcePreProcessor initialize() {
         return new RubySassCssProcessor();
+      }
+    }));
+    map.put(BourbonCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new BourbonCssProcessor();
       }
     }));
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new LazyProcessorDecorator(
