@@ -123,10 +123,11 @@ public final class Group {
 
   /**
    * @param type
-   *          of resources to collect.
-   * @return a group containing filtered resources. The created group has the same name.
+   *          of resources to collect. This value should not be null.
+   * @return a new group with the same name as original containing filtered resources. The created group has the same name.
    */
   public final Group collectResourcesOfType(final ResourceType type) {
+    Validate.notNull(type);
     final List<Resource> allResources = new ArrayList<Resource>();
     allResources.addAll(getResources());
 
