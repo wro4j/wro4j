@@ -53,7 +53,7 @@ public class PreProcessorExecutor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private WroConfiguration configuration;
+  private WroConfiguration config;
   /**
    * Runs the preProcessing in parallel.
    */
@@ -90,7 +90,7 @@ public class PreProcessorExecutor {
   }
   
   private boolean shouldRunInParallel(final List<Resource> resources) {
-    final boolean isParallel = configuration.isParallelPreprocessing();
+    final boolean isParallel = config.isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
@@ -176,9 +176,13 @@ public class PreProcessorExecutor {
       final Reader reader = new StringReader(resourceContent);
       try {
         decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
-      } catch (Exception e) {
-        IOUtils.copy(reader, writer);
-        LOG.debug("skipped processing on resource: {}, using processor: {}", resource, processor);
+      } catch (final Exception e) {
+        LOG.debug("Failed to process the resource: {} using processor: {}", resource, processor);
+        if (config.isIgnoreFailingProcessor()) {
+          writer.write(resourceContent);
+        } else {
+          throw new WroRuntimeException("The processor: " + processor + " failed", e);
+        }
       }
       resourceContent = writer.toString();
       stopWatch.stop();
@@ -198,7 +202,7 @@ public class PreProcessorExecutor {
       throws IOException {
     try {
       final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
-      final String result = IOUtils.toString(is, configuration.getEncoding());
+      final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       if (StringUtils.isEmpty(result)) {
         throw new IOException("Empty resource detected: " + resource.getUri());
@@ -206,7 +210,7 @@ public class PreProcessorExecutor {
       return result;
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: {}", resource);
-      if (configuration.isIgnoreMissingResources()) {
+      if (config.isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
         LOG.error("Cannot ignore the missing resource:  " + resource);

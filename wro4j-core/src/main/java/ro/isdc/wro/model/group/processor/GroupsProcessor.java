@@ -106,8 +106,7 @@ public class GroupsProcessor {
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
-      throws IOException {
+  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content) {
     LOG.debug("postProcessors: {}", processors);
     if (processors.isEmpty()) {
       return content;
@@ -121,10 +120,17 @@ public class GroupsProcessor {
       try {
         decorateWithPostProcessCallback(processor).process(input, output);
       } catch (Exception e) {
-        IOUtils.copy(input, output);
-        LOG.debug("skipped postProcessing of prcoessor: {}", processor);
+        LOG.debug("Failed to postProcess using processor: {}", processor);
+        if (config.isIgnoreFailingProcessor()) {
+          try {
+            output.write(content);
+          } catch (IOException ex) {
+            throw new WroRuntimeException("Shouldn't happen", ex);
+          }
+        } else {
+          throw new WroRuntimeException("The processor: " + processor + " failed", e);
+        }
       }
-      
       input = new StringReader(output.toString());
       stopWatch.stop();
     }

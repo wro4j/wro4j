@@ -101,6 +101,11 @@ public final class WroConfiguration
    */
   private boolean ignoreEmptyGroup = true;
   /**
+   * When this flag is true, any failure during processor, will leave the content unchanged. Otherwise, the exception
+   * will interrupt processing with a {@link RuntimeException}.
+   */
+  private boolean ignoreFailingProcessor = true;
+  /**
    * Listeners for the change of cache & model period properties.
    */
   private final transient List<PropertyChangeListener> cacheUpdatePeriodListeners =
@@ -446,6 +451,17 @@ public final class WroConfiguration
    */
   public void setIgnoreEmptyGroup(boolean ignoreEmptyGroup) {
     this.ignoreEmptyGroup = ignoreEmptyGroup;
+  }
+
+  /**
+   * @return true if the processing failure should be ignored. 
+   */
+  public boolean isIgnoreFailingProcessor() {
+    return ignoreFailingProcessor;
+  }
+  
+  public void setIgnoreFailingProcessor(boolean ignoreFailingProcessor) {
+    this.ignoreFailingProcessor = ignoreFailingProcessor;
   }
 
 
