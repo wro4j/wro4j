@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +118,12 @@ public class GroupsProcessor {
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
       output = new StringWriter();
-      decorateWithPostProcessCallback(processor).process(input, output);
+      try {
+        decorateWithPostProcessCallback(processor).process(input, output);
+      } catch (Exception e) {
+        IOUtils.copy(input, output);
+        LOG.debug("skipped postProcessing of prcoessor: {}", processor);
+      }
       
       input = new StringReader(output.toString());
       stopWatch.stop();

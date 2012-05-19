@@ -42,7 +42,6 @@ public class ProcessorDecorator
     } else if (processor instanceof ResourcePostProcessor) {
       this.decoratedProcessor = toPreProcessor((ResourcePostProcessor) processor);
     } else throw new IllegalArgumentException("Invalid processor: " + processor); 
-    
   }
 
   /**

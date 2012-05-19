@@ -106,7 +106,7 @@ public class PreProcessorExecutor {
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
-      //decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
+      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
       callables.add(new ContextPropagatingCallable<String>(new Callable<String>() {
         public String call()
             throws Exception {
@@ -174,7 +174,12 @@ public class PreProcessorExecutor {
       stopWatch.start("Processor: " + processor.getClass().getSimpleName());
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
-      decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
+      try {
+        decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
+      } catch (Exception e) {
+        IOUtils.copy(reader, writer);
+        LOG.debug("skipped processing on resource: {}, using processor: {}", resource, processor);
+      }
       resourceContent = writer.toString();
       stopWatch.stop();
     }
@@ -211,6 +216,7 @@ public class PreProcessorExecutor {
   }
   
   /**
+   * TODO move this decoration to {@link InjectorBuilder}
    * @return a decorated preProcessor which invokes callback methods.
    */
   private ResourcePreProcessor decorateWithPreProcessCallback(final ResourcePreProcessor processor) {
@@ -240,16 +246,7 @@ public class PreProcessorExecutor {
         final boolean applyProcessor = resource.isMinimize() || !new ProcessorDecorator(processor).isMinimize();
         if (applyProcessor) {
           LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
-          try {
-            processor.process(resource, reader, writer);
-          } catch (final IOException e) {
-            if (!configuration.isIgnoreMissingResources()) {
-              throw e;
-            }
-          }
-        } else {
-          IOUtils.copy(reader, writer);
-          LOG.debug("skipped processing on resource: {}", resource);
+          processor.process(resource, reader, writer);
         }
       }
     };
