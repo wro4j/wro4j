@@ -190,12 +190,24 @@ public class TestPreProcessorExecutor {
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenUsingFailingPreProcessor()
     throws Exception {
+    genericUseFailingPreProcessorWithIngoreFlag(false);
+  }
+  
+  @Test
+  public void shouldNotFailWhenUsingFailingPreProcessor()
+      throws Exception {
+    genericUseFailingPreProcessorWithIngoreFlag(true);
+  }
+
+  private void genericUseFailingPreProcessorWithIngoreFlag(boolean ignoreFlag) throws Exception {
+    Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
     Assert.assertEquals("", result);
-  }
 
+  }
+  
   /**
    * This test should work when running at least on dual-core.
    * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))

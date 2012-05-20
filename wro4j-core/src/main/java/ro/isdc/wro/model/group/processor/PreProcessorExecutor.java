@@ -251,6 +251,8 @@ public class PreProcessorExecutor {
         if (applyProcessor) {
           LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
           processor.process(resource, reader, writer);
+        } else {
+          IOUtils.copy(reader, writer);
         }
       }
     };
