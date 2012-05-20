@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -134,5 +136,18 @@ public class TestMinimizeAwareProcessorDecorator {
     victim.process(mockReader, mockWriter);
     Mockito.verify(mockPostProcessor, Mockito.atLeastOnce()).process(Mockito.any(Reader.class),
         Mockito.any(Writer.class));
+  }
+  
+  @Test
+  public void shouldLeaveContentUnchangedWhenProcessorIsSkipped()
+      throws Exception {
+    ResourcePreProcessor processor = Mockito.spy(new JSMinProcessor());
+    victim = new MinimizeAwareProcessorDecorator(processor, false);
+    final String resourceContent = "var i      =     1;";
+    final StringWriter writer = new StringWriter();
+    victim.process(new StringReader(resourceContent), writer);
+    Mockito.verify(mockPostProcessor, Mockito.never()).process(Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
+    Assert.assertEquals(resourceContent, writer.toString());
   }
 }

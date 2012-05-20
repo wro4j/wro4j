@@ -247,6 +247,7 @@ public class PreProcessorExecutor {
    * doesn't require the minimization.
    */
   private ResourcePreProcessor decorateWithMinimizeAware(final ResourcePreProcessor processor) {
+//    new MinimizeAwareProcessorDecorator(processor, minimize)
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {

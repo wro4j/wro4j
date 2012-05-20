@@ -25,7 +25,17 @@ import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 public class MinimizeAwareProcessorDecorator
     extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(MinimizeAwareProcessorDecorator.class);
-  private boolean minimize;
+  private boolean minimize = true;
+  
+  /**
+   * Uses minimize flag as true by default.
+   * 
+   * @param processor
+   */
+  public MinimizeAwareProcessorDecorator(final Object processor) {
+    this(processor, true);
+  }
+  
   /**
    * Decorates a pre or post processor.
    */
@@ -42,8 +52,9 @@ public class MinimizeAwareProcessorDecorator
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final ResourcePreProcessor processor = getDecoratedObject();
-    //apply processor only when minimize is required or the processor is not minimize aware
-    final boolean applyProcessor = minimize || !isMinimize();
+    // apply processor only when minimize is required or the processor is not minimize aware
+    final boolean applyProcessor = resource != null && minimize && resource.isMinimize() || resource == null
+        && minimize || !isMinimize();
     if (applyProcessor) {
       LOG.debug("Using Processor: {}", processor);
       processor.process(resource, reader, writer);
