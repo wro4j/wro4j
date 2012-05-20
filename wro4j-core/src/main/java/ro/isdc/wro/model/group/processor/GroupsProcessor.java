@@ -111,31 +111,34 @@ public class GroupsProcessor {
     if (processors.isEmpty()) {
       return content;
     }
-    Reader input = new StringReader(content.toString());
-    Writer output = null;
+    Reader reader = new StringReader(content.toString());
+    Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
-      output = new StringWriter();
+      writer = new StringWriter();
       try {
-        decorateWithPostProcessCallback(processor).process(input, output);
+        decorateWithPostProcessCallback(processor).process(reader, writer);
       } catch (Exception e) {
         LOG.debug("Failed to postProcess using processor: {}", processor);
         if (config.isIgnoreFailingProcessor()) {
           try {
-            output.write(content);
+            writer.write(content);
           } catch (IOException ex) {
             throw new WroRuntimeException("Shouldn't happen", ex);
           }
         } else {
           throw new WroRuntimeException("The processor: " + processor + " failed", e);
         }
+      } finally {
+        IOUtils.closeQuietly(reader);
+        IOUtils.closeQuietly(writer);
       }
-      input = new StringReader(output.toString());
+      reader = new StringReader(writer.toString());
       stopWatch.stop();
     }
     LOG.debug(stopWatch.prettyPrint());
-    return output.toString();
+    return writer.toString();
   }
 
   /**

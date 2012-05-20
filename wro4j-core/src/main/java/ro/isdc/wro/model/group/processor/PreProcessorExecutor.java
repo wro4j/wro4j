@@ -183,6 +183,9 @@ public class PreProcessorExecutor {
         } else {
           throw new WroRuntimeException("The processor: " + processor + " failed", e);
         }
+      } finally {
+        reader.close();
+        writer.close();
       }
       resourceContent = writer.toString();
       stopWatch.stop();

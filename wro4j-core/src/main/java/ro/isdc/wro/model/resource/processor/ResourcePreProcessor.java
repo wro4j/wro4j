@@ -22,7 +22,8 @@ public interface ResourcePreProcessor {
    * use reader for processing instead of trying to access the resource original content using {@link Resource}, because
    * this way you can ignore the other preProcessors from the chain.<br/>
    * When the processing fails, the content will remain unchanged. Therefore, it is not require to explicitly handle
-   * exception.
+   * exception.<br/>
+   * It is not required to close the reader and writers, because these will be closed for you.
    * 
    * @param resource
    *          the original resource as it found in the model.
