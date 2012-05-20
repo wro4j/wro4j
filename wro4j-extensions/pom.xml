@@ -69,7 +69,7 @@
       <version>3.1.16</version>
     </dependency>
     <dependency>
-      <groupId>com.edmi</groupId>
+      <groupId>nz.co.edmi</groupId>
       <artifactId>bourbon-gem-jar</artifactId>
       <version>2.1.0</version>
     </dependency>
