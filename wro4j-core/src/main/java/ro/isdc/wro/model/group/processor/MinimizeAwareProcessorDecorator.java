@@ -53,8 +53,8 @@ public class MinimizeAwareProcessorDecorator
       throws IOException {
     final ResourcePreProcessor processor = getDecoratedObject();
     // apply processor only when minimize is required or the processor is not minimize aware
-    final boolean applyProcessor = resource != null && minimize && resource.isMinimize() || resource == null
-        && minimize || !isMinimize();
+    final boolean applyProcessor = (resource != null && resource.isMinimize() && minimize)
+        || (resource == null && minimize) || !isMinimize();
     if (applyProcessor) {
       LOG.debug("Using Processor: {}", processor);
       processor.process(resource, reader, writer);

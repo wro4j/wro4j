@@ -6,7 +6,9 @@ package ro.isdc.wro.model.group.processor;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
@@ -255,10 +260,10 @@ public class TestPreProcessorExecutor {
   public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
     throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
-    Resource resource = Resource.create("classpath:1.js");
+    final Resource resource = Resource.create("classpath:1.js");
     resource.setMinimize(false);
     resources.add(resource);
-    ResourcePreProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
+    final ResourcePreProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -269,6 +274,33 @@ public class TestPreProcessorExecutor {
     executor.processAndMerge(resources, true);
   }
 
+  /**
+   * When an empty resource is processed, the processing should not fail (warn only).
+   */
+  @Test
+  public void shouldNotFailWhenEmptyResourceIsFound() throws Exception {
+    final WroConfiguration config = Context.get().getConfig();
+    config.setIgnoreMissingResources(false);
+    
+    final UriLocator emptyStreamLocator = new UriLocator() {
+      public boolean accept(final String uri) {
+        return true;
+      }
+      public InputStream locate(final String uri)
+          throws IOException {
+        return new ByteArrayInputStream("".getBytes());
+      }
+    };
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(emptyStreamLocator);
+    //init executor
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory);
+    InjectorBuilder.create(managerFactory).build().inject(executor);
+    
+    final List<Resource> resources = new ArrayList<Resource>();
+    resources.add(Resource.create("/resource.js"));
+    executor.processAndMerge(resources, true);
+  }
+  
   @After
   public void tearDown() {
     Context.unset();

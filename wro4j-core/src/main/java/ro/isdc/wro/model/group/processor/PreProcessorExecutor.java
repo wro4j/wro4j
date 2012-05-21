@@ -31,7 +31,6 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -208,7 +207,7 @@ public class PreProcessorExecutor {
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       if (StringUtils.isEmpty(result)) {
-        throw new IOException("Empty resource detected: " + resource.getUri());
+        LOG.warn("Empty resource detected: {}", resource.getUri());
       }
       return result;
     } catch (final IOException e) {
@@ -247,18 +246,6 @@ public class PreProcessorExecutor {
    * doesn't require the minimization.
    */
   private ResourcePreProcessor decorateWithMinimizeAware(final ResourcePreProcessor processor) {
-//    new MinimizeAwareProcessorDecorator(processor, minimize)
-    return new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        final boolean applyProcessor = resource.isMinimize() || !new ProcessorDecorator(processor).isMinimize();
-        if (applyProcessor) {
-          LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
-          processor.process(resource, reader, writer);
-        } else {
-          IOUtils.copy(reader, writer);
-        }
-      }
-    };
+    return new MinimizeAwareProcessorDecorator(processor);
   }
 }

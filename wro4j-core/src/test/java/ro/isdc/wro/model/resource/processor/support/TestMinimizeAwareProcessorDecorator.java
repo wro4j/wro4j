@@ -33,14 +33,17 @@ public class TestMinimizeAwareProcessorDecorator {
   private Reader mockReader;
   private Writer mockWriter;
   private MinimizeAwareProcessorDecorator victim;
-  
-  private static class MinimizeAwarePostProcessor
-      implements ResourcePostProcessor, MinimizeAware {
+  /**
+   * A processor which performs some sort of minimization.
+   */
+  private static class MinimizeAwareProcessor
+      implements ResourcePreProcessor, ResourcePostProcessor, MinimizeAware {
     public void process(final Reader reader, final Writer writer)
         throws IOException {
-      // do nothing
     }
-    
+    public void process(Resource resource, Reader reader, Writer writer)
+        throws IOException {
+    }
     public boolean isMinimize() {
       return true;
     }
@@ -87,10 +90,11 @@ public class TestMinimizeAwareProcessorDecorator {
   public void shouldInvokeMinimizePostProcessorWhenMinimizeIsRequired()
       throws Exception {
     
-    ResourcePostProcessor processor = Mockito.spy(new MinimizeAwarePostProcessor());
+    MinimizeAwareProcessor processor = Mockito.spy(new MinimizeAwareProcessor());
     victim = new MinimizeAwareProcessorDecorator(processor, true);
     victim.process(mockReader, mockWriter);
-    Mockito.verify(processor, Mockito.atLeastOnce()).process(Mockito.any(Reader.class), Mockito.any(Writer.class));
+    Mockito.verify(processor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
   }
   
   @Test
@@ -149,5 +153,59 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPostProcessor, Mockito.never()).process(Mockito.any(Reader.class),
         Mockito.any(Writer.class));
     Assert.assertEquals(resourceContent, writer.toString());
+  }
+  
+  @Test
+  public void shouldInvokePreProcessor()
+      throws Exception {
+    victim = new MinimizeAwareProcessorDecorator(mockPreProcessor);
+    victim.process(null, mockReader, mockWriter);
+    Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
+  }
+  
+
+  @Test
+  public void shouldInvokePreProcessorWithResourceWantingMinimize()
+      throws Exception {
+    victim = new MinimizeAwareProcessorDecorator(mockPreProcessor);
+    final Resource resource = Resource.create("someResource.js");
+    resource.setMinimize(true);
+    victim.process(resource, mockReader, mockWriter);
+    Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
+  }
+
+  @Test
+  public void shouldInvokePreProcessorWithResourceNotWantingMinimize()
+      throws Exception {
+    victim = new MinimizeAwareProcessorDecorator(mockPreProcessor);
+    final Resource resource = Resource.create("someResource.js");
+    resource.setMinimize(false);
+    victim.process(resource, mockReader, mockWriter);
+    Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
+  }
+  
+  @Test
+  public void shouldInvokeMinimizeAwarePreProcessorWithResourceWantingMinimize()
+      throws Exception {
+    victim = new MinimizeAwareProcessorDecorator(new MinimizeAwareProcessor());
+    final Resource resource = Resource.create("someResource.js");
+    resource.setMinimize(true);
+    victim.process(resource, mockReader, mockWriter);
+    Mockito.verify(mockPreProcessor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
+  }
+
+  @Test
+  public void shouldNotInvokeMinimizeAwarePreProcessorWithResourceNotWantingMinimize()
+      throws Exception {
+    victim = new MinimizeAwareProcessorDecorator(new MinimizeAwareProcessor());
+    final Resource resource = Resource.create("someResource.js");
+    resource.setMinimize(false);
+    victim.process(resource, mockReader, mockWriter);
+    Mockito.verify(mockPreProcessor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
   }
 }
