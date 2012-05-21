@@ -7,12 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -36,6 +31,9 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
+import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
+import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
@@ -63,18 +61,6 @@ public class WroFilter
    */
   private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
   /**
-   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
-   */
-  public static final String PATH_API = "wroAPI";
-  /**
-   * API - reload cache method call
-   */
-  public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
-  /**
-   * API - reload model method call
-   */
-  public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
-  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -86,6 +72,11 @@ public class WroFilter
    * WroManagerFactory. The brain of the optimizer.
    */
   private WroManagerFactory wroManagerFactory;
+
+  /**
+   * RequestHandlers. Used to handle request
+   */
+  private List<RequestHandler> requestHandlers;
 
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -107,7 +98,7 @@ public class WroFilter
   };
 
   /**
-   * @return implementation of {@link WroConfigurationFactory} used to create a {@link WroConfiguration} object.
+   * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
    */
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
@@ -121,11 +112,20 @@ public class WroFilter
     this.filterConfig = config;
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
+    this.requestHandlers = createRequestHandlers();
     createWroManagerFactory();
     initHeaderValues();
     registerChangeListeners();
     initJMX();
     doInit(config);
+  }
+
+  private List<RequestHandler> createRequestHandlers() {
+    List<RequestHandler> requestHandlers = new ArrayList<RequestHandler>();
+    requestHandlers.add(new ReloadCacheRequestHandler());
+    requestHandlers.add(new ReloadModelRequestHandler());
+    LOG.debug("default request handlers created");
+    return requestHandlers;
   }
 
   /**
@@ -225,7 +225,7 @@ public class WroFilter
         initHeaderValues();
         if (wroManagerFactory instanceof WroConfigurationChangeListener) {
           final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
-          ((WroConfigurationChangeListener)wroManagerFactory).onCachePeriodChanged(value);
+          ((WroConfigurationChangeListener) wroManagerFactory).onCachePeriodChanged(value);
         }
       }
     });
@@ -306,24 +306,20 @@ public class WroFilter
     final HttpServletRequest request = (HttpServletRequest)req;
     final HttpServletResponse response = (HttpServletResponse)res;
     try {
+
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
-      // TODO move API related checks into separate class and determine filter mapping for better mapping
-      if (shouldReloadCache()) {
-        wroConfiguration.reloadCache();
-        WroUtil.addNoCacheHeaders(response);
-        //set explicitly status OK for unit testing
-        response.setStatus(HttpServletResponse.SC_OK);
-      } else if (shouldReloadModel()) {
-        wroConfiguration.reloadModel();
-        WroUtil.addNoCacheHeaders(response);
-        //set explicitly status OK for unit testing
-        response.setStatus(HttpServletResponse.SC_OK);
-      } else {
-        processRequest(request, response);
-        onRequestProcessed();
+      for(RequestHandler requestHandler: requestHandlers) {
+        if(requestHandler.accept(request)) {
+          requestHandler.handle(request, response);
+          Context.unset();
+          return;
+        }
       }
+      processRequest(request, response);
+      onRequestProcessed();
+
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
@@ -335,33 +331,6 @@ public class WroFilter
    * Useful for unit tests to check the post processing.
    */
   protected void onRequestProcessed() {
-  }
-
-  /**
-   * @return true if reload model must be triggered.
-   */
-  private boolean shouldReloadModel() {
-    return wroConfiguration.isDebug() && matchesUrl(API_RELOAD_MODEL);
-  }
-
-  /**
-   * @return true if reload cache must be triggered.
-   */
-  private boolean shouldReloadCache() {
-    return wroConfiguration.isDebug() && matchesUrl(API_RELOAD_CACHE);
-  }
-
-  /**
-   * Check if the request path matches the provided api path.
-   */
-  private boolean matchesUrl(final String path) {
-    final HttpServletRequest request = Context.get().getRequest();
-    final Pattern pattern = Pattern.compile(".*" + path + "[/]?", Pattern.CASE_INSENSITIVE);
-    if (request.getRequestURI() != null) {
-      final Matcher m = pattern.matcher(request.getRequestURI());
-      return m.matches();
-    }
-    return false;
   }
 
   /**
