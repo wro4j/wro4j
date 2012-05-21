@@ -309,21 +309,27 @@ public class WroFilter
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
-      for(RequestHandler requestHandler: requestHandlers) {
-        if(requestHandler.accept(request)) {
-          requestHandler.handle(request, response);
-          Context.unset();
-          return;
-        }
+      if (!handledWithRequestHandler(request, response)) {
+        processRequest(request, response);
+        onRequestProcessed();
       }
-      processRequest(request, response);
-      onRequestProcessed();
 
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
       Context.unset();
     }
+  }
+
+  private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    for(RequestHandler requestHandler: requestHandlers) {
+      if(requestHandler.accept(request)) {
+        requestHandler.handle(request, response);
+        Context.unset();
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
