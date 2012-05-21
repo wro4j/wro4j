@@ -29,12 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
-import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.http.handler.RequestHandlerFactory;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
@@ -76,7 +74,7 @@ public class WroFilter
   /**
    * RequestHandlers. Used to handle request
    */
-  private List<RequestHandler> requestHandlers;
+  private Collection<RequestHandler> requestHandlers;
 
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -112,20 +110,13 @@ public class WroFilter
     this.filterConfig = config;
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
-    this.requestHandlers = createRequestHandlers();
     createWroManagerFactory();
     initHeaderValues();
     registerChangeListeners();
     initJMX();
     doInit(config);
-  }
 
-  private List<RequestHandler> createRequestHandlers() {
-    List<RequestHandler> requestHandlers = new ArrayList<RequestHandler>();
-    requestHandlers.add(new ReloadCacheRequestHandler());
-    requestHandlers.add(new ReloadModelRequestHandler());
-    LOG.debug("default request handlers created");
-    return requestHandlers;
+    this.requestHandlers = new RequestHandlerFactory(filterConfig.getServletContext()).create();
   }
 
   /**
@@ -321,9 +312,10 @@ public class WroFilter
     }
   }
 
-  private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    for(RequestHandler requestHandler: requestHandlers) {
-      if(requestHandler.accept(request)) {
+  private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    for (RequestHandler requestHandler : requestHandlers) {
+      if (requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         Context.unset();
         return true;
