@@ -46,13 +46,13 @@ import ro.isdc.wro.util.WroUtil;
 public class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
-  private LifecycleCallbackRegistry callbackRegistry;
-  @Inject
   private UriLocatorFactory uriLocatorFactory;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
   private WroConfiguration config;
+  @Inject
+  private LifecycleCallbackRegistry callbackRegistry;  
   /**
    * Runs the preProcessing in parallel.
    */
@@ -174,7 +174,7 @@ public class PreProcessorExecutor {
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
-        decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
+        processor.process(resource, reader, writer);
       } catch (final Exception e) {
         LOG.debug("Failed to process the resource: {} using processor: {}", resource, processor);
         if (config.isIgnoreFailingProcessor()) {
@@ -219,33 +219,5 @@ public class PreProcessorExecutor {
         throw e;
       }
     }
-  }
-  
-  /**
-   * TODO move this decoration to {@link InjectorBuilder}
-   * @return a decorated preProcessor which invokes callback methods.
-   */
-  private ResourcePreProcessor decorateWithPreProcessCallback(final ResourcePreProcessor processor) {
-    return new ResourcePreProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        callbackRegistry.onBeforePreProcess();
-        try {
-          processor.process(resource, reader, writer);
-        } finally {
-          callbackRegistry.onAfterPreProcess();
-        }
-      }
-    };
-  }
-  
-  /**
-   * TODO: move this decoration to {@link InjectorBuilder}.
-   * <p/>
-   * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
-   * doesn't require the minimization.
-   */
-  private ResourcePreProcessor decorateWithMinimizeAware(final ResourcePreProcessor processor) {
-    return new MinimizeAwareProcessorDecorator(processor);
   }
 }
