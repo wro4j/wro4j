@@ -27,6 +27,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
@@ -62,6 +65,7 @@ public class TestWroFilter {
   @Before
   public void setUp()
     throws Exception {
+    Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     filter = new WroFilter();
     Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
@@ -501,12 +505,20 @@ public class TestWroFilter {
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
     final FilterChain chain = Mockito.mock(FilterChain.class);
+    
+    final CacheStrategy<CacheEntry, ContentHashEntry> mockCacheStrategy = Mockito.mock(CacheStrategy.class);
+    
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setCacheStrategy(mockCacheStrategy);
+    
+    filter.setWroManagerFactory(managerFactory);
     //by default configuration is development
     filter.init(mockFilterConfig);
-
+    
     filter.doFilter(request, response, chain);
     //api method exposed -> chain is not called
     verifyChainIsNotCalled(chain);
+    
+    Mockito.verify(mockCacheStrategy).clear();
   }
 
 
