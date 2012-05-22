@@ -104,7 +104,7 @@ public final class WroConfiguration
    * When this flag is true, any failure during processor, will leave the content unchanged. Otherwise, the exception
    * will interrupt processing with a {@link RuntimeException}.
    */
-  private boolean ignoreFailingProcessor = true;
+  private boolean ignoreFailingProcessor = false;
   /**
    * Listeners for the change of cache & model period properties.
    */

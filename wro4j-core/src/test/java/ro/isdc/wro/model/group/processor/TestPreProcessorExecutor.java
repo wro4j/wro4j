@@ -75,6 +75,7 @@ public class TestPreProcessorExecutor {
     Context.set(context);
     //force parallel execution
     Context.get().getConfig().setParallelPreprocessing(true);
+    Context.get().getConfig().setIgnoreFailingProcessor(true);
     initExecutor();
   }
 

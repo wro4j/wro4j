@@ -44,7 +44,7 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(true, config.isGzipEnabled());
     Assert.assertEquals(true, config.isIgnoreMissingResources());
     Assert.assertEquals(true, config.isIgnoreEmptyGroup());
-    Assert.assertEquals(true, config.isIgnoreFailingProcessor());
+    Assert.assertEquals(false, config.isIgnoreFailingProcessor());
     Assert.assertEquals(true, config.isJmxEnabled());
     Assert.assertEquals(false, config.isCacheGzippedContent());
     Assert.assertEquals(false, config.isParallelPreprocessing());
@@ -74,7 +74,7 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.cacheGzippedContent.name(), "true");
     props.setProperty(ConfigConstants.parallelPreprocessing.name(), "true");
     props.setProperty(ConfigConstants.ignoreEmptyGroup.name(), "false");
-    props.setProperty(ConfigConstants.ignoreFailingProcessor.name(), "false");
+    props.setProperty(ConfigConstants.ignoreFailingProcessor.name(), "true");
     props.setProperty(ConfigConstants.connectionTimeout.name(), "5000");
     
     factory = new PropertyWroConfigurationFactory(props);
@@ -88,7 +88,7 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertEquals(true, config.isCacheGzippedContent());
     Assert.assertEquals(true, config.isParallelPreprocessing());
     Assert.assertEquals(false, config.isIgnoreEmptyGroup());
-    Assert.assertEquals(false, config.isIgnoreFailingProcessor());
+    Assert.assertEquals(true, config.isIgnoreFailingProcessor());
     Assert.assertEquals(5000, config.getConnectionTimeout());
   }
 

@@ -117,7 +117,10 @@ public class TestGroupsProcessor {
         locatorFactory);
     managerFactory.setProcessorsFactory(processorsFactory);
     
-    initVictim(new WroConfiguration(), managerFactory);
+    final WroConfiguration config = new WroConfiguration();
+    config.setIgnoreFailingProcessor(true);
+    initVictim(config, managerFactory);
+    
     final String actual = victim.process(key);
     Assert.assertEquals("1.js2.js", actual);
   }

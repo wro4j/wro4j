@@ -54,7 +54,7 @@ public class PropertyWroConfigurationFactory
     config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
     config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     config.setIgnoreEmptyGroup(valueAsBoolean(properties.get(ConfigConstants.ignoreEmptyGroup.name()), true));
-    config.setIgnoreFailingProcessor(valueAsBoolean(properties.get(ConfigConstants.ignoreFailingProcessor.name()), true));
+    config.setIgnoreFailingProcessor(valueAsBoolean(properties.get(ConfigConstants.ignoreFailingProcessor.name()), false));
     config.setEncoding(valueAsString(properties.get(ConfigConstants.encoding.name()), WroConfiguration.DEFAULT_ENCODING));
     config.setWroManagerClassName(valueAsString(properties.get(ConfigConstants.managerFactoryClassName.name())));
     config.setMbeanName(valueAsString(properties.get(ConfigConstants.mbeanName.name())));

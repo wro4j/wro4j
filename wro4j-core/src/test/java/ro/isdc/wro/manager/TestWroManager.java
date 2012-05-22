@@ -154,7 +154,9 @@ public class TestWroManager {
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
       Mockito.when(request.getRequestURI()).thenReturn(requestUri);
       
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      final WroConfiguration config = new WroConfiguration();
+      config.setIgnoreFailingProcessor(true);
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       
       onBeforeProcess();
       
