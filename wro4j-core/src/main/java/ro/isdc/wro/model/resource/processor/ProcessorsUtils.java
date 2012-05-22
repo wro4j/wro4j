@@ -67,10 +67,19 @@ public class ProcessorsUtils {
   public static final <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass,
     final Collection<ResourcePreProcessor> preProcessors) {
     T found = null;
-    for (final ResourcePreProcessor processor : preProcessors) {
-      if (processorClass.isInstance(processor)) {
-        found = (T) processor;
-        return found;
+    if (preProcessors != null) {
+      //TODO reuse common code
+      for (final ResourcePreProcessor processor : preProcessors) {
+        if (processorClass.isInstance(processor)) {
+          found = (T) processor;
+          return found;
+        } else if (processor instanceof ProcessorDecorator) {
+          final T decorated = (T) ((ProcessorDecorator) processor).getOriginalDecoratedObject();
+          if (processorClass.isInstance(decorated)) {
+            found = decorated;
+            return found;
+          }
+        }
       }
     }
     return null;

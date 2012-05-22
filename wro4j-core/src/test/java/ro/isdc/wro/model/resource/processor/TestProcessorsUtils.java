@@ -8,19 +8,25 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
 import ro.isdc.wro.model.group.processor.Minimize;
+import ro.isdc.wro.model.group.processor.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 
@@ -163,5 +169,39 @@ public class TestProcessorsUtils {
     assertEquals(CssMinProcessor.class, iterator.next().getClass());
     assertEquals(MinimizeAwareProcessor.class, iterator.next().getClass());
     assertEquals(CopyrightKeeperProcessorDecorator.class, iterator.next().getClass());
+  }
+  
+  @Test
+  public void cannotFindProcessorInNullProcessorsList() {
+    Assert.assertNull(ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class, null));
+  }
+  
+  @Test
+  public void cannotFindProcessorInEmptyProcessorsList() {
+    Assert.assertNull(ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class, new ArrayList<ResourcePreProcessor>()));
+  }
+  
+
+  @Test
+  public void cannotFindProcessorOfSearchedTypeList() {
+    final List<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
+    processors.add(new JSMinProcessor());
+    Assert.assertNull(ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class, processors));
+  }
+  
+  @Test
+  public void shouldFindProcessorOfSearchedType() {
+    final List<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
+    final CssUrlRewritingProcessor processor = new CssUrlRewritingProcessor();
+    processors.add(processor);
+    Assert.assertSame(processor, ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class, processors));
+  }
+  
+  @Test
+  public void shouldFindDecoratedProcessorOfSearchedType() {
+    final List<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
+    final CssUrlRewritingProcessor processor = new CssUrlRewritingProcessor();
+    processors.add(new MinimizeAwareProcessorDecorator(processor));
+    Assert.assertSame(processor, ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class, processors));
   }
 }

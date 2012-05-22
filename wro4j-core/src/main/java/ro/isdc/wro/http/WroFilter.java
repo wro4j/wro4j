@@ -362,11 +362,17 @@ public class WroFilter
   /**
    * Perform actual processing.
    */
-  private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
-    setResponseHeaders(response);
-    // process the uri using manager
-    wroManagerFactory.create().process();
+  private void processRequest(final HttpServletRequest request, final HttpServletResponse response) {
+    try {
+      setResponseHeaders(response);
+      // process the uri using manager
+      wroManagerFactory.create().process();
+    } catch (Exception e) {
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException) e;
+      }
+      throw new WroRuntimeException("Failed to process request", e);
+    }
   }
 
 
