@@ -3,8 +3,6 @@ package ro.isdc.wro.extensions.processor.support.sass;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;

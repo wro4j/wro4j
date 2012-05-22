@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
