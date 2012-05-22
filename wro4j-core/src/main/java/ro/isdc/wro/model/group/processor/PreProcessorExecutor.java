@@ -171,7 +171,8 @@ public class PreProcessorExecutor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
-      stopWatch.start("Processor: " + getProcessorName(processor));
+      final String processorName = getProcessorName(processor);
+      stopWatch.start("Processor: " + processorName);
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
@@ -179,9 +180,13 @@ public class PreProcessorExecutor {
       } catch (final Exception e) {
         LOG.debug("Failed to process the resource: {} using processor: {}", resource, processor);
         if (config.isIgnoreFailingProcessor()) {
+          writer = new StringWriter();
           writer.write(resourceContent);
+          //don't wrap exception unless required
+        } else if (e instanceof RuntimeException) {
+          throw (RuntimeException) e;
         } else {
-          throw new WroRuntimeException("The processor: " + processor + " failed", e);
+          throw new WroRuntimeException("The processor: " + processorName + " failed", e);
         }
       } finally {
         reader.close();
