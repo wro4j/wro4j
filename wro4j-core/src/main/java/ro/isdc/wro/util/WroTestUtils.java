@@ -116,7 +116,6 @@ public class WroTestUtils {
     injector.inject(processor);
   }
 
-
   /**
    * @return the injector
    */
@@ -126,7 +125,6 @@ public class WroTestUtils {
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
-
 
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
@@ -276,9 +274,6 @@ public class WroTestUtils {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
         Transformers.extensionTransformer("css"), processor);
   }
-
-
-
 
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)

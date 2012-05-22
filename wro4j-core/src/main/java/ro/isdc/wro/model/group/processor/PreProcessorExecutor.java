@@ -31,6 +31,7 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -170,7 +171,7 @@ public class PreProcessorExecutor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
-      stopWatch.start("Processor: " + processor.getClass().getSimpleName());
+      stopWatch.start("Processor: " + getProcessorName(processor));
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
@@ -191,6 +192,12 @@ public class PreProcessorExecutor {
     }
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
+  }
+
+  private String getProcessorName(final ResourcePreProcessor processor) {
+    final String processorName = (processor instanceof ProcessorDecorator) ? ((ProcessorDecorator) processor).getOriginalDecoratedObject().getClass().getSimpleName()
+        : processor.getClass().getSimpleName();
+    return processorName;
   }
   
   /**

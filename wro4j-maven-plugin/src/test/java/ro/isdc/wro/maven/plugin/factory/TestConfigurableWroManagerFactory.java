@@ -101,9 +101,9 @@ public class TestConfigurableWroManagerFactory {
     
     Assert.assertFalse(list.isEmpty());
     Iterator<ResourcePreProcessor> iterator = list.iterator();
-    Assert.assertEquals(JSMinProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(CssImportPreProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(CssVariablesProcessor.class, iterator.next().getClass());
+    Assert.assertEquals(JSMinProcessor.class, getProcessor(iterator.next()).getClass());
+    Assert.assertEquals(CssImportPreProcessor.class, getProcessor(iterator.next()).getClass());
+    Assert.assertEquals(CssVariablesProcessor.class, getProcessor(iterator.next()).getClass());
   }
 
   private Properties createProperties(final String key, final String value) {
@@ -157,7 +157,7 @@ public class TestConfigurableWroManagerFactory {
     initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
     Assert.assertEquals(CssMinProcessor.class,
-        processorsFactory.getPreProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+        getProcessor(processorsFactory.getPreProcessors().iterator().next()).getClass());
   }
   
   @Test
@@ -177,9 +177,16 @@ public class TestConfigurableWroManagerFactory {
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin, cssMin");
     initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
-    Assert.assertEquals(
-        JSMinProcessor.class,
-        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
+    Assert.assertEquals(JSMinProcessor.class,
+        getProcessor(processorsFactory.getPostProcessors().iterator().next()).getClass());
+  }
+  
+  /**
+   * @return the processor instance which is not a decorator based on provided processor.
+   */
+  private Object getProcessor(final Object processor) {
+    return processor instanceof ProcessorDecorator ? ((ProcessorDecorator) processor).getOriginalDecoratedObject()
+        : processor;
   }
   
   @Test(expected = WroRuntimeException.class)
