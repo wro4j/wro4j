@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Arrays;
 
 import junit.framework.Assert;
 
@@ -17,7 +18,9 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -169,5 +172,12 @@ public class TestCssUrlRewritingProcessor {
     processClasspathResourceType();
     Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
     Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
+  }
+  
+  @Test
+  public void shouldSupportCssResourcesOnly() {
+    Assert.assertTrue(Arrays.equals(new ResourceType[] {
+        ResourceType.CSS
+    }, new ProcessorDecorator(processor).getSupportedResourceTypes()));
   }
 }

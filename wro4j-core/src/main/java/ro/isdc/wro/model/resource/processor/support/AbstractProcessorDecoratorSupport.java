@@ -29,9 +29,11 @@ public abstract class AbstractProcessorDecoratorSupport
   implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, ObjectDecorator<Object> {
 
   /**
-   * This method is final, because it intends to preserve the getSupportedResourceType flag of the decorated processor. You still can
-   * override this behavior by implementing {@link AbstractProcessorDecoratorSupport#getSupportedResourceTypeInternal()} on your own
-   * risk.
+   * This method is final, because it intends to preserve the getSupportedResourceType flag of the decorated processor.
+   * You still can override this behavior by implementing
+   * {@link AbstractProcessorDecoratorSupport#getSupportedResourceTypeInternal()} on your own risk.
+   * 
+   * @return the {@link SupportedResourceType} annotation of the decorated processor if one exist.
    */
   public final SupportedResourceType getSupportedResourceType() {
     return getSupportedResourceTypeInternal();
