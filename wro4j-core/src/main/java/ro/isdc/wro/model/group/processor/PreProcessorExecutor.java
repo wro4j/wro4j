@@ -163,7 +163,7 @@ public class PreProcessorExecutor {
    */
   private String applyPreProcessors(final Resource resource, final boolean minimize)
       throws IOException {
-    // merge preProcessorsBy type and anyPreProcessors
+    //TODO: apply filtering inside a specialized decorator
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
@@ -183,13 +183,14 @@ public class PreProcessorExecutor {
       try {
         //decorate and process
         decoratePreProcessor(processor).process(resource, reader, writer);
+        //use the outcome for next input
+        resourceContent = writer.toString();
       } finally {
+        stopWatch.stop();
         callbackRegistry.onAfterPreProcess();
         reader.close();
         writer.close();
       }
-      resourceContent = writer.toString();
-      stopWatch.stop();
     }
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
