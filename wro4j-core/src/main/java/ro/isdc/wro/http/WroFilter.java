@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,18 +223,21 @@ public class WroFilter
       public void propertyChange(final PropertyChangeEvent event) {
         // reset cache headers when any property is changed in order to avoid browser caching
         initHeaderValues();
-        final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
-        wroManagerFactory.onCachePeriodChanged(value);
+        wroManagerFactory.onCachePeriodChanged(valueAsLong(event.getNewValue()));
       }
     });
     wroConfiguration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
       public void propertyChange(final PropertyChangeEvent event) {
         initHeaderValues();
-        final long value = Long.valueOf(String.valueOf(event.getNewValue())).longValue();
-        wroManagerFactory.onModelPeriodChanged(value);
+        wroManagerFactory.onModelPeriodChanged(valueAsLong(event.getNewValue()));
       }
     });
     LOG.debug("Cache & Model change listeners were registered");
+  }
+  
+  private long valueAsLong(final Object value) {
+    Validate.notNull(value);
+    return Long.valueOf(String.valueOf(value)).longValue();
   }
 
   /**
