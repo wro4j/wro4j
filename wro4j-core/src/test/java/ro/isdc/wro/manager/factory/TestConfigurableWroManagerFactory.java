@@ -127,9 +127,9 @@ public class TestConfigurableWroManagerFactory {
         JSMinProcessor.ALIAS + "," + CssImportPreProcessor.ALIAS + "," + CssVariablesProcessor.ALIAS);
     initFactory(mockFilterConfig);
     final List<ResourcePreProcessor> list = (List<ResourcePreProcessor>) processorsFactory.getPreProcessors();
-    Assert.assertEquals(JSMinProcessor.class, ((ProcessorDecorator)list.get(0)).getOriginalDecoratedObject().getClass());
-    Assert.assertEquals(CssImportPreProcessor.class, ((ProcessorDecorator)list.get(1)).getOriginalDecoratedObject().getClass());
-    Assert.assertEquals(CssVariablesProcessor.class, ((ProcessorDecorator)list.get(2)).getOriginalDecoratedObject().getClass());
+    Assert.assertEquals(JSMinProcessor.class, list.get(0).getClass());
+    Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
+    Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
   }
   
   @Test
@@ -193,8 +193,7 @@ public class TestConfigurableWroManagerFactory {
     factory.setConfigProperties(configProperties);
     Collection<ResourcePreProcessor> list = processorsFactory.getPreProcessors();
     Assert.assertEquals(1, list.size());
-    Assert.assertEquals(CssMinProcessor.class,
-        ((ProcessorDecorator) list.iterator().next()).getOriginalDecoratedObject().getClass());
+    Assert.assertEquals(CssMinProcessor.class, list.iterator().next().getClass());
   }
   
   @Test

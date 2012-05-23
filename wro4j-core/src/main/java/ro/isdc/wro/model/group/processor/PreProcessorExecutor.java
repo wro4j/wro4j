@@ -30,7 +30,8 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -54,6 +55,8 @@ public class PreProcessorExecutor {
   private WroConfiguration config;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;  
+  @Inject
+  private Injector injector;
   /**
    * Runs the preProcessing in parallel.
    */
@@ -171,24 +174,17 @@ public class PreProcessorExecutor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
-      final String processorName = getProcessorName(processor);
-      stopWatch.start("Processor: " + processorName);
+      stopWatch.start("Processor: " + processor.getClass().getSimpleName());
+      
+      callbackRegistry.onBeforePreProcess();
+      
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
-        processor.process(resource, reader, writer);
-      } catch (final Exception e) {
-        LOG.debug("Failed to process the resource: {} using processor: {}", resource, processor);
-        if (config.isIgnoreFailingProcessor()) {
-          writer = new StringWriter();
-          writer.write(resourceContent);
-          //don't wrap exception unless required
-        } else if (e instanceof RuntimeException) {
-          throw (RuntimeException) e;
-        } else {
-          throw new WroRuntimeException("The processor: " + processorName + " failed", e);
-        }
+        //decorate and process
+        decoratePreProcessor(processor).process(resource, reader, writer);
       } finally {
+        callbackRegistry.onAfterPreProcess();
         reader.close();
         writer.close();
       }
@@ -198,11 +194,14 @@ public class PreProcessorExecutor {
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
-
-  private String getProcessorName(final ResourcePreProcessor processor) {
-    final String processorName = (processor instanceof ProcessorDecorator) ? ((ProcessorDecorator) processor).getOriginalDecoratedObject().getClass().getSimpleName()
-        : processor.getClass().getSimpleName();
-    return processorName;
+  
+  /**
+   * Decorates preProcessor with mandatory decorators.
+   */
+  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
+    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(processor)); 
+    injector.inject(decorated);
+    return decorated;
   }
   
   /**

@@ -26,8 +26,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class MinimizeAwareProcessorDecorator
     extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(MinimizeAwareProcessorDecorator.class);
-  @Inject
-  private LifecycleCallbackRegistry callbackRegistry;
   /**
    * Flag indicating if minimize aware processing is allowed.
    */
@@ -57,21 +55,16 @@ public class MinimizeAwareProcessorDecorator
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    callbackRegistry.onBeforePreProcess();
-    try {
-      final ResourcePreProcessor processor = getDecoratedObject();
-      // apply processor only when minimize is required or the processor is not minimize aware
-      final boolean applyProcessor = (resource != null && resource.isMinimize() && minimize)
-          || (resource == null && minimize) || !isMinimize();
-      if (applyProcessor) {
-        LOG.debug("Using Processor: {}", processor);
-        processor.process(resource, reader, writer);
-      } else {
-        LOG.debug("Skipping processor: {}", processor);
-        IOUtils.copy(reader, writer);
-      }
-    } finally {
-      callbackRegistry.onAfterPreProcess();
+    final ResourcePreProcessor processor = getDecoratedObject();
+    // apply processor only when minimize is required or the processor is not minimize aware
+    final boolean applyProcessor = (resource != null && resource.isMinimize() && minimize)
+        || (resource == null && minimize) || !isMinimize();
+    if (applyProcessor) {
+      LOG.debug("Using Processor: {}", processor);
+      processor.process(resource, reader, writer);
+    } else {
+      LOG.debug("Skipping processor: {}", processor);
+      IOUtils.copy(reader, writer);
     }
   }
 }
