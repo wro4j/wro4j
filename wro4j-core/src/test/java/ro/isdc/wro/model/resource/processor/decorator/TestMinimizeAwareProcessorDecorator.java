@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.resource.processor.support;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -8,19 +8,21 @@ import java.io.Writer;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
-import ro.isdc.wro.model.group.processor.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 
@@ -53,6 +55,7 @@ public class TestMinimizeAwareProcessorDecorator {
   
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     mockReader = new StringReader("");
     mockWriter = new StringWriter();
@@ -227,5 +230,10 @@ public class TestMinimizeAwareProcessorDecorator {
     victim.process(resource, mockReader, mockWriter);
     Mockito.verify(mockPreProcessor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 }

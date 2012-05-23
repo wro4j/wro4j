@@ -18,7 +18,7 @@ import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 /**

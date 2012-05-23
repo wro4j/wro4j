@@ -1,7 +1,7 @@
 /**
  * Copyright wro4j@2011
  */
-package ro.isdc.wro.model.resource.processor.support;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;

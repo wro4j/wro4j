@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.group.processor;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -12,7 +12,6 @@ import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**

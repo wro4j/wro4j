@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -27,7 +28,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcesso
 import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 /**
  * Contains divers utility methods applied on processors.

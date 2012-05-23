@@ -123,6 +123,7 @@ public class GroupsProcessor {
         LOG.debug("Failed to postProcess using processor: {}", processor);
         if (config.isIgnoreFailingProcessor()) {
           try {
+            writer = new StringWriter();
             writer.write(content);
           } catch (IOException ex) {
             throw new WroRuntimeException("Shouldn't happen", ex);

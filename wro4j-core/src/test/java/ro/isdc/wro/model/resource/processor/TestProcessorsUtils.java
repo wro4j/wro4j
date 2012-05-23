@@ -20,10 +20,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.model.group.processor.Minimize;
-import ro.isdc.wro.model.group.processor.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;

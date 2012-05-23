@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorAwareDecorator;
-import ro.isdc.wro.model.group.processor.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
 
 /**
  * Responsible for injecting each processor with required fields before being used.
