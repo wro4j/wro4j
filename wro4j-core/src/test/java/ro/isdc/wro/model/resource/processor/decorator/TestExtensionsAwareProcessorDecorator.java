@@ -1,7 +1,7 @@
 /**
  * Copyright wro4j@2011
  */
-package ro.isdc.wro.model.resource.processor;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.File;
 import java.net.URL;
@@ -12,10 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.TestProcessorsUtils;
+import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -33,7 +35,8 @@ public class TestExtensionsAwareProcessorDecorator {
     final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
     final ResourcePreProcessor processor = ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor).addExtension(
         "js");
-    final URL url = getClass().getResource("extensionAware");
+    //we use test resource relative to TestProcessorsUtils class
+    final URL url = TestProcessorsUtils.class.getResource("extensionAware");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");

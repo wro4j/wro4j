@@ -87,4 +87,18 @@ public class DefaultWroManagerFactory
   final WroManagerFactory getFactory() {
     return factory;
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onCachePeriodChanged(long value) {
+    factory.onCachePeriodChanged(value);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void onModelPeriodChanged(long value) {
+    factory.onModelPeriodChanged(value);
+  }
 }

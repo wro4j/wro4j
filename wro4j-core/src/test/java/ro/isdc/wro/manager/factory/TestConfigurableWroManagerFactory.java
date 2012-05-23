@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,14 +26,14 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.AbstractDecorator;
 
 
@@ -190,9 +191,9 @@ public class TestConfigurableWroManagerFactory {
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
     initFactory(mockFilterConfig);
     factory.setConfigProperties(configProperties);
-    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
-    Assert.assertEquals(CssMinProcessor.class,
-        processorsFactory.getPreProcessors().toArray(new ResourcePreProcessor[] {})[0].getClass());
+    Collection<ResourcePreProcessor> list = processorsFactory.getPreProcessors();
+    Assert.assertEquals(1, list.size());
+    Assert.assertEquals(CssMinProcessor.class, list.iterator().next().getClass());
   }
   
   @Test

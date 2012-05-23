@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -6,7 +6,6 @@ import java.io.Writer;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.support.AbstractProcessorDecoratorSupport;
 import ro.isdc.wro.util.LazyInitializer;
 
 
@@ -24,6 +23,9 @@ public final class LazyProcessorDecorator
     this.processorInitializer = processor;
   }
   
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ResourcePreProcessor getDecoratedObject() {
     return processorInitializer.get();

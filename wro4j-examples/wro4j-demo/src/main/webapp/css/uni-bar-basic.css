@@ -1,0 +1,140 @@
+.uni-bar {
+    color: #fff;
+    background: #022943;
+    padding-top: 21px;
+}
+
+.uni-bar .search-box {
+    background: #fff !important;
+    height: auto !important;
+    padding: 7px 8px 9px 8px !important;
+    width: 700px !important;
+    border: 2px solid #5996be !important;
+    -webkit-border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
+    border-radius: 5px !important;
+    margin-right: 20px !important;
+    z-index: 1000 !important;
+    outline: none !important;
+}
+
+.uni-bar .primary {
+    margin-left: -14px;
+}
+
+.uno-search { position:relative }
+
+.uni-bar a.advanced-search {
+    display: inline !important;
+    padding: 0 !important;
+    font-size: 90% !important;
+    margin-left: 7px;
+    color:#fff;
+}
+
+.uni-bar label {
+    color: #999;
+    z-index: 1000;
+    padding-top: 9px;
+    padding-left: 11px;
+    margin: 0 !important;
+}
+
+.uni-bar ul {
+    height: auto !important;
+    padding: 0;
+}
+
+.search-results ul {
+    border-top: none;
+    border-left: 2px solid #5996be;
+    border-right: 2px solid #5996be;
+    border-bottom: 2px solid #5996be;
+    -webkit-border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    border-radius: 0 0 5px 5px;
+}
+
+.search-results ul li {
+    border-bottom: 1px solid #ddd;
+    background-color: #f7f5f5;
+    padding: 0 !important;
+}
+
+.search-results ul li:last-child {
+    border-bottom: 1px solid transparent;
+    -webkit-border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    border-radius: 0 0 5px 5px;
+}
+
+.search-results .ui-state-hover {
+    margin: 0 !important;
+    border: none;
+    background: #dfe9ee none !important;
+}
+
+.search-results a {
+    padding: 10px 5px !important;
+    cursor:pointer;
+}
+
+.search-results ul li.filter {
+    background: white;
+    width: 100%;
+    list-style: none;
+    margin:0;
+    float: left;
+}
+
+.search-filters-container {
+    display: none;
+}
+
+.uni-bar .filter label {
+    display: inline-block;
+}
+
+.uni-bar .filter .search-filters {
+    padding: 5px 10px;
+}
+
+.uni-bar .filter a {
+    display: inline-block !important;
+    float: right;
+}
+
+.uno-search li .type.unit {
+    color: #0069a9;
+    font-weight: bold;
+}
+
+.uno-search li .type.course {
+    color: #fc5d01;
+    font-weight: bold;
+}
+
+.uno-search li .type.career {
+    color: #7bc242;
+    font-weight: bold;
+}
+
+.uno-search li .type.content {
+    color: #666;
+    font-weight: bold;
+}
+
+.home-smooth-corner {
+    display: none !important;
+}
+
+.uno-search a.more-options {
+    padding-right: 0 !important;
+    text-decoration: underline;
+    font-size: 85%;
+}
+
+.uno-search a.more-options:visited,
+.uno-search a.more-options {
+    color: black;
+}
