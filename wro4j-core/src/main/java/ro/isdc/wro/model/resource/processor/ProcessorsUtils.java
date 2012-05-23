@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -26,7 +27,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcesso
 import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 /**
  * Contains divers utility methods applied on processors.
@@ -63,13 +63,22 @@ public class ProcessorsUtils {
    */
   @SuppressWarnings("unchecked")
   public static final <T extends ResourceProcessor> T findPreProcessorByClass(final Class<T> processorClass,
-    final Collection<ResourceProcessor> preProcessors) {
+    final Collection<ResourceProcessor> processors) {
+    if (processors == null) {
+      return null;
+    }
     T found = null;
-    for (final ResourceProcessor processor : preProcessors) {
+    for (final ResourceProcessor processor : processors) {
       if (processorClass.isInstance(processor)) {
         found = (T) processor;
         return found;
-      }
+       } else if (processor instanceof ProcessorDecorator) {
+          final T decorated = (T) ((ProcessorDecorator) processor).getOriginalDecoratedObject();
+          if (processorClass.isInstance(decorated)) {
+            found = decorated;
+            return found;
+          }
+        }
     }
     return null;
   }

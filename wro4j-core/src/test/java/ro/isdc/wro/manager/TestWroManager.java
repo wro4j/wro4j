@@ -156,7 +156,9 @@ public class TestWroManager {
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
       Mockito.when(request.getRequestURI()).thenReturn(requestUri);
       
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+      final WroConfiguration config = new WroConfiguration();
+      config.setIgnoreFailingProcessor(true);
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       
       onBeforeProcess();
       
@@ -288,12 +290,23 @@ public class TestWroManager {
   }
   
   @Test(expected = WroRuntimeException.class)
-  public void testCssWithInvalidImportAndIgnoreFalse()
+  public void shouldNotIgnoreInvalidImportWhenAProcessingFails()
+      throws Exception {
+    genericIgnoreFailingProcessorTest(false);
+  }
+  
+  @Test
+  public void shouldIgnoreInvalidImportWhenAProcessingFails()
+      throws Exception {
+    genericIgnoreFailingProcessorTest(true);
+  }
+  
+  private void genericIgnoreFailingProcessorTest(final boolean ignoreFlag)
       throws Exception {
     new GenericTestBuilder() {
       @Override
       protected void onBeforeProcess() {
-        Context.get().getConfig().setIgnoreMissingResources(false);
+        Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
       };
     }.processAndCompare("/invalidImport.css", "classpath:ro/isdc/wro/manager/invalidImport-out.css");
   }

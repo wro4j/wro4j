@@ -30,10 +30,8 @@ public class TestGroup {
   @Test
   public void shouldReturnSameGroupWhenGroupHasNoResources() {
     final Group group = new Group("group");
-    Group newGroup = group.collectResourcesOfType(null);
-    Assert.assertEquals(group, newGroup);
     
-    newGroup = group.collectResourcesOfType(ResourceType.CSS);
+    Group newGroup = group.collectResourcesOfType(ResourceType.CSS);
     Assert.assertEquals(group, newGroup);
     
     newGroup = group.collectResourcesOfType(ResourceType.JS);
@@ -47,17 +45,14 @@ public class TestGroup {
     group.addResource(Resource.create("2", ResourceType.JS));
     group.addResource(Resource.create("3", ResourceType.JS));
     
-    Group newGroup = group.collectResourcesOfType(null);
-    Assert.assertEquals(0, newGroup.getResources().size());
-    
-    newGroup = group.collectResourcesOfType(ResourceType.CSS);
+    Group newGroup = group.collectResourcesOfType(ResourceType.CSS);
     Assert.assertEquals(1, newGroup.getResources().size());
     
     newGroup = group.collectResourcesOfType(ResourceType.JS);
     Assert.assertEquals(2, newGroup.getResources().size());
   }
-
-  @Test(expected=NullPointerException.class)
+  
+  @Test(expected = NullPointerException.class)
   public void cannotPassNullResourceType() {
     final Group group = new Group("group");
     group.hasResourcesOfType(null);
@@ -129,5 +124,26 @@ public class TestGroup {
     Assert.assertEquals(4, group.getResources().size());
     Assert.assertEquals(r0, group.getResources().get(0));
     Assert.assertEquals(r1, group.getResources().get(1));
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotCollectResourcesWithNullType() {
+    final Group group = new Group("group");
+    group.collectResourcesOfType(null);
+  }
+  
+  @Test
+  public void test() {
+    final Group group = new Group("group");
+    group.addResource(Resource.create("1.js"));
+    group.addResource(Resource.create("2.js"));
+    group.addResource(Resource.create("3.js"));
+    group.addResource(Resource.create("4.js"));
+    group.addResource(Resource.create("5.js"));
+    group.addResource(Resource.create("6.js"));
+    group.addResource(Resource.create("1.css"));
+    
+    Assert.assertEquals(6, group.collectResourcesOfType(ResourceType.JS).getResources().size());
+    Assert.assertEquals(1, group.collectResourcesOfType(ResourceType.CSS).getResources().size());
   }
 }

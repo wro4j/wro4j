@@ -6,7 +6,9 @@ package ro.isdc.wro.model.group.processor;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -35,9 +37,12 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
 
@@ -71,6 +76,7 @@ public class TestPreProcessorExecutor {
     Context.set(context);
     //force parallel execution
     Context.get().getConfig().setParallelPreprocessing(true);
+    Context.get().getConfig().setIgnoreFailingProcessor(true);
     initExecutor();
   }
 
@@ -195,12 +201,24 @@ public class TestPreProcessorExecutor {
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenUsingFailingPreProcessor()
     throws Exception {
+    genericUseFailingPreProcessorWithIngoreFlag(false);
+  }
+  
+  @Test
+  public void shouldNotFailWhenUsingFailingPreProcessor()
+      throws Exception {
+    genericUseFailingPreProcessorWithIngoreFlag(true);
+  }
+
+  private void genericUseFailingPreProcessorWithIngoreFlag(boolean ignoreFlag) throws Exception {
+    Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
     initExecutor(createProcessorWhichFails());
     final Group group = createGroup(Resource.create("", ResourceType.JS));
     final String result = executor.processAndMerge(group, true);
     Assert.assertEquals("", result);
-  }
 
+  }
+  
   /**
    * This test should work when running at least on dual-core.
    * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))
@@ -261,6 +279,37 @@ public class TestPreProcessorExecutor {
     executor.processAndMerge(group, true);
   }
 
+  /**
+   * When an empty resource is processed, the processing should not fail (warn only).
+   */
+  @Test
+  public void shouldNotFailWhenEmptyResourceIsFound() throws Exception {
+    final WroConfiguration config = Context.get().getConfig();
+    config.setIgnoreMissingResources(false);
+    
+    final ResourceLocator emptyStreamLocator = new AbstractResourceLocator() {
+      public InputStream getInputStream()
+          throws IOException {
+        return new ByteArrayInputStream("".getBytes());
+      }
+    };
+    final ResourceLocatorFactory locatorFactory = new ResourceLocatorFactory() {
+      public ResourceLocator locate(String uri) {
+        return emptyStreamLocator;
+      }
+    };
+    //init executor
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setResourceLocatorFactory(locatorFactory);
+    InjectorBuilder.create(managerFactory).build().inject(executor);
+    
+    final List<Resource> resources = new ArrayList<Resource>();
+    resources.add(Resource.create("/resource.js"));
+    
+    Group group = new Group("name");
+    group.setResources(resources);
+    executor.processAndMerge(group, true);
+  }
+  
   @After
   public void tearDown() {
     Context.unset();

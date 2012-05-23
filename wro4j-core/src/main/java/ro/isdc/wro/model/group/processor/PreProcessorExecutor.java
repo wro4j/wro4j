@@ -31,8 +31,9 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -48,13 +49,15 @@ import ro.isdc.wro.util.WroUtil;
 public class PreProcessorExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(PreProcessorExecutor.class);
   @Inject
-  private LifecycleCallbackRegistry callbackRegistry;
-  @Inject
   private ResourceLocatorFactory resourceLocatorFactory;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private WroConfiguration configuration;
+  private WroConfiguration config;
+  @Inject
+  private LifecycleCallbackRegistry callbackRegistry;  
+  @Inject
+  private Injector injector;
   /**
    * Runs the preProcessing in parallel.
    */
@@ -91,7 +94,7 @@ public class PreProcessorExecutor {
   }
   
   private boolean shouldRunInParallel(final List<Resource> resources) {
-    final boolean isParallel = configuration.isParallelPreprocessing();
+    final boolean isParallel = config.isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
@@ -107,7 +110,7 @@ public class PreProcessorExecutor {
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
-      //decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
+      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
       callables.add(new ContextPropagatingCallable<String>(new Callable<String>() {
         public String call()
             throws Exception {
@@ -161,7 +164,7 @@ public class PreProcessorExecutor {
    */
   private String applyPreProcessors(final Resource resource, final boolean minimize)
       throws IOException {
-    // merge preProcessorsBy type and anyPreProcessors
+    //TODO: apply filtering inside a specialized decorator
     final Collection<ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
@@ -173,14 +176,34 @@ public class PreProcessorExecutor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Processor: " + processor.getClass().getSimpleName());
+      
+      callbackRegistry.onBeforePreProcess();
+      
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
-      decorateWithPreProcessCallback(decorateWithMinimizeAware(processor)).process(resource, reader, writer);
-      resourceContent = writer.toString();
-      stopWatch.stop();
+      try {
+        //decorate and process
+        decoratePreProcessor(processor).process(resource, reader, writer);
+        //use the outcome for next input
+        resourceContent = writer.toString();
+      } finally {
+        stopWatch.stop();
+        callbackRegistry.onAfterPreProcess();
+        reader.close();
+        writer.close();
+      }
     }
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
+  }
+  
+  /**
+   * Decorates preProcessor with mandatory decorators.
+   */
+  private ResourceProcessor decoratePreProcessor(final ResourceProcessor processor) {
+    ResourceProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(processor)); 
+    injector.inject(decorated);
+    return decorated;
   }
   
   /**
@@ -194,65 +217,20 @@ public class PreProcessorExecutor {
       throws IOException {
     try {
       final InputStream is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()).getInputStream());
-      final String result = IOUtils.toString(is, configuration.getEncoding());
+      final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       if (StringUtils.isEmpty(result)) {
-        throw new IOException("Empty resource detected: " + resource.getUri());
+        LOG.warn("Empty resource detected: {}", resource.getUri());
       }
       return result;
     } catch (final IOException e) {
       LOG.warn("Invalid resource found: {}", resource);
-      if (configuration.isIgnoreMissingResources()) {
+      if (config.isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
         LOG.error("Cannot ignore the missing resource:  " + resource);
         throw e;
       }
     }
-  }
-  
-  /**
-   * @return a decorated preProcessor which invokes callback methods.
-   */
-  private ResourceProcessor decorateWithPreProcessCallback(final ResourceProcessor processor) {
-    return new ResourceProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        callbackRegistry.onBeforePreProcess();
-        try {
-          processor.process(resource, reader, writer);
-        } finally {
-          callbackRegistry.onAfterPreProcess();
-        }
-      }
-    };
-  }
-  
-  /**
-   * TODO: move this decoration to {@link InjectorBuilder}.
-   * <p/>
-   * The decorated processor will skip processing if the processor has @Minimize annotation and resource being processed
-   * doesn't require the minimization.
-   */
-  private ResourceProcessor decorateWithMinimizeAware(final ResourceProcessor processor) {
-    return new ResourceProcessor() {
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        final boolean applyProcessor = resource.isMinimize() || !new ProcessorDecorator(processor).isMinimize();
-        if (applyProcessor) {
-          LOG.debug("\tUsing Processor: {}", processor.getClass().getSimpleName());
-          try {
-            processor.process(resource, reader, writer);
-          } catch (final IOException e) {
-            if (!configuration.isIgnoreMissingResources()) {
-              throw e;
-            }
-          }
-        } else {
-          IOUtils.copy(reader, writer);
-          LOG.debug("skipped processing on resource: {}", resource);
-        }
-      }
-    };
   }
 }

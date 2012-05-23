@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 
 /**
  * @author Alex Objelean

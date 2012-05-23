@@ -1,7 +1,7 @@
 /**
  * Copyright wro4j@2011
  */
-package ro.isdc.wro.model.resource.processor.support;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -56,10 +56,12 @@ public class ProcessorDecorator
 
   /**
    * Indicates if the processor is eligible for usage based on provided criteria.
+   * 
    * @param minimize
    *          - when true the processor should be minimize aware.
    * @param searchedType
-   *          - the type of the accepted processor. If the processor will have no type specified it will still be eligible.
+   *          - the type of the accepted processor. If the processor will have no type specified it will still be
+   *          eligible.
    * @return true if the processor is eligible for the following criteria: minimize & type.
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {

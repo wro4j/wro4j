@@ -1,7 +1,7 @@
 /**
  * Copyright wro4j@2011
  */
-package ro.isdc.wro.model.resource.processor;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +15,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.impl.CopyrightKeeperProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.TestProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -31,7 +31,7 @@ public class TestCopyrightKeeperProcessorDecorator {
       throws Exception {
     final ResourceProcessor decoratedProcessor = new CssMinProcessor();
     final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    final URL url = getClass().getResource("copyright");
+    final URL url = TestProcessorsUtils.class.getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -49,7 +49,7 @@ public class TestCopyrightKeeperProcessorDecorator {
       }
     };
     final ResourceProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    final URL url = getClass().getResource("copyright");
+    final URL url = TestProcessorsUtils.class.getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedCopyrightAware");

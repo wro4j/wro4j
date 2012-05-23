@@ -30,9 +30,9 @@ import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
@@ -156,7 +156,7 @@ public class TestConfigurableWroManagerFactory {
     initFactory(mockFilterConfig, configProperties);
     Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
     Assert.assertEquals(CssMinProcessor.class,
-        processorsFactory.getPreProcessors().toArray(new ResourceProcessor[] {})[0].getClass());
+        processorsFactory.getPreProcessors().iterator().next().getClass());
   }
   
   @Test
