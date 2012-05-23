@@ -27,7 +27,6 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.InjectorAwareProcessorsFactoryDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.util.HashBuilder;
@@ -126,7 +125,7 @@ public class InjectorBuilder {
     });
     map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
       public ProcessorsFactory create() {
-        return new InjectorAwareProcessorsFactoryDecorator(processorsFactory, injector);
+        return processorsFactory;
       }
     });
     map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
