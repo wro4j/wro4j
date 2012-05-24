@@ -1,15 +1,16 @@
 package ro.isdc.wro.extensions.processor.js;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
 import org.apache.commons.io.IOUtils;
+
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 /**
  * A base class for template processors like: dustJS or hoganJS.

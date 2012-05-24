@@ -14,8 +14,6 @@ import org.junit.Test;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.TestProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
-import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;

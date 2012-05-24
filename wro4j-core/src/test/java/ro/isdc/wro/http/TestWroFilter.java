@@ -35,6 +35,8 @@ import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
+import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -462,7 +464,7 @@ public class TestWroFilter {
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.PATH_API + "/someMethod");
+    Mockito.when(request.getRequestURI()).thenReturn(ReloadCacheRequestHandler.PATH_API + "/someMethod");
     final FilterChain chain = Mockito.mock(FilterChain.class);
     setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
     filter.init(mockFilterConfig);
@@ -479,7 +481,7 @@ public class TestWroFilter {
     throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.PATH_API + "/someMethod");
+    Mockito.when(request.getRequestURI()).thenReturn(ReloadCacheRequestHandler.PATH_API + "/someMethod");
     final FilterChain chain = Mockito.mock(FilterChain.class);
     //by default configuration is development
     filter.init(mockFilterConfig);
@@ -498,7 +500,7 @@ public class TestWroFilter {
 
     initFilterWithValidConfig();
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_CACHE);
+    Mockito.when(request.getRequestURI()).thenReturn(ReloadCacheRequestHandler.API_RELOAD_CACHE);
 
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
@@ -538,7 +540,7 @@ public class TestWroFilter {
     };
     initFilterWithValidConfig(theFilter);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_CACHE);
+    Mockito.when(request.getRequestURI()).thenReturn(ReloadCacheRequestHandler.API_RELOAD_CACHE);
 
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getWriter()).thenReturn(new PrintWriter(System.out));
@@ -602,7 +604,7 @@ public class TestWroFilter {
   public void testReloadCacheCall()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_CACHE);
+    Mockito.when(request.getRequestURI()).thenReturn(ReloadCacheRequestHandler.API_RELOAD_CACHE);
 
     final ThreadLocal<Integer> status = new ThreadLocal<Integer>();
     final HttpServletResponse response = new HttpServletResponseWrapper(Mockito.mock(HttpServletResponse.class,
@@ -623,7 +625,7 @@ public class TestWroFilter {
   public void testReloadModelCall()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getRequestURI()).thenReturn(WroFilter.API_RELOAD_MODEL);
+    Mockito.when(request.getRequestURI()).thenReturn(ReloadModelRequestHandler.API_RELOAD_MODEL);
 
     final ThreadLocal<Integer> status = new ThreadLocal<Integer>();
     final HttpServletResponse response = new HttpServletResponseWrapper(Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS)) {
