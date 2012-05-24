@@ -325,7 +325,6 @@ public class WroFilter
     for (RequestHandler requestHandler : requestHandlers) {
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
-        Context.unset();
         return true;
       }
     }
