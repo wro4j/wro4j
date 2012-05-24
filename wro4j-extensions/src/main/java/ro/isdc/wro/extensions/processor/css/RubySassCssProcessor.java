@@ -60,9 +60,10 @@ public class RubySassCssProcessor
   }
   
   /**
-   * Invoked when a processing exception occurs.
+   * Invoked when a processing exception occurs. By default propagates the runtime exception.
    */
   protected void onException(final WroRuntimeException e) {
+    throw e;
   }
   
   /**

@@ -43,7 +43,7 @@ public class JsLintMojo
       }
 
       @Override
-      protected void onException(final Exception e) {
+      protected void onException(final WroRuntimeException e) {
         JsLintMojo.this.onException(e);
       }
 

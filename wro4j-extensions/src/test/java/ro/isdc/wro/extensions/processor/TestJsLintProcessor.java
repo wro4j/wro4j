@@ -55,12 +55,7 @@ public class TestJsLintProcessor extends AbstractTestLinterProcessor {
 
   @Test
   public void canBeExecutedMultipleTimes() throws Exception {
-    final JsLintProcessor processor = new JsLintProcessor() {
-      @Override
-      protected void onException(final Exception e) {
-        throw new WroRuntimeException("", e);
-      }
-    };
+    final JsLintProcessor processor = new JsLintProcessor();
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {

@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
@@ -49,9 +51,19 @@ public class YUICssCompressorProcessor
     try {
       final CssCompressor compressor = new CssCompressor(reader);
       compressor.compress(writer, linebreakpos);
+    } catch(IOException e) {
+      onException(new WroRuntimeException("Exception during YuiCss processing of resource: " + resource, e));
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+
+  /**
+   * Invoked when a processing exception occurs.
+   */
+  protected void onException(final WroRuntimeException e) {
+    throw e;
   }
 }

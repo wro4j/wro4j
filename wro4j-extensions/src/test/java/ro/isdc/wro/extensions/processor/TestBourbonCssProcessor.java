@@ -28,8 +28,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Apr 21, 2010
  */
 public class TestBourbonCssProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(TestBourbonCssProcessor.class);
-  
   /** Location (base) of bourbon sass css with bourbon test resources. */
   private final URL url = getClass().getResource("bourboncss");
   
@@ -38,13 +36,7 @@ public class TestBourbonCssProcessor {
   
   @Before
   public void initEngine() {
-    bourbonCss = new BourbonCssProcessor() {
-      @Override
-      protected void onException(final WroRuntimeException e) {
-        LOG.debug("[FAIL] Exception message is: {}", e.getMessage());
-        throw e;
-      }
-    };
+    bourbonCss = new BourbonCssProcessor();
   }
   
   @Test

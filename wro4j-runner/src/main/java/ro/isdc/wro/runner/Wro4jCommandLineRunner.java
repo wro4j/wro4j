@@ -350,7 +350,7 @@ public class Wro4jCommandLineRunner {
       super.onLinterException(e, resource);
       System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
       System.err.println(e.getErrors());
-      onException(e);
+      onRunnerException(e);
     }
   }
 
