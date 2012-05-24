@@ -2,7 +2,7 @@
  * Copyright (C) 2011.
  * All rights reserved.
  */
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**

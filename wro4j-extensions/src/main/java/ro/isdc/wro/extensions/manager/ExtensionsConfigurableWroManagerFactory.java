@@ -31,8 +31,8 @@ import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.LazyProcessorDecorator;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
 import com.google.javascript.jscomp.CompilationLevel;

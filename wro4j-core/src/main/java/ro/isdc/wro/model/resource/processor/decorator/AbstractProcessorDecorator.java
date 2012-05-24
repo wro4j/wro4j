@@ -1,8 +1,7 @@
-package ro.isdc.wro.model.resource.processor.impl;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 
 
 /**

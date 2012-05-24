@@ -3,12 +3,14 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.js;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
@@ -38,11 +40,11 @@ import ro.isdc.wro.model.resource.processor.support.JSMin;
 @SupportedResourceType(ResourceType.JS)
 public class JSMinProcessor implements ResourcePreProcessor,
     ResourcePostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(JSMinProcessor.class);
   public static final String ALIAS = "jsMin";
   @Inject
-  private WroConfiguration configuration;
+  private WroConfiguration config;
   private String encoding;
+  
   /**
    * {@inheritDoc}
    */
@@ -51,18 +53,14 @@ public class JSMinProcessor implements ResourcePreProcessor,
     try {
       final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, getEncoding())) {};
       final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, getEncoding()));
-      final JSMin jsmin = new JSMin(is, os);
-
-      jsmin.jsmin();
+      
+      new JSMin(is, os).jsmin();
+      
       is.close();
       os.close();
 		} catch (final Exception e) {
-		  LOG.error("Exception occured while using processor: " + ALIAS, e);
       throw new IOException(e.getMessage());
-    } finally {
-      reader.close();
-      writer.close();
-    }
+    } 
   }
 
   /**
@@ -78,7 +76,11 @@ public class JSMinProcessor implements ResourcePreProcessor,
    * @return the encoding
    */
   private String getEncoding() {
-    return this.encoding == null ? configuration.getEncoding() : encoding;
+    if (encoding == null) {
+      //use config is available to get encoding
+      this.encoding = config == null ? WroConfiguration.DEFAULT_ENCODING : config.getEncoding();
+    }
+    return encoding;
   }
 
   /**

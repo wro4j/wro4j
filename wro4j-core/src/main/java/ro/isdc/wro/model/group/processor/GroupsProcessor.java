@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 
@@ -44,6 +46,9 @@ public class GroupsProcessor {
   private WroModelFactory modelFactory;
   @Inject
   private WroConfiguration config;
+  @Inject
+  private Injector injector;
+  
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
@@ -85,7 +90,8 @@ public class GroupsProcessor {
    * 
    * @return the post processed contents.
    */
-  private String doPostProcess(final String content, final CacheEntry cacheEntry) throws IOException {
+  private String doPostProcess(final String content, final CacheEntry cacheEntry)
+      throws IOException {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
@@ -111,38 +117,33 @@ public class GroupsProcessor {
     if (processors.isEmpty()) {
       return content;
     }
-    Reader input = new StringReader(content.toString());
-    Writer output = null;
+    Reader reader = new StringReader(content.toString());
+    Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
       stopWatch.start("Using " + processor.getClass().getSimpleName());
-      output = new StringWriter();
-      decorateWithPostProcessCallback(processor).process(input, output);
-      
-      input = new StringReader(output.toString());
-      stopWatch.stop();
+      writer = new StringWriter();
+      try {
+        callbackRegistry.onBeforePostProcess();
+        decorateProcessor(processor).process(reader, writer);
+      } finally {
+        stopWatch.stop();
+        callbackRegistry.onAfterPostProcess();
+        IOUtils.closeQuietly(reader);
+        IOUtils.closeQuietly(writer);
+      }
+      reader = new StringReader(writer.toString());
     }
     LOG.debug(stopWatch.prettyPrint());
-    return output.toString();
+    return writer.toString();
   }
-
+  
   /**
-   * TODO move to {@link InjectorBuilder}
-   * 
-   * @return a decorated postProcessor which invokes callback methods.
+   * @return a decorated postProcessor.
    */
-  private ResourcePostProcessor decorateWithPostProcessCallback(final ResourcePostProcessor processor) {
-    return new ResourcePostProcessor() {
-      public void process(final Reader reader, final Writer writer)
-          throws IOException {
-        // TODO update callbackContext
-        callbackRegistry.onBeforePostProcess();
-        try {
-          processor.process(reader, writer);
-        } finally {
-          callbackRegistry.onAfterPostProcess();
-        }
-      }
-    };
+  private ResourcePostProcessor decorateProcessor(final ResourcePostProcessor processor) {
+    ResourcePostProcessor decorated = new ExceptionHandlingProcessorDecorator(processor);
+    injector.inject(decorated);
+    return decorated;
   }
 }

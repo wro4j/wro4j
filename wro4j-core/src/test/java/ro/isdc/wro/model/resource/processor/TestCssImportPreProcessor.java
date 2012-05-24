@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -24,7 +25,9 @@ public class TestCssImportPreProcessor {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    final WroConfiguration config = new WroConfiguration();
+    config.setIgnoreFailingProcessor(true);
+    Context.set(Context.standaloneContext(), config);
     processor = new CssImportPreProcessor();
     WroTestUtils.initProcessor(processor);
   }

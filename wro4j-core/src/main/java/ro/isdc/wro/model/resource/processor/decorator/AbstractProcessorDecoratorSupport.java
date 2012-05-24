@@ -1,7 +1,7 @@
 /**
  * Copyright wro4j@2011
  */
-package ro.isdc.wro.model.resource.processor.support;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -19,7 +19,7 @@ import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
- * Hides details common to all processors decorators.
+ * Hides details common to all processors decorators, like ability to identify if a processor is minimize aware
  *
  * @author Alex Objelean
  * @created 11 Apr 2012

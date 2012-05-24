@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.resource.processor.support;
+package ro.isdc.wro.model.resource.processor.decorator;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -9,6 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
@@ -16,6 +18,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
@@ -151,5 +154,11 @@ public class TestProcessorDecorator {
       }
     };
     assertNull(null, new ProcessorDecorator(processor).getSupportedResourceType());
+  }
+  
+  @Test
+  public void shouldComputeIsMinimizeFlagOfDeepNestedDecoratedProcessor() {
+    ProcessorDecorator processor = new ProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(new JSMinProcessor())));
+    Assert.assertTrue(processor.isMinimize());
   }
 }
