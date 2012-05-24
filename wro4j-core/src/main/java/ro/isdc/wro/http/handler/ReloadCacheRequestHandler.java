@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.jmx.WroConfigurationMBean;
-import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
 

@@ -6,13 +6,13 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class DefaultRequestHandlerFactory implements RequestHandlerFactory {
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultRequestHandlerFactory.class);
 
   public Collection<RequestHandler> create() {
     Collection<RequestHandler> requestHandlers = new ArrayList<RequestHandler>();
     requestHandlers.add(new ReloadCacheRequestHandler());
     requestHandlers.add(new ReloadModelRequestHandler());
-    logger.debug("default request handlers created");
+    LOG.debug("default request handlers created");
 
     return requestHandlers;
   }
