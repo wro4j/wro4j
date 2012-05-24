@@ -36,7 +36,6 @@ public class TestSemicolonAppenderPreProcessor {
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
-    WroTestUtils.assertProcessorSupportResourceTypes(new SemicolonAppenderPreProcessor(), ResourceType.CSS,
-        ResourceType.JS);
+    WroTestUtils.assertProcessorSupportResourceTypes(new SemicolonAppenderPreProcessor(), ResourceType.JS);
   }
 }
