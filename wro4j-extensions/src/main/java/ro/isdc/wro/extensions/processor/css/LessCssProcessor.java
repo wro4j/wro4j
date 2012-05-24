@@ -135,15 +135,10 @@ public class LessCssProcessor
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
     } finally {
+      //return for later reuse
+      enginePool.returnObject(lessCss);
       reader.close();
       writer.close();
-      //return for later reuse
-      try {
-        enginePool.returnObject(lessCss);
-      } catch (final Exception e) {
-        //should never happen
-        LOG.error("Cannot return lessCss engine to the pool", e);
-      }
     }
   }
 

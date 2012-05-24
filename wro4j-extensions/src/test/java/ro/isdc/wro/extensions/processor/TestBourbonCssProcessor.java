@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.BourbonCssProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
@@ -28,6 +27,8 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Apr 21, 2010
  */
 public class TestBourbonCssProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(TestBourbonCssProcessor.class);
+
   /** Location (base) of bourbon sass css with bourbon test resources. */
   private final URL url = getClass().getResource("bourboncss");
   
@@ -46,11 +47,15 @@ public class TestBourbonCssProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByName(testFolder, expectedFolder, "scss", "css", bourbonCss);
   }
-
+  
   @Test
   public void shouldSupportOnlyCssResources() {
-    Assert.assertTrue(Arrays.equals(new ResourceType[] {
-      ResourceType.CSS
-    }, new ProcessorDecorator(bourbonCss).getSupportedResourceTypes()));
+    try {
+      Assert.assertTrue(Arrays.equals(new ResourceType[] {
+        ResourceType.CSS
+      }, new ProcessorDecorator(bourbonCss).getSupportedResourceTypes()));
+    } catch (Exception e) {
+      LOG.error("supported Resources were: " + new ProcessorDecorator(bourbonCss).getSupportedResourceTypes());
+    }
   }
 }

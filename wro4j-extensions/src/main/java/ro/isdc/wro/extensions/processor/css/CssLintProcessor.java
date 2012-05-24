@@ -125,7 +125,7 @@ public class CssLintProcessor
    * @param e {@link CssLintException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onCssLintException(final CssLintException e, final Resource resource)
-    throws Exception {
+  protected void onCssLintException(final CssLintException e, final Resource resource) throws Exception {
+    LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
 }
