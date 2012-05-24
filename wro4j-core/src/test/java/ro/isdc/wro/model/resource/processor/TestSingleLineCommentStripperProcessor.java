@@ -13,9 +13,8 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
-import ro.isdc.wro.model.resource.processor.support.ProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
