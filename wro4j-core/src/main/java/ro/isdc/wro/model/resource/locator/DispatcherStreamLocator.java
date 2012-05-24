@@ -115,13 +115,13 @@ public final class DispatcherStreamLocator {
 
       @Override
       public String getPathInfo() {
-        return WroUtil.getPathInfoFromLocation(location);
+        return WroUtil.getPathInfoFromLocation(this, location);
       }
 
 
       @Override
       public String getServletPath() {
-        return WroUtil.getServletPathFromLocation(location);
+        return WroUtil.getServletPathFromLocation(this, location);
       }
     };
     return wrappedRequest;
