@@ -72,8 +72,14 @@ public class TestCoffeeScriptProcessor {
       @Override
       protected void onException(final WroRuntimeException e) {
         counter.increment();
+        throw e;
       }
-    });
+    }) {
+      @Override
+      protected boolean isIgnoreFailingProcessor() {
+        return true;
+      }
+    };
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
