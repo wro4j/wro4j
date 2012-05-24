@@ -18,7 +18,9 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.4.7
  */
 public class BourbonCssProcessor extends RubySassCssProcessor implements ResourcePreProcessor, ResourcePostProcessor {
-
+  /**
+   * The processor alias.
+   */
   public static final String ALIAS = "bourbonCss";
 
   private static final String BOURBON_GEM_REQUIRE = "bourbon";
@@ -29,7 +31,7 @@ public class BourbonCssProcessor extends RubySassCssProcessor implements Resourc
    */
   @Override
   protected RubySassEngine getEngine() {
-    RubySassEngine engine = super.getEngine();
+    final RubySassEngine engine = super.getEngine();
     engine.addRequire(BOURBON_GEM_REQUIRE);
     return engine;
   }
