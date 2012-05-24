@@ -315,7 +315,7 @@ public class WroFilter
   private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     for (RequestHandler requestHandler : requestHandlers) {
-      if (requestHandler.accept(request)) {
+      if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         Context.unset();
         return true;

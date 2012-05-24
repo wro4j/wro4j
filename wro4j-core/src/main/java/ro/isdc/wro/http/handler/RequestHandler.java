@@ -37,8 +37,9 @@ public interface RequestHandler  {
   boolean accept(HttpServletRequest request);
 
   /**
-   * Used to activate (enable) this RequestHandler
+   * Used to determine if the RequestHandler is enabled
    */
-  void enable();
+  boolean isEnabled();
+
 
 }

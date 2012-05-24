@@ -2,7 +2,6 @@ package ro.isdc.wro.http.handler;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.jmx.WroConfigurationMBean;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -32,13 +33,13 @@ public class ReloadCacheRequestHandler
    * API - reload cache method call
    */
   public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
-  
+
   /**
    * {@inheritDoc}
    */
   public void handle(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    getWroConfiguration().reloadCache();
+      throws IOException {
+    getConfig().reloadCache();
     WroUtil.addNoCacheHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("Cache is reloaded");
@@ -48,19 +49,17 @@ public class ReloadCacheRequestHandler
    * {@inheritDoc}
    */
   public boolean accept(HttpServletRequest request) {
-    WroConfiguration wroConfiguration = Context.get().getConfig();
-    return wroConfiguration.isDebug() && WroUtil.matchesUrl(request, API_RELOAD_CACHE);
+    return WroUtil.matchesUrl(request, API_RELOAD_CACHE);
   }
   
   /**
    * {@inheritDoc}
    */
-  public void enable() {
-    throw new RuntimeException("Not implemented.");
+  public boolean isEnabled() {
+    return getConfig().isDebug();
   }
-  
-  private WroConfiguration getWroConfiguration() {
+
+  private WroConfigurationMBean getConfig() {
     return Context.get().getConfig();
   }
-  
 }

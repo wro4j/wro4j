@@ -35,7 +35,7 @@ public class ReloadModelRequestHandler
    * {@inheritDoc}
    */
   public void handle(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+      throws IOException {
     getWroConfiguration().reloadModel();
     WroUtil.addNoCacheHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
@@ -46,17 +46,17 @@ public class ReloadModelRequestHandler
    * {@inheritDoc}
    */
   public boolean accept(HttpServletRequest request) {
-    return getWroConfiguration().isDebug() && WroUtil.matchesUrl(request, API_RELOAD_MODEL);
+    return WroUtil.matchesUrl(request, API_RELOAD_MODEL);
   }
   
   /**
    * {@inheritDoc}
    */
-  public void enable() {
-    throw new RuntimeException("Not implemented jet!");
+  public boolean isEnabled() {
+    return getWroConfiguration().isDebug();
   }
   
-  private WroConfiguration getWroConfiguration() {
+  protected WroConfiguration getWroConfiguration() {
     return Context.get().getConfig();
   }
 }

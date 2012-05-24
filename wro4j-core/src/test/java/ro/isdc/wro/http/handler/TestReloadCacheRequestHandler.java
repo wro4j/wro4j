@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 public class TestReloadCacheRequestHandler {
 
-  private RequestHandler reloadCacheRequestHandler;
+  private ReloadCacheRequestHandler reloadCacheRequestHandler;
   private HttpServletRequest request;
   private HttpServletResponse response;
 
@@ -28,6 +28,7 @@ public class TestReloadCacheRequestHandler {
     response = mock(HttpServletResponse.class);
 
     Context.set(Context.webContext(request, response, mock(FilterConfig.class)));
+    //reloadCacheRequestHandler.setConfiguration(Context.get().getConfig());
   }
 
   @Test
