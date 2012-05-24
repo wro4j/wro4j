@@ -27,7 +27,7 @@ public interface RequestHandler  {
    * @throws IOException in case of I/O errors
    */
   void handle(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException;
+      throws IOException;
 
   /**
    * Determines if current request can be handled by this requestHandler
