@@ -88,12 +88,22 @@ public final class WroUtil {
   /**
    * Retrieve pathInfo from a given location.
    *
+   *
+   * @param request
    * @param location where to search contextPath.
    * @return pathInfo value.
    */
-  public static String getPathInfoFromLocation(final String location) {
+  public static String getPathInfoFromLocation(final HttpServletRequest request, final String location) {
     if (StringUtils.isEmpty(location)) {
       throw new IllegalArgumentException("Location cannot be empty string!");
+    }
+    final String contextPath = request.getContextPath();
+    if (contextPath != null) {
+      if (startsWithIgnoreCase(location, contextPath)) {
+        return location.substring(contextPath.length());
+      } else {
+        return location;
+      }
     }
     final String noSlash = location.substring(1);
     final int nextSlash = noSlash.indexOf('/');
@@ -171,8 +181,8 @@ public final class WroUtil {
    * @param location where to search the servletPath.
    * @return ServletPath string value.
    */
-  public static String getServletPathFromLocation(final String location) {
-    return location.replace(getPathInfoFromLocation(location), "");
+  public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
+    return location.replace(getPathInfoFromLocation(request, location), "");
   }
 
   /**
