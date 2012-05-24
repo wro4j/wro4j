@@ -31,6 +31,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.handler.DefaultRequestHandlerFactory;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.RequestHandlerFactory;
 import ro.isdc.wro.http.support.HttpHeader;
@@ -75,6 +76,10 @@ public class WroFilter
    * RequestHandlers. Used to handle request
    */
   private Collection<RequestHandler> requestHandlers;
+  /**
+   * Used to create the collection of requestHandlers to apply
+   */
+  private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
 
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -116,7 +121,7 @@ public class WroFilter
     initJMX();
     doInit(config);
 
-    this.requestHandlers = new RequestHandlerFactory(filterConfig.getServletContext()).create();
+    this.requestHandlers = requestHandlerFactory.create();
   }
 
   /**
@@ -397,6 +402,13 @@ public class WroFilter
     return this.wroManagerFactory;
   }
 
+  /**
+   * Sets the RequestHandlerFactory used to create the collection of requestHandlers
+   * @param requestHandlerFactory to set
+   */
+  public void setRequestHandlerFactory(final RequestHandlerFactory requestHandlerFactory) {
+    this.requestHandlerFactory = requestHandlerFactory;
+  }
 
   /**
    * Factory method for {@link WroManagerFactory}.
