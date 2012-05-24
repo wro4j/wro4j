@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
@@ -48,6 +50,7 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
@@ -403,5 +406,20 @@ public class WroTestUtils {
       public void destroy() {
       }
     };
+  }
+  
+  /**
+   * Asserts that a processor supports provided resource types. 
+   */
+  public static void assertProcessorSupportResourceTypes(final ResourcePreProcessor processor, final ResourceType ... expectedResourceTypes) {
+    ResourceType[] actualResourceTypes = new ProcessorDecorator(processor).getSupportedResourceTypes();
+    try {
+      Assert.assertTrue(Arrays.equals(expectedResourceTypes, actualResourceTypes));
+    } catch (AssertionFailedError e) {
+      final String message = "actual resourceTypes: " + Arrays.toString(actualResourceTypes) + ", expected are: "
+          + Arrays.toString(expectedResourceTypes);
+      LOG.error(message);
+      Assert.fail(message);
+    }
   }
 }

@@ -22,7 +22,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 

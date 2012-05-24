@@ -11,10 +11,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -76,4 +76,10 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
+  
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new JsHintProcessor(), ResourceType.JS);
+  }
+
 }

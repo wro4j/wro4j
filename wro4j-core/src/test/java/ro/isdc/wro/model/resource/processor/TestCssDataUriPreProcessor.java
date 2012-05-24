@@ -5,16 +5,12 @@ package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -45,11 +41,9 @@ public class TestCssDataUriPreProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-
+  
   @Test
-  public void shouldSupportCssResourcesOnly() {
-    Assert.assertTrue(Arrays.equals(new ResourceType[] {
-        ResourceType.CSS
-    }, new ProcessorDecorator(processor).getSupportedResourceTypes()));
+  public void shouldSupportOnlyCssResources() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
 }

@@ -18,6 +18,7 @@ import org.junit.Test;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -121,5 +122,11 @@ public class TestGoogleClosureCompressorProcessor {
     processor.process(new StringReader("alert(1);"), sw);
     //will leave result unchanged, because the processing is not successful.
     Assert.assertEquals("alert(1);", sw.toString());
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new GoogleClosureCompressorProcessor(), ResourceType.JS);
   }
 }

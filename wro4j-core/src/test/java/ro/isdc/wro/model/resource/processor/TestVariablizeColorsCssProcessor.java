@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -21,7 +22,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Aug 15, 2010
  */
 public class TestVariablizeColorsCssProcessor {
-  private ResourcePostProcessor processor;
+  private ResourcePreProcessor processor;
 
 
   @Before
@@ -39,5 +40,11 @@ public class TestVariablizeColorsCssProcessor {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
 }

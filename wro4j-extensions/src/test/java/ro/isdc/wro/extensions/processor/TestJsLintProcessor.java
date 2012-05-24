@@ -11,7 +11,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;

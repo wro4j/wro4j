@@ -36,7 +36,6 @@ public class RubySassEngine {
   private LinkedHashSet<String> requires;
 
   public RubySassEngine() {
-    super();
     requires = new LinkedHashSet<String>();
     requires.add(RUBY_GEM_REQUIRE);
     requires.add(SASS_PLUGIN_REQUIRE);

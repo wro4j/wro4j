@@ -6,9 +6,6 @@ package ro.isdc.wro.model.resource.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +13,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -51,10 +47,9 @@ public class TestJsMinProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
   
+
   @Test
-  public void shouldSupportOnlyJsResources() {
-    Assert.assertTrue(Arrays.equals(new ResourceType[] {
-      ResourceType.JS
-    }, new ProcessorDecorator(processor).getSupportedResourceTypes()));
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.JS);
   }
 }

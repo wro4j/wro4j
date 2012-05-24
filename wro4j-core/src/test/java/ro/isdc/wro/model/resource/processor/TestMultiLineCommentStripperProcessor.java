@@ -6,14 +6,10 @@ package ro.isdc.wro.model.resource.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -37,11 +33,10 @@ public class TestMultiLineCommentStripperProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "*",
       processor);
   }
-  
+
   @Test
-  public void shouldSupportCssAndJsResources() {
-    Assert.assertTrue(Arrays.equals(new ResourceType[] {
-        ResourceType.CSS, ResourceType.JS  
-    }, new ProcessorDecorator(new MultiLineCommentStripperProcessor()).getSupportedResourceTypes()));
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new MultiLineCommentStripperProcessor(), ResourceType.CSS,
+        ResourceType.JS);
   }
 }
