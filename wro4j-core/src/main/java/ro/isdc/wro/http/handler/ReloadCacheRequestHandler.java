@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ReloadCacheRequestHandler
     implements RequestHandler {
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
   
   /**
    * wro API mapping path. If request uri contains this, exposed API method will be invoked.
@@ -41,7 +41,7 @@ public class ReloadCacheRequestHandler
     getWroConfiguration().reloadCache();
     WroUtil.addNoCacheHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
-    logger.debug("Cache is reloaded");
+    LOG.debug("Cache is reloaded");
   }
   
   /**

@@ -6,6 +6,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.util.WroUtil;
@@ -19,6 +21,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ReloadModelRequestHandler
     implements RequestHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
   /**
    * wro API mapping path. If request uri contains this, exposed API method will be invoked.
    */
@@ -36,6 +39,7 @@ public class ReloadModelRequestHandler
     getWroConfiguration().reloadModel();
     WroUtil.addNoCacheHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
+    LOG.debug("WroModel reloaded");
   }
   
   /**
