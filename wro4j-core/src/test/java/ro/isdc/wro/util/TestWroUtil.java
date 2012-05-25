@@ -23,27 +23,39 @@ import org.mockito.Mockito;
 public class TestWroUtil {
   @Test(expected = IllegalArgumentException.class)
   public void cannotComputeEmptyLocation() {
-    WroUtil.getPathInfoFromLocation("");
+    WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "");
   }
   
   @Test
   public void computePathFromSomeLocation() {
-    final String result = WroUtil.getPathInfoFromLocation("location");
+    final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "location");
     Assert.assertEquals("", result);
   }
   
   @Test
   public void computePathFromNestedLocation() {
-    final String result = WroUtil.getPathInfoFromLocation("/a/b/c/d");
+    final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "/a/b/c/d");
     Assert.assertEquals("/b/c/d", result);
   }
-  
+
+  @Test
+  public void computePathFromLocationWithContextRoot() {
+    final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest("/a"), "/a/b/c/d");
+    Assert.assertEquals("/b/c/d", result);
+  }
+
+  @Test
+  public void computePathFromLocationWithDifferentContextRoot() {
+    final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest("/z"), "/a/b/c/d");
+    Assert.assertEquals("/a/b/c/d", result);
+  }
+
   @Test
   public void computeServletPathFromLocation() {
-    final String result = WroUtil.getServletPathFromLocation("/a/b/c/d");
+    final String result = WroUtil.getServletPathFromLocation(mockContextPathRequest(null), "/a/b/c/d");
     Assert.assertEquals("/a", result);
   }
-  
+
   /**
    * Test for several mangled header examples based on {@link http
    * ://developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/} blog post.
@@ -97,12 +109,34 @@ public class TestWroUtil {
     Mockito.when(request.getHeader(headerName)).thenReturn(headerValue);
     return request;
   }
-  
+
+  private HttpServletRequest mockContextPathRequest(final String contextPath) {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getContextPath()).thenReturn(contextPath);
+    return request;
+  }
+
   @Test
   public void testToJsMultilineString() {
     Assert.assertEquals("[\"\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString(""));
     Assert.assertEquals("[\"alert1\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString("alert1"));
     Assert.assertEquals("[\"\",\"alert1\",\"alert2\"].join(\"\\n\")", WroUtil.toJSMultiLineString("\nalert1\nalert2"));
+  }
+
+  @Test
+  public void shouldMatchUrl() {
+    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn("wroApi/test");
+    
+    Assert.assertTrue(WroUtil.matchesUrl(request, "wroApi/test"));
+  }
+
+  @Test
+  public void shouldNotMatchUrl() {
+    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn("someresource.css");
+
+    Assert.assertFalse(WroUtil.matchesUrl(request, "wroApi/test"));
   }
   
 }

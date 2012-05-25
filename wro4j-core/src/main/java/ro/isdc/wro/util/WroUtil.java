@@ -27,7 +27,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 
 /**
  * Utility class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
@@ -41,17 +41,15 @@ public final class WroUtil {
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
   private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("E, dd MMM yyyy HH:mm:ss z",
-    TimeZone.getTimeZone("GMT"));
+      TimeZone.getTimeZone("GMT"));
   /**
    * Patterns used to search for mangled Accept-Encoding header.
    */
-  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(
-    "(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
-  private static final Pattern PATTERN_GZIP = Pattern.compile(
-    "(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
-
+  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile("(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
+  private static final Pattern PATTERN_GZIP = Pattern.compile("(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
+  
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
-
+  
   /**
    * @return {@link ThreadFactory} with daemon threads.
    */
@@ -59,7 +57,7 @@ public final class WroUtil {
     return new ThreadFactory() {
       private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
       private final AtomicInteger threadNumber = new AtomicInteger(1);
-
+      
       public Thread newThread(final Runnable runnable) {
         final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
         thread.setDaemon(true);
@@ -67,27 +65,37 @@ public final class WroUtil {
       }
     };
   }
-
+  
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
-   *
-   * @param milliseconds to transform
+   * 
+   * @param milliseconds
+   *          to transform
    * @return string representation of the date.
    */
   public static String toDateAsString(final long milliseconds) {
     return DATE_FORMAT.format(milliseconds);
   }
-
-
+  
   /**
    * Retrieve pathInfo from a given location.
-   *
-   * @param location where to search contextPath.
+   * 
+   * @param request
+   * @param location
+   *          where to search contextPath.
    * @return pathInfo value.
    */
-  public static String getPathInfoFromLocation(final String location) {
+  public static String getPathInfoFromLocation(final HttpServletRequest request, final String location) {
     if (StringUtils.isEmpty(location)) {
       throw new IllegalArgumentException("Location cannot be empty string!");
+    }
+    final String contextPath = request.getContextPath();
+    if (contextPath != null) {
+      if (startsWithIgnoreCase(location, contextPath)) {
+        return location.substring(contextPath.length());
+      } else {
+        return location;
+      }
     }
     final String noSlash = location.substring(1);
     final int nextSlash = noSlash.indexOf('/');
@@ -97,10 +105,39 @@ public final class WroUtil {
     final String pathInfo = noSlash.substring(nextSlash);
     return pathInfo;
   }
-
+  
+  /**
+   * <p>
+   * Case insensitive check if a String starts with a specified prefix.
+   * </p>
+   * <p>
+   * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal. The
+   * comparison is case insensitive.
+   * </p>
+   * 
+   * <pre>
+   * StringUtils.startsWithIgnoreCase(null, null)      = true
+   * StringUtils.startsWithIgnoreCase(null, "abcdef")  = false
+   * StringUtils.startsWithIgnoreCase("abc", null)     = false
+   * StringUtils.startsWithIgnoreCase("abc", "abcdef") = true
+   * StringUtils.startsWithIgnoreCase("abc", "ABCDEF") = true
+   * </pre>
+   * 
+   * @see java.lang.String#startsWith(String)
+   * @param str
+   *          the String to check, may be null
+   * @param prefix
+   *          the prefix to find, may be null
+   * @return <code>true</code> if the String starts with the prefix, case insensitive, or both <code>null</code>
+   * @since 2.4
+   */
+  public static boolean startsWithIgnoreCase(final String str, final String prefix) {
+    return startsWith(str, prefix, true);
+  }
+  
   /**
    * Creates a folder like implementation for a class. Ex: com.mycompany.MyClass -> com/mycompany/
-   *
+   * 
    * @param clazz
    *          used as a base location for determining the package path.
    * @return a string representation of the path where the class resides.
@@ -109,21 +146,46 @@ public final class WroUtil {
     Validate.notNull(clazz, "Class cannot be null!");
     return clazz.getPackage().getName().replace('.', '/');
   }
-
+  
+  /**
+   * <p>
+   * Check if a String starts with a specified prefix (optionally case insensitive).
+   * </p>
+   * 
+   * @see java.lang.String#startsWith(String)
+   * @param str
+   *          the String to check, may be null
+   * @param prefix
+   *          the prefix to find, may be null
+   * @param ignoreCase
+   *          inidicates whether the compare should ignore case (case insensitive) or not.
+   * @return <code>true</code> if the String starts with the prefix or both <code>null</code>
+   */
+  private static boolean startsWith(final String str, final String prefix, final boolean ignoreCase) {
+    if (str == null || prefix == null) {
+      return (str == null && prefix == null);
+    }
+    if (prefix.length() > str.length()) {
+      return false;
+    }
+    return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
+  }
+  
   /**
    * Retrieve servletPath from a given location.
-   *
-   * @param location where to search the servletPath.
+   * 
+   * @param location
+   *          where to search the servletPath.
    * @return ServletPath string value.
    */
-  public static String getServletPathFromLocation(final String location) {
-    return location.replace(getPathInfoFromLocation(location), "");
+  public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
+    return location.replace(getPathInfoFromLocation(request, location), "");
   }
-
+  
   /**
    * Analyze headers of the request and searches for mangled (by proxy) for "Accept-Encoding" header and its mangled
    * variations and gzip header value and its mangled variations.
-   *
+   * 
    * @return true if this request support gzip encoding.
    */
   @SuppressWarnings("unchecked")
@@ -144,11 +206,13 @@ public final class WroUtil {
     }
     return false;
   }
-
+  
   /**
-   * Transforms a java multi-line string into javascript multi-line string.
-   * This technique was found at {@link http://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
-   * @param data a string containing new lines.
+   * Transforms a java multi-line string into javascript multi-line string. This technique was found at {@link http
+   * ://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
+   * 
+   * @param data
+   *          a string containing new lines.
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
   public static String toJSMultiLineString(final String data) {
@@ -161,7 +225,7 @@ public final class WroUtil {
       final String line = lines[i];
       result.append("\"");
       result.append(line.replace("\\", "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
-      //this is used to force a single line to have at least one new line (otherwise cssLint fails).
+      // this is used to force a single line to have at least one new line (otherwise cssLint fails).
       if (lines.length == 1) {
         result.append("\\n");
       }
@@ -173,7 +237,7 @@ public final class WroUtil {
     result.append("].join(\"\\n\")");
     return result.toString();
   }
-
+  
   /**
    * Add no-cache headers to response.
    */
@@ -182,22 +246,36 @@ public final class WroUtil {
     response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
     response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
   }
-
-
+  
+  /**
+   * Utility used to verify that requestURI matches provided path
+   */
+  public static boolean matchesUrl(HttpServletRequest request, final String path) {
+    final Pattern pattern = Pattern.compile(".*" + path + "[/]?", Pattern.CASE_INSENSITIVE);
+    if (request.getRequestURI() != null) {
+      final Matcher m = pattern.matcher(request.getRequestURI());
+      return m.matches();
+    }
+    return false;
+  }
+  
   /**
    * A simple way to create a {@link WroModelFactory}.
-   *
-   * @param model {@link WroModel} instance to be returned by the factory.
+   * 
+   * @param model
+   *          {@link WroModel} instance to be returned by the factory.
    */
   public static WroModelFactory factoryFor(final WroModel model) {
     return new WroModelFactory() {
       public WroModel create() {
         return model;
       }
-      public void destroy() {}
+      
+      public void destroy() {
+      }
     };
   }
-
+  
   public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
     return new ObjectFactory<T>() {
       public T create() {
@@ -205,12 +283,12 @@ public final class WroUtil {
       }
     };
   }
-
-
+  
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
-   *
-   * @param e the exception to wrap.
+   * 
+   * @param e
+   *          the exception to wrap.
    */
   public static void wrapWithWroRuntimeException(final Exception e) {
     LOG.error("Exception occured: " + e.getClass(), e.getCause());
