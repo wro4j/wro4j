@@ -16,40 +16,48 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.util.WroTestUtils;
 
+
+/**
+ * @author Ivar Conradi Østhus
+ */
 public class TestReloadCacheRequestHandler {
-
-  private ReloadCacheRequestHandler reloadCacheRequestHandler;
+  private ReloadCacheRequestHandler victim;
+  @Mock
   private HttpServletRequest request;
+  @Mock
   private HttpServletResponse response;
-
+  
   @Before
   public void setup() {
-    reloadCacheRequestHandler = new ReloadCacheRequestHandler();
-    request = mock(HttpServletRequest.class);
-    response = mock(HttpServletResponse.class);
-
+    MockitoAnnotations.initMocks(this);
+    victim = new ReloadCacheRequestHandler();
+    
     Context.set(Context.webContext(request, response, mock(FilterConfig.class)));
-    //reloadCacheRequestHandler.setConfiguration(Context.get().getConfig());
+    WroTestUtils.createInjector().inject(victim);
   }
-
+  
   @Test
   public void shouldHandleRequest() {
     when(request.getRequestURI()).thenReturn("wroApi/reloadCache");
-    assertTrue(reloadCacheRequestHandler.accept(request));
+    assertTrue(victim.accept(request));
   }
-
+  
   @Test
   public void shouldNotHandleRequest() {
     when(request.getRequestURI()).thenReturn("wroApi/somethingElse");
-    assertFalse(reloadCacheRequestHandler.accept(request));
+    assertFalse(victim.accept(request));
   }
-
+  
   @Test
-  public void shouldReloadCache() throws IOException, ServletException {
-    reloadCacheRequestHandler.handle(request, response);
+  public void shouldReloadCache()
+      throws IOException, ServletException {
+    victim.handle(request, response);
     verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
   }
 }
