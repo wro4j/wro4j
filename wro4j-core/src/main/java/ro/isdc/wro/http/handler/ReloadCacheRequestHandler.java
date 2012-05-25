@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.WroConfigurationMBean;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -23,7 +23,6 @@ import ro.isdc.wro.util.WroUtil;
 public class ReloadCacheRequestHandler
     implements RequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
-  
   /**
    * wro API mapping path. If request uri contains this, exposed API method will be invoked.
    */
@@ -32,13 +31,15 @@ public class ReloadCacheRequestHandler
    * API - reload cache method call
    */
   public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
+  @Inject
+  private Context context; 
 
   /**
    * {@inheritDoc}
    */
-  public void handle(HttpServletRequest request, HttpServletResponse response)
+  public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-    getConfig().reloadCache();
+    context.getConfig().reloadCache();
     WroUtil.addNoCacheHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("Cache is reloaded");
@@ -47,7 +48,7 @@ public class ReloadCacheRequestHandler
   /**
    * {@inheritDoc}
    */
-  public boolean accept(HttpServletRequest request) {
+  public boolean accept(final HttpServletRequest request) {
     return WroUtil.matchesUrl(request, API_RELOAD_CACHE);
   }
   
@@ -55,10 +56,6 @@ public class ReloadCacheRequestHandler
    * {@inheritDoc}
    */
   public boolean isEnabled() {
-    return getConfig().isDebug();
-  }
-
-  private WroConfigurationMBean getConfig() {
-    return Context.get().getConfig();
+    return context.getConfig().isDebug();
   }
 }

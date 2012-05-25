@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -31,13 +31,15 @@ public class ReloadModelRequestHandler
    * API - reload model method call
    */
   public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
+  @Inject
+  private Context context;
   
   /**
    * {@inheritDoc}
    */
   public void handle(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    getWroConfiguration().reloadModel();
+    context.getConfig().reloadModel();
     WroUtil.addNoCacheHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("WroModel reloaded");
@@ -54,10 +56,6 @@ public class ReloadModelRequestHandler
    * {@inheritDoc}
    */
   public boolean isEnabled() {
-    return getWroConfiguration().isDebug();
-  }
-  
-  protected WroConfiguration getWroConfiguration() {
-    return Context.get().getConfig();
+    return context.getConfig().isDebug();
   }
 }
