@@ -17,7 +17,8 @@ import ro.isdc.wro.util.WroUtil;
  * This RequestHandler will reload the model on HTTP requests to "wroAPU/reloadModel"
  * 
  * @author Ivar Conradi Østhus
- * @created Created on May 19, 2012
+ * @created 19 May 2012
+ * @since 1.4.7
  */
 public class ReloadModelRequestHandler
     implements RequestHandler {

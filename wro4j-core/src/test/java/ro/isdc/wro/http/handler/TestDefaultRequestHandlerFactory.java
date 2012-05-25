@@ -9,17 +9,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+/**
+ * @author Ivar Conradi Østhus
+ * @created 19 May 2012
+ */
 public class TestDefaultRequestHandlerFactory {
-  private DefaultRequestHandlerFactory defaultRequestHandlerFactory;
+  private DefaultRequestHandlerFactory victim;
   
   @Before
   public void setup() {
-    defaultRequestHandlerFactory = new DefaultRequestHandlerFactory();
+    victim = new DefaultRequestHandlerFactory();
   }
   
   @Test
   public void shouldCreateListOfDefaultRequestHandlers() {
-    Collection<RequestHandler> requestHandlers = defaultRequestHandlerFactory.create();
+    Collection<RequestHandler> requestHandlers = victim.create();
     assertThat(requestHandlers.isEmpty(), is(false));
   }
 }

@@ -77,10 +77,6 @@ public class WroFilter
    */
   private WroManagerFactory wroManagerFactory;
   /**
-   * RequestHandlers. Used to handle request
-   */
-  private Collection<RequestHandler> requestHandlers;
-  /**
    * Used to create the collection of requestHandlers to apply
    */
   private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
@@ -124,8 +120,6 @@ public class WroFilter
     registerChangeListeners();
     initJMX();
     doInit(config);
-
-    this.requestHandlers = requestHandlerFactory.create();
   }
 
   /**
@@ -182,7 +176,7 @@ public class WroFilter
     if (StringUtils.isEmpty(mbeanName)) {
       final String contextPath = getContextPath();
       mbeanName = StringUtils.isEmpty(contextPath) ? "ROOT" : contextPath;
-      mbeanName = MBEAN_PREFIX + contextPath;
+      mbeanName = MBEAN_PREFIX + mbeanName;
     }
     return mbeanName;
   }
@@ -322,7 +316,9 @@ public class WroFilter
 
   private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    for (RequestHandler requestHandler : requestHandlers) {
+    Collection<RequestHandler> handlers = requestHandlerFactory.create();
+    Validate.notNull(handlers, "requestHandlers cannot be null!");
+    for (RequestHandler requestHandler : handlers) {
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         return true;
@@ -409,6 +405,7 @@ public class WroFilter
    * @param requestHandlerFactory to set
    */
   public void setRequestHandlerFactory(final RequestHandlerFactory requestHandlerFactory) {
+    Validate.notNull(requestHandlerFactory);
     this.requestHandlerFactory = requestHandlerFactory;
   }
 

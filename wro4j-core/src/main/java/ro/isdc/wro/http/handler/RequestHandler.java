@@ -15,15 +15,20 @@ import javax.servlet.http.HttpServletResponse;
  * processing is not performed.
  *
  * @author Ivar Conradi Østhus
- * @created Created on May 19, 2012
+ * @created 19 May 2012
+ * @since 1.4.7
  */
-public interface RequestHandler  {
-
+public interface RequestHandler {
+  
   /**
    * Handle the given request, generating a response.
-   * @param request current HTTP request
-   * @param response current HTTP response
-   * @throws IOException in case of I/O errors
+   * 
+   * @param request
+   *          current HTTP request
+   * @param response
+   *          current HTTP response
+   * @throws IOException
+   *           in case of I/O errors
    */
   void handle(HttpServletRequest request, HttpServletResponse response)
       throws IOException;
