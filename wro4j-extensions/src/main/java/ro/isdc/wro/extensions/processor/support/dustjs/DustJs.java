@@ -2,7 +2,6 @@ package ro.isdc.wro.extensions.processor.support.dustjs;
 
 import java.io.InputStream;
 
-import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
 

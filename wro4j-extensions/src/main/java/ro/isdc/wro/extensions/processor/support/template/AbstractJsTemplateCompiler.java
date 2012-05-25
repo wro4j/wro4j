@@ -1,12 +1,13 @@
 package ro.isdc.wro.extensions.processor.support.template;
 
-import org.apache.commons.lang3.StringUtils;
-import org.mozilla.javascript.ScriptableObject;
-import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.util.WroUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mozilla.javascript.ScriptableObject;
+
+import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
