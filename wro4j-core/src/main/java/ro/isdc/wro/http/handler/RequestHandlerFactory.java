@@ -6,7 +6,8 @@ import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
- * Responsible for creating a {@link RequestHandler}'s collection.
+ * Responsible for creating a {@link RequestHandler}'s collection. The {@link RequestHandlerFactory#create()} will be
+ * invoked for each request. It is up to implementation to cache the requestHandler's creation.
  * 
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
