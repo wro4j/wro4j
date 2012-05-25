@@ -19,12 +19,13 @@ import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
+
 /**
-* Test Handlebars.js processor.
-*
-* @author heldeen
-*/
-public class HandlebarsJsProcessorTest {
+ * Test Handlebars.js processor.
+ *
+ * @author heldeen
+ */
+public class TestHandlebarsJsProcessor {
   private ResourcePreProcessor processor;
 
   @Before
@@ -39,7 +40,8 @@ public class HandlebarsJsProcessorTest {
   }
 
   @Test
-  public void testSimpleString() throws Exception {
+  public void testSimpleString()
+      throws Exception {
     StringWriter writer = new StringWriter();
     processor.process(null, new StringReader("Hello {name}!"), writer);
     String result = writer.toString();
@@ -48,7 +50,8 @@ public class HandlebarsJsProcessorTest {
   }
 
   @Test
-  public void shouldTransformFilesFromFolder() throws IOException {
+  public void shouldTransformFilesFromFolder()
+      throws IOException {
     final URL url = getClass().getResource("handlebarsjs");
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -57,7 +60,8 @@ public class HandlebarsJsProcessorTest {
   }
 
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldBeThreadSafe()
+      throws Exception {
     final HandlebarsJsProcessor processor = new HandlebarsJsProcessor();
     final Callable<Void> task = new Callable<Void>() {
       @Override
