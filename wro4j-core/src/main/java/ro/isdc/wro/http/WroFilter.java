@@ -42,6 +42,8 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -316,9 +318,13 @@ public class WroFilter
 
   private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    Collection<RequestHandler> handlers = requestHandlerFactory.create();
+    final Collection<RequestHandler> handlers = requestHandlerFactory.create();
     Validate.notNull(handlers, "requestHandlers cannot be null!");
-    for (RequestHandler requestHandler : handlers) {
+    //create injector used for process injectable fields from each requestHandler.
+    final Injector injector = InjectorBuilder.create(wroManagerFactory).build();
+    
+    for (final RequestHandler requestHandler : handlers) {
+      injector.inject(requestHandler);
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         return true;
