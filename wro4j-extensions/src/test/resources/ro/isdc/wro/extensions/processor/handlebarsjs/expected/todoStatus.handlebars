@@ -1,0 +1,31 @@
+(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoStatus'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  helpers = helpers || Handlebars.helpers;
+  var buffer = "", stack1, stack2, foundHelper, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+
+function program1(depth0,data) {
+  
+  
+  return "s";}
+
+  buffer += "<div class=\"row-fluid span5\">\n  <strong>";
+  foundHelper = helpers.remaining;
+  stack1 = foundHelper || depth0.remaining;
+  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "remaining", { hash: {} }); }
+  buffer += escapeExpression(stack1) + "</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>";
+  foundHelper = helpers.finished;
+  stack1 = foundHelper || depth0.finished;
+  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "finished", { hash: {} }); }
+  buffer += escapeExpression(stack1) + "</strong> completed item";
+  foundHelper = helpers.oneFinished;
+  stack1 = foundHelper || depth0.oneFinished;
+  stack2 = helpers.unless;
+  tmp1 = self.program(1, program1, data);
+  tmp1.hash = {};
+  tmp1.fn = tmp1;
+  tmp1.inverse = self.noop;
+  stack1 = stack2.call(depth0, stack1, tmp1);
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n  </button>\n</div>";
+  return buffer;} ); })();

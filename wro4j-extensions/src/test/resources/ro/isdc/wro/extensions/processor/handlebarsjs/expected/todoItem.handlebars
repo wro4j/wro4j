@@ -1,0 +1,31 @@
+(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoItem'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  helpers = helpers || Handlebars.helpers;
+  var buffer = "", stack1, foundHelper, tmp1, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing, helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+
+function program1(depth0,data) {
+  
+  
+  return "checked=\"checked\"";}
+
+  buffer += "<div class=\"display row-fluid span5\">Fluid\n  <input type=\"checkbox\" class=\"check\" ";
+  foundHelper = helpers.done;
+  stack1 = foundHelper || depth0.done;
+  tmp1 = self.program(1, program1, data);
+  tmp1.hash = {};
+  tmp1.fn = tmp1;
+  tmp1.inverse = self.noop;
+  if(foundHelper && typeof stack1 === functionType) { stack1 = stack1.call(depth0, tmp1); }
+  else { stack1 = blockHelperMissing.call(depth0, stack1, tmp1); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += " />\n  <label class=\"todo-content span3\">";
+  foundHelper = helpers.content;
+  stack1 = foundHelper || depth0.content;
+  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "content", { hash: {} }); }
+  buffer += escapeExpression(stack1) + "</label>\n  <i class=\"icon-remove-sign remove\" title=\"Remove\"></i>\n</div>\n<div class=\"edit row-fluid\">\n  <input type=\"text\" class=\"todo-edit span4\" value=\"";
+  foundHelper = helpers.content;
+  stack1 = foundHelper || depth0.content;
+  if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+  else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "content", { hash: {} }); }
+  buffer += escapeExpression(stack1) + "\" />\n</div>";
+  return buffer;} ); })();
