@@ -16,7 +16,7 @@ import org.junit.Test;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
 import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -26,7 +26,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author heldeen
  */
 public class TestHandlebarsJsProcessor {
-  private ResourcePreProcessor processor;
+  private ResourceProcessor processor;
 
   @Before
   public void setUp() {
@@ -67,7 +67,7 @@ public class TestHandlebarsJsProcessor {
       @Override
       public Void call() {
         try {
-          processor.process(new StringReader("Hello {name}!"), new StringWriter());
+          processor.process(null, new StringReader("Hello {name}!"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
