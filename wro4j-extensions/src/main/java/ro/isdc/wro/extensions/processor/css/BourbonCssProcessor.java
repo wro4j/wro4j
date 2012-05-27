@@ -5,6 +5,8 @@
 package ro.isdc.wro.extensions.processor.css;
 
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
