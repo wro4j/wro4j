@@ -11,7 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
@@ -55,8 +57,19 @@ public class TestYUIJsCompressorProcessor {
   @Test
   public void testInvalidJsShouldBeUnchanged()
     throws IOException {
-    final ResourceProcessor processor = YUIJsCompressorProcessor.doMungeCompressor();
+    final ResourceProcessor processor = new ExceptionHandlingProcessorDecorator(YUIJsCompressorProcessor.doMungeCompressor()) {
+      @Override
+      protected boolean isIgnoreFailingProcessor() {
+        return true;
+      }
+    };
     final String resourceUri = "classpath:" + WroUtil.toPackageAsFolder(getClass()) + "/invalid.js";
     WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, processor);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(YUIJsCompressorProcessor.noMungeCompressor(), ResourceType.JS);
   }
 }

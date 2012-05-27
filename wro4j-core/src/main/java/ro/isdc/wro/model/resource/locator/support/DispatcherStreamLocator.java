@@ -35,7 +35,7 @@ public final class DispatcherStreamLocator {
 
 
   /**
-   * @return {@link UriLocator} responsible for resolving external resources.
+   * Used to locate external resources. No wildcard handling is required.
    */
   private ResourceLocator newExternalResourceLocator(final String location) {
     return new UrlResourceLocator(location) {
@@ -47,20 +47,20 @@ public final class DispatcherStreamLocator {
         return false;
       }
     };
-  }
-
+  };
+  
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
    * the portal with multiple threads (web requests) that are combined with threads for wro4j.
    *
+   *
    * @return a valid stream for required location. This method will never return a null.
-   * @throws IOException
-   *           if the stream cannot be located at the specified location.
+   * @throws IOException if the stream cannot be located at the specified location.
    */
   public InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
-      final String location)
-      throws IOException {
+    final String location)
+    throws IOException {
     Validate.notNull(request);
     Validate.notNull(response);
     // where to write the bytes of the stream
@@ -121,10 +121,12 @@ public final class DispatcherStreamLocator {
         return getContextPath() + location;
       }
 
+
       @Override
       public String getPathInfo() {
         return WroUtil.getPathInfoFromLocation(this, location);
       }
+
 
       @Override
       public String getServletPath() {

@@ -1,0 +1,22 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+// Multiple image assets
+div.multiImage {
+  @include background-image(url("/images/a.png"), url("images/b.png"));
+}
+
+// Image asset with a linear-gradient
+div.ImageAndGradient {
+  @include background-image(url("/images/a.png"), linear-gradient(white 0, yellow 50%, transparent 50%));
+}
+
+// Multiple linear-gradients - Demo
+div.multiGradient {
+  @include background-image(linear-gradient(hsla(0, 100%, 100%, 0.25) 0%, hsla(0, 100%, 100%, 0.08) 50%, transparent 50%),
+                            linear-gradient(#4e7ba3, darken(#4e7ba4, 10%)));
+}
+
+// NOT SUPPORTED - Multiple image assets with shorthand notation
+div.shorthand {
+  @include background-image(url("/images/a.png") center no-repeat, url("images/b.png") left repeat);
+}

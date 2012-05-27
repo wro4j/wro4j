@@ -80,7 +80,6 @@ public class CJsonProcessor
       writer.write(doProcess(content));
     } catch (final WroRuntimeException e) {
       onException(e);
-      writer.write(content);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       LOG.warn("Exception while  applying lessCss processor on the " + resourceUri
           + " resource, no processing applied...", e);
@@ -106,7 +105,9 @@ public class CJsonProcessor
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final WroRuntimeException e) {}
+  protected void onException(final WroRuntimeException e) {
+    throw e;
+  }
 
 
   /**

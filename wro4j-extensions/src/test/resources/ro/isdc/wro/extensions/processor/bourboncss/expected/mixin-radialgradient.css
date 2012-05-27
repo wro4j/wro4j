@@ -1,0 +1,26 @@
+div.radialone {
+  background-color: #1e5799;
+  background-image: -webkit-gradient(radial, center center, 0, center center, 460, color-stop(0%, #1e5799), color-stop(100%, #3dc3d1));
+  background-image: -webkit-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: -moz-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: -ms-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: -o-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1); }
+
+div.radialtwo {
+  background-color: false;
+  background-image: -webkit-gradient(radial, center center, 0, center center, 460, color-stop(10%, #eeeeee), color-stop(30%, #1e5799), color-stop(100%, #efefef));
+  background-image: -webkit-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -moz-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -ms-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -o-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef); }
+
+div.radialthree {
+  background-color: red;
+  background-image: -webkit-gradient(radial, center center, 0, center center, 460, color-stop(10%, #eeeeee), color-stop(30%, #1e5799), color-stop(100%, #efefef));
+  background-image: -webkit-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -moz-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -ms-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -o-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef); }

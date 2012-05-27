@@ -9,6 +9,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -31,5 +32,11 @@ public class TestMultiLineCommentStripperProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "*",
       processor);
+  }
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new MultiLineCommentStripperProcessor(), ResourceType.CSS,
+        ResourceType.JS);
   }
 }

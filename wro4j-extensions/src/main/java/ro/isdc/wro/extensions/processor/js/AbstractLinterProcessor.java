@@ -85,7 +85,8 @@ public abstract class AbstractLinterProcessor
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final Exception e) {
+  protected void onException(final WroRuntimeException e) {
+    throw e;
   }
 
   /**

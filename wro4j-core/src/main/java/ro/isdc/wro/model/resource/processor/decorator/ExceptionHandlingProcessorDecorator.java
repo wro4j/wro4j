@@ -58,7 +58,7 @@ public class ExceptionHandlingProcessorDecorator
     } catch (final Exception e) {
       final String processorName = getOriginalDecoratedObject().getClass().getSimpleName();
       LOG.debug("Failed to process the resource: {} using processor: {}", resource, processorName);
-      if (config.isIgnoreFailingProcessor()) {
+      if (isIgnoreFailingProcessor()) {
         writer.write(resourceContent);
         // don't wrap exception unless required
       } else if (e instanceof RuntimeException) {
@@ -70,5 +70,12 @@ public class ExceptionHandlingProcessorDecorator
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * @return true if the failure should be ignored. By default uses the {@link WroConfiguration} to get the flag value.
+   */
+  protected boolean isIgnoreFailingProcessor() {
+    return config.isIgnoreFailingProcessor();
   }
 }

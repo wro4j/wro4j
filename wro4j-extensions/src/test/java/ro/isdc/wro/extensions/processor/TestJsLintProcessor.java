@@ -11,7 +11,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
@@ -54,12 +53,7 @@ public class TestJsLintProcessor extends AbstractTestLinterProcessor {
 
   @Test
   public void canBeExecutedMultipleTimes() throws Exception {
-    final JsLintProcessor processor = new JsLintProcessor() {
-      @Override
-      protected void onException(final Exception e) {
-        throw new WroRuntimeException("", e);
-      }
-    };
+    final JsLintProcessor processor = new JsLintProcessor();
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {

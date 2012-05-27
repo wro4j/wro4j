@@ -42,7 +42,7 @@ public class JsHintMojo
       }
 
       @Override
-      protected void onException(final Exception e) {
+      protected void onException(final WroRuntimeException e) {
         JsHintMojo.this.onException(e);
       }
 

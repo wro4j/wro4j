@@ -77,9 +77,10 @@ public class SassCssProcessor
   }
   
   /**
-   * Invoked when a processing exception occurs.
+   * Invoked when a processing exception occurs. By default the exception is thrown further.
    */
   protected void onException(final WroRuntimeException e) {
+    throw e;
   }
   
   /**

@@ -15,6 +15,7 @@ import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -104,26 +105,32 @@ public class YUIJsCompressorProcessor
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
+    throws IOException {
     final StopWatch watch = new StopWatch();
     watch.start("pack");
     final String content = IOUtils.toString(reader);
     try {
-      final JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(content),
-          new YUIErrorReporter());
+      final JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(content), new YUIErrorReporter());
       compressor.compress(writer, linebreakpos, munge, verbose, preserveAllSemiColons, disableOptimizations);
     } catch (final RuntimeException e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      // keep js unchanged if it contains errors -> this should be configurable
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+      //keep js unchanged if it contains errors -> this should be configurable
+      LOG.error("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
-      IOUtils.copy(new StringReader(content), writer);
-      // throw new WroRuntimeException("Problem while applying YUI compressor", e);
+      onException(new WroRuntimeException("Exception during processing", e));
     } finally {
       reader.close();
       writer.close();
       watch.stop();
       LOG.debug(watch.prettyPrint());
     }
+  }
+  
+
+  /**
+   * Invoked when a processing exception occurs.
+   */
+  protected void onException(final WroRuntimeException e) {
+    throw e;
   }
 }

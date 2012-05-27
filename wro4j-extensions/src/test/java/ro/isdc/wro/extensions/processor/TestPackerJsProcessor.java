@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -65,4 +66,9 @@ public class TestPackerJsProcessor {
     WroTestUtils.runConcurrently(task);
   }
 
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.JS);
+  }
 }

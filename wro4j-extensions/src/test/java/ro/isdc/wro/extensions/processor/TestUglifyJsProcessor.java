@@ -19,6 +19,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -96,5 +97,11 @@ public class TestUglifyJsProcessor {
         return UglifyJs.class.getResourceAsStream(UglifyJs.DEFAULT_UGLIFY_JS);
       }
     }.process("filename","alert(1);");
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new UglifyJsProcessor(), ResourceType.JS);
   }
 }

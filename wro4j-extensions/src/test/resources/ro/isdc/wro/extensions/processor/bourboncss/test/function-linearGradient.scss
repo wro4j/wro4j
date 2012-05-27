@@ -1,0 +1,5 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.linearGrad {
+  @include background-image(linear-gradient(white 0, yellow 50%, transparent 50%));
+}

@@ -11,12 +11,14 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.WroTestUtils;
 
 import com.google.javascript.jscomp.CompilationLevel;
@@ -33,8 +35,6 @@ import com.google.javascript.jscomp.JSSourceFile;
 public class TestGoogleClosureCompressorProcessor {
   private File testFolder;
   private GoogleClosureCompressorProcessor processor;
-
-
   @Before
   public void setUp() {
     testFolder = new File(ClassLoader.getSystemResource("test").getFile());
@@ -52,9 +52,14 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(processor);
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
   public void testWhiteSpaceOnly()
-    throws IOException {
+      throws IOException {
     processor.setCompilationLevel(CompilationLevel.WHITESPACE_ONLY);
     final URL url = getClass().getResource("google");
 
@@ -62,10 +67,9 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void testSimpleOptimization()
-    throws IOException {
+      throws IOException {
     processor.setCompilationLevel(CompilationLevel.SIMPLE_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
@@ -73,10 +77,9 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void testAdvancedOptimization()
-    throws IOException {
+      throws IOException {
     processor.setCompilationLevel(CompilationLevel.ADVANCED_OPTIMIZATIONS);
     final URL url = getClass().getResource("google");
 
@@ -117,5 +120,11 @@ public class TestGoogleClosureCompressorProcessor {
     processor.process(new StringReader("alert(1);"), sw);
     //will leave result unchanged, because the processing is not successful.
     Assert.assertEquals("alert(1);", sw.toString());
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new GoogleClosureCompressorProcessor(), ResourceType.JS);
   }
 }

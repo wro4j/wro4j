@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
@@ -117,5 +118,11 @@ public class TestLessCssProcessor {
         return LessCss.class.getResourceAsStream(LessCss.DEFAULT_LESS_JS);
       }
     }.less("#id {}");
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new LessCssProcessor(), ResourceType.CSS);
   }
 }

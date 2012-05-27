@@ -12,8 +12,11 @@ import ro.isdc.wro.model.resource.Resource;
 
 
 /**
- * ResourcePreProcessor. A processor which will be applied to the resource before merging.
- *
+ * Perform actual processing of the resource content from the {@link Reader} and writes the processed content to the
+ * {@link Writer}. The processor should focus only on transformation. If a processing fails, it is preferred to
+ * propagate the exception, because wro4j can allow custom behavior for this situation. It is possible to treat the
+ * exceptions by leaving the processed output unchanged, but in this case you may not benefit of global configuration.
+ * 
  * @author Alex Objelean
  * @created Created on Nov 19, 2008
  */

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.extensions.processor.css.BourbonCssProcessor;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
@@ -131,6 +132,12 @@ public class ExtensionsConfigurableWroManagerFactory
       @Override
       protected ResourceProcessor initialize() {
         return new RubySassCssProcessor();
+      }
+    }));
+    map.put(BourbonCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new BourbonCssProcessor();
       }
     }));
     map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new LazyProcessorDecorator(

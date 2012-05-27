@@ -54,7 +54,7 @@ public class JSMinProcessor
       is.close();
       os.close();
 		} catch (final Exception e) {
-      throw new IOException(e.getMessage());
+      throw new IOException(e);
     } 
   }
 

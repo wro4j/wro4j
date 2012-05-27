@@ -1,0 +1,13 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+button.normal {
+  @include button();
+}
+
+button.pill {
+  @include button(pill);
+}
+
+button.shiny {
+  @include button(shiny, #ff0000);
+}

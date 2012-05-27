@@ -1,0 +1,20 @@
+div.one {
+  background-image: -webkit-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: -moz-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: -ms-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: -o-radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1);
+  background-image: radial-gradient(50% 50%, ellipse cover, #1e5799, #3dc3d1); }
+
+div.two {
+  background-image: -webkit-radial-gradient(50% 50%, circle cover, #1e5799, #3dc3d1);
+  background-image: -moz-radial-gradient(50% 50%, circle cover, #1e5799, #3dc3d1);
+  background-image: -ms-radial-gradient(50% 50%, circle cover, #1e5799, #3dc3d1);
+  background-image: -o-radial-gradient(50% 50%, circle cover, #1e5799, #3dc3d1);
+  background-image: radial-gradient(50% 50%, circle cover, #1e5799, #3dc3d1); }
+
+div.three {
+  background-image: -webkit-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -moz-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -ms-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: -o-radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef);
+  background-image: radial-gradient(50% 50%, circle cover, #eeeeee 10%, #1e5799 30%, #efefef); }

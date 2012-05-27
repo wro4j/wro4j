@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
@@ -47,6 +49,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
@@ -58,15 +61,14 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  */
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
-
+  
   /**
-   * 
    * @return a {@link BaseWroManagerFactory} which uses an empty model.
    */
   public static BaseWroManagerFactory simpleManagerFactory() {
     return new BaseWroManagerFactory().setModelFactory(simpleModelFactory(new WroModel()));
   }
-
+  
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
    * 
@@ -113,13 +115,12 @@ public class WroTestUtils {
   }
   
   /**
-   * Compares files with the same name from sourceFolder against it's counterpart in targetFolder, but allows
-   * source and target files to have different extensions.
-   * TODO run tests in parallel
+   * Compares files with the same name from sourceFolder against it's counterpart in targetFolder, but allows source and
+   * target files to have different extensions. TODO run tests in parallel
    */
   public static void compareFromDifferentFoldersByName(final File sourceFolder, final File targetFolder,
-     final String srcExtension, final String targetExtension, final ResourceProcessor processor)
-     throws IOException {
+      final String srcExtension, final String targetExtension, final ResourceProcessor processor)
+      throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
         Transformers.extensionTransformer("css"), processor);
   }
@@ -270,8 +271,8 @@ public class WroTestUtils {
   }
   
   /**
-   * Applies a function for each file from a folder. The folder should contain at least one file to process,
-   * otherwise an exception will be thrown.
+   * Applies a function for each file from a folder. The folder should contain at least one file to process, otherwise
+   * an exception will be thrown.
    * 
    * @param folder
    *          {@link File} representing the folder where the files will be used from processing.
@@ -355,7 +356,8 @@ public class WroTestUtils {
    * @throws Exception
    *           if any of the executed tasks fails.
    */
-  public static void runConcurrently(final Callable<Void> task, final int times) throws Exception {
+  public static void runConcurrently(final Callable<Void> task, final int times)
+      throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();
     for (int i = 0; i < times; i++) {
@@ -369,7 +371,8 @@ public class WroTestUtils {
   /**
    * Run the task concurrently 100 times.
    */
-  public static void runConcurrently(final Callable<Void> task) throws Exception {
+  public static void runConcurrently(final Callable<Void> task)
+      throws Exception {
     runConcurrently(task, 100);
   }
   
@@ -389,8 +392,25 @@ public class WroTestUtils {
       public WroModel create() {
         return model;
       }
+      
       public void destroy() {
       }
     };
+  }
+  
+  
+  /**
+   * Asserts that a processor supports provided resource types. 
+   */
+  public static void assertProcessorSupportResourceTypes(final ResourceProcessor processor, final ResourceType ... expectedResourceTypes) {
+    ResourceType[] actualResourceTypes = new ProcessorDecorator(processor).getSupportedResourceTypes();
+    try {
+      Assert.assertTrue(Arrays.equals(expectedResourceTypes, actualResourceTypes));
+    } catch (AssertionFailedError e) {
+      final String message = "actual resourceTypes: " + Arrays.toString(actualResourceTypes) + ", expected are: "
+          + Arrays.toString(expectedResourceTypes);
+      LOG.error(message);
+      Assert.fail(message);
+    }
   }
 }
