@@ -207,9 +207,9 @@ public class ExtensionsConfigurableWroManagerFactory
         return new HoganJsProcessor();
       }
     }));
-    map.put(HandlebarsJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+    map.put(HandlebarsJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
       @Override
-      protected ResourcePreProcessor initialize() {
+      protected ResourceProcessor initialize() {
         return new HandlebarsJsProcessor();
       }
     }));
