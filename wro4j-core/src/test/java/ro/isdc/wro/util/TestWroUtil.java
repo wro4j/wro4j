@@ -122,5 +122,21 @@ public class TestWroUtil {
     Assert.assertEquals("[\"alert1\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString("alert1"));
     Assert.assertEquals("[\"\",\"alert1\",\"alert2\"].join(\"\\n\")", WroUtil.toJSMultiLineString("\nalert1\nalert2"));
   }
+
+  @Test
+  public void shouldMatchUrl() {
+    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn("wroApi/test");
+    
+    Assert.assertTrue(WroUtil.matchesUrl(request, "wroApi/test"));
+  }
+
+  @Test
+  public void shouldNotMatchUrl() {
+    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn("someresource.css");
+
+    Assert.assertFalse(WroUtil.matchesUrl(request, "wroApi/test"));
+  }
   
 }

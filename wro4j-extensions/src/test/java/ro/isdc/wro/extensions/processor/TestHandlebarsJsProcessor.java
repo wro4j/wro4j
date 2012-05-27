@@ -1,5 +1,7 @@
 package ro.isdc.wro.extensions.processor;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,28 +10,28 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
-import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
+import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
+
 /**
- * Test Hogan.js processor.
+ * Test Handlebars.js processor.
  *
- * @author Eivind B Waaler
+ * @author heldeen
  */
-public class TestHoganJsProcessor {
+public class TestHandlebarsJsProcessor {
   private ResourcePreProcessor processor;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    processor = new HoganJsProcessor();
+    processor = new HandlebarsJsProcessor();
   }
 
   @After
@@ -38,30 +40,34 @@ public class TestHoganJsProcessor {
   }
 
   @Test
-  public void testSimpleString() throws Exception {
+  public void testSimpleString()
+      throws Exception {
     StringWriter writer = new StringWriter();
-    processor.process(null, new StringReader("Hello {{name}}!"), writer);
+    processor.process(null, new StringReader("Hello {name}!"), writer);
     String result = writer.toString();
-    Assert.assertTrue(result.matches("function.*name.*"));
+    assertTrue(result.startsWith(HandlebarsJs.HANDLEBARS_JS_TEMPLATES_INIT));
+    assertTrue(result.contains("return \"Hello {name}!\\n\";} );"));
   }
 
   @Test
-  public void shouldTransformFilesFromFolder() throws IOException {
-    final URL url = getClass().getResource("hoganjs");
+  public void shouldTransformFilesFromFolder()
+      throws IOException {
+    final URL url = getClass().getResource("handlebarsjs");
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
 
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "handlebars", processor);
   }
 
   @Test
-  public void shouldBeThreadSafe() throws Exception {
-    final HoganJsProcessor processor = new HoganJsProcessor();
+  public void shouldBeThreadSafe()
+      throws Exception {
+    final HandlebarsJsProcessor processor = new HandlebarsJsProcessor();
     final Callable<Void> task = new Callable<Void>() {
       @Override
       public Void call() {
         try {
-          processor.process(null, new StringReader("Hello {{name}}!"), new StringWriter());
+          processor.process(new StringReader("Hello {name}!"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
@@ -69,11 +75,5 @@ public class TestHoganJsProcessor {
       }
     };
     WroTestUtils.runConcurrently(task);
-  }
-  
-
-  @Test
-  public void shouldSupportCorrectResourceTypes() {
-    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.JS);
   }
 }
