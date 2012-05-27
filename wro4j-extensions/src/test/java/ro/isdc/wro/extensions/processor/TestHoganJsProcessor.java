@@ -1,6 +1,12 @@
 package ro.isdc.wro.extensions.processor;
 
-import static junit.framework.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroTestUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,5 +75,11 @@ public class TestHoganJsProcessor {
       }
     };
     WroTestUtils.runConcurrently(task);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.JS);
   }
 }

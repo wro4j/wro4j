@@ -1,0 +1,9 @@
+div.single {
+  -webkit-box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.65);
+  -moz-box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.65); }
+
+div.double {
+  -webkit-box-shadow: 1px 1px 5px 1px green, -1px -1px 5px 1px blue;
+  -moz-box-shadow: 1px 1px 5px 1px green, -1px -1px 5px 1px blue;
+  box-shadow: 1px 1px 5px 1px green, -1px -1px 5px 1px blue; }

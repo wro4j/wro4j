@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -169,5 +170,10 @@ public class TestCssUrlRewritingProcessor {
     processClasspathResourceType();
     Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
     Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
+  }
+  
+  @Test
+  public void shouldSupportOnlyCssResources() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
 }

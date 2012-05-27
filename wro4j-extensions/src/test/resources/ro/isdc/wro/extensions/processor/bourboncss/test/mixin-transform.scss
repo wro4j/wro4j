@@ -1,0 +1,9 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.yTransform {
+  @include transform(translateY(50px));
+}
+
+div.topTranform {
+  @include transform-origin(center top);
+}

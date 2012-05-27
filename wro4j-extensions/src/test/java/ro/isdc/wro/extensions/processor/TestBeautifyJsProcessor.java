@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -55,5 +56,10 @@ public class TestBeautifyJsProcessor {
       }
     };
     WroTestUtils.runConcurrently(task);
+  }
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new BeautifyJsProcessor(), ResourceType.JS);
   }
 }

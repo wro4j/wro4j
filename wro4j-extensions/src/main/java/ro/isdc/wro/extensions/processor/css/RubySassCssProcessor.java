@@ -49,7 +49,6 @@ public class RubySassCssProcessor
       writer.write(getEngine().process(content));
     } catch (final WroRuntimeException e) {
       onException(e);
-      writer.write(content);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
@@ -60,15 +59,16 @@ public class RubySassCssProcessor
   }
   
   /**
-   * Invoked when a processing exception occurs.
+   * Invoked when a processing exception occurs. By default propagates the runtime exception.
    */
   protected void onException(final WroRuntimeException e) {
+    throw e;
   }
   
   /**
    * A getter used for lazy loading.
    */
-  private RubySassEngine getEngine() {
+  protected RubySassEngine getEngine() {
     if (engine == null) {
       engine = new RubySassEngine();
     }

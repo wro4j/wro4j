@@ -15,8 +15,6 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
@@ -32,9 +30,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Apr 21, 2010
  */
 public class TestRubySassCssProcessor {
-  
-  private static final Logger LOG = LoggerFactory.getLogger(TestRubySassCssProcessor.class);
-  
   /** Location (base) of ruby sass css test resources. */
   private final URL url = getClass().getResource("rubysasscss");
   
@@ -43,13 +38,7 @@ public class TestRubySassCssProcessor {
   
   @Before
   public void initEngine() {
-    rubySassCss = new RubySassCssProcessor() {
-      @Override
-      protected void onException(final WroRuntimeException e) {
-        LOG.debug("[FAIL] Exception message is: {}", e.getMessage());
-        throw e;
-      }
-    };
+    rubySassCss = new RubySassCssProcessor();
   }
   
   @Test

@@ -35,8 +35,9 @@ public final class DispatcherStreamLocator {
    * Used to locate external resources. No wildcard handling is required.
    */
   private UriLocator externalResourceLocator = new UrlUriLocator() {
-    protected boolean disableWildcards() {
-      return true;
+    @Override
+    public boolean isEnableWildcards() {
+      return false;
     };
   };
   

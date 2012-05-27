@@ -1,0 +1,9 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.single {
+  @include background-size(50% 100%); // Single
+}
+
+div.double {
+  @include background-size(50% 100%, 75% 100%); // Multiple
+}

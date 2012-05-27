@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -49,5 +50,11 @@ public class TestYUICssCompressorProcessor {
       }
     };
     WroTestUtils.runConcurrently(task);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new YUICssCompressorProcessor(), ResourceType.CSS);
   }
 }

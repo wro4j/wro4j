@@ -1,0 +1,13 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+// Positive number will increment up the golden-ratio
+div.header {
+  font-size: golden-ratio(14px,  1);
+  // returns: 22.652px
+}
+
+div.footer {
+  // Negative number will increment down the golden-ratio
+  font-size: floor(golden-ratio(14px, -1));
+  // returns: 8px
+}

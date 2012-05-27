@@ -1,0 +1,25 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.one {
+  @include border-radius(10px);
+}
+
+div.all {
+  @include border-radius(5px 5px 2px 2px);
+}
+
+//You can also specify individual corners.
+div.individual {
+  @include border-top-left-radius(5px);
+  @include border-top-right-radius(5px);
+  @include border-bottom-right-radius(5px);
+  @include border-bottom-left-radius(5px);
+}
+
+//Individual sides are supported as well.
+div.sides {
+  @include border-top-radius(5px);
+  @include border-bottom-radius(5px);
+  @include border-left-radius(5px);
+  @include border-right-radius(5px);
+}

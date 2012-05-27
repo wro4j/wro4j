@@ -1,0 +1,9 @@
+div.cols {
+  -webkit-columns: 12 8em;
+  -moz-columns: 12 8em;
+  columns: 12 8em; }
+
+div.colrules {
+  -webkit-column-rule: 1px solid green;
+  -moz-column-rule: 1px solid green;
+  column-rule: 1px solid green; }

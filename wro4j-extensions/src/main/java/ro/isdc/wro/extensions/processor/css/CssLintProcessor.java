@@ -82,8 +82,9 @@ public class CssLintProcessor
       }
     } catch (final WroRuntimeException e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+      LOG.error("Exception while applying " + ALIAS + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
+      onException(e);
     } finally {
       // don't change the processed content no matter what happens.
       writer.write(content);
@@ -92,6 +93,15 @@ public class CssLintProcessor
       enginePool.returnObject(cssLint);
     }
   }
+
+  /**
+   * Invoked when an unexpected exception occurred during processing. By default the exception is thrown further.
+   */
+  protected void onException(final WroRuntimeException e) {
+    throw e;
+  }
+
+
 
   /**
    * @return {@link CssLint} instance.
@@ -115,7 +125,7 @@ public class CssLintProcessor
    * @param e {@link CssLintException} which has occurred.
    * @param resource the processed resource which caused the exception.
    */
-  protected void onCssLintException(final CssLintException e, final Resource resource)
-    throws Exception {
+  protected void onCssLintException(final CssLintException e, final Resource resource) throws Exception {
+    LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
 }
