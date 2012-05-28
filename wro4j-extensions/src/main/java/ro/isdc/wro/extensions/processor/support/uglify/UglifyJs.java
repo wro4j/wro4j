@@ -38,6 +38,8 @@ public class UglifyJs {
    * The name of the uglify script to be used by default.
    */
   public static final String DEFAULT_UGLIFY_JS = "uglifyJs.min.js";
+  private String invokeScript;
+  private String defaultOptionsAsJson;
   /**
    * If true, the script is uglified, otherwise it is beautified.
    */
@@ -55,6 +57,16 @@ public class UglifyJs {
   }
 
   /**
+   * @return the script responsible for invoking the uglifyJs script.
+   */
+  private String getInvokeScript() throws IOException {
+    if (invokeScript == null) {
+      invokeScript = IOUtils.toString(UglifyJs.class.getResourceAsStream("invoke.js")); 
+    }
+    return invokeScript;
+  }
+  
+  /**
    * @param uglify if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
    *        formatted).
    */
@@ -62,7 +74,6 @@ public class UglifyJs {
     Validate.notNull(uglifyType);
     this.uglify = uglifyType == UGLIFY ? true : false;
   }
-
 
   /**
    * Factory method for creating the uglifyJs engine.
@@ -119,7 +130,6 @@ public class UglifyJs {
     }
   }
 
-
   /**
    * @return the stream of the uglify script. Override this method to provide a different script version.
    */
@@ -140,8 +150,8 @@ public class UglifyJs {
       final RhinoScriptBuilder builder = initScriptBuilder();
       watch.stop();
       final String originalCode = WroUtil.toJSMultiLineString(code);
-      final String invokeScript = String.format(IOUtils.toString(UglifyJs.class.getResourceAsStream("invoke.js")),
-        originalCode, getReservedNames(), !uglify);
+      // TODO handle reservedNames
+      final String invokeScript = String.format(getInvokeScript(), originalCode, createOptionsAsJson());
       watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
 
@@ -151,5 +161,22 @@ public class UglifyJs {
     } catch (final RhinoException e) {
       throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     }
+  }
+
+  /**
+   * @return json representation of options. This is the lowest level which allows options configurations. If this
+   *         method is overridden, the {@link UglifyJs#createOptions()} won't have any effect.
+   */
+  protected String createOptionsAsJson() throws IOException {
+    final String result = String.format(getDefaultOptions(), !uglify, getReservedNames());
+    return result;
+  }
+
+  private String getDefaultOptions()
+      throws IOException {
+    if (defaultOptionsAsJson == null) {
+      defaultOptionsAsJson = IOUtils.toString(UglifyJs.class.getResourceAsStream("options.js"));
+    }
+    return defaultOptionsAsJson;
   }
 }

@@ -65,7 +65,6 @@ public class TestUglifyJsProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void shouldBeThreadSafe()
     throws Exception {

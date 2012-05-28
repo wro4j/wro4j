@@ -52,16 +52,21 @@ exports.ast_squeeze_more = ast_squeeze_more;
 
 (function() {
   var orig_code = %s;
+  // the second argument is true for uglify and false for beautify.
+  //compressed code here
+  var options = %s;
+
   //parse code and get the initial AST
   var ast = jsp.parse(orig_code);
   //get a new AST with mangled names
-  ast = exports.ast_mangle(ast, { except: '%s'.split(',')});
-  //get an AST with compression optimizations
-  ast = exports.ast_squeeze(ast);
-  ast = exports.ast_squeeze_more(ast);
-  // the second argument is true for uglify and false for beautify.
-  //compressed code here
-  return exports.gen_code(ast, {
-	beautify: %s,
+  ast = exports.ast_mangle(ast, {
+      toplevel: options.mangle_toplevel,
+      except: options.reserved_names
   });
+  //get an AST with compression optimizations
+  ast = exports.ast_squeeze(ast, options);
+  if (options.unsafe) {
+	  ast = exports.ast_squeeze_more(ast);
+  }
+  return exports.gen_code(ast,  options.codegen_options);
 })();

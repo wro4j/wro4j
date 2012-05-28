@@ -28,9 +28,20 @@ public class TestOptionsBuilder {
   @Test
   public void testNullOptions()
     throws Exception {
-    Assert.assertEquals("{}", optionsBuilder.build(null));
+    final String[] options = null;
+    Assert.assertEquals("{}", optionsBuilder.build(options));
   }
-
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotBuildOptionsFromNullCSV() {
+    optionsBuilder.buildFromCsv(null);
+  }
+  
+  @Test
+  public void shouldBuildOptionsFromCSV() {
+    final String actual = optionsBuilder.buildFromCsv("a=1,b=2");
+    Assert.assertEquals("{\"a\": 1,\"b\": 2}", actual);
+  }
 
   @Test
   public void testOptionWithNoValue()
