@@ -65,7 +65,6 @@ public class TestUglifyJsProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void shouldBeThreadSafe()
     throws Exception {
@@ -99,6 +98,25 @@ public class TestUglifyJsProcessor {
     }.process("filename","alert(1);");
   }
   
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullOptions()
+      throws Exception {
+    new UglifyJs(UGLIFY) {
+      protected String createOptionsAsJson() throws IOException {
+        return null;
+      };
+    }.process("filename","alert(1);");
+  }
+  
+  @Test(expected = WroRuntimeException.class)
+  public void cannotAcceptInvalidJsonOptions()
+      throws Exception {
+    new UglifyJs(UGLIFY) {
+      protected String createOptionsAsJson() throws IOException {
+        return "This is an invalid JSON";
+      };
+    }.process("filename","alert(1);");
+  }
 
   @Test
   public void shouldSupportCorrectResourceTypes() {

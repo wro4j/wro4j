@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,22 @@ public class OptionsBuilder {
   public String[] splitOptions(final String optionAsString) {
     return optionAsString == null ? ArrayUtils.EMPTY_STRING_ARRAY : optionAsString.split("(?ims),(?![^\\[\\]]*\\])");
   }
+  
+  /**
+   * Builds options json representation from a set of options encoded in a string, each of them being separated by a
+   * comma.
+   * 
+   * @param optionsAsCsv
+   * @return json representation of options.
+   */
+  public String buildFromCsv(final String optionsAsCsv) {
+    Validate.notNull(optionsAsCsv);
+    return build(splitOptions(optionsAsCsv));
+  }
 
   /**
-   * @param options an array of options as provided by user.
+   * @param options
+   *          an array of options as provided by user.
    * @return the json object containing options to be used by linter code.
    */
   public String build(final String... options) {

@@ -127,8 +127,6 @@ public class YUIJsCompressorProcessor
       LOG.error("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
       onException(new WroRuntimeException("Exception during processing", e));
-      IOUtils.copy(new StringReader(content), writer);
-      //throw new WroRuntimeException("Problem while applying YUI compressor", e);
     } finally {
       reader.close();
       writer.close();
