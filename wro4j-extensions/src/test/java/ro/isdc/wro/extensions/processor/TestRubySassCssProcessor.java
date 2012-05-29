@@ -19,7 +19,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -46,7 +46,7 @@ public class TestRubySassCssProcessor {
   public void shouldProcessResourcesFromFolder()
           throws Exception {
       final URL url = getClass().getResource("rubysass");
-      final ResourcePreProcessor processor = new RubySassCssProcessor();
+      final ResourceProcessor processor = new RubySassCssProcessor();
 
       final File testFolder = new File(url.getFile(), "templates");
       final File expectedFolder = new File(url.getFile(), "results");
