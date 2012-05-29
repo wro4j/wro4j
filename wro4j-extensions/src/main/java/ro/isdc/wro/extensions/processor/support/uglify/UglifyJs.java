@@ -126,7 +126,7 @@ public class UglifyJs {
         builder = RhinoScriptBuilder.newChain(scope);
       }
       return builder;
-    } catch (final IOException ex) {
+    } catch (final Exception ex) {
       throw new IllegalStateException("Failed initializing js", ex);
     }
   }

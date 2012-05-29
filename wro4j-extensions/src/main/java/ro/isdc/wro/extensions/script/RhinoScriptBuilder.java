@@ -129,7 +129,7 @@ public class RhinoScriptBuilder {
 
 
   public void initContext() {
-    if (Context.getCurrentContext() == null) {
+    if (context == null) {
       context = Context.enter();
     }
   }
