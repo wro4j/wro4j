@@ -152,7 +152,9 @@ public class UglifyJs {
       watch.stop();
       final String originalCode = WroUtil.toJSMultiLineString(code);
       // TODO handle reservedNames
-      final String invokeScript = String.format(getInvokeScript(), originalCode, createOptionsAsJson());
+      final String optionsAsJson = createOptionsAsJson();
+      Validate.notNull(optionsAsJson);
+      final String invokeScript = String.format(getInvokeScript(), originalCode, optionsAsJson);
       watch.start(uglify ? "uglify" : "beautify");
       final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
       
@@ -161,7 +163,7 @@ public class UglifyJs {
       return String.valueOf(result);
     } catch (final RhinoException e) {
       throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
-    }
+    } 
   }
   
   /**
@@ -184,8 +186,7 @@ public class UglifyJs {
    */
   protected String createOptionsAsJson()
       throws IOException {
-    final String result = String.format(getDefaultOptions(), !uglify, getReservedNames());
-    return result;
+    return String.format(getDefaultOptions(), !uglify, getReservedNames());
   }
   
   /**
