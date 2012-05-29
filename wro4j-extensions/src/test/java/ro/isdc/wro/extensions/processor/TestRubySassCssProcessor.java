@@ -19,6 +19,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -42,6 +43,17 @@ public class TestRubySassCssProcessor {
   }
   
   @Test
+  public void shouldProcessResourcesFromFolder()
+          throws Exception {
+      final URL url = getClass().getResource("rubysass");
+      final ResourcePreProcessor processor = new RubySassCssProcessor();
+
+      final File testFolder = new File(url.getFile(), "templates");
+      final File expectedFolder = new File(url.getFile(), "results");
+      WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+
+  @Test
   public void testFromFolder()
       throws IOException {
     final File testFolder = new File(url.getFile(), "test");
@@ -63,7 +75,7 @@ public class TestRubySassCssProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          rubySassCss.process(new StringReader("#navbar {width: 80%;}"), new StringWriter());
+          rubySassCss.process(new StringReader("$side: top;$radius: 10px;.rounded-#{$side} {border-#{$side}-radius: $radius;}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
