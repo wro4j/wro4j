@@ -23,12 +23,13 @@ import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDe
 
 /**
  * A {@link ProcessorsFactory} implementation which is easy to configure using a {@link Properties} object.
- *
+ * 
  * @author Alex Objelean
  * @created 30 Jul 2011
  * @since 1.4.0
  */
-public class ConfigurableProcessorsFactory implements ProcessorsFactory {
+public class ConfigurableProcessorsFactory
+implements ProcessorsFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableProcessorsFactory.class);
   /**
    * Delimit tokens containing a list of locators, preProcessors & postProcessors.
@@ -59,8 +60,9 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
 
   /**
    * Creates a list of tokens (processors name) based on provided string of comma separated strings.
-   *
-   * @param input string representation of tokens separated by ',' character.
+   * 
+   * @param input
+   *          string representation of tokens separated by ',' character.
    * @return a list of non empty strings.
    */
   private static List<String> getTokens(final String input) {
@@ -106,9 +108,11 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
 
   /**
    * Extracts a list of items (processors) from the properties based on existing values inside the map.
-   *
-   * @param itemsAsString a comma separated list of items.
-   * @param map mapping between items and its implementations.
+   * 
+   * @param itemsAsString
+   *          a comma separated list of items.
+   * @param map
+   *          mapping between items and its implementations.
    * @return a list of items (processors).
    */
   @SuppressWarnings("unchecked")
@@ -121,8 +125,8 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
       Validate.notEmpty(tokenName);
       ResourceProcessor processor = map.get(tokenName.trim());
       if (processor == null) {
-
-        //extension check
+        
+        // extension check
         LOG.debug("[FAIL] no processor found named: {}. Proceeding with extension check. ", tokenName);
         final String extension = FilenameUtils.getExtension(tokenName);
         boolean hasExtension = !StringUtils.isEmpty(extension);
@@ -192,7 +196,11 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    */
   private Map<String, ResourceProcessor> getPreProcessorsMap() {
     if (this.preProcessorsMap == null) {
-      this.preProcessorsMap = newPreProcessorsMap();
+      synchronized (this) {
+        if (this.preProcessorsMap == null) {
+          this.preProcessorsMap = newPreProcessorsMap();
+        }
+      }
     }
     return this.preProcessorsMap;
   }
@@ -202,7 +210,11 @@ public class ConfigurableProcessorsFactory implements ProcessorsFactory {
    */
   private Map<String, ResourceProcessor> getPostProcessorsMap() {
     if (this.postProcessorsMap == null) {
-      this.postProcessorsMap = newPostProcessorsMap();
+      synchronized (this) {
+        if (this.preProcessorsMap == null) {
+          this.postProcessorsMap = newPostProcessorsMap();
+        }
+      }
     }
     return this.postProcessorsMap;
   }
