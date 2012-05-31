@@ -14,10 +14,10 @@ import ro.isdc.wro.examples.WebResourceOptimizationApplication;
 import ro.isdc.wro.examples.http.DispatchResourceServlet;
 import ro.isdc.wro.examples.http.DynamicResourceServlet;
 import ro.isdc.wro.examples.http.RedirectResourceServlet;
+import ro.isdc.wro.examples.http.WroFilterWithCustomRequestHandlers;
 import ro.isdc.wro.extensions.http.CoffeeScriptFilter;
 import ro.isdc.wro.extensions.http.LessCssFilter;
 import ro.isdc.wro.http.WroContextFilter;
-import ro.isdc.wro.http.WroFilter;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
@@ -31,7 +31,7 @@ final class WroExamplesServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     //bindings
-    bind(WroFilter.class).in(Singleton.class);
+    bind(WroFilterWithCustomRequestHandlers.class).in(Singleton.class);
     bind(WicketFilter.class).in(Singleton.class);
     bind(DwrServlet.class).in(Singleton.class);
     bind(ExternalResourceServlet.class).in(Singleton.class);
@@ -44,7 +44,7 @@ final class WroExamplesServletModule extends ServletModule {
 
     // filters
     // TODO find out how to add dispatchers to the filter mapping configuration
-    // filter("/wro/*").through(WroFilter.class);
+    filter("/wro/*").through(WroFilterWithCustomRequestHandlers.class);
     
     filter("/*").through(WroContextFilter.class);
     wicketFilter("/*");

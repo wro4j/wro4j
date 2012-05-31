@@ -14,29 +14,29 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * This RequestHandler will reload the cache on HTTP requests to "wroAPU/reloadCache"
+ * This RequestHandler will reload the cache on HTTP requests to "wroAPI/reloadCache".
+ * <p/>
+ * This handler is available only in debug mode by default. You can change this behavior by overriding
+ * {@link RequestHandler#isEnabled()} method.
  * 
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
  * @since 1.4.7
  */
 public class ReloadCacheRequestHandler
-    implements RequestHandler {
+    extends RequestHandlerSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
-  /**
-   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
-   */
-  public static final String PATH_API = "wroAPI";
   /**
    * API - reload cache method call
    */
-  public static final String API_RELOAD_CACHE = PATH_API + "/reloadCache";
+  public static final String ENDPOINT_URI = PATH_API + "/reloadCache";
   @Inject
-  private Context context; 
-
+  private Context context;
+  
   /**
    * {@inheritDoc}
    */
+  @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     context.getConfig().reloadCache();
@@ -48,13 +48,15 @@ public class ReloadCacheRequestHandler
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean accept(final HttpServletRequest request) {
-    return WroUtil.matchesUrl(request, API_RELOAD_CACHE);
+    return WroUtil.matchesUrl(request, ENDPOINT_URI);
   }
   
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isEnabled() {
     return context.getConfig().isDebug();
   }
