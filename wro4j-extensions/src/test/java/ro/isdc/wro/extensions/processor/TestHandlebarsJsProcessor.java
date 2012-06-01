@@ -68,7 +68,7 @@ public class TestHandlebarsJsProcessor {
       @Override
       public Void call() {
         try {
-          processor.process(new StringReader("Hello {name}!"), new StringWriter());
+          processor.process(null, new StringReader("Hello {name}!"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

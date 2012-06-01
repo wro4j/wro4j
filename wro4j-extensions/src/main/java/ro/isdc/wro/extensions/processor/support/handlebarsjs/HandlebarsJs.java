@@ -1,12 +1,8 @@
 package ro.isdc.wro.extensions.processor.support.handlebarsjs;
 
-import java.io.IOException;
 import java.io.InputStream;
 
-import org.mozilla.javascript.ScriptableObject;
-
-import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
 
 /**
@@ -15,7 +11,7 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author heldeen
  */
-public class HandlebarsJs {
+public class HandlebarsJs extends AbstractJsTemplateCompiler {
 
   /**
    * visible for testing, the init of a HandlebarsJs template
@@ -24,31 +20,21 @@ public class HandlebarsJs {
       + "templates = Handlebars.templates = Handlebars.templates || {};";
 
   private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.0.beta.6.js";
-  private ScriptableObject scope;
 
+  @Override
   public String compile(final String content, final String name) {
-    final RhinoScriptBuilder builder = initScriptBuilder();
-    final String compileScript = String.format("Handlebars.precompile(%s);", WroUtil.toJSMultiLineString(content));
+
     return HANDLEBARS_JS_TEMPLATES_INIT + "templates['" + name + "'] = template("
-        + (String) builder.evaluate(compileScript, "Handlebars.precompile") + " ); })();";
+        + super.compile(content, name) + " ); })();";
   }
 
-  protected InputStream getHandlebarsJsAsStream() {
+  @Override
+  protected String getCompileCommand() {
+    return "Handlebars.precompile";
+  }
+
+  @Override
+  protected InputStream getCompilerAsStream() {
     return HandlebarsJs.class.getResourceAsStream(DEFAULT_HANDLEBARS_JS);
-  }
-
-  private RhinoScriptBuilder initScriptBuilder() {
-    try {
-      RhinoScriptBuilder builder;
-      if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getHandlebarsJsAsStream(), DEFAULT_HANDLEBARS_JS);
-        scope = builder.getScope();
-      } else {
-        builder = RhinoScriptBuilder.newChain(scope);
-      }
-      return builder;
-    } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading init script", ex);
-    }
   }
 }
