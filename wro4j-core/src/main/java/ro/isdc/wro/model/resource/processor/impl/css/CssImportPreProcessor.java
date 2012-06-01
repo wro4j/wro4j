@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -129,8 +131,14 @@ public class CssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    final String css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()),
-      configuration.getEncoding());
+    String css = EMPTY;
+    try {
+      css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()), configuration.getEncoding());
+    } catch (IOException e) {
+      if (!configuration.isIgnoreMissingResources()) {
+        throw e;
+      }
+    }
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));

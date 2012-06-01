@@ -6,9 +6,12 @@ package ro.isdc.wro.model.resource.processor.factory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.imageio.spi.ServiceRegistry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.resource.processor.ProcessorsContributor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
@@ -30,7 +34,7 @@ import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDe
  * @since 1.4.0
  */
 public class ConfigurableProcessorsFactory
-implements ProcessorsFactory {
+    implements ProcessorsFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableProcessorsFactory.class);
   /**
    * Delimit tokens containing a list of locators, preProcessors & postProcessors.
@@ -118,6 +122,7 @@ implements ProcessorsFactory {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T> getListOfItems(final String itemsAsString, final Map<String, T> map) {
+    Validate.notNull(map);
     LOG.debug("itemsAsString: " + itemsAsString);
     final List<T> list = new ArrayList<T>();
     final List<String> tokenNames = getTokens(itemsAsString);
@@ -168,19 +173,57 @@ implements ProcessorsFactory {
     this.properties = properties;
     return this;
   }
+  
+  /**
+   * @return the list of all {@link ProcessorsContributor} found in classpath.
+   */
+  private List<ProcessorsContributor> discoverProcessorsContributors() {
+    final Iterator<ProcessorsContributor> iterator = ServiceRegistry.lookupProviders(ProcessorsContributor.class);
+    final List<ProcessorsContributor> contributors = new ArrayList<ProcessorsContributor>();
+    for (; iterator.hasNext();) {
+      contributors.add(iterator.next());
+    }
+    return contributors;
+  }
 
   /**
    * @return a default map of preProcessors.
    */
   public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
-    return new HashMap<String, ResourcePreProcessor>();
+    final Map<String, ResourcePreProcessor> resultMap = new HashMap<String, ResourcePreProcessor>();
+    final List<ProcessorsContributor> contributorList = discoverProcessorsContributors();
+    for (ProcessorsContributor contributor : contributorList) {
+      final Map<String, ResourcePreProcessor> contributionMap = contributor.contributePreProcessors();
+      for (Map.Entry<String, ResourcePreProcessor> entry : contributionMap.entrySet()) {
+        final String alias = entry.getKey();
+        if (resultMap.containsKey(alias)) {
+          LOG.warn("Duplicate ALIAS found: {}. Overriding old processor with new one.", alias);
+        }
+        resultMap.put(alias, entry.getValue());
+      }
+    }
+    return resultMap;
   }
-
+  
   /**
+   * TODO: reuse duplicated code.
+   * 
    * @return a default map of postProcessors.
    */
   public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
-    return new HashMap<String, ResourcePostProcessor>();
+    final Map<String, ResourcePostProcessor> resultMap = new HashMap<String, ResourcePostProcessor>();
+    final List<ProcessorsContributor> contributorList = discoverProcessorsContributors();
+    for (ProcessorsContributor contributor : contributorList) {
+      final Map<String, ResourcePostProcessor> contributionMap = contributor.contributePostProcessors();
+      for (Map.Entry<String, ResourcePostProcessor> entry : contributionMap.entrySet()) {
+        final String alias = entry.getKey();
+        if (resultMap.containsKey(alias)) {
+          LOG.warn("Duplicate ALIAS found: {}. Overriding old processor with new one.", alias);
+        }
+        resultMap.put(alias, entry.getValue());
+      }
+    }
+    return resultMap;
   }
 
   /**
@@ -213,7 +256,7 @@ implements ProcessorsFactory {
   private Map<String, ResourcePostProcessor> getPostProcessorsMap() {
     if (this.postProcessorsMap == null) {
       synchronized (this) {
-        if (this.preProcessorsMap == null) {
+        if (this.postProcessorsMap == null) {
           this.postProcessorsMap = newPostProcessorsMap();
         }
       }
