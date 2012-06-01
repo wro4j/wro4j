@@ -7,7 +7,6 @@ import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
@@ -29,5 +28,4 @@ public class HandlebarsJsProcessor
   protected AbstractJsTemplateCompiler createCompiler() {
     return new HandlebarsJs();
   }
-
 }
