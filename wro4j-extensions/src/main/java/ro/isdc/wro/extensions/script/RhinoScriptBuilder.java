@@ -127,9 +127,11 @@ public class RhinoScriptBuilder {
     }
   }
 
-
-  public void initContext() {
-    if (context == null) {
+  /**
+   * Makes sure the context is properly initialized.
+   */
+  private void initContext() {
+    if (Context.getCurrentContext() == null) {
       context = Context.enter();
     }
   }
