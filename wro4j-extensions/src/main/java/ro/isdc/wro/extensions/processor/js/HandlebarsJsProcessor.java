@@ -17,6 +17,7 @@ public class HandlebarsJsProcessor
     extends JsTemplateCompilerProcessor {
   public static final String ALIAS = "handlebarsJs";
 
+
   /**
    * {@inheritDoc}
    */
