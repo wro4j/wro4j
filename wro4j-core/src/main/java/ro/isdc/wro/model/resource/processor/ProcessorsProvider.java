@@ -11,14 +11,14 @@ import java.util.Map;
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
-public interface ProcessorsContributor {
+public interface ProcessorsProvider {
   /**
    * @return the preProcessors to contribute. The key represents the processor alias.
    */
-  Map<String, ResourcePreProcessor> contributePreProcessors();
+  Map<String, ResourcePreProcessor> providePreProcessors();
   
   /**
    * @return the postProcessors to contribute. The key represents the processor alias.
    */
-  Map<String, ResourcePostProcessor> contributePostProcessors();
+  Map<String, ResourcePostProcessor> providePostProcessors();
 }

@@ -24,7 +24,7 @@ import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ProcessorsContributor;
+import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
@@ -40,13 +40,13 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
-public class DefaultProcessorsContributor
-    implements ProcessorsContributor {
+public class DefaultProcessorsProvider
+    implements ProcessorsProvider {
   /**
    * {@inheritDoc}
    */
   @Override
-  public Map<String, ResourcePreProcessor> contributePreProcessors() {
+  public Map<String, ResourcePreProcessor> providePreProcessors() {
     return createMap();
   }
   
@@ -54,7 +54,7 @@ public class DefaultProcessorsContributor
    * {@inheritDoc}
    */
   @Override
-  public Map<String, ResourcePostProcessor> contributePostProcessors() {
+  public Map<String, ResourcePostProcessor> providePostProcessors() {
     final Map<String, ResourcePostProcessor> resultMap = new HashMap<String, ResourcePostProcessor>();
     /**
      * Created to overcome the difference between {@link ResourcePreProcessor} and {@link ResourcePostProcessor}

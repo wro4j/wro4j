@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.processor.ProcessorsContributor;
+import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
@@ -155,13 +155,23 @@ public class ConfigurableProcessorsFactory
     }
     return list;
   }
-
+  
+  /**
+   * @param map
+   *          containing preProcessors with corresponding alias (as key). The map must not be null and once set, the
+   *          default map will be overridden.
+   */
   public ConfigurableProcessorsFactory setPreProcessorsMap(final Map<String, ResourcePreProcessor> map) {
     Validate.notNull(map);
     preProcessorsMap = map;
     return this;
   }
 
+  /**
+   * @param map
+   *          containing postProcessors with corresponding alias (as key). The map must not be null and once set, the
+   *          default map will be overridden.
+   */
   public ConfigurableProcessorsFactory setPostProcessorsMap(final Map<String, ResourcePostProcessor> map) {
     Validate.notNull(map);
     postProcessorsMap = map;
@@ -175,11 +185,11 @@ public class ConfigurableProcessorsFactory
   }
   
   /**
-   * @return the list of all {@link ProcessorsContributor} found in classpath.
+   * @return the list of all {@link ProcessorsProvider} found in classpath.
    */
-  private List<ProcessorsContributor> discoverProcessorsContributors() {
-    final Iterator<ProcessorsContributor> iterator = ServiceRegistry.lookupProviders(ProcessorsContributor.class);
-    final List<ProcessorsContributor> contributors = new ArrayList<ProcessorsContributor>();
+  private List<ProcessorsProvider> discoverProcessorsContributors() {
+    final Iterator<ProcessorsProvider> iterator = ServiceRegistry.lookupProviders(ProcessorsProvider.class);
+    final List<ProcessorsProvider> contributors = new ArrayList<ProcessorsProvider>();
     for (; iterator.hasNext();) {
       contributors.add(iterator.next());
     }
@@ -189,11 +199,12 @@ public class ConfigurableProcessorsFactory
   /**
    * @return a default map of preProcessors.
    */
-  public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
+  protected Map<String, ResourcePreProcessor> newPreProcessorsMap() {
+    //TODO: reuse duplicated code.
     final Map<String, ResourcePreProcessor> resultMap = new HashMap<String, ResourcePreProcessor>();
-    final List<ProcessorsContributor> contributorList = discoverProcessorsContributors();
-    for (ProcessorsContributor contributor : contributorList) {
-      final Map<String, ResourcePreProcessor> contributionMap = contributor.contributePreProcessors();
+    final List<ProcessorsProvider> contributorList = discoverProcessorsContributors();
+    for (ProcessorsProvider contributor : contributorList) {
+      final Map<String, ResourcePreProcessor> contributionMap = contributor.providePreProcessors();
       for (Map.Entry<String, ResourcePreProcessor> entry : contributionMap.entrySet()) {
         final String alias = entry.getKey();
         if (resultMap.containsKey(alias)) {
@@ -206,15 +217,14 @@ public class ConfigurableProcessorsFactory
   }
   
   /**
-   * TODO: reuse duplicated code.
-   * 
    * @return a default map of postProcessors.
    */
-  public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
+  protected Map<String, ResourcePostProcessor> newPostProcessorsMap() {
+    //TODO: reuse duplicated code.
     final Map<String, ResourcePostProcessor> resultMap = new HashMap<String, ResourcePostProcessor>();
-    final List<ProcessorsContributor> contributorList = discoverProcessorsContributors();
-    for (ProcessorsContributor contributor : contributorList) {
-      final Map<String, ResourcePostProcessor> contributionMap = contributor.contributePostProcessors();
+    final List<ProcessorsProvider> contributorList = discoverProcessorsContributors();
+    for (ProcessorsProvider contributor : contributorList) {
+      final Map<String, ResourcePostProcessor> contributionMap = contributor.providePostProcessors();
       for (Map.Entry<String, ResourcePostProcessor> entry : contributionMap.entrySet()) {
         final String alias = entry.getKey();
         if (resultMap.containsKey(alias)) {
