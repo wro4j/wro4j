@@ -214,8 +214,8 @@ public class WroManager
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
-          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
           response.setContentLength(cacheValue.getRawContent().length());
+          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
         }
       }
     } finally {
