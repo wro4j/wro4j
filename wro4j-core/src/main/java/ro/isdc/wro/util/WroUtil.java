@@ -250,7 +250,7 @@ public final class WroUtil {
   /**
    * Utility used to verify that requestURI matches provided path
    */
-  public static boolean matchesUrl(HttpServletRequest request, final String path) {
+  public static boolean matchesUrl(final HttpServletRequest request, final String path) {
     final Pattern pattern = Pattern.compile(".*" + path + "[/]?", Pattern.CASE_INSENSITIVE);
     if (request.getRequestURI() != null) {
       final Matcher m = pattern.matcher(request.getRequestURI());

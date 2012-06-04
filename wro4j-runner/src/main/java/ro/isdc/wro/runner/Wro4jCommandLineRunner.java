@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -44,7 +43,6 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -54,21 +52,25 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 /**
  * Default command line runner. Interprets arguments and perform a processing.
- *
+ * 
  * @author Alex Objelean
  * @since 1.3.4
  */
 public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
   private final File defaultWroFile = newDefaultWroFile();
-
-  @Option(name = "-m", aliases = { "--minimize" }, usage = "Turns on the minimization by applying compressor")
+  
+  @Option(name = "-m", aliases = {
+    "--minimize"
+  }, usage = "Turns on the minimization by applying compressor")
   private boolean minimize;
   @Option(name = "--parallel", usage = "Turns on the parallel preProcessing of resources. This value is false by default.")
   private boolean parallelPreprocessing;
   @Option(name = "--targetGroups", metaVar = "GROUPS", usage = "Comma separated value of the group names from wro.xml to process. If none is provided, all groups will be processed.")
   private String targetGroups;
-  @Option(name = "-i", aliases = { "--ignoreMissingResources" }, usage = "Ignores missing resources")
+  @Option(name = "-i", aliases = {
+    "--ignoreMissingResources"
+  }, usage = "Ignores missing resources")
   private boolean ignoreMissingResources;
   @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
   private final File wroFile = defaultWroFile;
@@ -76,24 +78,26 @@ public class Wro4jCommandLineRunner {
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
   private File destinationFolder = new File(System.getProperty("user.dir"), "wro");
-  @Option(name = "-c", aliases = { "--compressor", "--preProcessors" }, metaVar = "COMPRESSOR", usage = "Comma separated list of pre-processors")
+  @Option(name = "-c", aliases = {
+    "--compressor", "--preProcessors"
+  }, metaVar = "COMPRESSOR", usage = "Comma separated list of pre-processors")
   private String preProcessorsList;
   @Option(name = "--postProcessors", metaVar = "POST_PROCESSOR", usage = "Comma separated list of post-processors")
   private String postProcessorsList;
-
-
+  
   public static void main(final String[] args)
-    throws Exception {
+      throws Exception {
     new Wro4jCommandLineRunner().doMain(args);
   }
-
+  
   /**
-   * @return the location where wro file is located by default. Default implementation uses current directory where user is located.
+   * @return the location where wro file is located by default. Default implementation uses current directory where user
+   *         is located.
    */
   protected File newDefaultWroFile() {
     return new File(System.getProperty("user.dir"), "wro.xml");
   }
-
+  
   /**
    * @param args
    */
@@ -120,8 +124,7 @@ public class Wro4jCommandLineRunner {
       LOG.info("Processing took: {}ms", watch.getLastTaskTimeMillis());
     }
   }
-
-
+  
   /**
    * Exception handler.
    */
@@ -129,8 +132,7 @@ public class Wro4jCommandLineRunner {
     System.out.println(e.getMessage());
     System.exit(1); // non-zero exit code indicates there was an error
   }
-
-
+  
   private void process() {
     try {
       Context.set(Context.standaloneContext());
@@ -149,8 +151,7 @@ public class Wro4jCommandLineRunner {
       System.err.println(e.getMessage());
     }
   }
-
-
+  
   /**
    * @return a list containing all groups needs to be processed.
    */
@@ -161,20 +162,20 @@ public class Wro4jCommandLineRunner {
     }
     return Arrays.asList(targetGroups.split(","));
   }
-
-
+  
   /**
    * Process a single group.
-   *
-   * @throws IOException if any IO related exception occurs.
+   * 
+   * @throws IOException
+   *           if any IO related exception occurs.
    */
   private void processGroup(final String group, final File parentFoder)
-    throws IOException {
+      throws IOException {
     ByteArrayOutputStream resultOutputStream = null;
     InputStream resultInputStream = null;
     try {
       LOG.info("processing group: " + group);
-
+      
       // mock request
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       Mockito.when(request.getRequestURI()).thenReturn(group);
@@ -182,13 +183,13 @@ public class Wro4jCommandLineRunner {
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       resultOutputStream = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
-
+      
       // init context
       final WroConfiguration config = new WroConfiguration();
       //
       config.setParallelPreprocessing(parallelPreprocessing);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-
+      
       Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing
       getManagerFactory().create().process();
@@ -199,7 +200,7 @@ public class Wro4jCommandLineRunner {
       // allow the same stream to be read again
       resultInputStream.reset();
       LOG.debug("Created file: {}", destinationFile.getName());
-
+      
       final OutputStream fos = new FileOutputStream(destinationFile);
       // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
@@ -221,7 +222,7 @@ public class Wro4jCommandLineRunner {
       }
     }
   }
-
+  
   /**
    * This implementation is similar to the one from Wro4jMojo. TODO: reuse if possible.
    */
@@ -233,7 +234,7 @@ public class Wro4jCommandLineRunner {
     if (cssTargetFolder.getPath().startsWith(contextFolder.getPath())) {
       rootFolder = contextFolder;
     }
-    //compute aggregatedFolderPath
+    // compute aggregatedFolderPath
     String aggregatedFolderPath = null;
     if (rootFolder != null) {
       aggregatedFolderPath = StringUtils.removeStart(cssTargetFolder.getPath(), rootFolder.getPath());
@@ -241,21 +242,21 @@ public class Wro4jCommandLineRunner {
     LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
     return aggregatedFolderPath;
   }
-
-
+  
   /**
    * Encodes a version using some logic.
-   *
-   * @param group the name of the resource to encode.
-   * @param input the stream of the result content.
+   * 
+   * @param group
+   *          the name of the resource to encode.
+   * @param input
+   *          the stream of the result content.
    * @return the name of the resource with the version encoded.
    */
   private String rename(final String group, final InputStream input)
-    throws IOException {
+      throws IOException {
     return getManagerFactory().create().getNamingStrategy().rename(group, input);
   }
-
-
+  
   /**
    * This method will ensure that you have a right and initialized instance of
    * {@link StandaloneContextAwareManagerFactory}.
@@ -267,13 +268,13 @@ public class Wro4jCommandLineRunner {
     managerFactory.initialize(createStandaloneContext());
     return managerFactory;
   }
-
+  
   private WroModelFactory createWroModelFactory() {
-  //autodetect if user didn't specify explicitly the wro file path (aka default is used).
+    // autodetect if user didn't specify explicitly the wro file path (aka default is used).
     final boolean autoDetectWroFile = defaultWroFile.getPath().equals(wroFile.getPath());
     return new SmartWroModelFactory().setWroFile(wroFile).setAutoDetectWroFile(autoDetectWroFile);
   }
-
+  
   private ProcessorsFactory createProcessorsFactory() {
     final Properties props = new Properties();
     if (preProcessorsList != null) {
@@ -282,11 +283,25 @@ public class Wro4jCommandLineRunner {
     if (postProcessorsList != null) {
       props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessorsList);
     }
-    return new ConfigurableProcessorsFactory().setProperties(props).setPreProcessorsMap(createProcessorsMap()).setPostProcessorsMap(
-        createProcessorsMap());
+    return new ConfigurableProcessorsFactory() {
+      protected Map<String, ResourceProcessor> newPreProcessorsMap() {
+        final Map<String, ResourceProcessor> map = super.newPreProcessorsMap();
+        // override csslint & jsHint aliases
+        map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
+        map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
+        return map;
+      }
+      
+      protected Map<String, ResourceProcessor> newPostProcessorsMap() {
+        final Map<String, ResourceProcessor> map = super.newPostProcessorsMap();
+        // override csslint & jsHint aliases
+        map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
+        map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
+        return map;
+      }
+    }.setProperties(props);
   }
-
-
+  
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
@@ -298,33 +313,24 @@ public class Wro4jCommandLineRunner {
     runContext.setIgnoreMissingResources(ignoreMissingResources);
     return runContext;
   }
-
-  /**
-   * Creates the map of known pre processors.
-   */
-  protected Map<String, ResourceProcessor> createProcessorsMap() {
-    final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
-    map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
-    map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
-    return map;
-  }
   
   /**
-   * @param destinationFolder the destinationFolder to set
+   * @param destinationFolder
+   *          the destinationFolder to set
    * @VisibleForTestOnly
    */
   void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
-
+  
   /**
    * Linter classes with custom exception handling.
    */
-  private class RunnerCssLintProcessor extends CssLintProcessor {
+  private class RunnerCssLintProcessor
+      extends CssLintProcessor {
     @Override
     protected void onCssLintException(final CssLintException e, final Resource resource)
-      throws Exception {
+        throws Exception {
       super.onCssLintException(e, resource);
       System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
       System.err.println(e.getErrors());
@@ -332,7 +338,8 @@ public class Wro4jCommandLineRunner {
     }
   }
   
-  private class RunnerJsHintProcessor extends JsHintProcessor {
+  private class RunnerJsHintProcessor
+      extends JsHintProcessor {
     @Override
     protected void onLinterException(final LinterException e, final Resource resource) {
       super.onLinterException(e, resource);
@@ -341,5 +348,5 @@ public class Wro4jCommandLineRunner {
       onRunnerException(e);
     }
   }
-
+  
 }

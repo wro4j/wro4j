@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -33,7 +32,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   /**
    * Allow subclasses to contribute with it's own pre processors.
    * <p>
-   * It is implementor responsibility to add a {@link ResourceProcessor} instance.
+   * It is implementor responsibility to add a {@link ResourcePreProcessor} instance.
    *
    * @param map containing processor mappings.
    */
@@ -57,29 +56,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   protected ProcessorsFactory newProcessorsFactory() {
     final ConfigurableProcessorsFactory factory = new ConfigurableProcessorsFactory() {
       @Override
-      public Map<String, ResourceProcessor> newPreProcessorsMap() {
-        final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-        contributePreProcessors(map);
-        return map;
-      }
-
-
-      @Override
-      public Map<String, ResourceProcessor> newPostProcessorsMap() {
-        final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-        contributePostProcessors(map);
-        return map;
-      }
-
-
-      @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
         updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
         updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
       }
-
 
       /**
        * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.

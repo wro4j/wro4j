@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -33,7 +35,10 @@ import ro.isdc.wro.util.StringUtils;
  * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
  * preProcessor & postProcessor. It is necessary because preProcessor is responsible for updating model with found
  * imported resources, while post processor removes import occurrences.
- *
+ * <p/>
+ * When processor finds an import which is not valid, it will check the
+ * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
+ * 
  * @author Alex Objelean
  */
 @SupportedResourceType(ResourceType.CSS)
@@ -63,8 +68,7 @@ public class CssImportPreProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
-    Validate.notNull(resourceLocatorFactory, "No ResourceLocator was injected");
-    Validate.notNull(preProcessorExecutor, "No preProcessorExecutor was injected");
+    validate();
     try {
       final String result = parseCss(resource, reader);
       writer.write(result);
@@ -73,6 +77,14 @@ public class CssImportPreProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * Checks if required fields were injected.
+   */
+  private void validate() {
+    Validate.notNull(resourceLocatorFactory, "No ResourceLocator was injected");
+    Validate.notNull(preProcessorExecutor, "No preProcessorExecutor was injected");
   }
 
 
@@ -126,8 +138,16 @@ public class CssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    final String css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()).getInputStream(),
+    String css = EMPTY;
+    try {
+      css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()).getInputStream(),
         configuration.getEncoding());
+    } catch (IOException e) {
+      LOG.warn("Invalid import detected: {}", resource.getUri());
+      if (!configuration.isIgnoreMissingResources()) {
+        throw e;
+      }
+    }
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));

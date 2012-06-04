@@ -67,7 +67,7 @@ public class TestJsonHPackProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 20);
   }
 
 

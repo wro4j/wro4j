@@ -7,18 +7,14 @@ package ro.isdc.wro.maven.plugin.manager.factory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.manager.ExtensionsConfigurableWroManagerFactory;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 /**
  * Default implementaiton which use a property file to read the pre & post processors to be used during processing.
@@ -46,26 +42,6 @@ public class ConfigurableWroManagerFactory
   @Override
   protected WroModelFactory newModelFactory() {
     return SmartWroModelFactory.createFromStandaloneContext(standaloneContext);
-  }
-
-  /**
-   * @return a map of preProcessors.
-   */
-  @Override
-  protected Map<String, ResourceProcessor> createPreProcessorsMap() {
-    final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
-    return map;
-  }
-
-  /**
-   * @return a map of postProcessors.
-   */
-  @Override
-  protected Map<String, ResourceProcessor> createPostProcessorsMap() {
-    final Map<String, ResourceProcessor> map = ProcessorsUtils.createProcessorsMap();
-    ExtensionsConfigurableWroManagerFactory.populateMapWithExtensionsProcessors(map);
-    return map;
   }
   /**
    * {@inheritDoc}

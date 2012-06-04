@@ -101,7 +101,7 @@ public class TestCoffeeScriptProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 30);
   }
 
   @Test
