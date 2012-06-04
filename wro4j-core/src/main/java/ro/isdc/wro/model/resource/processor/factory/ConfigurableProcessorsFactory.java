@@ -24,6 +24,7 @@ import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -190,14 +191,24 @@ public class ConfigurableProcessorsFactory
   private List<ProcessorsProvider> discoverProcessorsProviders() {
     final List<ProcessorsProvider> contributors = new ArrayList<ProcessorsProvider>();
     try {
-      final Iterator<ProcessorsProvider> iterator = ServiceRegistry.lookupProviders(ProcessorsProvider.class);
+      final Iterator<ProcessorsProvider> iterator = lookupProviders();
       for (; iterator.hasNext();) {
         contributors.add(iterator.next());
       }
     } catch (Exception e) {
-      LOG.error("Failed to discover ProcessorsProviders using ServiceRegistry. Empty list will be returned", e);
+      LOG.error("Failed to discover ProcessorsProviders using ServiceRegistry. Cannot continue...", e);
+      WroUtil.wrapWithWroRuntimeException(e);
     }
     return contributors;
+  }
+
+  /**
+   * This method is useful for mocking the lookup operation.
+   * @VisibleForTesting
+   * @return the iterator of found providers.
+   */
+  Iterator<ProcessorsProvider> lookupProviders() {
+    return ServiceRegistry.lookupProviders(ProcessorsProvider.class);
   }
   
   /**
@@ -276,6 +287,22 @@ public class ConfigurableProcessorsFactory
       }
     }
     return this.preProcessorsMap;
+  }
+  
+  /**
+   * @VisibleForTesting
+   * @return the list of all available pre processors;
+   */
+  Collection<ResourcePreProcessor> getAvailablePreProcessors() {
+    return getPreProcessorsMap().values();
+  }
+  
+  /**
+   * @VisibleForTesting
+   * @return the list of all available pre processors;
+   */
+  Collection<ResourcePostProcessor> getAvailablePostProcessors() {
+    return getPostProcessorsMap().values();
   }
   
   /**
