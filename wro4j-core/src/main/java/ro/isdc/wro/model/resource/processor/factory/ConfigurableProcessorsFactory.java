@@ -266,7 +266,7 @@ public class ConfigurableProcessorsFactory
   private Map<String, ResourcePostProcessor> getPostProcessorsMap() {
     if (this.postProcessorsMap == null) {
       synchronized (this) {
-        if (this.postProcessorsMap == null) {
+        if (this.preProcessorsMap == null) {
           this.postProcessorsMap = newPostProcessorsMap();
         }
       }

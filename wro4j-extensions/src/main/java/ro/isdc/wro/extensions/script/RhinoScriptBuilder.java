@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
-  private Context context;
   private final ScriptableObject scope;
 
 
@@ -41,6 +40,11 @@ public class RhinoScriptBuilder {
   }
 
 
+  private Context getContext() {
+    initContext();
+    return Context.getCurrentContext();
+  }
+  
   /**
    * @return the context
    */
@@ -53,7 +57,7 @@ public class RhinoScriptBuilder {
    * Initialize the context.
    */
   private ScriptableObject createContext(final ScriptableObject initialScope) {
-    initContext();
+    Context context = getContext();
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
@@ -72,7 +76,7 @@ public class RhinoScriptBuilder {
   }
 
   /**
-   * Add a clinet side environment to the script context (client-side aware).
+   * Add a client side environment to the script context (client-side aware).
    *
    * @return {@link RhinoScriptBuilder} used to chain evaluation of the scripts.
    * @throws IOException
@@ -112,9 +116,8 @@ public class RhinoScriptBuilder {
   public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
     throws IOException {
     Validate.notNull(stream);
-    initContext();
     try {
-      context.evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
+      getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
@@ -132,7 +135,7 @@ public class RhinoScriptBuilder {
    */
   private void initContext() {
     if (Context.getCurrentContext() == null) {
-      context = Context.enter();
+      Context.enter();
     }
   }
 
@@ -147,8 +150,7 @@ public class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
     Validate.notNull(script);
-    initContext();
-    context.evaluateString(scope, script, sourceName, 1, null);
+    getContext().evaluateString(scope, script, sourceName, 1, null);
     return this;
   }
 
@@ -183,9 +185,8 @@ public class RhinoScriptBuilder {
   public Object evaluate(final String script, final String sourceName) {
     Validate.notNull(script);
     // make sure we have a context associated with current thread
-    initContext();
     try {
-      return context.evaluateString(scope, script, sourceName, 1, null);
+      return getContext().evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {
       LOG.error("JavaScriptException occured: " + e.getMessage());
       throw e;
