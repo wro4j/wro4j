@@ -37,7 +37,8 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Pattern used to identify the placeholders where the url rewriting will be performed.
    */
-  private static final String PATTERN_PATH = "url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"]";
+  //(.*:\\s*
+  private static final String PATTERN_PATH = "(.*:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"])";
   /**
    * Compiled pattern.
    */
@@ -81,28 +82,42 @@ public abstract class AbstractCssUrlRewritingProcessor
     final Matcher matcher = PATTERN.matcher(cssContent);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
-      final String oldMatch = matcher.group();
-
-      final String urlGroup = matcher.group(3) != null ? matcher.group(3) : matcher.group(2);
+      final int matchIndex = 2;
+      final String originalExpression = matcher.group(matchIndex - 1);
+      final String urlGroup = matcher.group(matchIndex + 2) != null ? matcher.group(matchIndex + 2) : matcher.group(matchIndex + 1);
       LOG.debug("urlGroup: {}", urlGroup);
       //use urlContent to get rid of trailing spaces inside the url() construction
-      final String urlContent = matcher.group(1) != null ? matcher.group(1) : urlGroup;
+      final String urlContent = matcher.group(matchIndex) != null ? matcher.group(matchIndex) : urlGroup;
 
       Validate.notNull(urlGroup);
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
         LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
-        //prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
-        //from stackoverflow: @see http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
-        final String newReplacement = Matcher.quoteReplacement(oldMatch.replace(urlContent, replacedUrl));
+        /**
+         * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
+         * from stackoverflow: @see http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text 
+         */
+        final String modifiedExpression = Matcher.quoteReplacement(originalExpression.replace(urlContent, replacedUrl));
         onUrlReplaced(replacedUrl);
-        matcher.appendReplacement(sb, newReplacement);
+        matcher.appendReplacement(sb, replaceExpression(originalExpression, modifiedExpression));
       }
     }
     matcher.appendTail(sb);
     return sb.toString();
   }
 
+  /**
+   * Invoked to replace the entire css expression.
+   * 
+   * @param originalExpression
+   *          the original, unchanged expression.
+   * @param modifiedExpression
+   *          the changed expression.
+   * @return the expression to apply. By default the modifiedExpression will be returned.
+   */
+  protected String replaceExpression(final String originalExpression, final String modifiedExpression) {
+    return modifiedExpression;
+  }
 
   /**
    * Invoked when an url is replaced. Useful if you need to do something will replacements.
