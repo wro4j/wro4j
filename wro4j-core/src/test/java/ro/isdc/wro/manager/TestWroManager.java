@@ -288,23 +288,25 @@ public class TestWroManager {
   }
   
   @Test(expected = WroRuntimeException.class)
-  public void shouldNotIgnoreInvalidImportWhenAProcessingFails()
+  public void shouldNotIgnoreInvalidImportWhenImportedResourceIsMissing()
       throws Exception {
-    genericIgnoreFailingProcessorTest(false);
+    genericIgnoreMissingResourceTest(false);
   }
   
   @Test
-  public void shouldIgnoreInvalidImportWhenAProcessingFails()
+  public void shouldIgnoreInvalidImportWhenImportedResourceIsMissing()
       throws Exception {
-    genericIgnoreFailingProcessorTest(true);
+    genericIgnoreMissingResourceTest(true);
   }
   
-  private void genericIgnoreFailingProcessorTest(final boolean ignoreFlag)
+  private void genericIgnoreMissingResourceTest(final boolean ignoreFlag)
       throws Exception {
     new GenericTestBuilder() {
       @Override
       protected void onBeforeProcess() {
-        Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
+        final WroConfiguration config = Context.get().getConfig();
+        config.setIgnoreFailingProcessor(ignoreFlag);
+        config.setIgnoreMissingResources(ignoreFlag);
       };
     }.processAndCompare("/invalidImport.css", "classpath:ro/isdc/wro/manager/invalidImport-out.css");
   }

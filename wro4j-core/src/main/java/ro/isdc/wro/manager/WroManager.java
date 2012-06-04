@@ -184,9 +184,6 @@ public class WroManager
       // TODO move ETag check in wroManagerFactory
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
       
-      System.out.println("\n\n\nHashValue: " + cacheValue.getHash());
-      System.out.println("cacheKey: " + cacheKey);
-      
       // enclose etag value in quotes to be compliant with the RFC
       final String etagValue = String.format("\"%s\"", cacheValue.getHash());
 
@@ -217,8 +214,8 @@ public class WroManager
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
-          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
           response.setContentLength(cacheValue.getRawContent().length());
+          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
         }
       }
     } finally {
