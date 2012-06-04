@@ -24,7 +24,6 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
@@ -112,29 +111,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   protected ProcessorsFactory newProcessorsFactory() {
     final ConfigurableProcessorsFactory factory = new ConfigurableProcessorsFactory() {
       @Override
-      public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
-        final Map<String, ResourcePreProcessor> map = ProcessorsUtils.createPreProcessorsMap();
-        contributePreProcessors(map);
-        return map;
-      }
-
-
-      @Override
-      public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
-        final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
-        contributePostProcessors(map);
-        return map;
-      }
-
-
-      @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
         updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
         updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
       }
-
 
       /**
        * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.

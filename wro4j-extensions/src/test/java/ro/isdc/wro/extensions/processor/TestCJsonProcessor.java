@@ -83,7 +83,7 @@ public class TestCJsonProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 20);
   }
   
 

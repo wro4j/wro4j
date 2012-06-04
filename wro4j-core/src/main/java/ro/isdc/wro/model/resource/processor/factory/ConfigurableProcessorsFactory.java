@@ -6,9 +6,12 @@ package ro.isdc.wro.model.resource.processor.factory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.imageio.spi.ServiceRegistry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,9 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -30,13 +35,13 @@ import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDe
  * @since 1.4.0
  */
 public class ConfigurableProcessorsFactory
-implements ProcessorsFactory {
+    implements ProcessorsFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableProcessorsFactory.class);
   /**
    * Delimit tokens containing a list of locators, preProcessors & postProcessors.
    */
   private static final String TOKEN_DELIMITER = ",";
-
+  
   /**
    * Property name to specify pre processors.
    */
@@ -51,14 +56,14 @@ implements ProcessorsFactory {
   private Properties properties;
   private Map<String, ResourcePreProcessor> preProcessorsMap;
   private Map<String, ResourcePostProcessor> postProcessorsMap;
-
+  
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
    */
   protected Properties newProperties() {
     return new Properties();
   }
-
+  
   /**
    * Creates a list of tokens (processors name) based on provided string of comma separated strings.
    * 
@@ -76,7 +81,7 @@ implements ProcessorsFactory {
     }
     return list;
   }
-
+  
   /**
    * Creates a comma separated list of items.
    */
@@ -90,7 +95,7 @@ implements ProcessorsFactory {
     }
     return sb.toString();
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -98,7 +103,7 @@ implements ProcessorsFactory {
     final String processorsAsString = getProperties().getProperty(PARAM_PRE_PROCESSORS);
     return getListOfItems(processorsAsString, getPreProcessorsMap());
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -106,7 +111,7 @@ implements ProcessorsFactory {
     final String processorsAsString = getProperties().getProperty(PARAM_POST_PROCESSORS);
     return getListOfItems(processorsAsString, getPostProcessorsMap());
   }
-
+  
   /**
    * Extracts a list of items (processors) from the properties based on existing values inside the map.
    * 
@@ -118,6 +123,7 @@ implements ProcessorsFactory {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T> getListOfItems(final String itemsAsString, final Map<String, T> map) {
+    Validate.notNull(map);
     LOG.debug("itemsAsString: " + itemsAsString);
     final List<T> list = new ArrayList<T>();
     final List<String> tokenNames = getTokens(itemsAsString);
@@ -150,39 +156,115 @@ implements ProcessorsFactory {
     }
     return list;
   }
-
+  
+  /**
+   * @param map
+   *          containing preProcessors with corresponding alias (as key). The map must not be null and once set, the
+   *          default map will be overridden.
+   */
   public ConfigurableProcessorsFactory setPreProcessorsMap(final Map<String, ResourcePreProcessor> map) {
     Validate.notNull(map);
     preProcessorsMap = map;
     return this;
   }
-
+  
+  /**
+   * @param map
+   *          containing postProcessors with corresponding alias (as key). The map must not be null and once set, the
+   *          default map will be overridden.
+   */
   public ConfigurableProcessorsFactory setPostProcessorsMap(final Map<String, ResourcePostProcessor> map) {
     Validate.notNull(map);
     postProcessorsMap = map;
     return this;
   }
-
+  
   public ConfigurableProcessorsFactory setProperties(final Properties properties) {
     Validate.notNull(properties);
     this.properties = properties;
     return this;
   }
+  
+  /**
+   * @return the list of all {@link ProcessorsProvider} found in classpath.
+   */
+  private List<ProcessorsProvider> discoverProcessorsProviders() {
+    final List<ProcessorsProvider> contributors = new ArrayList<ProcessorsProvider>();
+    try {
+      final Iterator<ProcessorsProvider> iterator = lookupProviders();
+      for (; iterator.hasNext();) {
+        contributors.add(iterator.next());
+      }
+    } catch (Exception e) {
+      LOG.error("Failed to discover ProcessorsProviders using ServiceRegistry. Cannot continue...", e);
+      WroUtil.wrapWithWroRuntimeException(e);
+    }
+    return contributors;
+  }
 
   /**
+   * This method is useful for mocking the lookup operation.
+   * @VisibleForTesting
+   * @return the iterator of found providers.
+   */
+  Iterator<ProcessorsProvider> lookupProviders() {
+    return ServiceRegistry.lookupProviders(ProcessorsProvider.class);
+  }
+  
+  /**
+   * By default the processor will be discovered using {@link ServiceRegistry} pattern (by inspecting META-INF/services
+   * folder of each dependency).
+   * 
    * @return a default map of preProcessors.
    */
-  public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
-    return new HashMap<String, ResourcePreProcessor>();
+  protected Map<String, ResourcePreProcessor> newPreProcessorsMap() {
+    // TODO: reuse duplicated code.
+    final Map<String, ResourcePreProcessor> resultMap = new HashMap<String, ResourcePreProcessor>();
+    final List<ProcessorsProvider> providers = discoverProcessorsProviders();
+    for (ProcessorsProvider provider : providers) {
+      try {
+        final Map<String, ResourcePreProcessor> map = provider.providePreProcessors();
+        for (Map.Entry<String, ResourcePreProcessor> entry : map.entrySet()) {
+          final String alias = entry.getKey();
+          if (resultMap.containsKey(alias)) {
+            LOG.warn("Duplicate ALIAS found: {}. Overriding old processor with new one.", alias);
+          }
+          resultMap.put(alias, entry.getValue());
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to import preProcessors for provider: {}. Skipping the import for this provider.", provider);
+      }
+    }
+    return resultMap;
   }
-
+  
   /**
+   * By default the processor will be discovered using {@link ServiceRegistry} pattern (by inspecting META-INF/services
+   * folder of each dependency).
+   * 
    * @return a default map of postProcessors.
    */
-  public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
-    return new HashMap<String, ResourcePostProcessor>();
+  protected Map<String, ResourcePostProcessor> newPostProcessorsMap() {
+    // TODO: reuse duplicated code.
+    final Map<String, ResourcePostProcessor> resultMap = new HashMap<String, ResourcePostProcessor>();
+    final List<ProcessorsProvider> providers = discoverProcessorsProviders();
+    for (ProcessorsProvider provider : providers) {
+      try {
+        final Map<String, ResourcePostProcessor> map = provider.providePostProcessors();
+        for (Map.Entry<String, ResourcePostProcessor> entry : map.entrySet()) {
+          final String alias = entry.getKey();
+          if (resultMap.containsKey(alias)) {
+            LOG.warn("Duplicate ALIAS found: {}. Overriding old processor with new one.", alias);
+          }
+          resultMap.put(alias, entry.getValue());
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to import preProcessors for provider: {}. Skipping the import for this provider.", provider);
+      }
+    }
+    return resultMap;
   }
-
+  
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -192,7 +274,7 @@ implements ProcessorsFactory {
     }
     return this.properties;
   }
-
+  
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -206,14 +288,30 @@ implements ProcessorsFactory {
     }
     return this.preProcessorsMap;
   }
-
+  
+  /**
+   * @VisibleForTesting
+   * @return the list of all available pre processors;
+   */
+  Collection<ResourcePreProcessor> getAvailablePreProcessors() {
+    return getPreProcessorsMap().values();
+  }
+  
+  /**
+   * @VisibleForTesting
+   * @return the list of all available pre processors;
+   */
+  Collection<ResourcePostProcessor> getAvailablePostProcessors() {
+    return getPostProcessorsMap().values();
+  }
+  
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
   private Map<String, ResourcePostProcessor> getPostProcessorsMap() {
     if (this.postProcessorsMap == null) {
       synchronized (this) {
-        if (this.preProcessorsMap == null) {
+        if (this.postProcessorsMap == null) {
           this.postProcessorsMap = newPostProcessorsMap();
         }
       }

@@ -63,7 +63,7 @@ public class TestPackerJsProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 20);
   }
 
 
