@@ -34,7 +34,10 @@ import ro.isdc.wro.util.StringUtils;
  * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
  * preProcessor & postProcessor. It is necessary because preProcessor is responsible for updating model with found
  * imported resources, while post processor removes import occurrences.
- *
+ * <p/>
+ * When processor finds an import which is not valid, it will check the
+ * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
+ * 
  * @author Alex Objelean
  */
 @SupportedResourceType(ResourceType.CSS)
@@ -135,6 +138,7 @@ public class CssImportPreProcessor
     try {
       css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()), configuration.getEncoding());
     } catch (IOException e) {
+      LOG.warn("Invalid import detected: {}", resource.getUri());
       if (!configuration.isIgnoreMissingResources()) {
         throw e;
       }
