@@ -120,7 +120,6 @@ public class ConfigurableProcessorsFactory
    *          mapping between items and its implementations.
    * @return a list of items (processors).
    */
-  @SuppressWarnings("unchecked")
   private static List<ResourceProcessor> getListOfItems(final String itemsAsString, final Map<String, ResourceProcessor> map) {
     LOG.debug("itemsAsString: " + itemsAsString);
     final List<ResourceProcessor> list = new ArrayList<ResourceProcessor>();

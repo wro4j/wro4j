@@ -2,12 +2,9 @@ package ro.isdc.wro.model.resource.processor.support;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
@@ -45,19 +42,7 @@ public class DefaultProcessorsProvider
    * {@inheritDoc}
    */
   public Map<String, ResourceProcessor> providePostProcessors() {
-    return toPostProcessors(providePreProcessors());
-  }
-  
-  /**
-   * Creates a map of postProcessors form a map of preProcessors. This method will be removed in 1.5.0 release when
-   * there will be no differences between pre & post processor interface.
-   */
-  private Map<String, ResourceProcessor> toPostProcessors(final Map<String, ResourceProcessor> preProcessorsMap) {
-    final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
-    for (Entry<String, ResourceProcessor> entry : preProcessorsMap.entrySet()) {
-      map.put(entry.getKey(), new ProcessorDecorator(entry.getValue()));
-    }
-    return map;
+    return providePreProcessors();
   }
   
   private void populateProcessorsMap(final Map<String, ResourceProcessor> map) {
