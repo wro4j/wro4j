@@ -56,7 +56,6 @@ public final class Injector {
    * @param object to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
-    LOG.debug("processInjectAnnotation for: {}", object.getClass().getSimpleName());
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
