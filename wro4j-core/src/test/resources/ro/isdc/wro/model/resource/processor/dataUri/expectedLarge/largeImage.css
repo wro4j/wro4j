@@ -1,0 +1,5 @@
+input.button {
+  background: url(large.jpg);
+  background-image: url("large.jpg");
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='large.jpg', sizingMethod='scale');
+}

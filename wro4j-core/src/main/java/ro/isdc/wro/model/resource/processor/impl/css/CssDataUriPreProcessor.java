@@ -91,7 +91,11 @@ public class CssDataUriPreProcessor
     return !(imageUrl.startsWith("http") || (isProxyResource(imageUrl)));
   }
 
-  private DataUriGenerator getDataUriGenerator() {
+  /**
+   * @return the DataUriGenerator class responsible for transforming streams into base64 encoded strings.
+   * @VisibleForTesting
+   */
+  protected DataUriGenerator getDataUriGenerator() {
     if (dataUriGenerator == null) {
       dataUriGenerator = new DataUriGenerator();
     }

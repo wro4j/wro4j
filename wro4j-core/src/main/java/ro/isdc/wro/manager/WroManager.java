@@ -208,13 +208,13 @@ public class WroManager
       if (cacheValue.getRawContent() != null) {
         // use gziped response if supported & Set content length based on gzip flag
         if (isGzipAllowed()) {
-          response.setContentLength(cacheValue.getGzippedContent().length);
+          // response.setContentLength(cacheValue.getGzippedContent().length);
           // add gzip header and gzip response
           response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
-          response.setContentLength(cacheValue.getRawContent().length());
+          // response.setContentLength(cacheValue.getRawContent().length());
           IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
         }
       }

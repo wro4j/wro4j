@@ -240,7 +240,10 @@ public class CssUrlRewritingProcessor
     // remove '/' from imageUrl if it starts with one.
     final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX) ? cleanImageUrl.substring(1)
         : cleanImageUrl;
-    // remove redundant part of the path
+    // remove redundant part of the path, but skip protected resources (ex: located inside /WEB-INF/ folder). -> Not
+    // sure if this is a problem yet.
+    // final String computedImageLocation = ServletContextUriLocator.isProtectedResource(cssUriFolder) ? cssUriFolder
+    // + processedImageUrl : cleanPath(cssUriFolder + processedImageUrl);
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
     return computedImageLocation;

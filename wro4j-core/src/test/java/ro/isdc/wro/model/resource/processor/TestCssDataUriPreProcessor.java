@@ -10,6 +10,7 @@ import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -23,6 +24,7 @@ import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
+import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -36,10 +38,27 @@ public class TestCssDataUriPreProcessor {
   private final String PROXY_RESOURCE_PATH = "classpath:ro/isdc/wro/model/resource/processor/dataUri/proxyImage/";
   private ResourcePreProcessor processor;
 
+  protected DataUriGenerator createMockDataUriGenerator() {
+    try {
+      DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
+      Mockito.when(uriGenerator.generateDataURI(Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(
+          "data:image/png;base64,iVBORw0KG");
+      return uriGenerator;
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot create DataUriGenerator mock", e);
+    }
+  }
+
   @Before
-  public void init() {
+  public void init()
+      throws Exception {
     Context.set(Context.standaloneContext());
-    processor = new CssDataUriPreProcessor();
+    processor = new CssDataUriPreProcessor() {
+      @Override
+      protected DataUriGenerator getDataUriGenerator() {
+        return createMockDataUriGenerator();
+      }
+    };
     initProcessor(processor);
   }
 
@@ -82,12 +101,25 @@ public class TestCssDataUriPreProcessor {
   }
 
   @Test
-  public void testFromFolder()
+  public void shouldTransformResourcesFromFolder()
       throws Exception {
     final URL url = getClass().getResource("dataUri");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+  
+  @Test
+  public void shouldTransformLargeResources()
+      throws Exception {
+    processor = new CssDataUriPreProcessor();
+    initProcessor(processor);
+
+    final URL url = getClass().getResource("dataUri");
+    
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedLarge");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
   

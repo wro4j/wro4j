@@ -1,3 +1,5 @@
 input.button {
 	background: url(/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png);
+	background-image: url("/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png");
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png', sizingMethod='scale');
 }
