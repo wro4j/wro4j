@@ -22,17 +22,20 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
-public class TestFallbackCssDataUriProcessor {
+public class TestFallbackCssDataUriProcessor
+    extends TestCssDataUriPreProcessor {
   private ResourcePreProcessor processor;
 
+  @Override
   @Before
   public void init() {
     Context.set(Context.standaloneContext());
     processor = new FallbackCssDataUriProcessor();
     //find a way to use a custom uriLocator
-    WroTestUtils.initProcessor(processor);
+    initProcessor(processor);
   }
 
+  @Override
   @Test
   public void testFromFolder()
       throws Exception {
@@ -43,6 +46,7 @@ public class TestFallbackCssDataUriProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
   
+  @Override
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);

@@ -4,32 +4,81 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
  * Test for {@link CssDataUriPreProcessor} class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
 public class TestCssDataUriPreProcessor {
+  private final String PROXY_RESOURCE_PATH = "classpath:ro/isdc/wro/model/resource/processor/dataUri/proxyImage/";
   private ResourcePreProcessor processor;
 
   @Before
   public void init() {
     Context.set(Context.standaloneContext());
     processor = new CssDataUriPreProcessor();
-    //find a way to use a custom uriLocator
-    WroTestUtils.initProcessor(processor);
+    initProcessor(processor);
+  }
+
+  final void initProcessor(final ResourcePreProcessor processor) {
+    final BaseWroManagerFactory factory = new BaseWroManagerFactory();
+    factory.setUriLocatorFactory(createLocatorFactory());
+    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
+    final Injector injector = InjectorBuilder.create(factory).build();
+    injector.inject(processor);
+  }
+  
+  /**
+   * @return a locator factory which handles absolute url locations and failed servletContext relative url's by serving
+   *         proxy resources from classpath. This is useful to make test pass without internet connection.
+   */
+  private UriLocatorFactory createLocatorFactory() {
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(
+        new ServletContextUriLocator() {
+          @Override
+          public InputStream locate(final String uri)
+              throws IOException {
+            try {
+              return super.locate(uri);
+            } catch (Exception e) {
+              return new ClasspathUriLocator().locate(PROXY_RESOURCE_PATH + "test1.png");
+            }
+          }
+        }).addUriLocator(new UrlUriLocator() {
+      @Override
+      public InputStream locate(final String uri)
+          throws IOException {
+        // avoid external connections
+        if (uri.startsWith("http")) {
+          return new ClasspathUriLocator().locate(PROXY_RESOURCE_PATH + "test2.png");
+        }
+        return super.locate(uri);
+      }
+    });
+    return locatorFactory;
   }
 
   @Test

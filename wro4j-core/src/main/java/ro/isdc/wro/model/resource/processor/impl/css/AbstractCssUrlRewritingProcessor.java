@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -35,17 +38,26 @@ import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 public abstract class AbstractCssUrlRewritingProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
-
+  /**
+   * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
+   */
+  public static final String PATH_RESOURCES = "wroResources";
+  
+  /**
+   * The name of resource id parameter.
+   */
+  public static final String PARAM_RESOURCE_ID = "id";
   /**
    * Pattern used to identify the placeholders where the url rewriting will be performed.
    */
   //(.*:\\s*
-  private static final String PATTERN_PATH = "(.*:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"])";
+  private static final String PATTERN_PATH = "(background.*?:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"])";
   /**
    * Compiled pattern.
    */
   private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
-
+  @Inject
+  private Context context;
   /**
    * {@inheritDoc}
    */
@@ -154,7 +166,6 @@ public abstract class AbstractCssUrlRewritingProcessor
     return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
   }
 
-
   /**
    * Check if url must be replaced or not.
    *
@@ -165,5 +176,33 @@ public abstract class AbstractCssUrlRewritingProcessor
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
+  }
+  
+  /**
+   * This method has protected modifier in order to be accessed by unit test class.
+   * 
+   * @return urlPrefix value.
+   * @VisibleForTesting
+   */
+  protected String getUrlPrefix() {
+    final String requestURI = context.getRequest().getRequestURI();
+    return FilenameUtils.getFullPath(requestURI) + getProxyResourcePath();
+  }
+  
+  /**
+   * @return the part of the url used to identify a proxy resource.
+   */
+  private String getProxyResourcePath() {
+    return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
+  }
+  
+  /**
+   * @param url
+   *          of the resource to check.
+   * @return true if the provided url is a proxy resource (rewritten by {@link CssUrlRewritingProcessor}.
+   */
+  final boolean isProxyResource(final String url) {
+    Validate.notNull(url);
+    return url.contains(getProxyResourcePath());
   }
 }

@@ -59,7 +59,7 @@ public class CssDataUriPreProcessor
     final String fileName = FilenameUtils.getName(imageUrl);
     String fullPath = cleanImageUrl;
     /**
-     * Allow dataUri transformation of absolute url's using http(s) protocol. All url's protocola are intentionally not
+     * Allow dataUri transformation of absolute url's using http(s) protocol. All url's protocol are intentionally not
      * allowed, because it could be a potential security issue. For instance: <code>
      * .class {
      *   background: url(file:/path/to/secure/file.png);
@@ -67,7 +67,7 @@ public class CssDataUriPreProcessor
      * <code>
      * This should not be allowed.
      */
-    if (!cleanImageUrl.startsWith("http")) {
+    if (isImageUrlChangeRequired(cleanImageUrl)) {
       fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
@@ -81,6 +81,14 @@ public class CssDataUriPreProcessor
       LOG.warn("Couldn't extract dataUri from:" + fullPath + ", because: " + e.getMessage());
     }
     return result;
+  }
+
+  /**
+   * @param imageUrl
+   * @return true if the image url should be replaced with another (servlet context relative).
+   */
+  private boolean isImageUrlChangeRequired(final String imageUrl) {
+    return !(imageUrl.startsWith("http") || (isProxyResource(imageUrl)));
   }
 
   private DataUriGenerator getDataUriGenerator() {
