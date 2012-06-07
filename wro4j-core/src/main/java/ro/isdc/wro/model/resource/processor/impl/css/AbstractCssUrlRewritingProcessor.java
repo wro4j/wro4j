@@ -50,11 +50,17 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Pattern used to identify the placeholders where the url rewriting will be performed.
    */
-  private static final String PATTERN_PATH = "(?ims)([\\w-]*\\s*:\\s*url\\s*\\(\\s*['\"]?(.*?)['\"]?\\)[;]?)|filter\\s*:.*?\\(src\\s*=\\s*['\"]?(.*?)['\",]?\\)[;]?";
+  //|filter\\s*:.*?\\(src\\s*=\\s*['\"]?(.*?)['\",]?\\)[;]?
+  //private static final String PATTERN_PATH = "(.*:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\))";
+  //rivate static final String PATTERN_PATH = "(background.*?:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\))";
+  //private static final String PATTERN_PATH = "(?ims)(background.*?url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\))";
+  //private static final String PATTERN_PATH = "(?ims)(background.*?url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|.*?:.*?src\\s*=\\s*['\"]((?:.|\\s)*?)['\"])";
+  //private static final String PATTERN_PATH = "(?ims)([\\w-]*\\s*:\\s*url\\s*\\(\\s*['\"]?(.*?)['\"]?\\)[;]?)|filter\\s*:.*?\\(src\\s*=\\s*['\"]?(.*?)['\",]?\\)[;]?";
+  private static final String PATTERN_PATH = "(?ims)([\\w-]*\\s*:.*?[url|src]\\s*\\(\\s*['\"]?(.*?)['\"]\\)[;]?)";
   /**
    * Compiled pattern.
    */
-  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
+  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH);
   @Inject
   private Context context;
   /**
@@ -104,17 +110,21 @@ public abstract class AbstractCssUrlRewritingProcessor
     while (matcher.find()) {
       final int matchIndex = 0;
       final String originalExpression = matcher.group(matchIndex);
-      final String urlGroup = matcher.group(matchIndex + 3) != null ? matcher.group(matchIndex + 3) : matcher.group(matchIndex + 2);
+      final String urlGroup = matcher.group(matchIndex + 2);
+      //final String urlGroup = matcher.group(matchIndex + 3) != null ? matcher.group(matchIndex + 3) : matcher.group(matchIndex + 2);
       LOG.debug("urlGroup: {}", urlGroup);
-
+      //final String urlContent = matcher.group(matchIndex) != null ? matcher.group(matchIndex) : urlGroup;
+      
       Validate.notNull(urlGroup);
       if (isReplaceNeeded(urlGroup)) {
         final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
+        //LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
         LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, StringUtils.abbreviate(replacedUrl, 40));
         /**
          * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
          * from stackoverflow: @see http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text 
          */
+        //final String modifiedExpression = Matcher.quoteReplacement(originalExpression.replace(urlContent, replacedUrl));
         final String modifiedExpression = Matcher.quoteReplacement(originalExpression.replace(urlGroup, replacedUrl));
         onUrlReplaced(replacedUrl);
         matcher.appendReplacement(sb, replaceExpression(originalExpression, modifiedExpression));

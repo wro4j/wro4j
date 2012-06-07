@@ -1,12 +1,13 @@
 .imageWithSrcAttribute {
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png',
-		sizingMethod='scale' );
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/images/tabs/tabContent.png',
-		sizingMethod='scale' );
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',
-		sizingMethod='scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/images/tabs/tabContent.png',	sizingMethod='scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',	sizingMethod='scale' );
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',  
+	   sizingMethod='scale' );
 }
-
+@font-face {
+    src: url(btn_icons.png);
+}
 .relativeImageBackgrounds {
 	background: url(img.gif);
 	background: url(folder/img.gif);
@@ -17,6 +18,10 @@
 	background: url(../../img.gif) no-repeat right;
 	BACKGROUND-IMAGE: url(../img1.gif);
 	background-image: url(../img.gif);
+	background-image: 
+     #555 url(../img.gif);
+	background-image: 
+     url(../img.gif);
 	background:
 		url(../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png)
 		0 1.1em no-repeat !important;
