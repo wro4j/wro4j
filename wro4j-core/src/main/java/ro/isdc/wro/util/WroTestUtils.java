@@ -362,7 +362,7 @@ public class WroTestUtils {
   }
 
   /**
-   * Run the task concurrently 100 times.
+   * Run the task concurrently 50 times.
    */
   public static void runConcurrently(final Callable<Void> task) throws Exception {
     runConcurrently(task, 50);
