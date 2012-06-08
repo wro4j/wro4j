@@ -52,7 +52,7 @@ public class GroovyModelFactory
    * {@inheritDoc}
    */
   @Override
-  public synchronized WroModel create() {
+  public WroModel create() {
     final StopWatch stopWatch = new StopWatch("Create Wro Model from Groovy");
     final Script script;
     try {

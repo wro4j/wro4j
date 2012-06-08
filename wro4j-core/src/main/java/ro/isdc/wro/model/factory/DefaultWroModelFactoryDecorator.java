@@ -48,7 +48,7 @@ public class DefaultWroModelFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  public synchronized WroModel create() {
+  public WroModel create() {
     callbackRegistry.onBeforeModelCreated();
     try {
       return getDecoratedObject().create();
