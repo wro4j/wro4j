@@ -334,7 +334,7 @@ public class WroTestUtils {
       try {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("processing: {}", file.getName());
+        LOG.debug("=========== processing: {} ===========", file.getName());
         // ResourceType doesn't matter here
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)

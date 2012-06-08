@@ -136,7 +136,7 @@ public abstract class AbstractCssUrlRewritingProcessor
          */
         final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl, modifiedUrl));
         onUrlReplaced(modifiedUrl);
-        matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration, modifiedDeclaration));
+        matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration));
       }
     }
     matcher.appendTail(sb);

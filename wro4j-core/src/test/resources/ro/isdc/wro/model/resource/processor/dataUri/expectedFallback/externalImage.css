@@ -1,5 +1,16 @@
 input.button {
   background: url(http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png);background: url(data:image/png;base64,iVBORw0KG);
-  background-image: url("http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png");background-image: url(data:image/png;base64,iVBORw0KG);
-  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png';  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='data:image/png;base64,iVBORw0KG', sizingMethod='scale');
+  background-image: url("http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png");background-image: url("data:image/png;base64,iVBORw0KG");
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png', sizingMethod='scale');filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='data:image/png;base64,iVBORw0KG', sizingMethod='scale');
+}
+.multilineAndSpaces {
+  background: 
+     url( "http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png " );background: 
+     url(data:image/png;base64,iVBORw0KG);
+  background-image : 
+     url( "http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png " );background-image : 
+     url(data:image/png;base64,iVBORw0KG)     
+}
+@font-face {
+    src: url(http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png);src: url(data:image/png;base64,iVBORw0KG);
 }

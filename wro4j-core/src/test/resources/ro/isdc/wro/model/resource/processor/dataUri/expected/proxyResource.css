@@ -1,7 +1,7 @@
 input.button {
   background: url(data:image/png;base64,iVBORw0KG);
-  background-image: url(data:image/png;base64,iVBORw0KG);
-  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='data:image/png;base64,iVBORw0KG');
+  background-image: url("data:image/png;base64,iVBORw0KG");
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='data:image/png;base64,iVBORw0KG', sizingMethod='scale');
 }
 .multilineAndSpaces {
   background: 
