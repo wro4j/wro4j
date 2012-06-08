@@ -153,11 +153,12 @@ public class TestGroovyModelFactory {
     }; 
     WroTestUtils.init(factory);
     WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
       public Void call()
           throws Exception {
         factory.create();
         return null;
       }
-    }, 10);
+    });
   }
 }
