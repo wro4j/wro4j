@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ContextPropagatingCallable;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.Transformer;
@@ -39,17 +40,17 @@ public class TestDefaultWroModelFactory {
       @Override
       protected InputStream getModelResourceAsStream()
           throws IOException {
-        return TestXmlModelFactory.class.getResourceAsStream("testimport/wildcard.xml");
+        return TestXmlModelFactory.class.getResourceAsStream("wroWithWildcardResources.xml");
       };
     }, modelTransformers);
     WroTestUtils.init(factory);
     final WroModel expectedModel = factory.create();
-    WroTestUtils.runConcurrently(new Callable<Void>() {
+    WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
         Assert.assertEquals(expectedModel, factory.create());
         return null;
       }
-    });
+    }));
   }
 }
