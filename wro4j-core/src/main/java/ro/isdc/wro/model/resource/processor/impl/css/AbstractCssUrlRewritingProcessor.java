@@ -6,6 +6,7 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,26 +49,36 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   public static final String PARAM_RESOURCE_ID = "id";
   /**
-   * Pattern used to identify the placeholders where the url rewriting will be performed.
-   */
-  //|filter\\s*:.*?\\(src\\s*=\\s*['\"]?(.*?)['\",]?\\)[;]?
-  //private static final String PATTERN_PATH = "(.*:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\))";
-  //rivate static final String PATTERN_PATH = "(background.*?:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\))";
-  //private static final String PATTERN_PATH = "(?ims)(background.*?url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\))";
-  //private static final String PATTERN_PATH = "(?ims)(background.*?url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|.*?:.*?src\\s*=\\s*['\"]((?:.|\\s)*?)['\"])";
-  //private static final String PATTERN_PATH = "(?ims)([\\w-]*\\s*:\\s*url\\s*\\(\\s*['\"]?(.*?)['\"]?\\)[;]?)|filter\\s*:.*?\\(src\\s*=\\s*['\"]?(.*?)['\",]?\\)[;]?";
-  private static final String PATTERN_PATH = "(?ims)([\\w-]*\\s*:.*?[url|src]\\s*\\(\\s*['\"]?(.*?)['\"]\\)[;]?)";
-  /**
    * Compiled pattern.
    */
-  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH);
+  private static final Pattern PATTERN = Pattern.compile(loadPattern());
   @Inject
   private Context context;
+
+  /**
+   * Load the regex used to identify the placeholders where the url rewriting will be performed.
+   */
+  private static String loadPattern() {
+    try {
+      if (true) {
+        return "(?is)([\\w-]*\\s*?:[^{]*?\\b(?:src\\b\\s*=\\s*['\"](.*?)['\"].*?|url\\b\\s*\\(['\"]?(.*?)['\"]?\\)).*?)(?=(?:[\\s|\\r|\\n]*?[\\w-]*\\s*:|}))";
+      }
+      Properties props = new Properties();
+      props.load(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"));
+      
+      // Create a read-only CharBuffer on the file
+      // CharBuffer cbuf = Charset.forName("8859_1").newDecoder().decode(bbuf);
+      return props.getProperty("cssUrlRewrite");
+    } catch (IOException e) {
+      throw new WroRuntimeException("Could not load pattern from property file", e);
+    }
+  }
+  
   /**
    * {@inheritDoc}
    */
   public void process(final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
   }
 
@@ -108,26 +119,24 @@ public abstract class AbstractCssUrlRewritingProcessor
     final Matcher matcher = PATTERN.matcher(cssContent);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
-      final int matchIndex = 0;
-      final String originalExpression = matcher.group(matchIndex);
-      final String urlGroup = matcher.group(matchIndex + 2);
-      //final String urlGroup = matcher.group(matchIndex + 3) != null ? matcher.group(matchIndex + 3) : matcher.group(matchIndex + 2);
-      LOG.debug("urlGroup: {}", urlGroup);
-      //final String urlContent = matcher.group(matchIndex) != null ? matcher.group(matchIndex) : urlGroup;
+      final int declarationIndex = 1;
+      final int urlIndexA = 2;
+      final int urlIndexB = 3;
+      final String originalDeclaration = matcher.group(declarationIndex);
+      final String originalUrl = matcher.group(urlIndexA) != null ? matcher.group(urlIndexA) : matcher.group(urlIndexB);
+      LOG.debug("urlGroup: {}", originalUrl);
       
-      Validate.notNull(urlGroup);
-      if (isReplaceNeeded(urlGroup)) {
-        final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        //LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
-        LOG.debug("replaced old Url: [{}] with: [{}].", urlGroup, StringUtils.abbreviate(replacedUrl, 40));
+      Validate.notNull(originalUrl);
+      if (isReplaceNeeded(originalUrl)) {
+        final String modifiedUrl = replaceImageUrl(cssUri, originalUrl);
+        LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, StringUtils.abbreviate(modifiedUrl, 40));
         /**
          * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
          * from stackoverflow: @see http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text 
          */
-        //final String modifiedExpression = Matcher.quoteReplacement(originalExpression.replace(urlContent, replacedUrl));
-        final String modifiedExpression = Matcher.quoteReplacement(originalExpression.replace(urlGroup, replacedUrl));
-        onUrlReplaced(replacedUrl);
-        matcher.appendReplacement(sb, replaceExpression(originalExpression, modifiedExpression));
+        final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl, modifiedUrl));
+        onUrlReplaced(modifiedUrl);
+        matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration, modifiedDeclaration));
       }
     }
     matcher.appendTail(sb);
@@ -135,7 +144,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   }
 
   /**
-   * Invoked to replace the entire css expression.
+   * Invoked to replace the entire css declaration.
    * 
    * @param originalExpression
    *          the original, unchanged expression.
@@ -143,7 +152,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    *          the changed expression.
    * @return the expression to apply. By default the modifiedExpression will be returned.
    */
-  protected String replaceExpression(final String originalExpression, final String modifiedExpression) {
+  protected String replaceDeclaration(final String originalExpression, final String modifiedExpression) {
     return modifiedExpression;
   }
 

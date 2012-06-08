@@ -33,7 +33,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 /**
  * Utility class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
@@ -47,14 +47,12 @@ public final class WroUtil {
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
   private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("E, dd MMM yyyy HH:mm:ss z",
-    TimeZone.getTimeZone("GMT"));
+      TimeZone.getTimeZone("GMT"));
   /**
    * Patterns used to search for mangled Accept-Encoding header.
    */
-  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(
-    "(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
-  private static final Pattern PATTERN_GZIP = Pattern.compile(
-    "(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
+  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile("(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
+  private static final Pattern PATTERN_GZIP = Pattern.compile("(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
 
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
 
@@ -76,21 +74,21 @@ public final class WroUtil {
 
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
-   *
-   * @param milliseconds to transform
+   * 
+   * @param milliseconds
+   *          to transform
    * @return string representation of the date.
    */
   public static String toDateAsString(final long milliseconds) {
     return DATE_FORMAT.format(milliseconds);
   }
 
-
   /**
    * Retrieve pathInfo from a given location.
-   *
-   *
+   * 
    * @param request
-   * @param location where to search contextPath.
+   * @param location
+   *          where to search contextPath.
    * @return pathInfo value.
    */
   public static String getPathInfoFromLocation(final HttpServletRequest request, final String location) {
@@ -122,7 +120,7 @@ public final class WroUtil {
    * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal. The
    * comparison is case insensitive.
    * </p>
-   *
+   * 
    * <pre>
    * StringUtils.startsWithIgnoreCase(null, null)      = true
    * StringUtils.startsWithIgnoreCase(null, "abcdef")  = false
@@ -130,10 +128,12 @@ public final class WroUtil {
    * StringUtils.startsWithIgnoreCase("abc", "abcdef") = true
    * StringUtils.startsWithIgnoreCase("abc", "ABCDEF") = true
    * </pre>
-   *
+   * 
    * @see java.lang.String#startsWith(String)
-   * @param str the String to check, may be null
-   * @param prefix the prefix to find, may be null
+   * @param str
+   *          the String to check, may be null
+   * @param prefix
+   *          the prefix to find, may be null
    * @return <code>true</code> if the String starts with the prefix, case insensitive, or both <code>null</code>
    * @since 2.4
    */
@@ -143,7 +143,7 @@ public final class WroUtil {
 
   /**
    * Creates a folder like implementation for a class. Ex: com.mycompany.MyClass -> com/mycompany/
-   *
+   * 
    * @param clazz
    *          used as a base location for determining the package path.
    * @return a string representation of the path where the class resides.
@@ -157,11 +157,14 @@ public final class WroUtil {
    * <p>
    * Check if a String starts with a specified prefix (optionally case insensitive).
    * </p>
-   *
+   * 
    * @see java.lang.String#startsWith(String)
-   * @param str the String to check, may be null
-   * @param prefix the prefix to find, may be null
-   * @param ignoreCase inidicates whether the compare should ignore case (case insensitive) or not.
+   * @param str
+   *          the String to check, may be null
+   * @param prefix
+   *          the prefix to find, may be null
+   * @param ignoreCase
+   *          inidicates whether the compare should ignore case (case insensitive) or not.
    * @return <code>true</code> if the String starts with the prefix or both <code>null</code>
    */
   private static boolean startsWith(final String str, final String prefix, final boolean ignoreCase) {
@@ -174,11 +177,11 @@ public final class WroUtil {
     return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
   }
 
-
   /**
    * Retrieve servletPath from a given location.
-   *
-   * @param location where to search the servletPath.
+   * 
+   * @param location
+   *          where to search the servletPath.
    * @return ServletPath string value.
    */
   public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
@@ -188,7 +191,7 @@ public final class WroUtil {
   /**
    * Analyze headers of the request and searches for mangled (by proxy) for "Accept-Encoding" header and its mangled
    * variations and gzip header value and its mangled variations.
-   *
+   * 
    * @return true if this request support gzip encoding.
    */
   @SuppressWarnings("unchecked")
@@ -211,9 +214,11 @@ public final class WroUtil {
   }
 
   /**
-   * Transforms a java multi-line string into javascript multi-line string.
-   * This technique was found at {@link http://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
-   * @param data a string containing new lines.
+   * Transforms a java multi-line string into javascript multi-line string. This technique was found at {@link http
+   * ://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
+   * 
+   * @param data
+   *          a string containing new lines.
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
   public static String toJSMultiLineString(final String data) {
@@ -226,7 +231,7 @@ public final class WroUtil {
       final String line = lines[i];
       result.append("\"");
       result.append(line.replace("\\", "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
-      //this is used to force a single line to have at least one new line (otherwise cssLint fails).
+      // this is used to force a single line to have at least one new line (otherwise cssLint fails).
       if (lines.length == 1) {
         result.append("\\n");
       }
@@ -260,33 +265,37 @@ public final class WroUtil {
     return false;
   }
 
-
   /**
    * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
-   * @param preProcessor {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
+   * 
+   * @param preProcessor
+   *          {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
    * @return instance of {@link ResourceProcessor}.
    */
-  public static ResourcePostProcessor newResourceProcessor(final Resource resource, final ResourcePreProcessor preProcessor) {
+  public static ResourcePostProcessor newResourceProcessor(final Resource resource,
+      final ResourcePreProcessor preProcessor) {
     return new ResourcePostProcessor() {
       public void process(final Reader reader, final Writer writer)
-        throws IOException {
+          throws IOException {
         preProcessor.process(resource, reader, writer);
       }
     };
   }
 
-
   /**
    * A simple way to create a {@link WroModelFactory}.
-   *
-   * @param model {@link WroModel} instance to be returned by the factory.
+   * 
+   * @param model
+   *          {@link WroModel} instance to be returned by the factory.
    */
   public static WroModelFactory factoryFor(final WroModel model) {
     return new WroModelFactory() {
       public WroModel create() {
         return model;
       }
-      public void destroy() {}
+      
+      public void destroy() {
+      }
     };
   }
 
@@ -298,11 +307,11 @@ public final class WroUtil {
     };
   }
 
-
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
-   *
-   * @param e the exception to wrap.
+   * 
+   * @param e
+   *          the exception to wrap.
    */
   public static void wrapWithWroRuntimeException(final Exception e) {
     LOG.error("Exception occured: " + e.getClass(), e.getCause());

@@ -30,7 +30,7 @@ public class FallbackCssDataUriProcessor
    * {@inheritDoc}
    */
   @Override
-  protected String replaceExpression(final String originalExpression, final String modifiedExpression) {
+  protected String replaceDeclaration(final String originalExpression, final String modifiedExpression) {
     System.out.println("originalExpression: " + originalExpression);
     System.out.println("modifiedExpression: " + modifiedExpression);
     return originalExpression.equals(modifiedExpression) ? modifiedExpression : originalExpression + ";"
