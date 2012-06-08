@@ -21,8 +21,10 @@ import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
  * Rewrites background images by replacing the url with data uri of the image. If the replacement is not successful, it
  * is left unchanged.
  * <p/>
- * For more details, @see http://en.wikipedia.org/wiki/Data_URI_scheme
- *
+ * Attention: This processor should be added before {@link CssUrlRewritingProcessor}, otherwise the url's won't be
+ * replaced. For more details, @see <a href="http://en.wikipedia.org/wiki/Data_URI_scheme">DataUri Scheme on
+ * Wikipedia</a>
+ * 
  * @author Alex Objelean
  * @created May 9, 2010
  */
@@ -78,7 +80,7 @@ public class CssDataUriPreProcessor
         LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));
       }
     } catch (final IOException e) {
-      LOG.warn("Couldn't extract dataUri from:" + fullPath + ", because: " + e.getMessage());
+      LOG.warn("[FAIL] extract dataUri from:" + fullPath + ", because: " + e.getMessage());
     }
     return result;
   }

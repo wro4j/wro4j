@@ -13,7 +13,8 @@ import ro.isdc.wro.util.Transformer;
 
 
 /**
- * Decorates the model factory with callback registry calls & other useful factories.
+ * Decorates the model factory with callback registry calls & other useful factories. Another responsibility of this
+ * decorator is make model creation thread safe.
  * <p/>
  * This class doesn't extend {@link AbstractDecorator} because we have to enhance the decorated object with new
  * decorators.
@@ -24,10 +25,10 @@ import ro.isdc.wro.util.Transformer;
  */
 public class DefaultWroModelFactoryDecorator
     implements WroModelFactory, ObjectDecorator<WroModelFactory> {
-  private WroModelFactory decorated;
+  private final WroModelFactory decorated;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
-  private List<Transformer<WroModel>> modelTransformers;
+  private final List<Transformer<WroModel>> modelTransformers;
   
   public DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
       final List<Transformer<WroModel>> modelTransformers) {
@@ -47,7 +48,7 @@ public class DefaultWroModelFactoryDecorator
   /**
    * {@inheritDoc}
    */
-  public WroModel create() {
+  public synchronized WroModel create() {
     callbackRegistry.onBeforeModelCreated();
     try {
       return getDecoratedObject().create();

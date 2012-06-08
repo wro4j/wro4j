@@ -5,3 +5,5 @@
 # jsHint       [OK]
 # jsLint       [OK] 
 # dustJs       [N/A]
+
+- Model creation thread-safe test
