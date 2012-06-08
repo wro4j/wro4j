@@ -12,6 +12,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
@@ -29,7 +30,7 @@ import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
  * @created May 9, 2010
  */
 public class CssDataUriPreProcessor
-  extends AbstractCssUrlRewritingProcessor {
+    extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssDataUriPreProcessor.class);
   public static final String ALIAS = "cssDataUri";
   /**
@@ -45,12 +46,14 @@ public class CssDataUriPreProcessor
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-
+  
   /**
    * Replace provided url with the new url if needed.
-   *
-   * @param imageUrl to replace.
-   * @param cssUri Uri of the parsed css.
+   * 
+   * @param imageUrl
+   *          to replace.
+   * @param cssUri
+   *          Uri of the parsed css.
    * @return replaced url.
    */
   @Override
@@ -84,7 +87,7 @@ public class CssDataUriPreProcessor
     }
     return result;
   }
-
+  
   /**
    * @param imageUrl
    * @return true if the image url should be replaced with another (servlet context relative).
@@ -92,7 +95,7 @@ public class CssDataUriPreProcessor
   private boolean isImageUrlChangeRequired(final String imageUrl) {
     return !(imageUrl.startsWith("http") || (isProxyResource(imageUrl)));
   }
-
+  
   /**
    * @return the DataUriGenerator class responsible for transforming streams into base64 encoded strings.
    * @VisibleForTesting
@@ -103,27 +106,32 @@ public class CssDataUriPreProcessor
     }
     return dataUriGenerator;
   }
-
+  
   /**
-   * Decides whether the computed dataUri should replace the image url. It is useful when you want to limit the dataUri size.
-   * By default the size of dataUri is limited to 32KB (because IE8 has a 32KB limitation).
-   *
-   * @param dataUri base64 encoded stream.
+   * Decides whether the computed dataUri should replace the image url. It is useful when you want to limit the dataUri
+   * size. By default the size of dataUri is limited to 32KB (because IE8 has a 32KB limitation).
+   * 
+   * @param dataUri
+   *          base64 encoded stream.
    * @return true if dataUri should replace original image url.
    */
-  protected boolean replaceWithDataUri(final String dataUri) throws UnsupportedEncodingException {
-    final byte[] bytes = dataUri.getBytes("UTF8");
-    final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
-    LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length/1024, exceedLimit);
-    return !exceedLimit;
+  protected boolean replaceWithDataUri(final String dataUri) {
+    try {
+      final byte[] bytes = dataUri.getBytes("UTF8");
+      final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
+      LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length / 1024, exceedLimit);
+      return !exceedLimit;
+    } catch (UnsupportedEncodingException e) {
+      throw new WroRuntimeException("Should never happen", e);
+    }
   }
-
+  
   /**
    * {@inheritDoc}
    */
   @Override
   protected boolean isReplaceNeeded(final String url) {
-    //the dataUri should replace also absolute url's
+    // the dataUri should replace also absolute url's
     return !DataUriGenerator.isDataUri(url.trim());
   }
 }
