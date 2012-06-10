@@ -83,7 +83,8 @@ public class CssDataUriPreProcessor
         LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));
       }
     } catch (final IOException e) {
-      LOG.warn("[FAIL] extract dataUri from:" + fullPath + ", because: " + e.getMessage());
+      LOG.warn("[FAIL] extract dataUri from: {}, because: {}. "
+          + "A possible cause: using CssUrlRewritingProcessor before CssDataUriPreProcessor.", fullPath, e.getMessage());
     }
     return result;
   }

@@ -12,8 +12,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
+import org.apache.commons.lang3.text.translate.EntityArrays;
+import org.apache.commons.lang3.text.translate.LookupTranslator;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,17 +59,20 @@ public abstract class AbstractCssUrlRewritingProcessor
   private static final Pattern PATTERN = Pattern.compile(loadPattern());
   @Inject
   private Context context;
-  
+
   /**
    * Load the regex used to identify the placeholders where the url rewriting will be performed.
    */
   private static String loadPattern() {
     try {
-      if (true) {
+      if (false) {
         return "(?is)([\\w-]*\\s*?:[^{]*?\\b(?:src\\b\\s*=\\s*['\"](.*?)['\"].*?|url\\b\\s*\\(['\"]?(.*?)['\"]?\\)).*?)(?=(?:[\\s|\\r|\\n]*?[\\w-]*\\s*:|}))";
       }
       Properties props = new Properties();
       props.load(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"));
+      System.out.println(IOUtils.toString(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"), "UTF8"));
+      System.out.println("1: " + props.getProperty("cssUrlRewrite"));
+      System.out.println("3: " + StringEscapeUtils.escapeJava(props.getProperty("cssUrlRewrite")));
       
       // Create a read-only CharBuffer on the file
       // CharBuffer cbuf = Charset.forName("8859_1").newDecoder().decode(bbuf);
@@ -72,6 +80,9 @@ public abstract class AbstractCssUrlRewritingProcessor
     } catch (IOException e) {
       throw new WroRuntimeException("Could not load pattern from property file", e);
     }
+  }
+  
+  public static void main(String[] args) {
   }
   
   /**
