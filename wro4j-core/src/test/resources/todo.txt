@@ -8,4 +8,5 @@
 
 # testPage.css request is not consistent (investigate, probably a thread-safety issue). 
   - WildcardExpanderModelTransformer transform method should be synchronized
-# Read regex from properties file     
+# Read regex from properties file
+# ensure InjectorBuilder doesn't perform redundant initialization.     

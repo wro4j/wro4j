@@ -28,6 +28,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
+import ro.isdc.wro.util.RegexpProperties;
 
 
 /**
@@ -61,17 +62,15 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   private static String loadPattern() {
     try {
-      if (true) {
+      if (false) {
         return "(?is)([\\w-]*\\s*?:[^{]*?\\b(?:src\\b\\s*=\\s*['\"](.*?)['\"].*?|url\\b\\s*\\(['\"]?(.*?)['\"]?\\)).*?)(?=(?:[\\s|\\r|\\n]*?[\\w-]*\\s*:|}))";
       }
-      Properties props = new Properties();
+      Properties props = new RegexpProperties().load(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"));
       props.load(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"));
       System.out.println(IOUtils.toString(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"), "UTF8"));
       System.out.println("1: " + props.getProperty("cssUrlRewrite"));
       System.out.println("3: " + StringEscapeUtils.escapeJava(props.getProperty("cssUrlRewrite")));
       
-      // Create a read-only CharBuffer on the file
-      // CharBuffer cbuf = Charset.forName("8859_1").newDecoder().decode(bbuf);
       return props.getProperty("cssUrlRewrite");
     } catch (IOException e) {
       throw new WroRuntimeException("Could not load pattern from property file", e);

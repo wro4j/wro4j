@@ -103,8 +103,9 @@ public class CssDataUriPreProcessor
   }
   
   /**
-   * Decides whether the computed dataUri should replace the image url. It is useful when you want to limit the dataUri
-   * size. By default the size of dataUri is limited to 32KB (because IE8 has a 32KB limitation).
+   * Similar to {@link CssDataUriPreProcessor#isReplaceAccepted(String)}, but decides whether the computed dataUri
+   * should replace the image url. It is useful when you want to limit the dataUri size. By default the size of dataUri
+   * is limited to 32KB (because IE8 has a 32KB limitation).
    * 
    * @param dataUri
    *          base64 encoded stream.
