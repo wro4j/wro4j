@@ -76,7 +76,7 @@ public class WildcardExpanderModelTransformer
   /**
    * {@inheritDoc}
    */
-  public WroModel transform(final WroModel input) {
+  public synchronized WroModel transform(final WroModel input) {
     final WroModel model = input;
     
     for (final Group group : model.getGroups()) {

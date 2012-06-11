@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -65,11 +66,14 @@ public class CssDataUriPreProcessor
     String fullPath = cleanImageUrl;
     /**
      * Allow dataUri transformation of absolute url's using http(s) protocol. All url's protocol are intentionally not
-     * allowed, because it could be a potential security issue. For instance: <code>
+     * allowed, because it could be a potential security issue. For instance:
+     * 
+     * <pre>
      * .class {
      *   background: url(file:/path/to/secure/file.png);
      * }
-     * <code>
+     * </pre>
+     * 
      * This should not be allowed.
      */
     if (isImageUrlChangeRequired(cleanImageUrl)) {
@@ -78,7 +82,7 @@ public class CssDataUriPreProcessor
     String result = imageUrl;
     try {
       final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
-      if (replaceWithDataUri(dataUri)) {
+      if (isReplaceAccepted(dataUri)) {
         result = dataUri;
         LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));
       }
@@ -91,10 +95,47 @@ public class CssDataUriPreProcessor
   
   /**
    * @param imageUrl
+   *          the original url of the image.
    * @return true if the image url should be replaced with another (servlet context relative).
    */
   private boolean isImageUrlChangeRequired(final String imageUrl) {
     return !(imageUrl.startsWith("http") || (isProxyResource(imageUrl)));
+  }
+  
+  /**
+   * Decides whether the computed dataUri should replace the image url. It is useful when you want to limit the dataUri
+   * size. By default the size of dataUri is limited to 32KB (because IE8 has a 32KB limitation).
+   * 
+   * @param dataUri
+   *          base64 encoded stream.
+   * @return true if dataUri should replace original image url.
+   */
+  protected boolean isReplaceAccepted(final String dataUri) {
+    try {
+      final byte[] bytes = dataUri.getBytes(CharEncoding.UTF_8);
+      final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
+      LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length / 1024, exceedLimit);
+      return !exceedLimit;
+    } catch (UnsupportedEncodingException e) {
+      throw new WroRuntimeException("Should never happen", e);
+    }
+  }
+  
+  /**
+   * @deprecated use {@link CssDataUriPreProcessor#isReplaceAccepted(String)} instead.
+   */
+  @Deprecated
+  protected boolean replaceWithDataUri(final String dataUri) {
+    return isReplaceAccepted(dataUri);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean isReplaceNeeded(final String url) {
+    // the dataUri should replace also absolute url's
+    return !DataUriGenerator.isDataUri(url.trim());
   }
   
   /**
@@ -106,33 +147,5 @@ public class CssDataUriPreProcessor
       dataUriGenerator = new DataUriGenerator();
     }
     return dataUriGenerator;
-  }
-  
-  /**
-   * Decides whether the computed dataUri should replace the image url. It is useful when you want to limit the dataUri
-   * size. By default the size of dataUri is limited to 32KB (because IE8 has a 32KB limitation).
-   * 
-   * @param dataUri
-   *          base64 encoded stream.
-   * @return true if dataUri should replace original image url.
-   */
-  protected boolean replaceWithDataUri(final String dataUri) {
-    try {
-      final byte[] bytes = dataUri.getBytes("UTF8");
-      final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
-      LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length / 1024, exceedLimit);
-      return !exceedLimit;
-    } catch (UnsupportedEncodingException e) {
-      throw new WroRuntimeException("Should never happen", e);
-    }
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected boolean isReplaceNeeded(final String url) {
-    // the dataUri should replace also absolute url's
-    return !DataUriGenerator.isDataUri(url.trim());
   }
 }

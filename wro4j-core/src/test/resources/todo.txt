@@ -6,4 +6,6 @@
 # jsLint       [OK] 
 # dustJs       [N/A]
 
-- Model creation thread-safe test
+# testPage.css request is not consistent (investigate, probably a thread-safety issue). 
+  - WildcardExpanderModelTransformer transform method should be synchronized
+# Read regex from properties file     

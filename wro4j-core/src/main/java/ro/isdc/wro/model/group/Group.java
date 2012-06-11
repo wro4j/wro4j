@@ -37,7 +37,7 @@ public final class Group {
   /**
    * Resources of the group.
    */
-  private final List<Resource> resources = new ArrayList<Resource>();
+  private final List<Resource> resources = Collections.synchronizedList(new ArrayList<Resource>());
   
   /**
    * To be used by JSON serializer.

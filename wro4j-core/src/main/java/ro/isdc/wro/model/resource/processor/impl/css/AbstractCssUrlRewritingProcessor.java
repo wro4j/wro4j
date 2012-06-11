@@ -15,10 +15,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
-import org.apache.commons.lang3.text.translate.EntityArrays;
-import org.apache.commons.lang3.text.translate.LookupTranslator;
-import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +61,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   private static String loadPattern() {
     try {
-      if (false) {
+      if (true) {
         return "(?is)([\\w-]*\\s*?:[^{]*?\\b(?:src\\b\\s*=\\s*['\"](.*?)['\"].*?|url\\b\\s*\\(['\"]?(.*?)['\"]?\\)).*?)(?=(?:[\\s|\\r|\\n]*?[\\w-]*\\s*:|}))";
       }
       Properties props = new Properties();
@@ -82,7 +78,7 @@ public abstract class AbstractCssUrlRewritingProcessor
     }
   }
   
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
   }
   
   /**
