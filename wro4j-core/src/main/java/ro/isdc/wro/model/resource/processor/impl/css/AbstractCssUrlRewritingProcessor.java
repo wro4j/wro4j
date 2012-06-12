@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Properties;
@@ -12,7 +13,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -45,7 +45,6 @@ public abstract class AbstractCssUrlRewritingProcessor
    * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
    */
   public static final String PATH_RESOURCES = "wroResources";
-  
   /**
    * The name of resource id parameter.
    */
@@ -62,22 +61,12 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   private static String loadPattern() {
     try {
-      if (false) {
-        return "(?is)([\\w-]*\\s*?:[^{]*?\\b(?:src\\b\\s*=\\s*['\"](.*?)['\"].*?|url\\b\\s*\\(['\"]?(.*?)['\"]?\\)).*?)(?=(?:[\\s|\\r|\\n]*?[\\w-]*\\s*:|}))";
-      }
-      Properties props = new RegexpProperties().load(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"));
-      props.load(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"));
-      System.out.println(IOUtils.toString(AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties"), "UTF8"));
-      System.out.println("1: " + props.getProperty("cssUrlRewrite"));
-      System.out.println("3: " + StringEscapeUtils.escapeJava(props.getProperty("cssUrlRewrite")));
-      
+      final InputStream stream = AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties");
+      final Properties props = new RegexpProperties().load(stream);
       return props.getProperty("cssUrlRewrite");
     } catch (IOException e) {
       throw new WroRuntimeException("Could not load pattern from property file", e);
     }
-  }
-  
-  public static void main(final String[] args) {
   }
   
   /**

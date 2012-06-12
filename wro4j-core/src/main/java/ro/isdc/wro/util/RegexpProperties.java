@@ -10,10 +10,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.Validate;
 
+import com.sun.java.swing.plaf.windows.TMSchema.Prop;
+
 
 /**
  * Used to overcome the limitation of {@link Properties} class when dealing with regular expressions read from
- * properties file.
+ * properties file. The main benefit of using {@link RegexpProperties} over simple {@link Properties} is that the regexp
+ * doesn't have to be escaped.
  * 
  * @author Alex Objelean
  * @since 1.4.7
@@ -21,28 +24,30 @@ import org.apache.commons.lang3.Validate;
  */
 public class RegexpProperties {
   private Properties properties;
-  //\s*(.*)\b\s*?=\s*\b(.*)
-  private static final String REGEX_KEY_VALUE = "(?m)\\s*(.*)\\b\\s*?=\\s*\\b(.*)$";
-  //private static final String REGEX_KEY_VALUE = "(?m)\\w";
+  private static final String REGEX_KEY_VALUE = "(?m)\\s*(.*?)\\s*=\\s*(.*)\\s*$";
   private static final String REGEX_COMMENTS = "#.*";
   private static final Pattern PATTERN_KEY_VALUE = Pattern.compile(REGEX_KEY_VALUE);
   public RegexpProperties() {
-    this(new Properties());
+    this.properties = new Properties();
   }
   
-  private RegexpProperties(final Properties properties) {
-    Validate.notNull(properties);
-    this.properties = properties;
-  }
-  
+  /**
+   * Load the properties from the stream. 
+   * @param inputStream 
+   * @return {@link Properties} containing properties parsed from the stream.
+   * @throws IOException
+   */
   public Properties load(final InputStream inputStream) throws IOException {
     Validate.notNull(inputStream);
     final String rawContent = IOUtils.toString(inputStream, CharEncoding.UTF_8);
-    readProperties(rawContent.replaceAll(REGEX_COMMENTS, ""));
+    parseProperties(rawContent.replaceAll(REGEX_COMMENTS, ""));
     return this.properties;
   }
 
-  private void readProperties(final String propertiesAsString) {
+  /**
+   * parse the properties from the provided string containing a raw properties 
+   */
+  private void parseProperties(final String propertiesAsString) {
     //should work also \r?\n
     final String[] propertyEntries = propertiesAsString.split("\\r?\\n");
     for (final String entry : propertyEntries) {
@@ -55,10 +60,7 @@ public class RegexpProperties {
     while(matcher.find()) {
       final String key = matcher.group(1);
       final String value = matcher.group(2);
-      System.out.println("add key: " + key);
-      System.out.println("add value: " + value);
       this.properties.put(key, value);
-      //this.properties.setProperty(key, value);
     }
   }
 }
