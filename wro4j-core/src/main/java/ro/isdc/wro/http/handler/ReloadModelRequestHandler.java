@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ReloadModelRequestHandler
     implements RequestHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ReloadModelRequestHandler.class);
   /**
    * wro API mapping path. If request uri contains this, exposed API method will be invoked.
    */
