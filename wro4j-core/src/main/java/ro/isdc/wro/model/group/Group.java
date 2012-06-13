@@ -37,7 +37,7 @@ public final class Group {
   /**
    * Resources of the group.
    */
-  private final List<Resource> resources = new ArrayList<Resource>();
+  private final List<Resource> resources = Collections.synchronizedList(new ArrayList<Resource>());
   
   /**
    * To be used by JSON serializer.
@@ -159,13 +159,6 @@ public final class Group {
   }
   
   /**
-   * @return the name
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
    * @return the readonly list of resources.
    */
   public List<Resource> getResources() {
@@ -224,7 +217,13 @@ public final class Group {
     return false;
   }
   
-
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
+  
   /**
    * {@inheritDoc}
    */

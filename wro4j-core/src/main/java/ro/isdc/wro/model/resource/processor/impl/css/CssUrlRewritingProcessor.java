@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,15 +110,6 @@ public class CssUrlRewritingProcessor
     extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
   public static final String ALIAS = "cssUrlRewriting";
-  /**
-   * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
-   */
-  public static final String PATH_RESOURCES = "wroResources";
-  
-  /**
-   * The name of resource id parameter.
-   */
-  public static final String PARAM_RESOURCE_ID = "id";
   /**
    * Constant for WEB-INF folder.
    */
@@ -280,16 +270,6 @@ public class CssUrlRewritingProcessor
    */
   public final boolean isUriAllowed(final String uri) {
     return allowedUrls.contains(uri);
-  }
-  
-  /**
-   * This method has protected modifier in order to be accessed by unit test class.
-   * 
-   * @return urlPrefix value.
-   */
-  protected String getUrlPrefix() {
-    final String requestURI = context.getRequest().getRequestURI();
-    return String.format("%s?%s=", FilenameUtils.getFullPath(requestURI) + PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
 
 

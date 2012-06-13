@@ -27,7 +27,7 @@ import ro.isdc.wro.util.StringUtils;
  * {@link org.springframework.core.io.Resource} implementation for {@link javax.servlet.ServletContext} resources,
  * interpreting relative paths within the web application root directory.
  * 
- * @author Alex Objelean
+ * @author Alex Objelean, Ivar Conradi Østhus
  * @since 1.5.0
  */
 public class ServletContextResourceLocator
@@ -97,7 +97,7 @@ public class ServletContextResourceLocator
         final String fullPath = FilenameUtils.getFullPath(path);
         final String realPath = servletContext.getRealPath(fullPath);
         if (realPath == null) {
-          final String message = "Could not determine realPath for resource: " + path;
+          final String message = "[FAIL] Could not determine realPath for resource: " + path;
           LOG.error(message);
           throw new IOException(message);
         }
@@ -117,7 +117,7 @@ public class ServletContextResourceLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
+      LOG.warn("[FAIL] Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
     
@@ -194,7 +194,7 @@ public class ServletContextResourceLocator
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {
-      LOG.error("Exception while reading resource from " + uri);
+      LOG.error("[FAIL] reading resource from " + uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
   }

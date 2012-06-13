@@ -75,7 +75,7 @@ public class WildcardExpanderModelTransformer
   /**
    * {@inheritDoc}
    */
-  public WroModel transform(final WroModel input) {
+  public synchronized WroModel transform(final WroModel input) {
     final WroModel model = input;
     
     for (final Group group : model.getGroups()) {
@@ -147,7 +147,6 @@ public class WildcardExpanderModelTransformer
     return new Function<Collection<File>, Void>() {
       public Void apply(final Collection<File> input)
         throws Exception {
-        try {
         LOG.debug("\texpanded Files: {}", input);
         for (final File file : input) {
           baseNameFolderHolder.set(file.getParent());
@@ -156,9 +155,6 @@ public class WildcardExpanderModelTransformer
         }
         // use this to skip wildcard stream detection, we are only interested in the baseName
         throw new NoMoreAttemptsIOException("BaseNameFolder computed successfully, skip further wildcard processing..");
-        } finally {
-          LOG.debug("computed baseNameFolder: {}", baseNameFolderHolder.get());
-        }
       }
     };
   }

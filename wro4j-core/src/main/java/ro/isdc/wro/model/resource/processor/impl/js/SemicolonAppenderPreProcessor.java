@@ -14,6 +14,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -29,7 +30,7 @@ public class SemicolonAppenderPreProcessor
   /**
    * check if the last character is a semicolon and append only if one is missing.
    */
-  private static final String PATTERN = "(?is).*;[\\s\\r\\n]*$";
+  private static final String PATTERN = WroUtil.loadRegexpWithKey("javascript.hasSemicolon");
 
   /**
    * {@inheritDoc}

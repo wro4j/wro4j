@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public final class WroConfiguration
   /**
    * Default encoding to use.
    */
-  public static final String DEFAULT_ENCODING = "UTF-8";
+  public static final String DEFAULT_ENCODING = CharEncoding.UTF_8;
   /**
    * Default value for connectionTimeout property.
    */
@@ -449,7 +450,7 @@ public final class WroConfiguration
    *          flag for turning on/off failure when there is an empty group (nothing to process). This value is true by
    *          default, meaning that empty group will produce empty result (no exception).
    */
-  public void setIgnoreEmptyGroup(boolean ignoreEmptyGroup) {
+  public void setIgnoreEmptyGroup(final boolean ignoreEmptyGroup) {
     this.ignoreEmptyGroup = ignoreEmptyGroup;
   }
 
@@ -460,7 +461,7 @@ public final class WroConfiguration
     return ignoreFailingProcessor;
   }
   
-  public void setIgnoreFailingProcessor(boolean ignoreFailingProcessor) {
+  public void setIgnoreFailingProcessor(final boolean ignoreFailingProcessor) {
     this.ignoreFailingProcessor = ignoreFailingProcessor;
   }
 

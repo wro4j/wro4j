@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.xml.sax.SAXParseException;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ContextPropagatingCallable;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
@@ -221,12 +224,13 @@ public class TestXmlModelFactory {
       }
     }; 
     WroTestUtils.init(factory);
-    WroTestUtils.runConcurrently(new Callable<Void>() {
+    final WroModel expected = factory.create();
+    WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        factory.create();
+        Assert.assertEquals(expected, factory.create());
         return null;
       }
-    }, 10);
+    }), 10);
   }
 }

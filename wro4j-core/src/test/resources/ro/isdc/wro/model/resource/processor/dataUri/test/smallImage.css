@@ -1,3 +1,14 @@
 input.button {
 	background: url(btn_icons.png);
+	background-image: url("btn_icons.png");
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='btn_icons.png', sizingMethod='scale');	
+}
+.multilineAndSpaces {
+	background: 
+	   url( "btn_icons.png " );
+  background-image : 
+     url( "btn_icons.png " )	   
+}
+@font-face {
+    src: url(btn_icons.png);
 }

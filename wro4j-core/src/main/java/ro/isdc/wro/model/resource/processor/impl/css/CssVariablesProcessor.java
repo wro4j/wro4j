@@ -19,6 +19,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -26,7 +27,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * http://disruptive-innovations.com/zoo/cssvariables/). This is a pre processor, because it makes sense to apply
  * variables only on the same css. <br/>
  * This processor is implemented as both: preprocessor & postprocessor.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Jul 05, 2009
  */
@@ -36,47 +37,23 @@ public class CssVariablesProcessor
   private static final Logger LOG = LoggerFactory.getLogger(CssVariablesProcessor.class);
   public static final String ALIAS = "cssVariables";
   /**
-   * Pattern used to find variables definition. For instance:<br/>
-   * <code>
-   *
-   * @variables { var1: white; var2: #fff; } </code>
-   */
-  private static final String REGEX_VARIABLES_DEFINITION = "@variables\\s*\\{(.*?)\\}";
-  /**
-   * Pattern used to parse variables body & to extract mapping between variable & its value. For instance:<br/>
-   * <code>
-   *   corporateLogo: url(test.png);
-   *   mainBackground: yellow;
-   * </code>
-   */
-  private static final String REGEX_VARIABLES_BODY = "([^:\\s]*)\\s*:\\s*(.+?);";
-  /**
-   * Pattern used to parse variables body & to extract mapping between variable & its value. For instance:<br/>
-   * <code>
-   *   var(corporateLogo);
-   * </code>
-   */
-  private static final String REGEX_VARIABLE_HOLDER = "var\\s*\\((.+?)\\)";
-
-  /**
    * Compiled pattern for REGEX_VARIABLES_DEFINITION regex.
    */
-  private static final Pattern PATTERN_VARIABLES_DEFINITION = Pattern.compile(REGEX_VARIABLES_DEFINITION, Pattern.CASE_INSENSITIVE
-    | Pattern.DOTALL);
+  private static final Pattern PATTERN_VARIABLES_DEFINITION = Pattern.compile(WroUtil.loadRegexpWithKey("cssVariables.definition"));
   /**
    * Compiled pattern for REGEX_VARIABLES_BODY pattern.
    */
-  private static final Pattern PATTERN_VARIABLES_BODY = Pattern.compile(REGEX_VARIABLES_BODY, Pattern.CASE_INSENSITIVE);
+  private static final Pattern PATTERN_VARIABLES_BODY = Pattern.compile(WroUtil.loadRegexpWithKey("cssVariables.body"));
   /**
    * Compiled pattern for REGEX_VARIABLE_HOLDER pattern.
    */
-  private static final Pattern PATTERN_VARIABLE_HOLDER = Pattern.compile(REGEX_VARIABLE_HOLDER, Pattern.CASE_INSENSITIVE);
-
+  private static final Pattern PATTERN_VARIABLE_HOLDER = Pattern.compile(WroUtil.loadRegexpWithKey("cssVariables.holder"));
 
   /**
    * Extract variables map from variables body.
-   *
-   * @param variablesBody string containing variables mappings.
+   * 
+   * @param variablesBody
+   *          string containing variables mappings.
    * @return map with extracted variables.
    */
   private Map<String, String> extractVariables(final String variablesBody) {
@@ -97,17 +74,8 @@ public class CssVariablesProcessor
   /**
    * {@inheritDoc}
    */
-  public void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     try {
       final String css = IOUtils.toString(reader);
       final String result = parseCss(css);
@@ -118,11 +86,11 @@ public class CssVariablesProcessor
     }
   }
 
-
   /**
    * Parse css, find all defined variables & replace them.
-   *
-   * @param css to parse.
+   * 
+   * @param css
+   *          to parse.
    */
   private String parseCss(final String css) {
     // map containing variables & their values
@@ -144,12 +112,13 @@ public class CssVariablesProcessor
     return result;
   }
 
-
   /**
    * Replace variables from css with provided variables map.
-   *
-   * @param cleanCss used to replace variable placeholders.
-   * @param variables map of variables used for substitution.
+   * 
+   * @param cleanCss
+   *          used to replace variable placeholders.
+   * @param variables
+   *          map of variables used for substitution.
    * @return css with all variables replaced.
    */
   private String replaceVariables(final String css, final Map<String, String> variables) {

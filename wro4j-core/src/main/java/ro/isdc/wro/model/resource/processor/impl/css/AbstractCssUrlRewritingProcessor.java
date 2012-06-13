@@ -9,23 +9,27 @@ import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
  * A processor responsible for rewriting url's from inside the css resources.
- *
+ * 
  * @author Alex Objelean
  * @created Created on 9 May, 2010
  */
@@ -33,22 +37,90 @@ import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 public abstract class AbstractCssUrlRewritingProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
-
   /**
-   * Pattern used to identify the placeholders where the url rewriting will be performed.
+   * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
    */
-  //(.*:\\s*
-  private static final String PATTERN_PATH = "(.*:\\s*url\\s*\\((\\s*['\"]?((?:.*?|\\s*?))['\"]?\\s*)\\)|src\\s*=\\s*['\"]((?:.|\\s)*?)['\"])";
+  public static final String PATH_RESOURCES = "wroResources";
+  /**
+   * The name of resource id parameter.
+   */
+  public static final String PARAM_RESOURCE_ID = "id";
   /**
    * Compiled pattern.
    */
-  private static final Pattern PATTERN = Pattern.compile(PATTERN_PATH, Pattern.CASE_INSENSITIVE);
-
+  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
+  @Inject
+  private Context context;
+  
+  /**
+   * Parse the css content and transform found url's.
+   * 
+   * @param cssContent
+   *          to parse.
+   * @param cssUri
+   *          Uri of the css to parse.
+   * @return parsed css.
+   */
+  private String parseCss(final String cssContent, final String cssUri) {
+    final Matcher matcher = PATTERN.matcher(cssContent);
+    final StringBuffer sb = new StringBuffer();
+    while (matcher.find()) {
+      // index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
+      final int declarationIndex = 1;
+      /**
+       * index of the group containing an url inside a declaration of this form:
+       * 
+       * <pre>
+       * body {
+       *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
+       * }
+       * </pre>
+       * or
+       * <pre>
+       * @font-face {
+       *   src: url(btn_icons.png);
+       * }
+       */
+      final int urlIndexA = 2;
+      /**
+       * index of the group containing an url inside a declaration of this form:
+       * 
+       * <pre>
+       * body {
+       *     background: #B3B3B3 url(img.gif);color:red;
+       * }
+       * </pre>
+       * </pre>
+       */
+      final int urlIndexB = 3;
+      final String originalDeclaration = matcher.group(declarationIndex);
+      final String originalUrl = matcher.group(urlIndexA) != null ? matcher.group(urlIndexA) : matcher.group(urlIndexB);
+      LOG.debug("urlGroup: {}", originalUrl);
+      
+      Validate.notNull(originalUrl);
+      if (isReplaceNeeded(originalUrl)) {
+        final String modifiedUrl = replaceImageUrl(cssUri, originalUrl);
+        LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, StringUtils.abbreviate(modifiedUrl, 40));
+        /**
+         * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
+         * from stackoverflow: @see
+         * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
+         */
+        final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
+            modifiedUrl));
+        onUrlReplaced(modifiedUrl);
+        matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration));
+      }
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
+  }
+  
   /**
    * {@inheritDoc}
    */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
     try {
       final String cssUri = resource.getUri();
@@ -62,99 +134,102 @@ public abstract class AbstractCssUrlRewritingProcessor
       writer.close();
     }
   }
-
-
+  
   /**
    * Invoked when the process operation is completed. Useful to invoke some post processing logic or for custom logging.
    */
   protected void onProcessCompleted() {
   }
-
-
+  
   /**
-   * Perform actual css parsing logic.
-   *
-   * @param cssContent to parse.
-   * @param cssUri Uri of the css to parse.
-   * @return parsed css.
-   */
-  private String parseCss(final String cssContent, final String cssUri) {
-    final Matcher matcher = PATTERN.matcher(cssContent);
-    final StringBuffer sb = new StringBuffer();
-    while (matcher.find()) {
-      final int matchIndex = 2;
-      final String originalExpression = matcher.group(matchIndex - 1);
-      final String urlGroup = matcher.group(matchIndex + 2) != null ? matcher.group(matchIndex + 2) : matcher.group(matchIndex + 1);
-      LOG.debug("urlGroup: {}", urlGroup);
-      //use urlContent to get rid of trailing spaces inside the url() construction
-      final String urlContent = matcher.group(matchIndex) != null ? matcher.group(matchIndex) : urlGroup;
-
-      Validate.notNull(urlGroup);
-      if (isReplaceNeeded(urlGroup)) {
-        final String replacedUrl = replaceImageUrl(cssUri, urlGroup);
-        LOG.debug("replaced old Url: [{}] with: [{}].", urlContent, StringUtils.abbreviate(replacedUrl, 40));
-        /**
-         * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
-         * from stackoverflow: @see http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text 
-         */
-        final String modifiedExpression = Matcher.quoteReplacement(originalExpression.replace(urlContent, replacedUrl));
-        onUrlReplaced(replacedUrl);
-        matcher.appendReplacement(sb, replaceExpression(originalExpression, modifiedExpression));
-      }
-    }
-    matcher.appendTail(sb);
-    return sb.toString();
-  }
-
-  /**
-   * Invoked to replace the entire css expression.
+   * Invoked to replace the entire css declaration.
+   * <p/> 
+   * An example of css declaration:
+   * <pre>
+   * background: url(/image.png);
+   * </pre>
+   * Useful when the css declaration should be changed. The use-case is:
+   * {@link FallbackCssDataUriProcessor}.
    * 
-   * @param originalExpression
-   *          the original, unchanged expression.
-   * @param modifiedExpression
+   * @param originalDeclaration
+   *          the original, unchanged declaration.
+   * @param modifiedDeclaration
    *          the changed expression.
    * @return the expression to apply. By default the modifiedExpression will be returned.
    */
-  protected String replaceExpression(final String originalExpression, final String modifiedExpression) {
-    return modifiedExpression;
+  protected String replaceDeclaration(final String originalDeclaration, final String modifiedDeclaration) {
+    return modifiedDeclaration;
   }
-
+  
   /**
-   * Invoked when an url is replaced. Useful if you need to do something will replacements.
-   * @param replacedUrl the newly computed url created as a result of url rewriting.
+   * Invoked when an url is replaced. Useful if you need to do something with newly replaced url.
+   * 
+   * @param replacedUrl
+   *          the newly computed url created as a result of url rewriting.
    */
-  protected void onUrlReplaced(final String replacedUrl) {}
-
-
+  protected void onUrlReplaced(final String replacedUrl) {
+  }
+  
   /**
    * Replace provided url with the new url if needed.
-   *
-   * @param cssUri Uri of the parsed css.
-   * @param imageUrl to replace.
+   * 
+   * @param cssUri
+   *          Uri of the parsed css.
+   * @param imageUrl
+   *          to replace.
    * @return replaced url.
    */
   protected abstract String replaceImageUrl(final String cssUri, final String imageUrl);
-
+  
   /**
    * Cleans the image url by triming result and removing \' or \" characters if such exists.
-   *
-   * @param imageUrl to clean.
+   * 
+   * @param imageUrl
+   *          to clean.
    * @return cleaned image URL.
    */
   protected final String cleanImageUrl(final String imageUrl) {
     return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
   }
-
-
+  
   /**
    * Check if url must be replaced or not.
-   *
-   * @param url to check.
+   * 
+   * @param url
+   *          to check.
    * @return true if url needs to be replaced or remain unchanged.
    */
   protected boolean isReplaceNeeded(final String url) {
     // The replacement is not needed if the url of the image is absolute (can be
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(DataUriGenerator.isDataUri(url.trim()) || UrlResourceLocator.isValid(url));
+  }
+  
+  /**
+   * This method has protected modifier in order to be accessed by unit test class.
+   * 
+   * @return urlPrefix value.
+   * @VisibleForTesting
+   */
+  protected String getUrlPrefix() {
+    final String requestURI = context.getRequest().getRequestURI();
+    return FilenameUtils.getFullPath(requestURI) + getProxyResourcePath();
+  }
+  
+  /**
+   * @return the part of the url used to identify a proxy resource.
+   */
+  private String getProxyResourcePath() {
+    return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
+  }
+  
+  /**
+   * @param url
+   *          of the resource to check.
+   * @return true if the provided url is a proxy resource (rewritten by {@link CssUrlRewritingProcessor}.
+   */
+  final boolean isProxyResource(final String url) {
+    Validate.notNull(url);
+    return url.contains(getProxyResourcePath());
   }
 }

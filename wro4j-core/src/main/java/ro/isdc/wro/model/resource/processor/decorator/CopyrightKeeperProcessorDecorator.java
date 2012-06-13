@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -31,9 +32,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 public class CopyrightKeeperProcessorDecorator
   extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(CopyrightKeeperProcessorDecorator.class);
-
-  /** The url pattern */
-  private static final Pattern PATTERN_COPYRIGHT = Pattern.compile("(?ims)/\\*!.*?\\*/");
+  private static final Pattern PATTERN_COPYRIGHT = Pattern.compile(WroUtil.loadRegexpWithKey("comment.copyright"));
 
   private CopyrightKeeperProcessorDecorator(final ResourceProcessor processor) {
     super(processor);
@@ -48,6 +47,7 @@ public class CopyrightKeeperProcessorDecorator
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {

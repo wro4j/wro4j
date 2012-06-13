@@ -105,7 +105,6 @@ public class Context {
   public static Context get() {
     validateContext();
     final String correlationId = CORRELATION_ID.get();
-    LOG.debug("getContext for correlationId: {}", correlationId);
     return CONTEXT_MAP.get(correlationId);
   }
 

@@ -3,7 +3,10 @@
  */
 package ro.isdc.wro.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +39,8 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile("^[\\t ]*$\\r?\\n", Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile(loadRegexpWithKey("emptyLine"),
+      Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
@@ -45,9 +49,9 @@ public final class WroUtil {
   /**
    * Patterns used to search for mangled Accept-Encoding header.
    */
-  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile("(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
-  private static final Pattern PATTERN_GZIP = Pattern.compile("(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
-  
+  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(loadRegexpWithKey("requestHeader.acceptEncoding"));
+  private static final Pattern PATTERN_GZIP = Pattern.compile(loadRegexpWithKey("requestHeader.gzip"));
+
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
   
   /**
@@ -76,7 +80,7 @@ public final class WroUtil {
   public static String toDateAsString(final long milliseconds) {
     return DATE_FORMAT.format(milliseconds);
   }
-  
+
   /**
    * Retrieve pathInfo from a given location.
    * 
@@ -129,7 +133,6 @@ public final class WroUtil {
    * @param prefix
    *          the prefix to find, may be null
    * @return <code>true</code> if the String starts with the prefix, case insensitive, or both <code>null</code>
-   * @since 2.4
    */
   public static boolean startsWithIgnoreCase(final String str, final String prefix) {
     return startsWith(str, prefix, true);
@@ -170,7 +173,7 @@ public final class WroUtil {
     }
     return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
   }
-  
+
   /**
    * Retrieve servletPath from a given location.
    * 
@@ -283,7 +286,7 @@ public final class WroUtil {
       }
     };
   }
-  
+
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
    * 
@@ -296,5 +299,22 @@ public final class WroUtil {
       throw (WroRuntimeException) e;
     }
     throw new WroRuntimeException(e.getMessage(), e);
+  }
+  
+  /**
+   * Load the regular expression stored in in regexp.properties resource file.
+   * 
+   * @param key
+   *          the key of the regexp to load.
+   * @return regular expression value.
+   */
+  public static String loadRegexpWithKey(final String key) {
+    try {
+      final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
+      final Properties props = new RegexpProperties().load(stream);
+      return props.getProperty(key);
+    } catch (IOException e) {
+      throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
+    }
   }
 }

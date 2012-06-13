@@ -19,6 +19,7 @@ public class PerformanceLoggerCallback
     extends LifecycleCallbackSupport {
   private static final Logger LOG = LoggerFactory.getLogger(PerformanceLoggerCallback.class);
   private static final String SHORT_SUMMARY = "=====Performance Logger Statistics==============";
+  // TODO use ThreadLocal to store watch in order to be threadSafe.
   private StopWatch watch;
 
   /**

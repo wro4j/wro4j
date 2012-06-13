@@ -2,7 +2,7 @@
 <groups xmlns="http://www.isdc.ro/wro">
 
   <group name="g1">
-    <css>classpath:1.css</css>
+    <js>classpath:ro/isdc/wro/model/factory/expander/**.js</js>
   </group>
 
   <group name="g2">

@@ -130,7 +130,7 @@ public class WroTestUtils {
    */
   public static void initProcessor(final ResourceProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
-    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor).addPostProcessor(processor));
+    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
@@ -318,7 +318,7 @@ public class WroTestUtils {
       try {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("processing: {}", file.getName());
+        LOG.debug("=========== processing: {} ===========", file.getName());
         // ResourceType doesn't matter here
         compare(new FileInputStream(file), targetFileStream, new ResourceProcessor() {
           public void process(final Resource resource, final Reader reader, final Writer writer)
