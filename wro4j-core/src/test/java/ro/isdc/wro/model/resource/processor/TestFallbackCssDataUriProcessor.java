@@ -13,6 +13,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.FallbackCssDataUriProcessor;
+import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -22,27 +23,50 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
-public class TestFallbackCssDataUriProcessor {
+public class TestFallbackCssDataUriProcessor
+    extends TestCssDataUriPreProcessor {
   private ResourcePreProcessor processor;
 
+  @Override
   @Before
   public void init() {
     Context.set(Context.standaloneContext());
-    processor = new FallbackCssDataUriProcessor();
+    processor = new FallbackCssDataUriProcessor() {
+      @Override
+      protected DataUriGenerator getDataUriGenerator() {
+        return createMockDataUriGenerator();
+      }
+    };
     //find a way to use a custom uriLocator
-    WroTestUtils.initProcessor(processor);
+    initProcessor(processor);
   }
 
+  @Override
   @Test
-  public void testFromFolder()
+  public void shouldTransformResourcesFromFolder()
       throws Exception {
     final URL url = getClass().getResource("dataUri");
 
     final File testFolder = new File(url.getFile(), "test");
-    final File expectedFolder = new File(url.getFile(), "fallbackExpected");
+    final File expectedFolder = new File(url.getFile(), "expectedFallback");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
   
+  @Override
+  @Test
+  public void shouldTransformLargeResources()
+      throws Exception {
+    processor = new CssDataUriPreProcessor();
+    initProcessor(processor);
+    
+    final URL url = getClass().getResource("dataUri");
+    
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedFallbackLarge");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+  
+  @Override
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
