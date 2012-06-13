@@ -4,9 +4,11 @@
 package ro.isdc.wro.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,8 +53,8 @@ public final class WroUtil {
   /**
    * Patterns used to search for mangled Accept-Encoding header.
    */
-  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile("(?im)^(Accept-Encoding|Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$");
-  private static final Pattern PATTERN_GZIP = Pattern.compile("(?im)^((gzip|deflate)\\s?,?\\s?(gzip|deflate)?.*|X{4,13}|~{4,13}|-{4,13})$");
+  private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(loadRegexpWithKey("requestHeader.acceptEncoding"));
+  private static final Pattern PATTERN_GZIP = Pattern.compile(loadRegexpWithKey("requestHeader.gzip"));
 
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
 
@@ -319,5 +321,22 @@ public final class WroUtil {
       throw (WroRuntimeException) e;
     }
     throw new WroRuntimeException(e.getMessage(), e);
+  }
+  
+  /**
+   * Load the regular expression stored in in regexp.properties resource file.
+   * 
+   * @param key
+   *          the key of the regexp to load.
+   * @return regular expression value.
+   */
+  public static String loadRegexpWithKey(final String key) {
+    try {
+      final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
+      final Properties props = new RegexpProperties().load(stream);
+      return props.getProperty(key);
+    } catch (IOException e) {
+      throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
+    }
   }
 }

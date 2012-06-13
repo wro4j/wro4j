@@ -4,10 +4,8 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +26,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
-import ro.isdc.wro.util.RegexpProperties;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -52,23 +50,9 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Compiled pattern.
    */
-  private static final Pattern PATTERN = Pattern.compile(loadPattern());
+  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
   @Inject
   private Context context;
-
-  /**
-   * Load the regex used to identify the placeholders where the url rewriting will be performed.
-   */
-  private static String loadPattern() {
-    try {
-      final InputStream stream = AbstractCssUrlRewritingProcessor.class.getResourceAsStream("regex.properties");
-      final Properties props = new RegexpProperties().load(stream);
-      return props.getProperty("cssUrlRewrite");
-    } catch (IOException e) {
-      throw new WroRuntimeException("Could not load pattern from property file", e);
-    }
-  }
-  
   /**
    * {@inheritDoc}
    */

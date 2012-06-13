@@ -28,6 +28,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StringUtils;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -58,8 +59,7 @@ public class CssImportPreProcessor
    * List of processed resources, useful for detecting deep recursion.
    */
   private final List<Resource> processed = new ArrayList<Resource>();
-  /** The url pattern */
-  private static final Pattern PATTERN = Pattern.compile("@import\\s*(?:url\\()?[\"']?([^\"')]+)[\"')]?\\)?;?", Pattern.CASE_INSENSITIVE);
+  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
 
   /**
    * {@inheritDoc}

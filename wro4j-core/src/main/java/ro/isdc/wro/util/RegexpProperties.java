@@ -8,9 +8,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.java.swing.plaf.windows.TMSchema.Prop;
 
 
 /**
@@ -23,23 +25,28 @@ import com.sun.java.swing.plaf.windows.TMSchema.Prop;
  * @created 11 Jun 2012
  */
 public class RegexpProperties {
-  private Properties properties;
+  private static final Logger LOG = LoggerFactory.getLogger(RegexpProperties.class);
+  private final Properties properties;
   private static final String REGEX_KEY_VALUE = "(?m)\\s*(.*?)\\s*=\\s*(.*)\\s*$";
   private static final String REGEX_COMMENTS = "#.*";
   private static final Pattern PATTERN_KEY_VALUE = Pattern.compile(REGEX_KEY_VALUE);
+
   public RegexpProperties() {
     this.properties = new Properties();
   }
   
   /**
-   * Load the properties from the stream. 
-   * @param inputStream 
+   * Load the properties from the stream. The implementation will handle comments properly by removing them before
+   * properties are loaded.
+   * 
+   * @param inputStream
    * @return {@link Properties} containing properties parsed from the stream.
    * @throws IOException
    */
   public Properties load(final InputStream inputStream) throws IOException {
     Validate.notNull(inputStream);
     final String rawContent = IOUtils.toString(inputStream, CharEncoding.UTF_8);
+    LOG.debug("[OK] loading properties from stream with content: {}", StringUtils.abbreviate(rawContent, 20));
     parseProperties(rawContent.replaceAll(REGEX_COMMENTS, ""));
     return this.properties;
   }
