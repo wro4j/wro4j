@@ -28,8 +28,8 @@ public class SingleLineCommentStripperProcessor
   /**
    * Pattern containing a regex matching singleline comments & preceding empty spaces & tabs.
    */
-  public static final Pattern PATTERN = Pattern.compile("[\\t ]*//.*?$", Pattern.MULTILINE);
-
+  public static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("comment.singleline"),
+      Pattern.MULTILINE);
 
   /**
    * {@inheritDoc}

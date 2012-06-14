@@ -121,7 +121,7 @@ public class ServletContextUriLocator
         final String fullPath = FilenameUtils.getFullPath(uri);
         final String realPath = servletContext.getRealPath(fullPath);
         if (realPath == null) {
-          final String message = "Could not determine realPath for resource: " + uri;
+          final String message = "[FAIL] determine realPath for resource: " + uri;
           LOG.error(message);
           throw new IOException(message);
         }
@@ -141,7 +141,7 @@ public class ServletContextUriLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
+      LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
     
@@ -198,7 +198,7 @@ public class ServletContextUriLocator
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {
-      LOG.error("Exception while reading resource from " + uri);
+      LOG.error("[FAIL] reading resource from " + uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
   }

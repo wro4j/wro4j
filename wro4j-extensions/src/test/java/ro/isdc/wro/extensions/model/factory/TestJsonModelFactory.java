@@ -118,10 +118,11 @@ public class TestJsonModelFactory {
       };
     };
     WroTestUtils.init(factory);
+    final WroModel expected = factory.create();
     WroTestUtils.runConcurrently(new Callable<Void>() {
       public Void call()
           throws Exception {
-        factory.create();
+        Assert.assertEquals(expected, factory.create());
         return null;
       }
     }, 10);

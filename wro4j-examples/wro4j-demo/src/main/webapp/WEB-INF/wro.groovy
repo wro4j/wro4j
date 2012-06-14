@@ -1,5 +1,14 @@
 groups {
-  
+  testPage {
+    wildcard()
+  }
+  wildcard {
+    css("/static/**.css")
+    js("/static/js/*.js")
+    css("/WEB-INF/css/*.css")
+    css("classpath:ro/isdc/wro/resources/**.cs?")
+  }
+  /*
   encoding {
     js("/static/js/encoding/*.js")
   }
@@ -33,12 +42,6 @@ groups {
   "WEBINF-css" {
     css("/WEB-INF/css/webinf.css")
   }
-  wildcard {
-    css("/static/**.css")
-    js("/static/js/*.js")
-    css("/WEB-INF/css/*.css")
-    css("classpath:ro/isdc/wro/resources/**.cs?")
-  }
   uniform {
     css("/static/css/webapp.css")
     css("/static/css/css1.css")
@@ -71,9 +74,6 @@ groups {
     groupRef("jquery-mobile")
     groupRef('WEBINF-css')
   }
-  testPage {
-    wildcard()
-  }
   test {
     css("/static/css/webapp.css")
   }
@@ -104,4 +104,5 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
+  */
 }

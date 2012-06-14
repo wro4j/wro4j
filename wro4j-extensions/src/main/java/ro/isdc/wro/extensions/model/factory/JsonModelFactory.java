@@ -42,7 +42,7 @@ public class JsonModelFactory
    * {@inheritDoc}
    */
   @Override
-  public WroModel create() {
+  public synchronized WroModel create() {
     final StopWatch stopWatch = new StopWatch("Create Wro Model from Groovy");
     try {
       stopWatch.start("createModel");

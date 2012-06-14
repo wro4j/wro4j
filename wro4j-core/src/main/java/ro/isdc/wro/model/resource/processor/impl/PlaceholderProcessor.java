@@ -20,6 +20,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -33,9 +34,7 @@ import ro.isdc.wro.util.ObjectFactory;
 public class PlaceholderProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(PlaceholderProcessor.class);
-
-  /** The url pattern */
-  private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?ims)\\$\\{((.*?))}");
+  private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile(WroUtil.loadRegexpWithKey("placeholder"));
   private static final Properties EMPTY_PROPERTIES = new Properties();
 
   /**

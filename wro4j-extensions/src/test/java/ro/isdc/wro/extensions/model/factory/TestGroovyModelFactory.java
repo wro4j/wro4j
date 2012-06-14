@@ -17,7 +17,9 @@ package ro.isdc.wro.extensions.model.factory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
@@ -29,9 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ContextPropagatingCallable;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
+import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -42,7 +49,7 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestGroovyModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestGroovyModelFactory.class);
-  private GroovyModelFactory factory;
+  private WroModelFactory factory;
 
   @Before
   public void setUp() {
@@ -152,12 +159,39 @@ public class TestGroovyModelFactory {
       };
     }; 
     WroTestUtils.init(factory);
+    final WroModel expectedModel = factory.create();
     WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
       public Void call()
           throws Exception {
-        factory.create();
+        Assert.assertEquals(expectedModel, factory.create());
         return null;
       }
-    }, 10);
+    });
+  }
+  
+  @Test
+  public void decoratedModelshouldBeThreadSafe()
+      throws Exception {
+    List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
+    modelTransformers.add(new WildcardExpanderModelTransformer());
+    
+    factory = new DefaultWroModelFactoryDecorator(new GroovyModelFactory() {
+      @Override
+      protected InputStream getModelResourceAsStream()
+          throws IOException {
+        return TestGroovyModelFactory.class.getResourceAsStream("wro.groovy");
+      };
+    }, modelTransformers);
+    WroTestUtils.init(factory);
+    final WroModel expectedModel = factory.create();
+    WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
+      @Override
+      public Void call()
+          throws Exception {
+        Assert.assertEquals(expectedModel, factory.create());
+        return null;
+      }
+    }));
   }
 }
