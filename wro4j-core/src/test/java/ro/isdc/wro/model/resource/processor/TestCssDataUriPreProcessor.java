@@ -22,6 +22,7 @@ import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
@@ -81,13 +82,13 @@ public class TestCssDataUriPreProcessor {
           public InputStream getInputStream()
               throws IOException {
             if (uri.startsWith(ServletContextResourceLocator.PREFIX)) {
-              try {
-                return new ServletContextResourceLocator(null, uri).getInputStream();
-              } catch (IOException e) {
-                return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test1.png").getInputStream();
-              }
+              return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test1.png").getInputStream();
             }
-            return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test2.png").getInputStream();
+            try {
+              return new UrlResourceLocator(uri).getInputStream();
+            } catch (IOException e) {
+              return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test2.png").getInputStream();
+            }
           }
         };
       }
