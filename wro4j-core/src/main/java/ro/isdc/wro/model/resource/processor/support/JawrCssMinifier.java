@@ -28,12 +28,13 @@ import java.util.regex.Pattern;
  */
 public class JawrCssMinifier {
   // This regex captures comments
-  private static final String COMMENT_REGEX = "(/\\*[^*]*\\*+([^/][^*]*\\*+)*/)";
+  // private static final String COMMENT_REGEX = "(?is)(/\\*[^*]*\\*+([^/][^*]*\\*+)*/)";
+  private static final String COMMENT_REGEX = "(?is)(/\\*.*?\\*/)";
 
   // Captures CSS strings
   // private static final String QUOTED_CONTENT_REGEX =
   // "('(\\\\'|[^'])*?')|(\"(\\\\\"|[^\"])*?\")";
-  private static final String QUOTED_CONTENT_REGEX = "(([\"'])(?!data:|(\\s*\\)))(?:\\\\?+.)*?\\2)";
+  private static final String QUOTED_CONTENT_REGEX = "(?s)(([\"'])(?!data:|(\\s*\\)))(?:\\\\?+.)*?\\2)";
 
   // A placeholder string to replace and restore CSS strings
   private static final String STRING_PLACEHOLDER = "______'JAWR_STRING'______";
@@ -58,10 +59,11 @@ public class JawrCssMinifier {
    */
   private static final String SPACES_REGEX = "(?ims)(\\s*\\{\\s*)|(\\s*\\}\\s*)|((?<!\\sand)\\s*\\(\\s*)|(\\s*;\\s*)|(\\s*:\\s*)|(\\s*\\))|( +)";
 
-  private static final Pattern COMMENTS_PATTERN = Pattern.compile(COMMENT_REGEX, Pattern.DOTALL);
+  private static final Pattern COMMENTS_PATTERN = Pattern.compile(COMMENT_REGEX);
+
   private static final Pattern SPACES_PATTERN = Pattern.compile(SPACES_REGEX, Pattern.DOTALL);
 
-  private static final Pattern QUOTED_CONTENT_PATTERN = Pattern.compile(QUOTED_CONTENT_REGEX, Pattern.DOTALL);
+  private static final Pattern QUOTED_CONTENT_PATTERN = Pattern.compile(QUOTED_CONTENT_REGEX);
   private static final Pattern RULES_PATTERN = Pattern.compile(RULES_REGEX, Pattern.DOTALL);
   private static final Pattern NEW_LINES_TAB_PATTERN = Pattern.compile(NEW_LINE_TABS_REGEX, Pattern.DOTALL);
   private static final Pattern STRING_PLACE_HOLDE_PATTERN = Pattern.compile(STRING_PLACEHOLDER, Pattern.DOTALL);
@@ -100,6 +102,7 @@ public class JawrCssMinifier {
   public StringBuffer minifyCSS(final StringBuffer data) {
     // Remove comments and carriage returns
     String compressed = COMMENTS_PATTERN.matcher(data.toString()).replaceAll("");
+
 
     // Temporarily replace the strings with a placeholder
     final List<String> strings = new ArrayList<String>();

@@ -30,6 +30,17 @@ public class TestJawrCssMinifierProcessor {
       processor);
   }
   
+  @Test
+  public void shouldHandleInvalidResources()
+      throws IOException {
+    final ResourcePostProcessor processor = new JawrCssMinifierProcessor();
+    
+    final URL url = getClass().getResource("jawrcss");
+    
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedInvalid");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
