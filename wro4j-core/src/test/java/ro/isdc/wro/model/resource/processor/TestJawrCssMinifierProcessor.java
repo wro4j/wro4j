@@ -30,6 +30,10 @@ public class TestJawrCssMinifierProcessor {
       processor);
   }
   
+  /**
+   * Will transform a cssless resource which was causing an infinite recursion. The test proves that transformation
+   * doesn't fail, though the transformed css is not valid anyway.
+   */
   @Test
   public void shouldHandleInvalidResources()
       throws IOException {
