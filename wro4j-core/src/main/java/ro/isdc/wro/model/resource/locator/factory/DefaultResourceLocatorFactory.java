@@ -57,8 +57,7 @@ public abstract class DefaultResourceLocatorFactory
   }
 
   /**
-   * @param uri
-   * @return
+   * @return {@link ResourceLocator} handling servletContext resources (starting with /).
    */
   protected abstract ResourceLocator newServletContextResourceLocator(final String uri);
 

@@ -17,10 +17,11 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
@@ -74,28 +75,23 @@ public class TestCssDataUriPreProcessor {
    *         proxy resources from classpath. This is useful to make test pass without internet connection.
    */
   private ResourceLocatorFactory createLocatorFactory() {
-    final ResourceLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(
-        new ServletContextResourceLocator() {
-          @Override
-          public InputStream locate(final String uri)
+    final ResourceLocatorFactory locatorFactory = new ResourceLocatorFactory() {
+      public ResourceLocator locate(final String uri) {
+        return new AbstractResourceLocator() {
+          public InputStream getInputStream()
               throws IOException {
-            try {
-              return super.locate(uri);
-            } catch (Exception e) {
-              return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test1.png").getInputStream();
+            if (uri.startsWith(ServletContextResourceLocator.PREFIX)) {
+              try {
+                return new ServletContextResourceLocator(null, uri).getInputStream();
+              } catch (IOException e) {
+                return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test1.png").getInputStream();
+              }
             }
+            return new ClasspathResourceLocator(PROXY_RESOURCE_PATH + "test2.png").getInputStream();
           }
-        }).addUriLocator(new UrlResourceLocator() {
-      @Override
-      public InputStream locate(final String uri)
-          throws IOException {
-        // avoid external connections
-        if (uri.startsWith("http")) {
-          return new ClasspathUriLocator().locate(PROXY_RESOURCE_PATH + "test2.png");
-        }
-        return super.locate(uri);
+        };
       }
-    });
+    };
     return locatorFactory;
   }
   

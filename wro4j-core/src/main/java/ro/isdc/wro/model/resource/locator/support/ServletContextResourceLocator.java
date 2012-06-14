@@ -137,13 +137,6 @@ public class ServletContextResourceLocator
   }
   
   /**
-   * @return the path
-   */
-  String getPath() {
-    return this.path;
-  }
-  
-  /**
    * {@inheritDoc}
    */
   @Override
