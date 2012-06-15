@@ -13,6 +13,7 @@ import ro.isdc.wro.http.handler.RequestHandlerSupport;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.util.WroUtil;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -31,7 +32,6 @@ import com.google.gson.GsonBuilder;
  */
 public class ExposeModelRequestHandler
     extends RequestHandlerSupport {
-  private static final Logger LOG = LoggerFactory.getLogger(ExposeModelRequestHandler.class);
   @VisibleForTesting
   static final String CONTENT_TYPE = "application/json";
   /**
@@ -54,22 +54,20 @@ public class ExposeModelRequestHandler
     // Set header
     WroUtil.addNoCacheHeaders(response);
     response.setContentType(CONTENT_TYPE);
+    response.setStatus(HttpServletResponse.SC_OK);
     
     // Build content
-    final String modelAsJson = newGson().toJson(modelFactory.create());
-    response.getWriter().write(modelAsJson);
+    newGson(request).toJson(modelFactory.create(), response.getWriter());
     response.getWriter().flush();
-
-    LOG.debug("Model served as json: {}", modelAsJson);
   }
 
   /**
    * @return customized {@link Gson} instance.
    */
-  protected Gson newGson() {
-    return new GsonBuilder().create();
+  protected Gson newGson(final HttpServletRequest request) {
+    return new GsonBuilder().registerTypeAdapter(Resource.class, new ResourceSerializer(getWroBasePath(request))).setPrettyPrinting().disableHtmlEscaping().create();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -77,4 +75,8 @@ public class ExposeModelRequestHandler
   public boolean accept(final HttpServletRequest request) {
     return WroUtil.matchesUrl(request, ENDPOINT_URI);
   }
+  
+  private String getWroBasePath(HttpServletRequest request) {
+     return request.getRequestURI().replaceAll("(?i)" + ENDPOINT_URI, "");
+   }
 }

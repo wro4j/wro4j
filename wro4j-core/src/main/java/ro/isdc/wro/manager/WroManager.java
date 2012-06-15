@@ -282,7 +282,7 @@ public class WroManager
     LOG.debug("locating stream for resourceId: {}", resourceId);
     final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
       processorsFactory.getPreProcessors());
-    if (processor != null && !processor.isUriAllowed(resourceId)) {
+    if (processor != null && (!config.isDebug() && !processor.isUriAllowed(resourceId))) {
       throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
     }
     final InputStream is = uriLocatorFactory.locate(resourceId);

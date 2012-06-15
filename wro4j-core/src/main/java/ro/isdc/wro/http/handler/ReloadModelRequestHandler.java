@@ -25,7 +25,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ReloadModelRequestHandler
     extends RequestHandlerSupport {
-  private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ReloadModelRequestHandler.class);
   /**
    * API - reload model method call
    */
