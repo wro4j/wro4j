@@ -25,6 +25,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.provider.ConfigurableProvider;
 
 
 /**
@@ -191,7 +192,11 @@ public class ConfigurableProcessorsFactory
   private List<ProcessorsProvider> discoverProcessorsProviders() {
     final List<ProcessorsProvider> contributors = new ArrayList<ProcessorsProvider>();
     try {
-      final Iterator<ProcessorsProvider> iterator = lookupProviders();
+      Iterator<? extends ProcessorsProvider> iterator = lookupProviders(ProcessorsProvider.class);
+      for (; iterator.hasNext();) {
+        contributors.add(iterator.next());
+      }
+      iterator = lookupProviders(ConfigurableProvider.class);
       for (; iterator.hasNext();) {
         contributors.add(iterator.next());
       }
@@ -207,8 +212,8 @@ public class ConfigurableProcessorsFactory
    * @VisibleForTesting
    * @return the iterator of found providers.
    */
-  Iterator<ProcessorsProvider> lookupProviders() {
-    return ServiceRegistry.lookupProviders(ProcessorsProvider.class);
+  Iterator<? extends ProcessorsProvider> lookupProviders(Class<? extends ProcessorsProvider> clazz) {
+    return ServiceRegistry.lookupProviders(clazz);
   }
   
   /**

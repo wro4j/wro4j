@@ -129,7 +129,7 @@ public class TestConfigurableProcessorsFactory {
   public void cannotContinueWhenDiscoveryOfProcessorsFails() {
     factory = new ConfigurableProcessorsFactory() {
       @Override
-      Iterator<ProcessorsProvider> lookupProviders() {
+      Iterator<? extends ProcessorsProvider> lookupProviders(Class<? extends ProcessorsProvider> clazz) {
         throw new IllegalStateException("BOOM!");
       }
     };
@@ -140,7 +140,7 @@ public class TestConfigurableProcessorsFactory {
   public void shouldNotFailWhenASingleProviderFails() {
     factory = new ConfigurableProcessorsFactory() {
       @Override
-      Iterator<ProcessorsProvider> lookupProviders() {
+      Iterator<? extends ProcessorsProvider> lookupProviders(Class<? extends ProcessorsProvider> clazz) {
         final List<ProcessorsProvider> list = new ArrayList<ProcessorsProvider>();
         list.add(new ProcessorsProvider() {
           public Map<String, ResourcePreProcessor> providePreProcessors() {
