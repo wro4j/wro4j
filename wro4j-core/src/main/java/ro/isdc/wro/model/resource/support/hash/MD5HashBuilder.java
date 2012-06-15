@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010. All rights reserved.
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.hash;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -9,17 +9,22 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Uses MD5 algorithm for creating fingerprint.
- *
+ * 
  * @author Alex Objelean
  */
 public class MD5HashBuilder
-  extends AbstractDigesterHashBuilder {
+    extends AbstractDigesterHashBuilder {
+  /**
+   * A short name of this hashBuilder.
+   */
+  public static final String ALIAS = "MD5";
+  
   /**
    * {@inheritDoc}
    */
   @Override
   protected MessageDigest newMessageDigest()
-    throws NoSuchAlgorithmException {
-    return MessageDigest.getInstance("MD5");
+      throws NoSuchAlgorithmException {
+    return MessageDigest.getInstance(ALIAS);
   }
 }

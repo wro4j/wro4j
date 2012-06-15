@@ -29,10 +29,10 @@ import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.util.HashBuilder;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
-import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 

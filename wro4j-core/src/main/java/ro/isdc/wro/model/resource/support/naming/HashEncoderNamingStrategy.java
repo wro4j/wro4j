@@ -1,13 +1,16 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashBuilder;
 
 
 /**
@@ -20,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HashEncoderNamingStrategy
   implements NamingStrategy {
+  public static final String ALIAS = "hashEncoder-CRC32";
   private HashBuilder hashBuilder = newHashBuilder();
 
 

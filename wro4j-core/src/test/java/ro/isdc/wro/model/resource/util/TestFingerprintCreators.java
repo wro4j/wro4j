@@ -9,6 +9,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.MD5HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
+
 /**
  * Test class for {@link MD5HashBuilder}
  *

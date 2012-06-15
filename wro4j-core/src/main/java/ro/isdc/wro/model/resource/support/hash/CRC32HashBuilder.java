@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010. All rights reserved.
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,10 @@ import org.slf4j.LoggerFactory;
 public class CRC32HashBuilder
   implements HashBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(CRC32HashBuilder.class);
-
+  /**
+   * A short name of this hashBuilder.
+   */
+  public static final String ALIAS = "CRC32";
   /**
    * {@inheritDoc}
    */

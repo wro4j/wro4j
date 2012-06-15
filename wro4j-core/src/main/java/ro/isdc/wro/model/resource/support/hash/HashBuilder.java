@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.IOException;
 import java.io.InputStream;

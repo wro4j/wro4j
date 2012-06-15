@@ -1,0 +1,28 @@
+package ro.isdc.wro.model.resource.support.naming;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * Default implementation of {@link NamingStrategyProvider} providing all {@link NamingStrategy} implementations from
+ * core module.
+ * 
+ * @author Alex Objelean
+ * @created 16 Jun 2012
+ * @since 1.4.7
+ */
+public class DefaultNamingStrategiesProvider
+    implements NamingStrategyProvider {
+  /**
+   * {@inheritDoc}
+   */
+  public Map<String, NamingStrategy> provideNamingStrategies() {
+    final Map<String, NamingStrategy> map = new HashMap<String, NamingStrategy>();
+    map.put(TimestampNamingStrategy.ALIAS, new TimestampNamingStrategy());
+    map.put(NoOpNamingStrategy.ALIAS, new NoOpNamingStrategy());
+    map.put(HashEncoderNamingStrategy.ALIAS, new HashEncoderNamingStrategy());
+    return map;
+  }
+  
+}

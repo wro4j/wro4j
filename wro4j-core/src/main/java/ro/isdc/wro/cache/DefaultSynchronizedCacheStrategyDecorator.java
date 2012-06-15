@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.resource.util.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashBuilder;
 
 /**
  * Responsible for invoking {@link GroupsProcessor} when cache key is missed.
