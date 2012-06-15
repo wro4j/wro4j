@@ -1,0 +1,8 @@
+!red = #ff0000
+!green = #00ff00
+body
+  :color !red
+    :background-color !red
+        :color !green
+and
+
