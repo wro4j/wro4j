@@ -95,7 +95,7 @@ public class TestWroModelAsJsonRequestHandler {
     
     assertThat(
         body,
-        is("{\"groups\":[{\"name\":\"test\",\"resources\":[{\"type\":\"JS\",\"uri\":\"test.js\",\"minimize\":true}]}]}"));
+        is("{\n  \"groups\": [\n    {\n      \"name\": \"test\",\n      \"resources\": [\n        {\n          \"type\": \"JS\",\n          \"internalUri\": \"test.js\",\n          \"externalUri\": \"wroResources?id=test.js\"\n        }\n      ]\n    }\n  ]\n}"));
   }
 
   @Test
