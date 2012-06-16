@@ -25,7 +25,7 @@ import java.io.OutputStream;
 public class ResourceProxyRequestHandler implements RequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceProxyRequestHandler.class);
 
-  public static final String PARAM_RESOURCE_ID = "ID";
+  public static final String PARAM_RESOURCE_ID = "id";
   public static final String PATH_RESOURCES = "wroResources";
   
   @Inject
