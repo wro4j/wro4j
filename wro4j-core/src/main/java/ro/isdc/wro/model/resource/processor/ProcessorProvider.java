@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
-public interface ProcessorsProvider {
+public interface ProcessorProvider {
   /**
    * @return the preProcessors to contribute. The key represents the processor alias.
    */

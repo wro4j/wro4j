@@ -12,7 +12,7 @@ import java.util.Map;
  * @created 16 Jun 2012
  * @since 1.4.7
  */
-public class DefaultNamingStrategiesProvider
+public class DefaultNamingStrategyProvider
     implements NamingStrategyProvider {
   /**
    * {@inheritDoc}

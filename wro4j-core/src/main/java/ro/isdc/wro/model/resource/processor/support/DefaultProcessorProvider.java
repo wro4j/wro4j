@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
+import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
@@ -31,8 +31,8 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
-public class DefaultProcessorsProvider
-    implements ProcessorsProvider {
+public class DefaultProcessorProvider
+    implements ProcessorProvider {
   /**
    * {@inheritDoc}
    */

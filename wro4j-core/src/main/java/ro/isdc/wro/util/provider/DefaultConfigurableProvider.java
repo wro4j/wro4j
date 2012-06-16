@@ -2,14 +2,14 @@ package ro.isdc.wro.util.provider;
 
 import java.util.Map;
 
-import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
+import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.support.DefaultProcessorsProvider;
-import ro.isdc.wro.model.resource.support.hash.DefaultHashBuildersProvider;
+import ro.isdc.wro.model.resource.processor.support.DefaultProcessorProvider;
+import ro.isdc.wro.model.resource.support.hash.DefaultHashBuilderProvider;
 import ro.isdc.wro.model.resource.support.hash.HashBuilder;
-import ro.isdc.wro.model.resource.support.hash.HashBuildersProvider;
-import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategiesProvider;
+import ro.isdc.wro.model.resource.support.hash.HashBuilderProvider;
+import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
 
@@ -22,15 +22,15 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
  */
 public class DefaultConfigurableProvider
     extends ConfigurableProviderSupport {
-  private ProcessorsProvider processorsProvider = new DefaultProcessorsProvider();
-  private NamingStrategyProvider namingStrategiesProvider = new DefaultNamingStrategiesProvider();
-  private HashBuildersProvider hashBuildersProvider = new DefaultHashBuildersProvider();
+  private ProcessorProvider processorProvider = new DefaultProcessorProvider();
+  private NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
+  private HashBuilderProvider hashBuilderProvider = new DefaultHashBuilderProvider();
   
   /**
    * {@inheritDoc}
    */
   public java.util.Map<String,ResourcePreProcessor> providePreProcessors() {
-    return processorsProvider.providePreProcessors();
+    return processorProvider.providePreProcessors();
   }
 
   /**
@@ -38,7 +38,7 @@ public class DefaultConfigurableProvider
    */
   @Override
   public Map<String, ResourcePostProcessor> providePostProcessors() {
-    return processorsProvider.providePostProcessors();
+    return processorProvider.providePostProcessors();
   }
   
   /**
@@ -46,7 +46,7 @@ public class DefaultConfigurableProvider
    */
   @Override
   public Map<String, HashBuilder> provideHashBuilders() {
-    return hashBuildersProvider.provideHashBuilders();
+    return hashBuilderProvider.provideHashBuilders();
   }
   
   /**
@@ -54,6 +54,6 @@ public class DefaultConfigurableProvider
    */
   @Override
   public Map<String, NamingStrategy> provideNamingStrategies() {
-    return namingStrategiesProvider.provideNamingStrategies();
+    return namingStrategyProvider.provideNamingStrategies();
   }
 }
