@@ -348,7 +348,8 @@ public class TestWroFilter {
     requestGroupByUri("/folder/INVALID_GROUP.css", mockFilterChain);
     verifyChainIsCalled(mockFilterChain);
   }
-  
+
+  //TODO; fix this test when AuthorizedResourcesHolder is implemented
   @Test
   public void cannotAccessUnauthorizedRequest()
       throws Exception {
