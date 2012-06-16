@@ -10,11 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +51,8 @@ public class TestExposeModelRequestHandler {
   private WroModelFactory mockModelFactory;
   
   private OutputStream outputStream;
+
+  public static String PACKAGE_PATH = "ro/isdc/wro/extensions/http/handler/";
   
   @Before
   public void setUp()
@@ -77,6 +75,8 @@ public class TestExposeModelRequestHandler {
     OutputStreamWriter writer = new OutputStreamWriter(outputStream);
     PrintWriter printWriter = new PrintWriter(writer);
     when(mockResponse.getWriter()).thenReturn(printWriter);
+
+    when(mockRequest.getRequestURI()).thenReturn("/wro/wroApi/model");
   }
   
   @Test
@@ -96,6 +96,63 @@ public class TestExposeModelRequestHandler {
     assertFalse(victim.accept(mockRequest));
   }
   
+  @Test
+  public void shouldGenerateModelAsJson()
+      throws Exception {
+    victim.handle(mockRequest, mockResponse);
+    String body = outputStream.toString();
+
+    assertThat(body, is(readJsonFile("wroModel_simple.json")));
+  }
+
+  @Test
+  public void shouldSetCorrectContentType()
+      throws IOException, ServletException {
+    when(mockRequest.getRequestURI()).thenReturn("wroAPI/model");
+    victim.handle(mockRequest, mockResponse);
+    verify(mockResponse, times(1)).setContentType("application/json");
+    verify(mockResponse, times(1)).setStatus(HttpServletResponse.SC_OK);
+  }
+
+  @Test
+  public void shouldAcceptUri() {
+    when(mockRequest.getRequestURI()).thenReturn("wroApi/model");
+    boolean accept = victim.accept(mockRequest);
+    assertThat(accept, is(true));
+  }
+  
+  @Test
+  public void shouldNotProvideProxyUriForExternalResources() throws IOException {
+    when(mockModelFactory.create()).thenReturn(createWroModelExternalModelStub());
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(mockModelFactory);
+    victim = new ExposeModelRequestHandler();
+    Injector injector = InjectorBuilder.create(managerFactory).build();
+    injector.inject(victim);
+
+    victim.handle(mockRequest, mockResponse);
+    String body = outputStream.toString();
+
+    assertThat(body, is(readJsonFile("wroModel_external.json")));
+
+  }
+
+  private WroModel createWroModelExternalModelStub() {
+    WroModel wroModel = new WroModel();
+    List<Group> wroGroups = new ArrayList<Group>();
+    wroGroups.addAll(createSimpleModelStub().getGroups());
+
+    Group extGroup = new Group("external");
+    Resource resource = new Resource();
+    resource.setType(ResourceType.CSS);
+    resource.setUri("http://www.site.com/style.css");
+    resource.setMinimize(true);
+    extGroup.addResource(resource);
+    wroGroups.add(extGroup);
+
+    wroModel.setGroups(wroGroups);
+    return wroModel;
+  }
+
   private WroModel createSimpleModelStub() {
     WroModel wroModel = new WroModel();
     List<Group> wroGroups = new ArrayList<Group>();
@@ -109,32 +166,17 @@ public class TestExposeModelRequestHandler {
     wroModel.setGroups(wroGroups);
     return wroModel;
   }
-  
-  @Test
-  public void shouldGenerateModelAsJson()
-      throws Exception {
-    when(mockRequest.getRequestURI()).thenReturn("wroApi/model");
-    victim.handle(mockRequest, mockResponse);
-    String body = outputStream.toString();
-    
-    assertThat(
-        body,
-        is("{\n  \"groups\": [\n    {\n      \"name\": \"test\",\n      \"resources\": [\n        {\n          \"type\": \"JS\",\n          \"internalUri\": \"test.js\",\n          \"externalUri\": \"wroResources?id=test.js\"\n        }\n      ]\n    }\n  ]\n}"));
-  }
-  
-  @Test
-  public void shouldSetCorrectContentType()
-      throws IOException, ServletException {
-    when(mockRequest.getRequestURI()).thenReturn("wroAPI/model");
-    victim.handle(mockRequest, mockResponse);
-    verify(mockResponse, times(1)).setContentType("application/json");
-    verify(mockResponse, times(1)).setStatus(HttpServletResponse.SC_OK);
-  }
-  
-  @Test
-  public void shouldAcceptUri() {
-    when(mockRequest.getRequestURI()).thenReturn("wroApi/model");
-    boolean accept = victim.accept(mockRequest);
-    assertThat(accept, is(true));
+
+  private String readJsonFile(String filename)
+      throws IOException {
+    InputStream is = this.getClass().getClassLoader().getResourceAsStream(PACKAGE_PATH + filename);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    StringBuilder sb = new StringBuilder();
+    String line = null;
+    while ((line = reader.readLine()) != null) {
+      sb.append(line + "\n");
+    }
+    is.close();
+    return sb.toString().trim();
   }
 }

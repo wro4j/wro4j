@@ -27,6 +27,7 @@ import com.google.gson.GsonBuilder;
  * without being merged.
  * 
  * @author Alex Objelean
+ * @author Ivar Conradi Østhus
  * @created 31 May 2012
  * @since 1.4.7
  */

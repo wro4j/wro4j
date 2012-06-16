@@ -7,14 +7,15 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import java.lang.reflect.Type;
 
 /**
- * Serializes {@link Resource} to json. It transforms the internal uri to become internalUri and also builds an
- * externalUri which the user can use do download the specific resource.
+ * Serializes {@link Resource} to json. It transforms the resources to a jsonElement which also provide a proxyUri
+ * which the user can use do download the specific resource. If the resource is external
+ * (eg. http://www.site.com/style.css) no proxyUri is provided.
  *
  * Example JSON produced by this serializer:
  * {
  *    "type": "CSS",
- *    "internalUri": "/static/css/style.css",
- *    "externalUri": "/wro/wroResources?id\u003d/static/css/style.css"
+ *    "uri": "/static/css/style.css",
+ *    "proxyUri": "/wro/wroResources?id\u003d/static/css/style.css"
  * }
  *
  * @author Ivar Conradi Østhus
@@ -33,17 +34,25 @@ public class ResourceSerializer implements JsonSerializer<Resource> {
     JsonObject jsonObject = new JsonObject();
     String uri = resource.getUri();
     jsonObject.add("type", new JsonPrimitive(resource.getType().toString()));
-    jsonObject.add("internalUri", new JsonPrimitive(uri));
-    jsonObject.add("externalUri", new JsonPrimitive(getExternalUri(uri)));
+    jsonObject.add("uri", new JsonPrimitive(uri));
+    jsonObject.add("proxyUri", new JsonPrimitive(getExternalUri(uri)));
     return jsonObject;
   }
 
   private String getExternalUri(String uri) {
+    if(isExternal(uri)) {
+      return uri;
+    }
+
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(basePath);
     stringBuilder.append(CssUrlRewritingProcessor.PATH_RESOURCES);
     stringBuilder.append("?id=");
     stringBuilder.append(uri);
     return stringBuilder.toString();
+  }
+
+  private boolean isExternal(String uri) {
+    return uri.toLowerCase().startsWith("http://");
   }
 }
