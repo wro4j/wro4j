@@ -128,20 +128,7 @@ public class WroManager
   public final void process()
     throws IOException {
     validate();
-    if (isProxyResourceRequest()) {
-      serveProxyResourceRequest();
-    } else {
-      serveProcessedBundle();
-    }
-  }
-
-
-  /**
-   * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
-   */
-  private boolean isProxyResourceRequest() {
-    final HttpServletRequest request = Context.get().getRequest();
-    return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
+    serveProcessedBundle();
   }
 
 
@@ -265,35 +252,6 @@ public class WroManager
   protected String formatVersionedResource(final String hash, final String resourcePath) {
     return String.format("%s/%s", hash, resourcePath);
   }
-
-  /**
-   * Serve images and other external resources referred by bundled resources.
-   *
-   * @param request {@link HttpServletRequest} object.
-   * @param outputStream where the stream will be written.
-   * @throws IOException if no stream could be resolved.
-   */
-  private void serveProxyResourceRequest()
-    throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final OutputStream outputStream = Context.get().getResponse().getOutputStream();
-
-    final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-    LOG.debug("locating stream for resourceId: {}", resourceId);
-    final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
-      processorsFactory.getPreProcessors());
-    if (processor != null && !processor.isUriAllowed(resourceId)) {
-      throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
-    }
-    final InputStream is = uriLocatorFactory.locate(resourceId);
-    if (is == null) {
-      throw new WroRuntimeException("Cannot process request with uri: " + request.getRequestURI());
-    }
-    IOUtils.copy(is, outputStream);
-    IOUtils.closeQuietly(is);
-    IOUtils.closeQuietly(outputStream);
-  }
-
 
   /**
    * {@inheritDoc}
