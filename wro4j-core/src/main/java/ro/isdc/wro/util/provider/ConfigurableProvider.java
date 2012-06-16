@@ -1,7 +1,7 @@
 package ro.isdc.wro.util.provider;
 
-import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
-import ro.isdc.wro.model.resource.support.hash.HashBuildersProvider;
+import ro.isdc.wro.model.resource.processor.ProcessorProvider;
+import ro.isdc.wro.model.resource.support.hash.HashBuilderProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
 
 /**
@@ -12,5 +12,5 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
  * @since 1.4.7
  */
 public interface ConfigurableProvider
-    extends ProcessorsProvider, NamingStrategyProvider, HashBuildersProvider {
+    extends ProcessorProvider, NamingStrategyProvider, HashBuilderProvider {
 }

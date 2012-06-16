@@ -24,7 +24,7 @@ import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
+import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
@@ -41,7 +41,7 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @created 1 Jun 2012
  */
 public class DefaultProcessorsProvider
-    implements ProcessorsProvider {
+    implements ProcessorProvider {
   /**
    * {@inheritDoc}
    */

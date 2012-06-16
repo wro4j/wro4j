@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
  * @created 16 Jun 2012
  * @since 1.4.7
  */
-public interface HashBuildersProvider {
+public interface HashBuilderProvider {
   /**
    * @return the {@link HashBuilder} implementations to contribute. The key represents the alias.
    */
