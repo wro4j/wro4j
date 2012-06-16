@@ -1,14 +1,19 @@
 package ro.isdc.wro.http.handler;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
+import com.sun.xml.internal.ws.encoding.ContentType;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
+import javax.activation.FileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,6 +36,8 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   @Inject
   private UriLocatorFactory uriLocatorFactory;
 
+  private FileTypeMap fileTypeMap = FileTypeMap.getDefaultFileTypeMap();
+
   public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
     if(!hasAccessToResource(resourceUri)) {
@@ -43,9 +50,13 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     if (is == null) {
       throw new WroRuntimeException("Cannot process request with uri: " + request.getRequestURI());
     }
-    IOUtils.copy(is, outputStream);
+
+    int length = IOUtils.copy(is, outputStream);
     IOUtils.closeQuietly(is);
     IOUtils.closeQuietly(outputStream);
+
+    response.setContentLength(length);
+    response.setContentType(getContentType(resourceUri));
   }
 
   /**
@@ -75,6 +86,18 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    */
   private boolean hasAccessToResource(String resourceUri) {
     return true;
+  }
+
+  private String getContentType(String resourceUri) {
+    if(resourceUri.toLowerCase().endsWith(".css")) {
+      return "text/css";
+    } else if(resourceUri.toLowerCase().endsWith(".js")) {
+      return "application/javascript";
+    } else if(resourceUri.toLowerCase().endsWith(".png")) {
+      return "image/png";
+    } else {
+      return fileTypeMap.getContentType(resourceUri);
+    }
   }
 
 }

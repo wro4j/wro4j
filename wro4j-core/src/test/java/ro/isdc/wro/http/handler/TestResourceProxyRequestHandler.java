@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -14,6 +15,7 @@ import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +36,10 @@ public class TestResourceProxyRequestHandler {
   private HttpServletRequest request;
   @Mock
   private HttpServletResponse response;
+  @Mock
+  private ServletContext servletContext;
+  @Mock
+  private FilterConfig filterConfig;
 
   private OutputStream outputStream;
 
@@ -46,7 +52,8 @@ public class TestResourceProxyRequestHandler {
     MockitoAnnotations.initMocks(this);
     victim = new ResourceProxyRequestHandler();
 
-    Context.set(Context.webContext(request, response, mock(FilterConfig.class)));
+    Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
+    Context.set(Context.webContext(request, response, filterConfig));
 
     WroTestUtils.createInjector().inject(victim);
 
@@ -118,6 +125,50 @@ public class TestResourceProxyRequestHandler {
     verify(uriLocator, times(1)).locate(resourceUri);
     assertThat(body, is(expectedBody));
   }
+  
+  @Test
+  public void shouldSetResponseLength() throws IOException {
+    String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+    
+    victim.handle(request, response);
+    int expectedLength = IOUtils.toString(getInputStream("test.css")).length();
+
+    verify(response, times(1)).setContentLength(expectedLength);
+  }
+
+  @Test
+  public void shouldSetCSSContentType() throws IOException {
+    String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+
+    victim.handle(request, response);
+
+    verify(response, times(1)).setContentType("text/css");
+  }
+  
+  @Test
+  public void shouldSetJSContentType()
+      throws IOException {
+    String resourceUri = "classpath:" + packagePath + "/" + "test.js";
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+    
+    victim.handle(request, response);
+    
+    verify(response, times(1)).setContentType("application/javascript");
+  }
+  
+  @Test
+  public void shouldSetPNGContentType()
+      throws IOException {
+    String resourceUri = "classpath:" + packagePath + "/" + "test.png";
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+    
+    victim.handle(request, response);
+    
+    verify(response, times(1)).setContentType("image/png");
+  }
+
 
   private InputStream getInputStream(String filename) throws IOException {
     return this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);
