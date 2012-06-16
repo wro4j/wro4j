@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.IOException;
 import java.io.InputStream;

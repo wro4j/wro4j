@@ -16,7 +16,7 @@
 * This was inspired by TestFingerprintCreatorNamingStrategy.
 */
 
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import static junit.framework.Assert.assertEquals;
 
