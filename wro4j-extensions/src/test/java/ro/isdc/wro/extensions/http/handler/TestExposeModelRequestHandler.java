@@ -35,6 +35,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -51,8 +52,6 @@ public class TestExposeModelRequestHandler {
   private WroModelFactory mockModelFactory;
   
   private OutputStream outputStream;
-
-  public static String PACKAGE_PATH = "ro/isdc/wro/extensions/http/handler/";
   
   @Before
   public void setUp()
@@ -169,7 +168,8 @@ public class TestExposeModelRequestHandler {
 
   private String readJsonFile(String filename)
       throws IOException {
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream(PACKAGE_PATH + filename);
+    String packagePath = WroUtil.toPackageAsFolder(this.getClass());
+    InputStream is = this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);
     BufferedReader reader = new BufferedReader(new InputStreamReader(is));
     StringBuilder sb = new StringBuilder();
     String line = null;
