@@ -18,6 +18,7 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
    */
   public DefaultRequestHandlerFactory() {
     Collection<RequestHandler> requestHandlers = new ArrayList<RequestHandler>();
+    requestHandlers.add(new ResourceProxyRequestHandler());
     requestHandlers.add(new ReloadCacheRequestHandler());
     requestHandlers.add(new ReloadModelRequestHandler());
     setHandlers(requestHandlers);
