@@ -1,0 +1,14 @@
+{
+  "groups": [
+    {
+      "name": "test",
+      "resources": [
+        {
+          "type": "JS",
+          "uri": "test.js",
+          "proxyUri": "/wro/wroResources?id=test.js"
+        }
+      ]
+    }
+  ]
+}
