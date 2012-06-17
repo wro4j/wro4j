@@ -21,9 +21,9 @@ import ro.isdc.wro.WroRuntimeException;
  *
  * @author Alex Objelean
  */
-public abstract class AbstractDigesterHashBuilder
-  implements HashBuilder {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterHashBuilder.class);
+public abstract class AbstractDigesterHashStrategy
+  implements HashStrategy {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterHashStrategy.class);
 
 
   /**

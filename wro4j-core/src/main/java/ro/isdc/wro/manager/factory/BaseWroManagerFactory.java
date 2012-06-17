@@ -28,7 +28,7 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
@@ -51,7 +51,7 @@ public class BaseWroManagerFactory
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
   private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  private HashBuilder hashBuilder;
+  private HashStrategy hashBuilder;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and
    * processed.
@@ -178,9 +178,9 @@ public class BaseWroManagerFactory
 
 
   /**
-   * @return {@link HashBuilder} instance.
+   * @return {@link HashStrategy} instance.
    */
-  protected HashBuilder newHashBuilder() {
+  protected HashStrategy newHashBuilder() {
     return new SHA1HashBuilder();
   }
 
@@ -265,7 +265,7 @@ public class BaseWroManagerFactory
   /**
    * @param hashBuilder the hashBuilder to set
    */
-  public BaseWroManagerFactory setHashBuilder(final HashBuilder hashBuilder) {
+  public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
     this.hashBuilder = hashBuilder;
     return this;
   }

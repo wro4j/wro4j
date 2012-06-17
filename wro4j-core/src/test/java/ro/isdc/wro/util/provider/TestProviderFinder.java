@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ProcessorProvider;
-import ro.isdc.wro.model.resource.support.hash.HashBuilderProvider;
+import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
 
 /**
@@ -32,7 +32,7 @@ public class TestProviderFinder {
   
   @Test
   public void shouldFindHashBuilderProviders() {
-    victim = ProviderFinder.of(HashBuilderProvider.class);
+    victim = ProviderFinder.of(HashStrategyProvider.class);
     Assert.assertFalse(victim.find().isEmpty());
   }
   

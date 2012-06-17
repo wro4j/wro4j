@@ -11,7 +11,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.HashEncoderNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
@@ -28,8 +28,8 @@ public class TestFingerprintCreatorNamingStrategy {
   public void setUp() {
     namingStrategy = new HashEncoderNamingStrategy() {
       @Override
-      protected HashBuilder newHashBuilder() {
-        return new HashBuilder() {
+      protected HashStrategy newHashBuilder() {
+        return new HashStrategy() {
           public String getHash(final InputStream inputStream)
             throws IOException {
             return HASH;

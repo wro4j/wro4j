@@ -17,9 +17,10 @@ import org.slf4j.LoggerFactory;
  * Uses CRC32 algorithm for creating fingerprint.
  *
  * @author Alex Objelean
+ * @deprecated use {@link CRC32HashStrategy} instead
  */
 public class CRC32HashBuilder
-  implements HashBuilder {
+  implements HashStrategy {
   private static final Logger LOG = LoggerFactory.getLogger(CRC32HashBuilder.class);
   /**
    * A short name of this hashBuilder.

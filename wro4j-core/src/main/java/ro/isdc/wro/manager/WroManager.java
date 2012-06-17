@@ -43,7 +43,7 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
@@ -90,7 +90,7 @@ public class WroManager
    * HashBuilder for creating a hash based on the processed content.
    */
   @Inject
-  private HashBuilder hashBuilder;
+  private HashStrategy hashBuilder;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
@@ -385,14 +385,14 @@ public class WroManager
   /**
    * @param contentDigester the contentDigester to set
    */
-  public final WroManager setHashBuilder(final HashBuilder contentDigester) {
+  public final WroManager setHashBuilder(final HashStrategy contentDigester) {
     Validate.notNull(contentDigester);
     this.hashBuilder = contentDigester;
     return this;
   }
 
   
-  public final HashBuilder getHashBuilder() {
+  public final HashStrategy getHashBuilder() {
     return hashBuilder;
   }
 

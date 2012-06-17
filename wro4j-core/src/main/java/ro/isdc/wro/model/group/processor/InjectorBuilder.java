@@ -29,7 +29,7 @@ import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
@@ -52,7 +52,7 @@ public class InjectorBuilder {
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
-  private HashBuilder hashBuilder = new SHA1HashBuilder();
+  private HashStrategy hashBuilder = new SHA1HashBuilder();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
@@ -158,8 +158,8 @@ public class InjectorBuilder {
         return decorated;
       }
     });
-    map.put(HashBuilder.class, new InjectorObjectFactory<HashBuilder>() {
-      public HashBuilder create() {
+    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
+      public HashStrategy create() {
         return hashBuilder;
       }
     });

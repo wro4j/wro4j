@@ -1,16 +1,11 @@
-/*
- * Copyright (C) 2010.
- * All rights reserved.
- */
 package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Creates a fingerprint representation of the resource content.
- *
  * @author Alex Objelean
+ * @deprecated use {@link HashStrategy} instead.
  */
 public interface HashBuilder {
   /**

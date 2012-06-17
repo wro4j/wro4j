@@ -6,9 +6,9 @@ import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DefaultProcessorProvider;
-import ro.isdc.wro.model.resource.support.hash.DefaultHashBuilderProvider;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
-import ro.isdc.wro.model.resource.support.hash.HashBuilderProvider;
+import ro.isdc.wro.model.resource.support.hash.DefaultHashStrategyProvider;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
@@ -24,7 +24,7 @@ public class DefaultConfigurableProvider
     extends ConfigurableProviderSupport {
   private ProcessorProvider processorProvider = new DefaultProcessorProvider();
   private NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
-  private HashBuilderProvider hashBuilderProvider = new DefaultHashBuilderProvider();
+  private HashStrategyProvider hashBuilderProvider = new DefaultHashStrategyProvider();
   
   /**
    * {@inheritDoc}
@@ -45,8 +45,8 @@ public class DefaultConfigurableProvider
    * {@inheritDoc}
    */
   @Override
-  public Map<String, HashBuilder> provideHashBuilders() {
-    return hashBuilderProvider.provideHashBuilders();
+  public Map<String, HashStrategy> provideHashStrategies() {
+    return hashBuilderProvider.provideHashStrategies();
   }
   
   /**

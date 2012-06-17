@@ -11,11 +11,12 @@ import java.security.NoSuchAlgorithmException;
  * Uses SHA1 algorithm for creating fingerprint.
  * 
  * @author Alex Objelean
+ * @deprecated use {@link SHA1HashStrategy} instead.
  */
 public class SHA1HashBuilder
-    extends AbstractDigesterHashBuilder {
+    extends AbstractDigesterHashStrategy {
   /**
-   * A short name of this hashBuilder.
+   * A short name of this strategy.
    */
   public static final String ALIAS = "SHA-1";
   

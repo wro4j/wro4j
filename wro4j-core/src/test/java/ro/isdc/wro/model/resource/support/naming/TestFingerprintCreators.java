@@ -10,7 +10,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashBuilder;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
 
@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
  * @created 15 Aug 2010
  */
 public class TestFingerprintCreators {
-  private HashBuilder fingerprintCreator;
+  private HashStrategy fingerprintCreator;
 
   @Test
   public void testMD5() throws Exception {

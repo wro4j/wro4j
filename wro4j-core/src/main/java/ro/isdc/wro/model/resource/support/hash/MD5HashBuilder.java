@@ -11,9 +11,10 @@ import java.security.NoSuchAlgorithmException;
  * Uses MD5 algorithm for creating fingerprint.
  * 
  * @author Alex Objelean
+ * @deprecated use {@link MD5HashStrategy} instead
  */
 public class MD5HashBuilder
-    extends AbstractDigesterHashBuilder {
+    extends AbstractDigesterHashStrategy {
   /**
    * A short name of this hashBuilder.
    */

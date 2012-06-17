@@ -35,17 +35,19 @@ public class TestConfigurableNamingStrategy {
   
   @Test
   public void shouldUseNoOpNamingStrategyByDefault() {
-    Assert.assertSame(NoOpNamingStrategy.class, victim.getConfiguredNamingStrategy().getClass());
+    Assert.assertSame(NoOpNamingStrategy.class, victim.getConfiguredStrategy().getClass());
   }
   
   @Test(expected = WroRuntimeException.class)
   public void cannotConfigureInvalidAlias() {
-    victim.setProperties(buildPropsForAlias("invalidStrategy")).getConfiguredNamingStrategy();
+    victim.setProperties(buildPropsForAlias("invalidStrategy"));
+    victim.getConfiguredStrategy();
   }
   
   @Test(expected = WroRuntimeException.class)
   public void cannotConfigureInvalidAliases() {
-    victim.setProperties(buildPropsForAlias(NoOpNamingStrategy.ALIAS + ", invalidOne")).getConfiguredNamingStrategy();
+    victim.setProperties(buildPropsForAlias(NoOpNamingStrategy.ALIAS + ", invalidOne"));
+    victim.getConfiguredStrategy();
   }
 
   @Test
@@ -64,7 +66,8 @@ public class TestConfigurableNamingStrategy {
   }
   
   private void shouldUseCorrectStrategyForValidAlias(final Class<?> strategyClass, final String alias) {
-    final NamingStrategy actual = victim.setProperties(buildPropsForAlias(alias)).getConfiguredNamingStrategy();
+    victim.setProperties(buildPropsForAlias(alias));
+    final NamingStrategy actual = victim.getConfiguredStrategy();
     Assert.assertSame(strategyClass, actual.getClass());
   }
   
@@ -79,13 +82,14 @@ public class TestConfigurableNamingStrategy {
     final String mockAlias = "mock";
     victim = new ConfigurableNamingStrategy() {
       @Override
-      protected Map<String, NamingStrategy> newNamingStrategyMap() { 
+      protected Map<String, NamingStrategy> newStrategyMap() { 
         final Map<String, NamingStrategy> map = new HashMap<String, NamingStrategy>();
         map.put(mockAlias, mockNamingStrategy);
         return map;
       }
     };
-    final NamingStrategy actual = victim.setProperties(buildPropsForAlias(mockAlias)).getConfiguredNamingStrategy();
+    victim.setProperties(buildPropsForAlias(mockAlias));
+    final NamingStrategy actual = victim.getConfiguredStrategy();
     Assert.assertSame(mockNamingStrategy, actual);
   }
   

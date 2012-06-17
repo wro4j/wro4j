@@ -10,7 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 
 /**
@@ -24,13 +24,13 @@ import ro.isdc.wro.model.resource.support.hash.HashBuilder;
 public class HashEncoderNamingStrategy
   implements NamingStrategy {
   public static final String ALIAS = "hashEncoder-CRC32";
-  private HashBuilder hashBuilder = newHashBuilder();
+  private HashStrategy hashBuilder = newHashBuilder();
 
 
   /**
-   * @return an implementation of {@link HashBuilder}.
+   * @return an implementation of {@link HashStrategy}.
    */
-  protected HashBuilder newHashBuilder() {
+  protected HashStrategy newHashBuilder() {
     return new CRC32HashBuilder();
   }
 

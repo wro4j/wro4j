@@ -15,16 +15,16 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
  * @created 16 Jun 2012
  * @since 1.4.7
  */
-public class DefaultHashBuilderProvider
-    implements HashBuilderProvider {
+public class DefaultHashStrategyProvider
+    implements HashStrategyProvider {
   /**
    * {@inheritDoc}
    */
-  public Map<String, HashBuilder> provideHashBuilders() {
-    final Map<String, HashBuilder> map = new HashMap<String, HashBuilder>();
-    map.put(CRC32HashBuilder.ALIAS, new CRC32HashBuilder());
-    map.put(MD5HashBuilder.ALIAS, new MD5HashBuilder());
-    map.put(SHA1HashBuilder.ALIAS, new SHA1HashBuilder());
+  public Map<String, HashStrategy> provideHashStrategies() {
+    final Map<String, HashStrategy> map = new HashMap<String, HashStrategy>();
+    map.put(CRC32HashStrategy.ALIAS, new CRC32HashStrategy());
+    map.put(MD5HashStrategy.ALIAS, new MD5HashStrategy());
+    map.put(SHA1HashStrategy.ALIAS, new SHA1HashStrategy());
     return map;
   }
   

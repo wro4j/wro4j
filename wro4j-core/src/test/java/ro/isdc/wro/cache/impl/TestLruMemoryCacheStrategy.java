@@ -14,7 +14,7 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 /**
  * Tests the {@link LruMemoryCacheStrategy} class.
@@ -33,7 +33,7 @@ public class TestLruMemoryCacheStrategy {
 
   @Test
   public void testLruCache() throws IOException {
-    HashBuilder builder = new CRC32HashBuilder();
+    HashStrategy builder = new CRC32HashBuilder();
     CacheEntry key1 = new CacheEntry("testGroup01", ResourceType.JS, false);
     CacheEntry key2 = new CacheEntry("testGroup02", ResourceType.CSS, false);
     CacheEntry key3 = new CacheEntry("testGroup03", ResourceType.JS, false);

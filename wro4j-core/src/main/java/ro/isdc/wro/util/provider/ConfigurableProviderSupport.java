@@ -5,7 +5,7 @@ import java.util.Map;
 
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
@@ -42,7 +42,7 @@ public class ConfigurableProviderSupport
   /**
    * {@inheritDoc}
    */
-  public Map<String, HashBuilder> provideHashBuilders() {
-    return new HashMap<String, HashBuilder>();
+  public Map<String, HashStrategy> provideHashStrategies() {
+    return new HashMap<String, HashStrategy>();
   }
 }
