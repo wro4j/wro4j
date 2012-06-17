@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,17 +49,20 @@ public class ConfigurableNamingStrategy
    * @return the {@link NamingStrategy} whose alias is found configured in the properties. This method will never return
    *         null. If no alias is defined the {@link NoOpNamingStrategy} will be returned. If an invalid alias is
    *         provided - a runtime exception will be thrown.
+   * @VisibleForTesting
    */
-  private NamingStrategy getConfiguredNamingStrategy() {
+  NamingStrategy getConfiguredNamingStrategy() {
     final String alias = getProperties().getProperty(PARAM_NAMING_STRATEGY);
     NamingStrategy namingStrategy = new NoOpNamingStrategy(); 
     if (!StringUtils.isEmpty(alias)) {
+      LOG.debug("configured alias: {}", alias);
       namingStrategy = getNamingStrategyMap().get(alias);
       if (namingStrategy == null) {
-        throw new WroRuntimeException("Invalid namingStrategy alias provided: " + alias + ". Available aliases are: "
+        throw new WroRuntimeException("Invalid namingStrategy alias provided: <" + alias + ">. Available aliases are: "
             + getNamingStrategyMap().keySet());
       }
     }
+    LOG.debug("using NamingStrategy: {}", namingStrategy);
     return namingStrategy;
   }
 
@@ -68,7 +72,7 @@ public class ConfigurableNamingStrategy
    */
   protected Map<String, NamingStrategy> newNamingStrategyMap() {
     final Map<String, NamingStrategy> map = new HashMap<String, NamingStrategy>();
-    final List<NamingStrategyProvider> providers = providerFinder.find();
+    final List<NamingStrategyProvider> providers = getProviderFinder().find();
     for (NamingStrategyProvider provider : providers) {
       map.putAll(provider.provideNamingStrategies());
     }
@@ -99,12 +103,23 @@ public class ConfigurableNamingStrategy
   protected Properties newProperties() {
     return new Properties();
   }
+  
+  /**
+   * @param props
+   *          {@link Properties} containing configured alias.
+   * @return reference to this {@link ConfigurableNamingStrategy}.
+   */
+  public ConfigurableNamingStrategy setProperties(final Properties props) {
+    Validate.notNull(props);
+    this.properties = props;
+    return this;
+  }
 
   /**
    * @VisibleForTesting
    * @return the {@link ProviderFinder} used to find all {@link ProcessorProvider}'s.
    */
-  ProviderFinder<NamingStrategyProvider> getProcessorProviderFinder() {
+  ProviderFinder<NamingStrategyProvider> getProviderFinder() {
     if (providerFinder == null) {
       providerFinder = ProviderFinder.of(NamingStrategyProvider.class);
     }
