@@ -13,12 +13,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 
 /**
  * @author Alex Objelean
  */
-public class ConfigurableHashStrategyTest {
+public class TestConfigurableHashStrategy {
 
   @Mock
   private HashStrategy mockHashStrategy;
@@ -49,7 +48,7 @@ public class ConfigurableHashStrategyTest {
   
   @Test(expected = WroRuntimeException.class)
   public void cannotConfigureInvalidAliases() {
-    victim.setProperties(buildPropsForAlias(NoOpNamingStrategy.ALIAS + ", invalidOne"));
+    victim.setProperties(buildPropsForAlias(CRC32HashStrategy.ALIAS + ", invalidOne"));
     victim.getConfiguredStrategy();
   }
 
