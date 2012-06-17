@@ -33,8 +33,8 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.HashBuilder;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
 
 
@@ -174,6 +174,6 @@ public class TestInjectorBuilder {
     @Inject
     CacheStrategy<?, ?> cacheStrategy;
     @Inject
-    HashBuilder hashBuilder;
+    HashStrategy hashBuilder;
   }
 }

@@ -29,10 +29,10 @@ import ro.isdc.wro.model.resource.locator.factory.InjectorAwareResourceLocatorFa
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.util.HashBuilder;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
-import ro.isdc.wro.model.resource.util.SHA1HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 
@@ -53,7 +53,7 @@ public class InjectorBuilder {
   private ResourceLocatorFactory resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
-  private HashBuilder hashBuilder = new SHA1HashBuilder();
+  private HashStrategy hashStrategy = new SHA1HashStrategy();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
@@ -159,9 +159,9 @@ public class InjectorBuilder {
         return decorated;
       }
     });
-    map.put(HashBuilder.class, new InjectorObjectFactory<HashBuilder>() {
-      public HashBuilder create() {
-        return hashBuilder;
+    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
+      public HashStrategy create() {
+        return hashStrategy;
       }
     });
   }
@@ -180,7 +180,7 @@ public class InjectorBuilder {
     modelFactory = manager.getModelFactory();
     groupExtractor = manager.getGroupExtractor();
     cacheStrategy = manager.getCacheStrategy();
-    hashBuilder = manager.getHashBuilder();
+    hashStrategy = manager.getHashStrategy();
     modelTransformers = manager.getModelTransformers();
     return this;
   }

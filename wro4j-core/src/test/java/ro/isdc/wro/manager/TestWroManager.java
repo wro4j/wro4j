@@ -55,8 +55,8 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
-import ro.isdc.wro.model.resource.util.MD5HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
@@ -449,7 +449,7 @@ public class TestWroManager {
   public void testCRC32Fingerprint()
       throws Exception {
     final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new CRC32HashBuilder()).create();
+        new CRC32HashStrategy()).create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
@@ -458,7 +458,7 @@ public class TestWroManager {
   public void testMD5Fingerprint()
       throws Exception {
     final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new MD5HashBuilder()).create();
+        new MD5HashStrategy()).create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }

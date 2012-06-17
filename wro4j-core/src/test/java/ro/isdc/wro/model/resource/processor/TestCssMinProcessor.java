@@ -33,7 +33,7 @@ public class TestCssMinProcessor {
   @Test
   public void shouldHandleWrongCss()
       throws Exception {
-    final ResourcePostProcessor processor = new ExceptionHandlingProcessorDecorator(new CssMinProcessor());
+    final ResourceProcessor processor = new ExceptionHandlingProcessorDecorator(new CssMinProcessor());
     
     final URL url = getClass().getResource("cssmin");
     

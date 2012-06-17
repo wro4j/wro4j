@@ -37,7 +37,7 @@ public class TestJawrCssMinifierProcessor {
   @Test
   public void shouldHandleInvalidResources()
       throws IOException {
-    final ResourcePostProcessor processor = new JawrCssMinifierProcessor();
+    final ResourceProcessor processor = new JawrCssMinifierProcessor();
     
     final URL url = getClass().getResource("jawrcss");
     

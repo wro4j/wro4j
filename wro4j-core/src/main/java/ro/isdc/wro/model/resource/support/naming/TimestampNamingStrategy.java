@@ -11,7 +11,7 @@
  * either express or implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.InputStream;
 
@@ -28,6 +28,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class TimestampNamingStrategy
     implements NamingStrategy {
+  /**
+   * Alias used identify this implementation when configuring which {@link NamingStrategy} to use.
+   */
+  public static final String ALIAS = "timestamp";
   /**
    * {@inheritDoc}
    */

@@ -18,6 +18,10 @@ import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
 /**
@@ -62,28 +66,68 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
       }
-
-      /**
-       * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
-       */
-      private void updatePropertiesWithProcessors(final Properties props, final String paramName) {
-        final FilterConfig filterConfig = Context.get().getFilterConfig();
-        // first, retrieve value from init-param for backward compatibility
-        final String processorsAsString = filterConfig.getInitParameter(paramName);
-        if (processorsAsString != null) {
-          props.setProperty(paramName, processorsAsString);
-        } else {
-          // retrieve value from configProperties file
-          final String value = getConfigProperties().getProperty(paramName);
-          if (value != null) {
-            props.setProperty(paramName, value);
-          }
-        }
-      }
     };
     return factory;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected NamingStrategy newNamingStrategy() {
+    return new ConfigurableNamingStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithProcessors(props, ConfigurableNamingStrategy.KEY);
+        return props;
+      }
+    };
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected HashStrategy newHashStrategy() {
+    return new ConfigurableHashStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithProcessors(props, ConfigurableHashStrategy.KEY);
+        return props;
+
+      }
+    };
+  }
+  
+  /**
+   * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
+   */
+  private void updatePropertiesWithProcessors(final Properties props, final String paramName) {
+    final FilterConfig filterConfig = Context.get().getFilterConfig();
+    // first, retrieve value from init-param for backward compatibility
+    final String processorsAsString = filterConfig.getInitParameter(paramName);
+    if (processorsAsString != null) {
+      props.setProperty(paramName, processorsAsString);
+    } else {
+      // retrieve value from configProperties file
+      final String value = getConfigProperties().getProperty(paramName);
+      if (value != null) {
+        props.setProperty(paramName, value);
+      }
+    }
+  }
+
+  /**
+   * Use this method rather than accessing the field directly, because it will create a default one if none is provided.
+   */
+  private Properties getConfigProperties() {
+    if (configProperties == null) {
+      configProperties = newConfigProperties();
+    }
+    return configProperties;
+  }
 
   /**
    * Override this method to provide a different config properties file location. It is very likely that you would like
@@ -103,18 +147,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     }
     return props;
   }
-
-
-  /**
-   * Use this method rather than accessing the field directly, because it will create a default one if none is provided.
-   */
-  private Properties getConfigProperties() {
-    if (configProperties == null) {
-      configProperties = newConfigProperties();
-    }
-    return configProperties;
-  }
-
 
   /**
    * Setter is useful for unit tests.

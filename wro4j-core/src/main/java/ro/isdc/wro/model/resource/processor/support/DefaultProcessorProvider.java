@@ -3,7 +3,7 @@ package ro.isdc.wro.model.resource.processor.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
+import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
@@ -28,8 +28,8 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
-public class DefaultProcessorsProvider
-    implements ProcessorsProvider {
+public class DefaultProcessorProvider
+    implements ProcessorProvider {
   /**
    * {@inheritDoc}
    */

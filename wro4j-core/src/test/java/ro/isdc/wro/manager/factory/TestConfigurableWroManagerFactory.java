@@ -32,6 +32,13 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
+import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.TimestampNamingStrategy;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -188,5 +195,43 @@ public class TestConfigurableWroManagerFactory {
     initFactory(mockFilterConfig);
     factory.setConfigProperties(configProperties);
     processorsFactory.getPostProcessors();
+  }
+  
+  @Test(expected = WroRuntimeException.class)
+  public void cannotConfigureInvalidNamingStrategy() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableNamingStrategy.KEY, "INVALID");
+    initFactory(mockFilterConfig);
+    factory.setConfigProperties(configProperties);
+    factory.create().getNamingStrategy().rename("name", WroUtil.EMPTY_STREAM);
+  }
+  
+  @Test
+  public void shouldUseConfiguredNamingStrategy() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableNamingStrategy.KEY, TimestampNamingStrategy.ALIAS);
+    initFactory(mockFilterConfig);
+    factory.setConfigProperties(configProperties);
+    final NamingStrategy actual = ((ConfigurableNamingStrategy) factory.create().getNamingStrategy()).getConfiguredStrategy();
+    Assert.assertEquals(TimestampNamingStrategy.class, actual.getClass());
+  }
+  
+  @Test(expected = WroRuntimeException.class)
+  public void cannotConfigureInvalidHashStrategy() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableHashStrategy.KEY, "INVALID");
+    initFactory(mockFilterConfig);
+    factory.setConfigProperties(configProperties);
+    factory.create().getHashStrategy().getHash(WroUtil.EMPTY_STREAM);
+  }
+  
+  @Test
+  public void shouldUseConfiguredHashStrategy() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableHashStrategy.KEY, MD5HashStrategy.ALIAS);
+    initFactory(mockFilterConfig);
+    factory.setConfigProperties(configProperties);
+    final HashStrategy actual = ((ConfigurableHashStrategy) factory.create().getHashStrategy()).getConfiguredStrategy();
+    Assert.assertEquals(MD5HashStrategy.class, actual.getClass());
   }
 }
