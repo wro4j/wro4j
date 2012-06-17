@@ -63,12 +63,13 @@ public class ProviderFinder<T> {
     }
     return providers;
   }
-
+  
   /**
    * Collects also providers of type {@link ConfigurableProvider} if the T type is a supertype of
    * {@link ConfigurableProvider}.
    * 
-   * @param providers the list where found providers will be added.
+   * @param providers
+   *          the list where found providers will be added.
    */
   @SuppressWarnings("unchecked")
   private void collectConfigurableProviders(final List<T> providers) {
@@ -85,10 +86,12 @@ public class ProviderFinder<T> {
   /**
    * This method is useful for mocking the lookup operation.
    * 
+   * @param clazz
+   *          the class of the provider to lookup.
    * @VisibleForTesting
    * @return the iterator of found providers.
    */
-  <F> Iterator<F> lookupProviders(Class<F> clazz) {
+  <P> Iterator<P> lookupProviders(Class<P> clazz) {
     return ServiceRegistry.lookupProviders(clazz);
   }
 }
