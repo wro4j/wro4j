@@ -35,7 +35,6 @@ public abstract class AbstractDigesterHashStrategy
       throw new IllegalArgumentException("Content cannot be null!");
     }
     try {
-      LOG.debug("creating hash using SHA1 algorithm");
       final MessageDigest messageDigest = newMessageDigest();
       final InputStream digestIs = new DigestInputStream(input, messageDigest);
       // read till the end
