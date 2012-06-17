@@ -39,7 +39,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
-import ro.isdc.wro.http.handler.RequestHandlerFactory;
+import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;

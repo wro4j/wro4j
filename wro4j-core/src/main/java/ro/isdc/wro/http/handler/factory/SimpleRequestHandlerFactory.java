@@ -1,9 +1,11 @@
-package ro.isdc.wro.http.handler;
+package ro.isdc.wro.http.handler.factory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.lang3.Validate;
+
+import ro.isdc.wro.http.handler.RequestHandler;
 
 
 /**

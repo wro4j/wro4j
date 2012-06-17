@@ -34,10 +34,13 @@ public class ResourceProxyRequestHandler implements RequestHandler {
 
   private FileTypeMap fileTypeMap = FileTypeMap.getDefaultFileTypeMap();
 
+  /**
+   * {@inheritDoc}
+   */
   public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
-    if(!hasAccessToResource(resourceUri)) {
-      accessDeniedResponse(resourceUri, response);
+    if(!isAccessible(resourceUri)) {
+      denyRequest(resourceUri);
     }
 
     OutputStream outputStream = response.getOutputStream();
@@ -48,7 +51,8 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     }
 
     int length = IOUtils.copy(is, outputStream);
-
+    
+    //set the content length & type before the stream is closed
     response.setContentLength(length);
     response.setContentType(getContentType(resourceUri));
     response.setStatus(HttpServletResponse.SC_OK);
@@ -71,7 +75,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     return true;
   }
 
-  private void accessDeniedResponse(String resourceUri, HttpServletResponse response) {
+  private void denyRequest(final String resourceUri) {
     throw new UnauthorizedRequestException("Unauthorized resource request detected! " + resourceUri);
   }
 
@@ -80,13 +84,16 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    * Verifies that the user has access or not to the requested resource
    *
    * @param resourceUri of the resource to be proxied.
-   * @return
+   * @return true if the uri can be accessed.
    */
-  private boolean hasAccessToResource(String resourceUri) {
+  private boolean isAccessible(final String resourceUri) {
     return true;
   }
 
-  private String getContentType(String resourceUri) {
+  /**
+   * TODO move contentType detection to a separate class.
+   */
+  private String getContentType(final String resourceUri) {
     if (resourceUri.toLowerCase().endsWith(".css")) {
       return "text/css";
     } else if (resourceUri.toLowerCase().endsWith(".js")) {

@@ -1,4 +1,4 @@
-package ro.isdc.wro.http.handler;
+package ro.isdc.wro.http.handler.factory;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -7,6 +7,9 @@ import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.http.handler.factory.DefaultRequestHandlerFactory;
 
 
 /**
