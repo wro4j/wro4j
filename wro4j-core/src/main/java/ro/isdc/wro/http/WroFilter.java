@@ -301,7 +301,6 @@ public class WroFilter
     final HttpServletRequest request = (HttpServletRequest)req;
     final HttpServletResponse response = (HttpServletResponse)res;
     try {
-
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
 
