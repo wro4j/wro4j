@@ -1,5 +1,6 @@
-package ro.isdc.wro.model.resource.support.naming;
+package ro.isdc.wro.model.resource.support.hash;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -12,20 +13,22 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-
+import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 
 /**
  * @author Alex Objelean
  */
-public class TestConfigurableNamingStrategy {
+public class ConfigurableHashStrategyTest {
+
   @Mock
-  private NamingStrategy mockNamingStrategy;
-  private ConfigurableNamingStrategy victim;
+  private HashStrategy mockHashStrategy;
+  
+  private ConfigurableHashStrategy victim;
   
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    victim = new ConfigurableNamingStrategy();
+    victim = new ConfigurableHashStrategy();
   }
   
   @Test(expected = NullPointerException.class)
@@ -35,7 +38,7 @@ public class TestConfigurableNamingStrategy {
   
   @Test
   public void shouldUseNoOpNamingStrategyByDefault() {
-    Assert.assertSame(NoOpNamingStrategy.class, victim.getConfiguredStrategy().getClass());
+    Assert.assertSame(SHA1HashStrategy.class, victim.getConfiguredStrategy().getClass());
   }
   
   @Test(expected = WroRuntimeException.class)
@@ -51,52 +54,53 @@ public class TestConfigurableNamingStrategy {
   }
 
   @Test
-  public void shouldUseNoOpStrategyForValidAlias() {
-    shouldUseCorrectStrategyForValidAlias(NoOpNamingStrategy.class, NoOpNamingStrategy.ALIAS);
+  public void shouldUseCRC32StrategyForValidAlias() {
+    shouldUseCorrectStrategyForValidAlias(CRC32HashStrategy.class, CRC32HashStrategy.ALIAS);
   }
   
   @Test
   public void shouldUseTimestampNamingStrategyForValidAlias() {
-    shouldUseCorrectStrategyForValidAlias(TimestampNamingStrategy.class, TimestampNamingStrategy.ALIAS);
+    shouldUseCorrectStrategyForValidAlias(MD5HashStrategy.class, MD5HashStrategy.ALIAS);
   }
 
   @Test
   public void shouldUseHashEncoderStrategyForValidAlias() {
-    shouldUseCorrectStrategyForValidAlias(HashEncoderNamingStrategy.class, HashEncoderNamingStrategy.ALIAS);
+    shouldUseCorrectStrategyForValidAlias(SHA1HashStrategy.class, SHA1HashStrategy.ALIAS);
   }
   
   private void shouldUseCorrectStrategyForValidAlias(final Class<?> strategyClass, final String alias) {
     victim.setProperties(buildPropsForAlias(alias));
-    final NamingStrategy actual = victim.getConfiguredStrategy();
+    final HashStrategy actual = victim.getConfiguredStrategy();
     Assert.assertSame(strategyClass, actual.getClass());
   }
   
   private Properties buildPropsForAlias(final String alias) {
     final Properties props = new Properties();
-    props.setProperty(ConfigurableNamingStrategy.KEY, alias);
+    props.setProperty(ConfigurableHashStrategy.KEY, alias);
     return props;
   }
   
   @Test
-  public void shouldUseOverridenNamingStrategyMap() {
+  public void shouldUseOverridenStrategyMap() {
     final String mockAlias = "mock";
-    victim = new ConfigurableNamingStrategy() {
+    victim = new ConfigurableHashStrategy() {
       @Override
-      protected Map<String, NamingStrategy> newStrategyMap() { 
-        final Map<String, NamingStrategy> map = new HashMap<String, NamingStrategy>();
-        map.put(mockAlias, mockNamingStrategy);
+      protected Map<String, HashStrategy> newStrategyMap() { 
+        final Map<String, HashStrategy> map = new HashMap<String, HashStrategy>();
+        map.put(mockAlias, mockHashStrategy);
         return map;
       }
     };
     victim.setProperties(buildPropsForAlias(mockAlias));
-    final NamingStrategy actual = victim.getConfiguredStrategy();
-    Assert.assertSame(mockNamingStrategy, actual);
+    final HashStrategy actual = victim.getConfiguredStrategy();
+    Assert.assertSame(mockHashStrategy, actual);
   }
   
   @Test
-  public void shouldRenameWithConfiguredStrategy()
+  public void shouldHashWithConfiguredStrategy()
       throws Exception {
-    final String orignalName = "original.js";
-    Assert.assertEquals(orignalName, victim.rename(orignalName, null));
+    Assert.assertEquals("8151325dcdbae9e0ff95f9f9658432dbedfdb209",
+        victim.getHash(new ByteArrayInputStream("sample".getBytes())));
   }
+
 }

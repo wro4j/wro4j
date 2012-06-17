@@ -2,19 +2,9 @@ package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableStrategy;
-import ro.isdc.wro.util.provider.ProviderFinder;
 
 
 /**
@@ -30,7 +20,7 @@ public class ConfigurableNamingStrategy
   /**
    * Property name to specify namingStrategy alias.
    */
-  public static final String PARAM_NAMING_STRATEGY = "namingStrategy";
+  public static final String KEY = "namingStrategy";
   
   /**
    * {@inheritDoc}
@@ -61,6 +51,6 @@ public class ConfigurableNamingStrategy
    */
   @Override
   protected String getStrategyKey() {
-    return PARAM_NAMING_STRATEGY;
+    return KEY;
   }
 }

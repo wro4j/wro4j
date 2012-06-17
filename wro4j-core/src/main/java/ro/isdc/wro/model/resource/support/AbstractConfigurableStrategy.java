@@ -35,14 +35,7 @@ public abstract class AbstractConfigurableStrategy<S, P> {
   private ProviderFinder<P> providerFinder;
   private Map<String, S> map;
   private Properties properties;
-  private Class<P> providerClass;
 
-  @SuppressWarnings("unchecked")
-  public AbstractConfigurableStrategy() {
-    Type type = getClass().getGenericSuperclass();
-    providerClass = (Class<P>) ((ParameterizedType) type).getActualTypeArguments()[1];
-  }
-  
   /**
    * @return the {@link HashStrategy} whose alias is found configured in the properties. This method will never return
    *         null. If no alias is defined the {@link SHA1HashBuilder} will be returned. If an invalid alias is provided
@@ -116,9 +109,18 @@ public abstract class AbstractConfigurableStrategy<S, P> {
    */
   protected final ProviderFinder<P> getProviderFinder() {
     if (providerFinder == null) {
-      providerFinder = ProviderFinder.of(providerClass);
+      providerFinder = ProviderFinder.of(getProviderClass());
     }
     return providerFinder;
+  }
+  
+  /**
+   * @return the class of the provider of type P. Uses {@link ParameterizedType} to compute the class.
+   */
+  @SuppressWarnings("unchecked")  
+  private Class<P> getProviderClass() {
+    final Type type = getClass().getGenericSuperclass();
+    return (Class<P>) ((ParameterizedType) type).getActualTypeArguments()[1];
   }
   
   /**
