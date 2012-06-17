@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.InputStream;
 
@@ -14,6 +14,10 @@ import java.io.InputStream;
  */
 public class NoOpNamingStrategy
   implements NamingStrategy {
+  /**
+   * A short name of this naming strategy.
+   */
+  public static final String ALIAS = "noOp";
   /**
    * {@inheritDoc}
    */

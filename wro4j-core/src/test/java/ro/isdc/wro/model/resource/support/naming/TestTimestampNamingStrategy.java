@@ -16,12 +16,15 @@
 * This was inspired by TestFingerprintCreatorNamingStrategy.
 */
 
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import static junit.framework.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.TimestampNamingStrategy;
 
 /**
  * Test class for {@link TimestampNamingStrategy}

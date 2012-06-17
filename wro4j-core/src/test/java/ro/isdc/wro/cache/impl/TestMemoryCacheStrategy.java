@@ -13,8 +13,8 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
-import ro.isdc.wro.model.resource.util.HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 /**
  * Tests the {@link MemoryCacheStrategy} class.
@@ -33,7 +33,7 @@ public class TestMemoryCacheStrategy {
 
   @Test
   public void testCache() throws IOException {
-    HashBuilder builder = new CRC32HashBuilder();
+    HashStrategy builder = new CRC32HashStrategy();
     CacheEntry key = new CacheEntry("testGroup", ResourceType.JS, false);
 
     String content = "var foo = 'Hello World';";

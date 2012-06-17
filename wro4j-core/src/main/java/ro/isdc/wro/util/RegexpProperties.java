@@ -46,7 +46,6 @@ public class RegexpProperties {
   public Properties load(final InputStream inputStream) throws IOException {
     Validate.notNull(inputStream);
     final String rawContent = IOUtils.toString(inputStream, CharEncoding.UTF_8);
-    LOG.debug("[OK] loading properties from stream with content: {}", StringUtils.abbreviate(rawContent, 20));
     parseProperties(rawContent.replaceAll(REGEX_COMMENTS, ""));
     return this.properties;
   }

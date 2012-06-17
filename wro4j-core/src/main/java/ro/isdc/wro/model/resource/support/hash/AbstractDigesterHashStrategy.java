@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010. All rights reserved.
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,9 +21,9 @@ import ro.isdc.wro.WroRuntimeException;
  *
  * @author Alex Objelean
  */
-public abstract class AbstractDigesterHashBuilder
-  implements HashBuilder {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterHashBuilder.class);
+public abstract class AbstractDigesterHashStrategy
+  implements HashStrategy {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterHashStrategy.class);
 
 
   /**
@@ -35,7 +35,6 @@ public abstract class AbstractDigesterHashBuilder
       throw new IllegalArgumentException("Content cannot be null!");
     }
     try {
-      LOG.debug("creating hash using SHA1 algorithm");
       final MessageDigest messageDigest = newMessageDigest();
       final InputStream digestIs = new DigestInputStream(input, messageDigest);
       // read till the end

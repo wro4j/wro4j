@@ -1,13 +1,16 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 
 /**
@@ -20,14 +23,15 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HashEncoderNamingStrategy
   implements NamingStrategy {
-  private HashBuilder hashBuilder = newHashBuilder();
+  public static final String ALIAS = "hashEncoder-CRC32";
+  private HashStrategy hashStrategy = newHashStrategy();
 
 
   /**
-   * @return an implementation of {@link HashBuilder}.
+   * @return an implementation of {@link HashStrategy}.
    */
-  protected HashBuilder newHashBuilder() {
-    return new CRC32HashBuilder();
+  protected HashStrategy newHashStrategy() {
+    return new CRC32HashStrategy();
   }
 
   /**
@@ -37,7 +41,7 @@ public class HashEncoderNamingStrategy
     throws IOException {
     final String baseName = FilenameUtils.getBaseName(originalName);
     final String extension = FilenameUtils.getExtension(originalName);
-    final String hash = hashBuilder.getHash(inputStream);
+    final String hash = hashStrategy.getHash(inputStream);
     final StringBuilder sb = new StringBuilder(baseName).append("-").append(hash);
     if (!StringUtils.isEmpty(extension)) {
       sb.append(".").append(extension);
