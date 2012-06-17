@@ -40,7 +40,7 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
-public class DefaultProcessorsProvider
+public class DefaultProcessorProvider
     implements ProcessorProvider {
   /**
    * {@inheritDoc}

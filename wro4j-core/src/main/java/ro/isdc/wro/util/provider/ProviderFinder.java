@@ -54,11 +54,11 @@ public class ProviderFinder<T> {
       for (; iterator.hasNext();) {
         final T provider = iterator.next();
         LOG.debug("found provider: {}", provider);
-        providers.add(iterator.next());
+        providers.add(provider);
       }
       collectConfigurableProviders(providers);
     } catch (Exception e) {
-      LOG.error("Failed to discover ProcessorsProviders using ServiceRegistry. Cannot continue...", e);
+      LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
       WroUtil.wrapWithWroRuntimeException(e);
     }
     return providers;
@@ -92,6 +92,7 @@ public class ProviderFinder<T> {
    * @return the iterator of found providers.
    */
   <P> Iterator<P> lookupProviders(Class<P> clazz) {
+    LOG.debug("searching for providers of type : {}", clazz);
     return ServiceRegistry.lookupProviders(clazz);
   }
 }
