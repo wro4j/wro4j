@@ -6,7 +6,6 @@ package ro.isdc.wro.model.resource.processor.factory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -20,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.processor.ProcessorsProvider;
+import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.provider.ProviderFinder;
 
 
 /**
@@ -51,11 +50,12 @@ public class ConfigurableProcessorsFactory
    */
   public static final String PARAM_POST_PROCESSORS = "postProcessors";
   /**
-   * Properties object
+   * Holds the configurations describing available processors.
    */
   private Properties properties;
   private Map<String, ResourcePreProcessor> preProcessorsMap;
   private Map<String, ResourcePostProcessor> postProcessorsMap;
+  private ProviderFinder<ProcessorProvider> processorProviderFinder;
   
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
@@ -184,33 +184,7 @@ public class ConfigurableProcessorsFactory
     this.properties = properties;
     return this;
   }
-  
-  /**
-   * @return the list of all {@link ProcessorsProvider} found in classpath.
-   */
-  private List<ProcessorsProvider> discoverProcessorsProviders() {
-    final List<ProcessorsProvider> contributors = new ArrayList<ProcessorsProvider>();
-    try {
-      final Iterator<ProcessorsProvider> iterator = lookupProviders();
-      for (; iterator.hasNext();) {
-        contributors.add(iterator.next());
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to discover ProcessorsProviders using ServiceRegistry. Cannot continue...", e);
-      WroUtil.wrapWithWroRuntimeException(e);
-    }
-    return contributors;
-  }
 
-  /**
-   * This method is useful for mocking the lookup operation.
-   * @VisibleForTesting
-   * @return the iterator of found providers.
-   */
-  Iterator<ProcessorsProvider> lookupProviders() {
-    return ServiceRegistry.lookupProviders(ProcessorsProvider.class);
-  }
-  
   /**
    * By default the processor will be discovered using {@link ServiceRegistry} pattern (by inspecting META-INF/services
    * folder of each dependency).
@@ -220,8 +194,8 @@ public class ConfigurableProcessorsFactory
   protected Map<String, ResourcePreProcessor> newPreProcessorsMap() {
     // TODO: reuse duplicated code.
     final Map<String, ResourcePreProcessor> resultMap = new HashMap<String, ResourcePreProcessor>();
-    final List<ProcessorsProvider> providers = discoverProcessorsProviders();
-    for (ProcessorsProvider provider : providers) {
+    final List<ProcessorProvider> providers = getProcessorProviderFinder().find();
+    for (ProcessorProvider provider : providers) {
       try {
         final Map<String, ResourcePreProcessor> map = provider.providePreProcessors();
         for (Map.Entry<String, ResourcePreProcessor> entry : map.entrySet()) {
@@ -239,6 +213,17 @@ public class ConfigurableProcessorsFactory
   }
   
   /**
+   * @VisibleForTesting
+   * @return the {@link ProviderFinder} used to find all {@link ProcessorProvider}'s.
+   */
+  ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
+    if (processorProviderFinder == null) {
+      processorProviderFinder = ProviderFinder.of(ProcessorProvider.class);
+    }
+    return processorProviderFinder;
+  }
+  
+  /**
    * By default the processor will be discovered using {@link ServiceRegistry} pattern (by inspecting META-INF/services
    * folder of each dependency).
    * 
@@ -247,8 +232,8 @@ public class ConfigurableProcessorsFactory
   protected Map<String, ResourcePostProcessor> newPostProcessorsMap() {
     // TODO: reuse duplicated code.
     final Map<String, ResourcePostProcessor> resultMap = new HashMap<String, ResourcePostProcessor>();
-    final List<ProcessorsProvider> providers = discoverProcessorsProviders();
-    for (ProcessorsProvider provider : providers) {
+    final List<ProcessorProvider> providers = getProcessorProviderFinder().find();
+    for (ProcessorProvider provider : providers) {
       try {
         final Map<String, ResourcePostProcessor> map = provider.providePostProcessors();
         for (Map.Entry<String, ResourcePostProcessor> entry : map.entrySet()) {

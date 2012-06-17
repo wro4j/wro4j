@@ -52,8 +52,8 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.util.CRC32HashBuilder;
-import ro.isdc.wro.model.resource.util.MD5HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
@@ -419,11 +419,34 @@ public class TestWroManager {
     managerFactory.create().process();
   }
   
+  @Test(expected = UnauthorizedRequestException.class)
+  public void testProxyUnauthorizedRequest()
+      throws Exception {
+    processProxyWithResourceId("test");
+  }
+  
+  private void processProxyWithResourceId(final String resourceId)
+      throws IOException {
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourceId);
+    Mockito.when(request.getRequestURI()).thenReturn(
+        CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
+    
+    final WroConfiguration config = new WroConfiguration();
+    // we don't need caching here, otherwise we'll have clashing during unit tests.
+    config.setDisableCache(true);
+    
+    Context.set(
+        Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+            Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
+    managerFactory.create().process();
+  }
+  
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
     final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new CRC32HashBuilder()).create();
+        new CRC32HashStrategy()).create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
@@ -432,7 +455,7 @@ public class TestWroManager {
   public void testMD5Fingerprint()
       throws Exception {
     final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new MD5HashBuilder()).create();
+        new MD5HashStrategy()).create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }

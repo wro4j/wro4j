@@ -1,7 +1,4 @@
-/*
- * Copyright (C) 2010. All rights reserved.
- */
-package ro.isdc.wro.model.resource.util;
+package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,16 +9,20 @@ import java.util.zip.Checksum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Uses CRC32 algorithm for creating fingerprint.
- *
+ * 
  * @author Alex Objelean
+ * @since 1.4.7
+ * @created 17 Jun 2012
  */
-public class CRC32HashBuilder
-  implements HashBuilder {
-  private static final Logger LOG = LoggerFactory.getLogger(CRC32HashBuilder.class);
-
+public class CRC32HashStrategy
+    implements HashStrategy {
+  private static final Logger LOG = LoggerFactory.getLogger(CRC32HashStrategy.class);
+  /**
+   * A short name of this hashBuilder.
+   */
+  public static final String ALIAS = "CRC32";
   /**
    * {@inheritDoc}
    */
