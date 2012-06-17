@@ -53,4 +53,12 @@ public class ConfigurableHashStrategy
   protected Map<String, HashStrategy> getStrategies(final HashStrategyProvider provider) {
     return provider.provideHashStrategies();
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Class<HashStrategyProvider> getProviderClass() {
+    return HashStrategyProvider.class;
+  }
 }

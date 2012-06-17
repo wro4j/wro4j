@@ -28,8 +28,9 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.hash.HashBuilder;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
@@ -51,7 +52,7 @@ public class BaseWroManagerFactory
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
   private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  private HashStrategy hashBuilder;
+  private HashStrategy hashStrategy;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and
    * processed.
@@ -76,8 +77,8 @@ public class BaseWroManagerFactory
       if (cacheStrategy == null) {
         cacheStrategy = newCacheStrategy();
       }
-      if (hashBuilder == null) {
-        hashBuilder = newHashBuilder();
+      if (hashStrategy == null) {
+        hashStrategy = newHashStrategy();
       }
       if (modelTransformers == null) {
         modelTransformers = newModelTransformers();
@@ -90,12 +91,12 @@ public class BaseWroManagerFactory
       }
       //use NoOp as default naming strategy
       if (namingStrategy == null) {
-        namingStrategy = new NoOpNamingStrategy();
+        namingStrategy = newNamingStrategy();
       }
 
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
-      manager.setHashBuilder(hashBuilder);
+      manager.setHashBuilder(hashStrategy);
       manager.setUriLocatorFactory(uriLocatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
@@ -147,7 +148,7 @@ public class BaseWroManagerFactory
   public NamingStrategy getNamingStrategy() {
     return namingStrategy;
   }
-
+  
   /**
    * @return default implementation of modelTransformers.
    */
@@ -180,8 +181,15 @@ public class BaseWroManagerFactory
   /**
    * @return {@link HashStrategy} instance.
    */
-  protected HashStrategy newHashBuilder() {
-    return new SHA1HashBuilder();
+  protected HashStrategy newHashStrategy() {
+    return new SHA1HashStrategy();
+  }
+  
+  /**
+   * @return default {@link NamingStrategy} to be used by this {@link WroManagerFactory} 
+   */
+  protected NamingStrategy newNamingStrategy() {
+    return new NoOpNamingStrategy();
   }
 
   /**
@@ -266,7 +274,7 @@ public class BaseWroManagerFactory
    * @param hashBuilder the hashBuilder to set
    */
   public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
-    this.hashBuilder = hashBuilder;
+    this.hashStrategy = hashBuilder;
     return this;
   }
 

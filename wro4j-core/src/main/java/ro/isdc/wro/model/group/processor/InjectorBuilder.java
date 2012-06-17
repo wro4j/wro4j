@@ -30,7 +30,7 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
@@ -52,7 +52,7 @@ public class InjectorBuilder {
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
-  private HashStrategy hashBuilder = new SHA1HashBuilder();
+  private HashStrategy hashStrategy = new SHA1HashStrategy();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
@@ -160,7 +160,7 @@ public class InjectorBuilder {
     });
     map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
       public HashStrategy create() {
-        return hashBuilder;
+        return hashStrategy;
       }
     });
   }
@@ -179,7 +179,7 @@ public class InjectorBuilder {
     modelFactory = manager.getModelFactory();
     groupExtractor = manager.getGroupExtractor();
     cacheStrategy = manager.getCacheStrategy();
-    hashBuilder = manager.getHashBuilder();
+    hashStrategy = manager.getHashStrategy();
     modelTransformers = manager.getModelTransformers();
     return this;
   }

@@ -9,7 +9,7 @@ import java.io.InputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 
@@ -24,14 +24,14 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 public class HashEncoderNamingStrategy
   implements NamingStrategy {
   public static final String ALIAS = "hashEncoder-CRC32";
-  private HashStrategy hashBuilder = newHashBuilder();
+  private HashStrategy hashStrategy = newHashStrategy();
 
 
   /**
    * @return an implementation of {@link HashStrategy}.
    */
-  protected HashStrategy newHashBuilder() {
-    return new CRC32HashBuilder();
+  protected HashStrategy newHashStrategy() {
+    return new CRC32HashStrategy();
   }
 
   /**
@@ -41,7 +41,7 @@ public class HashEncoderNamingStrategy
     throws IOException {
     final String baseName = FilenameUtils.getBaseName(originalName);
     final String extension = FilenameUtils.getExtension(originalName);
-    final String hash = hashBuilder.getHash(inputStream);
+    final String hash = hashStrategy.getHash(inputStream);
     final StringBuilder sb = new StringBuilder(baseName).append("-").append(hash);
     if (!StringUtils.isEmpty(extension)) {
       sb.append(".").append(extension);

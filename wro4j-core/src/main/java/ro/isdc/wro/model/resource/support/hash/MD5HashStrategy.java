@@ -1,5 +1,8 @@
 package ro.isdc.wro.model.resource.support.hash;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Uses MD5 algorithm for creating fingerprint.
  * 
@@ -8,5 +11,18 @@ package ro.isdc.wro.model.resource.support.hash;
  * @created 17 Jun 2012
  */
 public class MD5HashStrategy
-    extends MD5HashBuilder {
+    extends AbstractDigesterHashStrategy {
+  /**
+   * A short name of this hashBuilder.
+   */
+  public static final String ALIAS = "MD5";
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected MessageDigest newMessageDigest()
+      throws NoSuchAlgorithmException {
+    return MessageDigest.getInstance(ALIAS);
+  }
 }

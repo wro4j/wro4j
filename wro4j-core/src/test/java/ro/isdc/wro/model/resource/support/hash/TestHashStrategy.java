@@ -1,7 +1,7 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.model.resource.support.naming;
+package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.ByteArrayInputStream;
 
@@ -9,24 +9,24 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.support.hash.CRC32HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.MD5HashBuilder;
-import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
+import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
+import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 
 /**
- * Test class for {@link MD5HashBuilder}
+ * Test class for {@link HashStrategy}
  *
  * @author Alex Objelean
  * @created 15 Aug 2010
  */
-public class TestFingerprintCreators {
+public class TestHashStrategy {
   private HashStrategy fingerprintCreator;
 
   @Test
   public void testMD5() throws Exception {
     final String input = "testString";
-    fingerprintCreator = new MD5HashBuilder();
+    fingerprintCreator = new MD5HashStrategy();
     final String hash = fingerprintCreator.getHash(new ByteArrayInputStream(input.getBytes()));
     Assert.assertEquals("536788f4dbdffeecfbb8f350a941eea3", hash);
   }
@@ -34,7 +34,7 @@ public class TestFingerprintCreators {
   @Test
   public void testSHA1() throws Exception {
     final String input = "testString";
-    fingerprintCreator = new SHA1HashBuilder();
+    fingerprintCreator = new SHA1HashStrategy();
     final String hash = fingerprintCreator.getHash(new ByteArrayInputStream(input.getBytes()));
     Assert.assertEquals("956265657d0b637ef65b9b59f9f858eecf55ed6a", hash);
   }
@@ -42,7 +42,7 @@ public class TestFingerprintCreators {
   @Test
   public void testCRC32() throws Exception {
     final String input = "testString";
-    fingerprintCreator = new CRC32HashBuilder();
+    fingerprintCreator = new CRC32HashStrategy();
     final String hash = fingerprintCreator.getHash(new ByteArrayInputStream(input.getBytes()));
     Assert.assertEquals("18f4fd08", hash);
   }

@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.SHA1HashBuilder;
 import ro.isdc.wro.util.provider.ProviderFinder;
 
 
@@ -115,10 +114,11 @@ public abstract class AbstractConfigurableStrategy<S, P> {
   }
   
   /**
-   * @return the class of the provider of type P. Uses {@link ParameterizedType} to compute the class.
+   * @return the class of the provider of type P. Uses {@link ParameterizedType} to compute the class. Override it to
+   *         support anonymous classes which do not play well with {@link ParameterizedType}'s.
    */
   @SuppressWarnings("unchecked")  
-  private Class<P> getProviderClass() {
+  protected Class<P> getProviderClass() {
     final Type type = getClass().getGenericSuperclass();
     return (Class<P>) ((ParameterizedType) type).getActualTypeArguments()[1];
   }

@@ -53,4 +53,12 @@ public class ConfigurableNamingStrategy
   protected String getStrategyKey() {
     return KEY;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Class<NamingStrategyProvider> getProviderClass() {
+    return NamingStrategyProvider.class;
+  }
 }
