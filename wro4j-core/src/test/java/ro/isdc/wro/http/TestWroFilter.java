@@ -664,7 +664,7 @@ public class TestWroFilter {
   @After
   public void tearDown() {
     if (victim != null) {
-      //victim.destroy();
+      victim.destroy();
     }
     Context.unset();
   }
