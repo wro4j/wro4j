@@ -1,20 +1,22 @@
 package ro.isdc.wro.http.handler;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.http.support.UnauthorizedRequestException;
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.activation.FileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.http.support.UnauthorizedRequestException;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
 /**
  * Provides access to wro resources via a resource proxy.
@@ -32,12 +34,12 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   @Inject
   private UriLocatorFactory uriLocatorFactory;
 
-  private FileTypeMap fileTypeMap = FileTypeMap.getDefaultFileTypeMap();
+  private final FileTypeMap fileTypeMap = FileTypeMap.getDefaultFileTypeMap();
 
   /**
    * {@inheritDoc}
    */
-  public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
     if(!isAccessible(resourceUri)) {
       denyRequest(resourceUri);
@@ -46,6 +48,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     OutputStream outputStream = response.getOutputStream();
     LOG.debug("locating stream for resourceId: {}", resourceUri);
     final InputStream is = uriLocatorFactory.locate(resourceUri);
+    // TODO remove. This check is not required, since the factory will throw IOException anyway.
     if (is == null) {
       throw new WroRuntimeException("Cannot process request with uri: " + request.getRequestURI());
     }
@@ -64,7 +67,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   /**
    * {@inheritDoc}
    */
-  public boolean accept(HttpServletRequest request) {
+  public boolean accept(final HttpServletRequest request) {
     return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
   }
 
@@ -76,7 +79,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   }
 
   private void denyRequest(final String resourceUri) {
-    throw new UnauthorizedRequestException("Unauthorized resource request detected! " + resourceUri);
+    throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
   }
 
   /**
@@ -87,7 +90,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    * @return true if the uri can be accessed.
    */
   private boolean isAccessible(final String resourceUri) {
-    return true;
+    return false;
   }
 
   /**

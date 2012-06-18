@@ -70,19 +70,36 @@ public class TestWroFilter {
   private FilterChain mockFilterChain;
   @Mock
   private ServletContext mockServletContext;
+  @Mock
+  private WroManagerFactory mockManagerFactory;
   
   @Before
   public void setUp()
       throws Exception {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
-    filter = new WroFilter();
+
+    Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    mockManagerFactory = Mockito.spy(new BaseWroManagerFactory());
+
+    filter = new WroFilter() {
+      @Override
+      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
+          final FilterChain chain) {
+        throw e;
+      }
+    };
     initFilter(filter);
   }
   
+  private void initChainOnErrorFilter()
+      throws ServletException {
+    filter = new WroFilter();
+    initFilter(filter);
+  }
+
   private void initFilter(final WroFilter filter)
       throws ServletException {
-    Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     filter.init(mockFilterConfig);
   }
   
@@ -134,11 +151,9 @@ public class TestWroFilter {
   @Test
   public void shouldUseInitiallySetManagerEvenIfAnInvalidAppFactoryClassNameIsSet()
       throws Exception {
-    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
     filter.setWroManagerFactory(mockManagerFactory);
     Mockito.when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
         "Invalid value");
-    filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
     Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
   }
@@ -212,7 +227,6 @@ public class TestWroFilter {
     Mockito.when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
         BaseWroManagerFactory.class.getName());
     
-    final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
     filter.setWroManagerFactory(mockManagerFactory);
     
     filter.init(mockFilterConfig);
@@ -332,6 +346,7 @@ public class TestWroFilter {
   @Test
   public void cannotProcessInvalidUri()
       throws Exception {
+    initChainOnErrorFilter();
     requestGroupByUri("", mockFilterChain);
     verifyChainIsCalled(mockFilterChain);
   }
@@ -339,17 +354,19 @@ public class TestWroFilter {
   @Test
   public void requestValidGroup()
       throws Exception {
+    initChainOnErrorFilter();
     requestGroupByUri("/folder/g1.css");
   }
   
   @Test
   public void requestInvalidGroup()
       throws Exception {
+    initChainOnErrorFilter();
     requestGroupByUri("/folder/INVALID_GROUP.css", mockFilterChain);
     verifyChainIsCalled(mockFilterChain);
   }
-
-  //TODO; fix this test when AuthorizedResourcesHolder is implemented
+  
+  // TODO; fix this test when AuthorizedResourcesHolder is implemented
   @Test
   public void cannotAccessUnauthorizedRequest()
       throws Exception {
@@ -383,12 +400,12 @@ public class TestWroFilter {
   }
   
   private void requestGroupByUri(final String requestUri)
-      throws IOException, ServletException {
+      throws Exception {
     requestGroupByUri(requestUri, new RequestBuilder(requestUri), mockFilterChain);
   }
   
   private void requestGroupByUri(final String requestUri, final FilterChain chain)
-      throws IOException, ServletException {
+      throws Exception {
     requestGroupByUri(requestUri, new RequestBuilder(requestUri), chain);
   }
   
@@ -396,13 +413,11 @@ public class TestWroFilter {
   public void testDoFilterInDEPLOYMENTMode()
       throws Exception {
     initFilterWithValidConfig();
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(request.getRequestURI()).thenReturn("/g2.js");
+    Mockito.when(mockRequest.getRequestURI()).thenReturn("/g2.js");
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
     Mockito.when(mockResponse.getOutputStream()).thenReturn(sos);
     setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
-    filter.init(mockFilterConfig);
-    filter.doFilter(request, mockResponse, mockFilterChain);
+    filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
   
   /**
@@ -411,7 +426,7 @@ public class TestWroFilter {
    * @param requestUri
    */
   private void requestGroupByUri(final String requestUri, final RequestBuilder requestBuilder, final FilterChain chain)
-      throws IOException, ServletException {
+      throws Exception {
     initFilterWithValidConfig();
     final HttpServletRequest request = requestBuilder.newRequest();
     final ServletOutputStream sos = Mockito.mock(ServletOutputStream.class);
@@ -421,7 +436,7 @@ public class TestWroFilter {
   }
   
   private void requestGroupByUri(final String requestUri, final RequestBuilder requestBuilder)
-      throws IOException, ServletException {
+      throws Exception {
     requestGroupByUri(requestUri, requestBuilder, mockFilterChain);
   }
   
@@ -631,14 +646,6 @@ public class TestWroFilter {
   @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullRequestHandlers()
       throws Exception {
-    filter = new WroFilter() {
-      @Override
-      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-          final FilterChain chain) {
-        throw e;
-      }
-    };
-    initFilter(filter);
     filter.setRequestHandlerFactory(new RequestHandlerFactory() {
       public Collection<RequestHandler> create() {
         return null;
@@ -652,6 +659,39 @@ public class TestWroFilter {
     filter.setRequestHandlerFactory(null);
   }
   
+  @Test(expected = UnauthorizedRequestException.class)
+  public void testProxyUnauthorizedRequest()
+      throws Exception {
+    processProxyWithResourceId("test");
+  }
+  
+  private void processProxyWithResourceId(final String resourceId)
+      throws Exception {
+    Mockito.when(mockRequest.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourceId);
+    Mockito.when(mockRequest.getRequestURI()).thenReturn(
+        CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
+    
+    final WroConfiguration config = new WroConfiguration();
+    // we don't need caching here, otherwise we'll have clashing during unit tests.
+    config.setDisableCache(true);
+    
+    Context.set(
+        Context.webContext(mockRequest, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+            Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
+    filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+  }
+  
+  /**
+   * Initialize {@link WroConfiguration} object with cacheUpdatePeriod & modelUpdatePeriod equal with provided argument.
+   */
+  private WroConfiguration newConfigWithUpdatePeriodValue(final long periodValue) {
+    final WroConfiguration config = new WroConfiguration();
+    config.setCacheUpdatePeriod(periodValue);
+    config.setModelUpdatePeriod(periodValue);
+    config.setDisableCache(true);
+    return config;
+  }
+
   @After
   public void tearDown() {
     if (filter != null) {

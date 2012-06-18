@@ -38,7 +38,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
@@ -52,7 +51,6 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
@@ -77,12 +75,13 @@ public class TestWroManager {
   private static final class WroManagerProcessor
       implements ResourcePreProcessor {
     
-    private WroManagerFactory createManagerFactory(final Resource resource) {
+    private BaseWroManagerFactory createManagerFactory(final Resource resource) {
       return new BaseWroManagerFactory() {
         @Override
         protected void onAfterInitializeManager(final WroManager manager) {
           manager.registerCallback(new PerformanceLoggerCallback());
         };
+        @Override
         protected WroModelFactory newModelFactory() {
           return WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("group").addResource(resource)));
         }
@@ -120,8 +119,7 @@ public class TestWroManager {
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
-      final WroManager manager = createManagerFactory(resource).create();
-      manager.setGroupExtractor(groupExtractor);
+      final WroManager manager = createManagerFactory(resource).setGroupExtractor(groupExtractor).create();
       manager.process();
     }
   }
@@ -417,29 +415,6 @@ public class TestWroManager {
     WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
-    managerFactory.create().process();
-  }
-  
-  @Test(expected = UnauthorizedRequestException.class)
-  public void testProxyUnauthorizedRequest()
-      throws Exception {
-    processProxyWithResourceId("test");
-  }
-  
-  private void processProxyWithResourceId(final String resourceId)
-      throws IOException {
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourceId);
-    Mockito.when(request.getRequestURI()).thenReturn(
-        CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
-    
-    final WroConfiguration config = new WroConfiguration();
-    // we don't need caching here, otherwise we'll have clashing during unit tests.
-    config.setDisableCache(true);
-    
-    Context.set(
-        Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-            Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
     managerFactory.create().process();
   }
   
