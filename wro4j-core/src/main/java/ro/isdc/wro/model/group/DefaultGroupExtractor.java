@@ -58,6 +58,7 @@ public class DefaultGroupExtractor
   public ResourceType getResourceType(final HttpServletRequest request) {
     Validate.notNull(request);
     final String uri = request.getRequestURI();
+    Validate.notNull(uri);
     ResourceType type = null;
     try {
       type = ResourceType.get(getExtensionFromUri(uri));

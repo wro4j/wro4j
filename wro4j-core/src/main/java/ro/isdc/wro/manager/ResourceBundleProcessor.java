@@ -32,8 +32,8 @@ import ro.isdc.wro.util.WroUtil;
  * @created 18 Jun 2012
  * @since 1.4.7
  */
-public class ResourceBundleRequestHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceBundleRequestHandler.class);
+public class ResourceBundleProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceBundleProcessor.class);
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */

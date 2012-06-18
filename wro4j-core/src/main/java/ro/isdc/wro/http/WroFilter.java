@@ -116,7 +116,6 @@ public class WroFilter
     this.filterConfig = config;
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
-    createWroManagerFactory();
     initHeaderValues();
     registerChangeListeners();
     initJMX();

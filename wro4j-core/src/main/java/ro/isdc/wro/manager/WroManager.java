@@ -91,7 +91,7 @@ public class WroManager
    * Schedules the cache update.
    */
   private final SchedulerHelper cacheSchedulerHelper;
-  private ResourceBundleRequestHandler resourceBundleHandler;
+  private ResourceBundleProcessor resourceBundleProcessor;
   
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -106,7 +106,7 @@ public class WroManager
         return new ReloadModelRunnable(WroManager.this);
       }
     }, ReloadModelRunnable.class.getSimpleName());
-    resourceBundleHandler = new ResourceBundleRequestHandler();
+    resourceBundleProcessor = new ResourceBundleProcessor();
   }
   
   /**
@@ -122,8 +122,18 @@ public class WroManager
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
     // Inject
-    injector.inject(resourceBundleHandler);
-    resourceBundleHandler.serveProcessedBundle();
+    injector.inject(getResourceBundleProcessor());
+    getResourceBundleProcessor().serveProcessedBundle();
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  public ResourceBundleProcessor getResourceBundleProcessor() {
+    if (resourceBundleProcessor == null) {
+      resourceBundleProcessor = new ResourceBundleProcessor();
+    }
+    return resourceBundleProcessor;
   }
   
   /**
