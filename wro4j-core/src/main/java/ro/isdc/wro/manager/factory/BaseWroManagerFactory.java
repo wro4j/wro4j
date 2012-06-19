@@ -28,7 +28,6 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
