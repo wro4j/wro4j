@@ -15,23 +15,26 @@ public class ContentTypeResolver {
   private final static Set<String> requiresCharset = new HashSet<String>();
 
   static {
-    defaultContentTypeMap.put("css",  "text/css");
-    defaultContentTypeMap.put("html", "text/html");
-    defaultContentTypeMap.put("htm",  "text/html");
-    defaultContentTypeMap.put("txt",  "text/plain");
-    defaultContentTypeMap.put("xml",  "application/xml");
-    defaultContentTypeMap.put("js",   "application/javascript");
-    defaultContentTypeMap.put("png",  "image/png");
-    defaultContentTypeMap.put("gif",  "image/gif");
-    defaultContentTypeMap.put("jpg",  "image/jpeg");
-    defaultContentTypeMap.put("jpeg", "image/jpeg");
+    defaultContentTypeMap.put("txt",   "text/plain");
+    defaultContentTypeMap.put("css",   "text/css");
+    defaultContentTypeMap.put("html",  "text/html");
+    defaultContentTypeMap.put("htm",   "text/html");
+    defaultContentTypeMap.put("xml",   "application/xml");
+    defaultContentTypeMap.put("xhtml", "application/xhtml+xml");
+    defaultContentTypeMap.put("js",    "application/javascript");
+    defaultContentTypeMap.put("png",   "image/png");
+    defaultContentTypeMap.put("gif",   "image/gif");
+    defaultContentTypeMap.put("jpg",   "image/jpeg");
+    defaultContentTypeMap.put("jpeg",  "image/jpeg");
 
     requiresCharset.add("text/css");
     requiresCharset.add("text/html");
     requiresCharset.add("text/plain");
     requiresCharset.add("application/xml");
+    requiresCharset.add("application/xhtml+xml");
     requiresCharset.add("application/javascript");
   }
+
 
   /**
    * Returns a valid HTTP contentType's for a given filename. It first relies on the custom defaultContentTypeMap and
