@@ -65,6 +65,9 @@ public class DataUriGenerator {
     binaryTypes.put("jpg", "image/jpeg");
     binaryTypes.put("png", "image/png");
     binaryTypes.put("jpeg", "image/jpeg");
+    binaryTypes.put("eot", "application/vnd.ms-fontobject");
+    binaryTypes.put("otf", "application/x-font-opentype");
+    binaryTypes.put("ttf", "application/octet-stream");
 
     textTypes.put("htm", "text/html");
     textTypes.put("html", "text/html");
@@ -139,6 +142,7 @@ public class DataUriGenerator {
     if (mimeType == null) {
       final String type = FilenameUtils.getExtension(filename);
       // if it's an image type, don't use a charset
+      LOG.debug("searching for type: <{}>", type);
       if (binaryTypes.containsKey(type)) {
         mimeType = binaryTypes.get(type);
       } else if (textTypes.containsKey(type)) {

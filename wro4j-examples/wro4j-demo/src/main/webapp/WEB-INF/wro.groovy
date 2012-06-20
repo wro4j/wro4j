@@ -1,5 +1,9 @@
 groups {
   testPage {
+    modules()
+  }
+  modules {
+    font()
     wildcard()
   }
   wildcard {
@@ -7,6 +11,9 @@ groups {
     js("/static/js/*.js")
     css("/WEB-INF/css/*.css")
     css("classpath:ro/isdc/wro/resources/**.cs?")
+  }
+  font {
+    css("/module/font/**.css")
   }
   /*
   encoding {
