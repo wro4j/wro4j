@@ -149,7 +149,6 @@ public class TestCssUrlRewritingProcessor {
       });
   }
 
-
   /**
    * Test a url css resource.
    */
