@@ -29,6 +29,7 @@ import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -53,6 +54,7 @@ public class InjectorBuilder {
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
   private HashStrategy hashStrategy = new SHA1HashStrategy();
+  private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
@@ -156,6 +158,11 @@ public class InjectorBuilder {
         final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(cacheStrategy);
         injector.inject(decorated);
         return decorated;
+      }
+    });
+    map.put(ResourceAuthorizationManager.class, new InjectorObjectFactory<ResourceAuthorizationManager>() {
+      public ResourceAuthorizationManager create() {
+        return authorizationManager;
       }
     });
     map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {

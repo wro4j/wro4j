@@ -17,6 +17,7 @@ import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 /**
  * Provides access to wro resources via a resource proxy.
@@ -36,9 +37,9 @@ public class ResourceProxyRequestHandler implements RequestHandler {
 
   @Inject
   private WroConfiguration config;
-
-  //TODO: remove when AuthorizedResourcesHolder exists.
-  public static boolean hasAccess = true;
+  
+  @Inject
+  private ResourceAuthorizationManager authManager;
 
   /**
    * {@inheritDoc}
@@ -86,7 +87,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    * Verifies that the user has access or not to the requested resource
    */
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
-    if(!hasAccess) {
+    if(!authManager.isAuthorized(resourceUri)) {
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
     }
