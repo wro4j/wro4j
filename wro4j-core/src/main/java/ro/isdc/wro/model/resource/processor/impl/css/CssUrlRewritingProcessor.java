@@ -5,6 +5,8 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static ro.isdc.wro.util.StringUtils.cleanPath;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -178,12 +180,29 @@ public class CssUrlRewritingProcessor
       return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
-      return computeNewImageLocation(cssUri, imageUrl);
+      final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
+      return computeNewImageLocation(externalServerCssUri, imageUrl);
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
+  }
+
+  /**
+   * Css files hosted on external server, should use its host as the root context when rewriting image url's starting
+   * with '/' character.
+   */
+  private String computeCssUriForExternalServer(final String cssUri) {
+    String exernalServerCssUri = cssUri;
+    try {
+      //the uri should end mandatory with /
+      exernalServerCssUri = new URL(cssUri).getHost() + "/";
+      LOG.debug("using {} host as cssUri", exernalServerCssUri);
+    } catch(MalformedURLException e) {
+      //should never happen
+    }
+    return exernalServerCssUri;
   }
   
   /**
