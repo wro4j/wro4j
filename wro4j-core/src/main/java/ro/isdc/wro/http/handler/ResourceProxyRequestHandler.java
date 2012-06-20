@@ -33,25 +33,19 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   @Inject
   private UriLocatorFactory uriLocatorFactory;
 
+  //TODO: remove when AuthorizedResourcesHolder exists.
+  public static boolean hasAccess = true;
+
   /**
    * {@inheritDoc}
    */
-  public void handle(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+  public void handle(final HttpServletRequest request, final HttpServletResponse response)
+      throws IOException {
+
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
-    if(!isAccessible(resourceUri)) {
-      denyRequest(resourceUri);
-    }
-    LOG.debug("locating stream for resourceId: {}", resourceUri);
-    final InputStream is = uriLocatorFactory.locate(resourceUri);
-    final OutputStream outputStream = response.getOutputStream();
+    verifyAccess(resourceUri, response);
+    handleVerifiedRequestURI(resourceUri, response);
 
-    int length = IOUtils.copy(is, outputStream);
-    response.setContentLength(length);
-    response.setContentType(ContentTypeResolver.get(resourceUri));
-    response.setStatus(HttpServletResponse.SC_OK);
-
-    IOUtils.closeQuietly(outputStream);
-    IOUtils.closeQuietly(is);
   }
 
   /**
@@ -68,18 +62,29 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     return true;
   }
 
-  private void denyRequest(final String resourceUri) {
-    throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
+  private void handleVerifiedRequestURI(final String resourceUri, final HttpServletResponse response)
+      throws IOException {
+    LOG.debug("locating stream for resourceId: {}", resourceUri);
+    final InputStream is = uriLocatorFactory.locate(resourceUri);
+    final OutputStream outputStream = response.getOutputStream();
+
+    int length = IOUtils.copy(is, outputStream);
+    response.setContentLength(length);
+    response.setContentType(ContentTypeResolver.get(resourceUri));
+    response.setStatus(HttpServletResponse.SC_OK);
+
+    IOUtils.closeQuietly(outputStream);
+    IOUtils.closeQuietly(is);
   }
 
   /**
    * TODO: use new AuthorizedResourcesHolder to check acccess to resourceUri
    * Verifies that the user has access or not to the requested resource
-   *
-   * @param resourceUri of the resource to be proxied.
-   * @return true if the uri can be accessed.
    */
-  private boolean isAccessible(final String resourceUri) {
-    return true;
+  private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
+    if(!hasAccess) {
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
+    }
   }
 }
