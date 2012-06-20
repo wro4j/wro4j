@@ -53,6 +53,21 @@ public class ContentTypeResolver {
     return systemFileTypeMap.getContentType(fileName);
   }
 
+  /**
+   * Returns a valid HTTP contentType's for a given filename with charset. It first relies on the custom
+   * defaultContentTypeMap and if not found it will fall back to defaultFileTypeMap from javax.activation.FileTypeMap.
+   *
+   * Examples:
+   * - ("somefile.css", "UTF-8") resolves to "text/css"; charset=UTF-8".
+   * - ("somefile.js.png", "UTF-8") resolves to "image/png"
+   * - ("/blah/index.html, "UTF-8") resolves to "text/html; charset=8"
+   * 
+   * @param fileName
+   *          with an filename extension
+   * @param encoding
+   *          which encoding to use
+   * @return contentType
+   */
   public static String get(final String fileName, final   String encoding) {
     final String contentType = get(fileName);
     if(requiresCharset.contains(contentType)) {
