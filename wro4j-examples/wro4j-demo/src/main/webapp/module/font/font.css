@@ -1,0 +1,10 @@
+@font-face {
+	font-family: 'RieslingRegular';
+	src: url('riesling.eot');
+	src: local('Riesling Regular'), local('Riesling'),
+		url('riesling.ttf') format('truetype');
+}
+
+#module-font p.riesling {
+	font: 26px/28px 'RieslingRegular', Arial, sans-serif;
+}

@@ -38,7 +38,7 @@ public class CssDataUriPreProcessor
   /**
    * The size limit. Images larger than this limit won't be transformed (due to IE8 limitation).
    */
-  private static final int SIZE_LIMIT = 32 * 1024;;
+  private static final int SIZE_LIMIT = 32 * 1024;
   /**
    * Generates dataUri based on inputStream of the url's found inside the css resource.
    */

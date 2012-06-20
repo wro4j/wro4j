@@ -323,8 +323,8 @@ public class WroFilter
     //create injector used for process injectable fields from each requestHandler.
     final Injector injector = InjectorBuilder.create(wroManagerFactory).build();
     for (final RequestHandler requestHandler : handlers) {
+      injector.inject(requestHandler);
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
-        injector.inject(requestHandler);
         requestHandler.handle(request, response);
         return true;
       }

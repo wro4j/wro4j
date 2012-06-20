@@ -122,6 +122,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   public final void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     Validate.notNull(resource, "Resource cannot be null! Probably you are using this processor as a Post-Processor and it is intended to be used as a Pre-Processor only!");
+    LOG.debug("Applying {} processor", getClass().getSimpleName());
     try {
       final String cssUri = resource.getUri();
       LOG.debug("cssUri: {}", cssUri);
