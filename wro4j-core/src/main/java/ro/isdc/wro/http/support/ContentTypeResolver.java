@@ -1,5 +1,7 @@
 package ro.isdc.wro.http.support;
 
+import org.apache.commons.io.FilenameUtils;
+
 import javax.activation.FileTypeMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +12,9 @@ public class ContentTypeResolver {
   private final static Map<String, String> defaultContentTypeMap = new HashMap<String, String>();
 
   static {
-    defaultContentTypeMap.put(".css", "text/css");
-    defaultContentTypeMap.put(".js", "application/javascript");
-    defaultContentTypeMap.put(".png", "image/png");
+    defaultContentTypeMap.put("css", "text/css");
+    defaultContentTypeMap.put("js", "application/javascript");
+    defaultContentTypeMap.put("png", "image/png");
   }
 
   /**
@@ -28,14 +30,10 @@ public class ContentTypeResolver {
    * @return contentType
    */
   public static String get(final String fileName) {
-    String fileNameLC = fileName.toLowerCase();
-    int pos = fileName.lastIndexOf(".");
-    String extension = fileNameLC.substring(pos);
-
+    String extension = FilenameUtils.getExtension(fileName).toLowerCase();
     if(defaultContentTypeMap.containsKey(extension)) {
       return defaultContentTypeMap.get(extension);
     }
-
-    return systemFileTypeMap.getContentType(fileNameLC);
+    return systemFileTypeMap.getContentType(fileName);
   }
 }
