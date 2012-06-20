@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
@@ -32,6 +33,9 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   
   @Inject
   private UriLocatorFactory uriLocatorFactory;
+
+  @Inject
+  private WroConfiguration config;
 
   //TODO: remove when AuthorizedResourcesHolder exists.
   public static boolean hasAccess = true;
@@ -68,9 +72,9 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     final InputStream is = uriLocatorFactory.locate(resourceUri);
     final OutputStream outputStream = response.getOutputStream();
 
+    response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
     int length = IOUtils.copy(is, outputStream);
     response.setContentLength(length);
-    response.setContentType(ContentTypeResolver.get(resourceUri));
     response.setStatus(HttpServletResponse.SC_OK);
 
     IOUtils.closeQuietly(outputStream);

@@ -144,7 +144,7 @@ public class TestResourceProxyRequestHandler {
 
     victim.handle(request, response);
 
-    verify(response, times(1)).setContentType("text/css");
+    verify(response, times(1)).setContentType("text/css; charset=UTF-8");
   }
   
   @Test
@@ -155,7 +155,7 @@ public class TestResourceProxyRequestHandler {
     
     victim.handle(request, response);
     
-    verify(response, times(1)).setContentType("application/javascript");
+    verify(response, times(1)).setContentType("application/javascript; charset=UTF-8");
   }
   
   @Test
