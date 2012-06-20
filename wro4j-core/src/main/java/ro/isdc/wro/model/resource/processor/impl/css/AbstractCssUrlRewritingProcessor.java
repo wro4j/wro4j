@@ -130,6 +130,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
+    LOG.debug("Applying {} processor", getClass().getSimpleName());
     try {
       final String cssUri = resource.getUri();
       LOG.debug("cssUri: {}", cssUri);

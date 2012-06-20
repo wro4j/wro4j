@@ -7,6 +7,6 @@
 # dustJs       [N/A]
 
 # testPage.css request is not consistent (investigate, probably a thread-safety issue). 
-  - WildcardExpanderModelTransformer transform method should be synchronized
 # Read regex from properties file
 # ensure InjectorBuilder doesn't perform redundant initialization.     
+# YuiCssMin throws stackOverflow when processing a css with large dataUri encoded (ex: font module with no dataUri size limit). Probably an invalid regexp.

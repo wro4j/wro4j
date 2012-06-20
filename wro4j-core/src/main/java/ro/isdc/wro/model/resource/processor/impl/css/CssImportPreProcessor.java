@@ -66,6 +66,7 @@ public class CssImportPreProcessor
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
+    LOG.debug("Applying {} processor", CssImportPreProcessor.this.getClass().getSimpleName());
     validate();
     try {
       final String result = parseCss(resource, reader);
