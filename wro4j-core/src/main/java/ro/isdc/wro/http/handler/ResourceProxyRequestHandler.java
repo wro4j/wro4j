@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.activation.FileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
@@ -35,8 +33,6 @@ public class ResourceProxyRequestHandler implements RequestHandler {
   @Inject
   private UriLocatorFactory uriLocatorFactory;
 
-  private final FileTypeMap fileTypeMap = FileTypeMap.getDefaultFileTypeMap();
-
   /**
    * {@inheritDoc}
    */
@@ -45,18 +41,11 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     if(!isAccessible(resourceUri)) {
       denyRequest(resourceUri);
     }
-
-    OutputStream outputStream = response.getOutputStream();
     LOG.debug("locating stream for resourceId: {}", resourceUri);
     final InputStream is = uriLocatorFactory.locate(resourceUri);
-    // TODO remove. This check is not required, since the factory will throw IOException anyway.
-    if (is == null) {
-      throw new WroRuntimeException("Cannot process request with uri: " + request.getRequestURI());
-    }
+    final OutputStream outputStream = response.getOutputStream();
 
     int length = IOUtils.copy(is, outputStream);
-    
-    //set the content length & type before the stream is closed
     response.setContentLength(length);
     response.setContentType(ContentTypeResolver.get(resourceUri));
     response.setStatus(HttpServletResponse.SC_OK);
