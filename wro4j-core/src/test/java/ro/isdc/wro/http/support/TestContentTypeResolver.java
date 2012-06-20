@@ -37,4 +37,9 @@ public class TestContentTypeResolver {
   public void shouldOnlyUseLastDot() {
     assertThat(ContentTypeResolver.get("somefile.js.png"), is("image/png"));
   }
+
+  @Test
+   public void shouldResolveHTMLUpperCaseExtenstion() {
+     assertThat(ContentTypeResolver.get("mefile.CSS"), is("text/css"));
+   }
 }

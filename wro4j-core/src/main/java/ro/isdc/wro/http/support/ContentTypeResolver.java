@@ -27,14 +27,15 @@ public class ContentTypeResolver {
    * @param fileName with an filename extension
    * @return contentType
    */
-  public static String get(String fileName) {
+  public static String get(final String fileName) {
+    String fileNameLC = fileName.toLowerCase();
     int pos = fileName.lastIndexOf(".");
-    String extension = fileName.substring(pos);
+    String extension = fileNameLC.substring(pos);
 
     if(defaultContentTypeMap.containsKey(extension)) {
       return defaultContentTypeMap.get(extension);
     }
 
-    return systemFileTypeMap.getContentType(fileName);
+    return systemFileTypeMap.getContentType(fileNameLC);
   }
 }
