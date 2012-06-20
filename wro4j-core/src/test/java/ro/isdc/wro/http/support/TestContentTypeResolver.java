@@ -17,10 +17,20 @@ public class TestContentTypeResolver {
   public void shouldResolveJPGExtenstion() {
     assertThat(ContentTypeResolver.get("s/bvews/omefile.jpg"), is("image/jpeg"));
   }
+
+  @Test
+   public void shouldResolveJPGExtenstionWithoutCharset() {
+     assertThat(ContentTypeResolver.get("s/bvews/omefile.jpg", "UTF-8"), is("image/jpeg"));
+   }
   
   @Test
   public void shouldResolveHTMLExtenstion() {
     assertThat(ContentTypeResolver.get("mefile.html"), is("text/html"));
+  }
+
+  @Test
+  public void shouldResolveHTMLExtenstionWitCharset() {
+    assertThat(ContentTypeResolver.get("mefile.html", "UTF-8"), is("text/html; charset=UTF-8"));
   }
   
   @Test
