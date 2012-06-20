@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -57,7 +58,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     
     //set the content length & type before the stream is closed
     response.setContentLength(length);
-    response.setContentType(getContentType(resourceUri));
+    response.setContentType(ContentTypeResolver.get(resourceUri));
     response.setStatus(HttpServletResponse.SC_OK);
 
     IOUtils.closeQuietly(outputStream);
@@ -90,22 +91,6 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    * @return true if the uri can be accessed.
    */
   private boolean isAccessible(final String resourceUri) {
-    return false;
+    return true;
   }
-
-  /**
-   * TODO move contentType detection to a separate class.
-   */
-  private String getContentType(final String resourceUri) {
-    if (resourceUri.toLowerCase().endsWith(".css")) {
-      return "text/css";
-    } else if (resourceUri.toLowerCase().endsWith(".js")) {
-      return "application/javascript";
-    } else if (resourceUri.toLowerCase().endsWith(".png")) {
-      return "image/png";
-    } else {
-      return fileTypeMap.getContentType(resourceUri);
-    }
-  }
-
 }
