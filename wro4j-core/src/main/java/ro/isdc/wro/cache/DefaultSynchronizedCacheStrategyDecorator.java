@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 /**
@@ -25,11 +26,12 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   private GroupsProcessor groupsProcessor;
   @Inject
   private HashStrategy hashBuilder; 
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
   
   public DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     super(cacheStrategy);
   }
-  
   
   /**
    * {@inheritDoc}
@@ -67,5 +69,12 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
     if (!Context.get().getConfig().isDisableCache()) {
       super.put(key, value);
     }
+  }
+  
+  @Override
+  public void clear() {
+    super.clear();
+    //reset authorization manager (clear any stored uri's).
+    authorizationManager.clear();
   }
 }

@@ -54,7 +54,7 @@ public class InjectorBuilder {
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
   private HashStrategy hashStrategy = new SHA1HashStrategy();
-  private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
+  private ResourceAuthorizationManager authorizationManager = newResourceAuthorizationManager();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
   /**
@@ -73,11 +73,20 @@ public class InjectorBuilder {
   private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
 
   /**
-   * @deprecated prefer using factory method {@link InjectorBuilder#create(WroManagerFactory)}
+   * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
+   * @VisibleForTesting
    */
   public InjectorBuilder() {
   }
 
+  /**
+   * @return the instance of {@link ResourceAuthorizationManager} to inject.
+   * @VisibleForTesting
+   */
+  protected ResourceAuthorizationManager newResourceAuthorizationManager() {
+    return new ResourceAuthorizationManager();
+  }  
+  
   /**
    * Factory method which uses a managerFactory to initialize injected fields.
    */
@@ -178,7 +187,10 @@ public class InjectorBuilder {
     return injector = new Injector(Collections.unmodifiableMap(map));
   }
 
-  private InjectorBuilder setWroManager(final WroManager manager) {
+  /**
+   * @VisibleForTesting
+   */
+  protected InjectorBuilder setWroManager(final WroManager manager) {
     Validate.notNull(manager);
     uriLocatorFactory = manager.getUriLocatorFactory();
     processorsFactory = manager.getProcessorsFactory();

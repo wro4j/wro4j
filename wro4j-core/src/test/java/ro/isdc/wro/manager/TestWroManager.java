@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.manager;
 
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +27,10 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -48,9 +54,12 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
@@ -67,7 +76,37 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
+  /**
+   * Used to test simple operations.
+   */
+  @InjectMocks
+  private WroManager victim;
+  @Mock
+  private ResourceAuthorizationManager mockAuthorizationManager;
+  /**
+   * Used to test more complex use-cases.
+   */
+  private WroManagerFactory managerFactory;
   
+  @Before
+  public void setUp() {
+    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
+        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    Context.set(context, newConfigWithUpdatePeriodValue(0));
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
+    MockitoAnnotations.initMocks(this);
+    
+    final Injector injector = new InjectorBuilder() {
+      {
+        setWroManager(new BaseWroManagerFactory().create());
+      }
+      protected ResourceAuthorizationManager newResourceAuthorizationManager() {
+        return mockAuthorizationManager;
+      };
+    }.build();
+    injector.inject(victim);
+  }
+
   /**
    * A processor which which uses a {@link WroManager} during processor, in order to process a single group, whose
    * resource is the pre processed resource of this processor.
@@ -81,6 +120,7 @@ public class TestWroManager {
         protected void onAfterInitializeManager(final WroManager manager) {
           manager.registerCallback(new PerformanceLoggerCallback());
         };
+        
         @Override
         protected WroModelFactory newModelFactory() {
           return WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("group").addResource(resource)));
@@ -122,16 +162,6 @@ public class TestWroManager {
       final WroManager manager = createManagerFactory(resource).setGroupExtractor(groupExtractor).create();
       manager.process();
     }
-  }
-  
-  private WroManagerFactory managerFactory;
-  
-  @Before
-  public void setUp() {
-    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
-        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
-    Context.set(context, newConfigWithUpdatePeriodValue(0));
-    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
   }
   
   private class GenericTestBuilder {
@@ -218,6 +248,18 @@ public class TestWroManager {
     config.setModelUpdatePeriod(periodValue);
     config.setDisableCache(true);
     return config;
+  }
+
+  @Test
+  public void shouldClearAuthorizationManagerWhenCachePeriodChanged() {
+    victim.onCachePeriodChanged(1);
+    verify(mockAuthorizationManager, atLeastOnce()).clear();
+  }
+  
+  @Test
+  public void shouldClearAuthorizationManagerWhenModelPeriodChanged() {
+    victim.onModelPeriodChanged(1);
+    verify(mockAuthorizationManager, atLeastOnce()).clear();
   }
   
   @Test

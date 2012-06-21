@@ -7,6 +7,7 @@ import org.apache.commons.lang3.Validate;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectDecorator;
 import ro.isdc.wro.util.Transformer;
@@ -28,6 +29,9 @@ public class DefaultWroModelFactoryDecorator
   private final WroModelFactory decorated;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
+
   private final List<Transformer<WroModel>> modelTransformers;
   
   public DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
@@ -62,6 +66,8 @@ public class DefaultWroModelFactoryDecorator
    */
   public void destroy() {
     getDecoratedObject().destroy();
+    //reset authorization manager (clear any stored uri's).
+    authorizationManager.clear();
   }
   
   /**

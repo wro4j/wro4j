@@ -30,6 +30,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
@@ -79,6 +80,8 @@ public class WroManager
   private HashStrategy hashStrategy;
   @Inject
   private Injector injector;
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
