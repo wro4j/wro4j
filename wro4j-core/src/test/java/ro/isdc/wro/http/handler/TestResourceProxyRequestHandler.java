@@ -1,18 +1,17 @@
 package ro.isdc.wro.http.handler;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.model.group.processor.InjectorBuilder;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.util.WroTestUtils;
-import ro.isdc.wro.util.WroUtil;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -20,17 +19,28 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.*;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.util.WroTestUtils;
+import ro.isdc.wro.util.WroUtil;
 
 /**
  * @author Ivar Conradi Østhus
  */
 public class TestResourceProxyRequestHandler {
+  @InjectMocks
   private ResourceProxyRequestHandler victim;
   @Mock
   private HttpServletRequest request;
@@ -40,6 +50,8 @@ public class TestResourceProxyRequestHandler {
   private ServletContext servletContext;
   @Mock
   private FilterConfig filterConfig;
+  @Mock
+  private ResourceAuthorizationManager authManager;
 
   private OutputStream outputStream;
 
@@ -63,7 +75,7 @@ public class TestResourceProxyRequestHandler {
     outputStream = new ByteArrayOutputStream();
     servletOutputStream = new ServletOutputStream() {
       @Override
-      public void write(int i) throws IOException {
+      public void write(final int i) throws IOException {
         outputStream.write(i);
       }
     };
@@ -90,7 +102,8 @@ public class TestResourceProxyRequestHandler {
 
   @Test
   public void shouldReturnClasspathResource() throws IOException {
-    String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(authManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
 
     victim.handle(request, response);
@@ -170,7 +183,7 @@ public class TestResourceProxyRequestHandler {
   }
 
 
-  private InputStream getInputStream(String filename) throws IOException {
+  private InputStream getInputStream(final String filename) throws IOException {
     return this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);
   }
 }
