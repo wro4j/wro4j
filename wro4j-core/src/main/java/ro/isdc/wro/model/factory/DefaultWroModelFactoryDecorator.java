@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectDecorator;
@@ -31,6 +33,8 @@ public class DefaultWroModelFactoryDecorator
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
+  @Inject
+  private WroConfiguration config;
 
   private final List<Transformer<WroModel>> modelTransformers;
   
@@ -54,10 +58,27 @@ public class DefaultWroModelFactoryDecorator
    */
   public WroModel create() {
     callbackRegistry.onBeforeModelCreated();
+    WroModel model = null;
     try {
-      return getDecoratedObject().create();
+      model = getDecoratedObject().create();
+      return model;
     } finally {
+      authorizeModelResources(model);
       callbackRegistry.onAfterModelCreated();
+    }
+  }
+  
+  /**
+   * Authorizes all resources of the model to be accessed as proxy resources (only in dev mode).
+   * 
+   * @param model
+   *          {@link WroModel} created by decorated factory.
+   */
+  private void authorizeModelResources(final WroModel model) {
+    if (config.isDebug()) {
+      for (Resource resource : model.getAllResources()) {
+        authorizationManager.add(resource.getUri());
+      }
     }
   }
   
