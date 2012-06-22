@@ -126,10 +126,7 @@ public class WroManager
     getResourceBundleProcessor().serveProcessedBundle();
   }
 
-  /**
-   * @VisibleForTesting
-   */
-  public ResourceBundleProcessor getResourceBundleProcessor() {
+  private ResourceBundleProcessor getResourceBundleProcessor() {
     if (resourceBundleProcessor == null) {
       resourceBundleProcessor = new ResourceBundleProcessor();
     }
