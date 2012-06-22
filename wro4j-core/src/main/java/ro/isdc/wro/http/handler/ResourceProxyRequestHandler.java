@@ -26,7 +26,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * @created 19 May 2012
  * @since 1.4.7
  */
-public class ResourceProxyRequestHandler implements RequestHandler {
+public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceProxyRequestHandler.class);
 
   public static final String PARAM_RESOURCE_ID = "id";
@@ -48,7 +48,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
       throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
     verifyAccess(resourceUri, response);
-    handleVerifiedRequestURI(resourceUri, response);
+    serverProxyResourceUri(resourceUri, response);
   }
 
   /**
@@ -58,16 +58,9 @@ public class ResourceProxyRequestHandler implements RequestHandler {
     return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean isEnabled() {
-    return true;
-  }
-
-  private void handleVerifiedRequestURI(final String resourceUri, final HttpServletResponse response)
+  private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
-    LOG.debug("locating stream for resourceId: {}", resourceUri);
+    LOG.debug("[OK] serving proxy resource: {}", resourceUri);
     final InputStream is = uriLocatorFactory.locate(resourceUri);
     final OutputStream outputStream = response.getOutputStream();
 
@@ -86,6 +79,7 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    */
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
     if(!authManager.isAuthorized(resourceUri)) {
+      LOG.debug("[FAIL] Unauthorized proxy resource: {}", resourceUri);
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
     }

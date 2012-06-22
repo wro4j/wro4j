@@ -41,7 +41,7 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
   /**
    * Add more handlers via reflection. If the module containing this handler is not available, it won't be added.
    */
-  private void addExtensionsHandlers(Collection<RequestHandler> requestHandlers) {
+  private void addExtensionsHandlers(final Collection<RequestHandler> requestHandlers) {
     try {
       // TODO add a test in extension module which proves that this handler is added when the the extensions module is
       // available. 
@@ -49,7 +49,8 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
           "ro.isdc.wro.extensions.http.handler.ExposeModelRequestHandler").newInstance();
       requestHandlers.add(requestHandler);
     } catch (final Exception e) {
-      LOG.info("ExposeModelRequestHandler not found and not added as a requestHandler.");
+      LOG.info("ExposeModelRequestHandler not found, probably because wro4j-extensions "
+          + "module is missing from classpath.");
     }
   }
 }

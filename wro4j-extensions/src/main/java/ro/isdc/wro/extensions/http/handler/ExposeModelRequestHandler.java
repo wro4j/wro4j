@@ -5,9 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.RequestHandlerSupport;
 import ro.isdc.wro.model.WroModel;
@@ -35,10 +32,6 @@ public class ExposeModelRequestHandler
     extends RequestHandlerSupport {
   @VisibleForTesting
   static final String CONTENT_TYPE = "application/json";
-  /**
-   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
-   */
-  public static final String PATH_API = "wroAPI";
   /**
    * API - reload cache method call
    */

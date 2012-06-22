@@ -75,7 +75,7 @@ public class DefaultWroModelFactoryDecorator
    *          {@link WroModel} created by decorated factory.
    */
   private void authorizeModelResources(final WroModel model) {
-    if (config.isDebug()) {
+    if (model != null && config.isDebug()) {
       for (Resource resource : model.getAllResources()) {
         authorizationManager.add(resource.getUri());
       }
