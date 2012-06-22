@@ -1,10 +1,15 @@
 package ro.isdc.wro.extensions.http.handler;
 
-import com.google.gson.*;
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-
 import java.lang.reflect.Type;
+
+import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
+import ro.isdc.wro.model.resource.Resource;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 /**
  * Serializes {@link Resource} to json. It transforms the resources to a jsonElement which also provide a proxyUri
@@ -46,7 +51,7 @@ public class ResourceSerializer implements JsonSerializer<Resource> {
 
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(basePath);
-    stringBuilder.append(CssUrlRewritingProcessor.PATH_RESOURCES);
+    stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
     stringBuilder.append("?id=");
     stringBuilder.append(uri);
     return stringBuilder.toString();
