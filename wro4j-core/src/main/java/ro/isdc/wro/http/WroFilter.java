@@ -82,7 +82,7 @@ public class WroFilter
    * Used to create the collection of requestHandlers to apply
    */
   private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
-
+  
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
    * put, in order to avoid duplicate keys. This is done, because according to RFC 2616 Message Headers field names are
@@ -100,14 +100,14 @@ public class WroFilter
       return super.get(((String) key).toLowerCase());
     }
   };
-
+  
   /**
    * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
    */
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -121,7 +121,7 @@ public class WroFilter
     initJMX();
     doInit(config);
   }
-
+  
   /**
    * Creates configuration by looking up in servletContext attributes. If none is found, a new one will be created using
    * the configuration factory.
@@ -135,7 +135,7 @@ public class WroFilter
     LOG.debug("config attribute: {}", configAttribute);
     return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
   }
-
+  
   /**
    * Creates {@link WroManagerFactory}.
    */
@@ -149,7 +149,7 @@ public class WroFilter
     LOG.debug("created managerFactory: {}", wroManagerFactory);
     return this.wroManagerFactory;
   }
-
+  
   /**
    * Expose MBean to tell JMX infrastructure about our MBean.
    */
@@ -167,7 +167,7 @@ public class WroFilter
       LOG.error("Exception occured while registering MBean", e);
     }
   }
-
+  
   /**
    * @return the name of MBean to be used by JMX to configure wro4j.
    */
@@ -230,7 +230,7 @@ public class WroFilter
     Validate.notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
   }
-
+  
   /**
    * Initialize header values.
    */
@@ -278,7 +278,7 @@ public class WroFilter
       headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
     }
   }
-
+  
   /**
    * Custom filter initialization - can be used for extended classes.
    * 
@@ -298,7 +298,7 @@ public class WroFilter
     try {
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-
+      
       if (!handledWithRequestHandler(request, response)) {
         processRequest(request, response);
         onRequestProcessed();
@@ -325,7 +325,7 @@ public class WroFilter
     }
     return false;
   }
-
+  
   /**
    * @return {@link Injector} used to inject {@link RequestHandler}'s.
    * @VisibleForTesting
@@ -339,7 +339,7 @@ public class WroFilter
    */
   protected void onRequestProcessed() {
   }
-
+  
   /**
    * Perform actual processing.
    */
@@ -399,7 +399,7 @@ public class WroFilter
   public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
   }
-
+  
   /**
    * @VisibleForTesting
    * @return configured {@link WroManagerFactory} instance.
@@ -407,7 +407,7 @@ public class WroFilter
   public final WroManagerFactory getWroManagerFactory() {
     return this.wroManagerFactory;
   }
-
+  
   /**
    * Sets the RequestHandlerFactory used to create the collection of requestHandlers
    * 
@@ -418,7 +418,7 @@ public class WroFilter
     Validate.notNull(requestHandlerFactory);
     this.requestHandlerFactory = requestHandlerFactory;
   }
-
+  
   /**
    * Factory method for {@link WroManagerFactory}.
    * <p/>
