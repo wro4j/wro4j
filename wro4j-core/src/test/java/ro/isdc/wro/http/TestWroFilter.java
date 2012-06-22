@@ -43,18 +43,20 @@ import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
-import ro.isdc.wro.http.handler.factory.SimpleRequestHandlerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.ObjectFactory;
 
 
@@ -78,6 +80,8 @@ public class TestWroFilter {
   private ServletContext mockServletContext;
   @Mock
   private WroManagerFactory mockManagerFactory;
+  @Mock
+  private ResourceAuthorizationManager mockAuthorizationManager;
   
   @Before
   public void setUp()
@@ -151,8 +155,8 @@ public class TestWroFilter {
       throws Exception {
     Mockito.when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
         "Invalid value");
-    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
-    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
+    victim.init(mockFilterConfig);
+    Assert.assertSame(mockManagerFactory, victim.getWroManagerFactory());
   }
   
   /**
@@ -200,13 +204,14 @@ public class TestWroFilter {
   @Test
   public void shouldUseCorrectWroManagerFactoryWhenOneIsSet()
       throws Exception {
+    final Class<?> managerClass = TestWroManagerFactory.class;
     victim.setWroManagerFactory(null);
     Mockito.when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
-        TestWroManagerFactory.class.getName());
+        managerClass.getName());
     
     victim.init(mockFilterConfig);
-    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
-    Mockito.verify(mockManagerFactory, Mockito.atLeastOnce()).create();
+    Class<?> actualClass = ((DefaultWroManagerFactory) victim.getWroManagerFactory()).getFactory().getClass();
+    Assert.assertSame(managerClass, actualClass);
   }
   
   public static class TestWroManagerFactory extends BaseWroManagerFactory {
@@ -348,8 +353,30 @@ public class TestWroFilter {
   @Test
   public void cannotAccessUnauthorizedRequest()
       throws Exception {
+    victim = new WroFilter() {
+      @Override
+      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
+          final FilterChain chain) {
+        throw e;
+      }
+      
+      @Override
+      Injector getInjector() {
+        return new InjectorBuilder() {
+          {
+            setWroManagerFactory(mockManagerFactory);
+          }
+          @Override
+          protected ResourceAuthorizationManager newResourceAuthorizationManager() {
+            return mockAuthorizationManager;
+          };
+        }.build();
+      }
+    };
     final String resourcePath = "/g1.css";
     final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + resourcePath;
+    
+    Mockito.when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
     requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
       @Override
       protected HttpServletRequest newRequest() {

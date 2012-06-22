@@ -315,7 +315,7 @@ public class WroFilter
     final Collection<RequestHandler> handlers = requestHandlerFactory.create();
     Validate.notNull(handlers, "requestHandlers cannot be null!");
     // create injector used for process injectable fields from each requestHandler.
-    final Injector injector = InjectorBuilder.create(wroManagerFactory).build();
+    final Injector injector = getInjector();
     for (final RequestHandler requestHandler : handlers) {
       injector.inject(requestHandler);
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
@@ -324,6 +324,14 @@ public class WroFilter
       }
     }
     return false;
+  }
+
+  /**
+   * @return {@link Injector} used to inject {@link RequestHandler}'s.
+   * @VisibleForTesting
+   */
+  Injector getInjector() {
+    return InjectorBuilder.create(wroManagerFactory).build();
   }
 
   /**
