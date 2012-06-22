@@ -4,6 +4,8 @@
 package ro.isdc.wro.http;
 
 import static org.mockito.Mockito.when;
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,9 +57,11 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -82,6 +86,10 @@ public class TestWroFilter {
   private WroManagerFactory mockManagerFactory;
   @Mock
   private ResourceAuthorizationManager mockAuthorizationManager;
+  @Mock
+  private UriLocatorFactory mockUriLocatorFactory;
+  @Mock
+  private UriLocator mockUriLocator;
   
   @Before
   public void setUp()
@@ -89,6 +97,10 @@ public class TestWroFilter {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     
+    when(mockUriLocatorFactory.getInstance(Mockito.anyString())).thenReturn(mockUriLocator);
+    when(mockUriLocator.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+    when(mockUriLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);
     when(mockManagerFactory.create()).thenReturn(new BaseWroManagerFactory().create());
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
@@ -214,7 +226,8 @@ public class TestWroFilter {
     Assert.assertSame(managerClass, actualClass);
   }
   
-  public static class TestWroManagerFactory extends BaseWroManagerFactory {
+  public static class TestWroManagerFactory
+      extends BaseWroManagerFactory {
   }
   
   @Test
@@ -349,10 +362,29 @@ public class TestWroFilter {
     verifyChainIsCalled(mockFilterChain);
   }
   
-  // TODO; fix this test when AuthorizedResourcesHolder is implemented
   @Test
   public void cannotAccessUnauthorizedRequest()
       throws Exception {
+    initVictimWithMockAuthManager();
+    final String resourcePath = "/g1.css";
+    final String requestUri = PATH_RESOURCES + resourcePath;
+    
+    Mockito.when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
+    requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
+      @Override
+      protected HttpServletRequest newRequest() {
+        final HttpServletRequest request = super.newRequest();
+        Mockito.when(request.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourcePath);
+        return request;
+      }
+    }, mockFilterChain);
+    verifyChainIsNotCalled(mockFilterChain);
+  }
+
+  /**
+   * Creates the victim filter which usues mock {@link ResourceAuthorizationManager}.
+   */
+  private void initVictimWithMockAuthManager() {
     victim = new WroFilter() {
       @Override
       protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
@@ -364,8 +396,9 @@ public class TestWroFilter {
       Injector getInjector() {
         return new InjectorBuilder() {
           {
-            setWroManagerFactory(mockManagerFactory);
+            setWroManager(new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).create());
           }
+
           @Override
           protected ResourceAuthorizationManager newResourceAuthorizationManager() {
             return mockAuthorizationManager;
@@ -373,32 +406,22 @@ public class TestWroFilter {
         }.build();
       }
     };
-    final String resourcePath = "/g1.css";
-    final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + resourcePath;
-    
-    Mockito.when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
-    requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
-      @Override
-      protected HttpServletRequest newRequest() {
-        final HttpServletRequest request = super.newRequest();
-        Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourcePath);
-        return request;
-      }
-    }, mockFilterChain);
-    verifyChainIsCalled(mockFilterChain);
   }
   
-  // TODO build model before performing the request
-  // @Test
+  @Test
   public void requestUrlRewrittenResource()
       throws Exception {
+    initVictimWithMockAuthManager();
     final String resourcePath = "classpath:ro/isdc/wro/http/2.css";
-    final String requestUri = CssUrlRewritingProcessor.PATH_RESOURCES + "?id=" + resourcePath;
+    
+    when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
+
+    final String requestUri = PATH_RESOURCES + "?id=" + resourcePath;
     requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
       @Override
       protected HttpServletRequest newRequest() {
         final HttpServletRequest request = super.newRequest();
-        Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourcePath);
+        Mockito.when(request.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourcePath);
         return request;
       }
     });
@@ -513,7 +536,7 @@ public class TestWroFilter {
         return factory;
       }
     };
-//    initFilterWithValidConfig(theFilter);
+    // initFilterWithValidConfig(theFilter);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.when(request.getRequestURI()).thenReturn(ReloadCacheRequestHandler.API_RELOAD_CACHE);
     
@@ -663,9 +686,8 @@ public class TestWroFilter {
   
   private void processProxyWithResourceId(final String resourceId)
       throws Exception {
-    Mockito.when(mockRequest.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourceId);
-    Mockito.when(mockRequest.getRequestURI()).thenReturn(
-        CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
+    Mockito.when(mockRequest.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourceId);
+    Mockito.when(mockRequest.getRequestURI()).thenReturn(PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=" + resourceId);
     
     final WroConfiguration config = new WroConfiguration();
     // we don't need caching here, otherwise we'll have clashing during unit tests.

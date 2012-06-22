@@ -46,11 +46,9 @@ public class ResourceProxyRequestHandler implements RequestHandler {
    */
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
     verifyAccess(resourceUri, response);
     handleVerifiedRequestURI(resourceUri, response);
-
   }
 
   /**

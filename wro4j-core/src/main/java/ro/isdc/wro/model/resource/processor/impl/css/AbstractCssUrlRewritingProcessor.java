@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -39,14 +42,6 @@ import ro.isdc.wro.util.WroUtil;
 public abstract class AbstractCssUrlRewritingProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
-  /**
-   * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
-   */
-  public static final String PATH_RESOURCES = "wroResources";
-  /**
-   * The name of resource id parameter.
-   */
-  public static final String PARAM_RESOURCE_ID = "id";
   /**
    * Compiled pattern.
    */
