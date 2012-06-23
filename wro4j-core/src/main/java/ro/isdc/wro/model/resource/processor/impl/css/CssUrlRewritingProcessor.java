@@ -200,24 +200,15 @@ public class CssUrlRewritingProcessor
   private String computeCssUriForExternalServer(final String cssUri) {
     String exernalServerCssUri = cssUri;
     try {
+      //compute the host of the external server (with protocol & port).
+      final String serverHost = cssUri.replace(new URL(cssUri).getPath(), "");
       //the uri should end mandatory with /
-      exernalServerCssUri = new URL(cssUri).getHost() + ServletContextUriLocator.PREFIX;
+      exernalServerCssUri = serverHost + ServletContextUriLocator.PREFIX;
       LOG.debug("using {} host as cssUri", exernalServerCssUri);
     } catch(MalformedURLException e) {
       //should never happen
     }
     return exernalServerCssUri;
-  }
-  
-  public static void main(String[] args) {
-    String cssUri = "http://www.google.com/caca/maca";
-    try {
-      //the uri should end mandatory with /
-      String exernalServerCssUri = new URL(cssUri).getHost() + "/";
-      System.out.println("using " + exernalServerCssUri);
-    } catch(MalformedURLException e) {
-      //should never happen
-    }
   }
   
   /**
