@@ -4,7 +4,6 @@
 package ro.isdc.wro.manager.factory;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,9 +24,6 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
@@ -82,79 +78,11 @@ public class TestConfigurableWroManagerFactory {
     // create one instance for test
     final WroManager manager = victim.create();
     processorsFactory = manager.getProcessorsFactory();
-    uriLocatorFactory = (SimpleUriLocatorFactory) AbstractDecorator.getOriginalDecoratedObject(manager.getUriLocatorFactory());
   }
   
   @After
   public void tearDown() {
     Context.unset();
-  }
-  
-  /**
-   * When no uri locators are set, the default factory is used.
-   */
-  @Test
-  public void testWhenNoUriLocatorsParamSet() {
-    createManager();
-    Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
-  }
-  
-  @Test
-  public void testWithEmptyUriLocators() {
-    createManager();
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("");
-    Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
-  }
-  
-  
-  @Test
-  public void shouldLoadUriLocatorsFromConfigurationFile() {
-    configProperties.setProperty(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS, "servletContext");
-    
-    createManager();
-    
-    Assert.assertEquals(1, uriLocatorFactory.getUriLocators().size());
-    Assert.assertSame(ServletContextUriLocator.class, uriLocatorFactory.getUriLocators().iterator().next().getClass());
-  }
-  
-  @Test
-  public void shouldLoadUriLocatorsFromFilterConfigRatherThanFromConfigProperties() {
-    configProperties.setProperty(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS, "servletContext");
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("classpath, servletContext");
-    
-    createManager();
-    
-    Assert.assertEquals(2, uriLocatorFactory.getUriLocators().size());
-    final Iterator<UriLocator> locatorsIterator = uriLocatorFactory.getUriLocators().iterator();
-    Assert.assertSame(ClasspathUriLocator.class, locatorsIterator.next().getClass());
-    Assert.assertSame(ServletContextUriLocator.class, locatorsIterator.next().getClass());
-  }
-
-  
-  @Test(expected = WroRuntimeException.class)
-  public void cannotUseInvalidUriLocatorsSet() {
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn(
-        "INVALID1,INVALID2");
-    
-    createManager();
-    
-    uriLocatorFactory.getUriLocators();
-  }
-  
-  @Test
-  public void testWhenValidLocatorsSet() {
-    createManager();
-    
-    configureValidUriLocators(mockFilterConfig);
-    Assert.assertEquals(3, uriLocatorFactory.getUriLocators().size());
-  }
-  
-  /**
-   * @param filterConfig
-   */
-  private void configureValidUriLocators(final FilterConfig filterConfig) {
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn(
-        "servletContext, url, classpath");
   }
   
   @Test
@@ -179,11 +107,12 @@ public class TestConfigurableWroManagerFactory {
   
   @Test(expected = WroRuntimeException.class)
   public void cannotUseInvalidPreProcessorsSet() {
-    createManager();
     
-    configureValidUriLocators(mockFilterConfig);
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(
         "INVALID1,INVALID2");
+    
+    createManager();
+    
     processorsFactory.getPreProcessors();
   }
   
