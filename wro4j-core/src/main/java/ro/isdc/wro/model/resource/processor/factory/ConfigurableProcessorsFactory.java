@@ -112,6 +112,7 @@ public class ConfigurableProcessorsFactory
   }
 
   /**
+   * TODO: move to a different class, since it is not used only to configure processors.
    * Extracts a list of items (processors) from the properties based on existing values inside the map.
    * 
    * @param itemsAsString
