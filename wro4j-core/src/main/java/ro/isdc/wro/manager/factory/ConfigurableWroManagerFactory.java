@@ -94,7 +94,9 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
     final Map<String, UriLocator> map = createLocatorsMap();
     contributeLocators(map);
-    final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
+    final Properties props = new Properties();
+    updatePropertiesWithConfiguration(props, PARAM_URI_LOCATORS);
+    final String uriLocators = props.getProperty(PARAM_URI_LOCATORS);
     final List<UriLocator> locators = ConfigurableProcessorsFactory.getListOfItems(uriLocators, map);
     for (final UriLocator locator : locators) {
       factory.addUriLocator(locator);
@@ -117,8 +119,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
-        updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
-        updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
+        updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
+        updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
       }
     };
@@ -134,7 +136,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
-        updatePropertiesWithProcessors(props, ConfigurableNamingStrategy.KEY);
+        updatePropertiesWithConfiguration(props, ConfigurableNamingStrategy.KEY);
         return props;
       }
     };
@@ -149,7 +151,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
-        updatePropertiesWithProcessors(props, ConfigurableHashStrategy.KEY);
+        updatePropertiesWithConfiguration(props, ConfigurableHashStrategy.KEY);
         return props;
 
       }
@@ -158,18 +160,25 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   
   /**
    * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
+   * This method helps to ensure backward compatibility of the filterConfig vs configProperties configuration.
+   * 
+   * @param props
+   *          the {@link Properties} which will be populated with the value extracted from filterConfig or
+   *          configProperties for the provided key.
+   * @param key
+   *          to read from filterConfig or configProperties and put into props.
    */
-  private void updatePropertiesWithProcessors(final Properties props, final String paramName) {
+  private void updatePropertiesWithConfiguration(final Properties props, final String key) {
     final FilterConfig filterConfig = Context.get().getFilterConfig();
     // first, retrieve value from init-param for backward compatibility
-    final String processorsAsString = filterConfig.getInitParameter(paramName);
-    if (processorsAsString != null) {
-      props.setProperty(paramName, processorsAsString);
+    final String valuesAsString = filterConfig.getInitParameter(key);
+    if (valuesAsString != null) {
+      props.setProperty(key, valuesAsString);
     } else {
       // retrieve value from configProperties file
-      final String value = getConfigProperties().getProperty(paramName);
+      final String value = getConfigProperties().getProperty(key);
       if (value != null) {
-        props.setProperty(paramName, value);
+        props.setProperty(key, value);
       }
     }
   }
