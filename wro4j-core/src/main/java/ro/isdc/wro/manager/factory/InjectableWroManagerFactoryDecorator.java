@@ -19,7 +19,7 @@ public class InjectableWroManagerFactoryDecorator
   private Injector injector;
   
   public InjectableWroManagerFactoryDecorator(final WroManagerFactory decorated) {
-    this(decorated, InjectorBuilder.create(decorated).build());
+    super(decorated);
   }
   
   public InjectableWroManagerFactoryDecorator(final WroManagerFactory decorated, final Injector injector) {
@@ -42,6 +42,9 @@ public class InjectableWroManagerFactoryDecorator
    * @return {@link Injector} used to inject the created manager.
    */
   protected Injector getInjector() {
+    if (injector == null) {
+      injector = InjectorBuilder.create(getDecoratedObject()).build();
+    }
     return injector;
   }
 }
