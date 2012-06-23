@@ -180,8 +180,12 @@ public class CssUrlRewritingProcessor
       return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
-      final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
-      return computeNewImageLocation(externalServerCssUri, imageUrl);
+      if (ServletContextUriLocator.isValid(imageUrl)) {
+        //when imageUrl starts with /, assume the cssUri is the external server host
+        final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
+        return computeNewImageLocation(externalServerCssUri, imageUrl);
+      }
+      return computeNewImageLocation(cssUri, imageUrl);      
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
@@ -196,8 +200,10 @@ public class CssUrlRewritingProcessor
   private String computeCssUriForExternalServer(final String cssUri) {
     String exernalServerCssUri = cssUri;
     try {
+      //compute the host of the external server (with protocol & port).
+      final String serverHost = cssUri.replace(new URL(cssUri).getPath(), "");
       //the uri should end mandatory with /
-      exernalServerCssUri = new URL(cssUri).getHost() + "/";
+      exernalServerCssUri = serverHost + ServletContextUriLocator.PREFIX;
       LOG.debug("using {} host as cssUri", exernalServerCssUri);
     } catch(MalformedURLException e) {
       //should never happen
