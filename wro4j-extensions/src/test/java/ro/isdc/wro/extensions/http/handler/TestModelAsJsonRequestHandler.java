@@ -1,6 +1,5 @@
 package ro.isdc.wro.extensions.http.handler;
 
-import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -10,7 +9,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +48,8 @@ import ro.isdc.wro.util.WroUtil;
  * @author Ivar Conradi Østhus
  * @author Alex Objelean
  */
-public class TestExposeModelRequestHandler {
-  private ExposeModelRequestHandler victim;
+public class TestModelAsJsonRequestHandler {
+  private ModelAsJsonRequestHandler victim;
   @Mock
   private HttpServletRequest mockRequest;
   @Mock
@@ -60,7 +66,7 @@ public class TestExposeModelRequestHandler {
     
     MockitoAnnotations.initMocks(this);
     
-    victim = new ExposeModelRequestHandler();
+    victim = new ModelAsJsonRequestHandler();
     
     final WroModel wroModel = createSimpleModelStub();
     
@@ -85,7 +91,7 @@ public class TestExposeModelRequestHandler {
   
   @Test
   public void shouldAcceptRequestsWithCorrectURI() {
-    when(mockRequest.getRequestURI()).thenReturn(ExposeModelRequestHandler.ENDPOINT_URI);
+    when(mockRequest.getRequestURI()).thenReturn(ModelAsJsonRequestHandler.ENDPOINT_URI);
     assertTrue(victim.accept(mockRequest));
   }
   
@@ -124,7 +130,7 @@ public class TestExposeModelRequestHandler {
   public void shouldNotProvideProxyUriForExternalResources() throws IOException {
     when(mockModelFactory.create()).thenReturn(createWroModelExternalModelStub());
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(mockModelFactory);
-    victim = new ExposeModelRequestHandler();
+    victim = new ModelAsJsonRequestHandler();
     Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
 

@@ -28,7 +28,7 @@ import com.google.gson.GsonBuilder;
  * @created 31 May 2012
  * @since 1.4.7
  */
-public class ExposeModelRequestHandler
+public class ModelAsJsonRequestHandler
     extends RequestHandlerSupport {
   @VisibleForTesting
   static final String CONTENT_TYPE = "application/json";

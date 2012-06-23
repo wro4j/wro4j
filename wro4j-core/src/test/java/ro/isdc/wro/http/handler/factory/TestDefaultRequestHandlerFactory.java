@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.http.handler.RequestHandler;
-import ro.isdc.wro.http.handler.factory.DefaultRequestHandlerFactory;
 
 
 /**

@@ -45,7 +45,7 @@ public class ResourceAuthorizationManager {
   }
   
   /**
-   * @return a readonly copy of authorized resources.
+   * @return a read-only copy of authorized resources.
    */
   public Collection<String> list() {
     return Collections.unmodifiableCollection(authorizedResources);

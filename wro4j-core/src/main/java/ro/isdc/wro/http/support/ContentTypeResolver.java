@@ -1,12 +1,13 @@
 package ro.isdc.wro.http.support;
 
-import org.apache.commons.io.FilenameUtils;
-
-import javax.activation.FileTypeMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.activation.FileTypeMap;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class ContentTypeResolver {
 

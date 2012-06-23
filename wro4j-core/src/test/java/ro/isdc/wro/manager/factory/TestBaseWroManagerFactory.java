@@ -18,7 +18,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
-import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**

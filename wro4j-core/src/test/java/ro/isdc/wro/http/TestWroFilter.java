@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.http;
 
-import static ro.isdc.wro.http.handler.RequestHandlerSupport.PATH_API;
 import static org.mockito.Mockito.when;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;

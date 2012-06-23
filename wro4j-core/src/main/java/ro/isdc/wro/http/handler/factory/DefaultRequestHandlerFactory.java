@@ -1,10 +1,10 @@
 package ro.isdc.wro.http.handler.factory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
