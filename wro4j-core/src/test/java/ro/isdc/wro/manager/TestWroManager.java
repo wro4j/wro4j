@@ -44,8 +44,8 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -93,17 +93,11 @@ public class TestWroManager {
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
+    managerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
     MockitoAnnotations.initMocks(this);
     
-    final Injector injector = new InjectorBuilder() {
-      {
-        setWroManager(new BaseWroManagerFactory().create());
-      }
-      protected ResourceAuthorizationManager newResourceAuthorizationManager() {
-        return mockAuthorizationManager;
-      };
-    }.build();
+    final Injector injector = new InjectorBuilder().setWroManager(managerFactory.create()).setResourceAuthorizationManager(
+        mockAuthorizationManager).build();
     injector.inject(victim);
   }
 
@@ -118,7 +112,7 @@ public class TestWroManager {
       return new BaseWroManagerFactory() {
         @Override
         protected void onAfterInitializeManager(final WroManager manager) {
-          manager.registerCallback(new PerformanceLoggerCallback());
+          //manager.registerCallback(new PerformanceLoggerCallback());
         };
         
         @Override
@@ -159,8 +153,9 @@ public class TestWroManager {
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
-      final WroManager manager = createManagerFactory(resource).setGroupExtractor(groupExtractor).create();
-      manager.process();
+      WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
+      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+      managerFactory.create().process();
     }
   }
   
@@ -265,7 +260,8 @@ public class TestWroManager {
   @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
-    final WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
+    WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
+    factory = new InjectableWroManagerFactoryDecorator(factory);
     
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -456,15 +452,17 @@ public class TestWroManager {
     
     WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
-    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
+    managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
     managerFactory.create().process();
   }
   
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new CRC32HashStrategy()).create();
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+        new CRC32HashStrategy()));
+    final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
@@ -472,8 +470,9 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new MD5HashStrategy()).create();
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+        new MD5HashStrategy()));
+    final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }

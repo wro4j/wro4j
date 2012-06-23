@@ -23,7 +23,6 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
@@ -101,8 +100,8 @@ public class BaseWroManagerFactory
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
       
-      final Injector injector = new InjectorBuilder(manager).build();
-      injector.inject(manager);
+//      final Injector injector = new InjectorBuilder(manager).build();
+//      injector.inject(manager);
       
       // initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);

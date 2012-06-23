@@ -40,6 +40,7 @@ import ro.isdc.wro.http.handler.factory.DefaultRequestHandlerFactory;
 import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -82,6 +83,7 @@ public class WroFilter
    * Used to create the collection of requestHandlers to apply
    */
   private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
+  private Injector injector;
   
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -331,7 +333,10 @@ public class WroFilter
    * @VisibleForTesting
    */
   Injector getInjector() {
-    return InjectorBuilder.create(wroManagerFactory).build();
+    if (injector == null) {
+      injector = InjectorBuilder.create(wroManagerFactory).build(); 
+    }
+    return injector;
   }
 
   /**
@@ -347,7 +352,9 @@ public class WroFilter
       throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager
-    wroManagerFactory.create().process();
+    final WroManager manager = wroManagerFactory.create();
+    getInjector().inject(manager);
+    manager.process();
   }
 
   /**

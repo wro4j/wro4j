@@ -25,6 +25,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -151,6 +152,7 @@ public class TestLifecycleCallbackRegistry {
 
     final WroManager manager = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(
       modelFactory).create();
+    WroTestUtils.createInjector().inject(manager);
     manager.registerCallback(callback);
     manager.process();
 
