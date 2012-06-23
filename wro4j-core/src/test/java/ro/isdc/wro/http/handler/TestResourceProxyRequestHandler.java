@@ -74,15 +74,9 @@ public class TestResourceProxyRequestHandler {
     Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
     Context.set(Context.webContext(request, response, filterConfig));
     // a more elaborate way to build injector, used to instruct it use a different instance of authorizationManager
-    final Injector injector = new InjectorBuilder() {
-      {
-        setWroManager(new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).create());
-      }
-      
-      protected ResourceAuthorizationManager newResourceAuthorizationManager() {
-        return mockAuthorizationManager;
-      };
-    }.build();
+    final Injector injector = new InjectorBuilder().setWroManager(
+        new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).create()).setResourceAuthorizationManager(
+        mockAuthorizationManager).build();
     injector.inject(victim);
     
     when(mockUriLocatorFactory.getInstance(anyString())).thenReturn(mockUriLocator);
