@@ -67,6 +67,22 @@ public final class WroModel {
     return this;
   }
 
+  /**
+   * @param resource
+   *          the {@link Resource} to search in all available groups.
+   * @return t collection of group names containing provided resource. If the resource is not availalbe, an empty collection
+   *         will be returned.
+   */
+  public Collection<String> getGroupNamesContainingResource(final String resourceUri) {
+    Validate.notNull(resourceUri);
+    final Set<String> groupNames = new HashSet<String>();
+    for (Group group : getGroups()) {
+      if (group.hasResource(resourceUri)) {
+        groupNames.add(group.getName());
+      }
+    }
+    return groupNames;
+  }
 
   /**
    * Identify duplicate group names.
