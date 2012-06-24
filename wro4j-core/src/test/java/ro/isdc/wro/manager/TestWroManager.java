@@ -44,6 +44,9 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
+import ro.isdc.wro.manager.callback.LifecycleCallback;
+import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
+import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
@@ -112,7 +115,7 @@ public class TestWroManager {
       return new BaseWroManagerFactory() {
         @Override
         protected void onAfterInitializeManager(final WroManager manager) {
-          //manager.registerCallback(new PerformanceLoggerCallback());
+          manager.registerCallback(new PerformanceLoggerCallback());
         };
         
         @Override
@@ -508,6 +511,15 @@ public class TestWroManager {
     final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager);
     reloadModelRunnable.run();
     Assert.assertNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
+  }
+
+  @Test
+  public void shouldRegisterCallback() {
+    final WroManager manager = new WroManager();
+    LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
+    manager.registerCallback(mockCallback);
+    manager.getCallbackRegistry().onProcessingComplete();
+    Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
   }
   
   @After

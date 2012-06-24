@@ -122,7 +122,6 @@ public class BaseWroManagerFactory
    * 
    * @param manager
    *          initialized instance of {@link WroManager}.
-   * @deprecated don't use this method to set callbacks, because the callbackRegistry won't be available at this point. 
    */
   protected void onAfterInitializeManager(final WroManager manager) {
   }

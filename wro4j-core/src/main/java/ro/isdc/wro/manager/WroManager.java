@@ -325,7 +325,7 @@ public class WroManager
    */
   public final void registerCallback(final LifecycleCallback callback) {
     Validate.notNull(callback);
-    callbackRegistry.registerCallback(callback);
+    getCallbackRegistry().registerCallback(callback);
   }
   
   public final List<Transformer<WroModel>> getModelTransformers() {
@@ -335,7 +335,15 @@ public class WroManager
   public final void setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
     this.modelTransformers = modelTransformers;
   }
+ 
   
+  public LifecycleCallbackRegistry getCallbackRegistry() {
+    if (callbackRegistry == null) {
+      callbackRegistry = new LifecycleCallbackRegistry();
+    }
+    return callbackRegistry;
+  }
+
   /**
    * {@inheritDoc}
    */

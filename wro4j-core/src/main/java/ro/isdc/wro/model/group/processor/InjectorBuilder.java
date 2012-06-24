@@ -49,7 +49,6 @@ import ro.isdc.wro.util.Transformer;
 public class InjectorBuilder {
   private GroupsProcessor groupsProcessor = new GroupsProcessor();
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
-  private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
@@ -57,6 +56,7 @@ public class InjectorBuilder {
   private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
+  private LifecycleCallbackRegistry callbackRegistry = null;
   /**
    * A cacheStrategy used for caching processed results.
    */
@@ -199,6 +199,7 @@ public class InjectorBuilder {
     cacheStrategy = manager.getCacheStrategy();
     hashStrategy = manager.getHashStrategy();
     modelTransformers = manager.getModelTransformers();
+    callbackRegistry = manager.getCallbackRegistry();
     return this;
   }
   

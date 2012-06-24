@@ -7,6 +7,7 @@
 # dustJs       [N/A]
 
 # testPage.css request is not consistent (investigate, probably a thread-safety issue). 
-  - WildcardExpanderModelTransformer transform method should be synchronized
-# Read regex from properties file
-# ensure InjectorBuilder doesn't perform redundant initialization.     
+# ensure InjectorBuilder doesn't perform redundant initialization.
+# wroModel reload seems to be broken
+# DispatchertreamLocator should handle 404 dispatch and try http call to locate the resource
+# Callbacks synchronization     
