@@ -100,9 +100,6 @@ public class BaseWroManagerFactory
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
       
-//      final Injector injector = new InjectorBuilder(manager).build();
-//      injector.inject(manager);
-      
       // initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);
       
@@ -125,6 +122,7 @@ public class BaseWroManagerFactory
    * 
    * @param manager
    *          initialized instance of {@link WroManager}.
+   * @deprecated don't use this method to set callbacks, because the callbackRegistry won't be available at this point. 
    */
   protected void onAfterInitializeManager(final WroManager manager) {
   }
