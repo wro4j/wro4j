@@ -113,25 +113,8 @@ public class CssUrlRewritingProcessor
   public static final String ALIAS = "cssUrlRewriting";
   @Inject
   private ResourceAuthorizationManager authorizationManager;
-  /**
-   * Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending on
-   * the depth of the aggregatedFolderPath.
-   */
-  private String aggregatedPathPrefix;
   @Inject
   private Context context;
-  
-  /**
-   * The folder where the final css is located. This is important for computing image location after url rewriting.
-   * 
-   * @param aggregatedFolderPath
-   *          the aggregatedFolder to set
-   */
-  private CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
-    aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolderPath);
-    LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
-    return this;
-  }
   
   /**
    * {@inheritDoc}
@@ -170,10 +153,13 @@ public class CssUrlRewritingProcessor
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
-      // ensure the folder path is set
-      setAggregatedFolderPath(context.getAggregatedFolderPath());
-      LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
-      return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
+      // Compute the folder where the final css is located. This is important for computing image location after url
+      // rewriting.
+      // Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending
+      // on the depth of the aggregatedFolderPath.
+      final String aggregatedPathPrefix = computeAggregationPathPrefix(context.getAggregatedFolderPath());
+      LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
+      return computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
       if (ServletContextUriLocator.isValid(imageUrl)) {

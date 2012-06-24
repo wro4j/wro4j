@@ -116,7 +116,6 @@ public class TestCssUrlRewritingProcessor {
       });
   }
 
-
   /**
    * Test a servletContext css resource.
    */
