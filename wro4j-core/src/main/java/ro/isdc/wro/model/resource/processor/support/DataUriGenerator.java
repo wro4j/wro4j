@@ -23,7 +23,6 @@ import ro.isdc.wro.util.Base64;
  * @created May 7, 2010
  */
 public class DataUriGenerator {
-  private static final Logger LOG = LoggerFactory.getLogger(DataUriGenerator.class);
   private static final String DATA_URI_PREFIX = "data:";
   
   /**

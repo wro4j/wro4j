@@ -27,6 +27,11 @@ public class ContentTypeResolver {
     defaultContentTypeMap.put("gif",   "image/gif");
     defaultContentTypeMap.put("jpg",   "image/jpeg");
     defaultContentTypeMap.put("jpeg",  "image/jpeg");
+    //font types
+    defaultContentTypeMap.put("eot", "application/vnd.ms-fontobject");
+    defaultContentTypeMap.put("otf", "application/x-font-opentype");
+    defaultContentTypeMap.put("ttf", "application/octet-stream");
+
 
     requiresCharset.add("text/css");
     requiresCharset.add("text/html");
