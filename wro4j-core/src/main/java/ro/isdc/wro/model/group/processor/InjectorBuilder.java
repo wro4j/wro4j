@@ -29,6 +29,7 @@ import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -40,7 +41,7 @@ import ro.isdc.wro.util.Transformer;
 /**
  * Responsible for building the {@link Injector}. It can build an {@link Injector} without needing a {@link WroManager},
  * but just by providing required dependencies.
- *
+ * 
  * @author Alex Objelean
  * @since 1.4.3
  * @created 6 Jan 2012
@@ -48,13 +49,14 @@ import ro.isdc.wro.util.Transformer;
 public class InjectorBuilder {
   private GroupsProcessor groupsProcessor = new GroupsProcessor();
   private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
-  private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
   private HashStrategy hashStrategy = new SHA1HashStrategy();
+  private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
   private WroModelFactory modelFactory = null;
   private GroupExtractor groupExtractor = null;
+  private LifecycleCallbackRegistry callbackRegistry = null;
   /**
    * A cacheStrategy used for caching processed results.
    */
@@ -65,17 +67,19 @@ public class InjectorBuilder {
   private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
   private Injector injector;
   /**
-   * Mapping of classes to be annotated and the corresponding injected object.
-   * TODO: probably replace this map with something like spring ApplicationContext (lightweight IoC).
+   * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
+   * something like spring ApplicationContext (lightweight IoC).
    */
   private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
-
+  
   /**
-   * @deprecated prefer using factory method {@link InjectorBuilder#create(WroManagerFactory)}
+   * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
+   * 
+   * @VisibleForTesting
    */
   public InjectorBuilder() {
   }
-
+  
   /**
    * Factory method which uses a managerFactory to initialize injected fields.
    */
@@ -84,10 +88,18 @@ public class InjectorBuilder {
     return new InjectorBuilder(managerFactory.create());
   }
   
+  /**
+   * Creates an injector from a {@link WroManager}.
+   */
+  public static InjectorBuilder create(final WroManager manager) {
+    Validate.notNull(manager);
+    return new InjectorBuilder(manager);
+  }
+  
   public InjectorBuilder(final WroManager manager) {
     setWroManager(manager);
   }
-
+  
   private void initMap() {
     map.put(PreProcessorExecutor.class, new InjectorObjectFactory<PreProcessorExecutor>() {
       public PreProcessorExecutor create() {
@@ -153,9 +165,15 @@ public class InjectorBuilder {
     });
     map.put(CacheStrategy.class, new InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>>() {
       public CacheStrategy<CacheEntry, ContentHashEntry> create() {
-        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(cacheStrategy);
+        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(
+            cacheStrategy);
         injector.inject(decorated);
         return decorated;
+      }
+    });
+    map.put(ResourceAuthorizationManager.class, new InjectorObjectFactory<ResourceAuthorizationManager>() {
+      public ResourceAuthorizationManager create() {
+        return authorizationManager;
       }
     });
     map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
@@ -164,14 +182,14 @@ public class InjectorBuilder {
       }
     });
   }
-
+  
   public Injector build() {
-    //first initialize the map
+    // first initialize the map
     initMap();
     return injector = new Injector(Collections.unmodifiableMap(map));
   }
-
-  private InjectorBuilder setWroManager(final WroManager manager) {
+  
+  public InjectorBuilder setWroManager(final WroManager manager) {
     Validate.notNull(manager);
     uriLocatorFactory = manager.getUriLocatorFactory();
     processorsFactory = manager.getProcessorsFactory();
@@ -181,13 +199,20 @@ public class InjectorBuilder {
     cacheStrategy = manager.getCacheStrategy();
     hashStrategy = manager.getHashStrategy();
     modelTransformers = manager.getModelTransformers();
+    callbackRegistry = manager.getCallbackRegistry();
     return this;
   }
-
+  
+  public InjectorBuilder setResourceAuthorizationManager(final ResourceAuthorizationManager authManager) {
+    Validate.notNull(authManager);
+    this.authorizationManager = authManager;
+    return this;
+  }
+  
   /**
    * A special type used for lazy object injection only in context of this class.
    */
   static interface InjectorObjectFactory<T>
-    extends ObjectFactory<T> {
+      extends ObjectFactory<T> {
   };
 }

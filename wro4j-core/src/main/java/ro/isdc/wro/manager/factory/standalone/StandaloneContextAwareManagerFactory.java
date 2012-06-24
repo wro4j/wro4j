@@ -7,9 +7,12 @@ package ro.isdc.wro.manager.factory.standalone;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
+
 /**
- * An implementation of {@link WroManagerFactory} aware about the run context.
- *
+ * An implementation of {@link WroManagerFactory} aware about the run context.<br/>
+ * TODO: find a way to not require {@link StandaloneContextAwareManagerFactory} for build time processing, but use any
+ * iinstance of {@link WroManagerFactory}.
+ * 
  * @author Alex Objelean
  */
 public interface StandaloneContextAwareManagerFactory

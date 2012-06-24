@@ -1,0 +1,14 @@
+input.button {
+	background: url(http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png);
+	background-image: url("http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png', sizingMethod='scale');
+}
+.multilineAndSpaces {
+  background: 
+     url( "http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png " );
+  background-image : 
+     url( "http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png " )     
+}
+@font-face {
+    src: url(http://wro4j.googlecode.com/svn/wiki/img/folderStructure.png);
+}

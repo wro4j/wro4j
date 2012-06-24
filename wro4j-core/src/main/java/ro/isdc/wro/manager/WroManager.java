@@ -4,32 +4,20 @@
 package ro.isdc.wro.manager;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -38,18 +26,15 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
-import ro.isdc.wro.model.resource.support.hash.HashBuilder;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.Transformer;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -92,18 +77,21 @@ public class WroManager
    */
   @Inject
   private HashStrategy hashStrategy;
+  @Inject
+  private Injector injector;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
   private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
   /**
-   * Schedules the cache update.
-   */
-  private final SchedulerHelper cacheSchedulerHelper;
-  /**
    * Schedules the model update.
    */
   private final SchedulerHelper modelSchedulerHelper;
+  /**
+   * Schedules the cache update.
+   */
+  private final SchedulerHelper cacheSchedulerHelper;
+  private ResourceBundleProcessor resourceBundleProcessor;
   
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -118,6 +106,7 @@ public class WroManager
         return new ReloadModelRunnable(WroManager.this);
       }
     }, ReloadModelRunnable.class.getSimpleName());
+    resourceBundleProcessor = new ResourceBundleProcessor();
   }
   
   /**
@@ -129,110 +118,19 @@ public class WroManager
   public final void process()
       throws IOException {
     validate();
-    if (isProxyResourceRequest()) {
-      serveProxyResourceRequest();
-    } else {
-      serveProcessedBundle();
+    // reschedule cache & model updates
+    cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
+    modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+    // Inject
+    injector.inject(getResourceBundleProcessor());
+    getResourceBundleProcessor().serveProcessedBundle();
+  }
+
+  private ResourceBundleProcessor getResourceBundleProcessor() {
+    if (resourceBundleProcessor == null) {
+      resourceBundleProcessor = new ResourceBundleProcessor();
     }
-  }
-  
-  /**
-   * Check if this is a request for a proxy resource - a resource which url is overwritten by wro4j.
-   */
-  private boolean isProxyResourceRequest() {
-    final HttpServletRequest request = Context.get().getRequest();
-    return request != null && StringUtils.contains(request.getRequestURI(), CssUrlRewritingProcessor.PATH_RESOURCES);
-  }
-  
-  private boolean isGzipAllowed() {
-    return config.isGzipEnabled() && isGzipSupported();
-  }
-  
-  /**
-   * Write to stream the content of the processed resource bundle.
-   * 
-   * @param model
-   *          the model used to build stream.
-   */
-  private void serveProcessedBundle()
-      throws IOException {
-    final Context context = Context.get();
-    final WroConfiguration configuration = context.getConfig();
-    
-    final HttpServletRequest request = context.getRequest();
-    final HttpServletResponse response = context.getResponse();
-    
-    OutputStream os = null;
-    try {
-      // find names & type
-      final ResourceType type = groupExtractor.getResourceType(request);
-      final String groupName = groupExtractor.getGroupName(request);
-      final boolean minimize = groupExtractor.isMinimized(request);
-      if (groupName == null || type == null) {
-        throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
-      }
-      initAggregatedFolderPath(request, type);
-      
-      // reschedule cache & model updates
-      cacheSchedulerHelper.scheduleWithPeriod(configuration.getCacheUpdatePeriod());
-      modelSchedulerHelper.scheduleWithPeriod(configuration.getModelUpdatePeriod());
-      
-      final CacheEntry cacheKey = new CacheEntry(groupName, type, minimize);
-      final ContentHashEntry cacheValue = cacheStrategy.get(cacheKey);
-      
-      // TODO move ETag check in wroManagerFactory
-      final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());
-      
-      // enclose etag value in quotes to be compliant with the RFC
-      final String etagValue = String.format("\"%s\"", cacheValue.getHash());
-      
-      if (etagValue != null && etagValue.equals(ifNoneMatch)) {
-        LOG.debug("ETag hash detected: {}. Sending {} status code", etagValue, HttpServletResponse.SC_NOT_MODIFIED);
-        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-        // because we cannot return null, return a stream containing nothing.
-        // TODO close output stream?
-        return;
-      }
-      /**
-       * Set contentType before actual content is written, solves <br/>
-       * <a href="http://code.google.com/p/wro4j/issues/detail?id=341">issue341</a>
-       */
-      if (type != null) {
-        response.setContentType(type.getContentType() + "; charset=" + configuration.getEncoding());
-      }
-      // set ETag header
-      response.setHeader(HttpHeader.ETAG.toString(), etagValue);
-      
-      os = response.getOutputStream();
-      if (cacheValue.getRawContent() != null) {
-        // use gziped response if supported & Set content length based on gzip flag
-        if (isGzipAllowed()) {
-          response.setContentLength(cacheValue.getGzippedContent().length);
-          // add gzip header and gzip response
-          response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
-          response.setHeader("Vary", "Accept-Encoding");
-          IOUtils.write(cacheValue.getGzippedContent(), os);
-        } else {
-          response.setContentLength(cacheValue.getRawContent().length());
-          IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
-        }
-      }
-    } finally {
-      if (os != null)
-        IOUtils.closeQuietly(os);
-    }
-  }
-  
-  /**
-   * Set the aggregatedFolderPath if required.
-   */
-  private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
-    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
-      final String requestUri = request.getRequestURI();
-      final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
-      final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
-      Context.get().setAggregatedFolderPath(aggregatedFolder);
-    }
+    return resourceBundleProcessor;
   }
   
   /**
@@ -263,38 +161,7 @@ public class WroManager
   protected String formatVersionedResource(final String hash, final String resourcePath) {
     return String.format("%s/%s", hash, resourcePath);
   }
-  
-  /**
-   * Serve images and other external resources referred by bundled resources.
-   * 
-   * @param request
-   *          {@link HttpServletRequest} object.
-   * @param outputStream
-   *          where the stream will be written.
-   * @throws IOException
-   *           if no stream could be resolved.
-   */
-  private void serveProxyResourceRequest()
-      throws IOException {
-    final HttpServletRequest request = Context.get().getRequest();
-    final OutputStream outputStream = Context.get().getResponse().getOutputStream();
-    
-    final String resourceId = request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID);
-    LOG.debug("locating stream for resourceId: {}", resourceId);
-    final CssUrlRewritingProcessor processor = ProcessorsUtils.findPreProcessorByClass(CssUrlRewritingProcessor.class,
-        processorsFactory.getPreProcessors());
-    if (processor != null && !processor.isUriAllowed(resourceId)) {
-      throw new UnauthorizedRequestException("Unauthorized resource request detected! " + request.getRequestURI());
-    }
-    final InputStream is = uriLocatorFactory.locate(resourceId);
-    if (is == null) {
-      throw new WroRuntimeException("Cannot process request with uri: " + request.getRequestURI());
-    }
-    IOUtils.copy(is, outputStream);
-    IOUtils.closeQuietly(is);
-    IOUtils.closeQuietly(outputStream);
-  }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -346,13 +213,6 @@ public class WroManager
   }
   
   /**
-   * @return true if Gzip is Supported
-   */
-  private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
-  }
-  
-  /**
    * @param groupExtractor
    *          the uriProcessor to set
    */
@@ -379,26 +239,15 @@ public class WroManager
   }
   
   /**
-   * @param contentDigester
+   * @param hashStrategy
    *          the contentDigester to set
    */
-  public final WroManager setHashBuilder(final HashStrategy contentDigester) {
-    Validate.notNull(contentDigester);
-    this.hashStrategy = contentDigester;
+  public final WroManager setHashStrategy(final HashStrategy hashStrategy) {
+    Validate.notNull(hashStrategy);
+    this.hashStrategy = hashStrategy;
     return this;
   }
   
-  /**
-   * @deprecated use {@link WroManager#getHashStrategy()} instead
-   */
-  @Deprecated
-  public final HashBuilder getHashBuilder() {
-    return hashStrategy;
-  }
-  
-  /**
-   * @return {@link HashStrategy} used by this {@link WroManager}.
-   */
   public final HashStrategy getHashStrategy() {
     return hashStrategy;
   }
@@ -476,7 +325,7 @@ public class WroManager
    */
   public final void registerCallback(final LifecycleCallback callback) {
     Validate.notNull(callback);
-    callbackRegistry.registerCallback(callback);
+    getCallbackRegistry().registerCallback(callback);
   }
   
   public final List<Transformer<WroModel>> getModelTransformers() {
@@ -486,7 +335,15 @@ public class WroManager
   public final void setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
     this.modelTransformers = modelTransformers;
   }
+ 
   
+  public LifecycleCallbackRegistry getCallbackRegistry() {
+    if (callbackRegistry == null) {
+      callbackRegistry = new LifecycleCallbackRegistry();
+    }
+    return callbackRegistry;
+  }
+
   /**
    * {@inheritDoc}
    */

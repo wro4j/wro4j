@@ -73,9 +73,6 @@
       <artifactId>bourbon-gem-jar</artifactId>
       <version>2.1.0</version>
     </dependency>
-		<!-- <dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId>
-			<artifactId>gmaven-runtime-default</artifactId> <version>1.0-rc-3</version> 
-			</dependency> -->
 		<dependency>
 			<groupId>org.codehaus.gmaven.runtime</groupId>
 			<artifactId>gmaven-runtime-1.7</artifactId>

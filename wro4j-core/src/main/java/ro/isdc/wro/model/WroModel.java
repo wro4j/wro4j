@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
+import ro.isdc.wro.model.resource.Resource;
 
 /**
  * The resource model encapsulates the information about all existing groups.
@@ -66,6 +67,22 @@ public final class WroModel {
     return this;
   }
 
+  /**
+   * @param resource
+   *          the {@link Resource} to search in all available groups.
+   * @return t collection of group names containing provided resource. If the resource is not availalbe, an empty collection
+   *         will be returned.
+   */
+  public Collection<String> getGroupNamesContainingResource(final String resourceUri) {
+    Validate.notNull(resourceUri);
+    final Set<String> groupNames = new HashSet<String>();
+    for (Group group : getGroups()) {
+      if (group.hasResource(resourceUri)) {
+        groupNames.add(group.getName());
+      }
+    }
+    return groupNames;
+  }
 
   /**
    * Identify duplicate group names.
@@ -141,6 +158,17 @@ public final class WroModel {
     return this;
   }
 
+  /**
+   * @return the set of all resources from all the groups of the model (no particular order).
+   */
+  public Set<Resource> getAllResources() {
+    final Set<Resource> resources = new HashSet<Resource>();
+    for (final Group group : getGroups()) {
+      resources.addAll(group.getResources());
+    }
+    return resources;
+  }
+  
   /**
    * {@inheritDoc}
    */

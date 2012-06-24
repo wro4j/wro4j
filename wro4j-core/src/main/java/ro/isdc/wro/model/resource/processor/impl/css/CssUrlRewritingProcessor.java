@@ -8,9 +8,6 @@ import static ro.isdc.wro.util.StringUtils.cleanPath;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,6 +20,7 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 
 /**
@@ -113,10 +111,8 @@ public class CssUrlRewritingProcessor
     extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
   public static final String ALIAS = "cssUrlRewriting";
-  /**
-   * A set of allowed url's.
-   */
-  private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
   /**
    * Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending on
    * the depth of the aggregatedFolderPath.
@@ -142,7 +138,7 @@ public class CssUrlRewritingProcessor
    */
   @Override
   protected void onProcessCompleted() {
-    LOG.debug("allowed urls: {}", allowedUrls);
+    LOG.debug("allowed urls: {}", authorizationManager.list());
   }
   
   /**
@@ -152,7 +148,7 @@ public class CssUrlRewritingProcessor
   protected void onUrlReplaced(final String replacedUrl) {
     final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
     LOG.debug("adding allowed url: {}", allowedUrl);
-    allowedUrls.add(allowedUrl);
+    authorizationManager.add(allowedUrl);
   }
   
   /**
@@ -280,6 +276,6 @@ public class CssUrlRewritingProcessor
    * @return true if passed argument is contained in allowed list.
    */
   public final boolean isUriAllowed(final String uri) {
-    return allowedUrls.contains(uri);
+    return authorizationManager.isAuthorized(uri);
   }
 }
