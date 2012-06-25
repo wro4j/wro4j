@@ -27,6 +27,7 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -55,6 +56,8 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -79,6 +82,31 @@ public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
   @Mock
   private ResourceAuthorizationManager mockAuthorizationManager;
+  /**
+   * Used to test simple operations.
+   */
+  @InjectMocks
+  private WroManager victim;
+  /**
+   * Used to test more complex use-cases.
+   */
+  private WroManagerFactory managerFactory;
+  
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
+        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    Context.set(context, newConfigWithUpdatePeriodValue(0));
+    managerFactory = new InjectableWroManagerFactoryDecorator(
+        new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
+   MockitoAnnotations.initMocks(this);
+    
+    final Injector injector = new InjectorBuilder().setWroManager(managerFactory.create()).setResourceAuthorizationManager(
+        mockAuthorizationManager).build();
+    injector.inject(victim);
+  }
+  
   /**
    * A processor which which uses a {@link WroManager} during processor, in order to process a single group, whose
    * resource is the pre processed resource of this processor.
@@ -132,20 +160,14 @@ public class TestWroManager {
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
       WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
-      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory) {
+        @Override
+        protected Injector getInjector() {
+          return super.getInjector();
+        }
+      };
       managerFactory.create().process();
     }
-  }
-  
-  private WroManagerFactory managerFactory;
-  
-  @Before
-  public void setUp() {
-    MockitoAnnotations.initMocks(this);
-    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
-        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
-    Context.set(context, newConfigWithUpdatePeriodValue(0));
-    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
   }
   
   private class GenericTestBuilder {
@@ -236,13 +258,13 @@ public class TestWroManager {
 
   @Test
   public void shouldClearAuthorizationManagerWhenCachePeriodChanged() {
-    managerFactory.onCachePeriodChanged(1);
+    victim.onCachePeriodChanged(1);
     verify(mockAuthorizationManager, atLeastOnce()).clear();
   }
   
   @Test
   public void shouldClearAuthorizationManagerWhenModelPeriodChanged() {
-    managerFactory.onModelPeriodChanged(1);
+    victim.onModelPeriodChanged(1);
     verify(mockAuthorizationManager, atLeastOnce()).clear();
   }
   
