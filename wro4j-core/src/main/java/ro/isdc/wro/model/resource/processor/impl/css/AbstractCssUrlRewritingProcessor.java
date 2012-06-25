@@ -94,7 +94,8 @@ public abstract class AbstractCssUrlRewritingProcessor
       
       Validate.notNull(originalUrl);
       if (isReplaceNeeded(originalUrl)) {
-        final String modifiedUrl = replaceImageUrl(cssUri, originalUrl);
+        //the originalUrl is cleaned to be sure that quotes are removed
+        final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
         LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, StringUtils.abbreviate(modifiedUrl, 40));
         /**
          * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
