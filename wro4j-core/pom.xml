@@ -30,5 +30,11 @@
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>jsp-api</artifactId>
 		</dependency>
+		<!-- This dependency has provided scope to allow WroTestUtils use Assert -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>
