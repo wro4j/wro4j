@@ -133,6 +133,7 @@ public class TestInjectorBuilder {
     Assert.assertNotNull(sample.groupExtractor);
     Assert.assertNotNull(sample.cacheStrategy);
     Assert.assertNotNull(sample.hashBuilder);
+    Assert.assertNotNull(sample.readOnlyContext);
   }
   
   @Test(expected = IOException.class)
@@ -177,6 +178,6 @@ public class TestInjectorBuilder {
     @Inject
     HashStrategy hashBuilder;
     @Inject
-    ReadOnlyContext context;
+    ReadOnlyContext readOnlyContext;
   }
 }
