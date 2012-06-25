@@ -3,13 +3,18 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.ProxyFactory;
+
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
@@ -47,8 +52,8 @@ import ro.isdc.wro.util.Transformer;
  * @created 6 Jan 2012
  */
 public class InjectorBuilder {
-  private GroupsProcessor groupsProcessor = new GroupsProcessor();
-  private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private final GroupsProcessor groupsProcessor = new GroupsProcessor();
+  private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
@@ -70,7 +75,7 @@ public class InjectorBuilder {
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
    * something like spring ApplicationContext (lightweight IoC).
    */
-  private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+  private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   
   /**
    * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
@@ -153,11 +158,7 @@ public class InjectorBuilder {
         return namingStrategy;
       }
     });
-    map.put(Context.class, new InjectorObjectFactory<Context>() {
-      public Context create() {
-        return Context.get();
-      }
-    });
+    map.put(Context.class, createContextProxy());
     map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return Context.get().getConfig();
@@ -183,6 +184,23 @@ public class InjectorBuilder {
     });
   }
   
+  private Context createContextProxy() {
+    try {
+      final ProxyFactory factory = new ProxyFactory();
+      factory.setSuperclass(Context.class);
+      final MethodHandler handler = new MethodHandler() {
+        public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args)
+            throws Throwable {
+          return thisMethod.invoke(Context.get(), args);
+        }
+      };
+      final Context proxyContext = (Context) factory.create(new Class<?>[0], new Object[0], handler);
+      return proxyContext;
+    } catch (Exception e) {
+      throw new WroRuntimeException("", e);
+    }
+  }
+
   public Injector build() {
     // first initialize the map
     initMap();

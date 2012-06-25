@@ -169,9 +169,10 @@ public class Context {
 
 
   /**
-   * Private constructor. Used to build {@link StandAloneContext}.
+   * The constructor with friendly modifier, used for proxy creation using javassist.
    */
-  private Context() {}
+  Context() {
+  }
 
 
   /**
