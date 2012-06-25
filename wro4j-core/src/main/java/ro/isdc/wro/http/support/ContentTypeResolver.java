@@ -30,7 +30,6 @@ public class ContentTypeResolver {
     //font types
     defaultContentTypeMap.put("eot", "application/vnd.ms-fontobject");
     defaultContentTypeMap.put("otf", "application/x-font-opentype");
-    defaultContentTypeMap.put("ttf", "application/octet-stream");
 
 
     requiresCharset.add("text/css");

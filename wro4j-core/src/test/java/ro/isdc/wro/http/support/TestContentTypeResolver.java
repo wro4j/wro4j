@@ -52,4 +52,19 @@ public class TestContentTypeResolver {
    public void shouldResolveHTMLUpperCaseExtenstion() {
      assertThat(ContentTypeResolver.get("mefile.CSS"), is("text/css"));
    }
+  
+  @Test
+  public void shouldResolveFontExtensionEot() {
+    assertThat(ContentTypeResolver.get("font.eot"), is("application/vnd.ms-fontobject"));
+  }
+  
+  @Test
+  public void shouldResolveFontExtensionOtf() {
+    assertThat(ContentTypeResolver.get("font.otf"), is("application/x-font-opentype"));
+  }
+  
+  @Test
+  public void shouldResolveFontExtensionTtf() {
+    assertThat(ContentTypeResolver.get("font.ttf"), is("application/octet-stream"));
+  }
 }
