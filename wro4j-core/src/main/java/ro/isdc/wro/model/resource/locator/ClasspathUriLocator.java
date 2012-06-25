@@ -13,6 +13,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -28,10 +29,11 @@ import ro.isdc.wro.util.StringUtils;
  */
 public class ClasspathUriLocator
     extends WildcardUriLocatorSupport {
-  /**
-   * Logger for this class.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
+  /**
+   * Alias used to register this locator with {@link LocatorProvider}. 
+   */
+  public static final String ALIAS = "classpath";
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */

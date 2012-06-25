@@ -24,11 +24,11 @@ import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
-import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 import ro.isdc.wro.util.LazyInitializer;
 
 import com.google.javascript.jscomp.CompilationLevel;

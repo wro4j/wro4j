@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008. All rights reserved.
  */
-package ro.isdc.wro.model.resource.locator;
+package ro.isdc.wro.model.resource.locator.support;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.util.WroUtil;
 
 

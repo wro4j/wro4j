@@ -28,6 +28,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 
 
 /**

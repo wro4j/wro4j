@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.WroUtil;
@@ -33,11 +35,23 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ServletContextUriLocator
     extends WildcardUriLocatorSupport {
+  private static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
   /**
-   * Logger for this class.
+   * Alias used to register this locator with {@link LocatorProvider}. 
    */
-  static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
-
+  public static final String ALIAS = "servletContext";
+  /**
+   * Same as default Alias (exist for explicit configuration). Uses DISPATCHER_FIRST strategy. Meaning that, for
+   * example, a jsp resource will be served in its final state (processed by servlet container), rather than in its raw
+   * variant.
+   */
+  public static final String ALIAS_DISPATCHER_FIRST = "servletContext.DISPATCHER_FIRST";
+  /**
+   * Uses SERVLET_CONTEXT_FIRST strategy, meaning that, for example, a jsp will be served with its raw content, instead
+   * of processed by container.
+   */
+  public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
+  
   /**
    * Prefix for url resources.
    */
