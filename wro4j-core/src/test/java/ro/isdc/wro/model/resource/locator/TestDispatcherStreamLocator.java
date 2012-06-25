@@ -3,6 +3,13 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -11,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,7 +40,9 @@ public class TestDispatcherStreamLocator {
   private RequestDispatcher mockDispatcher;
   @Mock
   private HttpServletResponse mockResponse;
-  private DispatcherStreamLocator locator;
+  @Mock
+  private UriLocator mockUriLocator;
+  private DispatcherStreamLocator victim;
 
   @Before
   public void setUp() {
@@ -40,58 +50,84 @@ public class TestDispatcherStreamLocator {
     Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("/resource.js"));
     Mockito.when(mockRequest.getServletPath()).thenReturn("");
     Context.set(Context.standaloneContext());
-    locator = new DispatcherStreamLocator();
+    victim = new DispatcherStreamLocator();
   }
 
   @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullRequestOrResponse()
       throws Exception {
-    locator.getInputStream(null, null, null);
+    victim.getInputStream(null, null, null);
   }
 
   @Test(expected = IOException.class)
   public void cannotLocateNullLocation()
       throws Exception {
-    locator.getInputStream(mockRequest, mockResponse, null);
+    victim.getInputStream(mockRequest, mockResponse, null);
   }
 
   @Test(expected = IOException.class)
   public void cannotLocateInvalidLocation()
       throws Exception {
-    locator.getInputStream(mockRequest, mockResponse, "/INVALID");
+    victim.getInputStream(mockRequest, mockResponse, "/INVALID");
   }
 
   @Test
   public void canLocateValidResource()
       throws Exception {
-    Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
-    Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "http://www.google.com"));
+    when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
+    assertNotNull(victim.getInputStream(mockRequest, mockResponse, "http://www.google.com"));
   }
-
-  @Test(expected=IOException.class)
+  
+  @Test(expected = IOException.class)
   public void testDispatchIncludeHasNoValidResource()
       throws Exception {
-    Mockito.when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
-    Mockito.doAnswer(new Answer<Void>() {
+    when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
+    doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
           throws Throwable {
         throw new IOException("Include doesn't work... nothing found");
       }
     }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
-    locator.getInputStream(mockRequest, mockResponse, "/static/*.js");
+    victim.getInputStream(mockRequest, mockResponse, "/static/*.js");
   }
 
   @Test
-  public void testDispatchIncludeReturnsValidResource()
+  public void shouldReturnsResourceIncludedByDispatcher()
       throws Exception {
-    Mockito.when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
-    Mockito.doAnswer(new Answer<Void>() {
+    final String content = "SomeNonEmptyContent";
+    when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
+    doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
           throws Throwable {
-        //do nothing
+        HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+        response.getOutputStream().write(content.getBytes());
         return null;
       }
     }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
-    Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "/static/*.js"));
+    assertEquals(content, IOUtils.toString(victim.getInputStream(mockRequest, mockResponse, "/static/*.js")));
+    verify(mockUriLocator, never()).locate(Mockito.anyString());
+  }
+  
+  @Test
+  public void shouldFallbackToExternalResourceLocatorWhenDispatcherReturns404() throws Exception {
+    victim = new DispatcherStreamLocator() {
+      @Override
+      UriLocator createExternalResourceLocator() {
+        return mockUriLocator;
+      }
+    };
+    final String location ="/some/location.js";
+    when(mockRequest.getRequestDispatcher(location)).thenReturn(mockDispatcher);
+    Mockito.doAnswer(new Answer<Void>() {
+      public Void answer(final InvocationOnMock invocation)
+          throws Throwable {
+        //simulate the dispatched response is empty
+        return null;
+      }
+    }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class),
+        Mockito.any(HttpServletResponse.class));
+    victim.getInputStream(mockRequest, mockResponse, location);
+    
+    verify(mockUriLocator).locate(Mockito.anyString());
   }
 }

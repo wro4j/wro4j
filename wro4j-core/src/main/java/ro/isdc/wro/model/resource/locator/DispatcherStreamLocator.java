@@ -25,22 +25,14 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * A strategy which use ByteArray IO Streams and dispatch the request to a given location.
- *
+ * Responsible to locate a context relative resource. It attempts to locate the resource using {@link RequestDispatcher}
+ * . If the dispatcher fails, it will fallback resource retrieval to a http call using {@link UrlUriLocator}.
+ * 
  * @author Alex Objelean
  */
-public final class DispatcherStreamLocator {
+public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-  /**
-   * Used to locate external resources. No wildcard handling is required.
-   */
-  private UriLocator externalResourceLocator = new UrlUriLocator() {
-    @Override
-    public boolean isEnableWildcards() {
-      return false;
-    };
-  };
-  
+
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
@@ -63,27 +55,30 @@ public final class DispatcherStreamLocator {
     final Context originalContext = Context.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
-      if (dispatcher == null) {
+      if (dispatcher != null) {
+        // Wrap request
+        final ServletRequest servletRequest = getWrappedServletRequest(request, location);
+        // Wrap response
+        final ServletResponse servletResponse = new RedirectedStreamServletResponseWrapper(os, response);
+        LOG.debug("dispatching request to location: " + location);
+        // use dispatcher
+        dispatcher.include(servletRequest, servletResponse);
+        warnOnEmptyStream = true;
+        // force flushing - the content will be written to
+        // BytArrayOutputStream. Otherwise exactly 32K of data will be
+        // written.
+        servletResponse.getWriter().flush();
+        os.close();
+      }
+      //fallback to external resource locator if the dispatcher is empty
+      if (os.size() == 0) {
         // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
         // the thread responsible for refreshing resources)
         // Returns the part URL from the protocol name up to the query string and contextPath.
         final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
         final String absolutePath = servletContextPath + location;
-        return externalResourceLocator.locate(absolutePath);
+        return createExternalResourceLocator().locate(absolutePath);
       }
-      // Wrap request
-      final ServletRequest servletRequest = getWrappedServletRequest(request, location);
-      // Wrap response
-      final ServletResponse servletResponse = new RedirectedStreamServletResponseWrapper(os, response);
-      LOG.debug("dispatching request to location: " + location);
-      // use dispatcher
-      dispatcher.include(servletRequest, servletResponse);
-      warnOnEmptyStream = true;
-      // force flushing - the content will be written to
-      // BytArrayOutputStream. Otherwise exactly 32K of data will be
-      // written.
-      servletResponse.getWriter().flush();
-      os.close();
     } catch (final Exception e) {
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
@@ -102,6 +97,20 @@ public final class DispatcherStreamLocator {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
+  /**
+   * @return the {@link UriLocator} responsible for locating resources when dispatcher fails. No wildcard handling is
+   *         required.
+   * @VisibleForTesting
+   */
+  UriLocator createExternalResourceLocator() {
+    return new UrlUriLocator() {
+      @Override
+      public boolean isEnableWildcards() {
+        return false;
+      };
+    };
+  }
+  
   /**
    * Build a wrapped servlet request which will be used for dispatching.
    */
