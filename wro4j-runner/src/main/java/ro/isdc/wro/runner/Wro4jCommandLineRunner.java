@@ -37,6 +37,7 @@ import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -266,7 +267,8 @@ public class Wro4jCommandLineRunner {
     managerFactory.setProcessorsFactory(createProcessorsFactory());
     managerFactory.setModelFactory(createWroModelFactory());
     managerFactory.initialize(createStandaloneContext());
-    return managerFactory;
+    //allow created manager to get injected immediately after creation
+    return new InjectableContextAwareManagerFactory(managerFactory);
   }
   
   private WroModelFactory createWroModelFactory() {

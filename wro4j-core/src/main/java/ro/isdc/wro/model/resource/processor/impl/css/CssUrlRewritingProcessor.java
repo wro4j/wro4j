@@ -8,9 +8,6 @@ import static ro.isdc.wro.util.StringUtils.cleanPath;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,6 +19,7 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 
 /**
@@ -116,11 +114,8 @@ public class CssUrlRewritingProcessor
    * Constant for WEB-INF folder.
    */
   private static final String PROTECTED_PREFIX = "/WEB-INF/";
-
-  /**
-   * A set of allowed url's.
-   */
-  private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
   /**
    * Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending on
    * the depth of the aggregatedFolderPath.
@@ -146,7 +141,7 @@ public class CssUrlRewritingProcessor
    */
   @Override
   protected void onProcessCompleted() {
-    LOG.debug("allowed urls: {}", allowedUrls);
+    LOG.debug("allowed urls: {}", authorizationManager.list());
   }
   
   /**
@@ -156,7 +151,7 @@ public class CssUrlRewritingProcessor
   protected void onUrlReplaced(final String replacedUrl) {
     final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
     LOG.debug("adding allowed url: {}", allowedUrl);
-    allowedUrls.add(allowedUrl);
+    authorizationManager.add(allowedUrl);
   }
   
   /**
@@ -294,27 +289,26 @@ public class CssUrlRewritingProcessor
    * @return true if passed argument is contained in allowed list.
    */
   public final boolean isUriAllowed(final String uri) {
-    return allowedUrls.contains(uri);
+    return authorizationManager.isAuthorized(uri);
   }
-
-
-
+  
   /**
    * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
    * folder).
-   *
-   * @param uri the uri to check.
+   * 
+   * @param uri
+   *          the uri to check.
    * @return true if the uri is a protected resource.
    */
   public boolean isProtectedResource(final String uri) {
     return StringUtils.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
   }
-
-
+  
   /**
    * Check if a uri is a context relative resource (if starts with /).
-   *
-   * @param uri to check.
+   * 
+   * @param uri
+   *          to check.
    * @return true if the uri is a servletContext resource.
    */
   private boolean isContextRelativeUri(final String uri) {

@@ -12,8 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.naming.HashEncoderNamingStrategy;
-import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
 /**

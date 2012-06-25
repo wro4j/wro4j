@@ -95,18 +95,13 @@ public class BaseWroManagerFactory
 
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
-      manager.setHashBuilder(hashStrategy);
+      manager.setHashStrategy(hashStrategy);
       manager.setResourceLocatorFactory(resourceLocatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
-
       
-      final Injector injector = new InjectorBuilder(manager).build();
-      injector.inject(manager);
-      
-      //initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);
       
       return manager;
@@ -165,7 +160,7 @@ public class BaseWroManagerFactory
   protected ProcessorsFactory newProcessorsFactory() {
     return new DefaultProcesorsFactory();
   }
-
+  
   /**
    * Override to provide a different or modified factory.
    *

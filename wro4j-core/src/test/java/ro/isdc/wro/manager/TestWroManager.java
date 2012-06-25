@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.manager;
 
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +27,9 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -38,9 +43,10 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.http.support.UnauthorizedRequestException;
+import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -54,7 +60,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
@@ -71,7 +77,8 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
-  
+  @Mock
+  private ResourceAuthorizationManager mockAuthorizationManager;
   /**
    * A processor which which uses a {@link WroManager} during processor, in order to process a single group, whose
    * resource is the pre processed resource of this processor.
@@ -79,12 +86,14 @@ public class TestWroManager {
   private static final class WroManagerProcessor
     implements ResourceProcessor {
     
-    private WroManagerFactory createManagerFactory(final Resource resource) {
+    private BaseWroManagerFactory createManagerFactory(final Resource resource) {
       return new BaseWroManagerFactory() {
         @Override
         protected void onAfterInitializeManager(final WroManager manager) {
           manager.registerCallback(new PerformanceLoggerCallback());
         };
+        
+        @Override
         protected WroModelFactory newModelFactory() {
           return WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("group").addResource(resource)));
         }
@@ -122,9 +131,9 @@ public class TestWroManager {
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
-      final WroManager manager = createManagerFactory(resource).create();
-      manager.setGroupExtractor(groupExtractor);
-      manager.process();
+      WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
+      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+      managerFactory.create().process();
     }
   }
   
@@ -132,6 +141,7 @@ public class TestWroManager {
   
   @Before
   public void setUp() {
+    MockitoAnnotations.initMocks(this);
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     Context.set(context, newConfigWithUpdatePeriodValue(0));
@@ -223,11 +233,24 @@ public class TestWroManager {
     config.setDisableCache(true);
     return config;
   }
+
+  @Test
+  public void shouldClearAuthorizationManagerWhenCachePeriodChanged() {
+    managerFactory.onCachePeriodChanged(1);
+    verify(mockAuthorizationManager, atLeastOnce()).clear();
+  }
+  
+  @Test
+  public void shouldClearAuthorizationManagerWhenModelPeriodChanged() {
+    managerFactory.onModelPeriodChanged(1);
+    verify(mockAuthorizationManager, atLeastOnce()).clear();
+  }
   
   @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
-    final WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
+    WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
+    factory = new InjectableWroManagerFactoryDecorator(factory);
     
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -418,38 +441,17 @@ public class TestWroManager {
     
     WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
-    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
-    managerFactory.create().process();
-  }
-  
-  @Test(expected = UnauthorizedRequestException.class)
-  public void testProxyUnauthorizedRequest()
-      throws Exception {
-    processProxyWithResourceId("test");
-  }
-  
-  private void processProxyWithResourceId(final String resourceId)
-      throws IOException {
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getParameter(CssUrlRewritingProcessor.PARAM_RESOURCE_ID)).thenReturn(resourceId);
-    Mockito.when(request.getRequestURI()).thenReturn(
-        CssUrlRewritingProcessor.PATH_RESOURCES + "?" + CssUrlRewritingProcessor.PARAM_RESOURCE_ID + "=" + resourceId);
-    
-    final WroConfiguration config = new WroConfiguration();
-    // we don't need caching here, otherwise we'll have clashing during unit tests.
-    config.setDisableCache(true);
-    
-    Context.set(
-        Context.webContext(request, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
-            Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
+    managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
     managerFactory.create().process();
   }
   
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new CRC32HashStrategy()).create();
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+        new CRC32HashStrategy()));
+    final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
@@ -457,8 +459,9 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    final WroManager manager = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
-        new MD5HashStrategy()).create();
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+        new MD5HashStrategy()));
+    final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }
@@ -494,6 +497,15 @@ public class TestWroManager {
     final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager);
     reloadModelRunnable.run();
     Assert.assertNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
+  }
+
+  @Test
+  public void shouldRegisterCallback() {
+    final WroManager manager = new WroManager();
+    LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
+    manager.registerCallback(mockCallback);
+    manager.getCallbackRegistry().onProcessingComplete();
+    Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
   }
   
   @After

@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "name": "test",
+      "resources": [
+        {
+          "type": "JS",
+          "uri": "test.js",
+          "proxyUri": "/wro/wroResources?id=test.js"
+        }
+      ]
+    },
+    {
+      "name": "external",
+      "resources": [
+        {
+          "type": "CSS",
+          "uri": "http://www.site.com/style.css",
+          "proxyUri": "http://www.site.com/style.css"
+        }
+      ]
+    }
+  ]
+}

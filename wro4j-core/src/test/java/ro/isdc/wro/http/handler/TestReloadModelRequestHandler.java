@@ -22,7 +22,9 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.util.WroTestUtils;
 
-
+/**
+ * @author Ivar Conradi Østhus
+ */
 public class TestReloadModelRequestHandler {
   private RequestHandler victim;
   @Mock

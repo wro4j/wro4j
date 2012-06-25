@@ -1,7 +1,8 @@
-package ro.isdc.wro.http.handler;
+package ro.isdc.wro.http.handler.factory;
 
 import java.util.Collection;
 
+import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.util.ObjectFactory;
 
 

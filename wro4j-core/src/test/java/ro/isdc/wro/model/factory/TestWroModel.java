@@ -3,7 +3,11 @@
  */
 package ro.isdc.wro.model.factory;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +21,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
@@ -27,13 +32,13 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
  * @created Created on Jan 6, 2010
  */
 public class TestWroModel {
-  private WroModel model;
+  private WroModel victim;
   private WroModelFactory factory;
   @Before
   public void setUp() {
     final Context context = Context.standaloneContext();
     Context.set(context);
-    model = buildValidModel();
+    victim = buildValidModel();
   }
 
   @After
@@ -43,26 +48,41 @@ public class TestWroModel {
 
   @Test
   public void testGetExistingGroup() {
-    Assert.assertFalse(model.getGroups().isEmpty());
-    final Group group = model.getGroupByName("g1");
-    //create a copy of original list
+    Assert.assertFalse(victim.getGroups().isEmpty());
+    final Group group = victim.getGroupByName("g1");
+    // create a copy of original list
     Assert.assertEquals(1, group.getResources().size());
   }
 
   @Test
   public void testGetGroupNames() {
-    final List<String> groupNames = model.getGroupNames();
+    final List<String> groupNames = victim.getGroupNames();
     Collections.sort(groupNames);
     final List<String> expected = Arrays.asList("g1","g2","g3");
     Assert.assertEquals(expected, groupNames);
   }
-
-  @Test(expected=InvalidGroupNameException.class)
+  
+  @Test(expected = InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
-    Assert.assertFalse(model.getGroups().isEmpty());
-    model.getGroupByName("INVALID_GROUP");
+    Assert.assertFalse(victim.getGroups().isEmpty());
+    victim.getGroupByName("INVALID_GROUP");
   }
-
+  
+  @Test
+  public void shouldReturnAllResourcesFromModel() {
+    assertEquals(3, victim.getAllResources().size());
+  }
+  
+  @Test
+  public void shouldNotReturnDuplicatedResources() {
+    victim = new WroModel();
+    assertEquals(0, victim.getAllResources().size());
+    
+    victim.addGroup(new Group("one").addResource(Resource.create("/one.js"))).addGroup(
+        new Group("two").addResource(Resource.create("/one.js")));
+    assertEquals(1, victim.getAllResources().size());
+  }
+  
   /**
    * @return a valid {@link WroModel} pre populated with some valid resources.
    */
@@ -71,10 +91,27 @@ public class TestWroModel {
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return new UrlResourceLocator(getClass().getResource("wro.xml"));
-      };
+      }
     };
-    //the uriLocator factory doesn't have any locators set...
+    // the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.create();
     return model;
+  }
+  
+  @Test
+  public void shouldReturnEmptyCollectionWhenAResourceIsNotContainedInAnyGroup() {
+    assertTrue(victim.getGroupNamesContainingResource("/someResource.js").isEmpty());
+  }
+  
+  @Test
+  public void shouldFindTheGroupContainingResource() {
+    Collection<String> groups = victim.getGroupNamesContainingResource("/path/to/resource");
+    assertEquals(2, groups.size());
+    assertEquals("[g2, g3]", Arrays.toString(groups.toArray()));
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotGetGroupsUsingNullResource() {
+    victim.getGroupNamesContainingResource(null);
   }
 }

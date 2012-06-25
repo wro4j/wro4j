@@ -183,6 +183,7 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
           logMessageBuffer.append(" Using " + getClassName(factoryClass) + " for model creation..\n");
           return factory.create();
         } catch (final WroRuntimeException e) {
+          LOG.debug("[FAIL] creating model... will try another factory");
           logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
             + " failed. Trying another ...\n");
           logMessageBuffer.append("[FAIL] Exception occured while building the model using: "

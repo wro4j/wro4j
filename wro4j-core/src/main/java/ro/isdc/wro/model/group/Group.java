@@ -86,6 +86,18 @@ public final class Group {
   }
   
   /**
+   * @return true if a {@link Resource} with an uri same as resourceUri is contained in this group.
+   */
+  public boolean hasResource(final String resourceUri) {
+    for (final Resource resource : resources) {
+      if (resource.getUri().equals(resourceUri)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  /**
    * Replace one resource with a list of other resources. The use case is related to wildcard expander functionality,
    * when resources containing wildcard are replaced with a list of wildcard-free resources. The order of resources is
    * preserved.

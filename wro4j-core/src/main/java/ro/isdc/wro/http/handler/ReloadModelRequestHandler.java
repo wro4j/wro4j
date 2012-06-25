@@ -14,30 +14,30 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * This RequestHandler will reload the model on HTTP requests to "wroAPU/reloadModel"
+ * This RequestHandler will reload the model on HTTP requests to "wroAPI/reloadModel"
+ * <p/>
+ * This handler is available only in debug mode by default. You can change this behavior by overriding
+ * {@link RequestHandler#isEnabled()} method.
  * 
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
  * @since 1.4.7
  */
 public class ReloadModelRequestHandler
-    implements RequestHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
-  /**
-   * wro API mapping path. If request uri contains this, exposed API method will be invoked.
-   */
-  public static final String PATH_API = "wroAPI";
+    extends RequestHandlerSupport {
+  private static final Logger LOG = LoggerFactory.getLogger(ReloadModelRequestHandler.class);
   /**
    * API - reload model method call
    */
-  public static final String API_RELOAD_MODEL = PATH_API + "/reloadModel";
+  public static final String ENDPOINT_URI = PATH_API + "/reloadModel";
   @Inject
   private Context context;
   
   /**
    * {@inheritDoc}
    */
-  public void handle(HttpServletRequest request, HttpServletResponse response)
+  @Override
+  public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     context.getConfig().reloadModel();
     WroUtil.addNoCacheHeaders(response);
@@ -48,13 +48,15 @@ public class ReloadModelRequestHandler
   /**
    * {@inheritDoc}
    */
-  public boolean accept(HttpServletRequest request) {
-    return WroUtil.matchesUrl(request, API_RELOAD_MODEL);
+  @Override
+  public boolean accept(final HttpServletRequest request) {
+    return WroUtil.matchesUrl(request, ENDPOINT_URI);
   }
   
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isEnabled() {
     return context.getConfig().isDebug();
   }

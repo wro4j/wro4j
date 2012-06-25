@@ -9,11 +9,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
-
 /**
  * Test class for {@link HashStrategy}
  *

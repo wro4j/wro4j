@@ -22,8 +22,7 @@ public abstract class LazyInitializer<T> {
    * @return the object initialized by this {@code LazyInitializer} the object
    */
   public final T get() {
-    // use a temporary variable to reduce the number of reads of the
-    // volatile field
+    // use a temporary variable to reduce the number of reads of the volatile field
     T result = object;
 
     if (result == null) {

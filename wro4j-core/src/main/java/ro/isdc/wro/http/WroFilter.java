@@ -35,11 +35,12 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.handler.DefaultRequestHandlerFactory;
 import ro.isdc.wro.http.handler.RequestHandler;
-import ro.isdc.wro.http.handler.RequestHandlerFactory;
+import ro.isdc.wro.http.handler.factory.DefaultRequestHandlerFactory;
+import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -82,7 +83,8 @@ public class WroFilter
    * Used to create the collection of requestHandlers to apply
    */
   private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
-
+  private Injector injector;
+  
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
    * put, in order to avoid duplicate keys. This is done, because according to RFC 2616 Message Headers field names are
@@ -117,7 +119,6 @@ public class WroFilter
     this.filterConfig = config;
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
-    createWroManagerFactory();
     initHeaderValues();
     registerChangeListeners();
     initJMX();
@@ -316,12 +317,12 @@ public class WroFilter
     }
   }
 
-  private boolean handledWithRequestHandler(HttpServletRequest request, HttpServletResponse response)
+  private boolean handledWithRequestHandler(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
     final Collection<RequestHandler> handlers = requestHandlerFactory.create();
     Validate.notNull(handlers, "requestHandlers cannot be null!");
-    //create injector used for process injectable fields from each requestHandler.
-    final Injector injector = InjectorBuilder.create(wroManagerFactory).build();
+    // create injector used for process injectable fields from each requestHandler.
+    final Injector injector = getInjector();
     for (final RequestHandler requestHandler : handlers) {
       injector.inject(requestHandler);
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
@@ -330,6 +331,17 @@ public class WroFilter
       }
     }
     return false;
+  }
+  
+  /**
+   * @return {@link Injector} used to inject {@link RequestHandler}'s.
+   * @VisibleForTesting
+   */
+  Injector getInjector() {
+    if (injector == null) {
+      injector = InjectorBuilder.create(wroManagerFactory).build(); 
+    }
+    return injector;
   }
 
   /**
@@ -345,7 +357,9 @@ public class WroFilter
     throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager
-    wroManagerFactory.create().process();
+    final WroManager manager = wroManagerFactory.create();
+    getInjector().inject(manager);
+    manager.process();
   }
 
 
@@ -438,7 +452,6 @@ public class WroFilter
   public final WroConfiguration getWroConfiguration() {
     return this.wroConfiguration;
   }
-
 
   /**
    * {@inheritDoc}
