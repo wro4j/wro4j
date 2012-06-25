@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -154,16 +157,7 @@ public class InjectorBuilder {
         return namingStrategy;
       }
     });
-    map.put(ReadOnlyContext.class, new InjectorObjectFactory<Context>() {
-      public Context create() {
-        return Context.get();
-      }
-    });
-    map.put(Context.class, new InjectorObjectFactory<Context>() {
-      public Context create() {
-        return Context.get();
-      }
-    });
+    map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
     map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return Context.get().getConfig();
@@ -189,6 +183,24 @@ public class InjectorBuilder {
     });
   }
   
+  /**
+   * @return a proxy of {@link ReadOnlyContext} object. This solution is preferred to {@link InjectorObjectFactory}
+   *         because the injected field ensure thread-safe behavior.
+   */
+  private ReadOnlyContext createReadOnlyContextProxy() {
+    InvocationHandler handler = new InvocationHandler() {
+      public Object invoke(final Object proxy, final Method method, final Object[] args)
+          throws Throwable {
+        return method.invoke(Context.get(), args);
+      }
+    };
+    final ReadOnlyContext readOnlyContext = (ReadOnlyContext) Proxy.newProxyInstance(
+        ReadOnlyContext.class.getClassLoader(), new Class[] {
+          ReadOnlyContext.class
+        }, handler);
+    return readOnlyContext;
+  }
+
   public Injector build() {
     // first initialize the map
     initMap();

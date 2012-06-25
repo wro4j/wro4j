@@ -24,6 +24,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -175,5 +176,7 @@ public class TestInjectorBuilder {
     CacheStrategy<?, ?> cacheStrategy;
     @Inject
     HashStrategy hashBuilder;
+    @Inject
+    ReadOnlyContext context;
   }
 }
