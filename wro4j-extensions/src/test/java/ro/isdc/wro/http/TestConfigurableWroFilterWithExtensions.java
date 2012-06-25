@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -52,7 +52,7 @@ public class TestConfigurableWroFilterWithExtensions {
     when(mockRequest.getRequestURI()).thenReturn("/some.js");
     when(mockResponse.getOutputStream()).thenReturn(mockServletOutputStream);
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+    DefaultContext.set(DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig));
   }
   
   @Test

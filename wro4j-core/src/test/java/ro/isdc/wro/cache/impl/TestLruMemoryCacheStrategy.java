@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
@@ -27,7 +27,7 @@ public class TestLruMemoryCacheStrategy {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     cache = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>(3);
   }
 
@@ -55,6 +55,6 @@ public class TestLruMemoryCacheStrategy {
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }

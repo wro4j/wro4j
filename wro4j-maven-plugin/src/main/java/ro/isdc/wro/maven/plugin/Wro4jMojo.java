@@ -23,7 +23,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -204,10 +204,10 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
 
       // init context
-      final WroConfiguration config = Context.get().getConfig();
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+      final WroConfiguration config = DefaultContext.get().getConfig();
+      DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
-      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
+      DefaultContext.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing
       getManagerFactory().create().process();
       // encode version & write result to file

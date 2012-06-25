@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -26,7 +26,7 @@ public class TestInjectorAwareUriLocatorFactoryDecorator {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     MockitoAnnotations.initMocks(this);
     injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }

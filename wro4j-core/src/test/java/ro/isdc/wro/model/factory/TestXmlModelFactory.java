@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ContextPropagatingCallable;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
@@ -41,8 +41,8 @@ public class TestXmlModelFactory {
   
   @Before
   public void setUp() {
-    final Context context = Context.standaloneContext();
-    Context.set(context);
+    final DefaultContext context = DefaultContext.standaloneContext();
+    DefaultContext.set(context);
     context.getConfig().setCacheUpdatePeriod(0);
     context.getConfig().setModelUpdatePeriod(0);
   }
@@ -65,8 +65,8 @@ public class TestXmlModelFactory {
   
   @Test
   public void testWithUpdatePeriodSet() {
-    Context.get().getConfig().setCacheUpdatePeriod(1);
-    Context.get().getConfig().setModelUpdatePeriod(1);
+    DefaultContext.get().getConfig().setCacheUpdatePeriod(1);
+    DefaultContext.get().getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
   

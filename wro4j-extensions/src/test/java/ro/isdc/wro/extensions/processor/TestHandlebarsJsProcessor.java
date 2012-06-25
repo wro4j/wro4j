@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
 import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -31,13 +31,13 @@ public class TestHandlebarsJsProcessor {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     processor = new HandlebarsJsProcessor();
   }
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   @Test

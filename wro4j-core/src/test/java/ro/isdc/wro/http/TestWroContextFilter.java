@@ -18,7 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 
 
 /**
@@ -52,9 +52,9 @@ public class TestWroContextFilter {
   @Test
   public void shouldInitializeContextForChainedFilters() throws Exception {
     Mockito.doAnswer(new Answer<Void>() {
-      public Void answer(InvocationOnMock invocation)
+      public Void answer(final InvocationOnMock invocation)
           throws Throwable {
-        Assert.assertTrue(Context.isContextSet());
+        Assert.assertTrue(DefaultContext.isContextSet());
         return null;
       }
     }).when(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
@@ -62,6 +62,6 @@ public class TestWroContextFilter {
     Mockito.verify(mockFilterChain, Mockito.times(1)).doFilter(Mockito.any(HttpServletRequest.class),
         Mockito.any(HttpServletResponse.class));
     //After chain processing, the context must be unset
-    Assert.assertFalse(Context.isContextSet());
+    Assert.assertFalse(DefaultContext.isContextSet());
   }
 }

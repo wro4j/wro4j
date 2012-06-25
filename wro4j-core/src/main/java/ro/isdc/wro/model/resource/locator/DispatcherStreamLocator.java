@@ -19,7 +19,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
 import ro.isdc.wro.util.WroUtil;
 
@@ -34,7 +34,7 @@ public final class DispatcherStreamLocator {
   /**
    * Used to locate external resources. No wildcard handling is required.
    */
-  private UriLocator externalResourceLocator = new UrlUriLocator() {
+  private final UriLocator externalResourceLocator = new UrlUriLocator() {
     @Override
     public boolean isEnableWildcards() {
       return false;
@@ -60,7 +60,7 @@ public final class DispatcherStreamLocator {
     boolean warnOnEmptyStream = false;
 
     // preserve context, in case it is unset during dispatching
-    final Context originalContext = Context.get();
+    final DefaultContext originalContext = DefaultContext.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher == null) {
@@ -95,8 +95,8 @@ public final class DispatcherStreamLocator {
         LOG.warn("Wrong or empty resource with location: {}", location);
       }
       // Put the context back
-      if (!Context.isContextSet()) {
-        Context.set(originalContext);
+      if (!DefaultContext.isContextSet()) {
+        DefaultContext.set(originalContext);
       }
     }
     return new ByteArrayInputStream(os.toByteArray());

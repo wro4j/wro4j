@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -49,14 +49,14 @@ public class TestGroupsProcessor {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     victim = new GroupsProcessor();
     initVictim(new WroConfiguration());
   }
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   private void initVictim(final WroConfiguration config) {
@@ -66,7 +66,7 @@ public class TestGroupsProcessor {
   }
   
   private void initVictim(final WroConfiguration config, final WroManagerFactory managerFactory) {
-    Context.set(Context.standaloneContext(), config);
+    DefaultContext.set(DefaultContext.standaloneContext(), config);
     final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
   }

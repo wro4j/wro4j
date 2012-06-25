@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
@@ -31,7 +31,7 @@ public class TestDuplicateAwareCssDataUriPreProcessor {
   @Before
   public void init() {
     processor = new DuplicatesAwareCssDataUriPreProcessor();
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     WroTestUtils.initProcessor(processor);
   }
 

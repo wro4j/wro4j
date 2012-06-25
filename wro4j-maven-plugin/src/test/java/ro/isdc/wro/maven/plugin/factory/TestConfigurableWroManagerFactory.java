@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
@@ -60,7 +60,7 @@ public class TestConfigurableWroManagerFactory {
   
   public void initFactory(final FilterConfig filterConfig, final Properties properties) {
     Validate.notNull(properties);
-    Context.set(Context.webContext(mockRequest, mockResponse, filterConfig));
+    DefaultContext.set(DefaultContext.webContext(mockRequest, mockResponse, filterConfig));
     
     final ConfigurableWroManagerFactory factory = new ConfigurableWroManagerFactory() {
       @Override
@@ -82,13 +82,13 @@ public class TestConfigurableWroManagerFactory {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     // init context
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+    DefaultContext.set(DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig));
     Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
   }
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   @Test

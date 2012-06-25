@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
@@ -15,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -36,7 +38,7 @@ public class TestCssUrlRewritingProcessor {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     processor = new CssUrlRewritingProcessor() {
       @Override
       protected String getUrlPrefix() {
@@ -122,7 +124,7 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void processServletContextResourceTypeWithAggregatedFolderSet()
     throws IOException {
-    Context.get().setAggregatedFolderPath("wro/css");
+    DefaultContext.get().setAggregatedFolderPath("wro/css");
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-servletContext-aggregatedFolderSet-outcome.css", new ResourcePostProcessor() {
         public void process(final Reader reader, final Writer writer)
@@ -131,7 +133,6 @@ public class TestCssUrlRewritingProcessor {
         }
       });
   }
-
 
   /**
    * Test a resource which is located inside WEB-INF protected folder.
@@ -173,5 +174,29 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
+  }
+  
+  /**
+   * Tests that the Context injected into processor is thread safe and uses the values of set by the thread which runs
+   * the processor.
+   */
+  @Test
+  public void shouldUseCorrectAggregatedFolderSetEvenWhenContextIsChangedInAnotherThread()
+      throws Exception {
+    WroTestUtils.runConcurrently(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        DefaultContext.set(DefaultContext.standaloneContext());
+        WroTestUtils.createInjector().inject(processor);
+        if (new Random().nextBoolean()) {
+          Thread.sleep(150);
+          processServletContextResourceTypeWithAggregatedFolderSet();
+        } else {
+          // ensure that a thread uses null aggregatedFolderPath which is injected into processor.
+          DefaultContext.get().setAggregatedFolderPath(null);
+        }
+        return null;
+      }
+    }, 20);
   }
 }

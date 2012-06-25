@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 
 
@@ -55,10 +56,10 @@ public class WroContextFilter
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
     try {
-      Context.set(Context.webContext(request, response, this.filterConfig));
+      DefaultContext.set(DefaultContext.webContext(request, response, this.filterConfig));
       chain.doFilter(request, response);
     } finally {
-      Context.unset();
+      DefaultContext.unset();
     }
   }
 
@@ -66,6 +67,6 @@ public class WroContextFilter
    * {@inheritDoc}
    */
   public void destroy() {
-    Context.destroy();
+    DefaultContext.destroy();
   }
 }

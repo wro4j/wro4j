@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -36,14 +36,14 @@ public class TestCoffeeScriptProcessor {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     processor = new CoffeeScriptProcessor();
   }
 
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   private static class Counter {
@@ -93,6 +93,7 @@ public class TestCoffeeScriptProcessor {
   public void shouldBeThreadSafe() throws Exception {
     final CoffeeScriptProcessor processor = new CoffeeScriptProcessor();
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
           processor.process(new StringReader("square = (x) -> x * x"), new StringWriter());

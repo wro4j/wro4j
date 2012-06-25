@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -164,7 +164,7 @@ public class WroTestUtils {
     throws IOException {
     Assert.assertNotNull(expected);
     Assert.assertNotNull(actual);
-    final String encoding = Context.get().getConfig().getEncoding();
+    final String encoding = DefaultContext.get().getConfig().getEncoding();
     compare(IOUtils.toString(expected, encoding), IOUtils.toString(actual, encoding));
     expected.close();
     actual.close();

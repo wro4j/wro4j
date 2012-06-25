@@ -13,7 +13,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -33,7 +33,7 @@ public class TestCssImportPreProcessor {
   public void setUp() {
     final WroConfiguration config = new WroConfiguration();
     config.setIgnoreFailingProcessor(true);
-    Context.set(Context.standaloneContext(), config);
+    DefaultContext.set(DefaultContext.standaloneContext(), config);
     processor = new CssImportPreProcessor();
     WroTestUtils.initProcessor(processor);
   }
@@ -57,13 +57,13 @@ public class TestCssImportPreProcessor {
   
   @Test
   public void shouldNotFailWhenInvalidResourceIsFound() throws Exception {
-    Context.get().getConfig().setIgnoreMissingResources(true);
+    DefaultContext.get().getConfig().setIgnoreMissingResources(true);
     processInvalidImport();
   }
   
   @Test(expected = IOException.class)
   public void shouldFailWhenInvalidResourceIsFound() throws Exception {
-    Context.get().getConfig().setIgnoreMissingResources(false);
+    DefaultContext.get().getConfig().setIgnoreMissingResources(false);
     processInvalidImport();
   }
 

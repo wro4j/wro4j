@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.extensions.processor.js.DustJsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -29,13 +29,13 @@ public class TestDustJsProcessor {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     processor = new DustJsProcessor();
   }
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   @Test

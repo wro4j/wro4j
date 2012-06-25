@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
@@ -27,7 +27,7 @@ public class TestBaseWroManagerFactory {
   BaseWroManagerFactory factory;
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
   }
   @Test
   public void defaultModelFactoryIsXml() {
@@ -66,14 +66,14 @@ public class TestBaseWroManagerFactory {
 
   @Test
   public void shouldNotFailWhenReloadingModelOutsideOfContext() throws Exception {
-    Context.unset();
+    DefaultContext.unset();
     factory = new BaseWroManagerFactory();
     factory.onModelPeriodChanged(0);
   }
 
   @Test
   public void shouldNotFailWhenReloadingCacheOutsideOfContext() throws Exception {
-    Context.unset();
+    DefaultContext.unset();
     factory = new BaseWroManagerFactory();
     factory.onCachePeriodChanged(0);
   }

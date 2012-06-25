@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 
 
 /**
@@ -29,12 +29,12 @@ public class TestUrlUriLocator {
   @Before
   public void setUp() {
     uriLocator = new UrlUriLocator();
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
   }
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   @Test(expected = NullPointerException.class)

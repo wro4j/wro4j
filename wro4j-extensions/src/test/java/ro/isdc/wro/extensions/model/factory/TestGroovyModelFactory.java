@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ContextPropagatingCallable;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -53,7 +53,7 @@ public class TestGroovyModelFactory {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
   }
 
   @Test(expected = WroRuntimeException.class)

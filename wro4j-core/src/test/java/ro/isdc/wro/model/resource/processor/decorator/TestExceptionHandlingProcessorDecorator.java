@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -35,7 +35,7 @@ public class TestExceptionHandlingProcessorDecorator {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     MockitoAnnotations.initMocks(this);
     victim = new ExceptionHandlingProcessorDecorator(mockProcessor);
     WroTestUtils.createInjector().inject(victim);
@@ -43,7 +43,7 @@ public class TestExceptionHandlingProcessorDecorator {
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   @Test(expected = NullPointerException.class)
@@ -78,7 +78,7 @@ public class TestExceptionHandlingProcessorDecorator {
   @Test
   public void shouldPreserveContentWhenProcessingFails()
       throws Exception {
-    Context.get().getConfig().setIgnoreFailingProcessor(true);
+    DefaultContext.get().getConfig().setIgnoreFailingProcessor(true);
     
     Mockito.doThrow(new IOException("BOOM")).when(mockProcessor).process(Mockito.any(Resource.class),
         Mockito.any(Reader.class), Mockito.any(Writer.class));

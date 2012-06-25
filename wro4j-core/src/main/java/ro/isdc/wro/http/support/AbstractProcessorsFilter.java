@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -64,11 +64,12 @@ public abstract class AbstractProcessorsFilter
     final HttpServletResponse response = (HttpServletResponse) res;
     try {
       // add request, response & servletContext to thread local
-      Context.set(Context.webContext(request, response, filterConfig));
+      DefaultContext.set(DefaultContext.webContext(request, response, filterConfig));
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
       final HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
       chain.doFilter(request, wrappedResponse);
-      final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
+      final Reader reader = new StringReader(new String(os.toByteArray(),
+          DefaultContext.get().getConfig().getEncoding()));
 
       final StringWriter writer = new StringWriter();
       doProcess(reader, writer);
@@ -79,7 +80,7 @@ public abstract class AbstractProcessorsFilter
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
-      Context.unset();
+      DefaultContext.unset();
     }
   }
 
@@ -128,7 +129,7 @@ public abstract class AbstractProcessorsFilter
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
-      chain.doFilter(Context.get().getRequest(), response);
+      chain.doFilter(DefaultContext.get().getRequest(), response);
     } catch (final Exception ex) {
       // should never happen
       LOG.error("Error while chaining the request.");

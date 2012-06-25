@@ -12,7 +12,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -41,9 +41,9 @@ public class DefaultStandaloneContextAwareManagerFactory
     Validate.notNull(standaloneContext);
     this.standaloneContext = standaloneContext;
     //This is important in order to make plugin aware about ignoreMissingResources option.
-    Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
+    DefaultContext.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
     LOG.debug("initialize: {}", standaloneContext);
-    LOG.debug("config: {}", Context.get().getConfig());
+    LOG.debug("config: {}", DefaultContext.get().getConfig());
   }
 
 

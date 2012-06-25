@@ -40,12 +40,11 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
-import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
 import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
@@ -93,9 +92,9 @@ public class TestWroManager {
   
   @Before
   public void setUp() {
-    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
+    final DefaultContext context = DefaultContext.webContext(Mockito.mock(HttpServletRequest.class),
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
-    Context.set(context, newConfigWithUpdatePeriodValue(0));
+    DefaultContext.set(context, newConfigWithUpdatePeriodValue(0));
     managerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
     MockitoAnnotations.initMocks(this);
     
@@ -130,7 +129,7 @@ public class TestWroManager {
       LOG.debug("resource: {}", resource);
       
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-      final HttpServletResponse response = Context.get().getResponse();
+      final HttpServletResponse response = DefaultContext.get().getResponse();
       
       Mockito.when(response.getOutputStream()).thenReturn(
           new DelegatingServletOutputStream(new WriterOutputStream(writer)));
@@ -140,7 +139,7 @@ public class TestWroManager {
       // we don't need caching here, otherwise we'll have clashing during unit tests.
       config.setDebug(true);
       config.setDisableCache(true);
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+      DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       
       // create a groupExtractor which always return the same group name.
       final String groupName = "group";
@@ -174,7 +173,7 @@ public class TestWroManager {
     public void processAndCompare(final String requestUri, final String expectedResourceUri)
         throws Exception {
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-      final HttpServletResponse response = Context.get().getResponse();
+      final HttpServletResponse response = DefaultContext.get().getResponse();
       
       final ByteArrayOutputStream out = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
@@ -182,7 +181,7 @@ public class TestWroManager {
       
       final WroConfiguration config = new WroConfiguration();
       config.setIgnoreFailingProcessor(true);
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+      DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       
       onBeforeProcess();
       
@@ -267,13 +266,13 @@ public class TestWroManager {
     factory = new InjectableWroManagerFactoryDecorator(factory);
     
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletResponse response = DefaultContext.get().getResponse();
     
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
     factory.create().process();
     
@@ -343,7 +342,7 @@ public class TestWroManager {
     new GenericTestBuilder() {
       @Override
       protected void onBeforeProcess() {
-        final WroConfiguration config = Context.get().getConfig();
+        final WroConfiguration config = DefaultContext.get().getConfig();
         config.setIgnoreFailingProcessor(ignoreFlag);
         config.setIgnoreMissingResources(ignoreFlag);
       };
@@ -371,7 +370,7 @@ public class TestWroManager {
       }
     }).when(response).setHeader(Mockito.anyString(), Mockito.anyString());
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
     managerFactory.create().process();
   }
@@ -381,13 +380,13 @@ public class TestWroManager {
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    final Context context = Context.webContext(request,
+    final DefaultContext context = DefaultContext.webContext(request,
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     final WroConfiguration config = new WroConfiguration();
     // make it run each 1 second
     config.setModelUpdatePeriod(1);
     config.setCacheUpdatePeriod(1);
-    Context.set(context, config);
+    DefaultContext.set(context, config);
     
     managerFactory.create().process();
     // let scheduler run a while
@@ -404,10 +403,10 @@ public class TestWroManager {
       throws Exception {
     newConfigWithUpdatePeriodValue(1);
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletResponse response = DefaultContext.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
     managerFactory.create().process();
     // allow thread to do its job
@@ -418,40 +417,40 @@ public class TestWroManager {
   public void testAggregatedComputedFolder()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletResponse response = DefaultContext.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/wro4j/wro/g1.css");
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
     managerFactory.create().process();
     
-    Assert.assertEquals("/wro4j/wro/", Context.get().getAggregatedFolderPath());
+    Assert.assertEquals("/wro4j/wro/", DefaultContext.get().getAggregatedFolderPath());
   }
   
   @Test
   public void testAggregatedComputedFolder2()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletResponse response = DefaultContext.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/wro4j/wro/path/to/g1.css");
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
     managerFactory.create().process();
     
-    Assert.assertEquals("/wro4j/wro/path/to/", Context.get().getAggregatedFolderPath());
+    Assert.assertEquals("/wro4j/wro/path/to/", DefaultContext.get().getAggregatedFolderPath());
   }
   
   @Test(expected = WroRuntimeException.class)
   public void shouldNotProcessGroupWithNoResources()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Context.get().getResponse();
+    final HttpServletResponse response = DefaultContext.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/noResources.css");
     
     WroConfiguration config = new WroConfiguration();
     config.setIgnoreEmptyGroup(false);
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     
     WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
@@ -499,7 +498,7 @@ public class TestWroManager {
     config.setDebug(true);
     config.setDisableCache(false);
     
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
     
     final WroManager wroManager = managerFactory.create();
     wroManager.process();
@@ -525,6 +524,6 @@ public class TestWroManager {
   @After
   public void tearDown() {
     managerFactory.destroy();
-    Context.unset();
+    DefaultContext.unset();
   }
 }

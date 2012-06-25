@@ -9,7 +9,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.FallbackCssDataUriProcessor;
@@ -30,7 +30,7 @@ public class TestFallbackCssDataUriProcessor
   @Override
   @Before
   public void init() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     processor = new FallbackCssDataUriProcessor() {
       @Override
       protected DataUriGenerator getDataUriGenerator() {

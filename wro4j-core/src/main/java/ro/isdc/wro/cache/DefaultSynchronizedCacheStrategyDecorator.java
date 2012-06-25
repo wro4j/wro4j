@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -66,7 +66,7 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
    */
   @Override
   public void put(final CacheEntry key, final ContentHashEntry value) {
-    if (!Context.get().getConfig().isDisableCache()) {
+    if (!DefaultContext.get().getConfig().isDisableCache()) {
       super.put(key, value);
     }
   }

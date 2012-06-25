@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -63,7 +63,7 @@ public class TestConfigurableWroFilter {
     when(mockRequest.getRequestURI()).thenReturn("/some.js");
     when(mockResponse.getOutputStream()).thenReturn(mockServletOutputStream);
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+    DefaultContext.set(DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig));
   }
 
   @Test
@@ -72,7 +72,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new ConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertEquals(10, Context.get().getConfig().getCacheUpdatePeriod());
+        assertEquals(10, DefaultContext.get().getConfig().getCacheUpdatePeriod());
       }
     };
     final Properties properties = new Properties();
@@ -88,7 +88,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertEquals(20, Context.get().getConfig().getCacheUpdatePeriod());
+        assertEquals(20, DefaultContext.get().getConfig().getCacheUpdatePeriod());
       }
     };
     filter.setCacheUpdatePeriod(20);
@@ -102,7 +102,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertEquals(WroConfiguration.DEFAULT_ENCODING, Context.get().getConfig().getEncoding());
+        assertEquals(WroConfiguration.DEFAULT_ENCODING, DefaultContext.get().getConfig().getEncoding());
       }
     };
     filter.setEncoding(null);
@@ -117,7 +117,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertEquals(encoding, Context.get().getConfig().getEncoding());
+        assertEquals(encoding, DefaultContext.get().getConfig().getEncoding());
       }
     };
     filter.setEncoding(encoding);
@@ -132,7 +132,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertEquals(mbeanName, Context.get().getConfig().getMbeanName());
+        assertEquals(mbeanName, DefaultContext.get().getConfig().getMbeanName());
       }
     };
     filter.setMbeanName(mbeanName);
@@ -146,7 +146,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertNull(Context.get().getConfig().getMbeanName());
+        assertNull(DefaultContext.get().getConfig().getMbeanName());
       }
     };
     filter.setMbeanName(null);
@@ -186,7 +186,7 @@ public class TestConfigurableWroFilter {
           return null;
         }
         @Override
-        protected void onRuntimeException(RuntimeException e, HttpServletResponse response, FilterChain chain) {
+        protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
           throw e;
         }
       };
@@ -212,14 +212,14 @@ public class TestConfigurableWroFilter {
     }
     
     @Override
-    protected void onRuntimeException(RuntimeException e, HttpServletResponse response, FilterChain chain) {
+    protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
       throw e;
     }
   };
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
 }

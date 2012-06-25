@@ -9,7 +9,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -28,7 +28,7 @@ public class TestVariablizeColorsCssProcessor {
   @Before
   public void setUp() {
     processor = new VariablizeColorsCssProcessor();
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     WroTestUtils.initProcessor(processor);
   }
 

@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -37,7 +37,7 @@ public class TestReloadModelRequestHandler {
     MockitoAnnotations.initMocks(this);
     victim = new ReloadModelRequestHandler();
     
-    Context.set(Context.webContext(request, response, mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, mock(FilterConfig.class)));
     WroTestUtils.createInjector().inject(victim);
   }
   

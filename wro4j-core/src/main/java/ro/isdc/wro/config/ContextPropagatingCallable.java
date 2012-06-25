@@ -12,22 +12,22 @@ import org.apache.commons.lang3.Validate;
  */
 public class ContextPropagatingCallable<T>
     implements Callable<T> {
-  private String correlationId;
-  private Callable<T> decorated;
+  private final String correlationId;
+  private final Callable<T> decorated;
   
   public ContextPropagatingCallable(final Callable<T> decorated) {
     Validate.notNull(decorated);
     this.decorated = decorated;
-    this.correlationId = Context.getCorrelationId();
+    this.correlationId = DefaultContext.getCorrelationId();
   }
   
   public T call()
       throws Exception {
-    Context.setCorrelationId(correlationId);
+    DefaultContext.setCorrelationId(correlationId);
     try {
       return decorated.call();
     } finally {
-      Context.unsetCorrelationId();
+      DefaultContext.unsetCorrelationId();
     }
   }
 }

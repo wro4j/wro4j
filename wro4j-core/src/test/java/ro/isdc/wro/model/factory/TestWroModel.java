@@ -18,7 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
@@ -37,8 +37,8 @@ public class TestWroModel {
   
   @Before
   public void setUp() {
-    final Context context = Context.standaloneContext();
-    Context.set(context);
+    final DefaultContext context = DefaultContext.standaloneContext();
+    DefaultContext.set(context);
     victim = buildValidModel();
   }
   

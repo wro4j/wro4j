@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -58,10 +58,10 @@ public class TestServletContextUriLocator {
     when(mockRequest.getServletPath()).thenReturn("");
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     
-    final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
+    final DefaultContext context = DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig);
     final WroConfiguration config = new WroConfiguration();
     config.setConnectionTimeout(100);
-    Context.set(context, config);
+    DefaultContext.set(context, config);
     
     locator = new ServletContextUriLocator();
     
@@ -137,7 +137,7 @@ public class TestServletContextUriLocator {
   public void shouldPreferServletContextBasedResolving()
     throws IOException {
     final InputStream is = new ByteArrayInputStream("a {}".getBytes());
-    Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
+    Mockito.when(DefaultContext.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
     final ServletContextUriLocator locator = new ServletContextUriLocator();
     initLocator(locator);
@@ -157,6 +157,6 @@ public class TestServletContextUriLocator {
 
   @After
   public void resetContext() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }

@@ -16,7 +16,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFactory;
@@ -102,7 +102,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
 
 
     extendPluginClasspath();
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     try {
       doExecute();
     } catch (final Exception e) {

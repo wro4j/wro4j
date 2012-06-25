@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -71,11 +71,11 @@ public class TestPreProcessorExecutor {
     when(mockRequest.getServletPath()).thenReturn("");
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     
-    final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
-    Context.set(context);
+    final DefaultContext context = DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig);
+    DefaultContext.set(context);
     //force parallel execution
-    Context.get().getConfig().setParallelPreprocessing(true);
-    Context.get().getConfig().setIgnoreFailingProcessor(true);
+    DefaultContext.get().getConfig().setParallelPreprocessing(true);
+    DefaultContext.get().getConfig().setIgnoreFailingProcessor(true);
     initExecutor();
   }
 
@@ -178,7 +178,7 @@ public class TestPreProcessorExecutor {
   @Test(expected = IOException.class)
   public void shouldFailWhenProcessingInvalidResource()
     throws Exception {
-    Context.get().getConfig().setIgnoreMissingResources(false);
+    DefaultContext.get().getConfig().setIgnoreMissingResources(false);
     shouldNotFailWhenProcessingInvalidResource();
   }
 
@@ -205,8 +205,8 @@ public class TestPreProcessorExecutor {
     genericUseFailingPreProcessorWithIngoreFlag(true);
   }
 
-  private void genericUseFailingPreProcessorWithIngoreFlag(boolean ignoreFlag) throws Exception {
-    Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
+  private void genericUseFailingPreProcessorWithIngoreFlag(final boolean ignoreFlag) throws Exception {
+    DefaultContext.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);
@@ -222,7 +222,7 @@ public class TestPreProcessorExecutor {
   public void preProcessingInParallelIsFaster()
     throws Exception {
     final StopWatch watch = new StopWatch();
-    WroConfiguration config = Context.get().getConfig();
+    WroConfiguration config = DefaultContext.get().getConfig();
 
     initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
     final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
@@ -280,7 +280,7 @@ public class TestPreProcessorExecutor {
    */
   @Test
   public void shouldNotFailWhenEmptyResourceIsFound() throws Exception {
-    final WroConfiguration config = Context.get().getConfig();
+    final WroConfiguration config = DefaultContext.get().getConfig();
     config.setIgnoreMissingResources(false);
     
     final UriLocator emptyStreamLocator = new UriLocator() {
@@ -304,6 +304,6 @@ public class TestPreProcessorExecutor {
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }

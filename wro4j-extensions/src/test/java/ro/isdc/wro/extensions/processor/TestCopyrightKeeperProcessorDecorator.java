@@ -9,7 +9,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -27,7 +27,7 @@ public class TestCopyrightKeeperProcessorDecorator {
   public void setUp() {
     final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
     processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     WroTestUtils.createInjector().inject(decoratedProcessor);
   }
 

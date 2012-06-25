@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.util.Transformer;
 import ro.isdc.wro.util.WroTestUtils;
@@ -29,14 +29,14 @@ public class TestModelTransformerFactory {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     MockitoAnnotations.initMocks(this);
     Mockito.when(mockFactory.create()).thenReturn(new WroModel());
   }
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   private ModelTransformerFactory factory;

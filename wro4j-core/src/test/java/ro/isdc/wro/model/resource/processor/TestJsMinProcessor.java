@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -28,13 +28,13 @@ public class TestJsMinProcessor {
   @Before
   public void setUp() {
     processor = new JSMinProcessor();
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     WroTestUtils.createInjector().inject(processor);
   }
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   @Test

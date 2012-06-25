@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 
 
 /**
@@ -27,8 +27,8 @@ public class TestContext {
   @Test(expected = WroRuntimeException.class)
   public void cannotAccessContext() {
     // unset intentionally
-    Context.unset();
-    Context.get();
+    DefaultContext.unset();
+    DefaultContext.get();
   }
 
 
@@ -37,9 +37,9 @@ public class TestContext {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final FilterConfig filterConfig = Mockito.mock(FilterConfig.class);
-    Context.set(Context.webContext(request, response, filterConfig));
+    DefaultContext.set(DefaultContext.webContext(request, response, filterConfig));
     // simulate that gzip encoding is accepted
-    Mockito.when(Context.get()
+    Mockito.when(DefaultContext.get()
       .getRequest()
       .getHeaders(Mockito.anyString()))
       .thenReturn(new Enumeration<String>() {
@@ -57,13 +57,13 @@ public class TestContext {
 
   @Test(expected = NullPointerException.class)
   public void cannotSetNullContext() {
-    Context.set(null);
+    DefaultContext.set(null);
   }
 
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   // @Test

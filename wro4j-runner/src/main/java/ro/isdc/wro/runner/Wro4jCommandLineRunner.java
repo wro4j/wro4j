@@ -28,7 +28,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -137,7 +137,7 @@ public class Wro4jCommandLineRunner {
   
   private void process() {
     try {
-      Context.set(Context.standaloneContext());
+      DefaultContext.set(DefaultContext.standaloneContext());
       // create destinationFolder if needed
       if (!destinationFolder.exists()) {
         destinationFolder.mkdirs();
@@ -190,9 +190,9 @@ public class Wro4jCommandLineRunner {
       final WroConfiguration config = new WroConfiguration();
       //
       config.setParallelPreprocessing(parallelPreprocessing);
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+      DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       
-      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
+      DefaultContext.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing
       getManagerFactory().create().process();
       // encode version & write result to file
@@ -287,6 +287,7 @@ public class Wro4jCommandLineRunner {
       props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessorsList);
     }
     return new ConfigurableProcessorsFactory() {
+      @Override
       protected Map<String, ResourcePreProcessor> newPreProcessorsMap() {
         final Map<String, ResourcePreProcessor> map = super.newPreProcessorsMap();
         // override csslint & jsHint aliases
@@ -295,6 +296,7 @@ public class Wro4jCommandLineRunner {
         return map;
       }
       
+      @Override
       protected Map<String, ResourcePostProcessor> newPostProcessorsMap() {
         final Map<String, ResourcePostProcessor> map = super.newPostProcessorsMap();
         // override csslint & jsHint aliases

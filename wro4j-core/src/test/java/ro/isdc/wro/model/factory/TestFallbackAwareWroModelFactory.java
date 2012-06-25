@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 
 
 /**
@@ -34,7 +34,7 @@ public class TestFallbackAwareWroModelFactory {
   @Before
   public void setUp() {
     // initialize the context
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     fallbackAwareModelFactory = new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()

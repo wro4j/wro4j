@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
 /**
@@ -19,13 +19,13 @@ public class TestContentHashEntry {
   private static final String RAW_CONTENT = "[RAW_CONTENT]";
   @Before
   public void setUp() {
-    final Context ctx = Context.standaloneContext();
-    Context.set(ctx);
+    final DefaultContext ctx = DefaultContext.standaloneContext();
+    DefaultContext.set(ctx);
   }
 
   @Test
   public void byDefaultCacheGzippedContentShouldBeDisabled() {
-    Assert.assertFalse(Context.get().getConfig().isCacheGzippedContent());
+    Assert.assertFalse(DefaultContext.get().getConfig().isCacheGzippedContent());
   }
 
   @Test
@@ -38,7 +38,7 @@ public class TestContentHashEntry {
 
   @Test
   public void shouldCacheGzippedContentByDefault() {
-    Context.get().getConfig().setCacheGzippedContent(true);
+    DefaultContext.get().getConfig().setCacheGzippedContent(true);
     final ContentHashEntry entry = ContentHashEntry.valueOf(RAW_CONTENT, "hash");
     Assert.assertNotNull(null, entry.getGzippedContentInternal());
     Assert.assertNotNull(entry.getGzippedContent());
@@ -46,7 +46,7 @@ public class TestContentHashEntry {
 
   @Test
   public void changingFlagShouldHaveNoEffect() {
-    final WroConfiguration config = Context.get().getConfig();
+    final WroConfiguration config = DefaultContext.get().getConfig();
     config.setCacheGzippedContent(false);
     final ContentHashEntry entry = ContentHashEntry.valueOf(RAW_CONTENT, "hash");
     Assert.assertNull(null, entry.getGzippedContentInternal());
@@ -59,6 +59,6 @@ public class TestContentHashEntry {
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }

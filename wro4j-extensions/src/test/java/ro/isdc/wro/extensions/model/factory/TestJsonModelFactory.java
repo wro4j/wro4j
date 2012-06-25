@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.util.WroTestUtils;
@@ -38,12 +38,12 @@ public class TestJsonModelFactory {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
   }
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   @Test(expected = WroRuntimeException.class)
@@ -120,6 +120,7 @@ public class TestJsonModelFactory {
     WroTestUtils.init(factory);
     final WroModel expected = factory.create();
     WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
       public Void call()
           throws Exception {
         Assert.assertEquals(expected, factory.create());

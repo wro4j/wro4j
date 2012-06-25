@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -62,7 +62,7 @@ public class TestModelAsJsonRequestHandler {
   @Before
   public void setUp()
       throws Exception {
-    Context.set(Context.webContext(mockRequest, mockResponse, mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(mockRequest, mockResponse, mock(FilterConfig.class)));
     
     MockitoAnnotations.initMocks(this);
     
@@ -172,7 +172,7 @@ public class TestModelAsJsonRequestHandler {
     return wroModel;
   }
 
-  private String readJsonFile(String filename)
+  private String readJsonFile(final String filename)
       throws IOException {
     String packagePath = WroUtil.toPackageAsFolder(this.getClass());
     InputStream is = this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);

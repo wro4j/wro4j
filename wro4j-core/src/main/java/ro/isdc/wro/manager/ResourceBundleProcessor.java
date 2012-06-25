@@ -17,6 +17,7 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -53,7 +54,7 @@ public class ResourceBundleProcessor {
    */
   public void serveProcessedBundle()
       throws IOException {
-    final Context context = Context.get();
+    final Context context = DefaultContext.get();
     final WroConfiguration configuration = context.getConfig();
     
     final HttpServletRequest request = context.getRequest();
@@ -120,18 +121,18 @@ public class ResourceBundleProcessor {
    * @return true if Gzip is Supported
    */
   private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
+    return WroUtil.isGzipSupported(DefaultContext.get().getRequest());
   }
   
   /**
    * Set the aggregatedFolderPath if required.
    */
   private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
-    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+    if (ResourceType.CSS == type && DefaultContext.get().getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
-      Context.get().setAggregatedFolderPath(aggregatedFolder);
+      DefaultContext.get().setAggregatedFolderPath(aggregatedFolder);
     }
   }
 }

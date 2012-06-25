@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
@@ -75,8 +75,8 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
 
     //init context
-    final WroConfiguration config = Context.get().getConfig();
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+    final WroConfiguration config = DefaultContext.get().getConfig();
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
     //perform processing
     getManagerFactory().create().process();
 

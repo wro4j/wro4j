@@ -19,7 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 
 
 /**
@@ -39,7 +39,7 @@ public class TestDispatcherStreamLocator {
     MockitoAnnotations.initMocks(this);
     Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("/resource.js"));
     Mockito.when(mockRequest.getServletPath()).thenReturn("");
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     locator = new DispatcherStreamLocator();
   }
 

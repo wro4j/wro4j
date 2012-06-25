@@ -36,7 +36,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
@@ -94,7 +94,7 @@ public class TestWroFilter {
   @Before
   public void setUp()
       throws Exception {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     MockitoAnnotations.initMocks(this);
     
     when(mockUriLocatorFactory.getInstance(Mockito.anyString())).thenReturn(mockUriLocator);
@@ -565,7 +565,7 @@ public class TestWroFilter {
       public void destroy() {
       }
     });
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     
     final WroFilter filter = new WroFilter() {
       @Override
@@ -577,7 +577,7 @@ public class TestWroFilter {
       protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
         return new ObjectFactory<WroConfiguration>() {
           public WroConfiguration create() {
-            return Context.get().getConfig();
+            return DefaultContext.get().getConfig();
           }
         };
       }
@@ -588,7 +588,7 @@ public class TestWroFilter {
     Assert.assertTrue(modelFactory.create().getGroups().isEmpty());
     
     // reload model
-    Context.get().getConfig().reloadModel();
+    DefaultContext.get().getConfig().reloadModel();
     // the second time should have one group
     Assert.assertEquals(1, modelFactory.create().getGroups().size());
   }
@@ -606,8 +606,8 @@ public class TestWroFilter {
       }
     };
     
-    Context.set(Context.webContext(mockRequest, response, mockFilterConfig));
-    victim.doFilter(Context.get().getRequest(), Context.get().getResponse(), mockFilterChain);
+    DefaultContext.set(DefaultContext.webContext(mockRequest, response, mockFilterConfig));
+    victim.doFilter(DefaultContext.get().getRequest(), DefaultContext.get().getResponse(), mockFilterChain);
     
     Assert.assertEquals(Integer.valueOf(HttpServletResponse.SC_OK), status.get());
   }
@@ -626,8 +626,8 @@ public class TestWroFilter {
       }
     };
     
-    Context.set(Context.webContext(mockRequest, response, Mockito.mock(FilterConfig.class)));
-    victim.doFilter(Context.get().getRequest(), Context.get().getResponse(), mockFilterChain);
+    DefaultContext.set(DefaultContext.webContext(mockRequest, response, Mockito.mock(FilterConfig.class)));
+    victim.doFilter(DefaultContext.get().getRequest(), DefaultContext.get().getResponse(), mockFilterChain);
     Assert.assertEquals(Integer.valueOf(HttpServletResponse.SC_OK), status.get());
   }
   
@@ -686,8 +686,8 @@ public class TestWroFilter {
     // we don't need caching here, otherwise we'll have clashing during unit tests.
     config.setDisableCache(true);
     
-    Context.set(
-        Context.webContext(mockRequest, Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
+    DefaultContext.set(DefaultContext.webContext(mockRequest,
+        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS),
             Mockito.mock(FilterConfig.class)), newConfigWithUpdatePeriodValue(0));
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
@@ -708,6 +708,6 @@ public class TestWroFilter {
     if (victim != null) {
       victim.destroy();
     }
-    Context.unset();
+    DefaultContext.unset();
   }
 }

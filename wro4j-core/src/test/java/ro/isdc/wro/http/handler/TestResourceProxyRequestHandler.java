@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -72,7 +72,7 @@ public class TestResourceProxyRequestHandler {
     victim = new ResourceProxyRequestHandler();
     
     Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
-    Context.set(Context.webContext(request, response, filterConfig));
+    DefaultContext.set(DefaultContext.webContext(request, response, filterConfig));
     // a more elaborate way to build injector, used to instruct it use a different instance of authorizationManager
     final Injector injector = new InjectorBuilder().setWroManager(
         new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).create()).setResourceAuthorizationManager(

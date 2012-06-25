@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -30,7 +31,7 @@ public class TestInjector {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
   }
 
   @Test(expected=NullPointerException.class)
@@ -94,7 +95,7 @@ public class TestInjector {
   @Test(expected=WroRuntimeException.class)
   public void canInjectContextOutsideOfContextScope() throws Exception {
     //remove the context explicitly
-    Context.unset();
+    DefaultContext.unset();
     shouldInjectContext();
   }
 
@@ -132,6 +133,6 @@ public class TestInjector {
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }

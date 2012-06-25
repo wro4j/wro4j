@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.extensions.model.factory.GroovyModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
@@ -40,7 +40,7 @@ public class CustomWroManagerFactory
       @Override
       protected InputStream getModelResourceAsStream()
         throws IOException {
-        return Context.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
+        return DefaultContext.get().getServletContext().getResourceAsStream("/WEB-INF/wro.groovy");
       }
     };
   }

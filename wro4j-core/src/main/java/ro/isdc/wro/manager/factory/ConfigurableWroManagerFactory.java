@@ -14,7 +14,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -169,7 +169,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *          to read from filterConfig or configProperties and put into props.
    */
   private void updatePropertiesWithConfiguration(final Properties props, final String key) {
-    final FilterConfig filterConfig = Context.get().getFilterConfig();
+    final FilterConfig filterConfig = DefaultContext.get().getFilterConfig();
     // first, retrieve value from init-param for backward compatibility
     final String valuesAsString = filterConfig.getInitParameter(key);
     if (valuesAsString != null) {
@@ -205,7 +205,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     // default location is /WEB-INF/wro.properties
     final Properties props = new Properties();
     try {
-      return new ServletContextPropertyWroConfigurationFactory(Context.get().getServletContext()).createProperties();
+      return new ServletContextPropertyWroConfigurationFactory(DefaultContext.get().getServletContext()).createProperties();
     } catch (final Exception e) {
       LOG.debug("No configuration property file found.");
     }

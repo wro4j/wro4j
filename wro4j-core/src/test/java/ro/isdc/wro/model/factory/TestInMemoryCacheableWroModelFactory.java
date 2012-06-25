@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.WroModel;
 
@@ -20,7 +20,7 @@ public class TestInMemoryCacheableWroModelFactory {
     final WroConfiguration configuration = new WroConfiguration();
     configuration.setModelUpdatePeriod(1);
 
-    Context.set(Context.standaloneContext(), configuration);
+    DefaultContext.set(DefaultContext.standaloneContext(), configuration);
   }
 
   @After
@@ -28,7 +28,7 @@ public class TestInMemoryCacheableWroModelFactory {
     if (cacheableModelFactory != null) {
       cacheableModelFactory.destroy();
     }
-    Context.destroy();
+    DefaultContext.destroy();
   }
 
   @Test

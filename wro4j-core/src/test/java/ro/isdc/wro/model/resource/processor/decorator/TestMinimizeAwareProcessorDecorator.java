@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
@@ -44,7 +44,7 @@ public class TestMinimizeAwareProcessorDecorator {
     public void process(final Reader reader, final Writer writer)
         throws IOException {
     }
-    public void process(Resource resource, Reader reader, Writer writer)
+    public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
     }
     public boolean isMinimize() {
@@ -54,7 +54,7 @@ public class TestMinimizeAwareProcessorDecorator {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     MockitoAnnotations.initMocks(this);
     mockReader = new StringReader("");
     mockWriter = new StringWriter();
@@ -233,6 +233,6 @@ public class TestMinimizeAwareProcessorDecorator {
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }

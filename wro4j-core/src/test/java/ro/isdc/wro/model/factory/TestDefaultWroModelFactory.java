@@ -12,8 +12,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ContextPropagatingCallable;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -40,11 +40,11 @@ public class TestDefaultWroModelFactory {
   
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     // required to get the authManager and make assertions agains it.
     injector.inject(this);
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
   }
 
   @Test
@@ -75,7 +75,7 @@ public class TestDefaultWroModelFactory {
   public void shouldAuthorizeResourcesFromModelWhenInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(true);
-    Context.set(Context.standaloneContext(), config);
+    DefaultContext.set(DefaultContext.standaloneContext(), config);
     final String authorizedResourceUri = "/authorized.js";
     createSampleModel(authorizedResourceUri);
     
@@ -87,7 +87,7 @@ public class TestDefaultWroModelFactory {
   public void shouldNotAuthorizeResourcesFromModelWhenNotInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(false);
-    Context.set(Context.standaloneContext(), config);
+    DefaultContext.set(DefaultContext.standaloneContext(), config);
     final String authorizedResourceUri = "/authorized.js";
     createSampleModel(authorizedResourceUri);
     

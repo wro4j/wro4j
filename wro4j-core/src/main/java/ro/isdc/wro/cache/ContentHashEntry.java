@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 
 
 /**
@@ -36,7 +36,7 @@ public final class ContentHashEntry
     this.rawContent = rawContent;
     this.hash = hash;
     //the trade-off between the memory and processing time
-    if (Context.get().getConfig().isCacheGzippedContent()) {
+    if (DefaultContext.get().getConfig().isCacheGzippedContent()) {
       gzippedContent = computeGzippedContent(rawContent);
     }
   }
@@ -46,7 +46,7 @@ public final class ContentHashEntry
     try {
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
       final OutputStream os = new GZIPOutputStream(new BufferedOutputStream(baos));
-      IOUtils.copy(new ByteArrayInputStream(content.getBytes(Context.get().getConfig().getEncoding())), os);
+      IOUtils.copy(new ByteArrayInputStream(content.getBytes(DefaultContext.get().getConfig().getEncoding())), os);
       os.close();
       return baos.toByteArray();
     } catch (final IOException e) {

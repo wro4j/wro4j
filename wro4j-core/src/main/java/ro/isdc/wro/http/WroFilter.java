@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.handler.RequestHandler;
@@ -299,7 +299,7 @@ public class WroFilter
     final HttpServletResponse response = (HttpServletResponse) res;
     try {
       // add request, response & servletContext to thread local
-      Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
+      DefaultContext.set(DefaultContext.webContext(request, response, filterConfig), wroConfiguration);
       
       if (!handledWithRequestHandler(request, response)) {
         processRequest(request, response);
@@ -308,7 +308,7 @@ public class WroFilter
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
-      Context.unset();
+      DefaultContext.unset();
     }
   }
 
@@ -369,7 +369,7 @@ public class WroFilter
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
-      chain.doFilter(Context.get().getRequest(), response);
+      chain.doFilter(DefaultContext.get().getRequest(), response);
     } catch (final Exception ex) {
       // should never happen
       LOG.error("Error while chaining the request: " + HttpServletResponse.SC_NOT_FOUND);
@@ -459,6 +459,6 @@ public class WroFilter
     if (wroConfiguration != null) {
       wroConfiguration.destroy();
     }
-    Context.destroy();
+    DefaultContext.destroy();
   }
 }

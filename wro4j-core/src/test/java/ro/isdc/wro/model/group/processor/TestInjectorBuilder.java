@@ -5,7 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static ro.isdc.wro.config.Context.set;
+import static ro.isdc.wro.config.DefaultContext.set;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -60,7 +60,7 @@ public class TestInjectorBuilder {
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
-    set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+    set(DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig));
   }
   
   @Test(expected = NullPointerException.class)
@@ -149,7 +149,7 @@ public class TestInjectorBuilder {
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   private static class Sample {

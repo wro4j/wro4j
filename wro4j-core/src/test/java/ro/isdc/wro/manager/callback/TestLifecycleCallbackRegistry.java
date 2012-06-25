@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -27,7 +27,6 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -38,13 +37,13 @@ public class TestLifecycleCallbackRegistry {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     registry = new LifecycleCallbackRegistry();
   }
 
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 
   @Test(expected=NullPointerException.class)
@@ -137,7 +136,7 @@ public class TestLifecycleCallbackRegistry {
     Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(""));
     Mockito.when(request.getRequestURI()).thenReturn("");
     Mockito.when(request.getServletPath()).thenReturn("");
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
+    DefaultContext.set(DefaultContext.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
     final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
 

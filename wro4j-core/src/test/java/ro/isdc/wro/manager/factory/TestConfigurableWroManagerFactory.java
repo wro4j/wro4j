@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -72,7 +72,7 @@ public class TestConfigurableWroManagerFactory {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     // init context
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+    DefaultContext.set(DefaultContext.webContext(mockRequest, mockResponse, mockFilterConfig));
     Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     victim = new ConfigurableWroManagerFactory();
     configProperties = new Properties();
@@ -91,7 +91,7 @@ public class TestConfigurableWroManagerFactory {
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
   
   /**

@@ -11,7 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.model.resource.ResourceType;
 
 
@@ -94,6 +94,6 @@ public class DefaultGroupExtractor
       throw new IllegalArgumentException("Request cannot be NULL!");
     }
     final String minimizeAsString = request.getParameter(PARAM_MINIMIZE);
-    return !(Context.get().getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
+    return !(DefaultContext.get().getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
   }
 }

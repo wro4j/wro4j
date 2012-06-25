@@ -20,7 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.DefaultContext;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
@@ -49,7 +49,7 @@ public class TestWildcardExpanderModelTransformer {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    Context.set(Context.standaloneContext());
+    DefaultContext.set(DefaultContext.standaloneContext());
     transformer = new WildcardExpanderModelTransformer();
     // create manager to force correct initialization.
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
@@ -186,6 +186,6 @@ public class TestWildcardExpanderModelTransformer {
   
   @After
   public void tearDown() {
-    Context.unset();
+    DefaultContext.unset();
   }
 }
