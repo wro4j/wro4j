@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +19,7 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -47,8 +51,8 @@ import ro.isdc.wro.util.Transformer;
  * @created 6 Jan 2012
  */
 public class InjectorBuilder {
-  private GroupsProcessor groupsProcessor = new GroupsProcessor();
-  private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private final GroupsProcessor groupsProcessor = new GroupsProcessor();
+  private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
@@ -70,7 +74,7 @@ public class InjectorBuilder {
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
    * something like spring ApplicationContext (lightweight IoC).
    */
-  private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+  private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   
   /**
    * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
@@ -153,11 +157,7 @@ public class InjectorBuilder {
         return namingStrategy;
       }
     });
-    map.put(Context.class, new InjectorObjectFactory<Context>() {
-      public Context create() {
-        return Context.get();
-      }
-    });
+    map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
     map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return Context.get().getConfig();
@@ -183,6 +183,24 @@ public class InjectorBuilder {
     });
   }
   
+  /**
+   * @return a proxy of {@link ReadOnlyContext} object. This solution is preferred to {@link InjectorObjectFactory}
+   *         because the injected field ensure thread-safe behavior.
+   */
+  private ReadOnlyContext createReadOnlyContextProxy() {
+    InvocationHandler handler = new InvocationHandler() {
+      public Object invoke(final Object proxy, final Method method, final Object[] args)
+          throws Throwable {
+        return method.invoke(Context.get(), args);
+      }
+    };
+    final ReadOnlyContext readOnlyContext = (ReadOnlyContext) Proxy.newProxyInstance(
+        ReadOnlyContext.class.getClassLoader(), new Class[] {
+          ReadOnlyContext.class
+        }, handler);
+    return readOnlyContext;
+  }
+
   public Injector build() {
     // first initialize the map
     initMap();
