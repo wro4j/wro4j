@@ -85,7 +85,7 @@ public class TestConfigurableWroFilter {
             LOG.debug("caught exception: ", e);
             processorsCreationException.set(e);
           }
-          return null;
+          return original;
         }
       };
       final Properties properties = new Properties();

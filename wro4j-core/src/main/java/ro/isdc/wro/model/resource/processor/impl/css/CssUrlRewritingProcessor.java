@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
@@ -116,25 +116,8 @@ public class CssUrlRewritingProcessor
   private static final String PROTECTED_PREFIX = "/WEB-INF/";
   @Inject
   private ResourceAuthorizationManager authorizationManager;
-  /**
-   * Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending on
-   * the depth of the aggregatedFolderPath.
-   */
-  private String aggregatedPathPrefix;
   @Inject
-  private Context context;
-  
-  /**
-   * The folder where the final css is located. This is important for computing image location after url rewriting.
-   * 
-   * @param aggregatedFolderPath
-   *          the aggregatedFolder to set
-   */
-  private CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
-    aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolderPath);
-    LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
-    return this;
-  }
+  private ReadOnlyContext context;
   
   /**
    * {@inheritDoc}
@@ -173,10 +156,13 @@ public class CssUrlRewritingProcessor
       if (isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
-      // ensure the folder path is set
-      setAggregatedFolderPath(context.getAggregatedFolderPath());
-      LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
-      return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
+      // Compute the folder where the final css is located. This is important for computing image location after url
+      // rewriting.
+      // Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending
+      // on the depth of the aggregatedFolderPath.
+      final String aggregatedPathPrefix = computeAggregationPathPrefix(context.getAggregatedFolderPath());
+      LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
+      return computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlResourceLocator.isValid(cssUri)) {
       if (isContextRelativeUri(imageUrl)) {

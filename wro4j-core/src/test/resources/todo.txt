@@ -11,3 +11,4 @@
 # wroModel reload seems to be broken
 # DispatchertreamLocator should handle 404 dispatch and try http call to locate the resource
 # Callbacks synchronization     
+# YuiCssMin throws stackOverflow when processing a css with large dataUri encoded (ex: font module with no dataUri size limit). Probably an invalid regexp.

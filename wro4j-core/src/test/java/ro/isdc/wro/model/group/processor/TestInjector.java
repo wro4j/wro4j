@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -80,9 +81,10 @@ public class TestInjector {
     initializeValidInjector();
     final Callable<?> inner = new Callable<Void>() {
       @Inject
-      private Context object;
+      private ReadOnlyContext object;
+
       public Void call()
-        throws Exception {
+          throws Exception {
         Assert.assertNotNull(object);
         return null;
       }
@@ -90,10 +92,11 @@ public class TestInjector {
     injector.inject(inner);
     inner.call();
   }
-
-  @Test(expected=WroRuntimeException.class)
-  public void canInjectContextOutsideOfContextScope() throws Exception {
-    //remove the context explicitly
+  
+  @Test(expected = WroRuntimeException.class)
+  public void canInjectContextOutsideOfContextScope()
+      throws Exception {
+    // remove the context explicitly
     Context.unset();
     shouldInjectContext();
   }
@@ -116,7 +119,7 @@ public class TestInjector {
 
   private class TestProcessor extends JSMinProcessor {
     @Inject
-    private Context context;
+    private ReadOnlyContext context;
   }
 
   @Test

@@ -19,7 +19,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -45,7 +45,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
   @Inject
-  private Context context;
+  private ReadOnlyContext context;
   
   /**
    * Parse the css content and transform found url's.

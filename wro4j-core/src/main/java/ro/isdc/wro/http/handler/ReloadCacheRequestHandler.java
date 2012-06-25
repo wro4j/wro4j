@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
@@ -31,7 +31,7 @@ public class ReloadCacheRequestHandler
    */
   public static final String ENDPOINT_URI = PATH_API + "/reloadCache";
   @Inject
-  private Context context;
+  private ReadOnlyContext context;
   
   /**
    * {@inheritDoc}

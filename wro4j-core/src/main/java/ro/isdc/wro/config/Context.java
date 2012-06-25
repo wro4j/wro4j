@@ -16,13 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.WroFilter;
-import ro.isdc.wro.model.resource.ResourceType;
 
 
 /**
@@ -30,8 +27,8 @@ import ro.isdc.wro.model.resource.ResourceType;
  *
  * @author Alex Objelean
  */
-public class Context {
-  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
+public class Context
+    implements ReadOnlyContext {
   /**
    * Maps correlationId with a Context.
    */
@@ -216,21 +213,14 @@ public class Context {
     return this.filterConfig;
   }
 
-
   /**
-   * @return the aggregatedFolderPath
+   * {@inheritDoc}
    */
   public String getAggregatedFolderPath() {
     return this.aggregatedFolderPath;
   }
 
   /**
-   * This field is useful only for the aggregated resources of type {@link ResourceType#CSS}. </br>The
-   * aggregatedFolderPath is used to compute the depth. For example, if aggregatedFolder is "wro" then the depth is 1
-   * and the path used to prefix the image url is <code>".."</code>. If the aggregatedFolder is "css/aggregated", the
-   * depth is 2 and the prefix is <code>"../.."</code>. The name of the aggregated folder is not important, it is used
-   * only to compute the depth.
-   *
    * @param aggregatedFolderPath the aggregatedFolderPath to set
    */
   public void setAggregatedFolderPath(final String aggregatedFolderPath) {

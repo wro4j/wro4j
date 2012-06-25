@@ -5,7 +5,7 @@ package ro.isdc.wro.model.factory;
 
 import java.io.IOException;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 public abstract class AbstractWroModelFactory
   implements WroModelFactory {
   @Inject
-  private Context context;
+  private ReadOnlyContext context;
   /**
    * Override this method, in order to provide different xml definition file name.
    *
@@ -29,7 +29,7 @@ public abstract class AbstractWroModelFactory
    *           if the stream couldn't be read.
    */
   protected ResourceLocator getModelResourceLocator() {
-    return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/" + getDefaultModelFilename());
+    return new ServletContextResourceLocator(context.getServletContext(), "/WEB-INF/" + getDefaultModelFilename());
   }
 
   /**
@@ -41,5 +41,4 @@ public abstract class AbstractWroModelFactory
    * {@inheritDoc}
    */
   public void destroy() {}
-
 }

@@ -1,7 +1,5 @@
 package ro.isdc.wro.manager.factory;
 
-import org.apache.commons.lang3.Validate;
-
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -22,12 +20,6 @@ public class InjectableWroManagerFactoryDecorator
     super(decorated);
   }
   
-  public InjectableWroManagerFactoryDecorator(final WroManagerFactory decorated, final Injector injector) {
-    super(decorated);
-    Validate.notNull(injector);
-    this.injector = injector;
-  }
-  
   /**
    * {@inheritDoc}
    */
@@ -41,7 +33,7 @@ public class InjectableWroManagerFactoryDecorator
   /**
    * @return {@link Injector} used to inject the created manager.
    */
-  protected Injector getInjector() {
+  public Injector getInjector() {
     if (injector == null) {
       injector = InjectorBuilder.create(getDecoratedObject()).build();
     }

@@ -160,12 +160,7 @@ public class TestWroManager {
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
       WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
-      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory) {
-        @Override
-        protected Injector getInjector() {
-          return super.getInjector();
-        }
-      };
+      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
       managerFactory.create().process();
     }
   }

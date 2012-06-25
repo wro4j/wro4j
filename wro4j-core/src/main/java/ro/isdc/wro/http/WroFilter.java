@@ -42,9 +42,9 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
+import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -76,14 +76,14 @@ public class WroFilter
    */
   private WroConfiguration wroConfiguration;
   /**
-   * WroManagerFactory. The brain of the optimizer.
+   * WroManagerFactory. The core of the optimizer. The {@link InjectableWroManagerFactoryDecorator} is used to force the
+   * injection during {@link WroManager} creation.
    */
-  private WroManagerFactory wroManagerFactory;
+  private InjectableWroManagerFactoryDecorator wroManagerFactory;
   /**
    * Used to create the collection of requestHandlers to apply
    */
   private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
-  private Injector injector;
   
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -118,7 +118,7 @@ public class WroFilter
     throws ServletException {
     this.filterConfig = config;
     this.wroConfiguration = createConfiguration();
-    this.wroManagerFactory = createWroManagerFactory();
+    this.wroManagerFactory = new InjectableWroManagerFactoryDecorator(createWroManagerFactory());
     initHeaderValues();
     registerChangeListeners();
     initJMX();
@@ -338,10 +338,7 @@ public class WroFilter
    * @VisibleForTesting
    */
   Injector getInjector() {
-    if (injector == null) {
-      injector = InjectorBuilder.create(wroManagerFactory).build(); 
-    }
-    return injector;
+    return wroManagerFactory.getInjector();
   }
 
   /**
@@ -358,7 +355,7 @@ public class WroFilter
     setResponseHeaders(response);
     // process the uri using manager
     final WroManager manager = wroManagerFactory.create();
-    getInjector().inject(manager);
+    // getInjector().inject(manager);
     manager.process();
   }
 
@@ -408,7 +405,11 @@ public class WroFilter
    * @param wroManagerFactory the wroManagerFactory to set
    */
   public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
-    this.wroManagerFactory = wroManagerFactory;
+    if (wroManagerFactory != null && !(wroManagerFactory instanceof InjectableWroManagerFactoryDecorator)) {
+      this.wroManagerFactory = new InjectableWroManagerFactoryDecorator(wroManagerFactory);
+    } else {
+      this.wroManagerFactory = (InjectableWroManagerFactoryDecorator) wroManagerFactory;
+    }
   }
 
   /**
@@ -416,7 +417,7 @@ public class WroFilter
    * @return configured {@link WroManagerFactory} instance.
    */
   public final WroManagerFactory getWroManagerFactory() {
-    return this.wroManagerFactory;
+    return this.wroManagerFactory.getOriginalDecoratedObject();
   }
 
   /**
