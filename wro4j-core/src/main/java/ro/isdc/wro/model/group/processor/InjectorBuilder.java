@@ -16,6 +16,7 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -47,8 +48,8 @@ import ro.isdc.wro.util.Transformer;
  * @created 6 Jan 2012
  */
 public class InjectorBuilder {
-  private GroupsProcessor groupsProcessor = new GroupsProcessor();
-  private PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private final GroupsProcessor groupsProcessor = new GroupsProcessor();
+  private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
@@ -70,7 +71,7 @@ public class InjectorBuilder {
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
    * something like spring ApplicationContext (lightweight IoC).
    */
-  private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+  private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   
   /**
    * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
@@ -151,6 +152,11 @@ public class InjectorBuilder {
       public NamingStrategy create() {
         injector.inject(namingStrategy);
         return namingStrategy;
+      }
+    });
+    map.put(ReadOnlyContext.class, new InjectorObjectFactory<Context>() {
+      public Context create() {
+        return Context.get();
       }
     });
     map.put(Context.class, new InjectorObjectFactory<Context>() {
