@@ -28,6 +28,7 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
@@ -106,14 +107,14 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testWithEmptyUriLocators() {
     createManager();
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("");
+    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn("");
     Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
   }
   
   
   @Test
   public void shouldLoadUriLocatorsFromConfigurationFile() {
-    configProperties.setProperty(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS, "servletContext");
+    configProperties.setProperty(ConfigurableLocatorFactory.PARAM_URI_LOCATORS, "servletContext");
     
     createManager();
     
@@ -123,8 +124,9 @@ public class TestConfigurableWroManagerFactory {
   
   @Test
   public void shouldLoadUriLocatorsFromFilterConfigRatherThanFromConfigProperties() {
-    configProperties.setProperty(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS, "servletContext");
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn("classpath, servletContext");
+    configProperties.setProperty(ConfigurableLocatorFactory.PARAM_URI_LOCATORS, "servletContext");
+    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn(
+        "classpath, servletContext");
     
     createManager();
     
@@ -137,7 +139,7 @@ public class TestConfigurableWroManagerFactory {
   
   @Test(expected = WroRuntimeException.class)
   public void cannotUseInvalidUriLocatorsSet() {
-    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn(
+    Mockito.when(mockFilterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn(
         "INVALID1,INVALID2");
     
     createManager();
@@ -157,7 +159,7 @@ public class TestConfigurableWroManagerFactory {
    * @param filterConfig
    */
   private void configureValidUriLocators(final FilterConfig filterConfig) {
-    Mockito.when(filterConfig.getInitParameter(ConfigurableWroManagerFactory.PARAM_URI_LOCATORS)).thenReturn(
+    Mockito.when(filterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn(
         "servletContext, url, classpath");
   }
   
