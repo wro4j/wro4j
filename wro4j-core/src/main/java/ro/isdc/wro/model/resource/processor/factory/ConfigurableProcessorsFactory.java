@@ -23,6 +23,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
+import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 import ro.isdc.wro.util.provider.ProviderFinder;
 
 
@@ -57,6 +58,37 @@ public class ConfigurableProcessorsFactory
   private Map<String, ResourcePostProcessor> postProcessorsMap;
   private ProviderFinder<ProcessorProvider> processorProviderFinder;
   
+  private final AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider> configurablePreProcessors = new AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider>() {
+    @Override
+    protected String getStrategyKey() {
+      return PARAM_PRE_PROCESSORS;
+    }
+
+    @Override
+    protected Map<String, ResourcePreProcessor> getStrategies(final ProcessorProvider provider) {
+      return provider.providePreProcessors();
+    }
+    
+    @Override
+    protected ResourcePreProcessor getStrategyForAlias(final String alias) {
+      ResourcePreProcessor processor = super.getStrategyForAlias(alias);
+      if (processor == null) {
+        final String extension = FilenameUtils.getExtension(alias);
+        boolean hasExtension = !StringUtils.isEmpty(extension);
+        if (hasExtension) {
+          final String processorName = FilenameUtils.getBaseName(alias);
+          LOG.debug("processorName: {}", processorName);
+          processor = super.getStrategyForAlias(processorName);
+          if (processor != null && processor instanceof ResourcePreProcessor) {
+            LOG.debug("adding Extension: {}", extension);
+            processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
+          }
+        }
+      }
+      return processor;
+    };
+  };
+
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
    */

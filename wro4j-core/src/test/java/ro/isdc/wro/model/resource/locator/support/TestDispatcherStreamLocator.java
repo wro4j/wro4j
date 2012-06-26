@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011. All rights reserved.
  */
-package ro.isdc.wro.model.resource.locator;
+package ro.isdc.wro.model.resource.locator.support;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -16,8 +16,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +26,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 
 

@@ -6,54 +6,52 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.provider.ProviderFinder;
 
 
 /**
- * Abstracts the configurable creation of the strategies. Uses two generic parameters:
+ * Abstracts the configurable creation of the strategies based on {@link ProviderFinder}. Uses two generic parameters:
  * 
  * @param <S>
  *          strategy type
  * @param <P>
  *          provider type
  * @author Alex Objelean
- * @created 17 Jun 2012
+ * @created 26 Jun 2012
  * @since 1.4.7
  */
-public abstract class AbstractConfigurableStrategy<S, P> {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurableStrategy.class);
-  
+public abstract class AbstractConfigurableStrategySupport<S, P> {
   private ProviderFinder<P> providerFinder;
   private Map<String, S> map;
   private Properties properties;
-
+  
   /**
-   * @return the {@link HashStrategy} whose alias is found configured in the properties. This method will never return
-   *         null. If no alias is defined the {@link SHA1HashBuilder} will be returned. If an invalid alias is provided
-   *         - a runtime exception will be thrown.
-   * @VisibleForTesting
+   * Override this method if a fallback search is required.
+   * 
+   * @param alias
+   *          of the strategy to use.
+   * @return the strategy S if one is found or null if no corresponding strategy found.
    */
-  public final S getConfiguredStrategy() {
-    final String alias = getProperties().getProperty(getStrategyKey());
-    S strategy = getDefaultStrategy();
-    if (!StringUtils.isEmpty(alias)) {
-      LOG.debug("configured alias: {}", alias);
-      strategy = getNamingStrategyMap().get(alias);
-      if (strategy == null) {
-        throw new WroRuntimeException("Invalid strategy alias provided: <" + alias + ">. Available aliases are: "
-            + getNamingStrategyMap().keySet());
-      }
-    }
-    LOG.debug("using strategy: {}", strategy);
-    return strategy;
+  protected S getStrategyForAlias(final String alias) {
+    return getStrategyMap().get(alias);
+  }
+  
+  /**
+   * @return the value configured in the properties file using the strategy key.
+   */
+  protected final String getConfiguredValue() {
+    return getProperties().getProperty(getStrategyKey());
+  }
+  
+  /**
+   * @return a set of available aliases.
+   */
+  protected final Set<String> getAvailableAliases() {
+    return getStrategyMap().keySet();
   }
   
   /**
@@ -69,7 +67,7 @@ public abstract class AbstractConfigurableStrategy<S, P> {
     return map;
   }
   
-  private Map<String, S> getNamingStrategyMap() {
+  private Map<String, S> getStrategyMap() {
     if (map == null) {
       map = newStrategyMap();
     }
@@ -117,7 +115,7 @@ public abstract class AbstractConfigurableStrategy<S, P> {
    * @return the class of the provider of type P. Uses {@link ParameterizedType} to compute the class. Override it to
    *         support anonymous classes which do not play well with {@link ParameterizedType}'s.
    */
-  @SuppressWarnings("unchecked")  
+  @SuppressWarnings("unchecked")
   protected Class<P> getProviderClass() {
     final Type type = getClass().getGenericSuperclass();
     return (Class<P>) ((ParameterizedType) type).getActualTypeArguments()[1];
@@ -129,12 +127,7 @@ public abstract class AbstractConfigurableStrategy<S, P> {
    * @return the map of provided strategies.
    */
   protected abstract Map<String, S> getStrategies(final P provider);
-  
-  /**
-   * @return the default strategy implementation to use when no key is configured is provided.
-   */
-  protected abstract S getDefaultStrategy();
-  
+
   /**
    * @return the key of the strategy property.
    */
