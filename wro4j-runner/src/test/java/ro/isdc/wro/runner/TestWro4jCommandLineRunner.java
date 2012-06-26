@@ -20,11 +20,11 @@ import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
-import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -104,7 +104,7 @@ public class TestWro4jCommandLineRunner {
     
     final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
-    final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
+    final String processorsList = AbstractConfigurableMultipleStrategy.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format("--wroFile %s --contextFolder %s -m --preProcessors " + processorsList,
         new Object[] {
           wroFile, contextFolder
@@ -129,7 +129,7 @@ public class TestWro4jCommandLineRunner {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
-    final String processorsList = ConfigurableProcessorsFactory.createItemsAsString(CssMinProcessor.ALIAS,
+    final String processorsList = AbstractConfigurableMultipleStrategy.createItemsAsString(CssMinProcessor.ALIAS,
         JSMinProcessor.ALIAS, CssVariablesProcessor.ALIAS);
     final String[] args = String.format(
         "--wroFile %s --contextFolder %s --destinationFolder %s -m %s " + processorsList, new Object[] {

@@ -2,6 +2,7 @@ package ro.isdc.wro.model.resource.support;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,14 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
   }
   
   /**
+   * @return a set of available strategies.
+   * @VisibleForTesting
+   */
+  public final Collection<S> getAvailableStrategies() {
+    return getStrategyMap().values();
+  }
+
+  /**
    * @return the map where the strategy alias will be searched. By default a {@link ProviderFinder} is used to build the
    *         map.
    */
@@ -67,6 +76,19 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
     return map;
   }
   
+  /**
+   * Allows the original strategy map to be overriden with new values.
+   * 
+   * @param overrideMap
+   *          a not null map of values to be added (or overriden) to original strategy map.
+   */
+  protected final void addToStrategyMap(final Map<String, S> overrideMap) {
+    Validate.notNull(map);
+    for (Map.Entry<String, S> entry : overrideMap.entrySet()) {
+      map.put(entry.getKey(), entry.getValue());
+    }
+  }
+
   private Map<String, S> getStrategyMap() {
     if (map == null) {
       map = newStrategyMap();

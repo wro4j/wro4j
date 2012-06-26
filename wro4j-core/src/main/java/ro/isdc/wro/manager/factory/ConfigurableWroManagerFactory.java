@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -17,12 +15,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -43,20 +37,6 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   private Properties configProperties;
-  /**
-   * Name of init param used to specify uri locators.
-   */
-  public static final String PARAM_URI_LOCATORS = "uriLocators";
-
-
-  private Map<String, UriLocator> createLocatorsMap() {
-    final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
-    map.put("servletContext", new ServletContextUriLocator());
-    map.put("classpath", new ClasspathUriLocator());
-    map.put("url", new UrlUriLocator());
-    return map;
-  }
-
 
   /**
    * Allow subclasses to contribute with it's own locators.
@@ -91,21 +71,14 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
-    final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-    final Map<String, UriLocator> map = createLocatorsMap();
-    contributeLocators(map);
-    final Properties props = new Properties();
-    updatePropertiesWithConfiguration(props, PARAM_URI_LOCATORS);
-    final String uriLocators = props.getProperty(PARAM_URI_LOCATORS);
-    final List<UriLocator> locators = ConfigurableProcessorsFactory.getListOfItems(uriLocators, map);
-    for (final UriLocator locator : locators) {
-      factory.addUriLocator(locator);
-    }
-    //TODO deprecate uri locator configuration
-    //use default when none provided
-    if (factory.getUriLocators().isEmpty()) {
-      return new DefaultUriLocatorFactory();
-    }
+    final ConfigurableLocatorFactory factory = new ConfigurableLocatorFactory() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableLocatorFactory.PARAM_URI_LOCATORS);
+        return props;
+      }
+    };
     return factory;
   }
 

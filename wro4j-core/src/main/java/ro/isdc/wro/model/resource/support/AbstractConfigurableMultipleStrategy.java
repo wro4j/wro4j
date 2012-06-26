@@ -27,12 +27,28 @@ public abstract class AbstractConfigurableMultipleStrategy<S, P>
   private static final String TOKEN_DELIMITER = ",";
   
   /**
+   * Creates a comma separated list of items.
+   * 
+   * @VisibleForTesting
+   */
+  public static String createItemsAsString(final String... items) {
+    final StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < items.length; i++) {
+      sb.append(items[i]);
+      if (i < items.length - 1) {
+        sb.append(TOKEN_DELIMITER);
+      }
+    }
+    return sb.toString();
+  }
+  
+  /**
    * @return the strategy S whose alias is found configured in the properties. This method will never return null. If no
    *         alias is defined the {@link SHA1HashBuilder} will be returned. If an invalid alias is provided - a runtime
    *         exception will be thrown.
    * @VisibleForTesting
    */
-  public final List<S> getConfiguredStrategy() {
+  public final List<S> getConfiguredStrategies() {
     final List<S> strategies = new ArrayList<S>();
     final List<String> aliasList = getAliasList(getConfiguredValue());
     for (String alias : aliasList) {

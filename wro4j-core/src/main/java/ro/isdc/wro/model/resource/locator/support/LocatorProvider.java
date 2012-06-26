@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  */
 public interface LocatorProvider {
   /**
-   * @return the locators to contribute. The key represents the processor alias.
+   * @return the locators to contribute. The key represents the locator alias.
    */
   Map<String, UriLocator> provideLocators();
 }

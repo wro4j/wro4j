@@ -6,10 +6,8 @@ package ro.isdc.wro.model.resource.processor.factory;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,12 +42,7 @@ public class TestConfigurableProcessorsFactory {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    factory = new ConfigurableProcessorsFactory() {
-      @Override
-      ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
-        return mockProviderFinder;
-      }
-    };
+    factory = new ConfigurableProcessorsFactory();
   }
   
   @Test
@@ -141,37 +134,37 @@ public class TestConfigurableProcessorsFactory {
   @Test
   public void shouldNotFailWhenASingleProviderFails() {
     factory = new ConfigurableProcessorsFactory() {
-      @Override
-      ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
-        final List<ProcessorProvider> list = new ArrayList<ProcessorProvider>();
-        list.add(new ProcessorProvider() {
-          public Map<String, ResourcePreProcessor> providePreProcessors() {
-            throw new IllegalStateException("BOOM!");
-          }
-          
-          public Map<String, ResourcePostProcessor> providePostProcessors() {
-            throw new IllegalStateException("BOOM!");
-          }
-        });
-        list.add(new ProcessorProvider() {
-          public Map<String, ResourcePreProcessor> providePreProcessors() {
-            final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
-            map.put("p1", mockPreProcessor);
-            map.put("p2", mockPreProcessor);
-            return map;
-          }
-          
-          public Map<String, ResourcePostProcessor> providePostProcessors() {
-            final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
-            map.put("p1", mockPostProcessor);
-            map.put("p2", mockPostProcessor);
-            map.put("p3", mockPostProcessor);
-            return map;
-          }
-        });
-        Mockito.when(mockProviderFinder.find()).thenReturn(list);
-        return mockProviderFinder;
-      }
+//      @Override
+//      ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
+//        final List<ProcessorProvider> list = new ArrayList<ProcessorProvider>();
+//        list.add(new ProcessorProvider() {
+//          public Map<String, ResourcePreProcessor> providePreProcessors() {
+//            throw new IllegalStateException("BOOM!");
+//          }
+//          
+//          public Map<String, ResourcePostProcessor> providePostProcessors() {
+//            throw new IllegalStateException("BOOM!");
+//          }
+//        });
+//        list.add(new ProcessorProvider() {
+//          public Map<String, ResourcePreProcessor> providePreProcessors() {
+//            final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+//            map.put("p1", mockPreProcessor);
+//            map.put("p2", mockPreProcessor);
+//            return map;
+//          }
+//          
+//          public Map<String, ResourcePostProcessor> providePostProcessors() {
+//            final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
+//            map.put("p1", mockPostProcessor);
+//            map.put("p2", mockPostProcessor);
+//            map.put("p3", mockPostProcessor);
+//            return map;
+//          }
+      // });
+      // Mockito.when(mockProviderFinder.find()).thenReturn(list);
+      // return mockProviderFinder;
+      // }
     };
     Assert.assertEquals(2, factory.getAvailablePreProcessors().size());
     Assert.assertEquals(3, factory.getAvailablePostProcessors().size());
