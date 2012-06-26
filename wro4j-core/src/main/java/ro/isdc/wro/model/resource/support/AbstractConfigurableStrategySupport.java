@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.util.provider.ProviderFinder;
 
@@ -26,6 +28,8 @@ import ro.isdc.wro.util.provider.ProviderFinder;
  * @since 1.4.7
  */
 public abstract class AbstractConfigurableStrategySupport<S, P> {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurableStrategySupport.class);
+  
   private ProviderFinder<P> providerFinder;
   private Map<String, S> map;
   private Properties properties;
@@ -51,7 +55,7 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
   /**
    * @return a set of available aliases.
    */
-  protected final Set<String> getAvailableAliases() {
+  public final Set<String> getAvailableAliases() {
     return getStrategyMap().keySet();
   }
   
@@ -62,7 +66,7 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
   public final Collection<S> getAvailableStrategies() {
     return getStrategyMap().values();
   }
-
+  
   /**
    * @return the map where the strategy alias will be searched. By default a {@link ProviderFinder} is used to build the
    *         map.
@@ -71,7 +75,11 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
     final Map<String, S> map = new HashMap<String, S>();
     final List<P> providers = getProviderFinder().find();
     for (P provider : providers) {
-      map.putAll(getStrategies(provider));
+      try {
+        map.putAll(getStrategies(provider));
+      } catch (Exception e) {
+        LOG.warn("Could not load strategies for provider: {}. It will be skipped.", provider);
+      }
     }
     // allow client to override defaults
     overrideDefaultStrategyMap(map);
@@ -109,7 +117,7 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
       target.put(entry.getKey(), entry.getValue());
     }
   }
-
+  
   private Map<String, S> getStrategyMap() {
     if (map == null) {
       map = newStrategyMap();
@@ -144,10 +152,10 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
   }
   
   /**
-   * @VisibleForTesting
    * @return the {@link ProviderFinder} used to find all strategies.
+   * @VisibleForTesting This method is not final only for testing purposes.
    */
-  protected final ProviderFinder<P> getProviderFinder() {
+  protected ProviderFinder<P> getProviderFinder() {
     if (providerFinder == null) {
       providerFinder = ProviderFinder.of(getProviderClass());
     }
@@ -170,7 +178,7 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
    * @return the map of provided strategies.
    */
   protected abstract Map<String, S> getStrategies(final P provider);
-
+  
   /**
    * @return the key of the strategy property.
    */
