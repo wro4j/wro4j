@@ -43,9 +43,8 @@ public abstract class AbstractConfigurableMultipleStrategy<S, P>
   }
   
   /**
-   * @return the strategy S whose alias is found configured in the properties. This method will never return null. If no
-   *         alias is defined the {@link SHA1HashBuilder} will be returned. If an invalid alias is provided - a runtime
-   *         exception will be thrown.
+   * @return the strategy S whose alias is found configured in the properties. This method will never return null. If an
+   *         invalid alias is provided - a runtime exception will be thrown.
    * @VisibleForTesting
    */
   public final List<S> getConfiguredStrategies() {
@@ -57,6 +56,7 @@ public abstract class AbstractConfigurableMultipleStrategy<S, P>
         throw new WroRuntimeException("Invalid strategy alias provided: <" + alias + ">. Available aliases are: "
             + getAvailableAliases());
       }
+      strategies.add(strategy);
     }
     LOG.debug("using strategies: {}", strategies);
     return strategies;

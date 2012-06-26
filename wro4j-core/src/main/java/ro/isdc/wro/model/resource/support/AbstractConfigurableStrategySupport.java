@@ -67,25 +67,46 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
    * @return the map where the strategy alias will be searched. By default a {@link ProviderFinder} is used to build the
    *         map.
    */
-  protected Map<String, S> newStrategyMap() {
+  private final Map<String, S> newStrategyMap() {
     final Map<String, S> map = new HashMap<String, S>();
     final List<P> providers = getProviderFinder().find();
     for (P provider : providers) {
       map.putAll(getStrategies(provider));
     }
+    // allow client to override defaults
+    overrideDefaultStrategyMap(map);
     return map;
   }
   
   /**
-   * Allows the original strategy map to be overriden with new values.
+   * Invoked after the the map of strategies is built from providers. Allows client to override its keys or add new
+   * entries.
    * 
-   * @param overrideMap
-   *          a not null map of values to be added (or overriden) to original strategy map.
+   * @param map
+   *          the built map.
    */
-  protected final void addToStrategyMap(final Map<String, S> overrideMap) {
-    Validate.notNull(map);
-    for (Map.Entry<String, S> entry : overrideMap.entrySet()) {
-      map.put(entry.getKey(), entry.getValue());
+  protected void overrideDefaultStrategyMap(final Map<String, S> map) {
+  }
+  
+  /**
+   * Utility method which copies all entries from source into target. Entries with the same keys from target will be
+   * overridden with entries from source. This operation is similar to {@link Map#putAll(Map)}, but it doesn't require
+   * changing generics to construction like
+   * 
+   * <pre>
+   * <? extends String, ? extends S>
+   * </pre>
+   * 
+   * @param source
+   *          the map from where the entries will be copied into target.
+   * @param target
+   *          the map where to put entries from source.
+   */
+  protected final void copyAll(final Map<String, S> source, final Map<String, S> target) {
+    Validate.notNull(source);
+    Validate.notNull(target);
+    for (Map.Entry<String, S> entry : source.entrySet()) {
+      target.put(entry.getKey(), entry.getValue());
     }
   }
 

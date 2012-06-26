@@ -83,4 +83,12 @@ public class ConfigurableLocatorFactory
   public UriLocator getInstance(final String uri) {
     return locatorFactory.getInstance(uri);
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Class<LocatorProvider> getProviderClass() {
+    return LocatorProvider.class;
+  }
 }

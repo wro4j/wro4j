@@ -58,11 +58,9 @@ public class ConfigurableProcessorsFactory
     }
     
     @Override
-    protected Map<String, ResourcePreProcessor> newStrategyMap() {
-      final Map<String, ResourcePreProcessor> map = super.newStrategyMap();
-      addToStrategyMap(ConfigurableProcessorsFactory.this.getPreProcessorsMap());
-      return map;
-    };
+    protected void overrideDefaultStrategyMap(final Map<String, ResourcePreProcessor> map) {
+      copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
+    }
 
     @Override
     protected Map<String, ResourcePreProcessor> getStrategies(final ProcessorProvider provider) {
@@ -101,11 +99,9 @@ public class ConfigurableProcessorsFactory
     }
     
     @Override
-    protected Map<String, ResourcePostProcessor> newStrategyMap() {
-      final Map<String, ResourcePostProcessor> map = super.newStrategyMap();
-      addToStrategyMap(ConfigurableProcessorsFactory.this.getPostProcessorsMap());
-      return map;
-    };
+    protected void overrideDefaultStrategyMap(final Map<String, ResourcePostProcessor> map) {
+      copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
+    }
     
     @Override
     protected Map<String, ResourcePostProcessor> getStrategies(final ProcessorProvider provider) {
