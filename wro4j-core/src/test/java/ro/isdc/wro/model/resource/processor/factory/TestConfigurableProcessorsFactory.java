@@ -6,72 +6,54 @@ package ro.isdc.wro.model.resource.processor.factory;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
-import ro.isdc.wro.util.provider.ProviderFinder;
 
 
 /**
  * @author Alex Objelean
  */
 public class TestConfigurableProcessorsFactory {
-  @Mock
-  private ResourcePreProcessor mockPreProcessor;
-  @Mock
-  private ResourcePostProcessor mockPostProcessor;
-  @Mock
-  private ProviderFinder<ProcessorProvider> mockProviderFinder;
-  private ConfigurableProcessorsFactory factory;
+  private ConfigurableProcessorsFactory victim;
   
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    factory = new ConfigurableProcessorsFactory() {
-      @Override
-      ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
-        return mockProviderFinder;
-      }
-    };
+    victim = new ConfigurableProcessorsFactory();
   }
   
   @Test
   public void shouldReturnEmptyListOfProcessors() {
-    assertEquals(Collections.EMPTY_LIST, factory.getPreProcessors());
-    assertEquals(Collections.EMPTY_LIST, factory.getPostProcessors());
+    assertEquals(Collections.EMPTY_LIST, victim.getPreProcessors());
+    assertEquals(Collections.EMPTY_LIST, victim.getPostProcessors());
   }
   
   @Test(expected = WroRuntimeException.class)
   public void testInvalidPreProcessorSet() {
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "invalid");
-    factory.setProperties(props);
-    factory.getPreProcessors();
+    victim.setProperties(props);
+    victim.getPreProcessors();
   }
   
   @Test(expected = WroRuntimeException.class)
   public void testInvalidPostProcessorSet() {
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "invalid");
-    factory.setProperties(props);
-    factory.getPostProcessors();
+    victim.setProperties(props);
+    victim.getPostProcessors();
   }
   
   @Test
@@ -80,9 +62,9 @@ public class TestConfigurableProcessorsFactory {
     map.put("valid", Mockito.mock(ResourcePreProcessor.class));
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "valid");
-    factory.setPreProcessorsMap(map);
-    factory.setProperties(props);
-    assertEquals(1, factory.getPreProcessors().size());
+    victim.setPreProcessorsMap(map);
+    victim.setProperties(props);
+    assertEquals(1, victim.getPreProcessors().size());
   }
   
   @Test
@@ -91,9 +73,9 @@ public class TestConfigurableProcessorsFactory {
     map.put("valid", Mockito.mock(ResourcePostProcessor.class));
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "valid");
-    factory.setPostProcessorsMap(map);
-    factory.setProperties(props);
-    assertEquals(1, factory.getPostProcessors().size());
+    victim.setPostProcessorsMap(map);
+    victim.setProperties(props);
+    assertEquals(1, victim.getPostProcessors().size());
   }
   
   @Test
@@ -105,9 +87,9 @@ public class TestConfigurableProcessorsFactory {
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS,
         String.format("%s.%s", processorName, extension));
-    factory.setPreProcessorsMap(map);
-    factory.setProperties(props);
-    assertEquals(0, factory.getPreProcessors().size());
+    victim.setPreProcessorsMap(map);
+    victim.setProperties(props);
+    assertEquals(0, victim.getPreProcessors().size());
   }
   
   @Test
@@ -126,54 +108,9 @@ public class TestConfigurableProcessorsFactory {
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS,
         String.format("%s.%s", processorName, extension));
-    factory.setPreProcessorsMap(map);
-    factory.setProperties(props);
-    assertEquals(1, factory.getPreProcessors().size());
-    assertTrue(factory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
-  }
-  
-  @Test(expected = WroRuntimeException.class)
-  public void cannotContinueWhenDiscoveryOfProcessorsFails() {
-    Mockito.when(mockProviderFinder.find()).thenThrow(new WroRuntimeException("BOOM!"));
-    factory.getPreProcessors();
-  }
-  
-  @Test
-  public void shouldNotFailWhenASingleProviderFails() {
-    factory = new ConfigurableProcessorsFactory() {
-      @Override
-      ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
-        final List<ProcessorProvider> list = new ArrayList<ProcessorProvider>();
-        list.add(new ProcessorProvider() {
-          public Map<String, ResourcePreProcessor> providePreProcessors() {
-            throw new IllegalStateException("BOOM!");
-          }
-          
-          public Map<String, ResourcePostProcessor> providePostProcessors() {
-            throw new IllegalStateException("BOOM!");
-          }
-        });
-        list.add(new ProcessorProvider() {
-          public Map<String, ResourcePreProcessor> providePreProcessors() {
-            final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
-            map.put("p1", mockPreProcessor);
-            map.put("p2", mockPreProcessor);
-            return map;
-          }
-          
-          public Map<String, ResourcePostProcessor> providePostProcessors() {
-            final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
-            map.put("p1", mockPostProcessor);
-            map.put("p2", mockPostProcessor);
-            map.put("p3", mockPostProcessor);
-            return map;
-          }
-        });
-        Mockito.when(mockProviderFinder.find()).thenReturn(list);
-        return mockProviderFinder;
-      }
-    };
-    Assert.assertEquals(2, factory.getAvailablePreProcessors().size());
-    Assert.assertEquals(3, factory.getAvailablePostProcessors().size());
+    victim.setPreProcessorsMap(map);
+    victim.setProperties(props);
+    assertEquals(1, victim.getPreProcessors().size());
+    assertTrue(victim.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
   }
 }

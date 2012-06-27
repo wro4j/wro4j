@@ -1,6 +1,9 @@
-package ro.isdc.wro.model.resource.processor;
+package ro.isdc.wro.model.resource.processor.support;
 
 import java.util.Map;
+
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 

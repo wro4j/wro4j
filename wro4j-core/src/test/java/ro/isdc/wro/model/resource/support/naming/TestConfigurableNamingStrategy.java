@@ -1,6 +1,5 @@
 package ro.isdc.wro.model.resource.support.naming;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -82,10 +81,8 @@ public class TestConfigurableNamingStrategy {
     final String mockAlias = "mock";
     victim = new ConfigurableNamingStrategy() {
       @Override
-      protected Map<String, NamingStrategy> newStrategyMap() { 
-        final Map<String, NamingStrategy> map = new HashMap<String, NamingStrategy>();
+      protected void overrideDefaultStrategyMap(final Map<String, NamingStrategy> map) {
         map.put(mockAlias, mockNamingStrategy);
-        return map;
       }
     };
     victim.setProperties(buildPropsForAlias(mockAlias));
