@@ -30,6 +30,7 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
    * Creates a factory with a list of default handlers.
    */
   public DefaultRequestHandlerFactory() {
+    // TODO use provider to load all available handlers as default behavior.
     Collection<RequestHandler> requestHandlers = new ArrayList<RequestHandler>();
     requestHandlers.add(new ResourceProxyRequestHandler());
     requestHandlers.add(new ReloadCacheRequestHandler());
@@ -44,9 +45,9 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
   private void addExtensionsHandlers(final Collection<RequestHandler> requestHandlers) {
     try {
       // TODO add a test in extension module which proves that this handler is added when the the extensions module is
-      // available. 
+      // available.
       RequestHandler requestHandler = (RequestHandler) Class.forName(
-          "ro.isdc.wro.extensions.http.handler.ExposeModelRequestHandler").newInstance();
+          "ro.isdc.wro.extensions.http.handler.ModelAsJsonRequestHandler").newInstance();
       requestHandlers.add(requestHandler);
     } catch (final Exception e) {
       LOG.info("ExposeModelRequestHandler not found, probably because wro4j-extensions "
