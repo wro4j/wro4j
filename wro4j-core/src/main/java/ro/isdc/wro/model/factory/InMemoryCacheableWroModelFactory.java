@@ -17,10 +17,6 @@ import ro.isdc.wro.util.DestroyableLazyInitializer;
  * @since 1.4.2
  */
 public class InMemoryCacheableWroModelFactory extends WroModelFactoryDecorator {
-  /**
-   * Reference to cached model instance. 
-   */
-  private WroModel model;
 
   public InMemoryCacheableWroModelFactory(final WroModelFactory decorated) {
     super(decorated);
@@ -29,8 +25,7 @@ public class InMemoryCacheableWroModelFactory extends WroModelFactoryDecorator {
   private DestroyableLazyInitializer<WroModel> modelInitializer = new DestroyableLazyInitializer<WroModel>() {
     @Override
     protected WroModel initialize() {
-      model = InMemoryCacheableWroModelFactory.super.create();
-      return model;
+      return InMemoryCacheableWroModelFactory.super.create();
     }
   };
 

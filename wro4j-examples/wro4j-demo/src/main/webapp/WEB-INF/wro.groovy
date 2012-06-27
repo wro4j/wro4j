@@ -5,6 +5,7 @@ groups {
   modules {
     font()
     wildcard()
+    jar()
   }
   wildcard {
     css("/static/**.css")
@@ -15,7 +16,7 @@ groups {
   font {
     css("/module/font/**.css")
   }
-  /*
+  
   encoding {
     js("/static/js/encoding/*.js")
   }
@@ -111,5 +112,5 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
-  */
+ /* */
 }

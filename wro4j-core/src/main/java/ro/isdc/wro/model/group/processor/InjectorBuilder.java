@@ -38,6 +38,8 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
+import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.Transformer;
 
@@ -54,17 +56,39 @@ public class InjectorBuilder {
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private UriLocatorFactory uriLocatorFactory = new SimpleUriLocatorFactory();
+  private LazyInitializer<UriLocatorFactory> uriLocatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
+    @Override
+    protected UriLocatorFactory initialize() {
+      return new InjectorAwareUriLocatorFactoryDecorator(uriLocatorFactory, injector);
+    }
+  };
   private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
   private NamingStrategy namingStrategy = new NoOpNamingStrategy();
   private HashStrategy hashStrategy = new SHA1HashStrategy();
   private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
   private WroModelFactory modelFactory = null;
+  
+  private LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
+    @Override
+    protected WroModelFactory initialize() {
+      return new DefaultWroModelFactoryDecorator(modelFactory, modelTransformers);
+    }
+  };
   private GroupExtractor groupExtractor = null;
   private LifecycleCallbackRegistry callbackRegistry = null;
   /**
    * A cacheStrategy used for caching processed results.
    */
   private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
+  /**
+   * Ensure the strategy is decorated only once.
+   */
+  private LazyInitializer<CacheStrategy<CacheEntry, ContentHashEntry>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheEntry, ContentHashEntry>>() {
+    @Override
+    protected CacheStrategy<CacheEntry, ContentHashEntry> initialize() {
+      return new DefaultSynchronizedCacheStrategyDecorator(cacheStrategy);
+    }
+  };
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
@@ -136,7 +160,7 @@ public class InjectorBuilder {
     });
     map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        return new InjectorAwareUriLocatorFactoryDecorator(uriLocatorFactory, injector);
+        return uriLocatorFactoryInitializer.get();
       }
     });
     map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
@@ -146,9 +170,9 @@ public class InjectorBuilder {
     });
     map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
-        final WroModelFactory decorated = new DefaultWroModelFactoryDecorator(modelFactory, modelTransformers);
-        injector.inject(decorated);
-        return decorated;
+        final WroModelFactory modelFactory = modelFactoryInitializer.get();
+        injector.inject(modelFactory);
+        return modelFactory;
       }
     });
     map.put(NamingStrategy.class, new InjectorObjectFactory<NamingStrategy>() {
@@ -165,8 +189,7 @@ public class InjectorBuilder {
     });
     map.put(CacheStrategy.class, new InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>>() {
       public CacheStrategy<CacheEntry, ContentHashEntry> create() {
-        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(
-            cacheStrategy);
+        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = cacheStrategyInitializer.get();
         injector.inject(decorated);
         return decorated;
       }

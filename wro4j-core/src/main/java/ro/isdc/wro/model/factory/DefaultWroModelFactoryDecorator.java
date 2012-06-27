@@ -49,8 +49,8 @@ public class DefaultWroModelFactoryDecorator
    * Decorate with several useful aspects, like: fallback, caching & model transformer ability.
    */
   private WroModelFactory enhance(final WroModelFactory decorated) {
-    return new ModelTransformerFactory(
-        new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(decorated))).setTransformers(modelTransformers);
+    return new InMemoryCacheableWroModelFactory(
+        new ModelTransformerFactory(new FallbackAwareWroModelFactory(decorated)).setTransformers(modelTransformers));
   }
   
   /**
