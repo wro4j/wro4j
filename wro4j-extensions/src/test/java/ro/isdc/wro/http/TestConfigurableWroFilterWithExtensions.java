@@ -58,7 +58,7 @@ public class TestConfigurableWroFilterWithExtensions {
   @Test
   public void extensionProcessorsShouldBeAvailable()
       throws Exception {
-    ConfigurableWroFilter filter = new ConfigurableWroFilter();
+    final ConfigurableWroFilter filter = new ConfigurableWroFilter();
     final Properties properties = new Properties();
     properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, CoffeeScriptProcessor.ALIAS);
     filter.setProperties(properties);
@@ -67,7 +67,7 @@ public class TestConfigurableWroFilterWithExtensions {
     WroManagerFactory factory = filter.newWroManagerFactory();
     WroManager wroManager = factory.create();
     
-    ProcessorsFactory processorsFactory = wroManager.getProcessorsFactory();
+    final ProcessorsFactory processorsFactory = wroManager.getProcessorsFactory();
     Collection<ResourcePostProcessor> postProcessors = processorsFactory.getPostProcessors();
     
     assertEquals(1, postProcessors.size());

@@ -78,7 +78,8 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
       try {
         map.putAll(getStrategies(provider));
       } catch (Exception e) {
-        LOG.warn("Could not load strategies for provider: {}. It will be skipped.", provider);
+        LOG.warn("Could not load strategies for provider: {}, because of: {}. It will be skipped.", provider,
+            e.getMessage());
       }
     }
     // allow client to override defaults

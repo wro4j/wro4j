@@ -28,8 +28,8 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
@@ -39,6 +39,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
@@ -59,7 +60,7 @@ public class TestConfigurableWroManagerFactory {
   private ConfigurableWroManagerFactory victim;
   @Mock
   private FilterConfig mockFilterConfig;
-  private SimpleUriLocatorFactory uriLocatorFactory;
+  private ConfigurableLocatorFactory uriLocatorFactory;
   @Mock
   private ServletContext mockServletContext;
   private ProcessorsFactory processorsFactory;
@@ -87,7 +88,7 @@ public class TestConfigurableWroManagerFactory {
     // create one instance for test
     final WroManager manager = victim.create();
     processorsFactory = manager.getProcessorsFactory();
-    uriLocatorFactory = (SimpleUriLocatorFactory) AbstractDecorator.getOriginalDecoratedObject(manager.getUriLocatorFactory());
+    uriLocatorFactory = (ConfigurableLocatorFactory) AbstractDecorator.getOriginalDecoratedObject(manager.getUriLocatorFactory());
   }
   
   @After
@@ -99,16 +100,16 @@ public class TestConfigurableWroManagerFactory {
    * When no uri locators are set, the default factory is used.
    */
   @Test
-  public void testWhenNoUriLocatorsParamSet() {
+  public void shouldHaveNoLocatorsWhenNoUriLocatorsParamSet() {
     createManager();
-    Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
+    Assert.assertTrue(uriLocatorFactory.getConfiguredStrategies().isEmpty());
   }
   
   @Test
-  public void testWithEmptyUriLocators() {
+  public void shouldHaveNoLocatorsWhenNoLocatorsInitParamSet() {
     createManager();
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn("");
-    Assert.assertFalse(uriLocatorFactory.getUriLocators().isEmpty());
+    Assert.assertTrue(uriLocatorFactory.getConfiguredStrategies().isEmpty());
   }
   
   
@@ -118,8 +119,9 @@ public class TestConfigurableWroManagerFactory {
     
     createManager();
     
-    Assert.assertEquals(1, uriLocatorFactory.getUriLocators().size());
-    Assert.assertSame(ServletContextUriLocator.class, uriLocatorFactory.getUriLocators().iterator().next().getClass());
+    Assert.assertEquals(1, uriLocatorFactory.getConfiguredStrategies().size());
+    Assert.assertSame(ServletContextUriLocator.class,
+        uriLocatorFactory.getConfiguredStrategies().iterator().next().getClass());
   }
   
   @Test
@@ -130,8 +132,8 @@ public class TestConfigurableWroManagerFactory {
     
     createManager();
     
-    Assert.assertEquals(2, uriLocatorFactory.getUriLocators().size());
-    final Iterator<UriLocator> locatorsIterator = uriLocatorFactory.getUriLocators().iterator();
+    Assert.assertEquals(2, uriLocatorFactory.getConfiguredStrategies().size());
+    final Iterator<UriLocator> locatorsIterator = uriLocatorFactory.getConfiguredStrategies().iterator();
     Assert.assertSame(ClasspathUriLocator.class, locatorsIterator.next().getClass());
     Assert.assertSame(ServletContextUriLocator.class, locatorsIterator.next().getClass());
   }
@@ -144,15 +146,14 @@ public class TestConfigurableWroManagerFactory {
     
     createManager();
     
-    uriLocatorFactory.getUriLocators();
+    uriLocatorFactory.getConfiguredStrategies();
   }
   
   @Test
-  public void testWhenValidLocatorsSet() {
-    createManager();
-    
+  public void shouldHaveCorrectLocatorsSet() {
     configureValidUriLocators(mockFilterConfig);
-    Assert.assertEquals(3, uriLocatorFactory.getUriLocators().size());
+    createManager();
+    Assert.assertEquals(3, uriLocatorFactory.getConfiguredStrategies().size());
   }
   
   /**
@@ -160,7 +161,8 @@ public class TestConfigurableWroManagerFactory {
    */
   private void configureValidUriLocators(final FilterConfig filterConfig) {
     Mockito.when(filterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn(
-        "servletContext, url, classpath");
+        ConfigurableLocatorFactory.createItemsAsString(ServletContextUriLocator.ALIAS, UrlUriLocator.ALIAS,
+            ClasspathUriLocator.ALIAS));
   }
   
   @Test
@@ -169,7 +171,8 @@ public class TestConfigurableWroManagerFactory {
     
     configureValidUriLocators(mockFilterConfig);
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(
-        JSMinProcessor.ALIAS + "," + CssImportPreProcessor.ALIAS + "," + CssVariablesProcessor.ALIAS);
+        AbstractConfigurableMultipleStrategy.createItemsAsString(JSMinProcessor.ALIAS, CssImportPreProcessor.ALIAS,
+            CssVariablesProcessor.ALIAS));
     final List<ResourcePreProcessor> list = (List<ResourcePreProcessor>) processorsFactory.getPreProcessors();
     Assert.assertEquals(JSMinProcessor.class, list.get(0).getClass());
     Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
