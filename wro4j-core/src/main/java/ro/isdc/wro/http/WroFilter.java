@@ -306,8 +306,8 @@ public class WroFilter
         processRequest(request, response);
         onRequestProcessed();
       }
-    } catch (final RuntimeException e) {
-      onRuntimeException(e, response, chain);
+    } catch (final Exception e) {
+      onException(e, response, chain);
     } finally {
       // Destroy the cached model after the processing is done if cache flag is disabled
       if (getConfiguration().isDisableCache()) {
@@ -361,12 +361,27 @@ public class WroFilter
   }
 
   /**
+   * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation redirects
+   * to 404 {@link WroRuntimeException} is thrown when in DEPLOYMENT mode.
+   * 
+   * @param e
+   *          {@link Exception} thrown during request processing.
+   */
+  protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
+    RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(
+        "Unexected exception", e);
+    onRuntimeException(re, response, chain);
+  }
+
+  /**
    * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
    * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
    * 
    * @param e
    *          {@link RuntimeException} thrown during request processing.
+   * @deprecated use {@link WroFilter#onException(Exception, HttpServletResponse, FilterChain)}
    */
+  @Deprecated
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
       final FilterChain chain) {
     LOG.debug("RuntimeException occured", e);
