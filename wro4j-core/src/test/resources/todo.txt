@@ -3,8 +3,7 @@
 # uglify       [OK]
 # cssLint      [OK]
 # jsHint       [OK]
-
-# jsLint       [OK] 
+# jsLint       [OK]
 # dustJs       [N/A]
 
 # TODO
