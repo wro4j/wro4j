@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010.
- * All rights reserved.
+ * Copyright (C) 2010. All rights reserved.
  */
 package ro.isdc.wro.model.factory;
 
@@ -21,7 +20,7 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 /**
  * Test class for {@link FallbackAwareXmlModelFactory}.
- *
+ * 
  * @author Alex Objelean
  */
 public class TestFallbackAwareWroModelFactory {
@@ -31,7 +30,6 @@ public class TestFallbackAwareWroModelFactory {
    * Used to simulate that a resource stream used to build the model is not available.
    */
   private boolean isModelAvailable;
-
 
   @Before
   public void setUp() {
@@ -48,12 +46,12 @@ public class TestFallbackAwareWroModelFactory {
         return null;
       };
     };
-    fallbackAwareModelFactory = new InMemoryCacheableWroModelFactory(new FallbackAwareWroModelFactory(new XmlModelFactory() {
+    fallbackAwareModelFactory = new FallbackAwareWroModelFactory(new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return locator;
       }
-    }));
+    });
     xmlModelFactory = new XmlModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {
@@ -62,14 +60,12 @@ public class TestFallbackAwareWroModelFactory {
     };
   }
 
-
   @Test
   public void testLastValidIsOK() {
     Assert.assertNotNull(fallbackAwareModelFactory.create());
     fallbackAwareModelFactory.destroy();
     Assert.assertNotNull(fallbackAwareModelFactory.create());
   }
-
 
   @Test(expected = WroRuntimeException.class)
   public void testWithoutLastValidThrowsException() {

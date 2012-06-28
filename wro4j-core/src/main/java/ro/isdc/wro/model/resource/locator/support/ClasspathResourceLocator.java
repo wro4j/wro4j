@@ -22,14 +22,18 @@ import ro.isdc.wro.util.StringUtils;
 
 
 /**
- * Locates classpath resources.
- *
+ * Implementation of the {@link UriLocator} that is able to read a resource from a classpath.
+ * 
  * @author Alex Objelean
  * @created 28 Mar 2011
  * @since 1.4.0
  */
 public class ClasspathResourceLocator extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathResourceLocator.class);
+  /**
+   * Alias used to register this locator with {@link LocatorProvider}. 
+   */
+  public static final String ALIAS = "classpath";
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link ResourceLocator} implementation.
    */
@@ -112,7 +116,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     }
     return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
   }
-
+  
   /**
    * Builds a {@link JarWildcardStreamLocator} in order to get resources from the full classpath.
    */

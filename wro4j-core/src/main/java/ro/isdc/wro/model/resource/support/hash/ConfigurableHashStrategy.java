@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import ro.isdc.wro.model.resource.support.AbstractConfigurableStrategy;
+import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
 /**
@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableStrategy;
  * @since 1.4.7
  */
 public class ConfigurableHashStrategy
-    extends AbstractConfigurableStrategy<HashStrategy, HashStrategyProvider>
+    extends AbstractConfigurableSingleStrategy<HashStrategy, HashStrategyProvider>
     implements HashStrategy {
   /**
    * Property name to specify alias.

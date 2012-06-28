@@ -3,10 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -18,11 +16,11 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
-import ro.isdc.wro.util.provider.ProviderFinder;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
+import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 
 
 /**
@@ -35,11 +33,7 @@ import ro.isdc.wro.util.provider.ProviderFinder;
 public class ConfigurableProcessorsFactory
     implements ProcessorsFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableProcessorsFactory.class);
-  /**
-   * Delimit tokens containing a list of locators, preProcessors & postProcessors.
-   */
-  private static final String TOKEN_DELIMITER = ",";
-
+  
   /**
    * Property name to specify pre processors.
    */
@@ -48,13 +42,96 @@ public class ConfigurableProcessorsFactory
    * Property name to specify post processors.
    */
   public static final String PARAM_POST_PROCESSORS = "postProcessors";
+  private Map<String, ResourceProcessor> preProcessorsMap;
+  private Map<String, ResourceProcessor> postProcessorsMap;
+
   /**
    * Holds the configurations describing available processors.
    */
   private Properties properties;
-  private Map<String, ResourceProcessor> preProcessorsMap;
-  private Map<String, ResourceProcessor> postProcessorsMap;
-  private ProviderFinder<ProcessorProvider> processorProviderFinder;
+  
+  private final AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> configurablePreProcessors = new AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider>() {
+    @Override
+    protected String getStrategyKey() {
+      return PARAM_PRE_PROCESSORS;
+    }
+    
+    @Override
+    protected void overrideDefaultStrategyMap(final Map<String, ResourceProcessor> map) {
+      copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
+    }
+
+    @Override
+    protected Map<String, ResourceProcessor> getStrategies(final ProcessorProvider provider) {
+      return provider.providePreProcessors();
+    }
+    
+    @Override
+    protected ResourceProcessor getStrategyForAlias(final String alias) {
+      ResourceProcessor processor = super.getStrategyForAlias(alias);
+      if (processor == null) {
+        final String extension = FilenameUtils.getExtension(alias);
+        boolean hasExtension = !StringUtils.isEmpty(extension);
+        if (hasExtension) {
+          final String processorName = FilenameUtils.getBaseName(alias);
+          LOG.debug("processorName: {}", processorName);
+          processor = super.getStrategyForAlias(processorName);
+          if (processor != null) {
+            LOG.debug("adding Extension: {}", extension);
+            processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
+          }
+        }
+      }
+      return processor;
+    }
+
+    @Override
+    protected Properties newProperties() {
+      return ConfigurableProcessorsFactory.this.getProperties();
+    };
+  };
+
+  private final AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> configurablePostProcessors = new AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider>() {
+    @Override
+    protected String getStrategyKey() {
+      return PARAM_POST_PROCESSORS;
+    }
+    
+    @Override
+    protected void overrideDefaultStrategyMap(final Map<String, ResourceProcessor> map) {
+      copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
+    }
+    
+    @Override
+    protected Map<String, ResourceProcessor> getStrategies(final ProcessorProvider provider) {
+      return provider.providePostProcessors();
+    }
+    
+    @Override
+    protected ResourceProcessor getStrategyForAlias(final String alias) {
+      ResourceProcessor processor = super.getStrategyForAlias(alias);
+      if (processor == null) {
+        final String extension = FilenameUtils.getExtension(alias);
+        boolean hasExtension = !StringUtils.isEmpty(extension);
+        if (hasExtension) {
+          final String processorName = FilenameUtils.getBaseName(alias);
+          LOG.debug("processorName: {}", processorName);
+          processor = super.getStrategyForAlias(processorName);
+          if (processor != null) {
+            LOG.debug("adding Extension: {}", extension);
+            processor = ExtensionsAwareProcessorDecorator.decorate(new ProcessorDecorator(processor)).addExtension(
+                extension);
+          }
+        }
+      }
+      return processor;
+    }
+    
+    @Override
+    protected Properties newProperties() {
+      return ConfigurableProcessorsFactory.this.getProperties();
+    };
+  };
 
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
@@ -62,96 +139,19 @@ public class ConfigurableProcessorsFactory
   protected Properties newProperties() {
     return new Properties();
   }
-
-  /**
-   * Creates a list of tokens (processors name) based on provided string of comma separated strings.
-   * 
-   * @param input
-   *          string representation of tokens separated by ',' character.
-   * @return a list of non empty strings.
-   */
-  private static List<String> getTokens(final String input) {
-    final List<String> list = new ArrayList<String>();
-    if (!StringUtils.isEmpty(input)) {
-      final String[] tokens = input.split(TOKEN_DELIMITER);
-      for (final String token : tokens) {
-        list.add(token.trim());
-      }
-    }
-    return list;
-  }
-
-  /**
-   * Creates a comma separated list of items.
-   */
-  public static String createItemsAsString(final String... items) {
-    final StringBuffer sb = new StringBuffer();
-    for (int i = 0; i < items.length; i++) {
-      sb.append(items[i]);
-      if (i < items.length - 1) {
-        sb.append(TOKEN_DELIMITER);
-      }
-    }
-    return sb.toString();
-  }
-
+  
   /**
    * {@inheritDoc}
    */
   public final Collection<ResourceProcessor> getPreProcessors() {
-    final String processorsAsString = getProperties().getProperty(PARAM_PRE_PROCESSORS);
-    return getListOfItems(processorsAsString, getPreProcessorsMap());
+    return configurablePreProcessors.getConfiguredStrategies();
   }
-
+  
   /**
    * {@inheritDoc}
    */
   public final Collection<ResourceProcessor> getPostProcessors() {
-    final String processorsAsString = getProperties().getProperty(PARAM_POST_PROCESSORS);
-    return getListOfItems(processorsAsString, getPostProcessorsMap());
-  }
-
-  /**
-   * TODO: move to a different class, since it is not used only to configure processors.
-   * Extracts a list of items (processors) from the properties based on existing values inside the map.
-   * 
-   * @param itemsAsString
-   *          a comma separated list of items.
-   * @param map
-   *          mapping between items and its implementations.
-   * @return a list of items (processors).
-   */
-  private static List<ResourceProcessor> getListOfItems(final String itemsAsString, final Map<String, ResourceProcessor> map) {
-    LOG.debug("itemsAsString: " + itemsAsString);
-    final List<ResourceProcessor> list = new ArrayList<ResourceProcessor>();
-    final List<String> tokenNames = getTokens(itemsAsString);
-    for (final String tokenName : tokenNames) {
-      LOG.debug("\ttokenName: {}", tokenName);
-      Validate.notEmpty(tokenName);
-      ResourceProcessor processor = map.get(tokenName.trim());
-      if (processor == null) {
-        
-        // extension check
-        LOG.debug("[FAIL] no processor found named: {}. Proceeding with extension check. ", tokenName);
-        final String extension = FilenameUtils.getExtension(tokenName);
-        boolean hasExtension = !StringUtils.isEmpty(extension);
-        if (hasExtension) {
-          final String processorName = FilenameUtils.getBaseName(tokenName);
-          LOG.debug("processorName: {}", processorName);
-          processor = map.get(processorName);
-          if (processor != null) {
-            LOG.debug("adding Extension: {}", extension);
-            processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
-          }
-        }
-        if (processor == null) {
-          throw new WroRuntimeException("Unknown processor name: " + tokenName + ". Available processors are: "
-              + map.keySet()).logError();
-        }
-      }
-      list.add(processor);
-    }
-    return list;
+    return configurablePostProcessors.getConfiguredStrategies();
   }
   
   /**
@@ -161,7 +161,7 @@ public class ConfigurableProcessorsFactory
    */
   public ConfigurableProcessorsFactory setPreProcessorsMap(final Map<String, ResourceProcessor> map) {
     Validate.notNull(map);
-    preProcessorsMap = map;
+    this.preProcessorsMap = map;
     return this;
   }
   
@@ -172,10 +172,10 @@ public class ConfigurableProcessorsFactory
    */
   public ConfigurableProcessorsFactory setPostProcessorsMap(final Map<String, ResourceProcessor> map) {
     Validate.notNull(map);
-    postProcessorsMap = map;
+    this.postProcessorsMap = map;
     return this;
   }
-
+  
   public ConfigurableProcessorsFactory setProperties(final Properties properties) {
     Validate.notNull(properties);
     this.properties = properties;
@@ -189,35 +189,7 @@ public class ConfigurableProcessorsFactory
    * @return a default map of preProcessors.
    */
   protected Map<String, ResourceProcessor> newPreProcessorsMap() {
-    // TODO: reuse duplicated code.
-    final Map<String, ResourceProcessor> resultMap = new HashMap<String, ResourceProcessor>();
-    final List<ProcessorProvider> providers = getProcessorProviderFinder().find();
-    for (ProcessorProvider provider : providers) {
-      try {
-        final Map<String, ResourceProcessor> map = provider.providePreProcessors();
-        for (Map.Entry<String, ResourceProcessor> entry : map.entrySet()) {
-          final String alias = entry.getKey();
-          if (resultMap.containsKey(alias)) {
-            LOG.warn("Duplicate ALIAS found: {}. Overriding old processor with new one.", alias);
-          }
-          resultMap.put(alias, entry.getValue());
-        }
-      } catch (Exception e) {
-        LOG.error("Failed to import preProcessors for provider: {}. Skipping the import for this provider.", provider);
-      }
-    }
-    return resultMap;
-  }
-
-  /**
-   * @VisibleForTesting
-   * @return the {@link ProviderFinder} used to find all {@link ProcessorProvider}'s.
-   */
-  ProviderFinder<ProcessorProvider> getProcessorProviderFinder() {
-    if (processorProviderFinder == null) {
-      processorProviderFinder = ProviderFinder.of(ProcessorProvider.class);
-    }
-    return processorProviderFinder;
+    return new HashMap<String, ResourceProcessor>();
   }
   
   /**
@@ -227,26 +199,9 @@ public class ConfigurableProcessorsFactory
    * @return a default map of postProcessors.
    */
   protected Map<String, ResourceProcessor> newPostProcessorsMap() {
-    // TODO: reuse duplicated code.
-    final Map<String, ResourceProcessor> resultMap = new HashMap<String, ResourceProcessor>();
-    final List<ProcessorProvider> providers = getProcessorProviderFinder().find();
-    for (ProcessorProvider provider : providers) {
-      try {
-        final Map<String, ResourceProcessor> map = provider.providePostProcessors();
-        for (Map.Entry<String, ResourceProcessor> entry : map.entrySet()) {
-          final String alias = entry.getKey();
-          if (resultMap.containsKey(alias)) {
-            LOG.warn("Duplicate ALIAS found: {}. Overriding old processor with new one.", alias);
-          }
-          resultMap.put(alias, entry.getValue());
-        }
-      } catch (Exception e) {
-        LOG.error("Failed to import preProcessors for provider: {}. Skipping the import for this provider.", provider);
-      }
-    }
-    return resultMap;
+    return new HashMap<String, ResourceProcessor>();
   }
-
+  
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -256,7 +211,7 @@ public class ConfigurableProcessorsFactory
     }
     return this.properties;
   }
-
+  
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -272,22 +227,6 @@ public class ConfigurableProcessorsFactory
   }
   
   /**
-   * @VisibleForTesting
-   * @return the list of all available pre processors;
-   */
-  Collection<ResourceProcessor> getAvailablePreProcessors() {
-    return getPreProcessorsMap().values();
-  }
-  
-  /**
-   * @VisibleForTesting
-   * @return the list of all available pre processors;
-   */
-  Collection<ResourceProcessor> getAvailablePostProcessors() {
-    return getPostProcessorsMap().values();
-  }
-  
-  /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
   private Map<String, ResourceProcessor> getPostProcessorsMap() {
@@ -299,5 +238,21 @@ public class ConfigurableProcessorsFactory
       }
     }
     return this.postProcessorsMap;
+  }
+
+  /**
+   * @VisibleForTesting
+   * @return the list of all available pre processors;
+   */
+  Collection<ResourceProcessor> getAvailablePreProcessors() {
+    return configurablePreProcessors.getAvailableStrategies();
+  }
+  
+  /**
+   * @VisibleForTesting
+   * @return the list of all available pre processors;
+   */
+  Collection<ResourceProcessor> getAvailablePostProcessors() {
+    return configurablePostProcessors.getAvailableStrategies();
   }
 }

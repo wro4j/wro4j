@@ -9,10 +9,8 @@ import java.util.Properties;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.ObjectFactory;
 
 
@@ -100,12 +98,13 @@ public class ConfigurableWroFilter
    */
   @Override
   protected WroManagerFactory newWroManagerFactory() {
-    return new BaseWroManagerFactory() {
-      @Override
-      protected ProcessorsFactory newProcessorsFactory() {
-        return new ConfigurableProcessorsFactory().setProperties(properties);
-      }
-    };
+    return new ConfigurableWroManagerFactory().setConfigProperties(properties);
+    // return new BaseWroManagerFactory() {
+    // @Override
+    // protected ProcessorsFactory newProcessorsFactory() {
+    // return new ConfigurableProcessorsFactory().setProperties(properties);
+    // }
+    // };
   }
 
   /**

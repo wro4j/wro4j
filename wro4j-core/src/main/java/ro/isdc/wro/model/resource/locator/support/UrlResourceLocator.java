@@ -30,6 +30,7 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 public class UrlResourceLocator
     extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(UrlResourceLocator.class);
+  public static final String ALIAS = "uri";
   /**
    * Path of the resource to be located.
    */

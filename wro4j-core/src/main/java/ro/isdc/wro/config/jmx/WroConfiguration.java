@@ -405,7 +405,7 @@ public final class WroConfiguration
   }
 
   /**
-   * @return the connectionTimeout
+   * @return the number of milliseconds before a connection is timed out.
    */
   public int getConnectionTimeout() {
     return this.connectionTimeout;
@@ -413,7 +413,7 @@ public final class WroConfiguration
 
 
   /**
-   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend
+   * Timeout (milliseconds) of the url connection for external resources. This is used to ensure that locator doesn't spend
    * too much time on slow end-point.
    *
    * @param connectionTimeout the connectionTimeout to set

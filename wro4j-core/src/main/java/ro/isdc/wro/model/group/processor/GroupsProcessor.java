@@ -24,10 +24,10 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -57,7 +57,6 @@ public class GroupsProcessor {
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
   
-
   /**
    * @param cacheKey
    *          to process.
@@ -125,7 +124,6 @@ public class GroupsProcessor {
     if (processors.isEmpty()) {
       return content;
     }
-
     Reader reader = new StringReader(content.toString());
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();

@@ -51,7 +51,7 @@ public class TestConfigurableWroFilter {
   @Test
   public void shouldBeConfiguredBySpring() throws Exception {
     filter.init(mockFilterConfig);
-    final WroConfiguration config = filter.getWroConfiguration();
+    final WroConfiguration config = filter.getConfiguration();
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(20, config.getModelUpdatePeriod());
     Assert.assertEquals(false, config.isGzipEnabled());

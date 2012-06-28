@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -33,6 +36,16 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   private Properties configProperties;
+
+  /**
+   * Allow subclasses to contribute with it's own locators.
+   *
+   * @param map containing locator mappings.
+   */
+  protected void contributeLocators(final Map<String, ResourceLocator> map) {
+  }
+
+
   /**
    * Allow subclasses to contribute with it's own pre processors.
    * <p>
@@ -40,7 +53,8 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePreProcessors(final Map<String, ResourceProcessor> map) {}
+  protected void contributePreProcessors(final Map<String, ResourceProcessor> map) {
+  }
 
 
   /**
@@ -50,7 +64,25 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing processor mappings.
    */
-  protected void contributePostProcessors(final Map<String, ResourceProcessor> map) {}
+  protected void contributePostProcessors(final Map<String, ResourceProcessor> map) {
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected ResourceLocatorFactory newResourceLocatorFactory() {
+    final ConfigurableLocatorFactory factory = new ConfigurableLocatorFactory() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableLocatorFactory.PARAM_URI_LOCATORS);
+        return props;
+      }
+    };
+    return factory;
+  }
 
 
   /**

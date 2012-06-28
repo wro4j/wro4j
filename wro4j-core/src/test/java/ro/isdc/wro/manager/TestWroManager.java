@@ -102,7 +102,7 @@ public class TestWroManager {
         new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
    MockitoAnnotations.initMocks(this);
     
-    final Injector injector = new InjectorBuilder().setWroManager(managerFactory.create()).setResourceAuthorizationManager(
+    final Injector injector = new InjectorBuilder(managerFactory).setResourceAuthorizationManager(
         mockAuthorizationManager).build();
     injector.inject(victim);
   }

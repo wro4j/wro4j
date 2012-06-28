@@ -3,7 +3,6 @@ package ro.isdc.wro.model.resource.processor.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import ro.isdc.wro.model.resource.processor.ProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;

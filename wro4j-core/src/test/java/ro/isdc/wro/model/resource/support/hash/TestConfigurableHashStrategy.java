@@ -1,7 +1,6 @@
 package ro.isdc.wro.model.resource.support.hash;
 
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -84,10 +83,8 @@ public class TestConfigurableHashStrategy {
     final String mockAlias = "mock";
     victim = new ConfigurableHashStrategy() {
       @Override
-      protected Map<String, HashStrategy> newStrategyMap() { 
-        final Map<String, HashStrategy> map = new HashMap<String, HashStrategy>();
+      protected void overrideDefaultStrategyMap(final Map<String, HashStrategy> map) {
         map.put(mockAlias, mockHashStrategy);
-        return map;
       }
     };
     victim.setProperties(buildPropsForAlias(mockAlias));

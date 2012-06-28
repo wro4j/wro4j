@@ -30,24 +30,8 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  */
-public final class DispatcherStreamLocator {
+public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-
-
-  /**
-   * Used to locate external resources. No wildcard handling is required.
-   */
-  private ResourceLocator newExternalResourceLocator(final String location) {
-    return new UrlResourceLocator(location) {
-      /**
-       * No wildcard handling is required.
-       */
-      @Override
-      public boolean isEnableWildcards() {
-        return false;
-      }
-    };
-  };
   
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
@@ -71,15 +55,7 @@ public final class DispatcherStreamLocator {
     final Context originalContext = Context.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
-      if (dispatcher == null) {
-        // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
-        // the thread responsible for refreshing resources)
-
-        // Returns the part URL from the protocol name up to the query string and contextPath.
-        final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-        final String absolutePath = servletContextPath + location;
-        return newExternalResourceLocator(absolutePath).getInputStream();
-      }
+      if (dispatcher != null) {
       // Wrap request
       final ServletRequest servletRequest = getWrappedServletRequest(request, location);
       // Wrap response
@@ -93,6 +69,16 @@ public final class DispatcherStreamLocator {
       // written.
       servletResponse.getWriter().flush();
       os.close();
+      }
+      //fallback to external resource locator if the dispatcher is empty
+      if (os.size() == 0) {
+        // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
+        // the thread responsible for refreshing resources)
+        // Returns the part URL from the protocol name up to the query string and contextPath.
+        final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
+        final String absolutePath = servletContextPath + location;
+        return createExternalResourceLocator(absolutePath).getInputStream();
+      }
     } catch (final Exception e) {
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
@@ -109,6 +95,23 @@ public final class DispatcherStreamLocator {
       }
     }
     return new ByteArrayInputStream(os.toByteArray());
+  }
+
+
+  /**
+   * Used to locate external resources. No wildcard handling is required.
+   * @VisibleForTesting
+   */
+  ResourceLocator createExternalResourceLocator(final String location) {
+    return new UrlResourceLocator(location) {
+      /**
+       * No wildcard handling is required.
+       */
+      @Override
+      public boolean isEnableWildcards() {
+        return false;
+      }
+    };
   }
 
   /**

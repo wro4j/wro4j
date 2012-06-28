@@ -58,7 +58,7 @@ public class TestConfigurableWroFilterWithExtensions {
   @Test
   public void extensionProcessorsShouldBeAvailable()
       throws Exception {
-    ConfigurableWroFilter filter = new ConfigurableWroFilter();
+    final ConfigurableWroFilter filter = new ConfigurableWroFilter();
     final Properties properties = new Properties();
     properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, CoffeeScriptProcessor.ALIAS);
     filter.setProperties(properties);

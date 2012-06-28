@@ -28,13 +28,29 @@ import ro.isdc.wro.util.StringUtils;
  * interpreting relative paths within the web application root directory.
  * 
  * @author Alex Objelean, Ivar Conradi Østhus
- * @since 1.5.0
+ * @created Created on Nov 10, 2008, Updated on March 2, 2012
  */
 public class ServletContextResourceLocator
     extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ServletContextResourceLocator.class);
   /**
-   * Prefix used to identify if the path is a servlet context path.
+   * Alias used to register this locator with {@link LocatorProvider}. 
+   */
+  public static final String ALIAS = "servletContext";
+  /**
+   * Same as default Alias (exist for explicit configuration). Uses DISPATCHER_FIRST strategy. Meaning that, for
+   * example, a jsp resource will be served in its final state (processed by servlet container), rather than in its raw
+   * variant.
+   */
+  public static final String ALIAS_DISPATCHER_FIRST = "servletContext.DISPATCHER_FIRST";
+  /**
+   * Uses SERVLET_CONTEXT_FIRST strategy, meaning that, for example, a jsp will be served with its raw content, instead
+   * of processed by container.
+   */
+  public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
+  
+  /**
+   * Prefix for url resources.
    */
   public static final String PREFIX = "/";
   private final ServletContext servletContext;
