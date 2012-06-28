@@ -45,7 +45,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
-import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
 import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
@@ -99,7 +98,7 @@ public class TestWroManager {
     managerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
     MockitoAnnotations.initMocks(this);
     
-    final Injector injector = new InjectorBuilder().setWroManager(managerFactory.create()).setResourceAuthorizationManager(
+    final Injector injector = new InjectorBuilder(managerFactory).setResourceAuthorizationManager(
         mockAuthorizationManager).build();
     injector.inject(victim);
   }
