@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+  <import>/WEB-INF/wro-bootstrap.xml</import>
+  <group name="main">
+    <css>/static/**.css</css>
+  </group>
+</groups>

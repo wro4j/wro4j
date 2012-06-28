@@ -116,7 +116,8 @@ public class WroFilter
   public final void init(final FilterConfig config)
       throws ServletException {
     this.filterConfig = config;
-    this.wroConfiguration = createConfiguration();
+    // invoke createConfiguration method only if the configuration was not set.
+    this.wroConfiguration = wroConfiguration == null ? createConfiguration() : wroConfiguration;
     this.wroManagerFactory = new InjectableWroManagerFactoryDecorator(createWroManagerFactory());
     initHeaderValues();
     registerChangeListeners();
@@ -308,6 +309,11 @@ public class WroFilter
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
+      // Destroy the cached model after the processing is done if cache flag is disabled
+      if (getConfiguration().isDisableCache()) {
+        LOG.debug("Disable Cache is true. Destroying model...");
+        this.wroManagerFactory.create().getModelFactory().destroy();
+      }
       Context.unset();
     }
   }
@@ -446,8 +452,19 @@ public class WroFilter
    * @return the {@link WroConfiguration} associated with this filter instance.
    * @VisibleForTesting
    */
-  public final WroConfiguration getWroConfiguration() {
+  public final WroConfiguration getConfiguration() {
     return this.wroConfiguration;
+  }
+  
+  /**
+   * Once set, this configuration will be used, instead of the one built by the factory.
+   * 
+   * @param config
+   *          a not null {@link WroConfiguration} to set.
+   */
+  public final void setConfiguration(final WroConfiguration config) {
+    Validate.notNull(config);
+    this.wroConfiguration = config;
   }
 
   /**
