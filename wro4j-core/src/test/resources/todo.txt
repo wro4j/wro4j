@@ -1,7 +1,6 @@
-
-
 # coffeeScript [OK] 
 # less         [N/A]
+
 # uglify       [OK]
 # cssLint      [OK]
 # jsHint       [OK]
