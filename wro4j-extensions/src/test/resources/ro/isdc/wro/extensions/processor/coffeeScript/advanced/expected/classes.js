@@ -1,11 +1,9 @@
 (function() {
   var Animal, Horse, Snake, sam, tom,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Animal = (function() {
-
-    Animal.name = 'Animal';
 
     function Animal(name) {
       this.name = name;
@@ -23,8 +21,6 @@
 
     __extends(Snake, _super);
 
-    Snake.name = 'Snake';
-
     function Snake() {
       return Snake.__super__.constructor.apply(this, arguments);
     }
@@ -41,8 +37,6 @@
   Horse = (function(_super) {
 
     __extends(Horse, _super);
-
-    Horse.name = 'Horse';
 
     function Horse() {
       return Horse.__super__.constructor.apply(this, arguments);
