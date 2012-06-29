@@ -232,7 +232,7 @@ public class BaseWroManagerFactory
           "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
       return smartFactoryClass.newInstance();
     } catch (final Exception e) {
-      LOG.info("[FAIL] SmartWroModelFactory is not available. Using default model factory.");
+      LOG.info("SmartWroModelFactory is not available. Using default model factory.");
       LOG.debug("Reason: {}", e.getMessage());
     }
     return new XmlModelFactory();
