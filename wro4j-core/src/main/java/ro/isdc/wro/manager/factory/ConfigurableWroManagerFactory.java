@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -17,18 +15,17 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
 /**
@@ -40,20 +37,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   private Properties configProperties;
-  /**
-   * Name of init param used to specify uri locators.
-   */
-  public static final String PARAM_URI_LOCATORS = "uriLocators";
-
-
-  private Map<String, UriLocator> createLocatorsMap() {
-    final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
-    map.put("servletContext", new ServletContextUriLocator());
-    map.put("classpath", new ClasspathUriLocator());
-    map.put("url", new UrlUriLocator());
-    return map;
-  }
-
 
   /**
    * Allow subclasses to contribute with it's own locators.
@@ -88,19 +71,14 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
-    final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-    final Map<String, UriLocator> map = createLocatorsMap();
-    contributeLocators(map);
-    final String uriLocators = Context.get().getFilterConfig().getInitParameter(PARAM_URI_LOCATORS);
-    final List<UriLocator> locators = ConfigurableProcessorsFactory.getListOfItems(uriLocators, map);
-    for (final UriLocator locator : locators) {
-      factory.addUriLocator(locator);
-    }
-    //TODO deprecate uri locator configuration
-    //use default when none provided
-    if (factory.getUriLocators().isEmpty()) {
-      return new DefaultUriLocatorFactory();
-    }
+    final ConfigurableLocatorFactory factory = new ConfigurableLocatorFactory() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableLocatorFactory.PARAM_URI_LOCATORS);
+        return props;
+      }
+    };
     return factory;
   }
 
@@ -112,51 +90,81 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   protected ProcessorsFactory newProcessorsFactory() {
     final ConfigurableProcessorsFactory factory = new ConfigurableProcessorsFactory() {
       @Override
-      public Map<String, ResourcePreProcessor> newPreProcessorsMap() {
-        final Map<String, ResourcePreProcessor> map = ProcessorsUtils.createPreProcessorsMap();
-        contributePreProcessors(map);
-        return map;
-      }
-
-
-      @Override
-      public Map<String, ResourcePostProcessor> newPostProcessorsMap() {
-        final Map<String, ResourcePostProcessor> map = ProcessorsUtils.createPostProcessorsMap();
-        contributePostProcessors(map);
-        return map;
-      }
-
-
-      @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
-        updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
-        updatePropertiesWithProcessors(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
+        updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
+        updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
-      }
-
-
-      /**
-       * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
-       */
-      private void updatePropertiesWithProcessors(final Properties props, final String paramName) {
-        final FilterConfig filterConfig = Context.get().getFilterConfig();
-        // first, retrieve value from init-param for backward compatibility
-        final String processorsAsString = filterConfig.getInitParameter(paramName);
-        if (processorsAsString != null) {
-          props.setProperty(paramName, processorsAsString);
-        } else {
-          // retrieve value from configProperties file
-          final String value = getConfigProperties().getProperty(paramName);
-          if (value != null) {
-            props.setProperty(paramName, value);
-          }
-        }
       }
     };
     return factory;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected NamingStrategy newNamingStrategy() {
+    return new ConfigurableNamingStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableNamingStrategy.KEY);
+        return props;
+      }
+    };
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected HashStrategy newHashStrategy() {
+    return new ConfigurableHashStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableHashStrategy.KEY);
+        return props;
+
+      }
+    };
+  }
+  
+  /**
+   * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
+   * This method helps to ensure backward compatibility of the filterConfig vs configProperties configuration.
+   * 
+   * @param props
+   *          the {@link Properties} which will be populated with the value extracted from filterConfig or
+   *          configProperties for the provided key.
+   * @param key
+   *          to read from filterConfig or configProperties and put into props.
+   */
+  private void updatePropertiesWithConfiguration(final Properties props, final String key) {
+    final FilterConfig filterConfig = Context.get().getFilterConfig();
+    // first, retrieve value from init-param for backward compatibility
+    final String valuesAsString = filterConfig.getInitParameter(key);
+    if (valuesAsString != null) {
+      props.setProperty(key, valuesAsString);
+    } else {
+      // retrieve value from configProperties file
+      final String value = getConfigProperties().getProperty(key);
+      if (value != null) {
+        props.setProperty(key, value);
+      }
+    }
+  }
+
+  /**
+   * Use this method rather than accessing the field directly, because it will create a default one if none is provided.
+   */
+  private Properties getConfigProperties() {
+    if (configProperties == null) {
+      configProperties = newConfigProperties();
+    }
+    return configProperties;
+  }
 
   /**
    * Override this method to provide a different config properties file location. It is very likely that you would like
@@ -176,18 +184,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     }
     return props;
   }
-
-
-  /**
-   * Use this method rather than accessing the field directly, because it will create a default one if none is provided.
-   */
-  private Properties getConfigProperties() {
-    if (configProperties == null) {
-      configProperties = newConfigProperties();
-    }
-    return configProperties;
-  }
-
 
   /**
    * Setter is useful for unit tests.

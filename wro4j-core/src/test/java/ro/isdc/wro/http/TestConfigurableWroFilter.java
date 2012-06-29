@@ -183,10 +183,10 @@ public class TestConfigurableWroFilter {
             LOG.debug("caught exception: ", e);
             processorsCreationException.set(e);
           }
-          return null;
+          return original;
         }
         @Override
-        protected void onRuntimeException(RuntimeException e, HttpServletResponse response, FilterChain chain) {
+        protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
           throw e;
         }
       };
@@ -212,7 +212,7 @@ public class TestConfigurableWroFilter {
     }
     
     @Override
-    protected void onRuntimeException(RuntimeException e, HttpServletResponse response, FilterChain chain) {
+    protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
       throw e;
     }
   };

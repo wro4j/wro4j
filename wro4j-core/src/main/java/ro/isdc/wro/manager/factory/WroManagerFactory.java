@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -12,7 +13,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @author Alex Objelean
  * @created Created on Oct 31, 2008
  */
-public interface WroManagerFactory extends ObjectFactory<WroManager> {
+public interface WroManagerFactory extends ObjectFactory<WroManager>, WroConfigurationChangeListener {
   /**
    * Called by filter indicating that it is being taken out of service.
    */

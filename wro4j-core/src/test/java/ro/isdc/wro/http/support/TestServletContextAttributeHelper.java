@@ -132,7 +132,7 @@ public class TestServletContextAttributeHelper {
     ServletContextAttributeHelper helper = new ServletContextAttributeHelper(mockServletContext);
     Mockito.when(mockServletContext.getAttribute(helper.getAttributeName(Attribute.CONFIGURATION))).thenReturn(expectedConfig);
     filter.init(mockFilterConfig);
-    Assert.assertSame(expectedConfig, filter.getWroConfiguration());
+    Assert.assertSame(expectedConfig, filter.getConfiguration());
   }
   
   @Test

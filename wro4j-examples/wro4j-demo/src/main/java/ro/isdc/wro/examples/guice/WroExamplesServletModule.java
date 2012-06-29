@@ -14,7 +14,10 @@ import ro.isdc.wro.examples.WebResourceOptimizationApplication;
 import ro.isdc.wro.examples.http.DispatchResourceServlet;
 import ro.isdc.wro.examples.http.DynamicResourceServlet;
 import ro.isdc.wro.examples.http.RedirectResourceServlet;
-import ro.isdc.wro.http.WroFilter;
+import ro.isdc.wro.examples.http.WroFilterWithCustomRequestHandlers;
+import ro.isdc.wro.extensions.http.CoffeeScriptFilter;
+import ro.isdc.wro.extensions.http.LessCssFilter;
+import ro.isdc.wro.http.WroContextFilter;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
@@ -28,18 +31,25 @@ final class WroExamplesServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     //bindings
-    bind(WroFilter.class).in(Singleton.class);
+    bind(WroFilterWithCustomRequestHandlers.class).in(Singleton.class);
     bind(WicketFilter.class).in(Singleton.class);
     bind(DwrServlet.class).in(Singleton.class);
     bind(ExternalResourceServlet.class).in(Singleton.class);
     bind(DynamicResourceServlet.class).in(Singleton.class);
     bind(RedirectResourceServlet.class).in(Singleton.class);
     bind(DispatchResourceServlet.class).in(Singleton.class);
+    bind(LessCssFilter.class).in(Singleton.class);
+    bind(CoffeeScriptFilter.class).in(Singleton.class);
+    bind(WroContextFilter.class).in(Singleton.class);
 
     // filters
     // TODO find out how to add dispatchers to the filter mapping configuration
-    // filter("/wro/*").through(WroFilter.class);
+    filter("/wro/*").through(WroFilterWithCustomRequestHandlers.class);
+    
+    filter("/*").through(WroContextFilter.class);
     wicketFilter("/*");
+    filter("*.less").through(LessCssFilter.class);
+    filter("*.coffee").through(CoffeeScriptFilter.class);
 
     //servlets
     serve("/dwr/*").with(DwrServlet.class);
@@ -47,6 +57,7 @@ final class WroExamplesServletModule extends ServletModule {
     serve("/resource/dynamic.js").with(DynamicResourceServlet.class);
     serve("/resource/redirect.js").with(RedirectResourceServlet.class);
     serve("/resource/dispatch.js").with(DispatchResourceServlet.class);
+    
   }
 
   /**

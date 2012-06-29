@@ -17,7 +17,7 @@ import ro.isdc.wro.manager.WroManager;
  */
 public class DefaultWroManagerFactory
     implements WroManagerFactory {
-  private WroManagerFactory factory;
+  private final WroManagerFactory factory;
   
   public DefaultWroManagerFactory(final WroConfiguration configuration) {
     factory = initFactory(configuration);
@@ -55,6 +55,20 @@ public class DefaultWroManagerFactory
   /**
    * {@inheritDoc}
    */
+  public void onCachePeriodChanged(final long value) {
+    factory.onCachePeriodChanged(value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onModelPeriodChanged(final long value) {
+    factory.onModelPeriodChanged(value);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
   public WroManager create() {
     return factory.create();
   }
@@ -70,7 +84,7 @@ public class DefaultWroManagerFactory
    * @VisibleForTesting
    * @return the inner factory.
    */
-  final WroManagerFactory getFactory() {
+  public final WroManagerFactory getFactory() {
     return factory;
   }
 }

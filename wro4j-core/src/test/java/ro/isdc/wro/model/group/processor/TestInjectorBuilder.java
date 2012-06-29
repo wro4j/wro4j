@@ -24,6 +24,7 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -33,8 +34,8 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.util.HashBuilder;
-import ro.isdc.wro.model.resource.util.NamingStrategy;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
 
 
@@ -132,6 +133,7 @@ public class TestInjectorBuilder {
     Assert.assertNotNull(sample.groupExtractor);
     Assert.assertNotNull(sample.cacheStrategy);
     Assert.assertNotNull(sample.hashBuilder);
+    Assert.assertNotNull(sample.readOnlyContext);
   }
   
   @Test(expected = IOException.class)
@@ -174,6 +176,8 @@ public class TestInjectorBuilder {
     @Inject
     CacheStrategy<?, ?> cacheStrategy;
     @Inject
-    HashBuilder hashBuilder;
+    HashStrategy hashBuilder;
+    @Inject
+    ReadOnlyContext readOnlyContext;
   }
 }

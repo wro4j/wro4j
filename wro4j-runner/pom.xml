@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-		<version>1.4.6</version>
+		<version>1.4.7</version>
 	</parent>
 
 	<artifactId>wro4j-runner</artifactId>
 	<packaging>jar</packaging>
-	<name>wro4j CommandLineRunner</name>
+	<name>wro4j runner</name>
 	
   <dependencies>
 		<dependency>

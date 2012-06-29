@@ -19,6 +19,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -64,7 +65,6 @@ public class TestUglifyJsProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void shouldBeThreadSafe()
     throws Exception {
@@ -96,5 +96,30 @@ public class TestUglifyJsProcessor {
         return UglifyJs.class.getResourceAsStream(UglifyJs.DEFAULT_UGLIFY_JS);
       }
     }.process("filename","alert(1);");
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullOptions()
+      throws Exception {
+    new UglifyJs(UGLIFY) {
+      protected String createOptionsAsJson() throws IOException {
+        return null;
+      };
+    }.process("filename","alert(1);");
+  }
+  
+  @Test(expected = WroRuntimeException.class)
+  public void cannotAcceptInvalidJsonOptions()
+      throws Exception {
+    new UglifyJs(UGLIFY) {
+      protected String createOptionsAsJson() throws IOException {
+        return "This is an invalid JSON";
+      };
+    }.process("filename","alert(1);");
+  }
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new UglifyJsProcessor(), ResourceType.JS);
   }
 }

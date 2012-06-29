@@ -11,8 +11,8 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -56,12 +56,7 @@ public class TestJsonHPackProcessor {
 
   private void genericThreadSafeTest(boolean pack)
       throws Exception {
-    final ResourcePostProcessor processor = new JsonHPackProcessor(pack) {
-      @Override
-      protected void onException(final WroRuntimeException e) {
-        throw e;
-      }
-    };
+    final ResourcePostProcessor processor = new JsonHPackProcessor(pack);
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
@@ -72,7 +67,12 @@ public class TestJsonHPackProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 20);
   }
 
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new JsonHPackProcessor(true), ResourceType.JS);
+  }
 }

@@ -1,0 +1,28 @@
+{
+    codegen_options: {
+            ascii_only: false,
+            beautify: %s,
+            indent_level: 4,
+            indent_start: 0,
+            quote_keys: false,
+            space_colon: false,
+            inline_script: false
+    },
+    reserved_names: '%s'.split(','),    
+    ast: false,
+    consolidate: false,
+    mangle: true,
+    mangle_toplevel: false,
+    no_mangle_functions: false,
+    squeeze: true,
+    make_seqs: true,
+    dead_code: true,
+    verbose: false,
+    show_copyright: true,
+    out_same_file: false,
+    max_line_length: 32 * 1024,
+    unsafe: false,
+    defines: { },
+    lift_vars: false,    
+    make: false,
+};

@@ -6,8 +6,10 @@ package ro.isdc.wro.config.jmx;
 
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
+
 /**
  * Hold the name of the properties.
+ * 
  * @author Alex Objelean
  * @created 11 May 2011
  * @since 1.3.7
@@ -54,6 +56,11 @@ public enum ConfigConstants {
    * allow filter chaining when there is nothing to process for a given request.
    */
   ignoreEmptyGroup,
+  /**
+   * When this flag is true, any failure during processor will leave the content unchanged. Otherwise, the exception
+   * will interrupt processing with a {@link RuntimeException}.
+   */
+  ignoreFailingProcessor,
   /**
    * Encoding to use when reading and writing bytes from/to stream
    */

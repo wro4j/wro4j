@@ -1,0 +1,13 @@
+div.single {
+  -webkit-background-size: 50% 100%;
+  -moz-background-size: 50% 100%;
+  -ms-background-size: 50% 100%;
+  -o-background-size: 50% 100%;
+  background-size: 50% 100%; }
+
+div.double {
+  -webkit-background-size: 50% 100%, 75% 100%;
+  -moz-background-size: 50% 100%, 75% 100%;
+  -ms-background-size: 50% 100%, 75% 100%;
+  -o-background-size: 50% 100%, 75% 100%;
+  background-size: 50% 100%, 75% 100%; }

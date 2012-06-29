@@ -1,0 +1,7 @@
+div.clear {
+  zoom: 1; }
+  div.clear:before, div.clear:after {
+    content: "";
+    display: table; }
+  div.clear:after {
+    clear: both; }

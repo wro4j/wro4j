@@ -71,6 +71,8 @@ public class SassCss {
 
     stopWatch.start("sass rendering");
     try {
+      // replace tabs with spaces, since the script doesn't handle well tabs (throws exception).
+      // dataWithoutTabs = data;
       final String execute = "exports.render(" + WroUtil.toJSMultiLineString(data) + ");";
       final Object result = builder.evaluate(execute, "sassRender");
       return String.valueOf(result);

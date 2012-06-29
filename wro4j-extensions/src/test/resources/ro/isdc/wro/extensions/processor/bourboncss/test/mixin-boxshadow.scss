@@ -1,0 +1,8 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.single {
+  @include box-shadow(0 0 5px 3px hsla(0, 0%, 0%, 0.65));
+}
+div.double {
+  @include box-shadow(1px 1px 5px 1px green, -1px -1px 5px 1px blue);
+}

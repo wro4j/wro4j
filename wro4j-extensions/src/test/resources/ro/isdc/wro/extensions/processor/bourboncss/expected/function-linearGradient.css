@@ -1,0 +1,6 @@
+div.linearGrad {
+  background-image: -webkit-linear-gradient(top, white 0, yellow 50%, transparent 50%);
+  background-image: -moz-linear-gradient(top, white 0, yellow 50%, transparent 50%);
+  background-image: -ms-linear-gradient(top, white 0, yellow 50%, transparent 50%);
+  background-image: -o-linear-gradient(top, white 0, yellow 50%, transparent 50%);
+  background-image: linear-gradient(top, white 0, yellow 50%, transparent 50%); }

@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -56,5 +57,11 @@ public class TestSassCssProcessor {
       }
     };
     WroTestUtils.runConcurrently(task);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new SassCssProcessor(), ResourceType.CSS);
   }
 }

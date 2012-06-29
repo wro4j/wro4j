@@ -4,12 +4,19 @@
 package ro.isdc.wro.model.resource.processor;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -24,7 +31,9 @@ public class TestCssImportPreProcessor {
 
   @Before
   public void setUp() {
-    Context.set(Context.standaloneContext());
+    final WroConfiguration config = new WroConfiguration();
+    config.setIgnoreFailingProcessor(true);
+    Context.set(Context.standaloneContext(), config);
     processor = new CssImportPreProcessor();
     WroTestUtils.initProcessor(processor);
   }
@@ -38,5 +47,31 @@ public class TestCssImportPreProcessor {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
+  }
+  
+  @Test
+  public void shouldNotFailWhenInvalidResourceIsFound() throws Exception {
+    Context.get().getConfig().setIgnoreMissingResources(true);
+    processInvalidImport();
+  }
+  
+  @Test(expected = IOException.class)
+  public void shouldFailWhenInvalidResourceIsFound() throws Exception {
+    Context.get().getConfig().setIgnoreMissingResources(false);
+    processInvalidImport();
+  }
+
+  
+  private void processInvalidImport()
+      throws IOException {
+    final Resource resource = Resource.create("someResource.css"); 
+    final Reader reader = new StringReader("@import('/path/to/invalid.css');");
+    processor.process(resource, reader, new StringWriter());
   }
 }

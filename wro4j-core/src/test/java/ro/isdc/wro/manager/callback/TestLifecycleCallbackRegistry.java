@@ -19,12 +19,15 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -136,7 +139,6 @@ public class TestLifecycleCallbackRegistry {
     Mockito.when(request.getServletPath()).thenReturn("");
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
 
-
     final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
 
     final String groupName = "group";
@@ -148,9 +150,10 @@ public class TestLifecycleCallbackRegistry {
     Group group = new Group(groupName);
     group.addResource(Resource.create("classpath:1.js"));
     final WroModelFactory modelFactory = WroUtil.factoryFor(new WroModel().addGroup(group));
-
-    final WroManager manager = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(
-      modelFactory).create();
+    
+    final WroManagerFactory managerFactory = new InjectableWroManagerFactoryDecorator(
+        new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(modelFactory));
+    final WroManager manager = managerFactory.create();
     manager.registerCallback(callback);
     manager.process();
 

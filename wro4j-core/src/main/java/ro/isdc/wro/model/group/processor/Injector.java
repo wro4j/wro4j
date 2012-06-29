@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
 import ro.isdc.wro.util.ObjectDecorator;
@@ -28,7 +29,7 @@ import ro.isdc.wro.util.ObjectDecorator;
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
-  private Map<Class<?>, Object> map;
+  private final Map<Class<?>, Object> map;
 
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
@@ -56,7 +57,6 @@ public final class Injector {
    * @param object to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
-    LOG.debug("processInjectAnnotation for: {}", object.getClass().getSimpleName());
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
@@ -106,13 +106,13 @@ public final class Injector {
   private boolean acceptAnnotatedField(final Object object, final Field field)
     throws IllegalAccessException {
     boolean accept = false;
-    try {
-      // accept private modifiers
-      field.setAccessible(true);
+    // accept private modifiers
+    field.setAccessible(true);
+    if (Context.isContextSet()) {
       for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
         if (entry.getKey().isAssignableFrom(field.getType())) {
           Object value = entry.getValue();
-          //treat factories as a special case for lazy load of the objects.
+          // treat factories as a special case for lazy load of the objects.
           if (value instanceof InjectorObjectFactory) {
             value = ((InjectorObjectFactory<?>) value).create();
           }
@@ -120,11 +120,7 @@ public final class Injector {
           return accept = true;
         }
       }
-      return accept;
-    } finally {
-      if (accept) {
-        LOG.debug("\t[OK] Injected {} -> {}", object.getClass().getName(), field.getType().getSimpleName());
-      }
     }
+    return accept;
   }
 }

@@ -1,0 +1,9 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.cols {
+  @include columns(12 8em);
+}
+
+div.colrules {
+  @include column-rule(1px solid green);
+}

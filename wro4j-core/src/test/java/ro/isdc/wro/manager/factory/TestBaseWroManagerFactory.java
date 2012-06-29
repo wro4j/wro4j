@@ -16,7 +16,8 @@ import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
-import ro.isdc.wro.model.resource.util.NoOpNamingStrategy;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 import ro.isdc.wro.util.WroUtil;
 
 /**
@@ -51,13 +52,11 @@ public class TestBaseWroManagerFactory {
   @Test
   public void shouldSetCallback() throws Exception {
     final LifecycleCallback callback = Mockito.spy(new LifecycleCallbackSupport());
-    factory = new BaseWroManagerFactory() {
-      @Override
-      protected void onAfterInitializeManager(final WroManager manager) {
-        manager.registerCallback(callback);
-      }
-    }.setModelFactory(WroUtil.factoryFor(new WroModel()));
+    factory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(new WroModel()));
     final WroManager manager = factory.create();
+    InjectorBuilder.create(factory).build().inject(manager);
+    
+    manager.registerCallback(callback);
     manager.getModelFactory().create();
 
     Mockito.verify(callback).onBeforeModelCreated();

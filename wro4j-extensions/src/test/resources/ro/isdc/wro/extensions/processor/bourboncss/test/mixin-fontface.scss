@@ -1,0 +1,13 @@
+@import "src/test/resources/ro/isdc/wro/extensions/processor/bourboncss/test/bourbon210/bourbon";
+
+div.normal {
+  @include font-face(nobile, '/fonts/nobile');
+}
+
+div.bold {
+  @include font-face(nobile, '/fonts/nobile_bold', bold);
+}
+
+div.italic {
+  @include font-face(nobile, '/fonts/nobile_italic', normal, italic);
+}

@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public final class WroConfiguration
   /**
    * Default encoding to use.
    */
-  public static final String DEFAULT_ENCODING = "UTF-8";
+  public static final String DEFAULT_ENCODING = CharEncoding.UTF_8;
   /**
    * Default value for connectionTimeout property.
    */
@@ -100,6 +101,11 @@ public final class WroConfiguration
    * allow filter chaining when there is nothing to process for a given request.
    */
   private boolean ignoreEmptyGroup = true;
+  /**
+   * When this flag is true, any failure during processor, will leave the content unchanged. Otherwise, the exception
+   * will interrupt processing with a {@link RuntimeException}.
+   */
+  private boolean ignoreFailingProcessor = false;
   /**
    * Listeners for the change of cache & model period properties.
    */
@@ -399,7 +405,7 @@ public final class WroConfiguration
   }
 
   /**
-   * @return the connectionTimeout
+   * @return the number of milliseconds before a connection is timed out.
    */
   public int getConnectionTimeout() {
     return this.connectionTimeout;
@@ -407,7 +413,7 @@ public final class WroConfiguration
 
 
   /**
-   * Timeout (seconds) of the url connection for external resources. This is used to ensure that locator doesn't spend
+   * Timeout (milliseconds) of the url connection for external resources. This is used to ensure that locator doesn't spend
    * too much time on slow end-point.
    *
    * @param connectionTimeout the connectionTimeout to set
@@ -444,8 +450,19 @@ public final class WroConfiguration
    *          flag for turning on/off failure when there is an empty group (nothing to process). This value is true by
    *          default, meaning that empty group will produce empty result (no exception).
    */
-  public void setIgnoreEmptyGroup(boolean ignoreEmptyGroup) {
+  public void setIgnoreEmptyGroup(final boolean ignoreEmptyGroup) {
     this.ignoreEmptyGroup = ignoreEmptyGroup;
+  }
+
+  /**
+   * @return true if the processing failure should be ignored. 
+   */
+  public boolean isIgnoreFailingProcessor() {
+    return ignoreFailingProcessor;
+  }
+  
+  public void setIgnoreFailingProcessor(final boolean ignoreFailingProcessor) {
+    this.ignoreFailingProcessor = ignoreFailingProcessor;
   }
 
 

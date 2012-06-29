@@ -1,0 +1,14 @@
+input.button {
+  background: url(large.jpg);
+  background-image: url("large.jpg");
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='large.jpg', sizingMethod='scale');
+}
+.multilineAndSpaces {
+  background: 
+     url(large.jpg);
+  background-image : 
+     url(large.jpg)     
+}
+@font-face {
+    src: url(large.jpg);
+}

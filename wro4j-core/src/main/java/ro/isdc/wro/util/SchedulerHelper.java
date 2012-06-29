@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Encapsulates the logic which handles scheduler creation and destroy. This class is threadsafe.
+ * Encapsulates the logic which handles scheduler creation and destroy. This class is thread-safe.
  *
  * @author Alex Objelean
  * @created 14 Oct 2011
@@ -93,8 +93,7 @@ public class SchedulerHelper {
    */
   public SchedulerHelper scheduleWithPeriod(final long period, final TimeUnit timeUnit) {
     Validate.notNull(timeUnit);
-    LOG.debug("period: {}", period);
-    LOG.debug("timeUnit: {}", timeUnit);
+    LOG.debug("period: {} [{}]", period, timeUnit);
     if (this.period != period) {
       this.period = period;
       if (!poolInitializer.get().isShutdown()) {
@@ -137,8 +136,8 @@ public class SchedulerHelper {
         future.cancel(true);
       }
       try {
-        while (!poolInitializer.get().awaitTermination(15, TimeUnit.SECONDS)) {
-          LOG.debug("Termination awaited: " + name);
+        while (!poolInitializer.get().awaitTermination(5, TimeUnit.SECONDS)) {
+          LOG.debug("Termination awaited: {}", name);
           poolInitializer.get().shutdownNow();
         }
       } catch (final InterruptedException e) {

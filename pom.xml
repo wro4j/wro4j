@@ -4,10 +4,10 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.6</version>
+  <version>1.4.7</version>
   <packaging>pom</packaging>  
   
-  <name>Web Resource Optimizer Parent</name>
+  <name>wro4j parent</name>
   <inceptionYear>2008</inceptionYear>
   <url>http://code.google.com/p/wro4j/</url>
   
@@ -65,8 +65,8 @@
     <commons-lang.version>3.1</commons-lang.version>
     <commons-pool.version>1.6</commons-pool.version>
     <closure.version>r1918</closure.version>
-    <slf4j.version>1.6.4</slf4j.version>    
-    <maven.version>3.0.3</maven.version>    
+    <slf4j.version>1.6.6</slf4j.version>    
+    <maven.version>3.0.4</maven.version>    
     <mockito.version>1.9.0</mockito.version>
     <junit.version>4.10</junit.version>    
     <rhino.version>1.7R3</rhino.version>

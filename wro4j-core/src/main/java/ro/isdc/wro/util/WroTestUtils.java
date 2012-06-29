@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.io.FileUtils;
@@ -48,6 +50,7 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
@@ -116,17 +119,12 @@ public class WroTestUtils {
     injector.inject(processor);
   }
 
-
   /**
    * @return the injector
    */
   public static void initProcessor(final ResourcePostProcessor processor) {
-    final BaseWroManagerFactory factory = new BaseWroManagerFactory();
-    factory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(processor));
-    final Injector injector = InjectorBuilder.create(factory).build();
-    injector.inject(processor);
+    initProcessor((ResourcePreProcessor) new ProcessorDecorator(processor));
   }
-
 
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
@@ -277,9 +275,6 @@ public class WroTestUtils {
         Transformers.extensionTransformer("css"), processor);
   }
 
-
-
-
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
     final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePostProcessor processor)
     throws IOException {
@@ -339,7 +334,7 @@ public class WroTestUtils {
       try {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("processing: {}", file.getName());
+        LOG.debug("=========== processing: {} ===========", file.getName());
         // ResourceType doesn't matter here
         compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
           public void process(final Reader reader, final Writer writer)
@@ -383,10 +378,10 @@ public class WroTestUtils {
   }
 
   /**
-   * Run the task concurrently 100 times.
+   * Run the task concurrently 50 times.
    */
   public static void runConcurrently(final Callable<Void> task) throws Exception {
-    runConcurrently(task, 100);
+    runConcurrently(task, 50);
   }
   
   /**
@@ -408,5 +403,20 @@ public class WroTestUtils {
       public void destroy() {
       }
     };
+  }
+  
+  /**
+   * Asserts that a processor supports provided resource types. 
+   */
+  public static void assertProcessorSupportResourceTypes(final ResourcePreProcessor processor, final ResourceType ... expectedResourceTypes) {
+    ResourceType[] actualResourceTypes = new ProcessorDecorator(processor).getSupportedResourceTypes();
+    try {
+      Assert.assertTrue(Arrays.equals(expectedResourceTypes, actualResourceTypes));
+    } catch (AssertionFailedError e) {
+      final String message = "actual resourceTypes: " + Arrays.toString(actualResourceTypes) + ", expected are: "
+          + Arrays.toString(expectedResourceTypes);
+      LOG.error(message);
+      Assert.fail(message);
+    }
   }
 }

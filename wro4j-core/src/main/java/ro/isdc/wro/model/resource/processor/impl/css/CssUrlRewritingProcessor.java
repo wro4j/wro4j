@@ -5,23 +5,22 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static ro.isdc.wro.util.StringUtils.cleanPath;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 
 /**
@@ -112,45 +111,17 @@ public class CssUrlRewritingProcessor
     extends AbstractCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlRewritingProcessor.class);
   public static final String ALIAS = "cssUrlRewriting";
-  /**
-   * Resources mapping path. If request uri contains this, the filter will dispatch it to the original resource.
-   */
-  public static final String PATH_RESOURCES = "wroResources";
-  
-  /**
-   * The name of resource id parameter.
-   */
-  public static final String PARAM_RESOURCE_ID = "id";
-  /**
-   * A set of allowed url's.
-   */
-  private final Set<String> allowedUrls = Collections.synchronizedSet(new HashSet<String>());
-  /**
-   * Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending on
-   * the depth of the aggregatedFolderPath.
-   */
-  private String aggregatedPathPrefix;
   @Inject
-  private Context context;
-  
-  /**
-   * The folder where the final css is located. This is important for computing image location after url rewriting.
-   * 
-   * @param aggregatedFolderPath
-   *          the aggregatedFolder to set
-   */
-  private CssUrlRewritingProcessor setAggregatedFolderPath(final String aggregatedFolderPath) {
-    aggregatedPathPrefix = computeAggregationPathPrefix(aggregatedFolderPath);
-    LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
-    return this;
-  }
+  private ResourceAuthorizationManager authorizationManager;
+  @Inject
+  private ReadOnlyContext context;
   
   /**
    * {@inheritDoc}
    */
   @Override
   protected void onProcessCompleted() {
-    LOG.debug("allowed urls: {}", allowedUrls);
+    LOG.debug("allowed urls: {}", authorizationManager.list());
   }
   
   /**
@@ -160,7 +131,7 @@ public class CssUrlRewritingProcessor
   protected void onUrlReplaced(final String replacedUrl) {
     final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
     LOG.debug("adding allowed url: {}", allowedUrl);
-    allowedUrls.add(allowedUrl);
+    authorizationManager.add(allowedUrl);
   }
   
   /**
@@ -182,18 +153,44 @@ public class CssUrlRewritingProcessor
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
         return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
       }
-      // ensure the folder path is set
-      setAggregatedFolderPath(context.getAggregatedFolderPath());
-      LOG.debug("aggregatedPathPrefix: {}", this.aggregatedPathPrefix);
-      return computeNewImageLocation(this.aggregatedPathPrefix + cssUri, imageUrl);
+      // Compute the folder where the final css is located. This is important for computing image location after url
+      // rewriting.
+      // Prefix of the path to the overwritten image url. This will be of the following type: "../" or "../.." depending
+      // on the depth of the aggregatedFolderPath.
+      final String aggregatedPathPrefix = computeAggregationPathPrefix(context.getAggregatedFolderPath());
+      LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
+      return computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
-      return computeNewImageLocation(cssUri, imageUrl);
+      if (ServletContextUriLocator.isValid(imageUrl)) {
+        //when imageUrl starts with /, assume the cssUri is the external server host
+        final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
+        return computeNewImageLocation(externalServerCssUri, imageUrl);
+      }
+      return computeNewImageLocation(cssUri, imageUrl);      
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
+  }
+
+  /**
+   * Css files hosted on external server, should use its host as the root context when rewriting image url's starting
+   * with '/' character.
+   */
+  private String computeCssUriForExternalServer(final String cssUri) {
+    String exernalServerCssUri = cssUri;
+    try {
+      //compute the host of the external server (with protocol & port).
+      final String serverHost = cssUri.replace(new URL(cssUri).getPath(), "");
+      //the uri should end mandatory with /
+      exernalServerCssUri = serverHost + ServletContextUriLocator.PREFIX;
+      LOG.debug("using {} host as cssUri", exernalServerCssUri);
+    } catch(MalformedURLException e) {
+      //should never happen
+    }
+    return exernalServerCssUri;
   }
   
   /**
@@ -250,7 +247,10 @@ public class CssUrlRewritingProcessor
     // remove '/' from imageUrl if it starts with one.
     final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX) ? cleanImageUrl.substring(1)
         : cleanImageUrl;
-    // remove redundant part of the path
+    // remove redundant part of the path, but skip protected resources (ex: located inside /WEB-INF/ folder). -> Not
+    // sure if this is a problem yet.
+    // final String computedImageLocation = ServletContextUriLocator.isProtectedResource(cssUriFolder) ? cssUriFolder
+    // + processedImageUrl : cleanPath(cssUriFolder + processedImageUrl);
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
     return computedImageLocation;
@@ -262,16 +262,6 @@ public class CssUrlRewritingProcessor
    * @return true if passed argument is contained in allowed list.
    */
   public final boolean isUriAllowed(final String uri) {
-    return allowedUrls.contains(uri);
-  }
-  
-  /**
-   * This method has protected modifier in order to be accessed by unit test class.
-   * 
-   * @return urlPrefix value.
-   */
-  protected String getUrlPrefix() {
-    final String requestURI = context.getRequest().getRequestURI();
-    return String.format("%s?%s=", FilenameUtils.getFullPath(requestURI) + PATH_RESOURCES, PARAM_RESOURCE_ID);
+    return authorizationManager.isAuthorized(uri);
   }
 }

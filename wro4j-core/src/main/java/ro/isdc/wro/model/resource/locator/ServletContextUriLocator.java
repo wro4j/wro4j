@@ -16,8 +16,10 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.WroUtil;
@@ -33,11 +35,23 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ServletContextUriLocator
     extends WildcardUriLocatorSupport {
+  private static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
   /**
-   * Logger for this class.
+   * Alias used to register this locator with {@link LocatorProvider}. 
    */
-  static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
-
+  public static final String ALIAS = "servletContext";
+  /**
+   * Same as default Alias (exist for explicit configuration). Uses DISPATCHER_FIRST strategy. Meaning that, for
+   * example, a jsp resource will be served in its final state (processed by servlet container), rather than in its raw
+   * variant.
+   */
+  public static final String ALIAS_DISPATCHER_FIRST = "servletContext.DISPATCHER_FIRST";
+  /**
+   * Uses SERVLET_CONTEXT_FIRST strategy, meaning that, for example, a jsp will be served with its raw content, instead
+   * of processed by container.
+   */
+  public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
+  
   /**
    * Prefix for url resources.
    */
@@ -55,7 +69,7 @@ public class ServletContextUriLocator
    */
   private LocatorStrategy locatorStrategy = LocatorStrategy.DISPATCHER_FIRST;
   @Inject
-  private Context context;
+  private ReadOnlyContext context;
   /**
    * Available LocatorStrategies. DISPATCHER_FIRST is default option. This means this UriLocator will first try to
    * locate resource via the dispatcher stream locator. This will include dynamic resources produces by servlet's or
@@ -121,7 +135,7 @@ public class ServletContextUriLocator
         final String fullPath = FilenameUtils.getFullPath(uri);
         final String realPath = servletContext.getRealPath(fullPath);
         if (realPath == null) {
-          final String message = "Could not determine realPath for resource: " + uri;
+          final String message = "[FAIL] determine realPath for resource: " + uri;
           LOG.error(message);
           throw new IOException(message);
         }
@@ -141,7 +155,7 @@ public class ServletContextUriLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("Couldn't localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
+      LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
     
@@ -198,7 +212,7 @@ public class ServletContextUriLocator
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {
-      LOG.error("Exception while reading resource from " + uri);
+      LOG.error("[FAIL] reading resource from " + uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
   }

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
 
@@ -29,7 +30,10 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
  * @created Created on Nov 10, 2008
  */
 public class UrlUriLocator extends WildcardUriLocatorSupport {
-  private static final Logger LOG = LoggerFactory.getLogger(UrlUriLocator.class);
+  /**
+   * Alias used to register this locator with {@link LocatorProvider}. 
+   */
+  public static final String ALIAS = "uri";
   @Inject
   private WroConfiguration config;
   /**

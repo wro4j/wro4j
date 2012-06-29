@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -82,6 +83,12 @@ public class TestCJsonProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 20);
+  }
+  
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new CJsonProcessor(true), ResourceType.JS);
   }
 }

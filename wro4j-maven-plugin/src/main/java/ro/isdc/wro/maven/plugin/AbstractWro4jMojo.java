@@ -19,6 +19,7 @@ import org.codehaus.classworlds.ClassRealm;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
@@ -132,21 +133,21 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
 
   /**
    * This method will ensure that you have a right and initialized instance of
-   * {@link StandaloneContextAwareManagerFactory}.
-   *
+   * {@link StandaloneContextAwareManagerFactory}. When overriding this method, ensure that creating managerFactory
+   * performs injection during manager creation, otherwise the manager won't be initialized porperly.
+   * 
    * @return {@link WroManagerFactory} implementation.
    */
   protected StandaloneContextAwareManagerFactory getManagerFactory()
     throws Exception {
     if (managerFactory == null) {
-      managerFactory = newWroManagerFactory();
+      managerFactory = new InjectableContextAwareManagerFactory(newWroManagerFactory());
       // initialize before process.
       managerFactory.initialize(createStandaloneContext());
     }
     return managerFactory;
   }
-
-
+  
   /**
    * {@inheritDoc}
    */
