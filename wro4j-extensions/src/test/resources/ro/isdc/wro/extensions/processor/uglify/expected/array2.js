@@ -1,1 +1,1 @@
-(function(){var Array=function(){};return new Array(1,2,3,4)})()
+(function(){var e=function(){};return new e(1,2,3,4)})()
