@@ -1,39 +1,39 @@
-(function(a) {
-    a.fn.hoverIntent = function(b, c) {
-        var d = {
+(function(e) {
+    e.fn.hoverIntent = function(t, n) {
+        var r = {
             sensitivity: 7,
             interval: 100,
             timeout: 0
         };
-        d = a.extend(d, c ? {
-            over: b,
-            out: c
-        } : b);
-        var e, f, g, h, i = function(a) {
-            e = a.pageX, f = a.pageY;
-        }, j = function(b, c) {
-            c.hoverIntent_t = clearTimeout(c.hoverIntent_t);
-            if (Math.abs(g - e) + Math.abs(h - f) < d.sensitivity) return a(c).unbind("mousemove", i), c.hoverIntent_s = 1, d.over.apply(c, [ b ]);
-            g = e, h = f, c.hoverIntent_t = setTimeout(function() {
-                j(b, c);
-            }, d.interval);
-        }, k = function(a, b) {
-            return b.hoverIntent_t = clearTimeout(b.hoverIntent_t), b.hoverIntent_s = 0, d.out.apply(b, [ a ]);
-        }, l = function(b) {
-            var c = (b.type == "mouseover" ? b.fromElement : b.toElement) || b.relatedTarget;
-            while (c && c != this) try {
-                c = c.parentNode;
-            } catch (a) {
-                c = this;
+        r = e.extend(r, n ? {
+            over: t,
+            out: n
+        } : t);
+        var i, s, o, u, f = function(e) {
+            i = e.pageX, s = e.pageY;
+        }, l = function(t, n) {
+            n.hoverIntent_t = clearTimeout(n.hoverIntent_t);
+            if (Math.abs(o - i) + Math.abs(u - s) < r.sensitivity) return e(n).unbind("mousemove", f), n.hoverIntent_s = 1, r.over.apply(n, [ t ]);
+            o = i, u = s, n.hoverIntent_t = setTimeout(function() {
+                l(t, n);
+            }, r.interval);
+        }, c = function(e, t) {
+            return t.hoverIntent_t = clearTimeout(t.hoverIntent_t), t.hoverIntent_s = 0, r.out.apply(t, [ e ]);
+        }, h = function(e) {
+            var t = (e.type == "mouseover" ? e.fromElement : e.toElement) || e.relatedTarget;
+            while (t && t != this) try {
+                t = t.parentNode;
+            } catch (n) {
+                t = this;
             }
-            if (c == this) return !1;
-            var e = jQuery.extend({}, b), f = this;
-            f.hoverIntent_t && (f.hoverIntent_t = clearTimeout(f.hoverIntent_t)), b.type == "mouseover" ? (g = e.pageX, h = e.pageY, a(f).bind("mousemove", i), f.hoverIntent_s != 1 && (f.hoverIntent_t = setTimeout(function() {
-                j(e, f);
-            }, d.interval))) : (a(f).unbind("mousemove", i), f.hoverIntent_s == 1 && (f.hoverIntent_t = setTimeout(function() {
-                k(e, f);
-            }, d.timeout)));
+            if (t == this) return !1;
+            var i = jQuery.extend({}, e), s = this;
+            s.hoverIntent_t && (s.hoverIntent_t = clearTimeout(s.hoverIntent_t)), e.type == "mouseover" ? (o = i.pageX, u = i.pageY, n(s).bind("mousemove", f), s.hoverIntent_s != 1 && (s.hoverIntent_t = setTimeout(function() {
+                l(i, s);
+            }, r.interval))) : (n(s).unbind("mousemove", f), s.hoverIntent_s == 1 && (s.hoverIntent_t = setTimeout(function() {
+                c(i, s);
+            }, r.timeout)));
         };
-        return this.mouseover(l).mouseout(l);
+        return this.mouseover(h).mouseout(h);
     };
 })(jQuery);

@@ -23,7 +23,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs untagged version: 1.2.7 (last commit date: 2012-05-08 21:35:42).
+ * The underlying implementation use the uglifyJs 1.3.2 version.
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>

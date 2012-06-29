@@ -40,7 +40,6 @@ public class TestCoffeeScriptProcessor {
     processor = new CoffeeScriptProcessor();
   }
 
-
   @After
   public void tearDown() {
     Context.unset();
@@ -93,6 +92,7 @@ public class TestCoffeeScriptProcessor {
   public void shouldBeThreadSafe() throws Exception {
     final CoffeeScriptProcessor processor = new CoffeeScriptProcessor();
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
           processor.process(new StringReader("square = (x) -> x * x"), new StringWriter());

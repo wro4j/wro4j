@@ -4,11 +4,14 @@
 package ro.isdc.wro.model.resource.processor.support;
 
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,18 +119,20 @@ class Selector {
    */
   private Property[] parseProperties(final String contents) {
     final String[] parts = contents.split(";");
-    final Property[] results = new Property[parts.length];
+    final List<Property> resultsAsList = new ArrayList<Property>();
 
     for (int i = 0; i < parts.length; i++) {
       try {
-        results[i] = new Property(parts[i]);
+        final String part = parts[i];
+        // ignore empty parts
+        if (!StringUtils.isEmpty(part.trim())) {
+          resultsAsList.add(new Property(part));
+        }
       } catch (final Exception e) {
         LOG.warn(e.getMessage(), e);
-        results[i] = null;
       }
     }
-
-    return results;
+    return resultsAsList.toArray(new Property[] {});
   }
 
 
@@ -154,13 +159,19 @@ class Property
     try {
       // Parse the property.
       //final String[] parts = property.split(":"); // Split "color: red" to ["color", " red"]
-      final String[] parts = property.split(":", 2); // Split "color: red" to ["color", " red"]
-      if (parts.length < 2) {
+      final List<String> parts = Arrays.asList(property.split(":", 2)); // Split "color: red" to ["color", " red"]
+      final List<String> nonEmptyParts = new ArrayList<String>();
+      for (String part : parts) {
+        if (!StringUtils.isEmpty(part.trim())) {
+          nonEmptyParts.add(part.trim());
+        }
+      }
+      if (nonEmptyParts.size() < 2) {
         throw new Exception("Warning: Incomplete property: " + property);
       }
-      this.property = parts[0].trim().toLowerCase();
+      this.property = nonEmptyParts.get(0).toLowerCase();
 
-      values = parseValues(parts[1].trim().replaceAll(", ", ","));
+      values = parseValues(nonEmptyParts.get(1).replaceAll(", ", ","));
 
     } catch (final PatternSyntaxException e) {
       // Invalid regular expression used.
