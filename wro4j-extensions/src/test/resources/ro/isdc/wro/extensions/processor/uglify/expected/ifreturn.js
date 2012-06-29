@@ -1,1 +1,1 @@
-function a(b){return b==1?2:17}
+function a(e){return e==1?2:17}

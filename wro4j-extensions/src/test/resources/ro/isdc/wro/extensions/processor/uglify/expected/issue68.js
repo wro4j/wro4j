@@ -1,1 +1,1 @@
-function f(){function g(){}if(a)return;g()}
+function f(){function e(){}if(a)return;e()}
