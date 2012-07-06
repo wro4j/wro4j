@@ -520,7 +520,7 @@ public class TestWroFilter {
     props.setProperty(ConfigConstants.debug.name(), Boolean.FALSE.toString());
     final WroFilter theFilter = new WroFilter() {
       @Override
-      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
         final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(props);
         return factory;
       }
@@ -570,7 +570,7 @@ public class TestWroFilter {
       }
       
       @Override
-      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
         return new ObjectFactory<WroConfiguration>() {
           public WroConfiguration create() {
             return Context.get().getConfig();
