@@ -106,7 +106,7 @@ public class WroFilter
   /**
    * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
    */
-  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
   
@@ -136,7 +136,7 @@ public class WroFilter
     // TODO use a named helper
     final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
     LOG.debug("config attribute: {}", configAttribute);
-    return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
+    return configAttribute != null ? configAttribute : newWroConfigurationFactory(filterConfig).create();
   }
   
   /**
@@ -368,7 +368,7 @@ public class WroFilter
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
-    RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(
+    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(
         "Unexected exception", e);
     onRuntimeException(re, response, chain);
   }
@@ -384,13 +384,13 @@ public class WroFilter
   @Deprecated
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
       final FilterChain chain) {
-    LOG.debug("RuntimeException occured", e);
+    LOG.debug("Exception occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);
     } catch (final Exception ex) {
       // should never happen
-      LOG.error("Error while chaining the request: " + HttpServletResponse.SC_NOT_FOUND);
+      LOG.error("Error while chaining the request",  e);
     }
   }
 
