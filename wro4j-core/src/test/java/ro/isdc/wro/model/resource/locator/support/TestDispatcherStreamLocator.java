@@ -147,6 +147,6 @@ public class TestDispatcherStreamLocator {
   @Test
   public void shouldMarkAsIncludedTheRequestWhenDispatcherIsUsed() throws Exception {
     shouldReturnsResourceIncludedByDispatcher();
-    verify(mockRequest).setAttribute(DispatcherStreamLocator.IS_INCLUDED_FROM_WRO, Boolean.TRUE);
+    verify(mockRequest).setAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER, Boolean.TRUE);
   }
 }

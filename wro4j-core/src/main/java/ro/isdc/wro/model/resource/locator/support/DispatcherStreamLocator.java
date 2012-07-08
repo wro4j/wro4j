@@ -38,7 +38,7 @@ public class DispatcherStreamLocator {
    * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent {@link StackOverflowError}.
    * @VisibleForTesting
    */
-  static final String IS_INCLUDED_FROM_WRO = DispatcherStreamLocator.class.getName() + "_included_from_wro";
+  public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName() + ".included_with_dispatcher";
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
@@ -141,16 +141,16 @@ public class DispatcherStreamLocator {
       }
     };
     //add an attribute to mark this request as included from wro
-    wrappedRequest.setAttribute(IS_INCLUDED_FROM_WRO, Boolean.TRUE);
+    wrappedRequest.setAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER, Boolean.TRUE);
     return wrappedRequest;
   }
-  
+
   /**
    * @param request
    * @return true if the request is included from within wro request cycle.
    */
   public static boolean isIncludedRequest(final HttpServletRequest request) {
     Validate.notNull(request);
-    return request.getAttribute(IS_INCLUDED_FROM_WRO) != null;
+    return request.getAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER) != null;
   }
 }
