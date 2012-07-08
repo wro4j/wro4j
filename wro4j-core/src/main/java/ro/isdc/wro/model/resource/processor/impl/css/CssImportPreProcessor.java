@@ -117,7 +117,6 @@ public class CssImportPreProcessor
     return removeImportStatements(sb.toString());
   }
 
-
   /**
    * Removes all @import statements for css.
    */
@@ -144,8 +143,8 @@ public class CssImportPreProcessor
       css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()).getInputStream(),
         configuration.getEncoding());
     } catch (IOException e) {
-      LOG.warn("Invalid import detected: {}", resource.getUri());
       if (!configuration.isIgnoreMissingResources()) {
+        LOG.error("Invalid import detected: {}", resource.getUri());
         throw e;
       }
     }
@@ -154,7 +153,7 @@ public class CssImportPreProcessor
       final Resource importedResource = buildImportedResource(resource, m.group(1));
       // check if already exist
       if (imports.contains(importedResource)) {
-        LOG.warn("Duplicate imported resource: " + importedResource);
+        LOG.warn("Duplicate imported resource: {}", importedResource);
       } else {
         imports.add(importedResource);
       }

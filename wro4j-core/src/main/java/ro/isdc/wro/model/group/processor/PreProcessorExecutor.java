@@ -220,15 +220,15 @@ public class PreProcessorExecutor {
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       if (StringUtils.isEmpty(result)) {
-        LOG.warn("Empty resource detected: {}", resource.getUri());
+        LOG.debug("Empty resource detected: {}", resource.getUri());
       }
       return result;
     } catch (final IOException e) {
-      LOG.warn("Invalid resource found: {}", resource);
+      LOG.debug("Invalid resource found: {}", resource);
       if (config.isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
-        LOG.error("Cannot ignore the missing resource:  " + resource);
+        LOG.error("Cannot ignore missing resource:  {}", resource);
         throw e;
       }
     }

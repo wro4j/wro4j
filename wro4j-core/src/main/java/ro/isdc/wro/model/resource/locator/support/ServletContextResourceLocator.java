@@ -114,7 +114,7 @@ public class ServletContextResourceLocator
         final String realPath = servletContext.getRealPath(fullPath);
         if (realPath == null) {
           final String message = "[FAIL] Could not determine realPath for resource: " + path;
-          LOG.error(message);
+          LOG.debug(message);
           throw new IOException(message);
         }
         return getWildcardStreamLocator().locateStream(path, new File(realPath));
@@ -147,7 +147,7 @@ public class ServletContextResourceLocator
       validateInputStreamIsNotNull(inputStream, path);
       return inputStream;
     } catch (IOException e) {
-      LOG.warn("Wrong or empty resource with location: {}", path);
+      LOG.debug("Wrong or empty resource with location: {}", uri);
       throw e;
     }
   }
