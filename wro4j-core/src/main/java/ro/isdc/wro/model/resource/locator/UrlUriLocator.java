@@ -13,8 +13,6 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
