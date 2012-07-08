@@ -5,7 +5,6 @@ package ro.isdc.wro.http;
 
 import java.util.Properties;
 
-
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -53,7 +52,7 @@ public class ConfigurableWroFilter
    * {@inheritDoc}
    */
   @Override
-  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
     if (properties == null) {
       properties = new Properties();
       properties.setProperty(ConfigConstants.debug.name(), String.valueOf(debug));

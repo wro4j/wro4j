@@ -104,7 +104,7 @@ public class TestWroFilter {
     
     when(mockUriLocatorFactory.locate(Mockito.anyString())).thenReturn(mockUriLocator);
     when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
-
+    
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);
     when(mockManagerFactory.create()).thenReturn(new BaseWroManagerFactory().create());
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
@@ -120,7 +120,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(mockManagerFactory);
     // victim.init(mockFilterConfig);
   }
-
+  
   private WroManagerFactory createValidManagerFactory() {
     return new BaseWroManagerFactory().setModelFactory(createValidModelFactory());
   }
@@ -376,7 +376,7 @@ public class TestWroFilter {
     }, mockFilterChain);
     verifyChainIsNotCalled(mockFilterChain);
   }
-
+  
   /**
    * Creates the victim filter which usues mock {@link ResourceAuthorizationManager}.
    */
@@ -403,7 +403,7 @@ public class TestWroFilter {
     final String resourcePath = "classpath:ro/isdc/wro/http/2.css";
     
     when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
-
+    
     final String requestUri = PATH_RESOURCES + "?id=" + resourcePath;
     requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
       @Override
@@ -432,7 +432,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(createValidManagerFactory());
     setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
     victim.init(mockFilterConfig);
-
+    
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
   
@@ -518,7 +518,7 @@ public class TestWroFilter {
     props.setProperty(ConfigConstants.debug.name(), Boolean.FALSE.toString());
     final WroFilter theFilter = new WroFilter() {
       @Override
-      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
         final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(props);
         return factory;
       }
@@ -568,7 +568,7 @@ public class TestWroFilter {
       }
       
       @Override
-      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
         return new ObjectFactory<WroConfiguration>() {
           public WroConfiguration create() {
             return Context.get().getConfig();
@@ -695,13 +695,13 @@ public class TestWroFilter {
     config.setDisableCache(true);
     return config;
   }
-
+  
   @Test
   public void shouldDestroyWroModelWhenCacheIsDisabled()
       throws Exception {
     final WroConfiguration config = new WroConfiguration();
     config.setDisableCache(true);
-
+    
     when(mockRequest.getRequestURI()).thenReturn("/resource/g1.css");
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
     victim.setConfiguration(config);
@@ -712,7 +712,7 @@ public class TestWroFilter {
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);
-
+    
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     
     verify(proxyModelFactory).destroy();
@@ -739,12 +739,24 @@ public class TestWroFilter {
     
     verify(proxyModelFactory, Mockito.never()).destroy();
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotSetNullConfiguration() {
     victim.setConfiguration(null);
   }
-
+  
+  @Test(expected = IllegalStateException.class)
+  public void shouldFailWhenConfigurationFactoryFails()
+      throws Exception {
+    victim = new WroFilter() {
+      @Override
+      protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
+        throw new IllegalStateException("BOOM!");
+      }
+    };
+    victim.init(mockFilterConfig);
+  }
+  
   @After
   public void tearDown() {
     if (victim != null) {

@@ -52,12 +52,12 @@ import ro.isdc.wro.util.WroUtil;
 /**
  * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the
  * way it is configured.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Oct 31, 2008
  */
 public class WroFilter
-  implements Filter {
+    implements Filter {
   private static final Logger LOG = LoggerFactory.getLogger(WroFilter.class);
   /**
    * The prefix to use for default mbean name.
@@ -97,25 +97,24 @@ public class WroFilter
       return super.put(key.trim().toLowerCase(), value);
     }
 
-
     @Override
     public String get(final Object key) {
-      return super.get(((String)key).toLowerCase());
+      return super.get(((String) key).toLowerCase());
     }
   };
-
+  
   /**
    * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
    */
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
-
+  
   /**
    * {@inheritDoc}
    */
   public final void init(final FilterConfig config)
-    throws ServletException {
+      throws ServletException {
     this.filterConfig = config;
     // invoke createConfiguration method only if the configuration was not set.
     this.wroConfiguration = wroConfiguration == null ? createConfiguration() : wroConfiguration;
@@ -125,7 +124,7 @@ public class WroFilter
     initJMX();
     doInit(config);
   }
-
+  
   /**
    * Creates configuration by looking up in servletContext attributes. If none is found, a new one will be created using
    * the configuration factory.
@@ -134,18 +133,18 @@ public class WroFilter
    */
   private WroConfiguration createConfiguration() {
     // Extract config from servletContext (if already configured)
-    //TODO use a named helper
+    // TODO use a named helper
     final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
     LOG.debug("config attribute: {}", configAttribute);
     return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
   }
-
+  
   /**
    * Creates {@link WroManagerFactory}.
    */
   private WroManagerFactory createWroManagerFactory() {
     if (this.wroManagerFactory == null) {
-      //TODO use a named helper
+      // TODO use a named helper
       final WroManagerFactory managerFactoryAttribute = ServletContextAttributeHelper.create(filterConfig).getManagerFactory();
       LOG.debug("managerFactory attribute: {}", managerFactoryAttribute);
       return managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
@@ -153,7 +152,7 @@ public class WroFilter
     LOG.debug("created managerFactory: {}", wroManagerFactory);
     return this.wroManagerFactory;
   }
-
+  
   /**
    * Expose MBean to tell JMX infrastructure about our MBean.
    */
@@ -171,7 +170,7 @@ public class WroFilter
       LOG.error("Exception occured while registering MBean", e);
     }
   }
-
+  
   /**
    * @return the name of MBean to be used by JMX to configure wro4j.
    */
@@ -185,33 +184,30 @@ public class WroFilter
     return mbeanName;
   }
 
-
   /**
    * @return Context path of the application.
    */
   private String getContextPath() {
     String contextPath = null;
     try {
-      contextPath = (String)ServletContext.class.getMethod("getContextPath", new Class<?>[] {}).invoke(
-        filterConfig.getServletContext(), new Object[] {});
+      contextPath = (String) ServletContext.class.getMethod("getContextPath", new Class<?>[] {}).invoke(
+          filterConfig.getServletContext(), new Object[] {});
     } catch (final Exception e) {
       contextPath = "DEFAULT";
       LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
-        + contextPath + " contextPath.");
+          + contextPath + " contextPath.");
     }
     return contextPath.replaceFirst("/", "");
   }
 
-
   /**
    * Override this method if you want to provide a different MBeanServer.
-   *
+   * 
    * @return {@link MBeanServer} to use for JMX.
    */
   protected MBeanServer getMBeanServer() {
     return ManagementFactory.getPlatformMBeanServer();
   }
-
 
   /**
    * Register property change listeners.
@@ -237,7 +233,7 @@ public class WroFilter
     Validate.notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
   }
-
+  
   /**
    * Initialize header values.
    */
@@ -264,19 +260,19 @@ public class WroFilter
         }
       } catch (final Exception e) {
         throw new WroRuntimeException("Invalid header init-param value: " + headerParam
-          + ". A correct value should have the following format: "
-          + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
-          + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
+            + ". A correct value should have the following format: "
+            + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
+            + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
       }
     }
     LOG.debug("Header Values: {}", headersMap);
   }
 
-
   /**
    * Parse header value & puts the found values in headersMap field.
-   *
-   * @param header value to parse.
+   * 
+   * @param header
+   *          value to parse.
    */
   private void parseHeader(final String header) {
     LOG.debug("parseHeader: {}", header);
@@ -285,28 +281,27 @@ public class WroFilter
       headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
     }
   }
-
+  
   /**
    * Custom filter initialization - can be used for extended classes.
-   *
+   * 
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config)
-    throws ServletException {}
-
+      throws ServletException {
+  }
 
   /**
    * {@inheritDoc}
    */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
-    throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest)req;
-    final HttpServletResponse response = (HttpServletResponse)res;
+      throws IOException, ServletException {
+    final HttpServletRequest request = (HttpServletRequest) req;
+    final HttpServletResponse response = (HttpServletResponse) res;
     try {
-
       // add request, response & servletContext to thread local
       Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-
+      
       if (!handledWithRequestHandler(request, response)) {
         processRequest(request, response);
         onRequestProcessed();
@@ -352,19 +347,18 @@ public class WroFilter
    */
   protected void onRequestProcessed() {
   }
-
+  
   /**
    * Perform actual processing.
    */
   private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+      throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager
     final WroManager manager = wroManagerFactory.create();
     // getInjector().inject(manager);
     manager.process();
   }
-
 
   /**
    * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation redirects
@@ -389,7 +383,7 @@ public class WroFilter
    */
   @Deprecated
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-    final FilterChain chain) {
+      final FilterChain chain) {
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
@@ -400,31 +394,32 @@ public class WroFilter
     }
   }
 
-
   /**
    * Method called for each request and responsible for setting response headers, used mostly for cache control.
    * Override this method if you want to change the way headers are set.<br>
-   *
-   * @param response {@link HttpServletResponse} object.
+   * 
+   * @param response
+   *          {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
     // Force resource caching as best as possible
     for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
       response.setHeader(entry.getKey(), entry.getValue());
     }
-    //prevent caching when in development mode
+    // prevent caching when in development mode
     if (wroConfiguration.isDebug()) {
       WroUtil.addNoCacheHeaders(response);
     }
   }
 
-
   /**
    * Allows external configuration of {@link WroManagerFactory} (ex: using spring IoC). When this value is set, the
-   * default {@link WroManagerFactory} initialization won't work anymore.<p/>
+   * default {@link WroManagerFactory} initialization won't work anymore.
+   * <p/>
    * Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.
-   *
-   * @param wroManagerFactory the wroManagerFactory to set
+   * 
+   * @param wroManagerFactory
+   *          the wroManagerFactory to set
    */
   public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
     if (wroManagerFactory != null && !(wroManagerFactory instanceof InjectableWroManagerFactoryDecorator)) {
@@ -433,7 +428,7 @@ public class WroFilter
       this.wroManagerFactory = (InjectableWroManagerFactoryDecorator) wroManagerFactory;
     }
   }
-
+  
   /**
    * @VisibleForTesting
    * @return configured {@link WroManagerFactory} instance.
@@ -441,16 +436,18 @@ public class WroFilter
   public final WroManagerFactory getWroManagerFactory() {
     return this.wroManagerFactory.getOriginalDecoratedObject();
   }
-
+  
   /**
    * Sets the RequestHandlerFactory used to create the collection of requestHandlers
-   * @param requestHandlerFactory to set
+   * 
+   * @param requestHandlerFactory
+   *          to set
    */
   public void setRequestHandlerFactory(final RequestHandlerFactory requestHandlerFactory) {
     Validate.notNull(requestHandlerFactory);
     this.requestHandlerFactory = requestHandlerFactory;
   }
-
+  
   /**
    * Factory method for {@link WroManagerFactory}.
    * <p/>
@@ -459,14 +456,12 @@ public class WroFilter
    * </p>
    * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
    * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
-   *
-   *
+   * 
    * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory newWroManagerFactory() {
     return new DefaultWroManagerFactory(wroConfiguration);
   }
-
 
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.
