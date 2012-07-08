@@ -89,7 +89,7 @@ public class DispatcherStreamLocator {
       throw new IOException("Error while dispatching the request for location " + location);
     } finally {
       if (warnOnEmptyStream && os.size() == 0) {
-        LOG.warn("Wrong or empty resource with location: {}", location);
+        LOG.debug("Wrong or empty resource with location: {}", location);
       }
       // Put the context back
       if (!Context.isContextSet()) {
