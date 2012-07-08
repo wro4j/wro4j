@@ -36,6 +36,19 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
+  
+  <filter>
+    <filter-name>Wro4j Assets</filter-name>
+    <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Wro4j Assets</filter-name>
+    <url-pattern>/assets/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+  
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
