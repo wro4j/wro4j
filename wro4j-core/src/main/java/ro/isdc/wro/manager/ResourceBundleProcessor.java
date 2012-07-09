@@ -106,7 +106,8 @@ public class ResourceBundleProcessor {
           response.setHeader("Vary", "Accept-Encoding");
           IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
-          response.setContentLength(cacheValue.getRawContent().length());
+          //using getRawContent().length() is not the same and can return 2Bytes smaller size.
+          response.setContentLength(cacheValue.getRawContent().getBytes().length);
           IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
         }
       }
