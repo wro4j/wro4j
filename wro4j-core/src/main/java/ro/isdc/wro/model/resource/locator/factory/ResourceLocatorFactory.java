@@ -17,10 +17,11 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 public interface ResourceLocatorFactory {
   /**
    * Based on provided uri, returns a best suited {@link ResourceLocator}.
-   *
+   * 
    * @param uri
    *          uri to read.
-   * @return a not null {@link ResourceLocator} implementation for the provided uri.
+   * @return a {@link ResourceLocator} implementation for the provided uri or null if there is no locator for handling
+   *         provided uri.
    */
   ResourceLocator locate(final String uri);
 }

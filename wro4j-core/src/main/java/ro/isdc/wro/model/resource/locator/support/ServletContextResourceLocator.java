@@ -147,7 +147,7 @@ public class ServletContextResourceLocator
       validateInputStreamIsNotNull(inputStream, path);
       return inputStream;
     } catch (IOException e) {
-      LOG.debug("Wrong or empty resource with location: {}", uri);
+      LOG.debug("Wrong or empty resource with location: {}", path);
       throw e;
     }
   }

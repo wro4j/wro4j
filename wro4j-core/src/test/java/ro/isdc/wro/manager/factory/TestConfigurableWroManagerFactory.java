@@ -25,8 +25,10 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ClasspathResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ServletContextResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
@@ -132,9 +134,9 @@ public class TestConfigurableWroManagerFactory {
     createManager();
     
     Assert.assertEquals(2, uriLocatorFactory.getConfiguredStrategies().size());
-    final Iterator<ResourceLocator> locatorsIterator = uriLocatorFactory.getConfiguredStrategies().iterator();
-    Assert.assertSame(ClasspathResourceLocator.class, locatorsIterator.next().getClass());
-    Assert.assertSame(ServletContextResourceLocator.class, locatorsIterator.next().getClass());
+    final Iterator<ResourceLocatorFactory> locatorsIterator = uriLocatorFactory.getConfiguredStrategies().iterator();
+    Assert.assertSame(ClasspathResourceLocatorFactory.class, locatorsIterator.next().getClass());
+    Assert.assertSame(ServletContextResourceLocatorFactory.class, locatorsIterator.next().getClass());
   }
 
   

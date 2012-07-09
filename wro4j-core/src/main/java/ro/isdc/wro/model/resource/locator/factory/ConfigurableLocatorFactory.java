@@ -24,7 +24,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
  * @since 1.4.0
  */
 public class ConfigurableLocatorFactory
-    extends AbstractConfigurableMultipleStrategy<ResourceLocator, LocatorProvider>
+    extends AbstractConfigurableMultipleStrategy<ResourceLocatorFactory, LocatorProvider>
     implements ResourceLocatorFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableLocatorFactory.class);
   /**
@@ -46,7 +46,7 @@ public class ConfigurableLocatorFactory
    * {@inheritDoc}
    */
   @Override
-  protected Map<String, ResourceLocator> getStrategies(final LocatorProvider provider) {
+  protected Map<String, ResourceLocatorFactory> getStrategies(final LocatorProvider provider) {
     return provider.provideLocators();
   }
   
@@ -61,10 +61,10 @@ public class ConfigurableLocatorFactory
    * {@inheritDoc}
    */
   private ResourceLocatorFactory newUriLocatorFactory() {
-    final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-    final List<ResourceLocator> locators = getConfiguredStrategies();
-    for (final UriLocator locator : locators) {
-      factory.addUriLocator(locator);
+    final SimpleResourceLocatorFactory factory = new SimpleResourceLocatorFactory();
+    final List<ResourceLocatorFactory> locators = getConfiguredStrategies();
+    for (final ResourceLocatorFactory locatorFactory : locators) {
+      factory.addFactory(locatorFactory);
     }
     // use default when none provided
     if (locators.isEmpty()) {

@@ -107,7 +107,7 @@ public class WroFilter
   /**
    * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
    */
-  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory() {
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
   
@@ -137,7 +137,7 @@ public class WroFilter
     // TODO use a named helper
     final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
     LOG.debug("config attribute: {}", configAttribute);
-    return configAttribute != null ? configAttribute : newWroConfigurationFactory().create();
+    return configAttribute != null ? configAttribute : newWroConfigurationFactory(filterConfig).create();
   }
   
   /**

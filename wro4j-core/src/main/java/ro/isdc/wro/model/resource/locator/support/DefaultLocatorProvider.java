@@ -3,7 +3,12 @@ package ro.isdc.wro.model.resource.locator.support;
 import java.util.HashMap;
 import java.util.Map;
 
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ClasspathResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ServletContextResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UrlResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.LocatorStrategy;
 
 
@@ -21,13 +26,21 @@ public class DefaultLocatorProvider
    */
   public Map<String, ResourceLocatorFactory> provideLocators() {
     final Map<String, ResourceLocatorFactory> map = new HashMap<String, ResourceLocatorFactory>();
-    map.put(ClasspathUriLocator.ALIAS, new ClasspathResourceLocator());
-    map.put(ServletContextUriLocator.ALIAS, new ServletContextUriLocator());
-    map.put(ServletContextUriLocator.ALIAS_DISPATCHER_FIRST,
-        new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.DISPATCHER_FIRST));
-    map.put(ServletContextUriLocator.ALIAS_SERVLET_CONTEXT_FIRST,
-        new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_FIRST));
-    map.put(UrlUriLocator.ALIAS, new UrlUriLocator());
+    map.put(ClasspathResourceLocator.ALIAS, new ClasspathResourceLocatorFactory());
+    map.put(ServletContextResourceLocator.ALIAS, new ServletContextResourceLocatorFactory());
+    map.put(ServletContextResourceLocator.ALIAS_DISPATCHER_FIRST, new ServletContextResourceLocatorFactory() {
+      @Override
+      protected ResourceLocator newLocator(final String uri) {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), uri).setLocatorStrategy(LocatorStrategy.DISPATCHER_FIRST);
+      }
+    });
+    map.put(ServletContextResourceLocator.ALIAS_SERVLET_CONTEXT_FIRST, new ServletContextResourceLocatorFactory() {
+      @Override
+      protected ResourceLocator newLocator(final String uri) {
+        return new ServletContextResourceLocator(Context.get().getServletContext(), uri).setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_FIRST);
+      }
+    });
+    map.put(UrlResourceLocator.ALIAS, new UrlResourceLocatorFactory());
     return map;
   }
 }
