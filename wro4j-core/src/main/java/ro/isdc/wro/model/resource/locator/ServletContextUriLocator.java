@@ -212,7 +212,7 @@ public class ServletContextUriLocator
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {
-      LOG.error("[FAIL] reading resource from " + uri);
+      LOG.debug("[FAIL] reading resource from {}", uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
   }
