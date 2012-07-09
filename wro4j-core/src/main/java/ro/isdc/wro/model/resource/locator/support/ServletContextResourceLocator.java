@@ -133,7 +133,7 @@ public class ServletContextResourceLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("[FAIL] Couldn't localize the stream containing wildcard. Original error message: \"" + e.getMessage()
+      LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
     
@@ -203,7 +203,7 @@ public class ServletContextResourceLocator
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {
-      LOG.error("[FAIL] reading resource from " + uri);
+      LOG.debug("[FAIL] reading resource from {}", uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
   }
