@@ -64,6 +64,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -756,6 +757,14 @@ public class TestWroFilter {
       }
     };
     victim.init(mockFilterConfig);
+  }
+  
+  @Test
+  public void shouldChainTheIncludedRequestByDispatcher() throws Exception {
+    when(mockRequest.getAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER)).thenReturn(Boolean.TRUE);
+    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    verify(mockManagerFactory, Mockito.never()).create();
+    verify(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
   }
   
   @After

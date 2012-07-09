@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.locator.support;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -129,5 +132,21 @@ public class TestDispatcherStreamLocator {
     victim.getInputStream(mockRequest, mockResponse, location);
     
     verify(mockUriLocator).locate(Mockito.anyString());
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotCheckNullRequestAsIncluded() {
+    DispatcherStreamLocator.isIncludedRequest(null);
+  }
+  
+  @Test
+  public void shouldNotBeIncludedRequestByDefault() {
+    assertFalse(DispatcherStreamLocator.isIncludedRequest(mockRequest));
+  }
+  
+  @Test
+  public void shouldMarkAsIncludedTheRequestWhenDispatcherIsUsed() throws Exception {
+    shouldReturnsResourceIncludedByDispatcher();
+    verify(mockRequest).setAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER, Boolean.TRUE);
   }
 }
