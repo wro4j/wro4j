@@ -13,6 +13,7 @@ import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCE
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Properties;
@@ -755,6 +756,14 @@ public class TestWroFilter {
       }
     };
     victim.init(mockFilterConfig);
+  }
+  
+  @Test
+  public void shouldChainTheIncludedRequestByDispatcher() throws Exception {
+    when(mockRequest.getAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER)).thenReturn(Boolean.TRUE);
+    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    verify(mockManagerFactory, Mockito.never()).create();
+    verify(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
   }
   
   @After

@@ -45,6 +45,7 @@ import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -298,23 +299,31 @@ public class WroFilter
       throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
-    try {
-      // add request, response & servletContext to thread local
-      Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-      
-      if (!handledWithRequestHandler(request, response)) {
-        processRequest(request, response);
-        onRequestProcessed();
+
+    //prevent StackOverflowError by skipping the already included wro request
+    if (!DispatcherStreamLocator.isIncludedRequest(request)) {
+      try {
+        // add request, response & servletContext to thread local
+        Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
+        
+        if (!handledWithRequestHandler(request, response)) {
+          processRequest(request, response);
+          onRequestProcessed();
+        }
+      } catch (final Exception e) {
+        onException(e, response, chain);
+      } finally {
+        // Destroy the cached model after the processing is done if cache flag is disabled
+        if (getConfiguration().isDisableCache()) {
+          LOG.debug("Disable Cache is true. Destroying model...");
+          final WroManager manager = this.wroManagerFactory.create();
+          manager.getModelFactory().destroy();
+          manager.getCacheStrategy().clear();
+        }
+        Context.unset();
       }
-    } catch (final Exception e) {
-      onException(e, response, chain);
-    } finally {
-      // Destroy the cached model after the processing is done if cache flag is disabled
-      if (getConfiguration().isDisableCache()) {
-        LOG.debug("Disable Cache is true. Destroying model...");
-        this.wroManagerFactory.create().getModelFactory().destroy();
-      }
-      Context.unset();
+    } else {
+      chain.doFilter(request, response);
     }
   }
 

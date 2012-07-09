@@ -26,13 +26,18 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * A strategy which use ByteArray IO Streams and dispatch the request to a given location.
- *
+ * Responsible to locate a context relative resource. It attempts to locate the resource using {@link RequestDispatcher}
+ * . If the dispatcher fails, it will fallback resource retrieval to a http call using {@link UrlUriLocator}.
+ * 
  * @author Alex Objelean
  */
 public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-  
+  /**
+   * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent {@link StackOverflowError}.
+   * @VisibleForTesting
+   */
+  public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName() + ".included_with_dispatcher";
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
@@ -47,6 +52,7 @@ public class DispatcherStreamLocator {
     throws IOException {
     Validate.notNull(request);
     Validate.notNull(response);
+    
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
@@ -97,7 +103,6 @@ public class DispatcherStreamLocator {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
-
   /**
    * Used to locate external resources. No wildcard handling is required.
    * @VisibleForTesting
@@ -110,10 +115,10 @@ public class DispatcherStreamLocator {
       @Override
       public boolean isEnableWildcards() {
         return false;
-      }
+      };
     };
   }
-
+  
   /**
    * Build a wrapped servlet request which will be used for dispatching.
    */
@@ -136,6 +141,17 @@ public class DispatcherStreamLocator {
         return WroUtil.getServletPathFromLocation(this, location);
       }
     };
+    //add an attribute to mark this request as included from wro
+    wrappedRequest.setAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER, Boolean.TRUE);
     return wrappedRequest;
+  }
+
+  /**
+   * @param request
+   * @return true if the request is included from within wro request cycle.
+   */
+  public static boolean isIncludedRequest(final HttpServletRequest request) {
+    Validate.notNull(request);
+    return request.getAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER) != null;
   }
 }

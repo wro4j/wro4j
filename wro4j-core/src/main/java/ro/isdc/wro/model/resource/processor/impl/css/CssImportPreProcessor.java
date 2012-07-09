@@ -97,7 +97,7 @@ public class CssImportPreProcessor
   private String parseCss(final Resource resource, final Reader reader)
     throws IOException {
     if (processed.contains(resource)) {
-      LOG.warn("Recursive import detected: " + resource);
+      LOG.debug("[WARN] Recursive import detected: {}", resource);
       return "";
     }
     processed.add(resource);
@@ -153,7 +153,7 @@ public class CssImportPreProcessor
       final Resource importedResource = buildImportedResource(resource, m.group(1));
       // check if already exist
       if (imports.contains(importedResource)) {
-        LOG.warn("Duplicate imported resource: {}", importedResource);
+        LOG.debug("[WARN] Duplicate imported resource: {}", importedResource);
       } else {
         imports.add(importedResource);
       }
