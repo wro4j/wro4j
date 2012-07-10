@@ -216,7 +216,7 @@ public class PreProcessorExecutor {
   private String getResourceContent(final Resource resource)
       throws IOException {
     try {
-      final InputStream is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()).getInputStream());
+      final InputStream is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       if (StringUtils.isEmpty(result)) {

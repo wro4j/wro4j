@@ -140,7 +140,7 @@ public class CssImportPreProcessor
     final List<Resource> imports = new ArrayList<Resource>();
     String css = EMPTY;
     try {
-      css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()).getInputStream(),
+      css = IOUtils.toString(resourceLocatorFactory.locate(resource.getUri()),
         configuration.getEncoding());
     } catch (IOException e) {
       if (!configuration.isIgnoreMissingResources()) {

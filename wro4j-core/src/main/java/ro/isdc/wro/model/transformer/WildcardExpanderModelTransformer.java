@@ -92,7 +92,7 @@ public class WildcardExpanderModelTransformer
    * Process each resource and replace it with a collection of resources if it contains wildcard.
    */
   private void processResource(final Group group, final Resource resource) {
-    final ResourceLocator resourceLocator = resourceLocatorFactory.locate(resource.getUri());
+    final ResourceLocator resourceLocator = resourceLocatorFactory.getLocator(resource.getUri());
 
     if (resourceLocator instanceof AbstractResourceLocator) {
       LOG.debug("Expanding resource: {}", resource.getUri());
@@ -127,7 +127,7 @@ public class WildcardExpanderModelTransformer
     // use thread local because we need to assign a File inside an anonymous class and it fits perfectly
     final ThreadLocal<String> baseNameFolderHolder = new ThreadLocal<String>();
     try {
-      final ResourceLocator locator = resourceLocatorFactory.locate(resourcePath);
+      final ResourceLocator locator = resourceLocatorFactory.getLocator(resourcePath);
       if (locator instanceof AbstractResourceLocator) {
         ((AbstractResourceLocator) locator).setWildcardExpanderHandler(createBaseNameComputerFunction(baseNameFolderHolder));
       }

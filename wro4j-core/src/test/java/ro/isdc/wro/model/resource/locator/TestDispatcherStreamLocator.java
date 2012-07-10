@@ -68,8 +68,8 @@ public class TestDispatcherStreamLocator {
     Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "http://www.google.com"));
   }
-
-  @Test(expected=IOException.class)
+  
+  @Test(expected = IOException.class)
   public void testDispatchIncludeHasNoValidResource()
       throws Exception {
     Mockito.when(mockRequest.getRequestDispatcher(Mockito.anyString())).thenReturn(mockDispatcher);
@@ -89,7 +89,9 @@ public class TestDispatcherStreamLocator {
     Mockito.doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
           throws Throwable {
-        //do nothing
+        // do nothing
+        HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+        response.getOutputStream().write("dummyContent".getBytes());
         return null;
       }
     }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));

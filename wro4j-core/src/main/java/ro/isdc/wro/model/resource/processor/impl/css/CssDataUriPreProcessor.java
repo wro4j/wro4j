@@ -79,7 +79,7 @@ public class CssDataUriPreProcessor
     }
     String result = imageUrl;
     try {
-      final InputStream inputStream = resourceLocatorFactory.locate(fullPath).getInputStream();
+      final InputStream inputStream = resourceLocatorFactory.getLocator(fullPath).getInputStream();
       final String dataUri = getDataUriGenerator().generateDataURI(inputStream, fileName);
       if (isReplaceAccepted(dataUri)) {
         result = dataUri;

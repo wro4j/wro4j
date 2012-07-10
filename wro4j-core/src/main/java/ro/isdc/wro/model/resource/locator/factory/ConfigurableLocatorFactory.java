@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator.factory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,7 +34,7 @@ public class ConfigurableLocatorFactory
    */
   public static final String PARAM_URI_LOCATORS = "uriLocators";
   
-  private final ResourceLocatorFactory locatorFactory = newUriLocatorFactory();
+  private final ResourceLocatorFactory locatorFactory = newLocatorFactory();
 
   /**
    * {@inheritDoc}
@@ -53,14 +55,22 @@ public class ConfigurableLocatorFactory
   /**
    * {@inheritDoc}
    */
-  public ResourceLocator locate(final String uri) {
+  public ResourceLocator getLocator(final String uri) {
+    return locatorFactory.getLocator(uri);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public InputStream locate(final String uri)
+      throws IOException {
     return locatorFactory.locate(uri);
   }
   
   /**
    * {@inheritDoc}
    */
-  private ResourceLocatorFactory newUriLocatorFactory() {
+  private ResourceLocatorFactory newLocatorFactory() {
     final SimpleResourceLocatorFactory factory = new SimpleResourceLocatorFactory();
     final List<ResourceLocatorFactory> locators = getConfiguredStrategies();
     for (final ResourceLocatorFactory locatorFactory : locators) {
@@ -78,7 +88,7 @@ public class ConfigurableLocatorFactory
    * {@inheritDoc}
    */
   public ResourceLocator getInstance(final String uri) {
-    return locatorFactory.getInstance(uri);
+    return locatorFactory.getLocator(uri);
   }
   
   /**

@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
@@ -41,6 +42,7 @@ public class TestConfigurableLocatorFactory {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Context.set(Context.standaloneContext());
     victim = new ConfigurableLocatorFactory();
   }
   
@@ -75,7 +77,7 @@ public class TestConfigurableLocatorFactory {
     final List<ResourceLocatorFactory> locators = victim.getConfiguredStrategies();
 
     assertEquals(1, locators.size());
-    assertEquals(ServletContextResourceLocator.class, locators.iterator().next().getClass());
+    assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(locators.iterator().next().getClass()));
   }
   
   @Test
@@ -91,11 +93,11 @@ public class TestConfigurableLocatorFactory {
     assertEquals(5, locatorFactories.size());
     
     final Iterator<ResourceLocatorFactory> iterator = locatorFactories.iterator();
-    assertEquals(ServletContextResourceLocator.class, iterator.next().getClass());
-    assertEquals(ServletContextResourceLocator.class, iterator.next().getClass());
-    assertEquals(ServletContextResourceLocator.class, iterator.next().getClass());
-    assertEquals(ClasspathResourceLocator.class, iterator.next().getClass());
-    assertEquals(UrlResourceLocator.class, iterator.next().getClass());
+    assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(iterator.next().getClass()));
+    assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(iterator.next().getClass()));
+    assertEquals(ServletContextResourceLocatorFactory.class, iterator.next().getClass());
+    assertEquals(ClasspathResourceLocatorFactory.class, iterator.next().getClass());
+    assertEquals(UrlResourceLocatorFactory.class, iterator.next().getClass());
   }
   
   @Test
@@ -119,7 +121,7 @@ public class TestConfigurableLocatorFactory {
     assertEquals(1, locators.size());
     
     final Iterator<ResourceLocatorFactory> iterator = locators.iterator();
-    assertSame(mockResourceLocator, iterator.next());
+    assertSame(mockResourceLocatorFactory, iterator.next());
   }
 
   @Test

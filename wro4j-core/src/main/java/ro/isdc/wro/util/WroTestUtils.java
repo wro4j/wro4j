@@ -89,17 +89,17 @@ public class WroTestUtils {
   private static Reader getReaderFromUri(final String uri)
     throws IOException {
     // wrap reader with bufferedReader for top efficiency
-    return new BufferedReader(new InputStreamReader(createDefaultUriLocatorFactory().locate(uri).getInputStream()));
+    return new BufferedReader(new InputStreamReader(createDefaultUriLocatorFactory().getLocator(uri).getInputStream()));
   }
   
   private static ResourceLocatorFactory createDefaultUriLocatorFactory() {
-    return DefaultResourceLocatorFactory.contextAwareFactory();
+    return new DefaultResourceLocatorFactory();
   }
 
 
   public static InputStream getInputStream(final String uri)
       throws IOException {
-    return createDefaultUriLocatorFactory().locate(uri).getInputStream();
+    return createDefaultUriLocatorFactory().getLocator(uri).getInputStream();
   }
 
   public static void init(final WroModelFactory factory) {

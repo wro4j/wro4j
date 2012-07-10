@@ -15,7 +15,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Test class for {@link DefaultResourceLocatorFactory}.
+ * Test class for {@link AbstractResourceLocatorFactory}.
  *
  * @author Alex Objelean
  */
@@ -23,24 +23,24 @@ public class TestDefaultResourceLocatorFactory {
   private ResourceLocatorFactory factory;
   @Before
   public void setUp() {
-    factory = DefaultResourceLocatorFactory.contextAwareFactory();
+    factory = new DefaultResourceLocatorFactory();
   }
 
   @Test(expected=NullPointerException.class)
   public void testNullUri() throws Exception {
-    factory.locate(null);
+    factory.getLocator(null);
   }
 
   @Test
   public void testInvalidUri() throws Exception {
-    final ResourceLocator locator = factory.locate("http://www.google.com");
+    final ResourceLocator locator = factory.getLocator("http://www.google.com");
     Assert.assertEquals(UrlResourceLocator.class, locator.getClass());
 
   }
 
   @Test
   public void testValidUri() throws Exception {
-    final ResourceLocator locator = factory.locate("classpath:" + WroUtil.toPackageAsFolder(TestDefaultResourceLocatorFactory.class));
+    final ResourceLocator locator = factory.getLocator("classpath:" + WroUtil.toPackageAsFolder(TestDefaultResourceLocatorFactory.class));
     Assert.assertEquals(ClasspathResourceLocator.class, locator.getClass());
   }
 }

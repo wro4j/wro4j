@@ -28,6 +28,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.AbstractResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -95,8 +96,8 @@ public class TestGroupsProcessor {
     final Group group = new Group(groupName).addResource(Resource.create("1.js")).addResource(Resource.create("2.js"));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(group));
     // the locator which returns the name of the resource as its content
-    final ResourceLocatorFactory locatorFactory = new ResourceLocatorFactory() {
-      public ResourceLocator locate(final String uri) {
+    final ResourceLocatorFactory locatorFactory = new AbstractResourceLocatorFactory() {
+      public ResourceLocator getLocator(final String uri) {
         return new AbstractResourceLocator() {
           public InputStream getInputStream()
               throws IOException {

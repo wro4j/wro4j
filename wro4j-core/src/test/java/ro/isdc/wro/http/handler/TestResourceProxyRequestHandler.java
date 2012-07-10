@@ -79,7 +79,7 @@ public class TestResourceProxyRequestHandler {
         mockAuthorizationManager).build();
     injector.inject(victim);
     
-    when(mockUriLocatorFactory.locate(anyString())).thenReturn(mockUriLocator);
+    when(mockUriLocatorFactory.getLocator(anyString())).thenReturn(mockUriLocator);
     when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
     
     packagePath = WroUtil.toPackageAsFolder(this.getClass());

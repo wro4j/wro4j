@@ -55,26 +55,27 @@ public class TestInjectorAwareUriLocatorFactoryDecorator {
     final ResourceLocatorFactory sampleFactory = new SampleUriLocatorFactory().addResourceLocator(locator);
     final ResourceLocatorFactory factory = new InjectorAwareResourceLocatorFactoryDecorator(sampleFactory, injector);
     //trigger injection processing
-    factory.locate("/uri");
+    factory.getLocator("/uri");
     Assert.assertNotNull(locator.processorsFactory);
   }
   
   
-  private static class SampleUriLocatorFactory implements ResourceLocatorFactory {
+  private static class SampleUriLocatorFactory
+      extends AbstractResourceLocatorFactory {
     private ResourceLocator locator;
     @Inject
     ProcessorsFactory processorsFactory;
-    public ResourceLocator locate(String uri) {
+    public ResourceLocator getLocator(final String uri) {
       return locator;
     }
-    public ResourceLocatorFactory addResourceLocator(ResourceLocator locator) {
+    public ResourceLocatorFactory addResourceLocator(final ResourceLocator locator) {
       this.locator = locator;
       return this;
     }
   }
   
   private static class SampleLocator extends ClasspathResourceLocator {
-    public SampleLocator(String path) {
+    public SampleLocator(final String path) {
       super(path);
     }
 

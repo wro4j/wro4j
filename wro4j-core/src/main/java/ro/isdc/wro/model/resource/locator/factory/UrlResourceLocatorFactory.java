@@ -12,11 +12,11 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
  * @since 1.5.0
  */
 public class UrlResourceLocatorFactory
-    implements ResourceLocatorFactory {
+    extends AbstractResourceLocatorFactory {
   /**
    * {@inheritDoc}
    */
-  public ResourceLocator locate(final String uri) {
+  public ResourceLocator getLocator(final String uri) {
     return UrlResourceLocator.isValid(uri) ? new UrlResourceLocator(uri) : null;
   }
 }

@@ -63,7 +63,7 @@ public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
-    final InputStream is = uriLocatorFactory.locate(resourceUri).getInputStream();
+    final InputStream is = uriLocatorFactory.getLocator(resourceUri).getInputStream();
     final OutputStream outputStream = response.getOutputStream();
 
     response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));

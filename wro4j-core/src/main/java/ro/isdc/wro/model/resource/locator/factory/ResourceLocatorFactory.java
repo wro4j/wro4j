@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.locator.factory;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 
 /**
@@ -19,9 +22,19 @@ public interface ResourceLocatorFactory {
    * Based on provided uri, returns a best suited {@link ResourceLocator}.
    * 
    * @param uri
-   *          uri to read.
+   *          of the resource for which {@link ResourceLocator} should be returned..
    * @return a {@link ResourceLocator} implementation for the provided uri or null if there is no locator for handling
    *         provided uri.
    */
-  ResourceLocator locate(final String uri);
+  ResourceLocator getLocator(final String uri);
+  
+  /**
+   * @param uri
+   *          of the resource to locate.
+   * @return the InputStream of the resource
+   * @throws IOException
+   *           if there is no locator capable reading this uri.
+   */
+  InputStream locate(final String uri)
+      throws IOException;
 }

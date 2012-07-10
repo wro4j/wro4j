@@ -30,7 +30,6 @@ import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ServletContextResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
@@ -121,7 +120,7 @@ public class TestConfigurableWroManagerFactory {
     createManager();
     
     Assert.assertEquals(1, uriLocatorFactory.getConfiguredStrategies().size());
-    Assert.assertSame(ServletContextResourceLocator.class,
+    Assert.assertSame(ServletContextResourceLocatorFactory.class,
         uriLocatorFactory.getConfiguredStrategies().iterator().next().getClass());
   }
   

@@ -103,7 +103,7 @@ public class TestWroFilter {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     
-    when(mockUriLocatorFactory.locate(Mockito.anyString())).thenReturn(mockUriLocator);
+    when(mockUriLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockUriLocator);
     when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
     
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);

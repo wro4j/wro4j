@@ -34,22 +34,26 @@ import ro.isdc.wro.util.WroUtil;
 public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
   /**
-   * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent {@link StackOverflowError}.
+   * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent
+   * {@link StackOverflowError}.
+   * 
    * @VisibleForTesting
    */
-  public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName() + ".included_with_dispatcher";
+  public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName()
+      + ".included_with_dispatcher";
+
   /**
    * When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
    * the portal with multiple threads (web requests) that are combined with threads for wro4j.
-   *
-   *
+   * 
    * @return a valid stream for required location. This method will never return a null.
-   * @throws IOException if the stream cannot be located at the specified location.
+   * @throws IOException
+   *           if the stream cannot be located at the specified location.
    */
   public InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
-    final String location)
-    throws IOException {
+      final String location)
+      throws IOException {
     Validate.notNull(request);
     Validate.notNull(response);
     
@@ -62,21 +66,21 @@ public class DispatcherStreamLocator {
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher != null) {
-      // Wrap request
-      final ServletRequest servletRequest = getWrappedServletRequest(request, location);
-      // Wrap response
-      final ServletResponse servletResponse = new RedirectedStreamServletResponseWrapper(os, response);
-      LOG.debug("dispatching request to location: " + location);
-      // use dispatcher
-      dispatcher.include(servletRequest, servletResponse);
-      warnOnEmptyStream = true;
-      // force flushing - the content will be written to
-      // BytArrayOutputStream. Otherwise exactly 32K of data will be
-      // written.
-      servletResponse.getWriter().flush();
-      os.close();
+        // Wrap request
+        final ServletRequest servletRequest = getWrappedServletRequest(request, location);
+        // Wrap response
+        final ServletResponse servletResponse = new RedirectedStreamServletResponseWrapper(os, response);
+        LOG.debug("dispatching request to location: {}", location);
+        // use dispatcher
+        dispatcher.include(servletRequest, servletResponse);
+        warnOnEmptyStream = true;
+        // force flushing - the content will be written to
+        // BytArrayOutputStream. Otherwise exactly 32K of data will be
+        // written.
+        servletResponse.getWriter().flush();
+        os.close();
       }
-      //fallback to external resource locator if the dispatcher is empty
+      // fallback to external resource locator if the dispatcher is empty
       if (os.size() == 0) {
         // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
         // the thread responsible for refreshing resources)
@@ -105,6 +109,7 @@ public class DispatcherStreamLocator {
 
   /**
    * Used to locate external resources. No wildcard handling is required.
+   * 
    * @VisibleForTesting
    */
   ResourceLocator createExternalResourceLocator(final String location) {
@@ -129,19 +134,17 @@ public class DispatcherStreamLocator {
         return getContextPath() + location;
       }
 
-
       @Override
       public String getPathInfo() {
         return WroUtil.getPathInfoFromLocation(this, location);
       }
-
 
       @Override
       public String getServletPath() {
         return WroUtil.getServletPathFromLocation(this, location);
       }
     };
-    //add an attribute to mark this request as included from wro
+    // add an attribute to mark this request as included from wro
     wrappedRequest.setAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER, Boolean.TRUE);
     return wrappedRequest;
   }

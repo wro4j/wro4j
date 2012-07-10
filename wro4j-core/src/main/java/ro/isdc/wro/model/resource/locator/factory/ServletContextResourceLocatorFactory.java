@@ -13,11 +13,11 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
  * @since 1.5.0
  */
 public class ServletContextResourceLocatorFactory
-    implements ResourceLocatorFactory {
+    extends AbstractResourceLocatorFactory {
   /**
    * {@inheritDoc}
    */
-  public ResourceLocator locate(final String uri) {
+  public ResourceLocator getLocator(final String uri) {
     return uri.startsWith(ServletContextResourceLocator.PREFIX) ? newLocator(uri) : null;
   }
 

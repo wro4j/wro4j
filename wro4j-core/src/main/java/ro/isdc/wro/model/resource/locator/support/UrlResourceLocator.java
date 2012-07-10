@@ -1,7 +1,3 @@
-/*
- * Copyright (C) 2011 Betfair.
- * All rights reserved.
- */
 package ro.isdc.wro.model.resource.locator.support;
 
 import java.io.BufferedInputStream;
@@ -14,6 +10,7 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,16 +39,12 @@ public class UrlResourceLocator
    * @throws MalformedURLException if the given URL path is not valid
    */
   public UrlResourceLocator(final String path) {
-    if (path == null) {
-      throw new IllegalArgumentException("path cannot be NULL!");
-    }
+    Validate.notNull(path);
     this.path = path;
   }
 
   public UrlResourceLocator(final URL url) {
-    if (url == null) {
-      throw new IllegalArgumentException("url cannot be NULL!");
-    }
+    Validate.notNull(url);
     this.path = url.toExternalForm();
   }
 
@@ -77,7 +70,7 @@ public class UrlResourceLocator
    */
   public InputStream getInputStream()
       throws IOException {
-    LOG.debug("Reading path: " + path);
+    LOG.debug("Reading path: {}", path);
     if (getWildcardStreamLocator().hasWildcard(path)) {
       final String fullPath = FilenameUtils.getFullPath(path);
       final URL url = new URL(fullPath);

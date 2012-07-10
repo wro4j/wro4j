@@ -15,14 +15,15 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
  * @since 1.5.0
  */
 public class SimpleResourceLocatorFactory
-    implements ResourceLocatorFactory {
+    extends AbstractResourceLocatorFactory {
   private final List<ResourceLocatorFactory> locatorFactories = new ArrayList<ResourceLocatorFactory>();
+
   /**
    * {@inheritDoc}
    */
-  public ResourceLocator locate(final String uri) {
+  public final ResourceLocator getLocator(final String uri) {
     for (ResourceLocatorFactory locatorFactory : locatorFactories) {
-      final ResourceLocator locator = locatorFactory.locate(uri);
+      final ResourceLocator locator = locatorFactory.getLocator(uri);
       if (locator != null) {
         return locator;
       }

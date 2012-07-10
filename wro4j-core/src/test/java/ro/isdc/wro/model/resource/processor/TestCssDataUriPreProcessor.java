@@ -18,6 +18,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.AbstractResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
@@ -76,8 +77,8 @@ public class TestCssDataUriPreProcessor {
    *         proxy resources from classpath. This is useful to make test pass without internet connection.
    */
   private ResourceLocatorFactory createLocatorFactory() {
-    final ResourceLocatorFactory locatorFactory = new ResourceLocatorFactory() {
-      public ResourceLocator locate(final String uri) {
+    final ResourceLocatorFactory locatorFactory = new AbstractResourceLocatorFactory() {
+      public ResourceLocator getLocator(final String uri) {
         return new AbstractResourceLocator() {
           public InputStream getInputStream()
               throws IOException {

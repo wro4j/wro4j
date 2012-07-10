@@ -12,11 +12,11 @@ import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
  * @since 1.5.0
  */
 public class ClasspathResourceLocatorFactory
-    implements ResourceLocatorFactory {
+    extends AbstractResourceLocatorFactory {
   /**
    * {@inheritDoc}
    */
-  public ResourceLocator locate(final String uri) {
+  public ResourceLocator getLocator(final String uri) {
     return uri.startsWith(ClasspathResourceLocator.PREFIX) ? new ClasspathResourceLocator(uri) : null;
   }
 }

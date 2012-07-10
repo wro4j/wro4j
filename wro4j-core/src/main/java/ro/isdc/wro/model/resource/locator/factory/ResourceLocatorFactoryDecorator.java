@@ -1,5 +1,8 @@
 package ro.isdc.wro.model.resource.locator.factory;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.util.AbstractDecorator;
 
@@ -24,7 +27,15 @@ public class ResourceLocatorFactoryDecorator extends AbstractDecorator<ResourceL
   /**
    * {@inheritDoc}
    */
-  public ResourceLocator locate(final String uri) {
+  public ResourceLocator getLocator(final String uri) {
+    return getDecoratedObject().getLocator(uri);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public InputStream locate(final String uri)
+      throws IOException {
     return getDecoratedObject().locate(uri);
   }
 }

@@ -139,14 +139,14 @@ public class TestInjectorBuilder {
   @Test(expected = IOException.class)
   public void shouldInjectEachLocatorProvidedByLocatorFactory()
       throws Exception {
-    final ResourceLocatorFactory resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
+    final ResourceLocatorFactory resourceLocatorFactory = new DefaultResourceLocatorFactory();
     WroManagerFactory managerFactory = new BaseWroManagerFactory().setResourceLocatorFactory(resourceLocatorFactory);
     final Injector injector = InjectorBuilder.create(managerFactory).build();
     
     final Sample sample = new Sample();
     injector.inject(sample);
     // this will throw NullPointerException if the uriLocator is not injected.
-    sample.resourceLocatorFactory.locate("/path/to/servletContext/resource.js").getInputStream();
+    sample.resourceLocatorFactory.getLocator("/path/to/servletContext/resource.js").getInputStream();
   }
   
   @After

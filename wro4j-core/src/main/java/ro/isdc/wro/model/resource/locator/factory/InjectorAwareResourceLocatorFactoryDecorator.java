@@ -1,5 +1,8 @@
 package ro.isdc.wro.model.resource.locator.factory;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.processor.Injector;
@@ -45,17 +48,30 @@ public final class InjectorAwareResourceLocatorFactoryDecorator
     }
   }
 
-  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ResourceLocator getLocator(final String uri) {
+    final ResourceLocator locator = getDecoratedObject().getLocator(uri);
+    if (locator != null) {
+      inject(locator);
+    }
+    return locator;
+  }
   
   /**
    * {@inheritDoc}
    */
   @Override
-  public ResourceLocator locate(final String uri) {
-    final ResourceLocator locator = getDecoratedObject().locate(uri);
-    if (locator != null) {
-      inject(locator);
-    }
-    return locator;
+  public InputStream locate(final String uri)
+      throws IOException {
+    // reuse the logic from AbstractResourceLocatorFactory which ensure that the IOException is thrown if no locator is
+    // found.
+    return new AbstractResourceLocatorFactory() {
+      public ResourceLocator getLocator(final String uri) {
+        return InjectorAwareResourceLocatorFactoryDecorator.this.getLocator(uri);
+      }
+    }.locate(uri);
   }
 }

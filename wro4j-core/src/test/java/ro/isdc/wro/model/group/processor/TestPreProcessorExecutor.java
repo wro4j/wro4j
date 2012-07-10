@@ -38,6 +38,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.AbstractResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -210,7 +211,7 @@ public class TestPreProcessorExecutor {
     genericUseFailingPreProcessorWithIngoreFlag(true);
   }
 
-  private void genericUseFailingPreProcessorWithIngoreFlag(boolean ignoreFlag) throws Exception {
+  private void genericUseFailingPreProcessorWithIngoreFlag(final boolean ignoreFlag) throws Exception {
     Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
     initExecutor(createProcessorWhichFails());
     final Group group = createGroup(Resource.create("", ResourceType.JS));
@@ -293,8 +294,8 @@ public class TestPreProcessorExecutor {
         return new ByteArrayInputStream("".getBytes());
       }
     };
-    final ResourceLocatorFactory locatorFactory = new ResourceLocatorFactory() {
-      public ResourceLocator locate(String uri) {
+    final ResourceLocatorFactory locatorFactory = new AbstractResourceLocatorFactory() {
+      public ResourceLocator getLocator(final String uri) {
         return emptyStreamLocator;
       }
     };

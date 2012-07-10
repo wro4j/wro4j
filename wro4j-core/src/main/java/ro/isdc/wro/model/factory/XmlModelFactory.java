@@ -219,7 +219,7 @@ public class XmlModelFactory
         @Override
         protected ResourceLocator getModelResourceLocator() {
           //TODO handle relative imports
-          return getResourceLocatorFactory().locate(name);
+          return getResourceLocatorFactory().getLocator(name);
         };
       };
       //pass the reference of the uriLocatorFactory to the anonymously created factory.
@@ -380,7 +380,7 @@ public class XmlModelFactory
    */
   public ResourceLocatorFactory getResourceLocatorFactory() {
     if (resourceLocatorFactory == null) {
-      resourceLocatorFactory = DefaultResourceLocatorFactory.contextAwareFactory();
+      resourceLocatorFactory = new DefaultResourceLocatorFactory();
     }
     return this.resourceLocatorFactory;
   }
