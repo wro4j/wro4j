@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -38,8 +37,9 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
    */
   @Override
   protected ContentHashEntry loadValue(final CacheEntry key) {
-    LOG.debug("load value in cache for key: " + key);
+    LOG.debug("load value in cache for key: {}", key);
     final String content = groupsProcessor.process(key);
+    LOG.debug("found content: {}", StringUtils.abbreviate(content, 30));
     return computeCacheValueByContent(content);
   }
 
@@ -58,16 +58,6 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
       return entry;
     } catch (IOException e) {
       throw new RuntimeException("Should never happen", e);
-    }
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void put(final CacheEntry key, final ContentHashEntry value) {
-    if (!Context.get().getConfig().isDisableCache()) {
-      super.put(key, value);
     }
   }
   
