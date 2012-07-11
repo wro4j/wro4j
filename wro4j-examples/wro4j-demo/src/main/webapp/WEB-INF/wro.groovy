@@ -6,7 +6,11 @@ groups {
     font()
     wildcard()
     jar()
+    sass()
   }
+  sass {
+    css("/module/sass/**.scss")
+  }  
   wildcard {
     css("/static/**.css")
     js("/static/js/*.js")
