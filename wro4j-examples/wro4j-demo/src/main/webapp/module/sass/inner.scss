@@ -7,4 +7,11 @@
   -webkit-border-#{$side}-radius: $radius;
 }
 
-#module-sass .inner { @include rounded-top; }
+#module-sass .inner { 
+    @include rounded-top;
+    font-weight: bold; 
+    p {
+       color: black;
+       &:hover { border-bottom: 1px; }
+    }    
+}

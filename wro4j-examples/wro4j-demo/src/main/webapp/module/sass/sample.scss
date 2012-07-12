@@ -1,4 +1,4 @@
-$main-color: #ce4dd6;
+$main-color: blue;
 $style: solid;
 
 #module-sass {
@@ -6,9 +6,6 @@ $style: solid;
     color: $main-color;
     style: $style;
   }
+  background: #efefef;
 }
 
-a {
-  color: $main-color;
-  &:hover { border-bottom: $style 1px; }
-}

@@ -93,7 +93,7 @@ public class TestInjector {
     inner.call();
   }
   
-  @Test(expected = WroRuntimeException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void canInjectContextOutsideOfContextScope()
       throws Exception {
     // remove the context explicitly

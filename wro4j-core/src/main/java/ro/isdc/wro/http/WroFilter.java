@@ -313,17 +313,24 @@ public class WroFilter
       } catch (final Exception e) {
         onException(e, response, chain);
       } finally {
-        // Destroy the cached model after the processing is done if cache flag is disabled
-        if (getConfiguration().isDisableCache()) {
-          LOG.debug("Disable Cache is true. Destroying model...");
-          final WroManager manager = this.wroManagerFactory.create();
-          manager.getModelFactory().destroy();
-          manager.getCacheStrategy().clear();
-        }
+        clearCacheIfRequired();
         Context.unset();
       }
     } else {
       chain.doFilter(request, response);
+    }
+  }
+
+  /**
+   * Clear model & resource cache if the corresponding option is enabled.
+   */
+  private void clearCacheIfRequired() {
+    // check for context presence, since it is possible that the Context is unset before this code is invoked
+    if (Context.isContextSet() && getConfiguration().isDisableCache()) {
+      LOG.debug("Disable Cache is true. Clearing cache...");
+      final WroManager manager = this.wroManagerFactory.create();
+      manager.getModelFactory().destroy();
+      manager.getCacheStrategy().clear();
     }
   }
 

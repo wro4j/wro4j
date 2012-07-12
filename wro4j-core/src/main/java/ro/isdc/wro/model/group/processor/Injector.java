@@ -46,6 +46,7 @@ public final class Injector {
    */
   public void inject(final Object object) {
     Validate.notNull(object);
+    Validate.isTrue(Context.isContextSet(), "Context is not available. Cannot inject outside of request cycle.");
     processInjectAnnotation(object);
   }
 
