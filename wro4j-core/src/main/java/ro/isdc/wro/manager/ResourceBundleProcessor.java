@@ -107,7 +107,7 @@ public class ResourceBundleProcessor {
           IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
           //using getRawContent().length() is not the same and can return 2Bytes smaller size.
-          response.setContentLength(cacheValue.getRawContent().getBytes().length);
+          response.setContentLength(cacheValue.getRawContent().getBytes(configuration.getEncoding()).length);
           IOUtils.write(cacheValue.getRawContent(), os, configuration.getEncoding());
         }
       }
