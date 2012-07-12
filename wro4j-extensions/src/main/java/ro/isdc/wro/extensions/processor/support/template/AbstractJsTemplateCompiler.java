@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mozilla.javascript.ScriptableObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.WroUtil;
@@ -12,12 +14,14 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * A base class for template processors like: dustJS or hoganJS.
- *  
+ * 
  * @author Eivind Barstad Waaler
  * @since 1.4.7
  * @created 11 May 2012
  */
 public abstract class AbstractJsTemplateCompiler {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractJsTemplateCompiler.class);
+
   private ScriptableObject scope;
   
   /**
@@ -32,9 +36,12 @@ public abstract class AbstractJsTemplateCompiler {
   public String compile(final String content, final String optionalArgument) {
     final RhinoScriptBuilder builder = initScriptBuilder();
     final String argStr = createArgStr(optionalArgument) + createArgStr(getArguments());
-    final String compileScript =
-      String.format("%s(%s%s);", getCompileCommand(), WroUtil.toJSMultiLineString(content), argStr);
-    return (String) builder.evaluate(compileScript, getCompileCommand());
+    final String compileCommand = getCompileCommand();
+    final String compileScript = String.format("%s(%s%s);", compileCommand, WroUtil.toJSMultiLineString(content),
+        argStr);
+    LOG.debug("compileCommand: {}", compileCommand);
+    LOG.debug("compileScript: {}", compileScript);
+    return (String) builder.evaluate(compileScript, compileCommand);
   }
 
   /**
@@ -43,13 +50,13 @@ public abstract class AbstractJsTemplateCompiler {
   protected abstract String getCompileCommand();
 
   /**
-   * @return additional arguments for the compiler. 
+   * @return additional arguments for the compiler.
    */
   protected String getArguments() {
     return null;
   }
 
-  private String createArgStr(String argument) {
+  private String createArgStr(final String argument) {
     return StringUtils.isNotBlank(argument) ? ", " + argument : "";
   }
   
