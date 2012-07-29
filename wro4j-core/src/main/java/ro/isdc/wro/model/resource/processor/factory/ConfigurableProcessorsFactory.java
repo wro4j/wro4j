@@ -50,89 +50,105 @@ public class ConfigurableProcessorsFactory
    */
   private Properties properties;
   
-  private final AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> configurablePreProcessors = new AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider>() {
-    @Override
-    protected String getStrategyKey() {
-      return PARAM_PRE_PROCESSORS;
-    }
-    
-    @Override
-    protected void overrideDefaultStrategyMap(final Map<String, ResourceProcessor> map) {
-      copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
-    }
+  private final AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> configurablePreProcessors = createConfigurablePreProcessorsStrategy();
 
-    @Override
-    protected Map<String, ResourceProcessor> getStrategies(final ProcessorProvider provider) {
-      return provider.providePreProcessors();
-    }
-    
-    @Override
-    protected ResourceProcessor getStrategyForAlias(final String alias) {
-      ResourceProcessor processor = super.getStrategyForAlias(alias);
-      if (processor == null) {
-        final String extension = FilenameUtils.getExtension(alias);
-        boolean hasExtension = !StringUtils.isEmpty(extension);
-        if (hasExtension) {
-          final String processorName = FilenameUtils.getBaseName(alias);
-          LOG.debug("processorName: {}", processorName);
-          processor = super.getStrategyForAlias(processorName);
-          if (processor != null) {
-            LOG.debug("adding Extension: {}", extension);
-            processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
+  private final AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> configurablePostProcessors = createConfigurablePostProcessorsStrategy();
+
+
+  /**
+   * @return the {@link AbstractConfigurableMultipleStrategy} responsible for providing postProcessors strategies.
+   */
+  private AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> createConfigurablePostProcessorsStrategy() {
+    return new AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider>() {
+      @Override
+      protected String getStrategyKey() {
+        return PARAM_POST_PROCESSORS;
+      }
+      
+      @Override
+      protected void overrideDefaultStrategyMap(final Map<String, ResourceProcessor> map) {
+        copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
+      }
+      
+      @Override
+      protected Map<String, ResourceProcessor> getStrategies(final ProcessorProvider provider) {
+        return getPostProcessorStrategies(provider);
+      }
+      
+      @Override
+      protected ResourceProcessor getStrategyForAlias(final String alias) {
+        ResourceProcessor processor = super.getStrategyForAlias(alias);
+        if (processor == null) {
+          final String extension = FilenameUtils.getExtension(alias);
+          boolean hasExtension = !StringUtils.isEmpty(extension);
+          if (hasExtension) {
+            final String processorName = FilenameUtils.getBaseName(alias);
+            LOG.debug("processorName: {}", processorName);
+            processor = super.getStrategyForAlias(processorName);
+            if (processor != null) {
+              LOG.debug("adding Extension: {}", extension);
+              processor = ExtensionsAwareProcessorDecorator.decorate(new ProcessorDecorator(processor)).addExtension(
+                  extension);
+            }
           }
         }
+        return processor;
       }
-      return processor;
-    }
-
-    @Override
-    protected Properties newProperties() {
-      return ConfigurableProcessorsFactory.this.getProperties();
+      
+      @Override
+      protected Properties newProperties() {
+        return ConfigurableProcessorsFactory.this.getProperties();
+      }
     };
-  };
+  }
 
-  private final AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> configurablePostProcessors = new AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider>() {
-    @Override
-    protected String getStrategyKey() {
-      return PARAM_POST_PROCESSORS;
-    }
-    
-    @Override
-    protected void overrideDefaultStrategyMap(final Map<String, ResourceProcessor> map) {
-      copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
-    }
-    
-    @Override
-    protected Map<String, ResourceProcessor> getStrategies(final ProcessorProvider provider) {
-      return provider.providePostProcessors();
-    }
-    
-    @Override
-    protected ResourceProcessor getStrategyForAlias(final String alias) {
-      ResourceProcessor processor = super.getStrategyForAlias(alias);
-      if (processor == null) {
-        final String extension = FilenameUtils.getExtension(alias);
-        boolean hasExtension = !StringUtils.isEmpty(extension);
-        if (hasExtension) {
-          final String processorName = FilenameUtils.getBaseName(alias);
-          LOG.debug("processorName: {}", processorName);
-          processor = super.getStrategyForAlias(processorName);
-          if (processor != null) {
-            LOG.debug("adding Extension: {}", extension);
-            processor = ExtensionsAwareProcessorDecorator.decorate(new ProcessorDecorator(processor)).addExtension(
-                extension);
+  /**
+   * @return the {@link AbstractConfigurableMultipleStrategy} responsible for providing preProcessors strategies.
+   */
+  private  AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider> createConfigurablePreProcessorsStrategy() {
+    return new AbstractConfigurableMultipleStrategy<ResourceProcessor, ProcessorProvider>() {
+      @Override
+      protected String getStrategyKey() {
+        return PARAM_PRE_PROCESSORS;
+      }
+      
+      @Override
+      protected void overrideDefaultStrategyMap(final Map<String, ResourceProcessor> map) {
+        copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
+      }
+
+      @Override
+      protected Map<String, ResourceProcessor> getStrategies(final ProcessorProvider provider) {
+        return getPreProcessorStrategies(provider);
+      }
+      
+      @Override
+      protected ResourceProcessor getStrategyForAlias(final String alias) {
+        ResourceProcessor processor = super.getStrategyForAlias(alias);
+        if (processor == null) {
+          final String extension = FilenameUtils.getExtension(alias);
+          boolean hasExtension = !StringUtils.isEmpty(extension);
+          if (hasExtension) {
+            final String processorName = FilenameUtils.getBaseName(alias);
+            LOG.debug("processorName: {}", processorName);
+            processor = super.getStrategyForAlias(processorName);
+            if (processor != null) {
+              LOG.debug("adding Extension: {}", extension);
+              processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
+            }
           }
         }
+        return processor;
       }
-      return processor;
-    }
-    
-    @Override
-    protected Properties newProperties() {
-      return ConfigurableProcessorsFactory.this.getProperties();
-    };
-  };
 
+      @Override
+      protected Properties newProperties() {
+        return ConfigurableProcessorsFactory.this.getProperties();
+      };
+    };
+  }
+
+  
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
    */
@@ -254,5 +270,13 @@ public class ConfigurableProcessorsFactory
    */
   Collection<ResourceProcessor> getAvailablePostProcessors() {
     return configurablePostProcessors.getAvailableStrategies();
+  }
+
+  protected Map<String, ResourceProcessor> getPostProcessorStrategies(final ProcessorProvider provider) {
+    return provider.providePostProcessors();
+  }
+
+  protected Map<String, ResourceProcessor> getPreProcessorStrategies(final ProcessorProvider provider) {
+    return provider.providePreProcessors();
   }
 }

@@ -15,12 +15,13 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
-import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
@@ -42,7 +43,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    *
    * @param map containing locator mappings.
    */
-  protected void contributeLocators(final Map<String, ResourceLocator> map) {
+  protected void contributeLocators(final Map<String, ResourceLocatorFactory> map) {
   }
 
 
@@ -80,6 +81,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         updatePropertiesWithConfiguration(props, ConfigurableLocatorFactory.PARAM_URI_LOCATORS);
         return props;
       }
+      @Override
+      protected Map<String, ResourceLocatorFactory> getStrategies(final LocatorProvider provider) {
+        final Map<String, ResourceLocatorFactory> map = super.getStrategies(provider);
+        contributeLocators(map);
+        return map;
+      }
     };
     return factory;
   }
@@ -97,6 +104,18 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
         updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
+      }
+      @Override
+      protected Map<String, ResourceProcessor> getPostProcessorStrategies(ProcessorProvider provider) {
+        final Map<String, ResourceProcessor> map = super.getPostProcessorStrategies(provider);
+        contributePostProcessors(map);
+        return map;
+      }
+      @Override
+      protected Map<String, ResourceProcessor> getPreProcessorStrategies(ProcessorProvider provider) {
+        final Map<String, ResourceProcessor> map = super.getPreProcessorStrategies(provider);
+        contributePreProcessors(map);
+        return map;
       }
     };
     return factory;
