@@ -35,21 +35,22 @@ public class ResourceSerializer implements JsonSerializer<Resource> {
   }
 
   @Override
-  public JsonElement serialize(Resource resource, Type type, JsonSerializationContext jsonSerializationContext) {
-    JsonObject jsonObject = new JsonObject();
-    String uri = resource.getUri();
+  public JsonElement serialize(final Resource resource, final Type type, final JsonSerializationContext jsonSerializationContext) {
+    final JsonObject jsonObject = new JsonObject();
+    final String uri = resource.getUri();
     jsonObject.add("type", new JsonPrimitive(resource.getType().toString()));
+    jsonObject.add("minimize", new JsonPrimitive(resource.isMinimize()));
     jsonObject.add("uri", new JsonPrimitive(uri));
     jsonObject.add("proxyUri", new JsonPrimitive(getExternalUri(uri)));
     return jsonObject;
   }
 
-  private String getExternalUri(String uri) {
+  private String getExternalUri(final String uri) {
     if(isExternal(uri)) {
       return uri;
     }
 
-    StringBuilder stringBuilder = new StringBuilder();
+    final StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(basePath);
     stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
     stringBuilder.append("?id=");
@@ -57,7 +58,7 @@ public class ResourceSerializer implements JsonSerializer<Resource> {
     return stringBuilder.toString();
   }
 
-  private boolean isExternal(String uri) {
-    return uri.toLowerCase().startsWith("http://");
+  private boolean isExternal(final String uri) {
+    return uri.toLowerCase().startsWith("http://") || uri.toLowerCase().startsWith("https://");
   }
 }

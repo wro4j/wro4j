@@ -5,6 +5,7 @@
       "resources": [
         {
           "type": "JS",
+          "minimize": true,
           "uri": "test.js",
           "proxyUri": "/wro/wroResources?id=test.js"
         }
@@ -14,7 +15,14 @@
       "name": "external",
       "resources": [
         {
+          "type": "JS",
+          "minimize": false,
+          "uri": "https://www.site.com/style.js",
+          "proxyUri": "https://www.site.com/style.js"
+        },
+        {
           "type": "CSS",
+          "minimize": true,
           "uri": "http://www.site.com/style.css",
           "proxyUri": "http://www.site.com/style.css"
         }
