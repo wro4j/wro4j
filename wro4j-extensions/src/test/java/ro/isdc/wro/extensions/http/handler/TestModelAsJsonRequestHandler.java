@@ -1,6 +1,7 @@
 package ro.isdc.wro.extensions.http.handler;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -105,9 +106,7 @@ public class TestModelAsJsonRequestHandler {
   public void shouldGenerateModelAsJson()
       throws Exception {
     victim.handle(mockRequest, mockResponse);
-    String body = outputStream.toString();
-
-    assertThat(body, is(readJsonFile("wroModel_simple.json")));
+    assertEquals(readJsonFile("wroModel_simple.json"), outputStream.toString());
   }
 
   @Test
@@ -135,10 +134,8 @@ public class TestModelAsJsonRequestHandler {
     injector.inject(victim);
 
     victim.handle(mockRequest, mockResponse);
-    String body = outputStream.toString();
 
-    assertThat(body, is(readJsonFile("wroModel_external.json")));
-
+    assertEquals(readJsonFile("wroModel_external.json"), outputStream.toString());
   }
 
   private WroModel createWroModelExternalModelStub() {
@@ -148,10 +145,12 @@ public class TestModelAsJsonRequestHandler {
 
     Group extGroup = new Group("external");
     Resource resource = new Resource();
-    resource.setType(ResourceType.CSS);
-    resource.setUri("http://www.site.com/style.css");
-    resource.setMinimize(true);
+    resource.setType(ResourceType.JS);
+    resource.setUri("https://www.site.com/style.js");
+    resource.setMinimize(false);
+    
     extGroup.addResource(resource);
+    extGroup.addResource(Resource.create("http://www.site.com/style.css"));
     wroGroups.add(extGroup);
 
     wroModel.setGroups(wroGroups);
