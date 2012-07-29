@@ -5,6 +5,7 @@
       "resources": [
         {
           "type": "JS",
+          "minimize": true,
           "uri": "test.js",
           "proxyUri": "/wro/wroResources?id=test.js"
         }
