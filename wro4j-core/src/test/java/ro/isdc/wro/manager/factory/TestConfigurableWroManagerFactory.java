@@ -340,7 +340,7 @@ public class TestConfigurableWroManagerFactory {
   }
 
   @Test
-  public void test() {
+  public void shouldConsiderContributeMethodsWhenManagerFactoryIsExtended() {
     final String alias = "contributed";
     victim = new ConfigurableWroManagerFactory() {
       @Override
@@ -356,7 +356,15 @@ public class TestConfigurableWroManagerFactory {
         map.put(alias, new UrlUriLocator());
       }
     };
-    victim.g
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, alias);
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, alias);
+    configProperties.setProperty(ConfigurableLocatorFactory.PARAM_URI_LOCATORS, alias);
+    victim.setConfigProperties(configProperties);
+    final WroManager manager = victim.create();
+
+    Assert.assertFalse(manager.getProcessorsFactory().getPostProcessors().isEmpty());
+    Assert.assertFalse(manager.getProcessorsFactory().getPreProcessors().isEmpty());
   }
   
   @After
