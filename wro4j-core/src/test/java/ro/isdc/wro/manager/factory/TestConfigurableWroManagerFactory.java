@@ -6,6 +6,7 @@ package ro.isdc.wro.manager.factory;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
@@ -30,6 +31,7 @@ import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
@@ -89,11 +91,6 @@ public class TestConfigurableWroManagerFactory {
     final WroManager manager = victim.create();
     processorsFactory = manager.getProcessorsFactory();
     uriLocatorFactory = (ConfigurableLocatorFactory) AbstractDecorator.getOriginalDecoratedObject(manager.getUriLocatorFactory());
-  }
-  
-  @After
-  public void tearDown() {
-    Context.unset();
   }
   
   /**
@@ -340,5 +337,38 @@ public class TestConfigurableWroManagerFactory {
     victim.setConfigProperties(configProperties);
     final HashStrategy actual = ((ConfigurableHashStrategy) victim.create().getHashStrategy()).getConfiguredStrategy();
     Assert.assertEquals(MD5HashStrategy.class, actual.getClass());
+  }
+
+  @Test
+  public void shouldConsiderContributeMethodsWhenManagerFactoryIsExtended() {
+    final String alias = "contributed";
+    victim = new ConfigurableWroManagerFactory() {
+      @Override
+      protected void contributePreProcessors(Map<String, ResourcePreProcessor> map) {
+        map.put(alias, new JSMinProcessor());
+      }
+      @Override
+      protected void contributePostProcessors(Map<String, ResourcePostProcessor> map) {
+        map.put(alias, new JSMinProcessor());
+      }
+      @Override
+      protected void contributeLocators(Map<String, UriLocator> map) {
+        map.put(alias, new UrlUriLocator());
+      }
+    };
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, alias);
+    configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, alias);
+    configProperties.setProperty(ConfigurableLocatorFactory.PARAM_URI_LOCATORS, alias);
+    victim.setConfigProperties(configProperties);
+    final WroManager manager = victim.create();
+
+    Assert.assertFalse(manager.getProcessorsFactory().getPostProcessors().isEmpty());
+    Assert.assertFalse(manager.getProcessorsFactory().getPreProcessors().isEmpty());
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 }
