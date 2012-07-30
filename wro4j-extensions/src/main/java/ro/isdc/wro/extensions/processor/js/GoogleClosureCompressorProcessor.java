@@ -14,6 +14,7 @@ import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
@@ -21,6 +22,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.ClosureCodingConvention;
@@ -54,6 +56,8 @@ public class GoogleClosureCompressorProcessor
   private WroConfiguration config;
   private String encoding;
 
+  private ObjectPoolHelper<Compiler> enginePool;
+
   /**
    * Uses google closure compiler with default compilation level: {@link CompilationLevel#SIMPLE_OPTIMIZATIONS}
    */
@@ -70,6 +74,12 @@ public class GoogleClosureCompressorProcessor
   public GoogleClosureCompressorProcessor(final CompilationLevel compilationLevel) {
     Validate.notNull(compilationLevel);
     this.compilationLevel = compilationLevel;
+    enginePool = new ObjectPoolHelper<Compiler>(new ObjectFactory<Compiler>() {
+      @Override
+      public Compiler create() {
+        return createCompiler();
+      }
+    });
   }
 
   /**
@@ -79,45 +89,56 @@ public class GoogleClosureCompressorProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
+    final Compiler compiler = enginePool.getObject();
     try {
-      Compiler.setLoggingLevel(Level.SEVERE);
-      final Compiler compiler = new Compiler();
-      if (compilerOptions == null) {
-        compilerOptions = newCompilerOptions();
-      }
-
-      final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
-      final JSSourceFile[] input = new JSSourceFile[] {
-        JSSourceFile.fromInputStream(fileName,
-        new ByteArrayInputStream(content.getBytes(getEncoding())))
-      };
-      JSSourceFile[] externs = getExterns(resource);
-      if (externs == null) {
-        //fallback to empty array when null is provided.
-        externs = new JSSourceFile[] {};
-      }
-      Result result = null;
-      /**
-       * fix the threadSafety issue.<br/>
-       * TODO remove synchronization after the <a
-       * href="http://code.google.com/p/closure-compiler/issues/detail?id=781">issue</a> is fixed
-       */
-      synchronized (this) {
-        compilationLevel.setOptionsForCompilationLevel(compilerOptions);
-        // make it play nice with GAE
-        compiler.disableThreads();
-        compiler.initOptions(compilerOptions);
-        result = compiler.compile(externs, input, compilerOptions);
-      }
-      if (result.success) {
-        writer.write(compiler.toSource());
-      } else {
-        writer.write(content);
+      synchronized (compiler) {
+        final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
+        final JSSourceFile[] input = new JSSourceFile[] {
+          JSSourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
+        };
+        Result result = compiler.compile(computeExterns(resource), input, newCompilerOptions());
+        
+        if (result.success) {
+          writer.write(compiler.toSource());
+        } else {
+          writer.write(content);
+        }
       }
     } finally {
+      enginePool.returnObject(compiler);
       reader.close();
       writer.close();
     }
+  }
+
+
+  private JSSourceFile[] computeExterns(final Resource resource) {
+    JSSourceFile[] externs = getExterns(resource);
+    if (externs == null) {
+      //fallback to empty array when null is provided.
+      externs = new JSSourceFile[] {};
+    }
+    return externs;
+  }
+
+  private Compiler createCompiler() {
+    Compiler.setLoggingLevel(Level.SEVERE);
+    if (true || compilerOptions == null) {
+      compilerOptions = newCompilerOptions();
+    }
+    final Compiler compiler = new Compiler();
+    /**
+     * fix the threadSafety issue.<br/>
+     * TODO remove synchronization after the <a
+     * href="http://code.google.com/p/closure-compiler/issues/detail?id=781">issue</a> is fixed
+     */
+    synchronized (this) {
+      compilationLevel.setOptionsForCompilationLevel(compilerOptions);
+      // make it play nice with GAE
+      compiler.disableThreads();
+      compiler.initOptions(compilerOptions);
+    }
+    return compiler;
   }
 
   private String getEncoding() {
