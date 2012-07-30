@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
@@ -29,13 +30,14 @@ import com.google.javascript.jscomp.JSSourceFile;
 
 /**
  * Test google closure js processor.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor {
   private File testFolder;
   private GoogleClosureCompressorProcessor processor;
+
   @Before
   public void setUp() {
     testFolder = new File(ClassLoader.getSystemResource("test").getFile());
@@ -65,7 +67,8 @@ public class TestGoogleClosureCompressorProcessor {
     final URL url = getClass().getResource("google");
 
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", (ResourcePreProcessor) processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+        (ResourcePreProcessor) processor);
   }
 
   @Test
@@ -75,7 +78,8 @@ public class TestGoogleClosureCompressorProcessor {
     final URL url = getClass().getResource("google");
 
     final File expectedFolder = new File(url.getFile(), "expectedSimple");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", ( ResourcePreProcessor) processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
+        (ResourcePreProcessor) processor);
   }
 
   @Test
@@ -86,7 +90,7 @@ public class TestGoogleClosureCompressorProcessor {
 
     final File expectedFolder = new File(url.getFile(), "expectedAdvanced");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      (ResourcePreProcessor)processor);
+        (ResourcePreProcessor) processor);
   }
 
   @Test
@@ -120,10 +124,22 @@ public class TestGoogleClosureCompressorProcessor {
 
     final StringWriter sw = new StringWriter();
     processor.process(new StringReader("alert(1);"), sw);
-    //will leave result unchanged, because the processing is not successful.
+    // will leave result unchanged, because the processing is not successful.
     Assert.assertEquals("alert(1);", sw.toString());
   }
   
+  @Test
+  public void shouldBeThreadSafe()
+      throws Exception {
+    WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
+      public Void call()
+          throws Exception {
+        processor.process(new StringReader("alert(1);"), new StringWriter());
+        return null;
+      }
+    });
+  }
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
