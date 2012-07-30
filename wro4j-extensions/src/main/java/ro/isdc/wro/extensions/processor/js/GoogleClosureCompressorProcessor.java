@@ -30,7 +30,6 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
-import com.google.javascript.jscomp.ThreadSafeComposeWarningsGuard;
 
 
 /**
@@ -86,11 +85,6 @@ public class GoogleClosureCompressorProcessor
       if (compilerOptions == null) {
         compilerOptions = newCompilerOptions();
       }
-      compilerOptions.setWarningsGuard(new ThreadSafeComposeWarningsGuard());
-      compilationLevel.setOptionsForCompilationLevel(compilerOptions);
-      //make it play nice with GAE
-      compiler.disableThreads();
-      compiler.initOptions(compilerOptions);
 
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
       final JSSourceFile[] input = new JSSourceFile[] {
@@ -102,7 +96,19 @@ public class GoogleClosureCompressorProcessor
         //fallback to empty array when null is provided.
         externs = new JSSourceFile[] {};
       }
-      final Result result = compiler.compile(externs, input, compilerOptions);
+      Result result = null;
+      /**
+       * fix the threadSafety issue.<br/>
+       * TODO remove synchronization after the <a
+       * href="http://code.google.com/p/closure-compiler/issues/detail?id=781">issue</a> is fixed
+       */
+      synchronized (this) {
+        compilationLevel.setOptionsForCompilationLevel(compilerOptions);
+        // make it play nice with GAE
+        compiler.disableThreads();
+        compiler.initOptions(compilerOptions);
+        result = compiler.compile(externs, input, compilerOptions);
+      }
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
