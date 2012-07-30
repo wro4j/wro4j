@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
@@ -99,7 +100,7 @@ public class TestGoogleClosureCompressorProcessor {
     final StringWriter sw = new StringWriter();
     WroTestUtils.createInjector().inject(processor);
 
-    processor.process(new StringReader("function test( ) {}"), sw);
+    processor.process(null, new StringReader("function test( ) {}"), sw);
     Assert.assertEquals("", sw.toString());
   }
 
@@ -117,11 +118,23 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(processor);
 
     final StringWriter sw = new StringWriter();
-    processor.process(new StringReader("alert(1);"), sw);
+    processor.process(null, new StringReader("alert(1);"), sw);
     //will leave result unchanged, because the processing is not successful.
     Assert.assertEquals("alert(1);", sw.toString());
   }
   
+  @Test
+  public void shouldBeThreadSafe()
+      throws Exception {
+    WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
+      public Void call()
+          throws Exception {
+        processor.process(null, new StringReader("alert(1);"), new StringWriter());
+        return null;
+      }
+    });
+  }
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
