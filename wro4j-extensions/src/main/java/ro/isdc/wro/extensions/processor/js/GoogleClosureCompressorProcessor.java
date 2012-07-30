@@ -22,12 +22,10 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
-import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.ClosureCodingConvention;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
 
@@ -177,8 +175,8 @@ public class GoogleClosureCompressorProcessor
     //use the wro4j encoding by default
     options.setOutputCharset(getEncoding());
     //set it to warning, otherwise compiler will fail
-    options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES,
-      CheckLevel.WARNING);
+    // options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES,
+    // CheckLevel.WARNING);
     return options;
   }
 
