@@ -30,6 +30,7 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.ThreadSafeComposeWarningsGuard;
 
 
 /**
@@ -75,6 +76,7 @@ public class GoogleClosureCompressorProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
@@ -84,6 +86,7 @@ public class GoogleClosureCompressorProcessor
       if (compilerOptions == null) {
         compilerOptions = newCompilerOptions();
       }
+      compilerOptions.setWarningsGuard(new ThreadSafeComposeWarningsGuard());
       compilationLevel.setOptionsForCompilationLevel(compilerOptions);
       //make it play nice with GAE
       compiler.disableThreads();
@@ -176,6 +179,7 @@ public class GoogleClosureCompressorProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     process(null, reader, writer);
