@@ -239,15 +239,7 @@ public class WroFilter
    * Initialize header values.
    */
   private void initHeaderValues() {
-    // put defaults
-    if (!wroConfiguration.isDebug()) {
-      final Long timestamp = new Date().getTime();
-      final Calendar cal = Calendar.getInstance();
-      cal.roll(Calendar.YEAR, 1);
-      headersMap.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-      headersMap.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
-      headersMap.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
-    }
+    configureDefaultHeaders(headersMap);
     final String headerParam = wroConfiguration.getHeader();
     if (!StringUtils.isEmpty(headerParam)) {
       try {
@@ -267,6 +259,24 @@ public class WroFilter
       }
     }
     LOG.debug("Header Values: {}", headersMap);
+  }
+
+  /**
+   * Allow configuration of default headers. This is useful when you need to set custom expires headers.
+   * 
+   * @param map
+   *          the {@link Map} where key represents the header name, and value - header value.
+   */
+  protected void configureDefaultHeaders(final Map<String, String> map) {
+    // put defaults
+    if (!wroConfiguration.isDebug()) {
+      final Long timestamp = new Date().getTime();
+      final Calendar cal = Calendar.getInstance();
+      cal.roll(Calendar.YEAR, 1);
+      map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
+      map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
+      map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+    }
   }
 
   /**
