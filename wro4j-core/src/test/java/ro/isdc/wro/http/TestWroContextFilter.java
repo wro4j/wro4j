@@ -3,6 +3,14 @@
  */
 package ro.isdc.wro.http;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -19,6 +27,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 
 
 /**
@@ -39,29 +49,54 @@ public class TestWroContextFilter {
   private HttpServletResponse mockResponse;
   @Mock
   private FilterChain mockFilterChain;
+  @Mock
+  private ServletContextAttributeHelper mockServletContextAttributeHelper;
 
   @Before
   public void setUp()
     throws Exception {
     MockitoAnnotations.initMocks(this);
-    victim = new WroContextFilter();
-    Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    victim = new WroContextFilter() {
+      @Override
+      ServletContextAttributeHelper getServletContextAttributeHelper() {
+        return mockServletContextAttributeHelper;
+      }
+    };
+    when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     victim.init(mockFilterConfig);
   }
 
   @Test
   public void shouldInitializeContextForChainedFilters() throws Exception {
-    Mockito.doAnswer(new Answer<Void>() {
+    doAnswer(new Answer<Void>() {
       public Void answer(InvocationOnMock invocation)
           throws Throwable {
-        Assert.assertTrue(Context.isContextSet());
+        assertTrue(Context.isContextSet());
         return null;
       }
     }).when(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
-    Mockito.verify(mockFilterChain, Mockito.times(1)).doFilter(Mockito.any(HttpServletRequest.class),
+    verify(mockFilterChain, times(1)).doFilter(Mockito.any(HttpServletRequest.class),
         Mockito.any(HttpServletResponse.class));
     //After chain processing, the context must be unset
-    Assert.assertFalse(Context.isContextSet());
+    assertFalse(Context.isContextSet());
+  }
+  
+  @Test
+  public void shouldUseWroConfigurationFoundInServletContext() throws Exception {
+    final WroConfiguration config = new WroConfiguration();
+    config.setCacheUpdatePeriod(1000);
+    
+    when(mockServletContextAttributeHelper.getWroConfiguration()).thenReturn(config);
+    doAnswer(new Answer<Void>() {
+      public Void answer(InvocationOnMock invocation)
+          throws Throwable {
+        assertSame(config, Context.get().getConfig());
+        return null;
+      }
+    }).when(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
+    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    verify(mockFilterChain, Mockito.times(1)).doFilter(Mockito.any(HttpServletRequest.class),
+        Mockito.any(HttpServletResponse.class));
   }
 }
