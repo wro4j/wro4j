@@ -100,12 +100,6 @@ public class ConfigurableWroFilter
   @Override
   protected WroManagerFactory newWroManagerFactory() {
     return new ConfigurableWroManagerFactory().setConfigProperties(properties);
-    // return new BaseWroManagerFactory() {
-    // @Override
-    // protected ProcessorsFactory newProcessorsFactory() {
-    // return new ConfigurableProcessorsFactory().setProperties(properties);
-    // }
-    // };
   }
 
   /**
