@@ -1,7 +1,10 @@
 package ro.isdc.wro.extensions.processor.js;
 
+import org.apache.commons.io.FilenameUtils;
+
 import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 
@@ -24,5 +27,11 @@ public class HandlebarsJsProcessor
   @Override
   protected AbstractJsTemplateCompiler createCompiler() {
     return new HandlebarsJs();
+  }
+
+  @Override
+  protected String getArgument(Resource resource) {
+    final String name = resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
+    return String.format("'%s'", name);
   }
 }
