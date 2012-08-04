@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * This class is not thread-safe.<br/>
- * The underlying implementation use the less.js version <code>1.3.0</code> project: {@link https
+ * The underlying implementation use patched less.js from version <code>1.3.0</code> project: {@link https
  * ://github.com/cloudhead/less.js}.
  * 
  * @author Alex Objelean
