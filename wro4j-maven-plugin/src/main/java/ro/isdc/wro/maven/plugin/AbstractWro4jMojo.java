@@ -15,6 +15,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
@@ -83,7 +84,13 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * @optional
    */
   private File extraConfigFile;
-
+  /**
+   * Responsible for identifying the resources changed during incremental build.
+   * 
+   * @component
+   */
+  //http://wiki.eclipse.org/M2E_compatible_maven_plugins#BuildContext
+  private BuildContext buildContext;
 
   /**
    * {@inheritDoc}
@@ -99,7 +106,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
     getLog().debug("wroManagerFactory: " + this.wroManagerFactory);
     getLog().debug("extraConfig: " + extraConfigFile);
-
 
     extendPluginClasspath();
     Context.set(Context.standaloneContext());
@@ -317,7 +323,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return this.ignoreMissingResources;
   }
 
-
   /**
    * Used for testing.
    *
@@ -327,14 +332,12 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.mavenProject = mavenProject;
   }
 
-
   /**
    * @return the targetGroups
    */
   public String getTargetGroups() {
     return this.targetGroups;
   }
-
 
   /**
    * @param versionEncoder(targetGroups) comma separated group names.
@@ -343,7 +346,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.targetGroups = targetGroups;
   }
 
-
   /**
    * @param wroManagerFactory to set
    */
@@ -351,12 +353,10 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.wroManagerFactory = wroManagerFactory;
   }
 
-
   /**
    * @param extraConfigFile the extraConfigFile to set
    */
   public void setExtraConfigFile(final File extraConfigFile) {
     this.extraConfigFile = extraConfigFile;
   }
-
 }
