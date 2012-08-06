@@ -33,6 +33,11 @@ public enum ConfigConstants {
    */
   modelUpdatePeriod,
   /**
+   * Parameter containing an integer value for specifying how often (in seconds) to run a thread responsible for
+   * checking resource changes. When a change is detected, the cache for that particular group is invalidated.
+   */
+  resourceWatcherUpdatePeriod,
+  /**
    * Disable cache configuration option. When true, the processed content won't be cached in DEVELOPMENT mode. In
    * DEPLOYMENT mode changing this flag will have no effect.
    */

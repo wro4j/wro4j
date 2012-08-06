@@ -39,6 +39,7 @@ public class TestPropertyWroConfigurationFactory {
     Assert.assertNotNull(config);
     Assert.assertEquals(0, config.getModelUpdatePeriod());
     Assert.assertEquals(0, config.getCacheUpdatePeriod());
+    Assert.assertEquals(0, config.getResourceWatcherUpdatePeriod());
     Assert.assertEquals(true, config.isDebug());
     Assert.assertEquals(false, config.isDisableCache());
     Assert.assertEquals(true, config.isGzipEnabled());
@@ -69,6 +70,7 @@ public class TestPropertyWroConfigurationFactory {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
     props.setProperty(ConfigConstants.modelUpdatePeriod.name(), "20");
+    props.setProperty(ConfigConstants.resourceWatcherUpdatePeriod.name(), "30");
     props.setProperty(ConfigConstants.disableCache.name(), "true");
     props.setProperty(ConfigConstants.gzipResources.name(), "false");
     props.setProperty(ConfigConstants.cacheGzippedContent.name(), "true");
@@ -83,6 +85,7 @@ public class TestPropertyWroConfigurationFactory {
     LOG.debug("config: {}", config);
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(20, config.getModelUpdatePeriod());
+    Assert.assertEquals(30, config.getResourceWatcherUpdatePeriod());
     Assert.assertEquals(true, config.isDisableCache());
     Assert.assertEquals(false, config.isGzipEnabled());
     Assert.assertEquals(true, config.isCacheGzippedContent());
