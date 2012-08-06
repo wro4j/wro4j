@@ -64,16 +64,20 @@ public class ResourceWatcherRunnable
    */
   public void run() {
     LOG.debug("Checking for resource changes...");
-    final Collection<Group> groups = modelFactory.create().getGroups();
-    // TODO run the check in parallel?
-    for (final Group group : groups) {
-      checkForChanges(group);
+    try {
+      final Collection<Group> groups = modelFactory.create().getGroups();
+      // TODO run the check in parallel?
+      for (final Group group : groups) {
+        checkForChanges(group);
+      }
+      // cleanUp
+      for (Entry<String, String> entry : currentMap.entrySet()) {
+        lastMap.put(entry.getKey(), entry.getValue());
+      }
+      currentMap.clear();
+    } catch (Exception e) {
+      LOG.error("Exception while checking for resource changes", e);
     }
-    // cleanUp
-    for (Entry<String, String> entry : currentMap.entrySet()) {
-      lastMap.put(entry.getKey(), entry.getValue());
-    }
-    currentMap.clear();
   }
   
   private void checkForChanges(final Group group) {
@@ -81,6 +85,8 @@ public class ResourceWatcherRunnable
     for (Resource resource : resources) {
       if (isChanged(resource)) {
         invalidate(group, resource);
+        // no need to check the rest of resources
+        break;
       }
     }
   }
@@ -100,10 +106,12 @@ public class ResourceWatcherRunnable
       final String lastHash = lastMap.get(uri);
       return lastHash != null ? !lastHash.equals(currentHash) : false;
     } catch (IOException e) {
+      LOG.debug("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
+          e.getMessage());
       return false;
     }
   }
-
+  
   /**
    * @param uri
    *          of the resource to get the hash for.

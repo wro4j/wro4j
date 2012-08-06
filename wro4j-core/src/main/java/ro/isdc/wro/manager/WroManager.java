@@ -129,7 +129,7 @@ public class WroManager
     // reschedule cache & model updates
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
-    resourceWatcherSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+    resourceWatcherSchedulerHelper.scheduleWithPeriod(config.getResourceWatcherUpdatePeriod());
     // Inject
     injector.inject(getResourceBundleProcessor());
     getResourceBundleProcessor().serveProcessedBundle();
