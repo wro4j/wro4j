@@ -5,3 +5,7 @@ $background_infos_color: #BC2342;
 $page_effective_width: 1200px;
 $column_count: 8;
 $column_width: $page_effective_width / $column_count;
+
+body {
+ width: $page_effective_width;
+}
