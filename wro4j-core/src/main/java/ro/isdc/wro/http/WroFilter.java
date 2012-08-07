@@ -320,20 +320,27 @@ public class WroFilter
           processRequest(request, response);
           onRequestProcessed();
         }
+        onProcessComplete();
       } catch (final Exception e) {
         onException(e, response, chain);
       } finally {
-        // Destroy the cached model after the processing is done if cache flag is disabled
-        if (getConfiguration().isDisableCache()) {
-          LOG.debug("Disable Cache is true. Destroying model...");
-          final WroManager manager = this.wroManagerFactory.create();
-          manager.getModelFactory().destroy();
-          manager.getCacheStrategy().clear();
-        }
         Context.unset();
       }
     } else {
       chain.doFilter(request, response);
+    }
+  }
+
+  /**
+   * clear the cache if the {@link WroConfiguration#isDisableCache()} flag is set to true.
+   */
+  private void onProcessComplete() {
+    // Destroy the cached model after the processing is done if cache flag is disabled
+    if (wroConfiguration.isDisableCache()) {
+      LOG.debug("Disable Cache is true. Destroying model...");
+      final WroManager manager = this.wroManagerFactory.create();
+      manager.getModelFactory().destroy();
+      manager.getCacheStrategy().clear();
     }
   }
 
@@ -374,9 +381,7 @@ public class WroFilter
       throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager
-    final WroManager manager = wroManagerFactory.create();
-    // getInjector().inject(manager);
-    manager.process();
+    wroManagerFactory.create().process();
   }
 
   /**
