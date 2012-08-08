@@ -346,12 +346,17 @@ public class WroTestUtils {
             } catch (final IllegalArgumentException e) {
               LOG.warn("unkown resource type for file: {}, assuming resource type is: {}", file.getPath(), resourceType);
             }
-            preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
+            try {
+              preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
+            } catch (IOException e) {
+              LOG.error("processing failed...", e);
+              throw new WroRuntimeException("Processing failed...", e);
+            }
           }
         });
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause());
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause(), e);
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }
