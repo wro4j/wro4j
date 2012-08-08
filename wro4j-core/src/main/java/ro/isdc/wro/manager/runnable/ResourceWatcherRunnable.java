@@ -22,6 +22,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -61,7 +62,9 @@ public class ResourceWatcherRunnable
    * {@inheritDoc}
    */
   public void run() {
-    LOG.debug("Checking for resource changes...");
+    LOG.info("Checking for resource changes...");
+    StopWatch watch = new StopWatch();
+    watch.start("detect changes");
     try {
       final Collection<Group> groups = modelFactory.create().getGroups();
       // TODO run the check in parallel?
@@ -75,10 +78,14 @@ public class ResourceWatcherRunnable
       currentMap.clear();
     } catch (Exception e) {
       LOG.error("Exception while checking for resource changes", e);
+    } finally {
+      watch.stop();
+      LOG.info("resource watcher info: {}", watch.prettyPrint());
     }
   }
   
   private void checkForChanges(final Group group) {
+    LOG.debug("Checking if group {} is changed..", group);
     List<Resource> resources = group.getResources();
     for (Resource resource : resources) {
       if (isChanged(resource)) {
@@ -98,6 +105,7 @@ public class ResourceWatcherRunnable
    * @return true if the resource was changed.
    */
   private boolean isChanged(final Resource resource) {
+    LOG.info("Checking if resource {} is changed..", resource);
     try {
       final String uri = resource.getUri();
       String currentHash = getCurrentHash(uri);
@@ -106,7 +114,6 @@ public class ResourceWatcherRunnable
     } catch (IOException e) {
       LOG.error("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
-      LOG.error("Exception", e);
       return false;
     }
   }
@@ -136,7 +143,7 @@ public class ResourceWatcherRunnable
    *          the {@link ResourceType} of the obsolete resource required to remove the exact entry from the cache.
    */
   private void invalidate(final Group group, final Resource resource) {
-    LOG.debug("Detected change for {} resource. Invalidating group: {}", resource, group);
+    LOG.info("Detected change for {} resource. Invalidating group: {}", resource, group);
     // Invalidate the entry by putting NULL into the cache
     CacheEntry key = new CacheEntry(group.getName(), resource.getType(), true);
     cacheStrategy.put(key, null);

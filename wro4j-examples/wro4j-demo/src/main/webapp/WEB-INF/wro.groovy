@@ -1,4 +1,9 @@
 groups {
+
+  dynamic {
+    js("/resource/dynamic.js")
+  }
+  /*
   testPage {
     modules()
   }
@@ -95,9 +100,6 @@ groups {
     js("/external/any.js")
   }
   
-  dynamic {
-    js("/resource/dynamic.js")
-  }
   
   jar {
     css("classpath:com/app/**.css")
@@ -112,5 +114,5 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
- /* */
+  */
 }

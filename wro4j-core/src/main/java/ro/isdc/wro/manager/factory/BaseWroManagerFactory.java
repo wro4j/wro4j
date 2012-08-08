@@ -61,7 +61,7 @@ public class BaseWroManagerFactory
   /**
    * Handles the lazy synchronized creation of the manager
    */
-  private DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
+  private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
     @Override
     protected WroManager initialize() {
       final WroManager manager = new WroManager();

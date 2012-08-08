@@ -17,6 +17,7 @@ import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.http.support.FieldsSavingRequestWrapper;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -113,13 +114,19 @@ public class WroManager
       @Override
       protected Runnable initialize() {
         final Context context = Context.get();
+        final Context newContext = Context.webContext(new FieldsSavingRequestWrapper(context.getRequest()),
+            context.getResponse(), context.getFilterConfig());
         return new ResourceWatcherRunnable(injector) {
           @Override
           public void run() {
-            // Keep the context for this thread and never unset it
-            Context.set(context);
-            super.run();
-            // TODO find a way to destroy the context
+            try {
+              // Keep the context for this thread and never unset it
+              Context.set(newContext);
+              super.run();
+              // TODO find a way to destroy the context
+            } catch (Exception e) {
+              LOG.error("Exception occured", e);
+            }
           }
         };
       }

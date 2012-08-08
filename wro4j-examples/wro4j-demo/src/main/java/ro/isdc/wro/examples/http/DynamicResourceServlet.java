@@ -6,7 +6,6 @@ package ro.isdc.wro.examples.http;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,7 +28,8 @@ public class DynamicResourceServlet
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException {
     resp.setContentType("text/javascript");
-    final String result = "document.write('<h1>b" + dateFormat.format(new Date()) + "</h1>');";
+    // final String result = "document.write('<h1>c" + dateFormat.format(new Date()) + "</h1>');";
+    final String result = "a";
     resp.getWriter().write(result);
   }
 }
