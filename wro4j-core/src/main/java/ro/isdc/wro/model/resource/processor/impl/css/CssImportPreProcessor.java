@@ -61,7 +61,8 @@ public class CssImportPreProcessor
    */
   private final List<Resource> processed = new ArrayList<Resource>();
   private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
-
+  private static final String REGEX_IMPORT_FROM_COMMENTS = WroUtil.loadRegexpWithKey("cssImportFromComments");
+  
   /**
    * {@inheritDoc}
    */
@@ -87,7 +88,6 @@ public class CssImportPreProcessor
     Validate.notNull(resourceLocatorFactory, "No ResourceLocator was injected");
     Validate.notNull(preProcessorExecutor, "No preProcessorExecutor was injected");
   }
-
 
   /**
    * @param resource {@link Resource} to process.
@@ -148,6 +148,8 @@ public class CssImportPreProcessor
         throw e;
       }
     }
+    //remove imports from comments before parse the file
+    css = css.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
       final Resource importedResource = buildImportedResource(resource, m.group(1));
