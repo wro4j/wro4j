@@ -14,10 +14,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.http.support.FieldsSavingRequestWrapper;
+import ro.isdc.wro.config.support.InheritableContextRunnable;
+import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -113,22 +112,7 @@ public class WroManager
     resourceWatcherSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        final Context context = Context.get();
-        final Context newContext = Context.webContext(new FieldsSavingRequestWrapper(context.getRequest()),
-            context.getResponse(), context.getFilterConfig());
-        return new ResourceWatcherRunnable(injector) {
-          @Override
-          public void run() {
-            try {
-              // Keep the context for this thread and never unset it
-              Context.set(newContext);
-              super.run();
-              // TODO find a way to destroy the context
-            } catch (Exception e) {
-              LOG.error("Exception occured", e);
-            }
-          }
-        };
+        return new InheritableContextRunnable(new ResourceWatcherRunnable(injector));
       }
     }, ReloadModelRunnable.class.getSimpleName());
     resourceBundleProcessor = new ResourceBundleProcessor();

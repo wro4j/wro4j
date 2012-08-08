@@ -150,5 +150,4 @@ public class ResourceWatcherRunnable
     key = new CacheEntry(group.getName(), resource.getType(), false);
     cacheStrategy.put(key, null);
   }
-  
 }

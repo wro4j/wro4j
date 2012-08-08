@@ -376,6 +376,25 @@ public class WroTestUtils {
       future.get();
     }
   }
+  
+  /**
+   * Runs a task concurrently. Allows to test thread-safe behavior.
+   * 
+   * @param task
+   *          a {@link Runnable} to run concurrently.
+   * @throws Exception
+   *           if any of the executed tasks fails.
+   */
+  public static void runConcurrently(final Runnable task, final int times)
+      throws Exception {
+    runConcurrently(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        task.run();
+        return null;
+      }
+    }, times);
+  }
 
   /**
    * Run the task concurrently 50 times.
