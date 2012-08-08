@@ -67,7 +67,7 @@ public class DispatcherStreamLocator {
         final ServletRequest servletRequest = getWrappedServletRequest(request, location);
         // Wrap response
         final ServletResponse servletResponse = new RedirectedStreamServletResponseWrapper(os, response);
-        LOG.debug("dispatching request to location: " + location);
+        LOG.debug("dispatching request to location: {}", location);
         // use dispatcher
         dispatcher.include(servletRequest, servletResponse);
         warnOnEmptyStream = true;

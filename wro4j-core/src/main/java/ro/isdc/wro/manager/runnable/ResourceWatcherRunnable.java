@@ -1,22 +1,23 @@
 package ro.isdc.wro.manager.runnable;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -34,11 +35,14 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 public class ResourceWatcherRunnable
     implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcherRunnable.class);
-  private final WeakReference<WroManager> wroManagerReference;
-  private final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  private final WroModelFactory modelFactory;
-  private final UriLocatorFactory locatorFactory;
-  private final HashStrategy hashStrategy;
+  @Inject
+  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  @Inject
+  private WroModelFactory modelFactory;
+  @Inject
+  private UriLocatorFactory locatorFactory;
+  @Inject
+  private HashStrategy hashStrategy;
   /**
    * Contains the resource uri's with associated hash values retrieved from last successful check.
    */
@@ -47,16 +51,10 @@ public class ResourceWatcherRunnable
    * Contains the resource uri's with associated hash values retrieved from currently performed check.
    */
   private final Map<String, String> currentMap = new HashMap<String, String>();
-  
-  /**
-   * TODO use Injectoror even better inject automatically all required fields after instantiation.
-   */
-  public ResourceWatcherRunnable(final WroManager wroManager) {
-    wroManagerReference = new WeakReference<WroManager>(wroManager);
-    cacheStrategy = wroManagerReference.get().getCacheStrategy();
-    modelFactory = wroManagerReference.get().getModelFactory();
-    locatorFactory = wroManagerReference.get().getUriLocatorFactory();
-    hashStrategy = wroManagerReference.get().getHashStrategy();
+
+  public ResourceWatcherRunnable(final Injector injector) {
+    Validate.notNull(injector);
+    injector.inject(this);
   }
   
   /**
@@ -106,8 +104,9 @@ public class ResourceWatcherRunnable
       final String lastHash = lastMap.get(uri);
       return lastHash != null ? !lastHash.equals(currentHash) : false;
     } catch (IOException e) {
-      LOG.debug("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
+      LOG.error("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
+      LOG.error("Exception", e);
       return false;
     }
   }
@@ -123,6 +122,7 @@ public class ResourceWatcherRunnable
     String currentHash = currentMap.get(uri);
     if (currentHash == null) {
       currentHash = hashStrategy.getHash(locatorFactory.locate(uri));
+      currentMap.put(uri, currentHash);
     }
     return currentHash;
   }

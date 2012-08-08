@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
@@ -111,7 +112,16 @@ public class WroManager
     resourceWatcherSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return new ResourceWatcherRunnable(WroManager.this);
+        final Context context = Context.get();
+        return new ResourceWatcherRunnable(injector) {
+          @Override
+          public void run() {
+            // Keep the context for this thread and never unset it
+            Context.set(context);
+            super.run();
+            // TODO find a way to destroy the context
+          }
+        };
       }
     }, ReloadModelRunnable.class.getSimpleName());
     resourceBundleProcessor = new ResourceBundleProcessor();
