@@ -6,11 +6,14 @@ package ro.isdc.wro.examples.http;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import ro.isdc.wro.model.resource.ResourceType;
 
 
 /**
@@ -27,9 +30,8 @@ public class DynamicResourceServlet
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException {
-    resp.setContentType("text/javascript");
-    // final String result = "document.write('<h1>c" + dateFormat.format(new Date()) + "</h1>');";
-    final String result = "a";
+    resp.setContentType(ResourceType.JS.getContentType());
+    final String result = "document.write('<h1>" + dateFormat.format(new Date()) + "</h1>');";
     resp.getWriter().write(result);
   }
 }

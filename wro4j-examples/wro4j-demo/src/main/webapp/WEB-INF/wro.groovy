@@ -3,15 +3,21 @@ groups {
   dynamic {
     js("/resource/dynamic.js")
   }
-  /*
+  dynamicRandom {
+    css("/resource/random.css")
+  }
+  
   testPage {
     modules()
   }
+  
   modules {
+    dynamicRandom()
     font()
     wildcard()
     jar()
   }
+  
   wildcard {
     css("/static/**.css")
     js("/static/js/*.js")
@@ -114,5 +120,5 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
-  */
+  /**/
 }
