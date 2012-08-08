@@ -463,7 +463,7 @@ public class TestWroManager {
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
         new CRC32HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
@@ -473,7 +473,7 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
         new MD5HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);

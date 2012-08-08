@@ -86,17 +86,28 @@ public class ResourceWatcherRunnable
   }
   
   private void checkForChanges(final Group group) {
-    LOG.debug("Checking if group {} is changed..", group);
+    LOG.debug("Checking if group {} is changed..", group.getName());
     List<Resource> resources = group.getResources();
     for (Resource resource : resources) {
       if (isChanged(resource)) {
-        invalidate(group, resource);
+        onResourceChanged(group, resource);
         // no need to check the rest of resources
         break;
       }
     }
   }
   
+  /**
+   * Invoked when a resource change detected.
+   * 
+   * @param group {@link Group} to which the changed {@link Resource} belongs to.
+   * @param resource the changed {@link Resource}.
+   * @VisibleForTesting
+   */
+  void onResourceChanged(final Group group, final Resource resource) {
+    invalidate(group, resource);    
+  }
+
   /**
    * Check if the resource was changed from previous run. The implementation uses resource content digest (hash) to
    * check for change.

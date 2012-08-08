@@ -448,16 +448,24 @@ public class WroTestUtils {
   public static UriLocatorFactory createResourceMockingLocatorFactory() {
     return new AbstractUriLocatorFactory() {
       public UriLocator getInstance(final String uri) {
-        return new UriLocator() {
-          public InputStream locate(final String uri)
-              throws IOException {
-            return new ByteArrayInputStream(uri.getBytes());
-          }
-          
-          public boolean accept(final String uri) {
-            return true;
-          }
-        };
+        return createResourceMockingLocator();
+      }
+    };
+  }
+
+  /**
+   * @return an implementation of {@link UriLocator} which always return a valid stream which contains the
+   *         resource uri as content.
+   */
+  public static UriLocator createResourceMockingLocator() {
+    return new UriLocator() {
+      public InputStream locate(final String uri)
+          throws IOException {
+        return new ByteArrayInputStream(uri.getBytes());
+      }
+      
+      public boolean accept(final String uri) {
+        return true;
       }
     };
   }

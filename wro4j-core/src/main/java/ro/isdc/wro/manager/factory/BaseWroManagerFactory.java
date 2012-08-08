@@ -257,11 +257,22 @@ public class BaseWroManagerFactory
   }
   
   /**
+   * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
    * @param hashBuilder
    *          the hashBuilder to set
    */
   public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
     this.hashStrategy = hashBuilder;
+    return this;
+  }
+  
+
+  /**
+   * @param hashBuilder
+   *          the hashBuilder to set
+   */
+  public BaseWroManagerFactory setHashStrategy(final HashStrategy hashStrategy) {
+    this.hashStrategy = hashStrategy;
     return this;
   }
   
