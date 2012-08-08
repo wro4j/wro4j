@@ -2,6 +2,7 @@ package ro.isdc.wro.manager.runnable;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +48,11 @@ public class ResourceWatcherRunnable
   /**
    * Contains the resource uri's with associated hash values retrieved from last successful check.
    */
-  private final Map<String, String> lastMap = new HashMap<String, String>();
+  private final Map<String, String> previousHashes = new HashMap<String, String>();
   /**
    * Contains the resource uri's with associated hash values retrieved from currently performed check.
    */
-  private final Map<String, String> currentMap = new HashMap<String, String>();
+  private final Map<String, String> currentHashes = new HashMap<String, String>();
 
   public ResourceWatcherRunnable(final Injector injector) {
     Validate.notNull(injector);
@@ -72,10 +73,10 @@ public class ResourceWatcherRunnable
         checkForChanges(group);
       }
       // cleanUp
-      for (Entry<String, String> entry : currentMap.entrySet()) {
-        lastMap.put(entry.getKey(), entry.getValue());
+      for (Entry<String, String> entry : currentHashes.entrySet()) {
+        previousHashes.put(entry.getKey(), entry.getValue());
       }
-      currentMap.clear();
+      currentHashes.clear();
     } catch (Exception e) {
       LOG.error("Exception while checking for resource changes", e);
     } finally {
@@ -109,7 +110,7 @@ public class ResourceWatcherRunnable
     try {
       final String uri = resource.getUri();
       String currentHash = getCurrentHash(uri);
-      final String lastHash = lastMap.get(uri);
+      final String lastHash = previousHashes.get(uri);
       return lastHash != null ? !lastHash.equals(currentHash) : false;
     } catch (IOException e) {
       LOG.error("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
@@ -126,10 +127,10 @@ public class ResourceWatcherRunnable
    */
   private String getCurrentHash(final String uri)
       throws IOException {
-    String currentHash = currentMap.get(uri);
+    String currentHash = currentHashes.get(uri);
     if (currentHash == null) {
       currentHash = hashStrategy.getHash(locatorFactory.locate(uri));
-      currentMap.put(uri, currentHash);
+      currentHashes.put(uri, currentHash);
     }
     return currentHash;
   }
@@ -149,5 +150,21 @@ public class ResourceWatcherRunnable
     cacheStrategy.put(key, null);
     key = new CacheEntry(group.getName(), resource.getType(), false);
     cacheStrategy.put(key, null);
+  }
+  
+  /**
+   * @return the map storing the hash of accumulated resources from previous runs.
+   * @VisibleForTesting
+   */
+  Map<String, String> getPreviousHashes() {
+    return Collections.unmodifiableMap(previousHashes);
+  }
+  
+  /**
+   * @return the map storing the hash of resources from current run.
+   * @VisibleForTesting
+   */
+  Map<String, String> getCurrentHashes() {
+    return Collections.unmodifiableMap(currentHashes);
   }
 }
