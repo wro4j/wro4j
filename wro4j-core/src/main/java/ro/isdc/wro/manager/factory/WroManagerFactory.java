@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.manager.factory;
 
-import ro.isdc.wro.config.WroConfigurationChangeListener;
+import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.util.ObjectFactory;
 

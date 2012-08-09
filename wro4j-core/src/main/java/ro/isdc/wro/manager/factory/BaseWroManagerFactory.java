@@ -61,7 +61,7 @@ public class BaseWroManagerFactory
   /**
    * Handles the lazy synchronized creation of the manager
    */
-  private DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
+  private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
     @Override
     protected WroManager initialize() {
       final WroManager manager = new WroManager();
@@ -232,7 +232,7 @@ public class BaseWroManagerFactory
           "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
       return smartFactoryClass.newInstance();
     } catch (final Exception e) {
-      LOG.info("SmartWroModelFactory is not available. Using default model factory.");
+      LOG.debug("SmartWroModelFactory is not available. Using default model factory.");
       LOG.debug("Reason: {}", e.getMessage());
     }
     return new XmlModelFactory();
@@ -257,11 +257,23 @@ public class BaseWroManagerFactory
   }
   
   /**
+   * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
    * @param hashBuilder
    *          the hashBuilder to set
    */
+  @Deprecated
   public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
     this.hashStrategy = hashBuilder;
+    return this;
+  }
+  
+
+  /**
+   * @param hashBuilder
+   *          the hashBuilder to set
+   */
+  public BaseWroManagerFactory setHashStrategy(final HashStrategy hashStrategy) {
+    this.hashStrategy = hashStrategy;
     return this;
   }
   

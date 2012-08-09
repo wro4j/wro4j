@@ -1,12 +1,14 @@
 /**
  * Copyright Alex Objelean
  */
-package ro.isdc.wro.manager;
+package ro.isdc.wro.manager.runnable;
 
 import java.lang.ref.WeakReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.manager.WroManager;
 
 
 /**

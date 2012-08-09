@@ -4,6 +4,7 @@
 package ro.isdc.wro.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,6 +47,8 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.AbstractUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -64,7 +67,6 @@ public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
 
   /**
-   * 
    * @return a {@link BaseWroManagerFactory} which uses an empty model.
    */
   public static BaseWroManagerFactory simpleManagerFactory() {
@@ -381,6 +383,25 @@ public class WroTestUtils {
       future.get();
     }
   }
+  
+  /**
+   * Runs a task concurrently. Allows to test thread-safe behavior.
+   * 
+   * @param task
+   *          a {@link Runnable} to run concurrently.
+   * @throws Exception
+   *           if any of the executed tasks fails.
+   */
+  public static void runConcurrently(final Runnable task, final int times)
+      throws Exception {
+    runConcurrently(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        task.run();
+        return null;
+      }
+    }, times);
+  }
 
   /**
    * Run the task concurrently 50 times.
@@ -423,5 +444,34 @@ public class WroTestUtils {
       LOG.error(message);
       Assert.fail(message);
     }
+  }
+  
+  /**
+   * @return an implementation of {@link UriLocatorFactory} which always return a valid stream which contains the
+   *         resource uri as content.
+   */
+  public static UriLocatorFactory createResourceMockingLocatorFactory() {
+    return new AbstractUriLocatorFactory() {
+      public UriLocator getInstance(final String uri) {
+        return createResourceMockingLocator();
+      }
+    };
+  }
+
+  /**
+   * @return an implementation of {@link UriLocator} which always return a valid stream which contains the
+   *         resource uri as content.
+   */
+  public static UriLocator createResourceMockingLocator() {
+    return new UriLocator() {
+      public InputStream locate(final String uri)
+          throws IOException {
+        return new ByteArrayInputStream(uri.getBytes());
+      }
+      
+      public boolean accept(final String uri) {
+        return true;
+      }
+    };
   }
 }

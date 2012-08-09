@@ -13,8 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.ContextPropagatingCallable;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;

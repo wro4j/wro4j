@@ -50,6 +50,7 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.runnable.ReloadModelRunnable;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -462,7 +463,7 @@ public class TestWroManager {
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
         new CRC32HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
@@ -472,7 +473,7 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
         new MD5HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);

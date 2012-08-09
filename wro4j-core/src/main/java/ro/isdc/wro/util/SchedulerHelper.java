@@ -115,7 +115,7 @@ public class SchedulerHelper {
       Validate.notNull(runnable);
       // avoid reject when this method is accessed concurrently.
       if (!poolInitializer.get().isShutdown()) {
-        LOG.debug("[START] Scheduling thread with period of {} - {}", period, Thread.currentThread().getId());
+        LOG.debug("[START] Scheduling thread with period of {} seconds. ThreadId:  {}", period, Thread.currentThread().getId());
         future = poolInitializer.get().scheduleWithFixedDelay(runnable, 0, period, timeUnit);
       }
     }
