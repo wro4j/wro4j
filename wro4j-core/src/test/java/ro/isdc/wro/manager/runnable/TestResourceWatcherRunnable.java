@@ -5,6 +5,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import junit.framework.Assert;
 
@@ -50,7 +51,7 @@ public class TestResourceWatcherRunnable {
 
   public Injector createInjector() {
     final UriLocatorFactory locatorFactory = new AbstractUriLocatorFactory() {
-      public UriLocator getInstance(String uri) {
+      public UriLocator getInstance(final String uri) {
         return mockLocator;
       }
     };
@@ -83,12 +84,20 @@ public class TestResourceWatcherRunnable {
   
   @Test
   public void shouldDetectResourceChange() throws Exception {
+    // flag used to assert that the expected code was invoked
+    final ThreadLocal<Boolean> flag = new ThreadLocal<Boolean>() {
+      @Override
+      protected Boolean initialValue() {
+        return Boolean.FALSE;
+      }
+    };
     victim = new ResourceWatcherRunnable(createInjector()) {
       @Override
       void onResourceChanged(final Group group, final Resource resource) {
         super.onResourceChanged(group, resource);
         Assert.assertEquals(GROUP_NAME, group.getName());
         Assert.assertEquals(RESOURCE_URI, resource.getUri());
+        flag.set(Boolean.TRUE);
       }
     };
     victim.run();
@@ -99,5 +108,26 @@ public class TestResourceWatcherRunnable {
 
     victim.run();
     assertEquals(1, victim.getPreviousHashes().keySet().size());
+    assertTrue(flag.get());
   }
+
+  @Test
+  public void shouldAssumeResourceNotChangedWhenStreamIsUnavailable()
+      throws Exception {
+    victim = new ResourceWatcherRunnable(createInjector()) {
+      @Override
+      void onResourceChanged(final Group group, final Resource resource) {
+        super.onResourceChanged(group, resource);
+        Assert.fail("Should not detect the change");
+      }
+    };
+    victim.run();
+    assertEquals(1, victim.getPreviousHashes().keySet().size());
+    
+    Mockito.when(mockLocator.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
+    
+    victim.run();
+    assertEquals(1, victim.getPreviousHashes().keySet().size());
+  }
+
 }
