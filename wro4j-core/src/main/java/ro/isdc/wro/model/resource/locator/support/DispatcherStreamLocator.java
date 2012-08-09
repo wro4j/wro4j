@@ -83,7 +83,6 @@ public class DispatcherStreamLocator {
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
       return locateExternal(request, location);
-      // throw new IOException("Error while dispatching the request for location " + location);
     }
     try {
       //fallback to external resource locator if the dispatcher is empty
