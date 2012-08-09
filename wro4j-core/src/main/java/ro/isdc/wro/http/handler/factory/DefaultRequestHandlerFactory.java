@@ -50,8 +50,8 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
           "ro.isdc.wro.extensions.http.handler.ModelAsJsonRequestHandler").newInstance();
       requestHandlers.add(requestHandler);
     } catch (final Exception e) {
-      LOG.info("ExposeModelRequestHandler not found, probably because wro4j-extensions "
-          + "module is missing from classpath.");
+      LOG.debug("ModelAsJsonRequestHandler not found, probably because wro4j-extensions "
+          + "module is missing from the classpath.");
     }
   }
 }

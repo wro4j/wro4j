@@ -32,7 +32,19 @@ public interface WroConfigurationMBean {
 	 * @param period number of seconds. Zero or less, means never.
 	 */
 	void setCacheUpdatePeriod(final long period);
+	
+	/**
+	 * @return period in seconds indicating how often resource changes are checked.
+	 */
+	long getResourceWatcherUpdatePeriod();
 
+  /**
+   * Set after how many seconds the resource change detection is performed..
+   *
+   * @param period number of seconds. Zero or less, means never.
+   */
+  void setResourceWatcherUpdatePeriod(final long period);
+  
 	/**
 	 * @return true if Gzip is Enabled.
 	 */

@@ -2,7 +2,7 @@
  * Copyright (C) 2010.
  * All rights reserved.
  */
-package ro.isdc.wro.config;
+package ro.isdc.wro.config.support;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 

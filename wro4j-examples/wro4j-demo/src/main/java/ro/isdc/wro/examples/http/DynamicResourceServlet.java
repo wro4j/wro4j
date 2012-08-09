@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ro.isdc.wro.model.resource.ResourceType;
+
 
 /**
  * @author Alex Objelean
@@ -28,7 +30,7 @@ public class DynamicResourceServlet
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException {
-    resp.setContentType("text/javascript");
+    resp.setContentType(ResourceType.JS.getContentType());
     final String result = "document.write('<h1>" + dateFormat.format(new Date()) + "</h1>');";
     resp.getWriter().write(result);
   }

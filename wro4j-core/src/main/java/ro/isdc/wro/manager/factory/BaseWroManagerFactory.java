@@ -237,7 +237,7 @@ public class BaseWroManagerFactory
         "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
       return smartFactoryClass.newInstance();
     } catch (final Exception e) {
-      LOG.info("SmartWroModelFactory is not available. Using default model factory.");
+      LOG.debug("SmartWroModelFactory is not available. Using default model factory.");
       LOG.debug("Reason: {}", e.getMessage());
     }
     return new XmlModelFactory();
@@ -260,10 +260,11 @@ public class BaseWroManagerFactory
     this.modelFactory = modelFactory;
     return this;
   }
-
-
+  
   /**
-   * @param hashBuilder the hashBuilder to set
+   * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
+   * @param hashBuilder
+   *          the hashBuilder to set
    */
   public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
     this.hashStrategy = hashBuilder;
@@ -271,7 +272,17 @@ public class BaseWroManagerFactory
   }
   
   /**
-   * @param modelTransformers the modelTransformers to set
+   * @param hashBuilder
+   *          the hashBuilder to set
+   */
+  public BaseWroManagerFactory setHashStrategy(final HashStrategy hashStrategy) {
+    this.hashStrategy = hashStrategy;
+    return this;
+  }
+  
+  /**
+   * @param modelTransformers
+   *          the modelTransformers to set
    */
   public BaseWroManagerFactory setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
     this.modelTransformers = modelTransformers;

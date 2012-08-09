@@ -67,7 +67,7 @@
     <closure.version>r1918</closure.version>
     <slf4j.version>1.6.6</slf4j.version>    
     <maven.version>3.0.4</maven.version>    
-    <mockito.version>1.9.0</mockito.version>
+    <mockito.version>1.9.5-rc1</mockito.version>
     <junit.version>4.10</junit.version>    
     <rhino.version>1.7R3</rhino.version>
      
@@ -126,11 +126,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
+        <scope>provided></scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>        
+        <scope>provided></scope>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>

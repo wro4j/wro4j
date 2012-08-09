@@ -13,6 +13,7 @@ import ro.isdc.wro.examples.ExternalResourceServlet;
 import ro.isdc.wro.examples.WebResourceOptimizationApplication;
 import ro.isdc.wro.examples.http.DispatchResourceServlet;
 import ro.isdc.wro.examples.http.DynamicResourceServlet;
+import ro.isdc.wro.examples.http.RandomCssResourceServlet;
 import ro.isdc.wro.examples.http.RedirectResourceServlet;
 import ro.isdc.wro.examples.http.WroFilterWithCustomRequestHandlers;
 import ro.isdc.wro.extensions.http.CoffeeScriptFilter;
@@ -36,6 +37,7 @@ final class WroExamplesServletModule extends ServletModule {
     bind(DwrServlet.class).in(Singleton.class);
     bind(ExternalResourceServlet.class).in(Singleton.class);
     bind(DynamicResourceServlet.class).in(Singleton.class);
+    bind(RandomCssResourceServlet.class).in(Singleton.class);
     bind(RedirectResourceServlet.class).in(Singleton.class);
     bind(DispatchResourceServlet.class).in(Singleton.class);
     bind(LessCssFilter.class).in(Singleton.class);
@@ -55,6 +57,7 @@ final class WroExamplesServletModule extends ServletModule {
     serve("/dwr/*").with(DwrServlet.class);
     serve("/external/*").with(ExternalResourceServlet.class);
     serve("/resource/dynamic.js").with(DynamicResourceServlet.class);
+    serve("/resource/random.css").with(RandomCssResourceServlet.class);
     serve("/resource/redirect.js").with(RedirectResourceServlet.class);
     serve("/resource/dispatch.js").with(DispatchResourceServlet.class);
     

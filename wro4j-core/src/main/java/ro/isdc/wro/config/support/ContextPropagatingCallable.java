@@ -1,8 +1,10 @@
-package ro.isdc.wro.config;
+package ro.isdc.wro.config.support;
 
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.Validate;
+
+import ro.isdc.wro.config.Context;
 
 
 /**

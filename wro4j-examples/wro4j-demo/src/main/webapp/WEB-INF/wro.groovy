@@ -1,12 +1,23 @@
 groups {
+
+  dynamic {
+    js("/resource/dynamic.js")
+  }
+  dynamicRandom {
+    css("/resource/random.css")
+  }
+  
   testPage {
     modules()
   }
+  
   modules {
+    dynamicRandom()
     font()
     wildcard()
     jar()
   }
+  
   wildcard {
     css("/static/**.css")
     js("/static/js/*.js")
@@ -95,9 +106,6 @@ groups {
     js("/external/any.js")
   }
   
-  dynamic {
-    js("/resource/dynamic.js")
-  }
   
   jar {
     css("classpath:com/app/**.css")
@@ -112,5 +120,5 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
- /* */
+  /**/
 }

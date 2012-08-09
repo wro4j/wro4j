@@ -8,18 +8,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.InheritableContextRunnable;
+import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.runnable.ReloadCacheRunnable;
+import ro.isdc.wro.manager.runnable.ReloadModelRunnable;
+import ro.isdc.wro.manager.runnable.ResourceWatcherRunnable;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -37,8 +40,10 @@ import ro.isdc.wro.util.Transformer;
 
 
 /**
- * Contains all the factories used by optimizer in order to perform the logic.
- *
+ * Contains all the factories used by optimizer in order to perform the logic. This object should be created through
+ * {@link WroManagerFactory}, in order to ensure that all dependencies are injected properly. In other words, avoid
+ * setting the fields explicitly after creating a new instance of {@link WroManager}
+ * 
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
@@ -70,9 +75,10 @@ public class WroManager
   @Inject
   private WroConfiguration config;
   /**
-   * Schedules the cache update.
+   * HashBuilder for creating a hash based on the processed content.
    */
-  private final SchedulerHelper cacheSchedulerHelper;
+  @Inject
+  private HashStrategy hashStrategy;
   @Inject
   private Injector injector;
   /**
@@ -84,10 +90,10 @@ public class WroManager
    */
   private final SchedulerHelper modelSchedulerHelper;
   /**
-   * HashBuilder for creating a hash based on the processed content.
+   * Schedules the cache update.
    */
-  @Inject
-  private HashStrategy hashStrategy;
+  private final SchedulerHelper cacheSchedulerHelper;
+  private final SchedulerHelper resourceWatcherSchedulerHelper;
   private ResourceBundleProcessor resourceBundleProcessor;
 
 
@@ -102,6 +108,12 @@ public class WroManager
       @Override
       protected Runnable initialize() {
         return new ReloadModelRunnable(WroManager.this);
+      }
+    }, ReloadModelRunnable.class.getSimpleName());
+    resourceWatcherSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return new InheritableContextRunnable(new ResourceWatcherRunnable(injector));
       }
     }, ReloadModelRunnable.class.getSimpleName());
     resourceBundleProcessor = new ResourceBundleProcessor();
@@ -119,6 +131,7 @@ public class WroManager
     // reschedule cache & model updates
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
+    resourceWatcherSchedulerHelper.scheduleWithPeriod(config.getResourceWatcherUpdatePeriod());
     // Inject
     injector.inject(getResourceBundleProcessor());
     getResourceBundleProcessor().serveProcessedBundle();
@@ -187,12 +200,13 @@ public class WroManager
     try {
       cacheSchedulerHelper.destroy();
       modelSchedulerHelper.destroy();
+      resourceWatcherSchedulerHelper.destroy();
       cacheStrategy.destroy();
       modelFactory.destroy();
     } catch (final Exception e) {
       LOG.error("Exception occured during manager destroy!!!");
     } finally {
-      LOG.info("WroManager destroyed");
+      LOG.debug("WroManager destroyed");
     }
   }
   
@@ -335,17 +349,10 @@ public class WroManager
  
   
   public LifecycleCallbackRegistry getCallbackRegistry() {
+    // TODO check if initialization is required.
     if (callbackRegistry == null) {
       callbackRegistry = new LifecycleCallbackRegistry();
     }
     return callbackRegistry;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }
