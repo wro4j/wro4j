@@ -205,7 +205,7 @@ public class WroManager
     } catch (final Exception e) {
       LOG.error("Exception occured during manager destroy!!!");
     } finally {
-      LOG.info("WroManager destroyed");
+      LOG.debug("WroManager destroyed");
     }
   }
   

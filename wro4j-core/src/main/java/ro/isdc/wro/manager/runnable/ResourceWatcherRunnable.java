@@ -63,8 +63,8 @@ public class ResourceWatcherRunnable
    * {@inheritDoc}
    */
   public void run() {
-    LOG.info("Checking for resource changes...");
-    StopWatch watch = new StopWatch();
+    LOG.info("ResourceWatcher started...");
+    final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
       final Collection<Group> groups = modelFactory.create().getGroups();
@@ -87,7 +87,7 @@ public class ResourceWatcherRunnable
   
   private void checkForChanges(final Group group) {
     LOG.debug("Checking if group {} is changed..", group.getName());
-    List<Resource> resources = group.getResources();
+    final List<Resource> resources = group.getResources();
     for (Resource resource : resources) {
       if (isChanged(resource)) {
         onResourceChanged(group, resource);
@@ -124,7 +124,7 @@ public class ResourceWatcherRunnable
       final String lastHash = previousHashes.get(uri);
       return lastHash != null ? !lastHash.equals(currentHash) : false;
     } catch (IOException e) {
-      LOG.error("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
+      LOG.warn("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
       return false;
     }

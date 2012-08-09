@@ -232,7 +232,7 @@ public class BaseWroManagerFactory
           "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
       return smartFactoryClass.newInstance();
     } catch (final Exception e) {
-      LOG.info("SmartWroModelFactory is not available. Using default model factory.");
+      LOG.debug("SmartWroModelFactory is not available. Using default model factory.");
       LOG.debug("Reason: {}", e.getMessage());
     }
     return new XmlModelFactory();
@@ -261,6 +261,7 @@ public class BaseWroManagerFactory
    * @param hashBuilder
    *          the hashBuilder to set
    */
+  @Deprecated
   public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
     this.hashStrategy = hashBuilder;
     return this;

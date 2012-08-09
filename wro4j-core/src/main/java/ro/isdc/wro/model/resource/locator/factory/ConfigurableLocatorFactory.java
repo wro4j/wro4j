@@ -71,7 +71,7 @@ public class ConfigurableLocatorFactory
     }
     // use default when none provided
     if (locators.isEmpty()) {
-      LOG.info("No locators configured. Using Default locator factory.");
+      LOG.debug("No locators configured. Using Default locator factory.");
       return new DefaultUriLocatorFactory();
     }
     return factory;
