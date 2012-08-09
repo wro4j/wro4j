@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.8-SNAPSHOT</version>
+  <version>1.4.8</version>
   <packaging>pom</packaging>  
   
   <name>wro4j parent</name>
@@ -126,13 +126,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
-        <scope>provided></scope>
+        <scope>provided&gt;</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>        
-        <scope>provided></scope>
+        <scope>provided&gt;</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
