@@ -6,6 +6,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import junit.framework.Assert;
 
@@ -26,6 +27,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.AbstractResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -51,7 +53,13 @@ public class TestResourceWatcherRunnable {
     final ResourceLocatorFactory locatorFactory = new AbstractResourceLocatorFactory() {
       public ResourceLocator getLocator(final String uri) {
         if (mockLocator == null) {
-          mockLocator = Mockito.spy(WroTestUtils.createResourceMockingLocator(uri));
+          // Mock interface directly instead of WroTestUtils.createResourceMockingLocator because of mockito bug
+          mockLocator = Mockito.spy(new AbstractResourceLocator() {
+            public InputStream getInputStream()
+                throws IOException {
+              return new ByteArrayInputStream(uri.getBytes());
+            }
+          });
         }
         return mockLocator;
       }
