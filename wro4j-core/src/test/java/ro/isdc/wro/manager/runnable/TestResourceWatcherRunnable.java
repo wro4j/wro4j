@@ -6,6 +6,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import junit.framework.Assert;
 
@@ -44,8 +45,18 @@ public class TestResourceWatcherRunnable {
   public void setUp() {
     initMocks(this);
     Context.set(Context.standaloneContext());
-    
-    mockLocator = Mockito.spy(WroTestUtils.createResourceMockingLocator());
+    // spy the interface instead of WroTestUtils.createResourceMockingLocator() because of mockito bug which was
+    // reported on their mailing list.
+    mockLocator = Mockito.spy(new UriLocator() {
+      public InputStream locate(final String uri)
+          throws IOException {
+        return new ByteArrayInputStream(uri.getBytes());
+      }
+      
+      public boolean accept(final String uri) {
+        return true;
+      }
+    });
     victim = new ResourceWatcherRunnable(createInjector());
   }
 
