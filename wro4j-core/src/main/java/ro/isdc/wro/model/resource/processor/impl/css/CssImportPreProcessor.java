@@ -59,7 +59,8 @@ public class CssImportPreProcessor
    * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
    * processor is thread-safe and doesn't eroneously detect recursion when running in concurrent environment.
    */
-  private ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
+  private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
+    @Override
     protected List<String> initialValue() {
       return new ArrayList<String>();
     };
