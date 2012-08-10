@@ -358,14 +358,13 @@ public class WroTestUtils {
         });
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause(), e);
+        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause());
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }
     }
     logSuccess(processedNumber);
   }
-
 
   /**
    * Runs a task concurrently. Allows to test thread-safe behavior.
