@@ -51,6 +51,8 @@ public class TestContextPropagatingCallable {
   
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenNoContextIsAvailable() {
+    // Explicitly unset context (it fails on Travis-CI
+    Context.unset();
     new ContextPropagatingCallable<Void>(NO_OP_CALLABLE);
   }
   
