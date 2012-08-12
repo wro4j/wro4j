@@ -63,7 +63,7 @@ public class ResourceWatcherRunnable
    * {@inheritDoc}
    */
   public void run() {
-    LOG.info("ResourceWatcher started...");
+    LOG.debug("ResourceWatcher started...");
     final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
@@ -124,7 +124,7 @@ public class ResourceWatcherRunnable
       final String lastHash = previousHashes.get(uri);
       return lastHash != null ? !lastHash.equals(currentHash) : false;
     } catch (IOException e) {
-      LOG.warn("Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
+      LOG.debug("[FAIL] Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
       return false;
     }
@@ -155,7 +155,7 @@ public class ResourceWatcherRunnable
    *          the {@link ResourceType} of the obsolete resource required to remove the exact entry from the cache.
    */
   private void invalidate(final Group group, final Resource resource) {
-    LOG.info("Detected change for {} resource. Invalidating group: {}", resource.getUri(), group.getName());
+    LOG.debug("Detected change for {} resource. Invalidating group: {}", resource.getUri(), group.getName());
     // Invalidate the entry by putting NULL into the cache
     CacheEntry key = new CacheEntry(group.getName(), resource.getType(), true);
     cacheStrategy.put(key, null);
