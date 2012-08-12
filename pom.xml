@@ -126,13 +126,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
-        <scope>provided&gt;</scope>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>        
-        <scope>provided&gt;</scope>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
