@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -29,6 +31,8 @@ import ro.isdc.wro.http.WroFilter;
  */
 public class Context
     implements ReadOnlyContext {
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
+
   /**
    * Maps correlationId with a Context.
    */
@@ -109,7 +113,16 @@ public class Context
    * @return true if the call is done during wro4j request cycle. In other words, if the context is set.
    */
   public static boolean isContextSet() {
-    return CORRELATION_ID.get() != null && CONTEXT_MAP.get(CORRELATION_ID.get()) != null;
+    try {
+      return CORRELATION_ID.get() != null && CONTEXT_MAP.get(CORRELATION_ID.get()) != null;
+    } catch (Exception e) {
+      /**
+       * this exception can happen when the the container is shutted down and a thread which checks for Context is still
+       * running: See <a href="http://code.google.com/p/wro4j/issues/detail?id=513>Issue 513</a>
+       */
+      LOG.debug("Unexpected exception during Context#isContextSet() method call", e);
+      return false;
+    }
   }
 
 
