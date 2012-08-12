@@ -166,6 +166,7 @@ public class WroFilter
           mbeanServer.registerMBean(wroConfiguration, name);
         }
       }
+      LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
       LOG.info("wro4j configuration: {}", wroConfiguration);
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);

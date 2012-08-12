@@ -24,6 +24,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.support.HttpHeader;
@@ -341,5 +342,12 @@ public final class WroUtil {
     } catch (IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
     }
+  }
+
+  /**
+   * @return the implementation version of wro4j.
+   */
+  public static String getImplementationVersion() {
+    return MDC.class.getPackage().getImplementationVersion();
   }
 }
