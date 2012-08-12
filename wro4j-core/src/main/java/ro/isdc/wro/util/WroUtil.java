@@ -342,4 +342,11 @@ public final class WroUtil {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
     }
   }
+
+  /**
+   * @return the implementation version of wro4j.
+   */
+  public static String getImplementationVersion() {
+    return WroUtil.class.getPackage().getImplementationVersion();
+  }
 }

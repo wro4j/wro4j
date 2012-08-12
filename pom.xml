@@ -126,13 +126,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
-        <scope>provided&gt;</scope>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>        
-        <scope>provided&gt;</scope>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -342,7 +342,7 @@
   </reporting>
   <profiles>
     <profile>
-      <id>dev</id>
+      <id>all</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -351,11 +351,22 @@
         <module>wro4j-extensions</module>
         <module>wro4j-maven-plugin</module>
         <module>wro4j-runner</module>           
-        <module>wro4j-examples</module>           
+        <module>wro4j-examples</module>        
       </modules>
     </profile>  
     <profile>
-      <id>release-profile</id>
+      <id>install</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>   
+        <module>wro4j-core</module>          
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+      </modules>
+    </profile>    
+    <profile>
+      <id>release</id>
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>

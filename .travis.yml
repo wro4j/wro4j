@@ -1,1 +1,1 @@
-script: mvn clean test -Prelease-profile
+script: mvn clean test 
