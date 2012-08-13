@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.8.1</version>
+  <version>1.4.9-SNAPSHOT</version>
   <packaging>pom</packaging>  
   
   <name>wro4j parent</name>
@@ -198,6 +198,11 @@
         <artifactId>dojo-shrinksafe</artifactId>
         <version>1.7.2</version>
       </dependency>      
+      <dependency>
+        <groupId>me.n4u.sass</groupId>
+        <artifactId>sass-gems</artifactId>
+        <version>3.2.0</version>
+      </dependency>
       <!-- Unit tests -->
       <dependency>
         <groupId>junit</groupId>
