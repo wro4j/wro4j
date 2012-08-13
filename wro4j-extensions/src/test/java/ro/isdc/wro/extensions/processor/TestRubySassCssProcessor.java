@@ -41,7 +41,7 @@ public class TestRubySassCssProcessor {
   }
   
   @Test
-  public void aShouldTestFromFolder()
+  public void shouldTestFromFolder()
       throws Exception {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -76,8 +76,6 @@ public class TestRubySassCssProcessor {
   
   /**
    * Test that processing invalid sass css produces exceptions.
-   * <p/>
-   * This test is prefixed with 'z' to make it run last, otherwise other tests fails (due to ruby engine weirdness).
    */
   @Test
   public void shouldFailWhenInvalidSassCssIsProcessed()
