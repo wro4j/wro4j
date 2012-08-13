@@ -3,15 +3,14 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static junit.framework.Assert.fail;
+
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +18,6 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -62,9 +60,10 @@ public class TestRubySassCssProcessor {
   public void shouldBeThreadSafe()
       throws Exception {
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
-          processor.process(new StringReader(
+          processor.process(null, new StringReader(
               "$side: top;$radius: 10px;.rounded-#{$side} {border-#{$side}-radius: $radius;}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
