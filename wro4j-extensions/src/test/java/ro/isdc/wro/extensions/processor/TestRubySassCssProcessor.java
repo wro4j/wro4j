@@ -13,7 +13,6 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -80,7 +79,6 @@ public class TestRubySassCssProcessor {
    * <p/>
    * This test is prefixed with 'z' to make it run last, otherwise other tests fails (due to ruby engine weirdness).
    */
-  @Ignore
   @Test
   public void shouldFailWhenInvalidSassCssIsProcessed()
       throws Exception {
@@ -103,7 +101,6 @@ public class TestRubySassCssProcessor {
   /**
    * This test proves that Sass Engine behave strangely after the first failure.
    */
-  @Ignore
   @Test
   public void shouldSucceedAfterAFailure()
       throws Exception {
