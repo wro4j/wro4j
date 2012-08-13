@@ -41,6 +41,7 @@ public class RubySassCssProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
@@ -77,6 +78,7 @@ public class RubySassCssProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
