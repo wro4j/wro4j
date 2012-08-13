@@ -117,7 +117,6 @@ public class ResourceWatcherRunnable
    * @return true if the resource was changed.
    */
   private boolean isChanged(final Resource resource) {
-    LOG.debug("Checking if resource {} is changed..", resource);
     try {
       final String uri = resource.getUri();
       String currentHash = getCurrentHash(uri);
@@ -140,6 +139,7 @@ public class ResourceWatcherRunnable
       throws IOException {
     String currentHash = currentHashes.get(uri);
     if (currentHash == null) {
+      LOG.debug("Checking if resource {} is changed..", uri);
       currentHash = hashStrategy.getHash(locatorFactory.locate(uri));
       currentHashes.put(uri, currentHash);
     }
