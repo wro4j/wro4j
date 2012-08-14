@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.factory;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -51,11 +52,6 @@ public class TestXmlModelFactory {
     context.getConfig().setModelUpdatePeriod(0);
   }
   
-  @After
-  public void tearDown() {
-    factory.destroy();
-  }
-  
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void recursiveGroupThrowsException() {
     factory = new XmlModelFactory() {
@@ -96,14 +92,7 @@ public class TestXmlModelFactory {
   
   @Test
   public void testMinimizeAttributePresence() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("wro-minimizeAttribute.xml"));
-      }
-    };
-    // the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.create();
+    final WroModel model = loadModelFromLocation("wro-minimizeAttribute.xml");
     final Group group = model.getGroupByName(model.getGroupNames().get(0));
     final List<Resource> resourceList = group.getResources();
     LOG.debug("resources: " + resourceList);
@@ -115,65 +104,29 @@ public class TestXmlModelFactory {
   
   @Test
   public void testValidImports() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/validImports.xml"));
-      }
-    };
-    WroTestUtils.init(factory);
-    // the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.create();
+    final WroModel model = loadModelFromLocation("testimport/validImports.xml");
     assertEquals(2, model.getGroupNames().size());
     LOG.debug("model: " + model);
   }
   
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testRecursiveImports() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/recursive.xml"));
-      }
-    };
-    WroTestUtils.init(factory);
-    factory.create();
+    loadModelFromLocation("testimport/recursive.xml");
   }
   
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testDeepRecursiveImports() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/deepRecursive.xml"));
-      }
-    };
-    WroTestUtils.init(factory);
-    factory.create();
+    loadModelFromLocation("testimport/deepRecursive.xml");
   }
   
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testCircularImports() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/circular1.xml"));
-      }
-    };
-    WroTestUtils.init(factory);
-    factory.create();
+    loadModelFromLocation("testimport/circular1.xml");
   }
   
   @Test(expected = WroRuntimeException.class)
   public void testInvalidImports() {
-    factory = new XmlModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/invalidImports.xml"));
-      }
-    };
-    WroTestUtils.init(factory);
-    factory.create();
+    loadModelFromLocation("testimport/invalidImports.xml");
   }
   
   @Test
@@ -201,14 +154,7 @@ public class TestXmlModelFactory {
   @Test(expected = SAXParseException.class)
   public void testWildcardImports() throws Throwable {
     try {
-      factory = new XmlModelFactory() {
-        @Override
-        protected ResourceLocator getModelResourceLocator() {
-          return new UrlResourceLocator(TestXmlModelFactory.class.getResource("testimport/wildcard.xml"));
-        }
-      };
-      WroTestUtils.init(factory);
-      factory.create();
+      loadModelFromLocation("testimport/wildcard.xml");
     } catch (final WroRuntimeException e) {
       LOG.debug("exception caught", e);
       throw e.getCause();
@@ -225,12 +171,45 @@ public class TestXmlModelFactory {
     }; 
     WroTestUtils.init(factory);
     final WroModel expected = factory.create();
+    
     WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        Assert.assertEquals(expected, factory.create());
+        assertEquals(expected, factory.create());
         return null;
       }
     }), 10);
+  }
+
+  @Test
+  public void shouldCreateEmptyModelWhenAllGroupsAreAbstract() {
+    final WroModel model = loadModelFromLocation("shouldCreateEmptyModelWhenAllGroupsAreAbstract.xml");
+    assertTrue(model.getGroups().isEmpty());
+  }
+  
+  @Test
+  public void shouldCreateNonEmptyModelWhenSomeGroupsAreAbstract() {
+    final WroModel model = loadModelFromLocation("shouldCreateNonEmptyModelWhenSomeGroupsAreAbstract.xml");
+    assertEquals(2, model.getGroups().size());
+  }
+
+  @Test
+  public void shouldContainOnlyNonAbstractGroups() {
+    final WroModel model = loadModelFromLocation("shouldContainOnlyNonAbstractGroups.xml");
+    assertEquals(1, model.getGroups().size());
+    Group group = model.getGroups().iterator().next();
+    assertEquals("nonAbstract", group.getName());
+    assertEquals(5, group.getResources().size());
+  }
+  
+  private WroModel loadModelFromLocation(final String location) {
+    final WroModelFactory factory = new XmlModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestXmlModelFactory.class.getResource(location));
+      }
+    };
+    WroTestUtils.init(factory);
+    return factory.create();
   }
 }

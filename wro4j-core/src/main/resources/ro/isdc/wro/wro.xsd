@@ -30,6 +30,8 @@
 			<xsd:element name="group-ref" type="xsd:IDREF" />
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:ID" use="required" />
+		<xsd:attribute name="abstract" type="xsd:boolean"
+            use="optional" default="false" />
 	</xsd:complexType>
 
 </xsd:schema>
