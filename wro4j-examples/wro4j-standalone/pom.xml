@@ -36,40 +36,21 @@
       </resource>          
     </resources>  
     <plugins>     
-      <plugin>
-        <groupId>ro.isdc.wro4j</groupId>
-        <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>csslint</goal>
-              <!--
-              <goal>jshint</goal>
-                            
-              <goal>csslint</goal>
-              -->
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <options>ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes,vendor-prefix,zero-units</options>
-          <ignoreMissingResources>true</ignoreMissingResources>          
-          <failNever>true</failNever>
-          <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/bundle/</cssDestinationFolder>
-          <!--
-
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-          <extraConfigFile>c:/path/wro.proprties</extraConfigFile>
-          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>          
-          <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-          -->
-        </configuration>
-      </plugin>
+	  <plugin>
+	    <groupId>ro.isdc.wro4j</groupId>
+	    <artifactId>wro4j-maven-plugin</artifactId>
+	    <version>1.4.8</version>
+	    <executions>
+	      <execution>
+	        <goals>
+	          <goal>jshint</goal>
+	        </goals>
+	      </execution>
+	    </executions>
+	    <configuration>
+	      <options>newcap</options>
+	    </configuration>
+	  </plugin>
     </plugins>
   </build>
 </project>
