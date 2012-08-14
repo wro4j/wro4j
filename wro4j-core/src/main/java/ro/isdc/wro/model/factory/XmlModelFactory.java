@@ -129,7 +129,6 @@ public class XmlModelFactory
    * Flag for enabling xml validation.
    */
   private boolean validateXml = true;
-  private final Set<Group> abstractGroups = new HashSet<Group>();
   
   /**
    * {@inheritDoc}
@@ -156,7 +155,6 @@ public class XmlModelFactory
     } finally {
       // clear the processed imports even when the model creation fails.
       processedImports.clear();
-      abstractGroups.clear();
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
     }
@@ -254,12 +252,7 @@ public class XmlModelFactory
     for (final Element element : allGroupElements.values()) {
       parseGroup(element, groups);
     }
-    for (Group group : groups) {
-      if (!abstractGroups.contains(group)) {
-        //model should contain only non abstract groups.
-        model.addGroup(group);
-      }
-    }
+    model.setGroups(groups);
     return model;
   }
   
@@ -304,11 +297,10 @@ public class XmlModelFactory
     group.setResources(resources);
     // this group is parsed, remove from unparsed collection
     groupsInProcess.remove(name);
-    if (isAbstractGroup) {
-      //keep track of abstract groups
-      abstractGroups.add(group);
+    if (!isAbstractGroup) {
+      //add only non abstract groups
+      groups.add(group);
     }
-    groups.add(group);
     return resources;
   }
   
