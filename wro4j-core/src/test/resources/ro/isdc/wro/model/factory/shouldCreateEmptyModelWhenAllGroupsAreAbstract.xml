@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+
+  <group name="g1" abstract="true">
+    <js>/g1.js</js>
+  </group>
+
+  <group name="g2"  abstract="true">
+    <css>/path/to/resource</css>
+    <js>/path/to/resource</js>
+  </group>
+  
+  <group name="g3"  abstract="true">
+    <js>/path/to/resource</js>
+    <group-ref>g2</group-ref>
+  </group>
+</groups>
