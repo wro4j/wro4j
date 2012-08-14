@@ -39,7 +39,7 @@
 	  <plugin>
 	    <groupId>ro.isdc.wro4j</groupId>
 	    <artifactId>wro4j-maven-plugin</artifactId>
-	    <version>1.4.8</version>
+	    <version>1.4.8.1</version>
 	    <executions>
 	      <execution>
 	        <goals>
@@ -48,6 +48,7 @@
 	      </execution>
 	    </executions>
 	    <configuration>
+	       <!-- Remove this option to make the jshint plugin not complain about found problem --> 
 	      <options>newcap</options>
 	    </configuration>
 	  </plugin>
