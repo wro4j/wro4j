@@ -1,6 +1,3 @@
-/**
- * Copyright Alex Objelean
- */
 package ro.isdc.wro.model.resource.support.naming;
 
 import java.io.IOException;
@@ -10,31 +7,26 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 
 /**
- * The simplest implementation of {@link NamingStrategy} which encodes the hash code into the name of the
- * resource. For instance: For <code>group.js</code> -> <code>group-<hashcode>.js</code>. This implementation uses by
- * default {@link CRC32HashBuilder} implementation.
+ * Encodes the hash into the folder where the resources is located.
+ * Example:
+ *    original name: group.js
+ *    renamed:        group-a912810be321.js
  *
  * @author Alex Objelean
- * @created 15 Aug 2010
- * @deprecated prefer Using {@link DefaultHashEncoderNamingStrategy}.
+ * @created 15 Aug 2012
+ * @since 1.4.9
  */
-public class HashEncoderNamingStrategy
+public class DefaultHashEncoderNamingStrategy
   implements NamingStrategy {
-  public static final String ALIAS = "hashEncoder-CRC32";
-  private HashStrategy hashStrategy = newHashStrategy();
+  public static final String ALIAS = "hashEncoder";
+  @Inject
+  private HashStrategy hashStrategy;
 
-
-  /**
-   * @return an implementation of {@link HashStrategy}.
-   */
-  protected HashStrategy newHashStrategy() {
-    return new CRC32HashStrategy();
-  }
   
   /**
    * @return the {@link HashStrategy} to use for renaming. By default the used strategy is the same as the one
@@ -53,9 +45,11 @@ public class HashEncoderNamingStrategy
     Validate.notNull(originalName);
     Validate.notNull(inputStream);
     final String baseName = FilenameUtils.getBaseName(originalName);
+    int baseNameIndex = originalName.indexOf(baseName);
+    final String path = originalName.substring(0, baseNameIndex);
     final String extension = FilenameUtils.getExtension(originalName);
-    final String hash = hashStrategy.getHash(inputStream);
-    final StringBuilder sb = new StringBuilder(baseName).append("-").append(hash);
+    final String hash = getHashStrategy().getHash(inputStream);
+    final StringBuilder sb = new StringBuilder(path).append(baseName).append("-").append(hash);
     if (!StringUtils.isEmpty(extension)) {
       sb.append(".").append(extension);
     }

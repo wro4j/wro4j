@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URISyntaxException;
@@ -35,6 +36,8 @@ import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactor
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.FolderHashEncoderNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
@@ -313,13 +316,24 @@ public class TestWro4jMojo {
     FileUtils.deleteQuietly(groupNameMappingFile);
   }
 
-  @After
-  public void tearDown()
+  @Test
+  public void shouldUseConfiguredNamingStrategy()
     throws Exception {
     Context.unset();
-    FileUtils.deleteDirectory(destinationFolder);
-    FileUtils.deleteDirectory(cssDestinationFolder);
-    FileUtils.deleteDirectory(jsDestinationFolder);
+    setWroWithValidResources();
+
+    final File extraConfigFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
+
+    Properties props = new Properties();
+    //TODO create a properties builder
+    props.setProperty(ConfigurableNamingStrategy.KEY, FolderHashEncoderNamingStrategy.ALIAS);
+    props.list(new PrintStream(extraConfigFile));
+    
+    mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
+    mojo.setExtraConfigFile(extraConfigFile);
+    mojo.setIgnoreMissingResources(true);
+    mojo.execute();
+
     FileUtils.deleteQuietly(extraConfigFile);
   }
 
@@ -364,5 +378,15 @@ public class TestWro4jMojo {
       factory.addPreProcessor(new CssUrlRewritingProcessor());
       return factory;
     }
+  }
+  
+
+  @After
+  public void tearDown()
+    throws Exception {
+    FileUtils.deleteDirectory(destinationFolder);
+    FileUtils.deleteDirectory(cssDestinationFolder);
+    FileUtils.deleteDirectory(jsDestinationFolder);
+    FileUtils.deleteQuietly(extraConfigFile);
   }
 }

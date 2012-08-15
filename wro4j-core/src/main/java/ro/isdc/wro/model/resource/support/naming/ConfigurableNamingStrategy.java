@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
@@ -21,13 +23,16 @@ public class ConfigurableNamingStrategy
    * Property name to specify namingStrategy alias.
    */
   public static final String KEY = "namingStrategy";
-  
+  @Inject
+  private Injector injector;
   /**
    * {@inheritDoc}
    */
   public String rename(String originalName, InputStream inputStream)
       throws IOException {
-    return getConfiguredStrategy().rename(originalName, inputStream);
+    final NamingStrategy namingStrategy = getConfiguredStrategy();
+    injector.inject(namingStrategy);
+    return namingStrategy.rename(originalName, inputStream);
   }
 
   /**

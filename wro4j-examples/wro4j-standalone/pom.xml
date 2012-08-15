@@ -36,10 +36,26 @@
       </resource>          
     </resources>  
     <plugins>     
+        <plugin>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-maven-plugin</artifactId>
+        <version>1.4.9-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+           <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>              
+        </configuration>
+        
+      </plugin>
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.9-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
