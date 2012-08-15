@@ -30,18 +30,18 @@ import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 /**
- * Test class for {@link FolderHashEncoderNamingStrategy}
+ * Test class for {@link HashEncoderNamingStrategy}
  *
  * @author Alex Objelean
  * @created 15 Aug 2012
  */
-public class TestFolderHashEncoderNamingStrategy {
+public class TestHashEncoderNamingStrategy {
   private NamingStrategy namingStrategy;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    namingStrategy = new FolderHashEncoderNamingStrategy();
+    namingStrategy = new HashEncoderNamingStrategy();
     WroTestUtils.createInjector().inject(namingStrategy);
   }
 
@@ -58,18 +58,18 @@ public class TestFolderHashEncoderNamingStrategy {
   @Test
   public void shouldRenameResourceWithEmptyContent() throws Exception {
     final String result = namingStrategy.rename("fileName", WroUtil.EMPTY_STREAM);
-    assertEquals("da39a3ee5e6b4b0d3255bfef95601890afd80709/fileName", result);
+    assertEquals("fileName-0", result);
   }
   
   @Test
   public void shouldRenameResourceWithSomeContent() throws Exception {
     final String result = namingStrategy.rename("anotherFile.js", new ByteArrayInputStream("someContent".getBytes()));
-    assertEquals("99ef8ae827896f2af4032d5dab9298ec86309abf/anotherFile.js", result);
+    assertEquals("anotherFile-b598c484.js", result);
   }
   
   @Test
   public void shouldRenameResourceContainedInAFolder() throws Exception {
     final String result = namingStrategy.rename("folder1/folder2/resource.css", new ByteArrayInputStream("someContent".getBytes()));
-    assertEquals("99ef8ae827896f2af4032d5dab9298ec86309abf/folder1/folder2/resource.css", result);
+    assertEquals("resource-b598c484.css", result);
   }
 }

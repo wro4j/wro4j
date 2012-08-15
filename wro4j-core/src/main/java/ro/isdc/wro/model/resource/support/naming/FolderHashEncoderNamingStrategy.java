@@ -10,7 +10,6 @@ import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 
 
 /**
