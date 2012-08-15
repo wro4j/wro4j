@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * @author Alex Objelean
@@ -27,6 +29,8 @@ public class TestConfigurableHashStrategy {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     victim = new ConfigurableHashStrategy();
+    Context.set(Context.standaloneContext());
+    WroTestUtils.createInjector().inject(victim);
   }
   
   @Test(expected = NullPointerException.class)

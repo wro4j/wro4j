@@ -147,7 +147,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         final Properties props = new Properties();
         updatePropertiesWithConfiguration(props, ConfigurableHashStrategy.KEY);
         return props;
-
       }
     };
   }

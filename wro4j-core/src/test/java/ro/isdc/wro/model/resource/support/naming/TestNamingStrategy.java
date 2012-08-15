@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -39,11 +40,22 @@ public class TestNamingStrategy {
     };
   }
   
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullOriginalName()
+      throws Exception {
+    namingStrategy.rename(null, WroUtil.EMPTY_STREAM);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullStream()
+      throws Exception {
+    namingStrategy.rename("fileName.js", null);
+  }
+  
   @Test
   public void testWithExtension()
       throws Exception {
-    // second argument doesn't matter.
-    final String result = namingStrategy.rename("fileName.js", null);
+    final String result = namingStrategy.rename("fileName.js", WroUtil.EMPTY_STREAM);
     Assert.assertEquals("fileName-" + HASH + ".js", result);
   }
   
@@ -51,7 +63,7 @@ public class TestNamingStrategy {
   public void testNoExtension()
       throws Exception {
     // second argument doesn't matter.
-    final String result = namingStrategy.rename("fileName", null);
+    final String result = namingStrategy.rename("fileName", WroUtil.EMPTY_STREAM);
     Assert.assertEquals("fileName-" + HASH, result);
   }
 }
