@@ -22,7 +22,7 @@ public class DefaultNamingStrategyProvider
     map.put(TimestampNamingStrategy.ALIAS, new TimestampNamingStrategy());
     map.put(NoOpNamingStrategy.ALIAS, new NoOpNamingStrategy());
     map.put(HashEncoderNamingStrategy.ALIAS, new HashEncoderNamingStrategy());
+    map.put(FolderHashEncoderNamingStrategy.ALIAS, new FolderHashEncoderNamingStrategy());
     return map;
   }
-  
 }

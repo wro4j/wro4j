@@ -172,6 +172,13 @@ public class InjectorBuilder {
         return namingStrategy;
       }
     });
+    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
+      public HashStrategy create() {
+        final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
+        injector.inject(hashStrategy);
+        return hashStrategy;
+      }
+    });
     map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
     map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
@@ -188,11 +195,6 @@ public class InjectorBuilder {
     map.put(ResourceAuthorizationManager.class, new InjectorObjectFactory<ResourceAuthorizationManager>() {
       public ResourceAuthorizationManager create() {
         return authorizationManager;
-      }
-    });
-    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
-      public HashStrategy create() {
-        return managerFactory.create().getHashStrategy();
       }
     });
   }
