@@ -232,7 +232,7 @@ public class PreProcessorExecutor {
         throw e;
       }
     } finally {
-      is.close();
+      IOUtils.closeQuietly(is);
     }
   }
 }

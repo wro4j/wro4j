@@ -75,10 +75,6 @@ public class ResourceProxyRequestHandler
     IOUtils.closeQuietly(outputStream);
   }
 
-  /**
-   * TODO: use new AuthorizedResourcesHolder to check acccess to resourceUri Verifies that the user has access or not to
-   * the requested resource
-   */
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
     if (!authManager.isAuthorized(resourceUri)) {
       LOG.debug("[FAIL] Unauthorized proxy resource: {}", resourceUri);
