@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class ConfigurableLocatorFactory
    */
   public InputStream locate(final String uri)
       throws IOException {
-    return locatorFactory.locate(uri);
+    return new AutoCloseInputStream(locatorFactory.locate(uri));
   }
   
   /**

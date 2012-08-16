@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,7 +157,8 @@ public class CssImportPreProcessor
     final List<Resource> imports = new ArrayList<Resource>();
     String css = EMPTY;
     try {
-      css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()), configuration.getEncoding());
+      css = IOUtils.toString(new AutoCloseInputStream(uriLocatorFactory.locate(resource.getUri())),
+          configuration.getEncoding());
     } catch (IOException e) {
       if (!configuration.isIgnoreMissingResources()) {
         LOG.error("Invalid import detected: {}", resource.getUri());

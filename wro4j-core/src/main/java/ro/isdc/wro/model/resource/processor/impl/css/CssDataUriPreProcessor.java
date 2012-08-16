@@ -4,9 +4,11 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -81,7 +83,8 @@ public class CssDataUriPreProcessor
     }
     String result = imageUrl;
     try {
-      final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
+      final InputStream is = new AutoCloseInputStream(uriLocatorFactory.locate(fullPath));
+      final String dataUri = getDataUriGenerator().generateDataURI(is, fileName);
       if (isReplaceAccepted(dataUri)) {
         result = dataUri;
         LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));

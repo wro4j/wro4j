@@ -44,6 +44,7 @@ public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
@@ -54,6 +55,7 @@ public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean accept(final HttpServletRequest request) {
     return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
   }
@@ -61,16 +63,20 @@ public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
-    final InputStream is = uriLocatorFactory.locate(resourceUri);
-    final OutputStream outputStream = response.getOutputStream();
-
-    response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-    int length = IOUtils.copy(is, outputStream);
-    response.setContentLength(length);
-    response.setStatus(HttpServletResponse.SC_OK);
-
-    IOUtils.closeQuietly(outputStream);
-    IOUtils.closeQuietly(is);
+    InputStream is = null;
+    try {
+      is = uriLocatorFactory.locate(resourceUri);
+      final OutputStream outputStream = response.getOutputStream();
+      
+      response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
+      int length = IOUtils.copy(is, outputStream);
+      response.setContentLength(length);
+      response.setStatus(HttpServletResponse.SC_OK);
+      
+      IOUtils.closeQuietly(outputStream);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
   }
 
   /**

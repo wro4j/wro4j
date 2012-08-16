@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -222,7 +223,7 @@ public class XmlModelFactory
             throws IOException {
           LOG.debug("build model from import: {}", name);
           LOG.debug("uriLocatorFactory: {}", locatorFactory);
-          return locatorFactory.locate(name);
+          return new AutoCloseInputStream(locatorFactory.locate(name));
         };
       };
       // pass the reference of the uriLocatorFactory to the anonymously created factory.

@@ -3,6 +3,8 @@ package ro.isdc.wro.model.resource.locator.factory;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
+
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorAwareDecorator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -48,6 +50,6 @@ public final class InjectorAwareUriLocatorFactoryDecorator
     if (locator == null) {
       throw new IOException("No locator is capable handling uri: " + uri);
     }
-    return locator.locate(uri);
+    return new AutoCloseInputStream(locator.locate(uri));
   }
 }
