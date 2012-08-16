@@ -1,13 +1,13 @@
 package ro.isdc.wro.http.handler;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +19,16 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
+
 /**
  * Provides access to wro resources via a resource proxy.
- *
+ * 
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
  * @since 1.4.7
  */
-public class ResourceProxyRequestHandler extends RequestHandlerSupport {
+public class ResourceProxyRequestHandler
+    extends RequestHandlerSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceProxyRequestHandler.class);
 
   public static final String PARAM_RESOURCE_ID = "id";
@@ -63,28 +65,22 @@ public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
-    InputStream is = null;
-    try {
-      is = uriLocatorFactory.locate(resourceUri);
-      final OutputStream outputStream = response.getOutputStream();
-      
-      response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-      int length = IOUtils.copy(is, outputStream);
-      response.setContentLength(length);
-      response.setStatus(HttpServletResponse.SC_OK);
-      
-      IOUtils.closeQuietly(outputStream);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
+    final OutputStream outputStream = response.getOutputStream();
+    
+    response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
+    int length = IOUtils.copy(new AutoCloseInputStream(uriLocatorFactory.locate(resourceUri)), outputStream);
+    response.setContentLength(length);
+    response.setStatus(HttpServletResponse.SC_OK);
+    
+    IOUtils.closeQuietly(outputStream);
   }
 
   /**
-   * TODO: use new AuthorizedResourcesHolder to check acccess to resourceUri
-   * Verifies that the user has access or not to the requested resource
+   * TODO: use new AuthorizedResourcesHolder to check acccess to resourceUri Verifies that the user has access or not to
+   * the requested resource
    */
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
-    if(!authManager.isAuthorized(resourceUri)) {
+    if (!authManager.isAuthorized(resourceUri)) {
       LOG.debug("[FAIL] Unauthorized proxy resource: {}", resourceUri);
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
