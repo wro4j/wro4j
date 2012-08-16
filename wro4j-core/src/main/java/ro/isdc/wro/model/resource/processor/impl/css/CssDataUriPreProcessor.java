@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -79,7 +80,7 @@ public class CssDataUriPreProcessor
     }
     String result = imageUrl;
     try {
-      final InputStream inputStream = resourceLocatorFactory.getLocator(fullPath).getInputStream();
+      final InputStream inputStream = new AutoCloseInputStream(resourceLocatorFactory.getLocator(fullPath).getInputStream());
       final String dataUri = getDataUriGenerator().generateDataURI(inputStream, fileName);
       if (isReplaceAccepted(dataUri)) {
         result = dataUri;

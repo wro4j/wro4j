@@ -1,13 +1,13 @@
 package ro.isdc.wro.http.handler;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,16 +63,14 @@ public class ResourceProxyRequestHandler extends RequestHandlerSupport {
   private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
-    final InputStream is = uriLocatorFactory.getLocator(resourceUri).getInputStream();
     final OutputStream outputStream = response.getOutputStream();
 
     response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-    int length = IOUtils.copy(is, outputStream);
+    int length = IOUtils.copy(new AutoCloseInputStream(uriLocatorFactory.locate(resourceUri)), outputStream);
     response.setContentLength(length);
     response.setStatus(HttpServletResponse.SC_OK);
 
     IOUtils.closeQuietly(outputStream);
-    IOUtils.closeQuietly(is);
   }
 
   /**

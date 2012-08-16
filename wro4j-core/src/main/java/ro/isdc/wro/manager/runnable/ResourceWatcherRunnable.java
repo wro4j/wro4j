@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +141,7 @@ public class ResourceWatcherRunnable
     String currentHash = currentHashes.get(uri);
     if (currentHash == null) {
       LOG.debug("Checking if resource {} is changed..", uri);
-      currentHash = hashStrategy.getHash(locatorFactory.locate(uri));
+      currentHash = hashStrategy.getHash(new AutoCloseInputStream(locatorFactory.locate(uri)));
       currentHashes.put(uri, currentHash);
     }
     return currentHash;

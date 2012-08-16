@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -216,7 +217,7 @@ public class PreProcessorExecutor {
   private String getResourceContent(final Resource resource)
       throws IOException {
     try {
-      final InputStream is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()));
+      final InputStream is = new BOMInputStream(new AutoCloseInputStream(resourceLocatorFactory.locate(resource.getUri())));
       final String result = IOUtils.toString(is, config.getEncoding());
       is.close();
       if (StringUtils.isEmpty(result)) {
