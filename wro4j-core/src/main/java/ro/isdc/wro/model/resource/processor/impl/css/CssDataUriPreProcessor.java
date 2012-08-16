@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -82,8 +83,9 @@ public class CssDataUriPreProcessor
       fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
+    InputStream is = null;
     try {
-      final InputStream is = new AutoCloseInputStream(uriLocatorFactory.locate(fullPath));
+      is = uriLocatorFactory.locate(fullPath);
       final String dataUri = getDataUriGenerator().generateDataURI(is, fileName);
       if (isReplaceAccepted(dataUri)) {
         result = dataUri;
@@ -92,6 +94,8 @@ public class CssDataUriPreProcessor
     } catch (final IOException e) {
       LOG.warn("[FAIL] extract dataUri from: {}, because: {}. "
           + "A possible cause: using CssUrlRewritingProcessor before CssDataUriPreProcessor.", fullPath, e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(is);
     }
     return result;
   }

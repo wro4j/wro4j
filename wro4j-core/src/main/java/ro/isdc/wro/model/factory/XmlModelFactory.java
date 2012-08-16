@@ -222,7 +222,6 @@ public class XmlModelFactory
         protected InputStream getModelResourceAsStream()
             throws IOException {
           LOG.debug("build model from import: {}", name);
-          LOG.debug("uriLocatorFactory: {}", locatorFactory);
           return new AutoCloseInputStream(locatorFactory.locate(name));
         };
       };

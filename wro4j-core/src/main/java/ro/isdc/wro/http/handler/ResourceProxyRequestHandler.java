@@ -35,7 +35,7 @@ public class ResourceProxyRequestHandler
   public static final String PATH_RESOURCES = "wroResources";
   
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory locatorFactory;
 
   @Inject
   private WroConfiguration config;
@@ -68,7 +68,7 @@ public class ResourceProxyRequestHandler
     final OutputStream outputStream = response.getOutputStream();
     
     response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-    int length = IOUtils.copy(new AutoCloseInputStream(uriLocatorFactory.locate(resourceUri)), outputStream);
+    int length = IOUtils.copy(new AutoCloseInputStream(locatorFactory.locate(resourceUri)), outputStream);
     response.setContentLength(length);
     response.setStatus(HttpServletResponse.SC_OK);
     
