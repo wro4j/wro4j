@@ -216,10 +216,10 @@ public class PreProcessorExecutor {
    */
   private String getResourceContent(final Resource resource)
       throws IOException {
+    InputStream is = null; 
     try {
-      final InputStream is = new BOMInputStream(new AutoCloseInputStream(resourceLocatorFactory.locate(resource.getUri())));
+      is = new BOMInputStream(resourceLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
-      is.close();
       if (StringUtils.isEmpty(result)) {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }
@@ -232,6 +232,8 @@ public class PreProcessorExecutor {
         LOG.error("Cannot ignore missing resource:  {}", resource);
         throw e;
       }
+    } finally {
+      IOUtils.closeQuietly(is);
     }
   }
 }

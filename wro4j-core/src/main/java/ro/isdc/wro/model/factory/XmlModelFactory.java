@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -97,7 +98,8 @@ public class XmlModelFactory
    */
   private static final String ATTR_GROUP_NAME = "name";
   /**
-   * Group abstract attribute used to distinguish an abstract group when its value is true. By default the value is false.
+   * Group abstract attribute used to distinguish an abstract group when its value is true. By default the value is
+   * false.
    */
   private static final String ATTR_GROUP_ABSTRACT = "abstract";
   /**
@@ -131,7 +133,7 @@ public class XmlModelFactory
    * Flag for enabling xml validation.
    */
   private boolean validateXml = true;
-
+  
   /**
    * {@inheritDoc}
    */
@@ -166,10 +168,12 @@ public class XmlModelFactory
    * @return valid {@link Document} of the xml containing model representation.
    */
   private Document createDocument() {
+    InputStream is = null;
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final Document document = factory.newDocumentBuilder().parse(getModelResourceLocator().getInputStream());
+      is = getModelResourceLocator().getInputStream();
+      final Document document = factory.newDocumentBuilder().parse(is);
       document.getDocumentElement().normalize();
       if (isValidateXml()) {
         validate(document);
@@ -177,6 +181,8 @@ public class XmlModelFactory
       return document;
     } catch (final Exception e) {
       throw new WroRuntimeException("Cannot build model from XML", e);
+    } finally {
+      IOUtils.closeQuietly(is);
     }
   }
   
@@ -221,11 +227,11 @@ public class XmlModelFactory
       final XmlModelFactory importedModelFactory = new XmlModelFactory() {
         @Override
         protected ResourceLocator getModelResourceLocator() {
-          //TODO handle relative imports
+          // TODO handle relative imports
           return getResourceLocatorFactory().getLocator(name);
         };
       };
-      //pass the reference of the uriLocatorFactory to the anonymously created factory.
+      // pass the reference of the uriLocatorFactory to the anonymously created factory.
       importedModelFactory.locatorFactory = this.locatorFactory;
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
@@ -298,7 +304,7 @@ public class XmlModelFactory
     // this group is parsed, remove from unparsed collection
     groupsInProcess.remove(name);
     if (!isAbstractGroup) {
-      //add only non abstract groups
+      // add only non abstract groups
       groups.add(group);
     }
     return resources;
@@ -381,7 +387,7 @@ public class XmlModelFactory
     this.validateXml = validateXml;
     return this;
   }
-
+  
   /**
    * @return the resourceLocatorFactory
    */
