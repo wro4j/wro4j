@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.ResourceWatcher;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 /**
@@ -27,6 +29,9 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   private HashStrategy hashBuilder; 
   @Inject
   private ResourceAuthorizationManager authorizationManager;
+  @Inject
+  private Injector injector;
+  private ResourceWatcher resourceWather;
   
   public DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     super(cacheStrategy);
@@ -39,7 +44,9 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   protected ContentHashEntry loadValue(final CacheEntry key) {
     LOG.debug("load value in cache for key: {}", key);
     final String content = groupsProcessor.process(key);
-    LOG.debug("found content: {}", StringUtils.abbreviate(content, 30));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("found content: {}", StringUtils.abbreviate(content, 30));
+    }
     return computeCacheValueByContent(content);
   }
 
@@ -50,7 +57,9 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
     String hash = null;
     try {
       if (content != null) {
-        LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 40));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 30));
+        }
         hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
       }
       final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
@@ -61,6 +70,28 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
     }
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void onBeforeGet(final CacheEntry key) {
+    if (shouldWatchForChange()) {
+      getResourceWatcher().check(key.getGroupName());
+    }
+  }
+  
+  private ResourceWatcher getResourceWatcher() {
+    if (resourceWather == null) {
+      resourceWather = new ResourceWatcher();
+      injector.inject(resourceWather);
+    }
+    return null;
+  }
+
+  private boolean shouldWatchForChange() {
+    return false;
+  }
+
   @Override
   public void clear() {
     super.clear();
