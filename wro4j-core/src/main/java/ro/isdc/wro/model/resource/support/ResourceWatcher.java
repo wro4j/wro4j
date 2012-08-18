@@ -2,10 +2,10 @@ package ro.isdc.wro.model.resource.support;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
@@ -45,12 +45,11 @@ public class ResourceWatcher {
   /**
    * Contains the resource uri's with associated hash values retrieved from last successful check.
    */
-  private final Map<String, String> previousHashes = new HashMap<String, String>();
+  private final Map<String, String> previousHashes = new ConcurrentHashMap<String, String>();
   /**
    * Contains the resource uri's with associated hash values retrieved from currently performed check.
    */
-  private final Map<String, String> currentHashes = new HashMap<String, String>();
-  
+  private final Map<String, String> currentHashes = new ConcurrentHashMap<String, String>();
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
    * 
@@ -64,7 +63,6 @@ public class ResourceWatcher {
     watch.start("detect changes");
     try {
       final Group group = modelFactory.create().getGroupByName(cacheEntry.getGroupName());
-      // TODO run the check in parallel?
       if (isGroupChanged(group)) {
         onGroupChanged(cacheEntry);
       }
@@ -83,6 +81,7 @@ public class ResourceWatcher {
   
   private boolean isGroupChanged(final Group group) {
     LOG.debug("Checking if group {} is changed..", group.getName());
+    // TODO run the check in parallel?
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (Resource resource : resources) {

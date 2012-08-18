@@ -39,6 +39,7 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     final ReadWriteLock lock = getLockForKey(key);
     lock.readLock().lock();
     try {
+      onBeforeGet(key);
       value = getDecoratedObject().get(key);
     } finally {
       lock.readLock().unlock();
@@ -46,7 +47,6 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     if (value == null) {
       lock.writeLock().lock();
       try {
-        onBeforeGet(key);
         // this is necessary to ensure that the load wasn't invoked 
         value = getDecoratedObject().get(key);
         if (value == null) {
