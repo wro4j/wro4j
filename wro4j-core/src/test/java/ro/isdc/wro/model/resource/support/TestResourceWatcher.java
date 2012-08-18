@@ -1,4 +1,4 @@
-package ro.isdc.wro.manager.runnable;
+package ro.isdc.wro.model.resource.support;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -25,6 +25,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.AbstractUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -34,10 +35,11 @@ import ro.isdc.wro.util.WroTestUtils;
 /**
  * @author Alex Objelean
  */
-public class TestResourceWatcherRunnable {
+public class TestResourceWatcher {
   private static final String RESOURCE_URI = "/test.js";
   private static final String GROUP_NAME = "g1";
-  private ResourceWatcherRunnable victim;
+  private CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.JS, true);
+  private ResourceWatcher victim;
   @Mock
   private UriLocator mockLocator;
   
@@ -57,7 +59,8 @@ public class TestResourceWatcherRunnable {
         return true;
       }
     });
-    victim = new ResourceWatcherRunnable(createInjector());
+    victim = new ResourceWatcher();
+    createInjector().inject(victim);
   }
 
   public Injector createInjector() {
@@ -76,19 +79,15 @@ public class TestResourceWatcherRunnable {
   }
   
   @Test(expected = NullPointerException.class)
-  public void cannotAcceptNullArgument() {
-    new ResourceWatcherRunnable(null);
-  }
-  
-  @Test(expected = WroRuntimeException.class)
-  public void cannotCreateRunnableWhenRunningOutsideOfContext() {
+  public void cannotCheckNullCacheEntry() {
     Context.unset();
-    victim = new ResourceWatcherRunnable(WroTestUtils.createInjector());
+    victim = new ResourceWatcher();
+    victim.check(null);
   }
   
   @Test
   public void shouldPopulatePreviousHashesAfterFirstRun() {
-    victim.run();
+    victim.check(cacheEntry);
     assertTrue(victim.getCurrentHashes().keySet().isEmpty());
     assertEquals(1, victim.getPreviousHashes().keySet().size());
   }
@@ -102,22 +101,22 @@ public class TestResourceWatcherRunnable {
         return Boolean.FALSE;
       }
     };
-    victim = new ResourceWatcherRunnable(createInjector()) {
+    victim = new ResourceWatcher() {
       @Override
-      void onResourceChanged(final Group group, final Resource resource) {
-        super.onResourceChanged(group, resource);
-        Assert.assertEquals(GROUP_NAME, group.getName());
-        Assert.assertEquals(RESOURCE_URI, resource.getUri());
+      void onGroupChanged(final CacheEntry cacheEntry) {
+        super.onGroupChanged(cacheEntry);
+        Assert.assertEquals(GROUP_NAME, cacheEntry.getGroupName());
         flag.set(Boolean.TRUE);
       }
     };
-    victim.run();
+    createInjector().inject(victim);
+    victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
     
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenReturn(
         new ByteArrayInputStream("different".getBytes()));
 
-    victim.run();
+    victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
     assertTrue(flag.get());
   }
@@ -125,20 +124,20 @@ public class TestResourceWatcherRunnable {
   @Test
   public void shouldAssumeResourceNotChangedWhenStreamIsUnavailable()
       throws Exception {
-    victim = new ResourceWatcherRunnable(createInjector()) {
+    victim = new ResourceWatcher() {
       @Override
-      void onResourceChanged(final Group group, final Resource resource) {
-        super.onResourceChanged(group, resource);
+      void onGroupChanged(final CacheEntry cacheEntry) {
+        super.onGroupChanged(cacheEntry);
         Assert.fail("Should not detect the change");
       }
     };
-    victim.run();
+    createInjector().inject(victim);
+    victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
     
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
     
-    victim.run();
+    victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
   }
-
 }

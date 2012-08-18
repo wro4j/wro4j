@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.StopWatch;
@@ -50,17 +50,24 @@ public class ResourceWatcher {
    * Contains the resource uri's with associated hash values retrieved from currently performed check.
    */
   private final Map<String, String> currentHashes = new HashMap<String, String>();
+  
   /**
-   * {@inheritDoc}
+   * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
+   * 
+   * @param cacheEntry
+   *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
    */
-  public void check(final String groupName) {
+  public void check(final CacheEntry cacheEntry) {
+    Validate.notNull(cacheEntry);
     LOG.debug("ResourceWatcher started...");
     final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
-      final Group group = modelFactory.create().getGroupByName(groupName);
+      final Group group = modelFactory.create().getGroupByName(cacheEntry.getGroupName());
       // TODO run the check in parallel?
-      checkGroup(group);
+      if (isGroupChanged(group)) {
+        onGroupChanged(cacheEntry);
+      }
       // cleanUp
       for (Entry<String, String> entry : currentHashes.entrySet()) {
         previousHashes.put(entry.getKey(), entry.getValue());
@@ -74,27 +81,28 @@ public class ResourceWatcher {
     }
   }
   
-  private void checkGroup(final Group group) {
+  private boolean isGroupChanged(final Group group) {
     LOG.debug("Checking if group {} is changed..", group.getName());
     final List<Resource> resources = group.getResources();
+    boolean isChanged = false;
     for (Resource resource : resources) {
-      if (isChanged(resource)) {
-        onResourceChanged(group, resource);
-        // no need to check the rest of resources
+      if (isChanged = isChanged(resource)) {
         break;
       }
     }
+    return isChanged;
   }
+  
   
   /**
    * Invoked when a resource change detected.
    * 
-   * @param group {@link Group} to which the changed {@link Resource} belongs to.
-   * @param resource the changed {@link Resource}.
+   * @param key
+   *          {@link CacheEntry} which has to be invalidated because the corresponding group contains stale resources.
    * @VisibleForTesting
    */
-  void onResourceChanged(final Group group, final Resource resource) {
-    invalidate(group, resource);    
+  void onGroupChanged(final CacheEntry cacheEntry) {
+    cacheStrategy.put(cacheEntry, null);
   }
 
   /**
@@ -133,23 +141,6 @@ public class ResourceWatcher {
       currentHashes.put(uri, currentHash);
     }
     return currentHash;
-  }
-  
-  /**
-   * Removes from cache the entry for the obsolete group.
-   * 
-   * @param group
-   *          the group whose resources are obsolete.
-   * @param resourceType
-   *          the {@link ResourceType} of the obsolete resource required to remove the exact entry from the cache.
-   */
-  private void invalidate(final Group group, final Resource resource) {
-    LOG.debug("Detected change for {} resource. Invalidating group: {}", resource.getUri(), group.getName());
-    // Invalidate the entry by putting NULL into the cache
-    CacheEntry key = new CacheEntry(group.getName(), resource.getType(), true);
-    cacheStrategy.put(key, null);
-    key = new CacheEntry(group.getName(), resource.getType(), false);
-    cacheStrategy.put(key, null);
   }
   
   /**

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.FieldsSavingRequestWrapper;
-import ro.isdc.wro.manager.runnable.ResourceWatcherRunnable;
 
 
 /**

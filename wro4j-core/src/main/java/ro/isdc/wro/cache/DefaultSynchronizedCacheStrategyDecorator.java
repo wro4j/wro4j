@@ -76,7 +76,7 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   @Override
   protected void onBeforeGet(final CacheEntry key) {
     if (shouldWatchForChange()) {
-      getResourceWatcher().check(key.getGroupName());
+      getResourceWatcher().check(key);
     }
   }
   
