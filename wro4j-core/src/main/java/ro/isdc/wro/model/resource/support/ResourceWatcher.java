@@ -100,8 +100,9 @@ public class ResourceWatcher {
    *          {@link CacheEntry} which has to be invalidated because the corresponding group contains stale resources.
    * @VisibleForTesting
    */
-  void onGroupChanged(final CacheEntry cacheEntry) {
-    cacheStrategy.put(cacheEntry, null);
+  void onGroupChanged(final CacheEntry key) {
+    LOG.debug("detected change for cacheKey: {}", key);
+    cacheStrategy.put(key, null);
   }
 
   /**

@@ -36,10 +36,11 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     Validate.notNull(key);
     LOG.debug("Searching cache key: {}", key);
     V value = null;
+    //invoke this callback method before the lock is acquired to avoid dead-lock
+    onBeforeGet(key);
     final ReadWriteLock lock = getLockForKey(key);
     lock.readLock().lock();
     try {
-      onBeforeGet(key);
       value = getDecoratedObject().get(key);
     } finally {
       lock.readLock().unlock();
