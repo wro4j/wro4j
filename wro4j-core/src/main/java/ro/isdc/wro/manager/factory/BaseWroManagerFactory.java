@@ -310,10 +310,10 @@ public class BaseWroManagerFactory
 
 
   /**
-   * @param resourceLocatorFactory the uriLocatorFactory to set
+   * @param locatorFactory the uriLocatorFactory to set
    */
-  public BaseWroManagerFactory setResourceLocatorFactory(final ResourceLocatorFactory resourceLocatorFactory) {
-    this.resourceLocatorFactory = resourceLocatorFactory;
+  public BaseWroManagerFactory setLocatorFactory(final ResourceLocatorFactory locatorFactory) {
+    this.resourceLocatorFactory = locatorFactory;
     return this;
   }
 

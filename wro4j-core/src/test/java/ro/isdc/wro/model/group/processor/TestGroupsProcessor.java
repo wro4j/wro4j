@@ -115,7 +115,7 @@ public class TestGroupsProcessor {
     };
     final ProcessorsFactory processorsFactory = new SimpleProcessorsFactory().addPreProcessor(failingPreProcessor).addPostProcessor(
         new ProcessorDecorator(failingPreProcessor));
-    final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory).setResourceLocatorFactory(
+    final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory).setLocatorFactory(
         locatorFactory);
     managerFactory.setProcessorsFactory(processorsFactory);
     

@@ -300,7 +300,7 @@ public class TestPreProcessorExecutor {
       }
     };
     //init executor
-    WroManagerFactory managerFactory = new BaseWroManagerFactory().setResourceLocatorFactory(locatorFactory);
+    WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(locatorFactory);
     InjectorBuilder.create(managerFactory).build().inject(executor);
     
     final List<Resource> resources = new ArrayList<Resource>();

@@ -75,7 +75,7 @@ public class TestResourceProxyRequestHandler {
     Context.set(Context.webContext(request, response, filterConfig));
     // a more elaborate way to build injector, used to instruct it use a different instance of authorizationManager
     final Injector injector = new InjectorBuilder(
-        new BaseWroManagerFactory().setResourceLocatorFactory(mockUriLocatorFactory)).setResourceAuthorizationManager(
+        new BaseWroManagerFactory().setLocatorFactory(mockUriLocatorFactory)).setResourceAuthorizationManager(
         mockAuthorizationManager).build();
     injector.inject(victim);
     

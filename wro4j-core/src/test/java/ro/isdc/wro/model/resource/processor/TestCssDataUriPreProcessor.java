@@ -66,7 +66,7 @@ public class TestCssDataUriPreProcessor {
   
   final void initProcessor(final ResourceProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
-    factory.setResourceLocatorFactory(createLocatorFactory());
+    factory.setLocatorFactory(createLocatorFactory());
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
