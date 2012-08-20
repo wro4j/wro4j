@@ -12,7 +12,6 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.cache.CacheEntry;
@@ -27,7 +26,9 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.AbstractResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -39,32 +40,28 @@ public class TestResourceWatcher {
   private static final String GROUP_NAME = "g1";
   private final CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.JS, true);
   private ResourceWatcher victim;
-  @Mock
-  private ResourceLocatorFactory mockLocator;
+  private ResourceLocator mockLocator;
   
   @Before
   public void setUp() {
     initMocks(this);
     Context.set(Context.standaloneContext());
-    // spy the interface instead of WroTestUtils.createResourceMockingLocator() because of mockito bug which was
-    // reported on their mailing list.
-    mockLocator = Mockito.spy(new UriLocator() {
-      public InputStream locate(final String uri)
-          throws IOException {
-        return new ByteArrayInputStream(uri.getBytes());
-      }
-      
-      public boolean accept(final String uri) {
-        return true;
-      }
-    });
     victim = new ResourceWatcher();
     createInjector().inject(victim);
   }
 
   public Injector createInjector() {
-    final ResourceLocatorFactory locatorFactory = new AbstractUriLocatorFactory() {
-      public ResourceLocator getInstance(final String uri) {
+    final ResourceLocatorFactory locatorFactory = new AbstractResourceLocatorFactory() {
+      public ResourceLocator getLocator(final String uri) {
+        if (mockLocator == null) {
+          // Mock interface directly instead of WroTestUtils.createResourceMockingLocator because of mockito bug
+          mockLocator = Mockito.spy(new AbstractResourceLocator() {
+            public InputStream getInputStream()
+                throws IOException {
+              return new ByteArrayInputStream(uri.getBytes());
+            }
+          });
+        }
         return mockLocator;
       }
     };
@@ -112,7 +109,7 @@ public class TestResourceWatcher {
     victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
     
-    Mockito.when(mockLocator.locate(Mockito.anyString())).thenReturn(
+    Mockito.when(mockLocator.getInputStream()).thenReturn(
         new ByteArrayInputStream("different".getBytes()));
 
     victim.check(cacheEntry);
@@ -134,7 +131,7 @@ public class TestResourceWatcher {
     victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
     
-    Mockito.when(mockLocator.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
+    Mockito.when(mockLocator.getInputStream()).thenThrow(new IOException("Resource is unavailable"));
     
     victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
