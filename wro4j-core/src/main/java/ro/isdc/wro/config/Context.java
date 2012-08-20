@@ -113,16 +113,7 @@ public class Context
    * @return true if the call is done during wro4j request cycle. In other words, if the context is set.
    */
   public static boolean isContextSet() {
-    try {
-      return CORRELATION_ID.get() != null && CONTEXT_MAP.get(CORRELATION_ID.get()) != null;
-    } catch (Exception e) {
-      /**
-       * this exception can happen when the the container is shutted down and a thread which checks for Context is still
-       * running: See <a href="http://code.google.com/p/wro4j/issues/detail?id=513>Issue 513</a>
-       */
-      LOG.debug("Unexpected exception during Context#isContextSet() method call", e);
-      return false;
-    }
+    return CORRELATION_ID.get() != null && CONTEXT_MAP.get(CORRELATION_ID.get()) != null;
   }
 
 
@@ -285,5 +276,4 @@ public class Context
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
-
 }
