@@ -95,7 +95,7 @@ public class GroupsProcessor {
     Validate.notNull(content);
     final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
-      LOG.warn("No processors defined. Please, check if your configuration is correct.");
+      LOG.debug("[WARN] No processors defined. Please, check if your configuration is correct.");
     }
     final Collection<ResourcePostProcessor> processors = ProcessorsUtils.filterProcessorsToApply(
         cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);

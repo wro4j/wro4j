@@ -12,15 +12,20 @@ groups {
   }
   
   modules {
-    dynamicRandom()
+    dynamicRandom()  
     font()
     wildcard()
+    /*
     jar()
+    */
   }
   
   wildcard {
+   
     css("/static/**.css")
+   /*
     js("/static/js/*.js")
+    */
     css("/WEB-INF/css/*.css")
     css("classpath:ro/isdc/wro/resources/**.cs?")
   }

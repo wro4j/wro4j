@@ -43,7 +43,9 @@ public class SchedulerHelper {
    * Period in seconds (how often a runnable should run).
    */
   private volatile long period = 0;
-
+  /**
+   * The name of this scheduler (used for logging).
+   */
   private final String name;
   /**
    * The future of the currently running task. Allows reschedule operation by cancelling execution of the running
