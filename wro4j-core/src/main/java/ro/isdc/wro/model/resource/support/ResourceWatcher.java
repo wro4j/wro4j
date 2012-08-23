@@ -5,7 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
@@ -157,5 +160,49 @@ public class ResourceWatcher {
    */
   Map<String, String> getCurrentHashes() {
     return Collections.unmodifiableMap(currentHashes);
+  }
+  
+  public static void main(final String[] args) {
+    int number = 5;
+    CyclicBarrier cb = new CyclicBarrier(number, new Runnable() {
+      public void run() {
+        System.out.println("Barrier reached");
+      }
+    });
+    for (int i = 0; i < number; i++) {
+      new Thread(new Task(cb)).start();
+    }
+  }
+  
+  private static class Task
+      implements Runnable {
+    CyclicBarrier cb;
+    
+    public Task(final CyclicBarrier cb) {
+      this.cb = cb;
+    }
+    
+    public void run() {
+      try {
+        System.out.println("start thread: " + Thread.currentThread().getId());
+        Thread.sleep(new Random().nextInt(1500));
+        System.out.println("slow operation complete");
+        boolean random = !new Random().nextBoolean();
+        System.out.println("random: " + random);
+        if (random) {
+          Thread.currentThread().interrupt();
+          // cb.reset();
+          // cb.notifyAll();
+        }
+        cb.await();
+        System.out.println("End thread: " + Thread.currentThread().getId());
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        cb.reset();
+        Thread.currentThread().interrupt();
+      } catch (BrokenBarrierException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }
