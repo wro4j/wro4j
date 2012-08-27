@@ -56,7 +56,7 @@ public class InjectorBuilder {
    */
   private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   private WroManagerFactory managerFactory;
-  private final LazyInitializer<UriLocatorFactory> uriLocatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
+  private final LazyInitializer<UriLocatorFactory> locatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
     @Override
     protected UriLocatorFactory initialize() {
       final WroManager manager = managerFactory.create();
@@ -150,7 +150,7 @@ public class InjectorBuilder {
     });
     map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        return uriLocatorFactoryInitializer.get();
+        return locatorFactoryInitializer.get();
       }
     });
     map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
