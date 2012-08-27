@@ -1,6 +1,7 @@
 package ro.isdc.wro.http.handler;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +52,7 @@ public class ResourceProxyRequestHandler
       throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
     verifyAccess(resourceUri, response);
-    serverProxyResourceUri(resourceUri, response);
+    serveProxyResourceUri(resourceUri, response);
   }
 
   /**
@@ -62,17 +63,23 @@ public class ResourceProxyRequestHandler
     return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
   }
 
-  private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
+  private void serveProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
     final OutputStream outputStream = response.getOutputStream();
-    
     response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-    int length = IOUtils.copy(new AutoCloseInputStream(locatorFactory.locate(resourceUri)), outputStream);
-    response.setContentLength(length);
+    // Fixme: set cache header, etag, ...
     response.setStatus(HttpServletResponse.SC_OK);
-    
-    IOUtils.closeQuietly(outputStream);
+    InputStream is = null;
+    try {
+      is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
+      int length = IOUtils.copy(is, outputStream);
+      // servlet engine may ignore this if content body is flushed to client
+      response.setContentLength(length);
+    } finally {
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(outputStream);
+    }
   }
 
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
