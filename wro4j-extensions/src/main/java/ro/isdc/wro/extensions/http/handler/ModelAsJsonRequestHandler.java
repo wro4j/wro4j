@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.RequestHandlerSupport;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Inject;
@@ -46,7 +47,7 @@ public class ModelAsJsonRequestHandler
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     // Set header
-    WroUtil.addNoCacheHeaders(response);
+    ResponseHeadersConfigurer.noCache().setHeaders(response);
     response.setContentType(CONTENT_TYPE);
     response.setStatus(HttpServletResponse.SC_OK);
     

@@ -22,7 +22,7 @@ import ro.isdc.wro.WroRuntimeException;
  * 
  * @author Alex Objelean
  */
-public class TestResponseHeaderConfigurer {
+public class TestResponseHeadersConfigurer {
   @Mock
   private HttpServletRequest request;
   @Mock

@@ -66,7 +66,7 @@ public class ResponseHeadersConfigurer {
     return new ResponseHeadersConfigurer() {
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
-        noCache(map);
+        addNoCacheHeaders(map);
       }
     };
   }
@@ -136,7 +136,7 @@ public class ResponseHeadersConfigurer {
     // put defaults
     if (debug) {
       // prevent caching when in development mode
-      noCache(map);
+      addNoCacheHeaders(map);
     } else {
       final Long timestamp = new Date().getTime();
       final Calendar cal = Calendar.getInstance();
@@ -150,7 +150,7 @@ public class ResponseHeadersConfigurer {
   /**
    * Populates the map with headers used to disable cache.
    */
-  private static void noCache(final Map<String, String> map) {
+  private static void addNoCacheHeaders(final Map<String, String> map) {
     map.put(HttpHeader.PRAGMA.toString(), "no-cache");
     map.put(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
     map.put(HttpHeader.EXPIRES.toString(), "0");

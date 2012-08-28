@@ -248,13 +248,6 @@ public final class WroUtil {
     result.append("].join(\"\\n\")");
     return result.toString();
   }
-
-  /**
-   * Add no-cache headers to response.
-   */
-  public static void addNoCacheHeaders(final HttpServletResponse response) {
-    ResponseHeadersConfigurer.noCache().setHeaders(response);
-  }
   
   /**
    * Utility used to verify that requestURI matches provided path
