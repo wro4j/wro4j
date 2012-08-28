@@ -3,14 +3,12 @@ package ro.isdc.wro.http.support;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,13 +158,7 @@ public class ResponseHeadersConfigurer {
    * Reset the configured headers and compute them again based on default headers and those set by "headers" property.
    */
   public final void reset() {
-    init(new HashMap<String, String>());
-  }
-  
-  private void init(final Map<String, String> map) {
-    Validate.notNull(map);
     headersMap.clear();
-    headersMap.putAll(map);
     initHeaderValues();
   }
 

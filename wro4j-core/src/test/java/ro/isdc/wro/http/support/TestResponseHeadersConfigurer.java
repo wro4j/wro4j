@@ -18,7 +18,7 @@ import ro.isdc.wro.WroRuntimeException;
 
 
 /**
- * Test the behavior of {@link AbstractProcessorsFilter}
+ * Test the behavior of {@link ResponseHeadersConfigurer}
  * 
  * @author Alex Objelean
  */
