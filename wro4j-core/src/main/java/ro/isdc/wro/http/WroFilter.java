@@ -35,7 +35,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.factory.DefaultRequestHandlerFactory;
 import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
-import ro.isdc.wro.http.support.ResponseHeaderConfigurer;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
@@ -79,13 +79,7 @@ public class WroFilter
    */
   private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
   
-  /**
-   * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
-   */
-  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
-    return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
-  }
-  private ResponseHeaderConfigurer headerConfigurer = newResponseHeaderConfigurer();
+  private final ResponseHeadersConfigurer headerConfigurer = newResponseHeaderConfigurer();
 
   /**
    * {@inheritDoc}
@@ -211,16 +205,16 @@ public class WroFilter
    * Configure headers according to latest values of {@link WroConfiguration}.
    */
   private void configureHeaders() {
-    headerConfigurer.setDebug(wroConfiguration.isDebug()).setHeaders(wroConfiguration.getHeader()).update();
+    headerConfigurer.setDebug(wroConfiguration.isDebug()).setHeaders(wroConfiguration.getHeader()).reset();
   }
   
   /**
-   * @return the {@link ResponseHeaderConfigurer}.
+   * @return the {@link ResponseHeadersConfigurer}.
    */
-  protected ResponseHeaderConfigurer newResponseHeaderConfigurer() {
-    return new ResponseHeaderConfigurer() {
+  protected ResponseHeadersConfigurer newResponseHeaderConfigurer() {
+    return new ResponseHeadersConfigurer() {
       @Override
-      public void configureDefaultHeaders(Map<String, String> map) {
+      public void configureDefaultHeaders(final Map<String, String> map) {
         super.configureDefaultHeaders(map);
         WroFilter.this.configureDefaultHeaders(map);
       }
@@ -237,8 +231,9 @@ public class WroFilter
    * 
    * @param map
    *          the {@link Map} where key represents the header name, and value - header value.
-   * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and {@link ResponseHeaderConfigurer#configureDefaultHeaders(Map)}
+   * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and {@link ResponseHeadersConfigurer#configureDefaultHeaders(Map)}
    */
+  @Deprecated
   protected void configureDefaultHeaders(final Map<String, String> map) {
   }
   
@@ -375,7 +370,7 @@ public class WroFilter
    *          {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    headerConfigurer.setResponseHeaders(response);
+    headerConfigurer.setHeaders(response);
   }
 
   /**
@@ -429,6 +424,13 @@ public class WroFilter
     return new DefaultWroManagerFactory(wroConfiguration);
   }
 
+  /**
+   * @return implementation of {@link ObjectFactory<WroConfiguration>} used to create a {@link WroConfiguration} object.
+   */
+  protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
+    return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
+  }
+  
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.
    * @VisibleForTesting

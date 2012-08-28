@@ -1,6 +1,7 @@
 package ro.isdc.wro.http.support;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,15 +17,17 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
- * Responsible for configuring response headers (mostly expiry ones).
+ * Responsible for configuring response headers. The configured headers contains the default headers overridden by those
+ * set through "headers" property.
  * 
  * @author Alex Objelean
  * @since 1.4.9
  * @created 27 Aug 2012
  */
-public class ResponseHeaderConfigurer {
-  private static final Logger LOG = LoggerFactory.getLogger(ResponseHeaderConfigurer.class);
+public class ResponseHeadersConfigurer {
+  private static final Logger LOG = LoggerFactory.getLogger(ResponseHeadersConfigurer.class);
   /**
    * Default value used by Cache-control header.
    */
@@ -56,7 +59,32 @@ public class ResponseHeaderConfigurer {
     }
   };
   
+  /**
+   * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers used to disable cache.
+   */
+  public static ResponseHeadersConfigurer noCache() {
+    return new ResponseHeadersConfigurer() {
+      @Override
+      public void configureDefaultHeaders(final Map<String, String> map) {
+        noCache(map);
+      }
+    };
+  }
   
+  /**
+   * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers used to disable cache.
+   */
+  public static ResponseHeadersConfigurer emptyHeaders() {
+    return new ResponseHeadersConfigurer() {
+      @Override
+      public void configureDefaultHeaders(final Map<String, String> map) {
+      }
+    };
+  }
+
+  public ResponseHeadersConfigurer() {
+    reset();
+  }
 
   /**
    * Initialize header values.
@@ -93,7 +121,8 @@ public class ResponseHeaderConfigurer {
     LOG.debug("parseHeader: {}", header);
     final String headerName = header.substring(0, header.indexOf(":"));
     if (!headersMap.containsKey(headerName)) {
-      headersMap.put(headerName, header.substring(header.indexOf(":") + 1));
+      final String value = header.substring(header.indexOf(":") + 1);
+      headersMap.put(headerName, StringUtils.trim(value));
     }
   }
 
@@ -105,7 +134,10 @@ public class ResponseHeaderConfigurer {
    */
   public void configureDefaultHeaders(final Map<String, String> map) {
     // put defaults
-    if (!debug) {
+    if (debug) {
+      // prevent caching when in development mode
+      noCache(map);
+    } else {
       final Long timestamp = new Date().getTime();
       final Calendar cal = Calendar.getInstance();
       cal.roll(Calendar.YEAR, 1);
@@ -114,11 +146,20 @@ public class ResponseHeaderConfigurer {
       map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
     }
   }
-  
+
   /**
-   * Update the configured headers. 
+   * Populates the map with headers used to disable cache.
    */
-  public final void update() {
+  private static void noCache(final Map<String, String> map) {
+    map.put(HttpHeader.PRAGMA.toString(), "no-cache");
+    map.put(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
+    map.put(HttpHeader.EXPIRES.toString(), "0");
+  }
+
+  /**
+   * Reset the configured headers and compute them again based on default headers and those set by "headers" property.
+   */
+  public final void reset() {
     init(new HashMap<String, String>());
   }
   
@@ -136,23 +177,18 @@ public class ResponseHeaderConfigurer {
    * @param response
    *          {@link HttpServletResponse} object.
    */
-  public void setResponseHeaders(final HttpServletResponse response) {
+  public void setHeaders(final HttpServletResponse response) {
     // Force resource caching as best as possible
     for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
       response.setHeader(entry.getKey(), entry.getValue());
     }
-    // prevent caching when in development mode
-    if (debug) {
-      WroUtil.addNoCacheHeaders(response);
-    }
   }
-  
 
   /**
    * @param headers
    *          String representation of headers to set. Each header is separated by | character.
    */
-  public ResponseHeaderConfigurer setHeaders(final String headers) {
+  public ResponseHeadersConfigurer setHeaders(final String headers) {
     this.headers = headers;
     return this;
   }
@@ -160,8 +196,15 @@ public class ResponseHeaderConfigurer {
   /**
    * @param debug flag for debug mode. When this flag is true, the no cache headers will be set.
    */
-  public ResponseHeaderConfigurer setDebug(final boolean debug) {
+  public ResponseHeadersConfigurer setDebug(final boolean debug) {
     this.debug = debug;
     return this;
+  }
+  
+  /**
+   * @VisibleForTesting
+   */
+  final Map<String, String> getHeadersMap() {
+    return Collections.unmodifiableMap(headersMap);
   }
 }
