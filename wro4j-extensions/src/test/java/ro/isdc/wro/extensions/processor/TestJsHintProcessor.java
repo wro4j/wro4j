@@ -58,8 +58,6 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
   /**
    * This test was created initially to prove that {@link JsHintProcessor} is thread-safe, but it doesn't work well when
    * trying to reuse the scope. TODO: This needs to be investigated.
-   *
-   * @throws Exception
    */
   @Test
   public void canBeExecutedMultipleTimes() throws Exception {
