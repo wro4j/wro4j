@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -33,11 +34,7 @@ public class ResponseHeadersConfigurer {
   /**
    * String representation of headers to set. Each header is separated by a | character.
    */
-  private String headers;
-  /**
-   * Flag for debug mode
-   */
-  private boolean debug;
+  private final String headersAsString;
   
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -70,18 +67,45 @@ public class ResponseHeadersConfigurer {
   }
   
   /**
-   * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers used to disable cache.
+   * Factory method which creates a {@link ResponseHeadersConfigurer} containing no headers set.
    */
   public static ResponseHeadersConfigurer emptyHeaders() {
-    return new ResponseHeadersConfigurer() {
+    return new ResponseHeadersConfigurer();
+  }
+  
+  /**
+   * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers used to disable cache in debug
+   * mode.
+   */
+  public static ResponseHeadersConfigurer fromConfig(final WroConfiguration config) {
+    return new ResponseHeadersConfigurer(config.getHeader()) {
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
-      }
+        useDefaultsFromConfig(config, map);
+      };
     };
+  }
+  
+  /**
+   * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers provided as string (separated
+   * by | character).
+   */
+  public static ResponseHeadersConfigurer withHeadersSet(final String headersAsString) {
+    return new ResponseHeadersConfigurer(headersAsString);
   }
 
   public ResponseHeadersConfigurer() {
-    reset();
+    this(null);
+  }
+  
+  /**
+   * @param headersAsString
+   *          string representation of the headers to add separated by | character.
+   */
+  public ResponseHeadersConfigurer(final String headersAsString) {
+    this.headersAsString = headersAsString;
+    headersMap.clear();
+    initHeaderValues();
   }
 
   /**
@@ -89,24 +113,28 @@ public class ResponseHeadersConfigurer {
    */
   private void initHeaderValues() {
     configureDefaultHeaders(headersMap);
-    if (!StringUtils.isEmpty(headers)) {
+    configureFromHeadersAsString();
+    LOG.debug("Header Values: {}", headersMap);
+  }
+
+  private void configureFromHeadersAsString() {
+    if (!StringUtils.isEmpty(headersAsString)) {
       try {
-        if (headers.contains("|")) {
-          final String[] headerAsArray = headers.split("[|]");
+        if (headersAsString.contains("|")) {
+          final String[] headerAsArray = headersAsString.split("[|]");
           for (final String header : headerAsArray) {
             parseHeader(header);
           }
         } else {
-          parseHeader(headers);
+          parseHeader(headersAsString);
         }
       } catch (final Exception e) {
-        throw new WroRuntimeException("Invalid header init-param value: " + headers
+        throw new WroRuntimeException("Invalid header init-param value: " + headersAsString
             + ". A correct value should have the following format: "
             + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
             + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
       }
     }
-    LOG.debug("Header Values: {}", headersMap);
   }
 
   /**
@@ -131,18 +159,6 @@ public class ResponseHeadersConfigurer {
    *          the {@link Map} where key represents the header name, and value - header value.
    */
   public void configureDefaultHeaders(final Map<String, String> map) {
-    // put defaults
-    if (debug) {
-      // prevent caching when in development mode
-      addNoCacheHeaders(map);
-    } else {
-      final Long timestamp = new Date().getTime();
-      final Calendar cal = Calendar.getInstance();
-      cal.roll(Calendar.YEAR, 1);
-      map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-      map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
-      map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
-    }
   }
 
   /**
@@ -155,11 +171,25 @@ public class ResponseHeadersConfigurer {
   }
 
   /**
-   * Reset the configured headers and compute them again based on default headers and those set by "headers" property.
+   * Encapsulates the default headers set based on {@link WroConfiguration}. This exist for backward compatibility and
+   * exist for internal usage only (do not call this method explicitly).
+   * 
+   * @deprecated will be removed when other deprecated methods requiring this method will be removed.
    */
-  public final void reset() {
-    headersMap.clear();
-    initHeaderValues();
+  @Deprecated
+  protected static void useDefaultsFromConfig(final WroConfiguration config, final Map<String, String> map) {
+    // put defaults
+    if (config.isDebug()) {
+      // prevent caching when in development mode
+      addNoCacheHeaders(map);
+    } else {
+      final Long timestamp = new Date().getTime();
+      final Calendar cal = Calendar.getInstance();
+      cal.roll(Calendar.YEAR, 1);
+      map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
+      map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
+      map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+    }
   }
 
   /**
@@ -174,23 +204,6 @@ public class ResponseHeadersConfigurer {
     for (final Map.Entry<String, String> entry : headersMap.entrySet()) {
       response.setHeader(entry.getKey(), entry.getValue());
     }
-  }
-
-  /**
-   * @param headers
-   *          String representation of headers to set. Each header is separated by | character.
-   */
-  public ResponseHeadersConfigurer setHeaders(final String headers) {
-    this.headers = headers;
-    return this;
-  }
-
-  /**
-   * @param debug flag for debug mode. When this flag is true, the no cache headers will be set.
-   */
-  public ResponseHeadersConfigurer setDebug(final boolean debug) {
-    this.debug = debug;
-    return this;
   }
   
   /**

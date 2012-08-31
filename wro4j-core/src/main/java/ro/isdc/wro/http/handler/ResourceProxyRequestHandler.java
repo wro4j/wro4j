@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ContentTypeResolver;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -43,6 +44,7 @@ public class ResourceProxyRequestHandler
   
   @Inject
   private ResourceAuthorizationManager authManager;
+  private ResponseHeadersConfigurer headersConfigurer;
 
   /**
    * {@inheritDoc}
@@ -68,7 +70,10 @@ public class ResourceProxyRequestHandler
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
     final OutputStream outputStream = response.getOutputStream();
     response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-    // Fixme: set cache header, etag, ...
+
+    // set expiry headers
+    getHeadersConfigurer().setHeaders(response);
+
     response.setStatus(HttpServletResponse.SC_OK);
     InputStream is = null;
     try {
@@ -88,5 +93,19 @@ public class ResourceProxyRequestHandler
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
     }
+  }
+  
+  private final ResponseHeadersConfigurer getHeadersConfigurer() {
+    if (headersConfigurer == null) {
+      headersConfigurer = newResponseHeadersConfigurer();
+    }
+    return headersConfigurer;
+  }
+
+  /**
+   * @return the {@link ResponseHeadersConfigurer}.
+   */
+  protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
+    return ResponseHeadersConfigurer.fromConfig(config);
   }
 }

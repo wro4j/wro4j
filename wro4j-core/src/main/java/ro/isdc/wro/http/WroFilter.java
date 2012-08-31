@@ -77,9 +77,9 @@ public class WroFilter
   /**
    * Used to create the collection of requestHandlers to apply
    */
-  private RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory();
+  private RequestHandlerFactory requestHandlerFactory = newRequestHandlerFactory();
   
-  private final ResponseHeadersConfigurer headerConfigurer = newResponseHeaderConfigurer();
+  private ResponseHeadersConfigurer headersConfigurer;
 
   /**
    * {@inheritDoc}
@@ -90,7 +90,7 @@ public class WroFilter
     // invoke createConfiguration method only if the configuration was not set.
     this.wroConfiguration = wroConfiguration == null ? createConfiguration() : wroConfiguration;
     this.wroManagerFactory = new InjectableWroManagerFactoryDecorator(createWroManagerFactory());
-    configureHeaders();
+    headersConfigurer = newResponseHeadersConfigurer();
     registerChangeListeners();
     initJMX();
     doInit(config);
@@ -188,39 +188,42 @@ public class WroFilter
     wroConfiguration.registerCacheUpdatePeriodChangeListener(new PropertyChangeListener() {
       public void propertyChange(final PropertyChangeEvent event) {
         // reset cache headers when any property is changed in order to avoid browser caching
-        configureHeaders();
+        headersConfigurer = newResponseHeadersConfigurer();
         wroManagerFactory.onCachePeriodChanged(valueAsLong(event.getNewValue()));
       }
     });
     wroConfiguration.registerModelUpdatePeriodChangeListener(new PropertyChangeListener() {
       public void propertyChange(final PropertyChangeEvent event) {
-        configureHeaders();
+        headersConfigurer = newResponseHeadersConfigurer();
         wroManagerFactory.onModelPeriodChanged(valueAsLong(event.getNewValue()));
       }
     });
     LOG.debug("Cache & Model change listeners were registered");
   }
-
-  /**
-   * Configure headers according to latest values of {@link WroConfiguration}.
-   */
-  private void configureHeaders() {
-    headerConfigurer.setDebug(wroConfiguration.isDebug()).setHeaders(wroConfiguration.getHeader()).reset();
-  }
   
   /**
    * @return the {@link ResponseHeadersConfigurer}.
    */
-  protected ResponseHeadersConfigurer newResponseHeaderConfigurer() {
-    return new ResponseHeadersConfigurer() {
+  protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
+    /**
+     * TODO: when the WroFilter#configureDefaultsHeaders is deprecated, replace this constructor with factory method.
+     */
+    return new ResponseHeadersConfigurer(wroConfiguration.getHeader()) {
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
-        super.configureDefaultHeaders(map);
+        useDefaultsFromConfig(wroConfiguration, map);
         WroFilter.this.configureDefaultHeaders(map);
       }
     };
   }
   
+  /**
+   * @return default implementation of {@link RequestHandlerFactory}
+   */
+  protected RequestHandlerFactory newRequestHandlerFactory() {
+    return new DefaultRequestHandlerFactory();
+  }
+
   private long valueAsLong(final Object value) {
     Validate.notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
@@ -370,7 +373,7 @@ public class WroFilter
    *          {@link HttpServletResponse} object.
    */
   protected void setResponseHeaders(final HttpServletResponse response) {
-    headerConfigurer.setHeaders(response);
+    headersConfigurer.setHeaders(response);
   }
 
   /**
