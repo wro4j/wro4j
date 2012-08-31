@@ -360,8 +360,8 @@ public class WroFilter
       LOG.debug("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);
     } catch (final Exception ex) {
-      // should never happen
-      LOG.error("Error while chaining the request",  e);
+      // should never happen (use debug level to suppres unuseful logs)
+      LOG.debug("Error while chaining the request", e);
     }
   }
 
