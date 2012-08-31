@@ -187,6 +187,8 @@ public class ResponseHeadersConfigurer {
       final Calendar cal = Calendar.getInstance();
       cal.roll(Calendar.YEAR, 1);
       map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
+      // TODO probably this is not a good idea to set this field which will have a different value when there will be
+      // more than one instance of wro4j.
       map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
       map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
     }
