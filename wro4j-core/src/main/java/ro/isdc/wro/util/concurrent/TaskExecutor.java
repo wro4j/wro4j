@@ -1,0 +1,140 @@
+package ro.isdc.wro.util.concurrent;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+/**
+ * Hides the details of running tasks in parallel.
+ * 
+ * @author Alex Objelean
+ */
+public class TaskExecutor<T> {
+  private static final Logger LOG = LoggerFactory.getLogger(TaskExecutor.class);
+  /**
+   * Run the tasks in parallel.
+   */
+  private CompletionService<T> completionService;
+  /**
+   * Responsible for consume the available results. The consumer is run asynchronously to avoid blocking the job
+   * execution.
+   */
+  private ExecutorService consumerService;
+  
+  private CompletionService<T> getCompletionService() {
+    if (completionService == null) {
+      completionService = new ExecutorCompletionService<T>(newExecutor());
+    }
+    return completionService;
+  }
+  
+  /**
+   * @return a not null instance of {@link ExecutorService} which is created lazily.
+   */
+  private ExecutorService getConsumerService() {
+    if (consumerService == null) {
+      // it is enough to use an executor with a single thread.
+      consumerService = Executors.newFixedThreadPool(1);
+    }
+    return consumerService;
+  }
+
+  /**
+   * @return the {@link ExecutorService} responsible for running the tasks.
+   */
+  protected ExecutorService newExecutor() {
+    return Executors.newFixedThreadPool(10);
+  }
+  
+  /**
+   * Submits a task to the taskExecutor.
+   */
+  public final void submit(final Callable<T> callable) {
+    // new ContextPropagatingCallable<T>(
+    getCompletionService().submit(callable);
+    consumeResult();
+  }
+  
+  /**
+   * Reads asynchronously the latest available result.
+   */
+  private void consumeResult() {
+    getConsumerService().submit(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        try {
+          T result = getCompletionService().take().get();
+          onResultAvailable(result);
+        } catch (Exception e) {
+          LOG.error("Exception while consuming result", e);
+        }
+        return null;
+      }
+    });
+  }
+  
+  /**
+   * A callback invoked when a result is available.
+   * 
+   * @param result
+   *          the available processed result.
+   * @throws Exception
+   *           if callback execution fails.
+   */
+  protected void onResultAvailable(final T result)
+      throws Exception {
+  }
+  
+  private static void printDate() {
+    System.out.println(new SimpleDateFormat("HH:ss:S").format(new Date()));
+  }
+
+  public static void main(final String[] args)
+      throws Exception {
+    final TaskExecutor<String> executor = new TaskExecutor<String>() {
+      @Override
+      protected void onResultAvailable(final String result)
+          throws Exception {
+        System.out.println("result available: " + result);
+        System.out.println("\n===============\n");
+        printDate();
+      }
+
+    };
+    executor.submit(new Callable<String>() {
+      public String call()
+          throws Exception {
+        printDate();
+        String result = Thread.currentThread().getName();
+        System.out.println("\n[START]===============\nThread " + result + " started...");
+        double sleep = 2000;
+        System.out.println("Sleeping for: " + sleep);
+        Thread.sleep((long) sleep);
+        return result;
+      }
+    });
+    for (int i = 0; i < 10; i++) {
+      executor.submit(new Callable<String>() {
+        public String call()
+            throws Exception {
+          printDate();
+          String result = Thread.currentThread().getName() + ":" + UUID.randomUUID().toString();
+          System.out.println("\n[START]===============\nThread " + result + " started...");
+          double sleep = Math.random() * 300;
+          System.out.println("Sleeping for: " + sleep);
+          Thread.sleep((long) sleep);
+          return result;
+        }
+      });
+    }
+  }
+}
