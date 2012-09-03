@@ -35,6 +35,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -61,6 +62,7 @@ public class PreProcessorExecutor {
    * Runs the preProcessing in parallel.
    */
   private ExecutorService executor;
+  private TaskExecutor<String> taskExecutor;
   
   /**
    * Apply preProcessors on resources and merge them.
@@ -140,6 +142,27 @@ public class PreProcessorExecutor {
       }
     }
     return result.toString();
+  }
+
+  /**
+   * TODO find a way to collect results in the same order they are submitted.
+   */
+  private TaskExecutor<String> getTaskExecutor() {
+    if (taskExecutor == null) {
+      taskExecutor = new TaskExecutor<String>() {
+        @Override
+        protected void onException(Exception e) {
+          // propagate original cause
+          final Throwable cause = e.getCause();
+          if (cause instanceof WroRuntimeException) {
+            throw (WroRuntimeException) cause;
+          } else {
+            throw new WroRuntimeException("Problem during parallel pre processing", e.getCause());
+          }
+        }
+      };
+    }
+    return taskExecutor;
   }
   
   private ExecutorService getExecutorService() {

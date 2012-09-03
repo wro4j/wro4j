@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.http.WroFilter;
 
 
@@ -268,6 +270,17 @@ public class Context
     return CORRELATION_ID.get();
   }
   
+  /**
+   * Decorates a callable with {@link ContextPropagatingCallable} making it possible to access the {@link Context} from
+   * within the decorated callable.
+   * 
+   * @param callable
+   *          the {@link Callable} to decorate.
+   * @return the decorated callable.
+   */
+  public static <T> Callable<T> decorate(final Callable<T> callable) {
+    return new ContextPropagatingCallable<T>(callable);
+  }
 
   /**
    * {@inheritDoc}

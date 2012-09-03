@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class TaskExecutor<T> {
    * Run the tasks in parallel.
    */
   private CompletionService<T> completionService;
+  private ExecutorService completionExecutor;
   /**
    * Responsible for consume the available results. The consumer is run asynchronously to avoid blocking the job
    * execution.
@@ -32,9 +34,16 @@ public class TaskExecutor<T> {
   
   private CompletionService<T> getCompletionService() {
     if (completionService == null) {
-      completionService = new ExecutorCompletionService<T>(newExecutor());
+      completionService = new ExecutorCompletionService<T>(getExecutor());
     }
     return completionService;
+  }
+  
+  public ExecutorService getExecutor() {
+    if (completionExecutor == null) {
+      completionExecutor = newExecutor();
+    }
+    return completionExecutor;
   }
   
   /**
@@ -47,21 +56,24 @@ public class TaskExecutor<T> {
     }
     return consumerService;
   }
-
+  
   /**
    * @return the {@link ExecutorService} responsible for running the tasks.
    */
   protected ExecutorService newExecutor() {
-    return Executors.newFixedThreadPool(10);
+    return Executors.newFixedThreadPool(2);
   }
   
   /**
-   * Submits a task to the taskExecutor.
+   * Submits a task to the taskExecutor. This operation is not a blocking one.
    */
   public final void submit(final Callable<T> callable) {
-    // new ContextPropagatingCallable<T>(
     getCompletionService().submit(callable);
     consumeResult();
+  }
+  
+  public final void shutdown() {
+    getExecutor().shutdown();
   }
   
   /**
@@ -72,14 +84,24 @@ public class TaskExecutor<T> {
       public Void call()
           throws Exception {
         try {
-          T result = getCompletionService().take().get();
+          final T result = getCompletionService().take().get();
           onResultAvailable(result);
-        } catch (Exception e) {
+        } catch (final Exception e) {
+          onException(e);
           LOG.error("Exception while consuming result", e);
         }
         return null;
       }
     });
+  }
+  
+  /**
+   * Invoked when an exception occurs during task execution. By default exception is ignored.
+   * 
+   * @param e
+   *          {@link Exception} caught during execution.
+   */
+  protected void onException(final Exception e) {
   }
   
   /**
@@ -97,7 +119,7 @@ public class TaskExecutor<T> {
   private static void printDate() {
     System.out.println(new SimpleDateFormat("HH:ss:S").format(new Date()));
   }
-
+  
   public static void main(final String[] args)
       throws Exception {
     final TaskExecutor<String> executor = new TaskExecutor<String>() {
@@ -108,7 +130,7 @@ public class TaskExecutor<T> {
         System.out.println("\n===============\n");
         printDate();
       }
-
+      
     };
     executor.submit(new Callable<String>() {
       public String call()

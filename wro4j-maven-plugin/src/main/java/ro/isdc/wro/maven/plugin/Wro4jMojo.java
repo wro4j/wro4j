@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -82,6 +84,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
+  private TaskExecutor<Void> taskExecutor;
 
 
   /**
@@ -108,16 +111,28 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("groupNameMappingFile: " + groupNameMappingFile);
-
+    boolean parallel = false;
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final File destinationFolder = computeDestinationFolder(resourceType);
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-        processGroup(groupWithExtension, destinationFolder);
+        if (parallel) {
+        getTaskExecutor().submit(Context.decorate(new Callable<Void>() {
+          public Void call()
+              throws Exception {
+            processGroup(groupWithExtension, destinationFolder);
+            return null;
+          }
+        }));
+        } else {
+          processGroup(groupWithExtension, destinationFolder);
+        }
       }
     }
-
+    if (parallel) {
+      getTaskExecutor().shutdown();
+    }
     writeGroupNameMap();
   }
 
@@ -281,6 +296,22 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return result;
   }
 
+
+  /**
+   * TODO find a way to collect results in the same order they are submitted.
+   */
+  private TaskExecutor<Void> getTaskExecutor() {
+    if (taskExecutor == null) {
+      taskExecutor = new TaskExecutor<Void>() {
+        @Override
+        protected void onException(final Exception e) {
+          //propagate exception
+          throw new RuntimeException(e);
+        }
+      };
+    }
+    return taskExecutor;
+  }
 
   /**
    * @param destinationFolder the destinationFolder to set

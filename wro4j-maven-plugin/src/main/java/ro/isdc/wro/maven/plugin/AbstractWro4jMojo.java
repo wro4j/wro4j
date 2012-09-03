@@ -106,6 +106,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     try {
       doExecute();
     } catch (final Exception e) {
+      getLog().error("Exception occured while executing maven plugin", e);
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
     }
   }
