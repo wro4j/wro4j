@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class TaskExecutor<T> {
    * @return the {@link ExecutorService} responsible for running the tasks.
    */
   protected ExecutorService newExecutor() {
-    return Executors.newFixedThreadPool(2);
+    return Executors.newFixedThreadPool(5);
   }
   
   /**
@@ -72,18 +73,27 @@ public class TaskExecutor<T> {
    */
   public final void submit(final Collection<Callable<T>> callables)
       throws Exception {
-    for (final Callable<T> callable : callables) {
-      getCompletionService().submit(callable);
-    }
-    for (int i = 0; i < callables.size(); i++) {
-      doConsumeResult();
+    Validate.notNull(callables);
+    LOG.debug("running {} tasks", callables.size());
+    if (callables.size() == 1) {
+      final T result = callables.iterator().next().call();
+      onResultAvailable(result);
+    } else {
+      LOG.debug("Running tasks in parallel");
+      for (final Callable<T> callable : callables) {
+        getCompletionService().submit(callable);
+      }
+      for (int i = 0; i < callables.size(); i++) {
+        doConsumeResult();
+      }
+      getExecutor().shutdown();
     }
   }
-
+  
   /**
    * Submits a task to the taskExecutor. This operation is not a blocking one.
    */
-  public final void submit(final Callable<T> callable) {
+  private final void submit(final Callable<T> callable) {
     getCompletionService().submit(callable);
     consumeResult();
   }
@@ -137,7 +147,7 @@ public class TaskExecutor<T> {
       LOG.error("Exception while consuming result", e);
     }
   }
-
+  
   private static void printDate() {
     System.out.println(new SimpleDateFormat("HH:ss:S").format(new Date()));
   }

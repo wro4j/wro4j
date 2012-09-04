@@ -59,7 +59,6 @@ public abstract class AbstractSingleProcessorMojo
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
-    System.out.println("groupsAsList: " + groupsAsList);
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
