@@ -86,7 +86,8 @@ public class TaskExecutor<T> {
       for (int i = 0; i < callables.size(); i++) {
         doConsumeResult();
       }
-      getExecutor().shutdown();
+      //need to find out how to safely shutdown the executor
+      //getExecutor().shutdown();
     }
   }
   
@@ -96,10 +97,6 @@ public class TaskExecutor<T> {
   private final void submit(final Callable<T> callable) {
     getCompletionService().submit(callable);
     consumeResult();
-  }
-  
-  public final void shutdown() {
-    getExecutor().shutdown();
   }
   
   /**
