@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -28,7 +29,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.util.concurrent.TaskExecutor;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -36,17 +37,17 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * A build-time solution for organizing and minimizing static resources. By default uses the same configuration as the
  * run-time solution. Additionally, allows you to change the processors used by changing the wroManagerFactory
  * implementation used by the plugin.
- *
+ * 
  * @goal run
  * @phase compile
  * @requiresDependencyResolution runtime
- *
  * @author Alex Objelean
  */
-public class Wro4jMojo extends AbstractWro4jMojo {
+public class Wro4jMojo
+    extends AbstractWro4jMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.
-   *
+   * 
    * @parameter default-value="${project.build.directory}/wro/" expression="${destinationFolder}"
    * @optional
    */
@@ -63,14 +64,14 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   private File jsDestinationFolder;
   /**
    * This parameter is not meant to be used. The only purpose is to hold project build directory
-   *
+   * 
    * @parameter default-value="${project.build.directory}
    * @optional
    */
   private File buildDirectory;
   /**
    * This parameter is not meant to be used. The only purpose is to hold the final build name of the artifacty
-   *
+   * 
    * @parameter default-value="${project.build.directory}/${project.build.finalName}
    * @optional
    */
@@ -84,15 +85,13 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
-  private TaskExecutor<Void> taskExecutor;
-
 
   /**
    * {@inheritDoc}
    */
   @Override
   protected void validate()
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     super.validate();
     // additional validation requirements
     if (destinationFolder == null) {
@@ -100,39 +99,46 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
   }
 
-
   /**
    * {@inheritDoc}
    */
   @Override
   protected void doExecute()
-    throws Exception {
+      throws Exception {
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("groupNameMappingFile: " + groupNameMappingFile);
     boolean parallel = false;
     final Collection<String> groupsAsList = getTargetGroupsAsList();
+    StopWatch watch = new StopWatch();
+    watch.start("processGroups: " + groupsAsList);
+    
+    final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
+
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final File destinationFolder = computeDestinationFolder(resourceType);
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
         if (parallel) {
-        getTaskExecutor().submit(Context.decorate(new Callable<Void>() {
-          public Void call()
-              throws Exception {
-            processGroup(groupWithExtension, destinationFolder);
-            return null;
-          }
-        }));
+          callables.add(Context.decorate(new Callable<Void>() {
+            public Void call()
+                throws Exception {
+              processGroup(groupWithExtension, destinationFolder);
+              return null;
+            }
+          }));
         } else {
           processGroup(groupWithExtension, destinationFolder);
         }
       }
     }
     if (parallel) {
-      getTaskExecutor().shutdown();
+      getTaskExecutor().submit(callables);
+      // getTaskExecutor().shutdown();
     }
+    watch.stop();
+    System.out.println(watch.prettyPrint());
     writeGroupNameMap();
   }
 
@@ -150,13 +156,15 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
   /**
    * Encodes a version using some logic.
-   *
-   * @param group the name of the resource to encode.
-   * @param input the stream of the result content.
+   * 
+   * @param group
+   *          the name of the resource to encode.
+   * @param input
+   *          the stream of the result content.
    * @return the name of the resource with the version encoded.
    */
   private String rename(final String group, final InputStream input)
-    throws Exception {
+      throws Exception {
     try {
       final String newName = getManagerFactory().create().getNamingStrategy().rename(group, input);
       groupNames.setProperty(group, newName);
@@ -166,16 +174,17 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
   }
 
-
   /**
    * Computes the destination folder based on resource type.
-   *
-   * @param resourceType {@link ResourceType} to process.
+   * 
+   * @param resourceType
+   *          {@link ResourceType} to process.
    * @return destinationFoder where the result of resourceType will be copied.
-   * @throws MojoExecutionException if computed folder is null.
+   * @throws MojoExecutionException
+   *           if computed folder is null.
    */
   private File computeDestinationFolder(final ResourceType resourceType)
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     File folder = destinationFolder;
     if (resourceType == ResourceType.JS) {
       if (jsDestinationFolder != null) {
@@ -190,8 +199,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     getLog().info("folder: " + folder);
     if (folder == null) {
       throw new MojoExecutionException("Couldn't compute destination folder for resourceType: " + resourceType
-        + ". That means that you didn't define one of the following parameters: "
-        + "destinationFolder, cssDestinationFolder, jsDestinationFolder");
+          + ". That means that you didn't define one of the following parameters: "
+          + "destinationFolder, cssDestinationFolder, jsDestinationFolder");
     }
     if (!folder.exists()) {
       folder.mkdirs();
@@ -199,12 +208,11 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return folder;
   }
 
-
   /**
    * Process a single group.
    */
   private void processGroup(final String group, final File parentFoder)
-    throws Exception {
+      throws Exception {
     ByteArrayOutputStream resultOutputStream = null;
     InputStream resultInputStream = null;
     try {
@@ -230,7 +238,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       final File parentFolder = destinationFile.getParentFile();
       if (!parentFolder.exists()) {
-        //make directories if required
+        // make directories if required
         parentFolder.mkdirs();
       }
       destinationFile.createNewFile();
@@ -248,8 +256,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         destinationFile.delete();
       } else {
         getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
-        getLog().info(
-          destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
+        getLog().info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
       }
     } finally {
       if (resultOutputStream != null) {
@@ -261,13 +268,12 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
   }
 
-
   /**
    * The idea is to compute the aggregatedFolderPath based on a root folder. The root folder is determined by comparing
    * the cssTargetFolder (the folder where aggregated css files are located) with build directory or contextFolder. If
    * rootFolder is null, then the result is also null (equivalent to using the cssTargetFolder the same as the root
    * folder.
-   *
+   * 
    * @return the aggregated folder path, based on the cssDestinationFolder (if set) and the build folder or the
    *         contextFolder.
    */
@@ -296,41 +302,25 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return result;
   }
 
-
   /**
-   * TODO find a way to collect results in the same order they are submitted.
-   */
-  private TaskExecutor<Void> getTaskExecutor() {
-    if (taskExecutor == null) {
-      taskExecutor = new TaskExecutor<Void>() {
-        @Override
-        protected void onException(final Exception e) {
-          //propagate exception
-          throw new RuntimeException(e);
-        }
-      };
-    }
-    return taskExecutor;
-  }
-
-  /**
-   * @param destinationFolder the destinationFolder to set
+   * @param destinationFolder
+   *          the destinationFolder to set
    */
   public void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
 
-
   /**
-   * @param cssDestinationFolder the cssDestinationFolder to set
+   * @param cssDestinationFolder
+   *          the cssDestinationFolder to set
    */
   public void setCssDestinationFolder(final File cssDestinationFolder) {
     this.cssDestinationFolder = cssDestinationFolder;
   }
 
-
   /**
-   * @param jsDestinationFolder the jsDestinationFolder to set
+   * @param jsDestinationFolder
+   *          the jsDestinationFolder to set
    */
   public void setJsDestinationFolder(final File jsDestinationFolder) {
     this.jsDestinationFolder = jsDestinationFolder;
@@ -338,23 +328,25 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
   /**
    * The folder where the project is built.
-   *
-   * @param buildDirectory the buildDirectory to set
+   * 
+   * @param buildDirectory
+   *          the buildDirectory to set
    */
   public void setBuildDirectory(final File buildDirectory) {
     this.buildDirectory = buildDirectory;
   }
 
   /**
-   * @param buildFinalName the buildFinalName to set
+   * @param buildFinalName
+   *          the buildFinalName to set
    */
   public void setBuildFinalName(final File buildFinalName) {
     this.buildFinalName = buildFinalName;
   }
 
-
   /**
-   * @param groupNameMappingFile the groupNameMappingFile to set
+   * @param groupNameMappingFile
+   *          the groupNameMappingFile to set
    */
   public void setGroupNameMappingFile(final String groupNameMappingFile) {
     this.groupNameMappingFile = groupNameMappingFile;

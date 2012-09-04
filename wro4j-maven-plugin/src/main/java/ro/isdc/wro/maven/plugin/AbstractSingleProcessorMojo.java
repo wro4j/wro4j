@@ -4,7 +4,9 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -24,20 +26,21 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 /**
  * Maven plugin which use a singe processor.
- *
+ * 
  * @author Alex Objelean
  */
-public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
+public abstract class AbstractSingleProcessorMojo
+    extends AbstractWro4jMojo {
   /**
    * Comma separated options. This field is optional. If no value is provided, no options will be used..
-   *
+   * 
    * @parameter expression="${options}"
    * @optional
    */
   private String options;
   /**
    * When true, all the plugin won't stop its execution and will log all found errors.
-   *
+   * 
    * @parameter default-value="false" expression="${failNever}"
    * @optional
    */
@@ -48,36 +51,56 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    */
   @Override
   public final void doExecute()
-    throws Exception {
+      throws Exception {
     getLog().info("options: " + options);
     getLog().info("failNever: " + failNever);
 
+    boolean parallel = true;
+    final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
+
     final Collection<String> groupsAsList = getTargetGroupsAsList();
+    System.out.println("groupsAsList: " + groupsAsList);
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-        processGroup(groupWithExtension);
+        
+        if (parallel) {
+          callables.add(Context.decorate(new Callable<Void>() {
+            public Void call()
+                throws Exception {
+              processGroup(groupWithExtension);
+              return null;
+            }
+          }));
+        } else {
+          processGroup(groupWithExtension);
+        }
       }
+    }
+    if (parallel) {
+      getTaskExecutor().submit(callables);
     }
   }
 
   /**
-   * @param group the name of the group to process.
+   * @param group
+   *          the name of the group to process.
    */
-  private void processGroup(final String group) throws Exception {
+  private void processGroup(final String group)
+      throws Exception {
     getLog().info("processing group: " + group);
-
-    //mock request
+    
+    // mock request
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(group);
-    //mock response
+    // mock response
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
-
-    //init context
+    
+    // init context
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-    //perform processing
+    // perform processing
     getManagerFactory().create().process();
 
     getLog().debug("Processing group: " + group + " [OK]");
@@ -88,7 +111,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    */
   @Override
   protected StandaloneContextAwareManagerFactory getManagerFactory()
-    throws Exception {
+      throws Exception {
     final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
     factory.setProcessorsFactory(createSingleProcessorsFactory());
     return factory;
@@ -112,14 +135,17 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
 
   /**
    * Used for tests only.
-   * @param options the options to set
+   * 
+   * @param options
+   *          the options to set
    */
   void setOptions(final String options) {
     this.options = options;
   }
 
   /**
-   * @param failNever the failFast to set
+   * @param failNever
+   *          the failFast to set
    */
   public void setFailNever(final boolean failNever) {
     this.failNever = failNever;

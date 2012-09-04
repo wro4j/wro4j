@@ -24,6 +24,7 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -83,7 +84,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * @optional
    */
   private File extraConfigFile;
-
+  private TaskExecutor<Void> taskExecutor;
 
   /**
    * {@inheritDoc}
@@ -254,6 +255,18 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
   }
 
+  protected final TaskExecutor<Void> getTaskExecutor() {
+    if (taskExecutor == null) {
+      taskExecutor = new TaskExecutor<Void>() {
+        @Override
+        protected void onException(final Exception e) {
+          // propagate exception
+          throw new RuntimeException(e);
+        }
+      };
+    }
+    return taskExecutor;
+  }
 
   /**
    * @param contextFolder the servletContextFolder to set

@@ -1,6 +1,7 @@
 package ro.isdc.wro.util.concurrent;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -8,7 +9,6 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +65,22 @@ public class TaskExecutor<T> {
   }
   
   /**
+   * @param callables
+   *          a {@link Collection} of {@link Callable} to execute.
+   * @throws Exception
+   *           if an exception occured during callable execution.
+   */
+  public final void submit(final Collection<Callable<T>> callables)
+      throws Exception {
+    for (final Callable<T> callable : callables) {
+      getCompletionService().submit(callable);
+    }
+    for (int i = 0; i < callables.size(); i++) {
+      doConsumeResult();
+    }
+  }
+
+  /**
    * Submits a task to the taskExecutor. This operation is not a blocking one.
    */
   public final void submit(final Callable<T> callable) {
@@ -83,13 +99,7 @@ public class TaskExecutor<T> {
     getConsumerService().submit(new Callable<Void>() {
       public Void call()
           throws Exception {
-        try {
-          final T result = getCompletionService().take().get();
-          onResultAvailable(result);
-        } catch (final Exception e) {
-          onException(e);
-          LOG.error("Exception while consuming result", e);
-        }
+        doConsumeResult();
         return null;
       }
     });
@@ -101,7 +111,8 @@ public class TaskExecutor<T> {
    * @param e
    *          {@link Exception} caught during execution.
    */
-  protected void onException(final Exception e) {
+  protected void onException(final Exception e)
+      throws Exception {
   }
   
   /**
@@ -116,6 +127,17 @@ public class TaskExecutor<T> {
       throws Exception {
   }
   
+  private void doConsumeResult()
+      throws Exception {
+    try {
+      final T result = getCompletionService().take().get();
+      onResultAvailable(result);
+    } catch (final Exception e) {
+      onException(e);
+      LOG.error("Exception while consuming result", e);
+    }
+  }
+
   private static void printDate() {
     System.out.println(new SimpleDateFormat("HH:ss:S").format(new Date()));
   }

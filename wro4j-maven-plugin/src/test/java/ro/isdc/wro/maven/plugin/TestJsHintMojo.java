@@ -8,13 +8,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 
-
 /**
  * Test the {@link JsHintMojo} class.
- *
+ * 
  * @author Alex Objelean
  */
-public class TestJsHintMojo extends AbstractTestLinterMojo {
+public class TestJsHintMojo
+    extends AbstractTestLinterMojo {
   /**
    * {@inheritDoc}
    */
@@ -29,7 +29,8 @@ public class TestJsHintMojo extends AbstractTestLinterMojo {
   }
 
   @Test
-  public void usePredefOptions() throws Exception {
+  public void usePredefOptions()
+      throws Exception {
     getMojo().setOptions("predef=['YUI','window','document','OnlineOpinion','xui']");
 
     getMojo().setTargetGroups("undef");
@@ -38,14 +39,14 @@ public class TestJsHintMojo extends AbstractTestLinterMojo {
 
   @Test
   public void testMojoWithPropertiesSet()
-    throws Exception {
+      throws Exception {
     getMojo().setIgnoreMissingResources(true);
     getMojo().execute();
   }
 
-
   @Test
-  public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue() throws Exception {
+  public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue()
+      throws Exception {
     setWroWithInvalidResources();
     getMojo().setIgnoreMissingResources(true);
     getMojo().execute();
@@ -53,15 +54,21 @@ public class TestJsHintMojo extends AbstractTestLinterMojo {
 
   @Test
   public void testResourceWithUndefVariables()
-    throws Exception {
+      throws Exception {
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
-
+  
+  @Test
+  public void shouldProcessMultipleGroups()
+      throws Exception {
+    getMojo().setTargetGroups("undef,valid,g3");
+    getMojo().execute();
+  }
 
   @Test
   public void testEmptyOptions()
-    throws Exception {
+      throws Exception {
     getMojo().setOptions("");
     getMojo().setTargetGroups("undef");
     getMojo().execute();
