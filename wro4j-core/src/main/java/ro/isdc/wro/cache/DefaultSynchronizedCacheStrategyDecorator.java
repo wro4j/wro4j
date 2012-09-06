@@ -28,7 +28,17 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   @Inject
   private ResourceAuthorizationManager authorizationManager;
   
-  public DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  /**
+   * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the operation is redundant.
+   */
+  public static CacheStrategy<CacheEntry, ContentHashEntry> decorate(final CacheStrategy<CacheEntry, ContentHashEntry> decorated) {
+    if (decorated instanceof DefaultSynchronizedCacheStrategyDecorator) {
+      return decorated;
+    }
+    return new DefaultSynchronizedCacheStrategyDecorator(decorated);
+  }
+  
+  private DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     super(cacheStrategy);
   }
   

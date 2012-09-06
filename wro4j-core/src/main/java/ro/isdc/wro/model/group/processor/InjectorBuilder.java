@@ -87,11 +87,9 @@ public class InjectorBuilder {
     @Override
     protected CacheStrategy<CacheEntry, ContentHashEntry> initialize() {
       final WroManager manager = managerFactory.create();
-      final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(
-          managerFactory.create().getCacheStrategy());
       // update manager with new decorated strategy
-      manager.setCacheStrategy(decorated);
-      return decorated;
+      manager.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(managerFactory.create().getCacheStrategy()));
+      return manager.getCacheStrategy();
     }
   };
 
