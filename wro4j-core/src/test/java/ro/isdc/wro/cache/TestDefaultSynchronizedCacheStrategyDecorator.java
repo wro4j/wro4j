@@ -5,6 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.util.ObjectDecorator;
 
 /**
  * 
@@ -23,7 +24,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     CacheStrategy<CacheEntry, ContentHashEntry> original = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     Assert.assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
-    Assert.assertSame(original, ((CacheStrategyDecorator<?, ?>) victim).getDecoratedObject());
+    Assert.assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
   }
   
   /**

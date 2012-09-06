@@ -32,7 +32,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestDefaultWroModelFactory {
-  private DefaultWroModelFactoryDecorator victim;
+  private WroModelFactory victim;
   @Inject
   private ResourceAuthorizationManager authManager;
   @Inject
@@ -46,14 +46,14 @@ public class TestDefaultWroModelFactory {
     injector.inject(this);
     Context.set(Context.standaloneContext());
   }
-
+  
   @Test
   public void decoratedModelshouldBeThreadSafe()
       throws Exception {
     final List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
     modelTransformers.add(new WildcardExpanderModelTransformer());
-
-    victim = new DefaultWroModelFactoryDecorator(new XmlModelFactory() {
+    
+    victim = DefaultWroModelFactoryDecorator.decorate(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
           throws IOException {
@@ -70,7 +70,7 @@ public class TestDefaultWroModelFactory {
       }
     }));
   }
-
+  
   @Test
   public void shouldAuthorizeResourcesFromModelWhenInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
@@ -94,7 +94,7 @@ public class TestDefaultWroModelFactory {
     Assert.assertFalse(authManager.isAuthorized(authorizedResourceUri));
     Assert.assertFalse(authManager.isAuthorized("/notAuthorized.js"));
   }
-
+  
   /**
    * Instructs the victim to create the model with a single resource
    */
@@ -104,10 +104,11 @@ public class TestDefaultWroModelFactory {
       public WroModel create() {
         return model;
       }
+      
       public void destroy() {
       }
     };
-    victim = new DefaultWroModelFactoryDecorator(decorated, Collections.EMPTY_LIST);
+    victim = DefaultWroModelFactoryDecorator.decorate(decorated, Collections.EMPTY_LIST);
     injector.inject(victim);
     victim.create();
   }

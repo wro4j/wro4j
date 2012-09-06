@@ -12,30 +12,32 @@ import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
+
 /**
  * Responsible for invoking {@link GroupsProcessor} when cache key is missed.
- *   
+ * 
  * @author Alex Objelean
  * @crated 2 May 2012
  * @since 1.4.6
  */
-public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchronizedCacheStrategyDecorator<CacheEntry, ContentHashEntry> {
+public class DefaultSynchronizedCacheStrategyDecorator
+    extends AbstractSynchronizedCacheStrategyDecorator<CacheEntry, ContentHashEntry> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultSynchronizedCacheStrategyDecorator.class);
   @Inject
   private GroupsProcessor groupsProcessor;
   @Inject
-  private HashStrategy hashBuilder; 
+  private HashStrategy hashBuilder;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
   
   /**
-   * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the operation is redundant.
+   * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the
+   * operation is redundant.
    */
-  public static CacheStrategy<CacheEntry, ContentHashEntry> decorate(final CacheStrategy<CacheEntry, ContentHashEntry> decorated) {
-    if (decorated instanceof DefaultSynchronizedCacheStrategyDecorator) {
-      return decorated;
-    }
-    return new DefaultSynchronizedCacheStrategyDecorator(decorated);
+  public static CacheStrategy<CacheEntry, ContentHashEntry> decorate(
+      final CacheStrategy<CacheEntry, ContentHashEntry> decorated) {
+    return decorated instanceof DefaultSynchronizedCacheStrategyDecorator ? decorated
+        : new DefaultSynchronizedCacheStrategyDecorator(decorated);
   }
   
   private DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
@@ -52,7 +54,7 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
     LOG.debug("found content: {}", StringUtils.abbreviate(content, 30));
     return computeCacheValueByContent(content);
   }
-
+  
   /**
    * Creates a {@link ContentHashEntry} based on provided content.
    */
@@ -74,7 +76,7 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   @Override
   public void clear() {
     super.clear();
-    //reset authorization manager (clear any stored uri's).
+    // reset authorization manager (clear any stored uri's).
     authorizationManager.clear();
   }
 }
