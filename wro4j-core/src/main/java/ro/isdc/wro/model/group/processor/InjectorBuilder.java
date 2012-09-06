@@ -60,11 +60,10 @@ public class InjectorBuilder {
     @Override
     protected UriLocatorFactory initialize() {
       final WroManager manager = managerFactory.create();
-      final UriLocatorFactory decorated = new InjectorAwareUriLocatorFactoryDecorator(manager.getUriLocatorFactory(),
-          injector);
       // update manager with new decorated factory
-      manager.setUriLocatorFactory(decorated);
-      return decorated;
+      manager.setUriLocatorFactory(InjectorAwareUriLocatorFactoryDecorator.decorate(manager.getUriLocatorFactory(),
+          injector));
+      return manager.getUriLocatorFactory();
     }
   };
   private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
@@ -73,11 +72,10 @@ public class InjectorBuilder {
     @Override
     protected WroModelFactory initialize() {
       final WroManager manager = managerFactory.create();
-      final WroModelFactory decorated = new DefaultWroModelFactoryDecorator(manager.getModelFactory(),
-          manager.getModelTransformers());
       // update manager with new decorated factory
-      manager.setModelFactory(decorated);
-      return decorated;
+      manager.setModelFactory(DefaultWroModelFactoryDecorator.decorate(manager.getModelFactory(),
+          manager.getModelTransformers()));
+      return manager.getModelFactory();
     }
   };
   /**
@@ -87,11 +85,9 @@ public class InjectorBuilder {
     @Override
     protected CacheStrategy<CacheEntry, ContentHashEntry> initialize() {
       final WroManager manager = managerFactory.create();
-      final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(
-          managerFactory.create().getCacheStrategy());
       // update manager with new decorated strategy
-      manager.setCacheStrategy(decorated);
-      return decorated;
+      manager.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(manager.getCacheStrategy()));
+      return manager.getCacheStrategy();
     }
   };
 

@@ -20,13 +20,16 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 public final class InjectorAwareUriLocatorFactoryDecorator
     extends InjectorAwareDecorator<UriLocatorFactory> implements UriLocatorFactory {
   
+  public static UriLocatorFactory decorate(final UriLocatorFactory decorated, final Injector injector) {
+    return decorated instanceof InjectorAwareUriLocatorFactoryDecorator ? decorated : new InjectorAwareUriLocatorFactoryDecorator(decorated, injector);
+  }
   /**
    * Decorates an {@link UriLocatorFactory} and uses provided injector to inject the locator.
    * 
    * @param decorated
    * @param injector
    */
-  public InjectorAwareUriLocatorFactoryDecorator(final UriLocatorFactory decorated, final Injector injector) {
+  private InjectorAwareUriLocatorFactoryDecorator(final UriLocatorFactory decorated, final Injector injector) {
     super(decorated, injector);
   }
 
