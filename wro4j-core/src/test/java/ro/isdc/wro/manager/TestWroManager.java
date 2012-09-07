@@ -27,7 +27,6 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -86,7 +85,6 @@ public class TestWroManager {
   /**
    * Used to test simple operations.
    */
-  @InjectMocks
   private WroManager victim;
   /**
    * Used to test more complex use-cases.
@@ -98,13 +96,14 @@ public class TestWroManager {
     MockitoAnnotations.initMocks(this);
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    managerFactory = new InjectableWroManagerFactoryDecorator(
-        new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
-   MockitoAnnotations.initMocks(this);
+    
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
     
     final Injector injector = new InjectorBuilder(managerFactory).setResourceAuthorizationManager(
         mockAuthorizationManager).build();
+    victim = managerFactory.create();
     injector.inject(victim);
   }
   

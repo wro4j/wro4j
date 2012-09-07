@@ -21,13 +21,17 @@ public final class InjectorAwareResourceLocatorFactoryDecorator
     extends ResourceLocatorFactoryDecorator {
   private final Injector injector;
   
+  public static ResourceLocatorFactory decorate(final ResourceLocatorFactory decorated, final Injector injector) {
+    return decorated instanceof InjectorAwareResourceLocatorFactoryDecorator ? decorated : new InjectorAwareResourceLocatorFactoryDecorator(decorated, injector);
+  }
+  
   /**
    * Decorates an {@link UriLocatorFactory} and uses provided injector to inject the locator.
    * 
    * @param decorated
    * @param injector
    */
-  public InjectorAwareResourceLocatorFactoryDecorator(final ResourceLocatorFactory decorated, final Injector injector) {
+  private InjectorAwareResourceLocatorFactoryDecorator(final ResourceLocatorFactory decorated, final Injector injector) {
     super(decorated);
     Validate.notNull(injector);
     this.injector = injector;

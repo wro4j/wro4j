@@ -21,19 +21,21 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;
 
+
 /**
  * Responsible for invoking {@link GroupsProcessor} when cache key is missed.
- *   
+ * 
  * @author Alex Objelean
  * @crated 2 May 2012
  * @since 1.4.6
  */
-public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchronizedCacheStrategyDecorator<CacheEntry, ContentHashEntry> {
+public class DefaultSynchronizedCacheStrategyDecorator
+    extends AbstractSynchronizedCacheStrategyDecorator<CacheEntry, ContentHashEntry> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultSynchronizedCacheStrategyDecorator.class);
   @Inject
   private GroupsProcessor groupsProcessor;
   @Inject
-  private HashStrategy hashBuilder; 
+  private HashStrategy hashBuilder;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
   @Inject
@@ -47,7 +49,20 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   private final Set<CacheEntry> checkedKeys = Collections.synchronizedSet(new HashSet<CacheEntry>());
   private SchedulerHelper resourceWatcherScheduler;
   
-  public DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  /**
+   * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the
+   * operation is redundant.
+   */
+  public static CacheStrategy<CacheEntry, ContentHashEntry> decorate(
+      final CacheStrategy<CacheEntry, ContentHashEntry> decorated) {
+    return decorated instanceof DefaultSynchronizedCacheStrategyDecorator ? decorated
+        : new DefaultSynchronizedCacheStrategyDecorator(decorated);
+  }
+  
+  /**
+   * @VisibleForTesting
+   */
+  DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
     super(cacheStrategy);
     resourceWatcherScheduler = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
@@ -142,7 +157,7 @@ public class DefaultSynchronizedCacheStrategyDecorator extends AbstractSynchroni
   @Override
   public void clear() {
     super.clear();
-    //reset authorization manager (clear any stored uri's).
+    // reset authorization manager (clear any stored uri's).
     authorizationManager.clear();
   }
 }
