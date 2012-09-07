@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.http.support.HttpHeader;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
@@ -247,15 +247,6 @@ public final class WroUtil {
     }
     result.append("].join(\"\\n\")");
     return result.toString();
-  }
-
-  /**
-   * Add no-cache headers to response.
-   */
-  public static void addNoCacheHeaders(final HttpServletResponse response) {
-    response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
-    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
-    response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
   }
   
   /**

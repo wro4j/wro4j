@@ -1,6 +1,7 @@
 package ro.isdc.wro.http.handler;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ContentTypeResolver;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -42,6 +44,7 @@ public class ResourceProxyRequestHandler
   
   @Inject
   private ResourceAuthorizationManager authManager;
+  private ResponseHeadersConfigurer headersConfigurer;
 
   /**
    * {@inheritDoc}
@@ -51,7 +54,7 @@ public class ResourceProxyRequestHandler
       throws IOException {
     final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
     verifyAccess(resourceUri, response);
-    serverProxyResourceUri(resourceUri, response);
+    serveProxyResourceUri(resourceUri, response);
   }
 
   /**
@@ -62,17 +65,26 @@ public class ResourceProxyRequestHandler
     return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
   }
 
-  private void serverProxyResourceUri(final String resourceUri, final HttpServletResponse response)
+  private void serveProxyResourceUri(final String resourceUri, final HttpServletResponse response)
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
     final OutputStream outputStream = response.getOutputStream();
-    
     response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
-    int length = IOUtils.copy(new AutoCloseInputStream(locatorFactory.locate(resourceUri)), outputStream);
-    response.setContentLength(length);
+
+    // set expiry headers
+    getHeadersConfigurer().setHeaders(response);
+
     response.setStatus(HttpServletResponse.SC_OK);
-    
-    IOUtils.closeQuietly(outputStream);
+    InputStream is = null;
+    try {
+      is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
+      int length = IOUtils.copy(is, outputStream);
+      // servlet engine may ignore this if content body is flushed to client
+      response.setContentLength(length);
+    } finally {
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(outputStream);
+    }
   }
 
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
@@ -81,5 +93,19 @@ public class ResourceProxyRequestHandler
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
     }
+  }
+  
+  private final ResponseHeadersConfigurer getHeadersConfigurer() {
+    if (headersConfigurer == null) {
+      headersConfigurer = newResponseHeadersConfigurer();
+    }
+    return headersConfigurer;
+  }
+
+  /**
+   * @return the {@link ResponseHeadersConfigurer}.
+   */
+  protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
+    return ResponseHeadersConfigurer.fromConfig(config);
   }
 }
