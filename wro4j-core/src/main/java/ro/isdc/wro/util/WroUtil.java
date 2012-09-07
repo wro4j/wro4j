@@ -244,15 +244,6 @@ public final class WroUtil {
   }
   
   /**
-   * Add no-cache headers to response.
-   */
-  public static void addNoCacheHeaders(final HttpServletResponse response) {
-    response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
-    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
-    response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
-  }
-  
-  /**
    * Utility used to verify that requestURI matches provided path
    */
   public static boolean matchesUrl(final HttpServletRequest request, final String path) {
