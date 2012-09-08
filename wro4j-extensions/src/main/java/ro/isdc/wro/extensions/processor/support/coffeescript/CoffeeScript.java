@@ -82,8 +82,6 @@ public class CoffeeScript {
         buildOptions());
       final String result = (String)builder.evaluate(compileScript, "CoffeeScript.compile");
       return result;
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       watch.stop();
       LOG.debug(watch.prettyPrint());

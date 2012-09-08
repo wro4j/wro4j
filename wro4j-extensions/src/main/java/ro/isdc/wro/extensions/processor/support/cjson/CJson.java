@@ -71,8 +71,6 @@ public class CJson {
       final String execute = "CJSON.stringify(JSON.parse(" + WroUtil.toJSMultiLineString(data) + "));";
       final Object result = builder.evaluate(execute, "pack");
       return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
@@ -90,8 +88,6 @@ public class CJson {
       final String execute = "JSON.stringify(CJSON.parse(" + WroUtil.toJSMultiLineString(data) + "));";
       final Object result = builder.evaluate(execute, "unpack");
       return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
