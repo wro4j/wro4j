@@ -79,8 +79,6 @@ public class TestLessCssProcessor {
 
   /**
    * Test that processing invalid less css produces exceptions
-   *
-   * @throws Exception
    */
   @Test
   public void shouldFailWhenInvalidLessCssIsProcessed()
