@@ -72,8 +72,6 @@ public class JsonHPack {
         resultAsString = removeEnclosedArray(resultAsString);
       }
       return resultAsString;
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
@@ -108,8 +106,6 @@ public class JsonHPack {
         resultAsString = removeEnclosedArray(resultAsString);
       }
       return resultAsString;
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

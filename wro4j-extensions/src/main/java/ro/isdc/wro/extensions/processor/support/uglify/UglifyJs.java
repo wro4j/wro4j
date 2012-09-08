@@ -145,25 +145,21 @@ public class UglifyJs {
    */
   public String process(final String filename, final String code)
       throws IOException {
-    try {
-      final StopWatch watch = new StopWatch();
-      watch.start("init " + filename);
-      final RhinoScriptBuilder builder = initScriptBuilder();
-      watch.stop();
-      final String originalCode = WroUtil.toJSMultiLineString(code);
-      // TODO handle reservedNames
-      final String optionsAsJson = createOptionsAsJson();
-      Validate.notNull(optionsAsJson);
-      final String invokeScript = String.format(getInvokeScript(), originalCode, optionsAsJson);
-      watch.start(uglify ? "uglify" : "beautify");
-      final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
-      
-      watch.stop();
-      LOG.debug(watch.prettyPrint());
-      return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
-    } 
+    final StopWatch watch = new StopWatch();
+    watch.start("init " + filename);
+    final RhinoScriptBuilder builder = initScriptBuilder();
+    watch.stop();
+    final String originalCode = WroUtil.toJSMultiLineString(code);
+    // TODO handle reservedNames
+    final String optionsAsJson = createOptionsAsJson();
+    Validate.notNull(optionsAsJson);
+    final String invokeScript = String.format(getInvokeScript(), originalCode, optionsAsJson);
+    watch.start(uglify ? "uglify" : "beautify");
+    final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
+    
+    watch.stop();
+    LOG.debug(watch.prettyPrint());
+    return String.valueOf(result);
   }
   
   /**

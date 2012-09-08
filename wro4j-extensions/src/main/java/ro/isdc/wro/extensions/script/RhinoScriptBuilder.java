@@ -18,6 +18,8 @@ import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
+
 
 /**
  * Used to evaluate javascript on the serverside using rhino javascript engine. Encapsulate and hides all implementation
@@ -122,7 +124,7 @@ public class RhinoScriptBuilder {
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
       if (e instanceof RhinoException) {
-        LOG.error("RhinoException: " + RhinoUtils.createExceptionMessage((RhinoException) e));
+        LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage((RhinoException) e));
       }
       throw e;
     } finally {
@@ -188,8 +190,9 @@ public class RhinoScriptBuilder {
     try {
       return getContext().evaluateString(scope, script, sourceName, 1, null);
     } catch (final JavaScriptException e) {
-      LOG.error("JavaScriptException occured: " + e.getMessage());
-      throw e;
+      final String message = RhinoUtils.createExceptionMessage(e);
+      LOG.error("JavaScriptException occured: {}", message);
+      throw new WroRuntimeException(message);
     } finally {
       // Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
       if (Context.getCurrentContext() != null) {

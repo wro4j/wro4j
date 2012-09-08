@@ -90,8 +90,6 @@ public class LessCss {
       final String execute = "lessIt(" + WroUtil.toJSMultiLineString(data) + ");";
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
