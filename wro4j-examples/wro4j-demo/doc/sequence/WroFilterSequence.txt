@@ -1,0 +1,14 @@
+title WroFilter Resource Request Sequence
+
+
+note over Browser,WroFilter: /wro/group.js
+Browser->WroFilter: doFilter()
+
+WroFilter->+Context: setContext
+WroFilter->WroManagerFactory: create()
+WroManagerFactory->+WroManager: process()
+
+
+WroManager-->-WroFilter: Serve resource
+Context->-WroFilter: unsetContext
+WroFilter->Browser: rendered resource
