@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -23,6 +24,8 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+
+import javax.servlet.ServletContext;
 
 
 /**
@@ -115,7 +118,7 @@ public class NodeLessCssProcessor
    */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
+    throws IOException {
     final String content = IOUtils.toString(reader);
     try {
       String resourceUri = resource == null ? "unknown.less" : resource.getUri();
@@ -145,10 +148,10 @@ public class NodeLessCssProcessor
       pb.redirectErrorStream(true);
       Process shell = pb.start();
       shellIn = shell.getInputStream();
-      final String result = IOUtils.toString(shellIn);
+      final String result = IOUtils.toString(shellIn, "UTF-8");
       int exitStatus = shell.waitFor();//this won't return till `out' stream being flushed!
       if (exitStatus != 0) {
-        final String errorMessage = result.replace(filePath, resourceUri);
+        final String errorMessage = MessageFormat.format("Error in LESS file: {0}\n\n{1}", temp, result.replace(filePath, resourceUri));
         throw new WroRuntimeException(errorMessage);
       }
       LOG.debug("exitStatus: {}", exitStatus);

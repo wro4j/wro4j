@@ -130,10 +130,10 @@ public class LessCssProcessor
     try {
       writer.write(lessCss.less(content));
     } catch (final WroRuntimeException e) {
-      onException(e); 
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
+      onException(e);
     } finally {
       //return for later reuse
       enginePool.returnObject(lessCss);
