@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -151,7 +152,7 @@ public class NodeLessCssProcessor
   private Process createProcess(final String sourceFilePath)
       throws IOException {
     final String[] commandLine = getCommandLine(sourceFilePath);
-    LOG.debug("commandLine arguments: {}", commandLine);
+    LOG.debug("commandLine arguments: {}", Arrays.asList(commandLine));
     final ProcessBuilder processBuilder = new ProcessBuilder(commandLine).redirectErrorStream(true);
     return processBuilder.start();
   }
