@@ -51,6 +51,13 @@ public class NodeLessCssProcessor
   private static final Logger LOG = LoggerFactory.getLogger(NodeLessCssProcessor.class);
   
   public static final String ALIAS = "nodeLessCss";
+
+  private String[] getCommandLine(String tempFilePath) {
+    if (System.getProperty("os.name").contains("Windows"))
+      return new String[]{"cmd", "/c", SHELL_COMMAND, "--no-color", tempFilePath};
+    else
+      return new String[]{SHELL_COMMAND, "--no-color", tempFilePath};
+  }
   
   /**
    * {@inheritDoc}
@@ -84,7 +91,7 @@ public class NodeLessCssProcessor
       IOUtils.write(content, new FileOutputStream(temp), encoding);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
       final String tempFilePath = temp.getPath();
-      final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND,"--no-color", tempFilePath).redirectErrorStream(true);
+      final ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(tempFilePath)).redirectErrorStream(true);
       final Process shell = processBuilder.start();
       shellIn = shell.getInputStream();
       final String result = IOUtils.toString(shellIn, encoding);
@@ -104,8 +111,8 @@ public class NodeLessCssProcessor
       FileUtils.deleteQuietly(temp);
     }
   }
-  
-  /**
+
+    /**
    * @return true if the processor is supported on this environment. The implementation check if the required shell
    *         utility is available.
    */
