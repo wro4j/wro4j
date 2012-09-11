@@ -84,14 +84,13 @@ public class NodeLessCssProcessor
       IOUtils.write(content, new FileOutputStream(temp), encoding);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
       final String tempFilePath = temp.getPath();
-      final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND, tempFilePath).redirectErrorStream(true);
+      final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND,"--no-color", tempFilePath).redirectErrorStream(true);
       final Process shell = processBuilder.start();
       shellIn = shell.getInputStream();
       int exitStatus = shell.waitFor();// this won't return till `out' stream being flushed!
       final String result = IOUtils.toString(shellIn, encoding);
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
-        //find a way to get rid of escape character found at the end (minor issue)
         final String errorMessage = MessageFormat.format("Error in LESS: \n{0}", result.replace(tempFilePath, resourceUri));
         throw new WroRuntimeException(errorMessage);
       }
