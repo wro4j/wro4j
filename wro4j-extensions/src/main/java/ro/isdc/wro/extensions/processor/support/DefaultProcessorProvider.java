@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import ro.isdc.wro.extensions.processor.css.BourbonCssProcessor;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.css.FallbackLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
@@ -128,6 +129,12 @@ public class DefaultProcessorProvider
       @Override
       protected ResourcePreProcessor initialize() {
           return new NodeLessCssProcessor();
+      }
+    }));
+    map.put(FallbackLessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+          return new FallbackLessCssProcessor();
       }
     }));
     map.put(SassCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {

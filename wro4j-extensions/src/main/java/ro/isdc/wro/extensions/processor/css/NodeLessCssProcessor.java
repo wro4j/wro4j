@@ -110,7 +110,7 @@ public class NodeLessCssProcessor
    * @return true if the processor is supported on this environment. The implementation check if the required shell
    *         utility is available.
    */
-  public final boolean isSupported() {
+  public boolean isSupported() {
     try {
       new ProcessBuilder(SHELL_COMMAND).start();
       return true;
