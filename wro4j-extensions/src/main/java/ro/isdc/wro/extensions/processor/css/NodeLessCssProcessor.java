@@ -24,6 +24,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SupportAware;
 
 
 /**
@@ -45,7 +46,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class NodeLessCssProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor, SupportAware {
   private static final String SHELL_COMMAND = "lessc";
   
   private static final Logger LOG = LoggerFactory.getLogger(NodeLessCssProcessor.class);
