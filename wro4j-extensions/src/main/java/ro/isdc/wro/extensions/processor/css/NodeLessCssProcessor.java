@@ -121,10 +121,10 @@ public class NodeLessCssProcessor
       String resourceUri = resource == null ? "unknown.less" : resource.getUri();
       writer.write(process(resourceUri, content));
     } catch (final WroRuntimeException e) {
+        final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+        LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+                + " resource, no processing applied...", e);
       onException(e);
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
     } finally {
       // return for later reuse
       reader.close();
@@ -137,7 +137,7 @@ public class NodeLessCssProcessor
     File temp = null; 
     try {
       temp = createTempFile();
-      FileUtils.writeStringToFile(temp, content);
+      //FileUtils.writeStringToFile(temp, content);
       IOUtils.write(content, new FileOutputStream(temp), "UTF-8");
       LOG.debug("absolute path: " + temp.getAbsolutePath());
       final String filePath = temp.getPath();
@@ -145,14 +145,14 @@ public class NodeLessCssProcessor
       pb.redirectErrorStream(true);
       Process shell = pb.start();
       shellIn = shell.getInputStream();
-      int exitStatus = shell.waitFor();
       final String result = IOUtils.toString(shellIn);
+      int exitStatus = shell.waitFor();//this won't return till `out' stream being flushed!
       if (exitStatus != 0) {
         final String errorMessage = result.replace(filePath, resourceUri);
         throw new WroRuntimeException(errorMessage);
       }
-      LOG.debug(result);
       LOG.debug("exitStatus: {}", exitStatus);
+      LOG.debug(result);
       return result;
     } catch (Exception e) {
       LOG.error(e.getMessage());
