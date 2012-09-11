@@ -13,6 +13,9 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,21 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestNodeLessCssProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(TestNodeLessCssProcessor.class);
+  private static boolean isSupported = false;
+  @BeforeClass
+  public static void beforeClass() {
+    //initialize this field only once.
+    isSupported = new NodeLessCssProcessor().isSupported();
+  }
 
+  /**
+   * Checks if the test can be run by inspecting {@link NodeLessCssProcessor#isSupported()}
+   */
+  @Before
+  public void beforeMethod() {
+    Assume.assumeTrue(isSupported);
+  }
+  
   @Test
   public void testFromFolder()
       throws Exception {
