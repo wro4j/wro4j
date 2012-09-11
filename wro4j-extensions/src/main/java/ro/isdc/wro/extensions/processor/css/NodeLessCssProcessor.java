@@ -47,11 +47,21 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
 @SupportedResourceType(ResourceType.CSS)
 public class NodeLessCssProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, SupportAware {
+  private static final String OPTION_NO_COLOR = "--no-color";
   private static final String SHELL_COMMAND = "lessc";
-  
   private static final Logger LOG = LoggerFactory.getLogger(NodeLessCssProcessor.class);
-  
   public static final String ALIAS = "nodeLessCss";
+  /**
+   * Flag indicating that we are running on Windows platform. This will be initialized only once in constructor.
+   */
+  private boolean isWindows;
+  
+  public NodeLessCssProcessor() {
+    // initialize this field at construction.
+    final String osName = System.getProperty("os.name");
+    LOG.debug("OS Name: {}", osName);
+    isWindows = osName != null && osName.contains("Windows");
+  }
   
   /**
    * {@inheritDoc}
@@ -113,34 +123,6 @@ public class NodeLessCssProcessor
       FileUtils.deleteQuietly(temp);
     }
   }
-
-  /**
-   * Creates process responsible for running lessc shell command by reading the file content from the sourceFilePath
-   * @param sourceFilePath the source path of the file from where the lessc will read the less file.
-   * @throws IOException when the process execution fails.
-   */
-  private Process createProcess(final String sourceFilePath)
-      throws IOException {
-    final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND, sourceFilePath).redirectErrorStream(true);
-    return processBuilder.start();
-  }
-  
-  /**
-   * @return true if the processor is supported on this environment. The implementation check if the required shell
-   *         utility is available.
-   */
-  public boolean isSupported() {
-    try {
-      new ProcessBuilder(SHELL_COMMAND).start();
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-  
-  private File createTempFile() {
-    return new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString() + ".less");
-  }
   
   /**
    * Invoked when a processing exception occurs.
@@ -156,5 +138,64 @@ public class NodeLessCssProcessor
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
+  }
+  
+  /**
+   * Creates process responsible for running lessc shell command by reading the file content from the sourceFilePath
+   * 
+   * @param sourceFilePath
+   *          the source path of the file from where the lessc will read the less file.
+   * @throws IOException
+   *           when the process execution fails.
+   */
+  private Process createProcess(final String sourceFilePath)
+      throws IOException {
+    final String[] commandLine = getCommandLine(sourceFilePath);
+    LOG.debug("commandLine arguments: {}", commandLine);
+    final ProcessBuilder processBuilder = new ProcessBuilder(commandLine).redirectErrorStream(true);
+    return processBuilder.start();
+  }
+  
+  /**
+   * @return true if the processor is supported on this environment. The implementation check if the required shell
+   *         utility is available.
+   */
+  public boolean isSupported() {
+    try {
+      new ProcessBuilder(getCommandLine("")).start();
+      return true;
+    } catch (Exception e) {
+      LOG.warn("The {} processor is not supported.", getClass().getName());
+      return false;
+    }
+  }
+  
+  /**
+   * @return arguments for command line. The implementation will take care of OS differences.
+   */
+  private String[] getCommandLine(final String filePath) {
+    return isWindows ? buildArgumentsForWindows(filePath) : buildArgumentsForNonWindows(filePath);
+  }
+  
+  /**
+   * @return arguments required to run lessc on non Windows platform.
+   */
+  private String[] buildArgumentsForNonWindows(final String filePath) {
+    return new String[] {
+      SHELL_COMMAND, OPTION_NO_COLOR, filePath
+    };
+  }
+  
+  /**
+   * @return arguments required to run lessc on Windows platform.
+   */
+  private String[] buildArgumentsForWindows(final String filePath) {
+    return new String[] {
+      "cmd", "/c", SHELL_COMMAND, OPTION_NO_COLOR, filePath
+    };
+  }
+  
+  private File createTempFile() {
+    return new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString() + ".less");
   }
 }
