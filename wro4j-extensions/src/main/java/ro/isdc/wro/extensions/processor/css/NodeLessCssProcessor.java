@@ -156,13 +156,13 @@ public class NodeLessCssProcessor
       }
       LOG.debug("exitStatus: {}", exitStatus);
       LOG.debug(result);
+      FileUtils.deleteQuietly(temp);
       return result;
     } catch (Exception e) {
       LOG.error(e.getMessage());
       throw new WroRuntimeException(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(shellIn);
-      FileUtils.deleteQuietly(temp);
     }
   }
 
