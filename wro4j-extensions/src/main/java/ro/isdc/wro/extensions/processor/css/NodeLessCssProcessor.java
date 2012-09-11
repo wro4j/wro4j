@@ -87,8 +87,8 @@ public class NodeLessCssProcessor
       final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND,"--no-color", tempFilePath).redirectErrorStream(true);
       final Process shell = processBuilder.start();
       shellIn = shell.getInputStream();
-      int exitStatus = shell.waitFor();// this won't return till `out' stream being flushed!
       final String result = IOUtils.toString(shellIn, encoding);
+      int exitStatus = shell.waitFor();// this won't return till `out' stream being flushed!
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
         final String errorMessage = MessageFormat.format("Error in LESS: \n{0}", result.replace(tempFilePath, resourceUri));
