@@ -10,7 +10,7 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
@@ -48,7 +48,7 @@ public class CustomStandaloneWroManagerFactory
     factory.addPreProcessor(new JSMinProcessor());
 
     // factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
-    factory.addPostProcessor(new LessCssProcessor());
+    factory.addPostProcessor(new RhinoLessCssProcessor());
     factory.addPostProcessor(new YUICssCompressorProcessor());
 
     final ResourcePreProcessor processor = new JsHintProcessor() {

@@ -29,7 +29,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Important node: this processor is not cross platform and has some pre-requesites in order to work.
  * <p/>
- * Same as {@link LessCssProcessor} but uses <code>lessc</code> shell utility to process the less.
+ * Same as {@link RhinoLessCssProcessor} but uses <code>lessc</code> shell utility to process the less.
  * <p/>
  * Installation instructions: Install the libnode-less package (Unix OS)
  * 

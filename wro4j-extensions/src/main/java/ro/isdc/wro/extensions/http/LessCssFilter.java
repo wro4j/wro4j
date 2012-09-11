@@ -3,7 +3,7 @@ package ro.isdc.wro.extensions.http;
 import java.util.ArrayList;
 import java.util.List;
 
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.http.support.AbstractProcessorsFilter;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -19,7 +19,7 @@ public class LessCssFilter
   private List<ResourcePreProcessor> list = new ArrayList<ResourcePreProcessor>();
 
   public LessCssFilter() {
-    list.add(new LessCssProcessor());
+    list.add(new RhinoLessCssProcessor());
   }
   
   /**

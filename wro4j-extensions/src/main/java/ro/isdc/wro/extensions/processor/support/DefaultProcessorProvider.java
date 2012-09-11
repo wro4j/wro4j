@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 
 import ro.isdc.wro.extensions.processor.css.BourbonCssProcessor;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
-import ro.isdc.wro.extensions.processor.css.FallbackLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
@@ -119,10 +119,10 @@ public class DefaultProcessorProvider
         return new PackerJsProcessor();
       }
     }));
-    map.put(LessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+    map.put(RhinoLessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
-          return new LessCssProcessor();
+          return new RhinoLessCssProcessor();
       }
     }));
     map.put(NodeLessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
@@ -131,10 +131,10 @@ public class DefaultProcessorProvider
           return new NodeLessCssProcessor();
       }
     }));
-    map.put(FallbackLessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+    map.put(LessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
-          return new FallbackLessCssProcessor();
+          return new LessCssProcessor();
       }
     }));
     map.put(SassCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {

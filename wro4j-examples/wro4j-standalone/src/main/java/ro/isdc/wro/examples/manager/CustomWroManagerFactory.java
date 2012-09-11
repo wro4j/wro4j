@@ -4,7 +4,7 @@
  */
 package ro.isdc.wro.examples.manager;
 
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -55,7 +55,7 @@ public class CustomWroManagerFactory
     factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
     factory.addPreProcessor(new YUICssCompressorProcessor());
     factory.addPostProcessor(new CssVariablesProcessor());
-    factory.addPostProcessor(new LessCssProcessor());
+    factory.addPostProcessor(new RhinoLessCssProcessor());
 
     return factory;
   }
