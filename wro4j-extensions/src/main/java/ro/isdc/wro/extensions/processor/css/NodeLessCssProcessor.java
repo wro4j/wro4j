@@ -47,7 +47,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class NodeLessCssProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final String SHELL_COMMAND = "lessc";
-
+  
   private static final Logger LOG = LoggerFactory.getLogger(NodeLessCssProcessor.class);
   
   public static final String ALIAS = "nodeLessCss";
@@ -57,15 +57,15 @@ public class NodeLessCssProcessor
    */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     final String content = IOUtils.toString(reader);
     try {
       final String resourceUri = resource == null ? "unknown.less" : resource.getUri();
       writer.write(process(resourceUri, content));
     } catch (final WroRuntimeException e) {
-        final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-        LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-                + " resource, no processing applied...", e);
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
       onException(e);
     } finally {
       // return for later reuse
@@ -76,23 +76,30 @@ public class NodeLessCssProcessor
   
   private String process(final String resourceUri, final String content) {
     InputStream shellIn = null;
-    //the file holding the input file to process
-    File temp = null; 
+    // the file holding the input file to process
+    File temp = null;
     try {
       temp = createTempFile();
       final String encoding = "UTF-8";
       IOUtils.write(content, new FileOutputStream(temp), encoding);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
       final String tempFilePath = temp.getPath();
-      final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND, tempFilePath).redirectErrorStream(true);
-      final Process shell = processBuilder.start();
-      shellIn = shell.getInputStream();
-      int exitStatus = shell.waitFor();// this won't return till `out' stream being flushed!
+      final Process process = createProcess(tempFilePath);
+      shellIn = process.getInputStream();
+      //
+      /**
+       * It is important to read before waitFor is invoked because read stream is blocking stdout while Java application
+       * doesn't read the whole buffer. It hangs when processing large files. The lessc isn't closing till all STDOUT
+       * flushed. This blocks io and Node does not exit because of that.
+       */
       final String result = IOUtils.toString(shellIn, encoding);
+      int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
+      
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
-        //find a way to get rid of escape character found at the end (minor issue)
-        final String errorMessage = MessageFormat.format("Error in LESS: \n{0}", result.replace(tempFilePath, resourceUri));
+        // find a way to get rid of escape character found at the end (minor issue)
+        final String errorMessage = MessageFormat.format("Error in LESS: \n{0}",
+            result.replace(tempFilePath, resourceUri));
         throw new WroRuntimeException(errorMessage);
       }
       return result;
@@ -101,9 +108,20 @@ public class NodeLessCssProcessor
       throw new WroRuntimeException(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(shellIn);
-      //always cleanUp
+      // always cleanUp
       FileUtils.deleteQuietly(temp);
     }
+  }
+
+  /**
+   * Creates process responsible for running lessc shell command by reading the file content from the sourceFilePath
+   * @param sourceFilePath the source path of the file from where the lessc will read the less file.
+   * @throws IOException when the process execution fails.
+   */
+  private Process createProcess(final String sourceFilePath)
+      throws IOException {
+    final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND, sourceFilePath).redirectErrorStream(true);
+    return processBuilder.start();
   }
   
   /**
@@ -118,7 +136,7 @@ public class NodeLessCssProcessor
       return false;
     }
   }
-
+  
   private File createTempFile() {
     return new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString() + ".less");
   }
