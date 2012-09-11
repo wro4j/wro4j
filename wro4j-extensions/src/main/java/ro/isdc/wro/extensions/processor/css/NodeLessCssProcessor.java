@@ -25,82 +25,19 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
-import javax.servlet.ServletContext;
-
 
 /**
- * A processor using lessCss engine: @see http://www.asual.com/lesscss/
- * <p>
- * The main css goodies are: <br/>
- * <ul>
- * <li>Variables - Variables allow you to specify widely used values in a single place, and then re-use them throughout
- * the style sheet, making global changes as easy as changing one line of code.<br/>
- * 
- * <pre>
- * @brand_color: #4D926F;
- * #header { color: @brand_color; }
- * h2 { color: @brand_color; }
- * </pre>
- * 
- * </li>
- * <li>Mixins - Mixins allow you to embed all the properties of a class into another class by simply including the class
- * name as one of its properties. It's just like variables, but for whole classes. Mixins can also behave like
- * functions, and take arguments, as seen in the example bellow.</br>
- * 
- * <pre>
- *  .rounded_corners (@radius: 5px) {
- *   -moz-border-radius: @radius;
- *   -webkit-border-radius: @radius;
- *   border-radius: @radius;
- * }
- * 
- * #header {
- *   .rounded_corners;
- * }
- * 
- * #footer {
- *   .rounded_corners(10px);
- * }
- * </pre>
- * 
- * </li>
- * <li>Nested Rules - Rather than constructing long selector names to specify inheritance, in Less you can simply nest
- * selectors inside other selectors. This makes inheritance clear and style sheets shorter </br>
- * 
- * <pre>
- * #header {
- *   color: red;
- *   a {
- *     font-weight: bold;
- *     text-decoration: none;
- *   }
- * }
- * </pre>
- * 
- * </li>
- * <li>Operations - Are some elements in your style sheet proportional to other elements? Operations let you add,
- * subtract, divide and multiply property values and colors, giving you the power to do create complex relationships
- * between properties.</br>
- * 
- * <pre>
- *  @the-border: 1px;
- * @base-color: #111;
- * 
- * #header {
- *   color: @base-color * 3;
- *   border-left: @the-border;
- *   border-right: @the-border * 2;
- * }
- * 
- * #footer {
- *   color: (@base-color + #111) * 1.5;
- * }
- * </pre>
- * 
- * </li>
- * </ul>
- * If processing encounter any issues during processing, no change will be applied to the resource.
+ * Important node: this processor is not cross platform and has some pre-requesites in order to work.
  * <p/>
+ * Same as {@link LessCssProcessor} but uses <code>lessc</code> shell utility to process the less.
+ * <p/>
+ * Installation instructions: Install the libnode-less package (Unix OS)
+ * 
+ * <pre>
+ *   sudo apt-get install libnode-less
+ * </pre>
+ * 
+ * It is possible to test whether the lessc utility is available using {@link NodeLessCssProcessor#isSupported()}
  * 
  * @author Alex Objelean
  * @since 1.4.10
@@ -109,6 +46,8 @@ import javax.servlet.ServletContext;
 @SupportedResourceType(ResourceType.CSS)
 public class NodeLessCssProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
+  private static final String SHELL_COMMAND = "lessc";
+
   private static final Logger LOG = LoggerFactory.getLogger(NodeLessCssProcessor.class);
   
   public static final String ALIAS = "nodeLessCss";
@@ -121,7 +60,7 @@ public class NodeLessCssProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     try {
-      String resourceUri = resource == null ? "unknown.less" : resource.getUri();
+      final String resourceUri = resource == null ? "unknown.less" : resource.getUri();
       writer.write(process(resourceUri, content));
     } catch (final WroRuntimeException e) {
         final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
@@ -137,32 +76,46 @@ public class NodeLessCssProcessor
   
   private String process(final String resourceUri, final String content) {
     InputStream shellIn = null;
+    //the file holding the input file to process
     File temp = null; 
     try {
       temp = createTempFile();
-      //FileUtils.writeStringToFile(temp, content);
-      IOUtils.write(content, new FileOutputStream(temp), "UTF-8");
-      LOG.debug("absolute path: " + temp.getAbsolutePath());
-      final String filePath = temp.getPath();
-      ProcessBuilder pb = new ProcessBuilder("lessc", filePath);
-      pb.redirectErrorStream(true);
-      Process shell = pb.start();
+      final String encoding = "UTF-8";
+      IOUtils.write(content, new FileOutputStream(temp), encoding);
+      LOG.debug("absolute path: {}", temp.getAbsolutePath());
+      final String tempFilePath = temp.getPath();
+      final ProcessBuilder processBuilder = new ProcessBuilder(SHELL_COMMAND, tempFilePath).redirectErrorStream(true);
+      final Process shell = processBuilder.start();
       shellIn = shell.getInputStream();
-      final String result = IOUtils.toString(shellIn, "UTF-8");
-      int exitStatus = shell.waitFor();//this won't return till `out' stream being flushed!
+      int exitStatus = shell.waitFor();// this won't return till `out' stream being flushed!
+      final String result = IOUtils.toString(shellIn, encoding);
       if (exitStatus != 0) {
-        final String errorMessage = MessageFormat.format("Error in LESS file: {0}\n\n{1}", temp, result.replace(filePath, resourceUri));
+        LOG.error("exitStatus: {}", exitStatus);
+        //find a way to get rid of escape character found at the end (minor issue)
+        final String errorMessage = MessageFormat.format("Error in LESS: \n{0}", result.replace(tempFilePath, resourceUri));
         throw new WroRuntimeException(errorMessage);
       }
-      LOG.debug("exitStatus: {}", exitStatus);
-      LOG.debug(result);
-      FileUtils.deleteQuietly(temp);
       return result;
     } catch (Exception e) {
-      LOG.error(e.getMessage());
+      LOG.error(e.getMessage(), e);
       throw new WroRuntimeException(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(shellIn);
+      //always cleanUp
+      FileUtils.deleteQuietly(temp);
+    }
+  }
+  
+  /**
+   * @return true if the processor is supported on this environment. The implementation check if the required shell
+   *         utility is available.
+   */
+  public boolean isSupported() {
+    try {
+      new ProcessBuilder(SHELL_COMMAND).start();
+      return true;
+    } catch (Exception e) {
+      return false;
     }
   }
 
@@ -176,6 +129,7 @@ public class NodeLessCssProcessor
   protected void onException(final WroRuntimeException e) {
     throw e;
   }
+  
   /**
    * {@inheritDoc}
    */
@@ -184,5 +138,4 @@ public class NodeLessCssProcessor
       throws IOException {
     process(null, reader, writer);
   }
-  
 }
