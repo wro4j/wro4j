@@ -118,7 +118,10 @@ public class NodeLessCssProcessor
    */
   public boolean isSupported() {
     try {
-      new ProcessBuilder(SHELL_COMMAND).start();
+      if (System.getProperty("os.name").contains("Windows"))
+        new ProcessBuilder("cmd","/s",SHELL_COMMAND).start();
+      else
+        new ProcessBuilder(SHELL_COMMAND).start();
       return true;
     } catch (Exception e) {
       return false;
