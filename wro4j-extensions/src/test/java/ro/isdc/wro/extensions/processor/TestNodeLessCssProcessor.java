@@ -42,7 +42,7 @@ public class TestNodeLessCssProcessor {
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
-    final File expectedFolder = new File(url.getFile(), "expected");
+    final File expectedFolder = new File(url.getFile(), "expectedNode");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 

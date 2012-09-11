@@ -25,8 +25,6 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
-import javax.servlet.ServletContext;
-
 
 /**
  * A processor using lessCss engine: @see http://www.asual.com/lesscss/
@@ -137,32 +135,33 @@ public class NodeLessCssProcessor
   
   private String process(final String resourceUri, final String content) {
     InputStream shellIn = null;
+    //the file holding the input file to process
     File temp = null; 
     try {
       temp = createTempFile();
-      //FileUtils.writeStringToFile(temp, content);
-      IOUtils.write(content, new FileOutputStream(temp), "UTF-8");
-      LOG.debug("absolute path: " + temp.getAbsolutePath());
+      final String encoding = "UTF-8";
+      IOUtils.write(content, new FileOutputStream(temp), encoding);
+      LOG.debug("absolute path: {}", temp.getAbsolutePath());
       final String filePath = temp.getPath();
-      ProcessBuilder pb = new ProcessBuilder("lessc", filePath);
-      pb.redirectErrorStream(true);
-      Process shell = pb.start();
+      final ProcessBuilder processBuilder = new ProcessBuilder("lessc", filePath).redirectErrorStream(true);
+      final Process shell = processBuilder.start();
       shellIn = shell.getInputStream();
-      final String result = IOUtils.toString(shellIn, "UTF-8");
-      int exitStatus = shell.waitFor();//this won't return till `out' stream being flushed!
+      int exitStatus = shell.waitFor();// this won't return till `out' stream being flushed!
+      final String result = IOUtils.toString(shellIn, encoding);
       if (exitStatus != 0) {
-        final String errorMessage = MessageFormat.format("Error in LESS file: {0}\n\n{1}", temp, result.replace(filePath, resourceUri));
+        //find a way to get rid of escape character found at the end (minor issue)
+        final String errorMessage = MessageFormat.format("Error in LESS: \n{0}", result.replace(filePath, resourceUri));
         throw new WroRuntimeException(errorMessage);
       }
       LOG.debug("exitStatus: {}", exitStatus);
-      LOG.debug(result);
-      FileUtils.deleteQuietly(temp);
       return result;
     } catch (Exception e) {
       LOG.error(e.getMessage());
       throw new WroRuntimeException(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(shellIn);
+      //always cleanUp
+      //FileUtils.deleteQuietly(temp);
     }
   }
 
@@ -176,6 +175,7 @@ public class NodeLessCssProcessor
   protected void onException(final WroRuntimeException e) {
     throw e;
   }
+  
   /**
    * {@inheritDoc}
    */
@@ -184,5 +184,4 @@ public class NodeLessCssProcessor
       throws IOException {
     process(null, reader, writer);
   }
-  
 }

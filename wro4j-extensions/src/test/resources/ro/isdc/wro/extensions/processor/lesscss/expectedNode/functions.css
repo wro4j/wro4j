@@ -1,0 +1,26 @@
+#functions {
+  color: #eedd;
+  width: increment(15);
+  height: undefined("self");
+  border-width: add(2, 3);
+  variable: increment(10);
+}
+#built-in {
+  escaped: -Some::weird(#thing, y);
+  lighten: #ffcccc;
+  darken: #330000;
+  saturate: #203c31;
+  desaturate: #29332f;
+  greyscale: #2e2e2e;
+  spin-p: #bf6a40;
+  spin-n: #bf4055;
+  format: "rgb(32, 128, 64)";
+  format-string: "hello world";
+  eformat: rgb(32, 128, 64);
+  hue: 98;
+  saturation: 12%;
+  lightness: 95%;
+}
+#alpha {
+  alpha: rgba(153, 94, 51, 0.6);
+}
