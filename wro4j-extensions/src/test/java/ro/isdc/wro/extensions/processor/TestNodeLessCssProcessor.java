@@ -68,8 +68,8 @@ public class TestNodeLessCssProcessor {
   public void shouldBeThreadSafe() throws Exception {
     final NodeLessCssProcessor processor = new NodeLessCssProcessor() {
       @Override
-      protected void onException(final WroRuntimeException e) {
-        throw e;
+      protected void onException(final Exception e) {
+        throw WroRuntimeException.wrap(e);
       }
     };
     final Callable<Void> task = new Callable<Void>() {
@@ -92,13 +92,7 @@ public class TestNodeLessCssProcessor {
   @Test
   public void shouldFailWhenInvalidLessCssIsProcessed()
       throws Exception {
-    final ResourcePreProcessor processor = new NodeLessCssProcessor() {
-      @Override
-      protected void onException(final WroRuntimeException e) {
-        LOG.debug("[FAIL] Exception message is: {}", e.getMessage());
-        throw e;
-      };
-    };
+    final ResourcePreProcessor processor = new NodeLessCssProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "invalid");

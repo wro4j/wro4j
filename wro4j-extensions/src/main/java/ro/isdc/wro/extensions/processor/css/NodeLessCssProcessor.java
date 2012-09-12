@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,13 +71,13 @@ public class NodeLessCssProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
+    final String resourceUri = resource == null ? "unknown.less" : resource.getUri();
     try {
-      final String resourceUri = resource == null ? "unknown.less" : resource.getUri();
       writer.write(process(resourceUri, content));
-    } catch (final WroRuntimeException e) {
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+    } catch (Exception e) {
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
+      LOG.error(e.getMessage(), e);
       onException(e);
     } finally {
       // return for later reuse
@@ -86,7 +86,7 @@ public class NodeLessCssProcessor
     }
   }
   
-  private String process(final String resourceUri, final String content) {
+  private String process(final String resourceUri, final String content) throws Exception {
     InputStream shellIn = null;
     // the file holding the input file to process
     File temp = null;
@@ -96,15 +96,15 @@ public class NodeLessCssProcessor
       IOUtils.write(content, new FileOutputStream(temp), encoding);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
       final String tempFilePath = temp.getPath();
+      
       final Process process = createProcess(tempFilePath);
-      shellIn = process.getInputStream();
       /**
        * It is important to read before waitFor is invoked because read stream is blocking stdout while Java application
        * doesn't read the whole buffer. It hangs when processing large files. The lessc isn't closing till all STDOUT
        * flushed. This blocks io and Node does not exit because of that.
        */
-      final String result = IOUtils.toString(shellIn, encoding);
-      int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!      
+      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
+      int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
       
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
@@ -114,9 +114,6 @@ public class NodeLessCssProcessor
         throw new WroRuntimeException(errorMessage);
       }
       return result;
-    } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
-      throw new WroRuntimeException(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(shellIn);
       // always cleanUp
@@ -125,10 +122,11 @@ public class NodeLessCssProcessor
   }
   
   /**
-   * Invoked when a processing exception occurs.
+   * Invoked when a processing exception occurs. Default implementation wraps the original exception into
+   * {@link WroRuntimeException}.
    */
-  protected void onException(final WroRuntimeException e) {
-    throw e;
+  protected void onException(final Exception e) {
+    throw WroRuntimeException.wrap(e);
   }
   
   /**
@@ -172,16 +170,19 @@ public class NodeLessCssProcessor
   }
   
   /**
+   * Creates the platform specific arguments to run the <code>lessc</code> shell utility. Default implementation handles
+   * windows and unix platforms.
+   * 
    * @return arguments for command line. The implementation will take care of OS differences.
    */
-  private String[] getCommandLine(final String filePath) {
-    return isWindows ? buildArgumentsForWindows(filePath) : buildArgumentsForNonWindows(filePath);
+  protected String[] getCommandLine(final String filePath) {
+    return isWindows ? buildArgumentsForWindows(filePath) : buildArgumentsForUnix(filePath);
   }
   
   /**
    * @return arguments required to run lessc on non Windows platform.
    */
-  private String[] buildArgumentsForNonWindows(final String filePath) {
+  private String[] buildArgumentsForUnix(final String filePath) {
     return new String[] {
       SHELL_COMMAND, OPTION_NO_COLOR, filePath
     };
