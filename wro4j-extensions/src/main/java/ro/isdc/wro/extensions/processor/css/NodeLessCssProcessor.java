@@ -55,7 +55,7 @@ public class NodeLessCssProcessor
   /**
    * Flag indicating that we are running on Windows platform. This will be initialized only once in constructor.
    */
-  private boolean isWindows;
+  private final boolean isWindows;
   
   public NodeLessCssProcessor() {
     // initialize this field at construction.
@@ -98,14 +98,13 @@ public class NodeLessCssProcessor
       final String tempFilePath = temp.getPath();
       final Process process = createProcess(tempFilePath);
       shellIn = process.getInputStream();
-      //
       /**
        * It is important to read before waitFor is invoked because read stream is blocking stdout while Java application
        * doesn't read the whole buffer. It hangs when processing large files. The lessc isn't closing till all STDOUT
        * flushed. This blocks io and Node does not exit because of that.
        */
       final String result = IOUtils.toString(shellIn, encoding);
-      int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
+      int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!      
       
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
@@ -161,6 +160,7 @@ public class NodeLessCssProcessor
    * @return true if the processor is supported on this environment. The implementation check if the required shell
    *         utility is available.
    */
+  @Override
   public boolean isSupported() {
     try {
       new ProcessBuilder(getCommandLine("")).start();
