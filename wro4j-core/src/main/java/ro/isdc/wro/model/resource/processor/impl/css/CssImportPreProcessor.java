@@ -5,6 +5,7 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -110,7 +111,7 @@ public class CssImportPreProcessor
       onRecursiveImportDetected();
       return "";
     }
-    getProcessedList().add(resource.getUri());
+    getProcessedList().add(resource.getUri().replace(File.separatorChar,'/'));
     final StringBuffer sb = new StringBuffer();
     final List<Resource> importsCollector = getImportedResources(resource);
     // for now, minimize always
