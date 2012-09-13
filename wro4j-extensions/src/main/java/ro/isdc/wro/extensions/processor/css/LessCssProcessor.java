@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -24,6 +27,7 @@ import ro.isdc.wro.util.LazyInitializer;
 @SupportedResourceType(ResourceType.CSS)
 public class LessCssProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   public static final String ALIAS = "lessCss";
   private final ResourcePreProcessor lessProcessor;
   
@@ -45,6 +49,7 @@ public class LessCssProcessor
    * @VisibleForTesting
    */
   protected NodeLessCssProcessor createNodeProcessor() {
+    LOG.debug("creating NodeLess processor");
     return new NodeLessCssProcessor();
   }
   
@@ -72,6 +77,7 @@ public class LessCssProcessor
    * @VisibleFortesTesting
    */
   protected ResourcePreProcessor createRhinoProcessor() {
+    LOG.debug("NodeLess is not supported. Using fallback RhinoLess processor");
     return new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {

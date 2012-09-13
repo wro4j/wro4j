@@ -68,7 +68,7 @@ public class TestNodeLessCssProcessor {
   public void shouldBeThreadSafe() throws Exception {
     final NodeLessCssProcessor processor = new NodeLessCssProcessor() {
       @Override
-      protected void onException(final Exception e) {
+      protected void onException(final Exception e, final String content) {
         throw WroRuntimeException.wrap(e);
       }
     };
