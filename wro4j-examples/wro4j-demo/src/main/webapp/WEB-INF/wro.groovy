@@ -138,5 +138,4 @@ groups {
     bootstrap()
     googleCodePrettify()
   }
-  /*js("/module/bootstrapDemo/widgets.js")*/
 }
