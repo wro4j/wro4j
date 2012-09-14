@@ -5,9 +5,9 @@ input.button {
 }
 .multilineAndSpaces {
   background: 
-     url(data:image/png;base64,iVBORw0KG);
+     url( "data:image/png;base64,iVBORw0KG" );
   background-image : 
-     url(data:image/png;base64,iVBORw0KG)     
+     url( "data:image/png;base64,iVBORw0KG" )     
 }
 @font-face {
     src: url(data:image/png;base64,iVBORw0KG);
