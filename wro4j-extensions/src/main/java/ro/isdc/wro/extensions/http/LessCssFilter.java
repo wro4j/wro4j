@@ -16,7 +16,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 public class LessCssFilter
     extends AbstractProcessorsFilter {
-  private List<ResourcePreProcessor> list = new ArrayList<ResourcePreProcessor>();
+  private final List<ResourcePreProcessor> list = new ArrayList<ResourcePreProcessor>();
 
   public LessCssFilter() {
     list.add(new LessCssProcessor());
@@ -29,5 +29,4 @@ public class LessCssFilter
   protected List<ResourcePreProcessor> getProcessorsList() {
     return list;
   }
-  
 }

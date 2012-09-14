@@ -50,8 +50,8 @@ final class WroExamplesServletModule extends ServletModule {
     
     filter("/*").through(WroContextFilter.class);
     wicketFilter("/*");
-    filter("*.less").through(LessCssFilter.class);
-    filter("*.coffee").through(CoffeeScriptFilter.class);
+//    filter("*.less").through(LessCssFilter.class);
+//    filter("*.coffee").through(CoffeeScriptFilter.class);
 
     //servlets
     serve("/dwr/*").with(DwrServlet.class);

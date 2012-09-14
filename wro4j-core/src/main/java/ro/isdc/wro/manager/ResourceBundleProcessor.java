@@ -132,6 +132,7 @@ public class ResourceBundleProcessor {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
+      LOG.debug("set aggregatedFolderPath: {}", aggregatedFolder);
       Context.get().setAggregatedFolderPath(aggregatedFolder);
     }
   }

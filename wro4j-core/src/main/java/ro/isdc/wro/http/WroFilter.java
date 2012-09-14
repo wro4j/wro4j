@@ -106,7 +106,6 @@ public class WroFilter
     // Extract config from servletContext (if already configured)
     // TODO use a named helper
     final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
-    LOG.debug("config attribute: {}", configAttribute);
     return configAttribute != null ? configAttribute : newWroConfigurationFactory(filterConfig).create();
   }
   

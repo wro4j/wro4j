@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
@@ -308,7 +306,9 @@ public final class WroUtil {
    * 
    * @param e
    *          the exception to wrap.
+   * @deprecated use {@link WroRuntimeException#wrap(Exception)}
    */
+  @Deprecated
   public static void wrapWithWroRuntimeException(final Exception e) {
     LOG.error("Exception occured: " + e.getClass(), e.getCause());
     if (e instanceof WroRuntimeException) {
