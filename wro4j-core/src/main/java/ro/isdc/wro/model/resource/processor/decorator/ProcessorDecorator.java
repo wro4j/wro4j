@@ -42,6 +42,7 @@ public class ProcessorDecorator
   /**
    * @return the decorated processor.
    */
+  @Override
   public final ResourceProcessor getDecoratedObject() {
     return decoratedProcessor;
   }
@@ -73,5 +74,13 @@ public class ProcessorDecorator
     final boolean isMinimizedSatisfied = minimize == true || !isMinimize();
     
     return isTypeSatisfied && isMinimizedSatisfied;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return getOriginalDecoratedObject().toString();
   }
 }

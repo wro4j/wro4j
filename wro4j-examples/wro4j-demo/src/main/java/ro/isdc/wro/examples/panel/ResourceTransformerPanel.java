@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
@@ -154,7 +154,7 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new CssVariablesProcessor());
       list.add(new VariablizeColorsCssProcessor());
 
-      list.add(new LessCssProcessor());
+      list.add(new RhinoLessCssProcessor());
       list.add(new SassCssProcessor());
       list.add(new YUICssCompressorProcessor());
       list.add(new JawrCssMinifierProcessor());

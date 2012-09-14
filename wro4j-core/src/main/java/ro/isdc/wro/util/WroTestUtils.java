@@ -239,13 +239,18 @@ public class WroTestUtils {
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("comparing with: {}", targetFile.getName());
-        compare(new FileInputStream(file), targetFileStream, new ResourceProcessor() {
-          public void process(final Resource resource, final Reader reader, final Writer writer)
-              throws IOException {
-            // ResourceType doesn't matter here
-            processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
-          }
-        });
+        try {
+          compare(new FileInputStream(file), targetFileStream, new ResourceProcessor() {
+            public void process(final Resource resource, final Reader reader, final Writer writer)
+                throws IOException {
+              // ResourceType doesn't matter here
+              processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
+            }
+          });
+        } catch (ComparisonFailure e) {
+          LOG.error("Failed comparing: {}", file.getName());
+          throw e;
+        }
         processedNumber++;
       } catch (final Exception e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: "
@@ -329,6 +334,7 @@ public class WroTestUtils {
         final InputStream targetFileStream = new FileInputStream(targetFile);
         LOG.debug("=========== processing: {} ===========", file.getName());
         // ResourceType doesn't matter here
+        try {
         compare(new FileInputStream(file), targetFileStream, new ResourceProcessor() {
           public void process(final Resource resource, final Reader reader, final Writer writer)
               throws IOException {
@@ -347,6 +353,10 @@ public class WroTestUtils {
             }
           }
         });
+        } catch (ComparisonFailure e) {
+          LOG.error("failed comparing: {}", file.getName());
+          throw e;
+        }
         processedNumber++;
       } catch (final IOException e) {
         LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause());
@@ -356,6 +366,7 @@ public class WroTestUtils {
     }
     logSuccess(processedNumber);
   }
+
   /**
    * Runs a task concurrently. Allows to test thread-safe behavior.
    * 

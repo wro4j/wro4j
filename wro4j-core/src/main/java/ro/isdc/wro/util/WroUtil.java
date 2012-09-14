@@ -285,7 +285,9 @@ public final class WroUtil {
    * 
    * @param e
    *          the exception to wrap.
+   * @deprecated use {@link WroRuntimeException#wrap(Exception)}
    */
+  @Deprecated
   public static void wrapWithWroRuntimeException(final Exception e) {
     LOG.error("Exception occured: " + e.getClass(), e.getCause());
     if (e instanceof WroRuntimeException) {

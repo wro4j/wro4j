@@ -44,4 +44,18 @@ public class WroRuntimeException extends RuntimeException {
     LOG.error(getMessage());
     return this;
   }
+  
+  /**
+   * Wraps original exception into {@link WroRuntimeException} and throw it.
+   * 
+   * @param e
+   *          the exception to wrap.
+   */
+  public static WroRuntimeException wrap(final Exception e) {
+    LOG.error("Exception occured: " + e.getClass(), e.getCause());
+    if (e instanceof WroRuntimeException) {
+      return (WroRuntimeException) e;
+    }
+    return new WroRuntimeException(e.getMessage(), e);
+  }
 }

@@ -28,7 +28,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssLintProcessor {
-  private ResourceProcessor processor = new CssLintProcessor();
+  private final ResourceProcessor processor = new CssLintProcessor();
 
 
   @Test
@@ -50,9 +50,10 @@ public class TestCssLintProcessor {
       }
     };
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
-          lessCss.process(new StringReader(".label {color: red;}"), new StringWriter());
+          lessCss.process(null, new StringReader(".label {color: red;}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

@@ -29,5 +29,4 @@ public class LessCssFilter
   protected List<ResourceProcessor> getProcessorsList() {
     return list;
   }
-
 }

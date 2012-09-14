@@ -22,7 +22,6 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.ObjectFactory;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -66,6 +65,7 @@ public class CssLintProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
@@ -77,7 +77,7 @@ public class CssLintProcessor
         LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
         onCssLintException(e, resource);
       } catch (final Exception ex) {
-        WroUtil.wrapWithWroRuntimeException(e);
+        throw WroRuntimeException.wrap(e);
       }
     } catch (final WroRuntimeException e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
@@ -100,21 +100,11 @@ public class CssLintProcessor
     throw e;
   }
 
-
-
   /**
    * @return {@link CssLint} instance.
    */
   protected CssLint newCssLint() {
     return new CssLint();
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer) throws IOException {
-    process(null, reader, writer);
   }
 
   /**
