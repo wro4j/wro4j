@@ -6,9 +6,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.output.WriterOutputStream;
@@ -21,7 +18,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -35,7 +31,7 @@ public class TestXmlReportBuilder {
   }
   
   @Test
-  public void testFromFolder()
+  public void shouldBuildReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("xml");
     
@@ -50,20 +46,5 @@ public class TestXmlReportBuilder {
         XmlReportBuilder.create(errors).write(new WriterOutputStream(writer));
       }
     });
-  }
-  
-  public static void main(String[] args) {
-    final List<ResourceLinterErrors<LinterError>> errors = new ArrayList<ResourceLinterErrors<LinterError>>();
-    Collection<LinterError> file1Errors = new ArrayList<LinterError>();
-    LinterError linterError = new LinterError();
-    linterError.setCharacter(2);
-    linterError.setEvidence("evidence");
-    linterError.setLine(20);
-    linterError.setReason("reason");
-    file1Errors.add(linterError);
-    errors.add(ResourceLinterErrors.<LinterError> create("file1", file1Errors));
-    final Type type = new TypeToken<List<ResourceLinterErrors<LinterError>>>() {}.getType();
-    String json = new GsonBuilder().setPrettyPrinting().create().toJson(errors, type);
-    System.out.println(json);
   }
 }
