@@ -6,6 +6,8 @@ package ro.isdc.wro.util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -318,5 +321,22 @@ public final class WroUtil {
    */
   public static String getImplementationVersion() {
     return WroUtil.class.getPackage().getImplementationVersion();
+  }
+  
+  /**
+   * Copy and close the reader and writer streams.
+   *
+   * @param reader The source stream.
+   * @param writer The destination stream.
+   * @throws IOException If content cannot be copy.
+   */
+  public static void safeCopy(final Reader reader, final Writer writer)
+      throws IOException {
+    try {
+      IOUtils.copy(reader, writer);
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(writer);
+    }
   }
 }
