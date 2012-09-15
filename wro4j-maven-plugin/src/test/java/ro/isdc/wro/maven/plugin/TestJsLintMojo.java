@@ -3,10 +3,17 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static junit.framework.Assert.assertTrue;
+
+import java.io.File;
+
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
+
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -67,5 +74,23 @@ public class TestJsLintMojo extends AbstractTestLinterMojo {
     getMojo().setOptions("");
     getMojo().setTargetGroups("undef");
     getMojo().execute();
+  }
+  
+  @Test
+  public void shouldGenerateXmlReportFile()
+      throws Exception {
+    final File reportFile = WroUtil.createTempFile();
+    try {
+      ((JsLintMojo) getMojo()).setReportFile(reportFile);
+      getMojo().setOptions("undef, browser");
+      getMojo().setTargetGroups(null);
+      getMojo().setFailNever(true);
+      getMojo().setIgnoreMissingResources(true);
+      getMojo().execute();
+    } finally {
+      //Assert that file is big enough to prove that it contains serialized errors.
+      assertTrue(reportFile.length() > 1000);
+      FileUtils.deleteQuietly(reportFile);
+    }
   }
 }

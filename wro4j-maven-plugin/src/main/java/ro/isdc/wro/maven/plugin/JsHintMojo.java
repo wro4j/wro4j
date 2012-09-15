@@ -40,6 +40,9 @@ public class JsHintMojo
    * @optional
    */
   private File reportFile;
+  /**
+   * Contains errors found during jshint processing which will be reported eventually.
+   */
   private Collection<ResourceLinterErrors<LinterError>> foundErrors;
   
   /**
