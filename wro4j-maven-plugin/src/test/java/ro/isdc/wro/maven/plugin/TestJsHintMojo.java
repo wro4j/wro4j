@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -81,9 +83,12 @@ public class TestJsHintMojo
       ((JsHintMojo) getMojo()).setReportFile(reportFile);
       getMojo().setOptions("undef, browser");
       getMojo().setTargetGroups(null);
+      getMojo().setFailNever(true);
+      getMojo().setIgnoreMissingResources(true);
       getMojo().execute();
     } finally {
-      System.out.println(IOUtils.toString(new FileInputStream(reportFile)));
+      //Assert that file is big enough to prove that it contains serialized errors.
+      assertTrue(reportFile.length() > 1000);
       FileUtils.deleteQuietly(reportFile);
     }
   }
