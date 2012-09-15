@@ -4,7 +4,6 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.Collection;
 
 import javax.servlet.FilterConfig;

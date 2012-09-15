@@ -40,48 +40,60 @@ public class JsHintMojo
    * @optional
    */
   private File reportFile;
+  private Collection<ResourceLinterErrors<LinterError>> foundErrors;
   
   /**
    * {@inheritDoc}
    */
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
-    // collects the reported errors
-    final Collection<ResourceLinterErrors<LinterError>> errors = new ArrayList<ResourceLinterErrors<LinterError>>();
-    try {
-      final ResourcePreProcessor processor = new JsHintProcessor() {
-        @Override
-        public void process(final Resource resource, final Reader reader, final Writer writer)
-            throws IOException {
-          getLog().info("processing resource: " + resource);
-          super.process(resource, reader, writer);
+    final ResourcePreProcessor processor = new JsHintProcessor() {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        getLog().info("processing resource: " + resource);
+        super.process(resource, reader, writer);
+      }
+      
+      @Override
+      protected void onException(final WroRuntimeException e) {
+        JsHintMojo.this.onException(e);
+      }
+      
+      @Override
+      protected void onLinterException(final LinterException e, final Resource resource) {
+        final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s",
+            e.getErrors().size(), resource, e.getErrors());
+        getLog().error(errorMessage);
+        // collect found errors
+        foundErrors.add(ResourceLinterErrors.create(resource.getUri(), e.getErrors()));
+        if (!isFailNever()) {
+          throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
-        
-        @Override
-        protected void onException(final WroRuntimeException e) {
-          JsHintMojo.this.onException(e);
-        }
-        
-        @Override
-        protected void onLinterException(final LinterException e, final Resource resource) {
-          final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s",
-              e.getErrors().size(), e.getErrors());
-          getLog().error(errorMessage);
-          //collect found errors
-          errors.add(ResourceLinterErrors.create(resource.getUri(), e.getErrors()));
-          if (!isFailNever()) {
-            throw new WroRuntimeException("Errors found when validating resource: " + resource);
-          }
-        };
-      }.setOptions(getOptions());
-      return processor;
-    } finally {
-      if (reportFile != null) {
-        try {
-          XmlReportBuilder.create(errors).write(new FileOutputStream(reportFile));
-        } catch (FileNotFoundException e) {
-          getLog().error("Could not create report file: " + reportFile, e);
-        }
+      };
+    }.setOptions(getOptions());
+    return processor;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void onBeforeExecute() {
+    foundErrors = new ArrayList<ResourceLinterErrors<LinterError>>();
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void onAfterExecute() {
+    if (reportFile != null) {
+      try {
+        getLog().debug("creating report at location: " + reportFile);
+        XmlReportBuilder.create(foundErrors).write(new FileOutputStream(reportFile));
+      } catch (FileNotFoundException e) {
+        getLog().error("Could not create report file: " + reportFile, e);
       }
     }
   }
@@ -90,5 +102,12 @@ public class JsHintMojo
    * Used by unit test to check if mojo doesn't fail.
    */
   void onException(final Exception e) {
+  }
+  
+  /**
+   * @VisibleForTesting
+   */
+  void setReportFile(final File reportFile) {
+    this.reportFile = reportFile;
   }
 }
