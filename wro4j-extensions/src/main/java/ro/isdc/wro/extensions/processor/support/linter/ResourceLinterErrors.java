@@ -20,6 +20,12 @@ public class ResourceLinterErrors<T> {
   private String resourcePath;
   
   /**
+   * Required by json serializer.
+   */
+  public ResourceLinterErrors() {
+  }
+  
+  /**
    * Factory method for creating a {@link ResourceLinterErrors} instance.
    * 
    * @param resourcePath
@@ -48,5 +54,13 @@ public class ResourceLinterErrors<T> {
    */
   public String getResourcePath() {
     return resourcePath;
+  }
+
+  public void setErrors(final Collection<T> errors) {
+    this.errors = errors;
+  }
+
+  public void setResourcePath(final String resourcePath) {
+    this.resourcePath = resourcePath;
   }
 }

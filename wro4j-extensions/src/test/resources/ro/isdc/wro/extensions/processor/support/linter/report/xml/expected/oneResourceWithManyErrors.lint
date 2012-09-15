@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><lint><file name="file1"><issue char="2" evidence="evidence1" line="1" reason="reason1"/><issue char="5" evidence="evidence2" line="20" reason="reason2"/><issue char="7" evidence="evidence3" line="30" reason="reason3"/><issue char="8" evidence="evidence4" line="50" reason="reason4"/></file></lint>

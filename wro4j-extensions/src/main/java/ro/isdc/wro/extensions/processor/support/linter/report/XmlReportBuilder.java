@@ -30,8 +30,9 @@ import ro.isdc.wro.extensions.processor.support.linter.ResourceLinterErrors;
  * @created 15 Sep 2012
  */
 public class XmlReportBuilder {
-  private static final String ATTR_NAME = "name";
+  private static final String ELEMENT_ISSUE = "issue";
   private static final String ELEMENT_FILE = "file";
+  private static final String ATTR_NAME = "name";
   private static final String ATTR_REASON = "reason";
   private static final String ATTR_LINE = "line";
   private static final String ATTR_EVIDENCE = "evidence";
@@ -40,10 +41,19 @@ public class XmlReportBuilder {
   private Collection<ResourceLinterErrors<LinterError>> errors;
   
   /**
+   * Factory method for creating {@link XmlReportBuilder}.
    * @param errors
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  public XmlReportBuilder(final Collection<ResourceLinterErrors<LinterError>> errors) {
+  public static XmlReportBuilder create(final Collection<ResourceLinterErrors<LinterError>> errors) { 
+    return new XmlReportBuilder(errors);
+  }
+  
+  /**
+   * @param errors
+   *          a not null collection of {@link LinterError} used to build an XML report from.
+   */
+  private XmlReportBuilder(final Collection<ResourceLinterErrors<LinterError>> errors) {
     notNull(errors);
     this.errors = errors;
     initDocument();
@@ -100,7 +110,7 @@ public class XmlReportBuilder {
    * Creates a {@link Node} containing a detailed description of an issue.
    */
   private Node createIssueElement(final LinterError error) {
-    final Element issueElement = doc.createElement(ELEMENT_FILE);
+    final Element issueElement = doc.createElement(ELEMENT_ISSUE);
     issueElement.setAttribute(ATTR_CHARACTER, String.valueOf(error.getCharacter()));
     issueElement.setAttribute(ATTR_EVIDENCE, String.valueOf(error.getEvidence()));
     issueElement.setAttribute(ATTR_LINE, String.valueOf(error.getLine()));
