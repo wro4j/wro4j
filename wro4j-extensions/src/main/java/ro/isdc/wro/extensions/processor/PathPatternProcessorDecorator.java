@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.Validate.notEmpty;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ public class PathPatternProcessorDecorator
     this.includes = includes;
     matcher = new AntPathMatcher();
     this.patterns = patterns;
+    LOG.debug("{} patterns {}", includes ? "include" : "exclude", Arrays.toString(patterns));
   }
   
   /**
@@ -95,7 +97,8 @@ public class PathPatternProcessorDecorator
       final Writer writer)
       throws IOException {
     if (resource != null) {
-      String uri = resource.getUri();
+      final String uri = resource.getUri();
+      LOG.debug("matching uri: {}", uri);
       if (includes) {
         // Match (p1 OR p2 OR .. pn)
         for (String pattern : patterns) {
@@ -136,7 +139,8 @@ public class PathPatternProcessorDecorator
    */
   @Override
   public String toString() {
-    StringBuilder buffer = new StringBuilder(includes ? "(" : "!(");
+    final String processorName = getOriginalDecoratedObject().getClass().getSimpleName();
+    StringBuilder buffer = new StringBuilder(processorName + ": ").append(includes ? "(" : "!(");
     String separator = includes ? " || " : " && ";
     for (String pattern : patterns) {
       buffer.append(pattern).append(separator);

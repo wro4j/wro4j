@@ -346,7 +346,7 @@ public final class WroUtil {
    * Copy and close the reader and writer streams.
    *
    * @param reader The source stream.
-   * @param writer The destintation stream.
+   * @param writer The destination stream.
    * @throws IOException If content cannot be copy.
    */
   public static void safeCopy(final Reader reader, final Writer writer)
