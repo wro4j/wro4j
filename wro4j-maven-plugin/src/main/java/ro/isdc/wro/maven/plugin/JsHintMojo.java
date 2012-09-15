@@ -3,20 +3,28 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
+import ro.isdc.wro.extensions.processor.support.linter.ResourceLinterErrors;
+import ro.isdc.wro.extensions.processor.support.linter.report.XmlReportBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
  * Maven plugin used to validate js scripts defined in wro model using <a href="http://jshint.com/">jsLint</a>.
- *
+ * 
  * @goal jshint
  * @phase compile
  * @requiresDependencyResolution runtime
@@ -26,40 +34,58 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 public class JsHintMojo
     extends AbstractSingleProcessorMojo {
   /**
+   * File where the report will be written.
+   * 
+   * @parameter default-value="${project.build.directory}/wro-reports/jshint.xml" expression="${reportFile}"
+   * @optional
+   */
+  private File reportFile;
+  
+  /**
    * {@inheritDoc}
    */
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
-    final ResourcePreProcessor processor = new JsHintProcessor() {
-      @Override
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        getLog().info("processing resource: " + resource);
-        if (resource != null) {
-          getLog().info("processing resource: " + resource.getUri());
+    // collects the reported errors
+    final Collection<ResourceLinterErrors<LinterError>> errors = new ArrayList<ResourceLinterErrors<LinterError>>();
+    try {
+      final ResourcePreProcessor processor = new JsHintProcessor() {
+        @Override
+        public void process(final Resource resource, final Reader reader, final Writer writer)
+            throws IOException {
+          getLog().info("processing resource: " + resource);
+          super.process(resource, reader, writer);
         }
-        super.process(resource, reader, writer);
-      }
-
-      @Override
-      protected void onException(final WroRuntimeException e) {
-        JsHintMojo.this.onException(e);
-      }
-
-      @Override
-      protected void onLinterException(final LinterException e, final Resource resource) {
-        getLog().error(
-            e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
-                + e.getErrors());
-        if (!isFailNever()) {
-          //throw new MojoExecutionException("Errors found when validating resource: " + resource);
-          throw new WroRuntimeException("Errors found when validating resource: " + resource);
+        
+        @Override
+        protected void onException(final WroRuntimeException e) {
+          JsHintMojo.this.onException(e);
         }
-      };
-    }.setOptions(getOptions());
-    return processor;
+        
+        @Override
+        protected void onLinterException(final LinterException e, final Resource resource) {
+          final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s",
+              e.getErrors().size(), e.getErrors());
+          getLog().error(errorMessage);
+          //collect found errors
+          errors.add(ResourceLinterErrors.create(resource.getUri(), e.getErrors()));
+          if (!isFailNever()) {
+            throw new WroRuntimeException("Errors found when validating resource: " + resource);
+          }
+        };
+      }.setOptions(getOptions());
+      return processor;
+    } finally {
+      if (reportFile != null) {
+        try {
+          XmlReportBuilder.create(errors).write(new FileOutputStream(reportFile));
+        } catch (FileNotFoundException e) {
+          getLog().error("Could not create report file: " + reportFile, e);
+        }
+      }
+    }
   }
-
+  
   /**
    * Used by unit test to check if mojo doesn't fail.
    */
