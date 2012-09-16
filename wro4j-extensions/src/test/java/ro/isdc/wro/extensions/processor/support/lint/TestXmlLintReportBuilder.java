@@ -25,7 +25,7 @@ import com.google.gson.reflect.TypeToken;
 public class TestXmlLintReportBuilder {
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullErrors() {
-    XmlLintReportBuilder.create(null);
+    XmlLinterErrorReportBuilder.createLintReportBuilder(null);
   }
   
   @Test
@@ -41,7 +41,7 @@ public class TestXmlLintReportBuilder {
           throws IOException {
         final Type type = new TypeToken<LintReport<LinterError>>() {}.getType();
         final LintReport<LinterError> errors = new Gson().fromJson(reader, type);
-        XmlLintReportBuilder.create(errors).write(new WriterOutputStream(writer));
+        XmlLinterErrorReportBuilder.createLintReportBuilder(errors).write(new WriterOutputStream(writer));
       }
     });
   }

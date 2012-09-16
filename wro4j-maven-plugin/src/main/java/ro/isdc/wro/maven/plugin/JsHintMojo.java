@@ -9,13 +9,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.lint.LintReport;
 import ro.isdc.wro.extensions.processor.support.lint.ResourceLintReport;
-import ro.isdc.wro.extensions.processor.support.lint.XmlLintReportBuilder;
+import ro.isdc.wro.extensions.processor.support.lint.XmlLinterErrorReportBuilder;
 import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
@@ -94,7 +93,7 @@ public class JsHintMojo
     if (reportFile != null) {
       try {
         getLog().debug("creating report at location: " + reportFile);
-        XmlLintReportBuilder.create(lintReport).write(new FileOutputStream(reportFile));
+        XmlLinterErrorReportBuilder.createLintReportBuilder(lintReport).write(new FileOutputStream(reportFile));
       } catch (FileNotFoundException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
@@ -103,6 +102,7 @@ public class JsHintMojo
   
   /**
    * Used by unit test to check if mojo doesn't fail.
+   * @VisibleForTesting
    */
   void onException(final Exception e) {
   }
