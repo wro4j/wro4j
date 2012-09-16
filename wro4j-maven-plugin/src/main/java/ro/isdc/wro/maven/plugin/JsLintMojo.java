@@ -9,15 +9,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
+import ro.isdc.wro.extensions.processor.support.lint.LintReport;
+import ro.isdc.wro.extensions.processor.support.lint.ResourceLintReport;
+import ro.isdc.wro.extensions.processor.support.lint.XmlLintReportBuilder;
 import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
-import ro.isdc.wro.extensions.processor.support.linter.ResourceLinterErrors;
-import ro.isdc.wro.extensions.processor.support.linter.report.XmlReportBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -37,14 +36,14 @@ public class JsLintMojo
   /**
    * File where the report will be written.
    * 
-   * @parameter default-value="${project.build.directory}/wro-reports/jslint.xml" expression="${reportFile}"
+   * @parameter default-value="${project.build.directory}/wro4j-reports/jslint.xml" expression="${reportFile}"
    * @optional
    */
   private File reportFile;
   /**
    * Contains errors found during jshint processing which will be reported eventually.
    */
-  private Collection<ResourceLinterErrors<LinterError>> foundErrors;
+  private LintReport<LinterError> lintReport;
   
   /**
    * {@inheritDoc}
@@ -73,7 +72,7 @@ public class JsLintMojo
             e.getErrors().size(), resource, e.getErrors());
         getLog().error(errorMessage);
         // collect found errors
-        foundErrors.add(ResourceLinterErrors.create(resource.getUri(), e.getErrors()));
+        lintReport.addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
         if (!isFailNever()) {
           throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
@@ -88,7 +87,7 @@ public class JsLintMojo
    */
   @Override
   protected void onBeforeExecute() {
-    foundErrors = new ArrayList<ResourceLinterErrors<LinterError>>();
+    lintReport = new LintReport<LinterError>();
   }
   
   /**
@@ -99,7 +98,7 @@ public class JsLintMojo
     if (reportFile != null) {
       try {
         getLog().debug("creating report at location: " + reportFile);
-        XmlReportBuilder.create(foundErrors).write(new FileOutputStream(reportFile));
+        XmlLintReportBuilder.create(lintReport).write(new FileOutputStream(reportFile));
       } catch (FileNotFoundException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }

@@ -1,4 +1,4 @@
-package ro.isdc.wro.extensions.processor.support.linter.report;
+package ro.isdc.wro.extensions.processor.support.lint;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -19,7 +19,6 @@ import org.w3c.dom.Node;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterError;
-import ro.isdc.wro.extensions.processor.support.linter.ResourceLinterErrors;
 
 
 /**
@@ -29,7 +28,7 @@ import ro.isdc.wro.extensions.processor.support.linter.ResourceLinterErrors;
  * @since 1.4.10
  * @created 15 Sep 2012
  */
-public class XmlReportBuilder {
+public class XmlLintReportBuilder {
   private static final String ELEMENT_ISSUE = "issue";
   private static final String ELEMENT_FILE = "file";
   private static final String ATTR_NAME = "name";
@@ -38,24 +37,24 @@ public class XmlReportBuilder {
   private static final String ATTR_EVIDENCE = "evidence";
   private static final String ATTR_CHARACTER = "char";
   private Document doc;
-  private Collection<ResourceLinterErrors<LinterError>> errors;
+  private LintReport<LinterError> lintReport;
   
   /**
-   * Factory method for creating {@link XmlReportBuilder}.
-   * @param errors
-   *          a not null collection of {@link LinterError} used to build an XML report from.
+   * Factory method for creating {@link XmlLintReportBuilder}.
+   * @param lintReport
+   *          {@link LintReport} to build xml reports from.
    */
-  public static XmlReportBuilder create(final Collection<ResourceLinterErrors<LinterError>> errors) { 
-    return new XmlReportBuilder(errors);
+  public static XmlLintReportBuilder create(final LintReport<LinterError> lintReport) { 
+    return new XmlLintReportBuilder(lintReport);
   }
   
   /**
-   * @param errors
+   * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  private XmlReportBuilder(final Collection<ResourceLinterErrors<LinterError>> errors) {
-    notNull(errors);
-    this.errors = errors;
+  private XmlLintReportBuilder(final LintReport<LinterError> lintReport) {
+    notNull(lintReport);
+    this.lintReport = lintReport;
     initDocument();
   }
   
@@ -77,7 +76,7 @@ public class XmlReportBuilder {
     final Element rootElement = doc.createElement("lint");
     doc.appendChild(rootElement);
     
-    for (ResourceLinterErrors<LinterError> resourceErrors : errors) {
+    for (ResourceLintReport<LinterError> resourceErrors : lintReport.getReports()) {
       rootElement.appendChild(createFileElement(resourceErrors));
     }
     // write the content into xml file
@@ -97,10 +96,10 @@ public class XmlReportBuilder {
   /**
    * Creates a {@link Node} containing informations about all errors associated to a single resource.
    */
-  private Node createFileElement(final ResourceLinterErrors<LinterError> resourceErrors) {
+  private Node createFileElement(final ResourceLintReport<LinterError> resourceErrors) {
     final Element fileElement = doc.createElement(ELEMENT_FILE);
     fileElement.setAttribute(ATTR_NAME, resourceErrors.getResourcePath());
-    for (LinterError error : resourceErrors.getErrors()) {
+    for (LinterError error : resourceErrors.getLints()) {
       fileElement.appendChild(createIssueElement(error));
     }
     return fileElement;
