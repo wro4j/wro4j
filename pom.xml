@@ -215,13 +215,7 @@
         <artifactId>mockito-core</artifactId>
         <version>${mockito.version}</version>
         <scope>test</scope>
-      </dependency>            
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>${mockito.version}</version>
-        <scope>test</scope>
-      </dependency>      
+      </dependency>                
     </dependencies>        
   </dependencyManagement>
   <dependencies>
@@ -314,6 +308,12 @@
         <configuration>
           <tagBase>http://github.com/alexo/wro4j/tree/</tagBase>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>1.3.1</version>
+        <inherited>true</inherited>
       </plugin>
     </plugins>
     <extensions>
