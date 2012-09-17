@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.FileUtils;
@@ -16,8 +17,8 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
-import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
+import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -55,7 +56,8 @@ public class JsHintMojo
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         getLog().info("processing resource: " + resource);
-        super.process(resource, reader, writer);
+        //use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
+        super.process(resource, reader, new StringWriter());
       }
       
       @Override
