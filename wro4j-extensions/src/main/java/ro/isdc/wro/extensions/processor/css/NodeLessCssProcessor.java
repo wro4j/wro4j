@@ -167,6 +167,7 @@ public class NodeLessCssProcessor
   public boolean isSupported() {
     try {
       new ProcessBuilder(getCommandLine("")).start();
+      LOG.debug("The {} processor is supported.", getClass().getName());
       return true;
     } catch (Exception e) {
       LOG.warn("The {} processor is not supported.", getClass().getName());
