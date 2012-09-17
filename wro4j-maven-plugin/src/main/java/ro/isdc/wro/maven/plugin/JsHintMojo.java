@@ -97,7 +97,7 @@ public class JsHintMojo
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        XmlReportFormatter.createForLinterError(lintReport, XmlReportFormatter.Type.LINT).write(new FileOutputStream(reportFile));
+        XmlReportFormatter.createForLinterError(lintReport, XmlReportFormatter.FormatterType.LINT).write(new FileOutputStream(reportFile));
       } catch (IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }

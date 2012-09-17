@@ -102,7 +102,7 @@ public class CssLintMojo
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        XmlReportFormatter.createForCssLintError(lintReport, XmlReportFormatter.Type.CSSLINT).write(
+        XmlReportFormatter.createForCssLintError(lintReport, XmlReportFormatter.FormatterType.CSSLINT).write(
             new FileOutputStream(reportFile));
       } catch (IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);

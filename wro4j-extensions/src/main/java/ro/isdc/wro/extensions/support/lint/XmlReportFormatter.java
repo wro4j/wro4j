@@ -45,9 +45,9 @@ public class XmlReportFormatter
   private static final String ATTR_SEVERITY = "severity";
   private static final String ELEMENT_CSSLINT = "csslint";
   
-  private final Type type;
+  private final FormatterType formatterType;
   
-  public static enum Type {
+  public static enum FormatterType {
     LINT, CHECKSTYLE, CSSLINT
   }
   
@@ -57,12 +57,12 @@ public class XmlReportFormatter
    * @param lintReport
    *          {@link LintReport} to build xml reports from.
    */
-  public static XmlReportFormatter create(final LintReport<LintItem> lintReport, final Type type) {
-    return new XmlReportFormatter(lintReport, type);
+  public static XmlReportFormatter create(final LintReport<LintItem> lintReport, final FormatterType formatterType) {
+    return new XmlReportFormatter(lintReport, formatterType);
   }
   
-  public static XmlReportFormatter createForLinterError(final LintReport<LinterError> lintReport, final Type type) {
-    return createInternal(lintReport, type, new Function<LinterError, LintItem>() {
+  public static XmlReportFormatter createForLinterError(final LintReport<LinterError> lintReport, final FormatterType formatterType) {
+    return createInternal(lintReport, formatterType, new Function<LinterError, LintItem>() {
       @Override
       public LintItem apply(final LinterError input)
           throws Exception {
@@ -71,8 +71,8 @@ public class XmlReportFormatter
     });
   }
   
-  public static XmlReportFormatter createForCssLintError(final LintReport<CssLintError> lintReport, final Type type) {
-    return createInternal(lintReport, type, new Function<CssLintError, LintItem>() {
+  public static XmlReportFormatter createForCssLintError(final LintReport<CssLintError> lintReport, final FormatterType formatterType) {
+    return createInternal(lintReport, formatterType, new Function<CssLintError, LintItem>() {
       @Override
       public LintItem apply(final CssLintError input)
           throws Exception {
@@ -86,12 +86,12 @@ public class XmlReportFormatter
    * 
    * @param lintReport
    *          {@link LintReport} containing all lints.
-   * @param type
+   * @param formatterType
    *          the type of formatter to use.
    * @param adapter
    *          a {@link Function} responsible for adapting a type <F> into {@link LintItem}
    */
-  private static <F> XmlReportFormatter createInternal(final LintReport<F> lintReport, final Type type,
+  private static <F> XmlReportFormatter createInternal(final LintReport<F> lintReport, final FormatterType formatterType,
       final Function<F, LintItem> adapter) {
     final LintReport<LintItem> report = new LintReport<LintItem>();
     for (ResourceLintReport<F> item : lintReport.getReports()) {
@@ -105,17 +105,17 @@ public class XmlReportFormatter
       }
       report.addReport(ResourceLintReport.create(item.getResourcePath(), lints));
     }
-    return new XmlReportFormatter(report, type);
+    return new XmlReportFormatter(report, formatterType);
   }
   
   /**
    * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  protected XmlReportFormatter(final LintReport<LintItem> lintReport, final Type type) {
+  protected XmlReportFormatter(final LintReport<LintItem> lintReport, final FormatterType type) {
     super(lintReport);
     notNull(type);
-    this.type = type;
+    this.formatterType = type;
   }
   
   /**
@@ -180,21 +180,21 @@ public class XmlReportFormatter
    * @return the name of the attribute indicating the character number where the issue is located.
    */
   protected String getColumnAttributeName() {
-    return type == Type.CHECKSTYLE ? ATTR_COLUMN : ATTR_CHARACTER;
+    return formatterType == FormatterType.CHECKSTYLE ? ATTR_COLUMN : ATTR_CHARACTER;
   }
   
   /**
    * @return the name of the attribute indicating a reason of the issue.
    */
   protected String getReasonAttributeName() {
-    return type == Type.CHECKSTYLE ? ATTR_MESSAGE : ATTR_REASON;
+    return formatterType == FormatterType.CHECKSTYLE ? ATTR_MESSAGE : ATTR_REASON;
   }
   
   /**
    * @return name of tag indicating an issue.
    */
   protected String getIssueElementName() {
-    return type == Type.CHECKSTYLE ? ELEMENT_ERROR : ELEMENT_ISSUE;
+    return formatterType == FormatterType.CHECKSTYLE ? ELEMENT_ERROR : ELEMENT_ISSUE;
   }
   
   /**
@@ -202,9 +202,9 @@ public class XmlReportFormatter
    */
   protected String getRootElementName() {
     String result = ELEMENT_CHECKSTYLE;
-    if (type == Type.LINT) {
+    if (formatterType == FormatterType.LINT) {
       result = ELEMENT_LINT;
-    } else if (type == Type.CSSLINT) {
+    } else if (formatterType == FormatterType.CSSLINT) {
       result = ELEMENT_CSSLINT;
     }
     return result;

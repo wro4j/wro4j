@@ -25,7 +25,7 @@ import com.google.gson.reflect.TypeToken;
 public class TestXmlReportFormatter {
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullLintReport() {
-    XmlReportFormatter.create(null, XmlReportFormatter.Type.LINT);
+    XmlReportFormatter.create(null, XmlReportFormatter.FormatterType.LINT);
   }
   
   @Test(expected = NullPointerException.class)
@@ -37,24 +37,24 @@ public class TestXmlReportFormatter {
   public void shouldFormatLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/lint");
-    checkFormattedReportsFromFolder(url, XmlReportFormatter.Type.LINT);
+    checkFormattedReportsFromFolder(url, XmlReportFormatter.FormatterType.LINT);
   }
   
   @Test
   public void shouldFormatCheckstypeReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/checkstyle");
-    checkFormattedReportsFromFolder(url, XmlReportFormatter.Type.CHECKSTYLE);
+    checkFormattedReportsFromFolder(url, XmlReportFormatter.FormatterType.CHECKSTYLE);
   }
   
   @Test
   public void shouldFormatCssLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/csslint");
-    checkFormattedReportsFromFolder(url, XmlReportFormatter.Type.CSSLINT);
+    checkFormattedReportsFromFolder(url, XmlReportFormatter.FormatterType.CSSLINT);
   }
 
-  private void checkFormattedReportsFromFolder(final URL url, final XmlReportFormatter.Type formatterType)
+  private void checkFormattedReportsFromFolder(final URL url, final XmlReportFormatter.FormatterType formatterType)
       throws IOException {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
