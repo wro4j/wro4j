@@ -1,4 +1,4 @@
-package ro.isdc.wro.extensions.processor.support.lint;
+package ro.isdc.wro.extensions.support.lint;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,7 +14,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * @since 1.4.10
  * @created 17 Sep 2012
  */
-public class XmlCssLintErrorReportBuilder extends AbstractXmlLintReportBuilder<CssLintError> {
+public class XmlCssLintErrorReportBuilder extends AbstractXmlLintReportFormatter<CssLintError> {
   /**
    * Checkstyle related constants
    */

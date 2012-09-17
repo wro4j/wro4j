@@ -1,4 +1,4 @@
-package ro.isdc.wro.extensions.processor.support.lint;
+package ro.isdc.wro.extensions.support.lint;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -25,14 +25,14 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * @since 1.4.10
  * @created 15 Sep 2012
  */
-public abstract class AbstractXmlLintReportBuilder<T> {
+public abstract class AbstractXmlLintReportFormatter<T> {
   private Document doc;
   private LintReport<T> lintReport;
   /**
    * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  protected AbstractXmlLintReportBuilder(final LintReport<T> lintReport) {
+  protected AbstractXmlLintReportFormatter(final LintReport<T> lintReport) {
     notNull(lintReport);
     this.lintReport = lintReport;
     initDocument();

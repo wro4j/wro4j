@@ -1,4 +1,6 @@
-package ro.isdc.wro.extensions.processor.support.lint;
+package ro.isdc.wro.extensions.support.lint;
+
+import static org.apache.commons.lang3.Validate.notNull;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -13,7 +15,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * @since 1.4.10
  * @created 15 Sep 2012
  */
-public class XmlLinterErrorReportBuilder extends AbstractXmlLintReportBuilder<LinterError> {
+public class XmlLinterErrorReportFormatter extends AbstractXmlLintReportFormatter<LinterError> {
   /**
    * Checkstyle related constants
    */
@@ -33,47 +35,29 @@ public class XmlLinterErrorReportBuilder extends AbstractXmlLintReportBuilder<Li
   private static final String ATTR_EVIDENCE = "evidence";
   private static final String ATTR_CHARACTER = "char";
   
-  /**
-   * Factory method for creating {@link XmlLinterErrorReportBuilder}.
-   * @param lintReport
-   *          {@link LintReport} to build xml reports from.
-   */
-  public static XmlLinterErrorReportBuilder createLintReportBuilder(final LintReport<LinterError> lintReport) { 
-    return new XmlLinterErrorReportBuilder(lintReport);
+  private final Type  type;
+  
+  public static enum Type {
+    LINT, CHECKSTYLE
   }
   
   /**
-   * Builder responsible for generating checkstyle reports.
+   * Factory method for creating {@link XmlLinterErrorReportFormatter}.
    * @param lintReport
-   * @return
+   *          {@link LintReport} to build xml reports from.
    */
-  public static XmlLinterErrorReportBuilder createCheckstyleReportBuilder(final LintReport<LinterError> lintReport) { 
-    return new XmlLinterErrorReportBuilder(lintReport) {
-      @Override
-      protected String getCharAttributeName() {
-        return ATTR_COLUMN;
-      }
-      @Override
-      protected String getIssueElementName() {
-        return ELEMENT_ERROR;
-      }
-      @Override
-      protected String getReasonAttributeName() {
-        return ATTR_MESSAGE;
-      }
-      @Override
-      protected String getRootElementName() {
-        return ELEMENT_CHECKSTYLE;
-      }
-    };
+  public static XmlLinterErrorReportFormatter create(final LintReport<LinterError> lintReport, final Type type) {
+    return new XmlLinterErrorReportFormatter(lintReport, type);
   }
   
   /**
    * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  protected XmlLinterErrorReportBuilder(final LintReport<LinterError> lintReport) {
+  protected XmlLinterErrorReportFormatter(final LintReport<LinterError> lintReport, final Type type) {
     super(lintReport);
+    notNull(type);
+    this.type = type;
   }
   
   /**
@@ -106,7 +90,7 @@ public class XmlLinterErrorReportBuilder extends AbstractXmlLintReportBuilder<Li
    */
   private Node createIssueElement(final LinterError error) {
     final Element issueElement = getDocument().createElement(getIssueElementName());
-    issueElement.setAttribute(getCharAttributeName(), String.valueOf(error.getCharacter()));
+    issueElement.setAttribute(getColumnAttributeName(), String.valueOf(error.getCharacter()));
     issueElement.setAttribute(ATTR_EVIDENCE, String.valueOf(error.getEvidence()));
     issueElement.setAttribute(ATTR_LINE, String.valueOf(error.getLine()));
     issueElement.setAttribute(getReasonAttributeName(), String.valueOf(error.getReason()));
@@ -116,28 +100,28 @@ public class XmlLinterErrorReportBuilder extends AbstractXmlLintReportBuilder<Li
   /**
    * @return the name of the attribute indicating the character number where the issue is located.
    */
-  protected String getCharAttributeName() {
-    return ATTR_CHARACTER;
+  protected String getColumnAttributeName() {
+    return type == Type.LINT ? ATTR_CHARACTER : ATTR_COLUMN;
   }
 
   /**
    * @return the name of the attribute indicating a reason of the issue.
    */
   protected String getReasonAttributeName() {
-    return ATTR_REASON;
+    return type == Type.LINT ? ATTR_REASON : ATTR_MESSAGE;
   }
 
   /**
    * @return name of tag indicating an issue. 
    */
   protected String getIssueElementName() {
-    return ELEMENT_ISSUE;
+    return type == Type.LINT ? ELEMENT_ISSUE : ELEMENT_ERROR;
   }
   
   /**
    * @return the name of root element.
    */
   protected String getRootElementName() {
-    return ELEMENT_LINT;
+    return type == Type.LINT ? ELEMENT_LINT: ELEMENT_CHECKSTYLE;
   }
 }

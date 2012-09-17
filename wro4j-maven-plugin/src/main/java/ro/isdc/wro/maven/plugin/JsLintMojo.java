@@ -12,11 +12,11 @@ import java.io.Writer;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
-import ro.isdc.wro.extensions.processor.support.lint.LintReport;
-import ro.isdc.wro.extensions.processor.support.lint.ResourceLintReport;
-import ro.isdc.wro.extensions.processor.support.lint.XmlLinterErrorReportBuilder;
 import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
+import ro.isdc.wro.extensions.support.lint.LintReport;
+import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
+import ro.isdc.wro.extensions.support.lint.XmlLinterErrorReportFormatter;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -98,7 +98,7 @@ public class JsLintMojo
     if (reportFile != null) {
       try {
         getLog().debug("creating report at location: " + reportFile);
-        XmlLinterErrorReportBuilder.createLintReportBuilder(lintReport).write(new FileOutputStream(reportFile));
+        XmlLinterErrorReportFormatter.create(lintReport, XmlLinterErrorReportFormatter.Type.LINT).write(new FileOutputStream(reportFile));
       } catch (FileNotFoundException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }

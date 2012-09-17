@@ -1,4 +1,4 @@
-package ro.isdc.wro.extensions.processor.support.lint;
+package ro.isdc.wro.extensions.support.lint;
 
 import java.util.Collection;
 import java.util.Collections;
