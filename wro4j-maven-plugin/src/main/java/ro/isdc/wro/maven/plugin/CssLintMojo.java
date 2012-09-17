@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.FileUtils;
@@ -17,8 +18,8 @@ import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintError;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
-import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
+import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
@@ -59,7 +60,8 @@ public class CssLintMojo
         if (resource != null) {
           getLog().info("processing resource: " + resource.getUri());
         }
-        super.process(resource, reader, writer);
+        //use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
+        super.process(resource, reader, new StringWriter());
       }
       
       @Override
