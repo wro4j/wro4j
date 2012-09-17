@@ -4,6 +4,7 @@
 package ro.isdc.wro.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -11,6 +12,7 @@ import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -18,6 +20,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -336,5 +339,12 @@ public final class WroUtil {
       IOUtils.closeQuietly(reader);
       IOUtils.closeQuietly(writer);
     }
+  }
+  
+  /**
+   * @return a generated {@link File} with unique name located in temp folder. 
+   */
+  public static File createTempFile() {
+    return new File(FileUtils.getTempDirectory(), "wro4j" + UUID.randomUUID().toString());
   }
 }

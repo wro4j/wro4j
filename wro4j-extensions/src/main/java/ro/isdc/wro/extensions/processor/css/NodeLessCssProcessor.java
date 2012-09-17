@@ -11,7 +11,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -25,6 +24,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -90,7 +90,7 @@ public class NodeLessCssProcessor
     // the file holding the input file to process
     File temp = null;
     try {
-      temp = createTempFile();
+      temp = WroUtil.createTempFile();
       final String encoding = "UTF-8";
       IOUtils.write(content, new FileOutputStream(temp), encoding);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
@@ -191,9 +191,5 @@ public class NodeLessCssProcessor
     return new String[] {
       "cmd", "/c", SHELL_COMMAND, OPTION_NO_COLOR, filePath
     };
-  }
-  
-  private File createTempFile() {
-    return new File(FileUtils.getTempDirectory(), UUID.randomUUID().toString() + ".less");
   }
 }

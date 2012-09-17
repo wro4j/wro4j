@@ -22,7 +22,7 @@ public class CssLintException extends Exception {
    */
   public Collection<CssLintError> getErrors() {
     if (errors == null) {
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
     return this.errors;
   }

@@ -17,8 +17,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
@@ -35,7 +33,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestNodeLessCssProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(TestNodeLessCssProcessor.class);
   private static boolean isSupported = false;
   @BeforeClass
   public static void beforeClass() {

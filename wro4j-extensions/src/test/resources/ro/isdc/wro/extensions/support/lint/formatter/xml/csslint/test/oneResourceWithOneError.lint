@@ -1,0 +1,15 @@
+{
+  "reports": [
+    {
+      "lints": [
+        {
+          "line": 20,
+          "character": 2,
+          "reason": "reason",
+          "evidence": "evidence"
+        }
+      ],
+      "resourcePath": "file1"
+    }
+  ]
+}
