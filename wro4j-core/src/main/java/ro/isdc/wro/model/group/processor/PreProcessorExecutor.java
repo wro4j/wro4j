@@ -168,7 +168,19 @@ public class PreProcessorExecutor {
     final Collection<ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
-    String resourceContent = getResourceContent(resource);
+    
+    String resourceContent = null;
+    try {
+      resourceContent = getResourceContent(resource);
+    } catch (final IOException e) {
+      LOG.debug("Invalid resource found: {}", resource);
+      if (config.isIgnoreMissingResources()) {
+        return StringUtils.EMPTY;
+      } else {
+        LOG.error("Cannot ignore missing resource:  {}", resource);
+        throw e;
+      }
+    }
     if (processors.isEmpty()) {
       return resourceContent;
     }
@@ -223,14 +235,6 @@ public class PreProcessorExecutor {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }
       return result;
-    } catch (final IOException e) {
-      LOG.debug("Invalid resource found: {}", resource);
-      if (config.isIgnoreMissingResources()) {
-        return StringUtils.EMPTY;
-      } else {
-        LOG.error("Cannot ignore missing resource:  {}", resource);
-        throw e;
-      }
     } finally {
       IOUtils.closeQuietly(is);
     }
