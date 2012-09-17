@@ -13,6 +13,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
 
@@ -40,8 +41,8 @@ public class LessCssProcessor
    * it is not supported, the fallback processor will be used.
    */
   private ResourcePreProcessor initializeProcessor() {
-    final NodeLessCssProcessor nodeProcessor = createNodeProcessor();
-    return nodeProcessor.isSupported() ? nodeProcessor : createRhinoProcessor();
+    final ProcessorDecorator processor = new ProcessorDecorator(createNodeProcessor());
+    return processor.isSupported() ? processor : createRhinoProcessor();
   }
 
   /**
