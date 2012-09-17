@@ -4,11 +4,12 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+
+import org.apache.commons.io.FileUtils;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -83,6 +84,7 @@ public class JsHintMojo
   @Override
   protected void onBeforeExecute() {
     lintReport = new LintReport<LinterError>();
+    FileUtils.deleteQuietly(reportFile);
   }
   
   /**
@@ -92,9 +94,11 @@ public class JsHintMojo
   protected void onAfterExecute() {
     if (reportFile != null) {
       try {
+        reportFile.getParentFile().mkdirs();
+        reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
         XmlReportFormatter.createForLinterError(lintReport, XmlReportFormatter.Type.LINT).write(new FileOutputStream(reportFile));
-      } catch (FileNotFoundException e) {
+      } catch (IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
     }
