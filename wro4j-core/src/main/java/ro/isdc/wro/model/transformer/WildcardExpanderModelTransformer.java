@@ -22,6 +22,7 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.WildcardExpanderHandlerAware;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.Transformer;
 

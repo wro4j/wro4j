@@ -12,6 +12,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.SupportAware;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectDecorator;
@@ -25,7 +26,7 @@ import ro.isdc.wro.util.ObjectDecorator;
  * @since 1.4.6
  */
 public abstract class AbstractProcessorDecoratorSupport
-  implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, ObjectDecorator<Object> {
+  implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware, ObjectDecorator<Object> {
 
   /**
    * This method is final, because it intends to preserve the getSupportedResourceType flag of the decorated processor.
@@ -69,12 +70,19 @@ public abstract class AbstractProcessorDecoratorSupport
   public final boolean isMinimize() {
     return isMinimizeInternal();
   }
-
+  
   /**
    * Allow subclass override the way isMinimized is used. 
    */
   protected boolean isMinimizeInternal() {
     return isMinimizeForProcessor(getDecoratedObject());
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isSupported() {
+    return getDecoratedObject() instanceof SupportAware ? ((SupportAware) getOriginalDecoratedObject()).isSupported() : true;
   }
 
   /**

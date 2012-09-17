@@ -1,15 +1,16 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.SupportAware;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
@@ -35,7 +37,7 @@ public class TestProcessorDecorator {
   @Test
   public void shouldDecorateAProcessor() {
     new ProcessorDecorator(new ResourceProcessor() {
-      public void process(Resource resource, Reader reader, Writer writer)
+      public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
       }
     });
@@ -108,7 +110,7 @@ public class TestProcessorDecorator {
   @Test
   public void shouldComputeEligibilityForProcessorWithNoTypeAndNotMinimizeAware() {
     ResourceProcessor noOpProcessor = new ResourceProcessor() {
-      public void process(Resource resource, Reader reader, Writer writer)
+      public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
       }
     };
@@ -142,7 +144,25 @@ public class TestProcessorDecorator {
   
   @Test
   public void shouldComputeIsMinimizeFlagOfDeepNestedDecoratedProcessor() {
-    ProcessorDecorator processor = new ProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(new JSMinProcessor())));
-    Assert.assertTrue(processor.isMinimize());
+    final ProcessorDecorator processor = new ProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(new JSMinProcessor())));
+    assertTrue(processor.isMinimize());
+  }
+  
+  private static class SupportAwareProcessor extends JSMinProcessor implements SupportAware {
+   public boolean isSupported() {
+      return true;
+    } 
+  }
+  
+  @Test
+  public void shouldIdentifyProcessorSupport() {
+    final SupportAwareProcessor supportAwareProcessor = mock(SupportAwareProcessor.class);
+    ProcessorDecorator decorator = new ProcessorDecorator(supportAwareProcessor);
+    
+    when(supportAwareProcessor.isSupported()).thenReturn(true);
+    assertEquals(true, decorator.isSupported());
+    
+    when(supportAwareProcessor.isSupported()).thenReturn(false);
+    assertEquals(false, decorator.isSupported());
   }
 }
