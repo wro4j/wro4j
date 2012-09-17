@@ -6,12 +6,10 @@ package ro.isdc.wro.maven.plugin;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import ro.isdc.wro.util.WroUtil;

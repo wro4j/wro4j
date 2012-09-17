@@ -14,7 +14,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * @since 1.4.10
  * @created 17 Sep 2012
  */
-public class XmlCssLintErrorReportBuilder extends AbstractXmlLintReportFormatter<CssLintError> {
+public class XmlCssLintErrorReportFormatter extends AbstractXmlLintReportFormatter<CssLintError> {
   /**
    * Checkstyle related constants
    */
@@ -34,12 +34,12 @@ public class XmlCssLintErrorReportBuilder extends AbstractXmlLintReportFormatter
   private static final String ATTR_COLUMN = "column";
   
   /**
-   * Factory method for creating {@link XmlCssLintErrorReportBuilder}.
+   * Factory method for creating {@link XmlCssLintErrorReportFormatter}.
    * @param lintReport
    *          {@link LintReport} to build xml reports from.
    */
-  public static XmlCssLintErrorReportBuilder createLintReportBuilder(final LintReport<CssLintError> lintReport) { 
-    return new XmlCssLintErrorReportBuilder(lintReport);
+  public static XmlCssLintErrorReportFormatter createLintReportBuilder(final LintReport<CssLintError> lintReport) { 
+    return new XmlCssLintErrorReportFormatter(lintReport);
   }
   
   /**
@@ -47,8 +47,8 @@ public class XmlCssLintErrorReportBuilder extends AbstractXmlLintReportFormatter
    * @param lintReport
    * @return
    */
-  public static XmlCssLintErrorReportBuilder createCheckstyleReportBuilder(final LintReport<CssLintError> lintReport) { 
-    return new XmlCssLintErrorReportBuilder(lintReport) {
+  public static XmlCssLintErrorReportFormatter createCheckstyleReportBuilder(final LintReport<CssLintError> lintReport) { 
+    return new XmlCssLintErrorReportFormatter(lintReport) {
       @Override
       protected String getIssueElementName() {
         return ELEMENT_ERROR;
@@ -68,7 +68,7 @@ public class XmlCssLintErrorReportBuilder extends AbstractXmlLintReportFormatter
    * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  protected XmlCssLintErrorReportBuilder(final LintReport<CssLintError> lintReport) {
+  protected XmlCssLintErrorReportFormatter(final LintReport<CssLintError> lintReport) {
     super(lintReport);
   }
   

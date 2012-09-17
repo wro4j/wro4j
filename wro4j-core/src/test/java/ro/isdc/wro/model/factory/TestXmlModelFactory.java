@@ -11,9 +11,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
