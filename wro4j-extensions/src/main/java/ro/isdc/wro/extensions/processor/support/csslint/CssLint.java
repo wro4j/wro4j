@@ -24,8 +24,8 @@ import com.google.gson.reflect.TypeToken;
 
 
 /**
- * CssLint script engine utility. The underlying implementation uses CSSLint script utility {@link https
- * ://github.com/stubbornella/csslint}. The underlying csslint version is untagged (committed on 2012-06-06 21:16:12).
+ * CssLint script engine utility. The underlying implementation uses CSSLint script utility<br/>
+ * {@link https ://github.com/stubbornella/csslint}. The underlying csslint version is 0.9.9.
  * 
  * @author Alex Objelean
  * @since 1.3.8
