@@ -30,11 +30,12 @@ public class ResourceLintReport<T> {
    * 
    * @param resourcePath
    *          the path of the of the resource
-   * @param errors
-   * @return
+   * @param lints
+   *          a collection of lints associated with a resource.
+   * @return {@link ResourceLintReport} with all lints set.
    */
-  public static <T> ResourceLintReport<T> create(final String resourcePath, final Collection<T> errors) {
-    return new ResourceLintReport<T>(resourcePath, errors);
+  public static <T> ResourceLintReport<T> create(final String resourcePath, final Collection<T> lints) {
+    return new ResourceLintReport<T>(resourcePath, lints);
   }
   
   private ResourceLintReport(final String resourcePath, final Collection<T> errors) {

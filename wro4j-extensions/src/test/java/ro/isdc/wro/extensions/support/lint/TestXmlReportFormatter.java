@@ -22,32 +22,39 @@ import com.google.gson.reflect.TypeToken;
 /**
  * @author Alex Objelean
  */
-public class TestXmlLinterErrorReportFormatter {
+public class TestXmlReportFormatter {
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullLintReport() {
-    XmlLinterErrorReportFormatter.create(null, XmlLinterErrorReportFormatter.Type.LINT);
+    XmlReportFormatter.create(null, XmlReportFormatter.Type.LINT);
   }
   
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullType() {
-    XmlLinterErrorReportFormatter.create(new LintReport(), null);
+    XmlReportFormatter.create(new LintReport<LintItem>(), null);
   }
   
   @Test
   public void shouldFormatLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/lint");
-    checkFormattedRportsFromFolder(url, XmlLinterErrorReportFormatter.Type.LINT);
+    checkFormattedReportsFromFolder(url, XmlReportFormatter.Type.LINT);
   }
   
   @Test
   public void shouldFormatCheckstypeReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/checkstyle");
-    checkFormattedRportsFromFolder(url, XmlLinterErrorReportFormatter.Type.CHECKSTYLE);
+    checkFormattedReportsFromFolder(url, XmlReportFormatter.Type.CHECKSTYLE);
+  }
+  
+  @Test
+  public void shouldFormatCssLintReportFromFolder()
+      throws Exception {
+    final URL url = getClass().getResource("formatter/xml/csslint");
+    checkFormattedReportsFromFolder(url, XmlReportFormatter.Type.CSSLINT);
   }
 
-  private void checkFormattedRportsFromFolder(final URL url, final XmlLinterErrorReportFormatter.Type formatterType)
+  private void checkFormattedReportsFromFolder(final URL url, final XmlReportFormatter.Type formatterType)
       throws IOException {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -57,7 +64,7 @@ public class TestXmlLinterErrorReportFormatter {
           throws IOException {
         final Type type = new TypeToken<LintReport<LinterError>>() {}.getType();
         final LintReport<LinterError> errors = new Gson().fromJson(reader, type);
-        XmlLinterErrorReportFormatter.create(errors, formatterType).write(
+        XmlReportFormatter.createForLinterError(errors, formatterType).write(
             new WriterOutputStream(writer));
       }
     });

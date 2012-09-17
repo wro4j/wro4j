@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
@@ -45,5 +46,13 @@ public final class LintReport<T> {
     Validate.notNull(resourceLintReport);
     reports.add(resourceLintReport);
     return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
   }
 }

@@ -3,15 +3,21 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
-import java.net.URISyntaxException;
+import java.io.FileInputStream;
 import java.net.URL;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -33,7 +39,7 @@ public class TestCssLintMojo {
   }
   
   private void setWroFile(final String classpathResourceName)
-      throws URISyntaxException {
+      throws Exception {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
@@ -118,5 +124,24 @@ public class TestCssLintMojo {
     mojo.setOptions("");
     mojo.setTargetGroups("undef");
     mojo.execute();
+  }
+  
+  @Test
+  public void shouldGenerateXmlReportFile()
+      throws Exception {
+    final File reportFile = WroUtil.createTempFile();
+    try {
+      mojo.setReportFile(reportFile);
+      //mojo.setOptions("undef, browser");
+      mojo.setTargetGroups(null);
+      mojo.setFailNever(true);
+      mojo.setIgnoreMissingResources(true);
+      mojo.execute();
+    } finally {
+      IOUtils.copy(new FileInputStream(reportFile), System.out);
+      // Assert that file is big enough to prove that it contains serialized errors.
+      assertTrue(reportFile.length() > 1000);
+      FileUtils.deleteQuietly(reportFile);
+    }
   }
 }

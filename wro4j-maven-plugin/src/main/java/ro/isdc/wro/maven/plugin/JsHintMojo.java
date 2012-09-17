@@ -16,7 +16,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
-import ro.isdc.wro.extensions.support.lint.XmlLinterErrorReportFormatter;
+import ro.isdc.wro.extensions.support.lint.XmlReportFormatter;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -93,7 +93,7 @@ public class JsHintMojo
     if (reportFile != null) {
       try {
         getLog().debug("creating report at location: " + reportFile);
-        XmlLinterErrorReportFormatter.create(lintReport, XmlLinterErrorReportFormatter.Type.LINT).write(new FileOutputStream(reportFile));
+        XmlReportFormatter.createForLinterError(lintReport, XmlReportFormatter.Type.LINT).write(new FileOutputStream(reportFile));
       } catch (FileNotFoundException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
