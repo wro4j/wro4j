@@ -22,8 +22,8 @@ import ro.isdc.wro.util.Function;
  * @since 1.4.10
  * @created 15 Sep 2012
  */
-public class XmlReportFormatter
-    extends AbstractXmlLintReportFormatter<LintItem> {
+public class ReportXmlFormatter
+    extends AbstractReportXmlFormatter<LintItem> {
   /**
    * Checkstyle related constants
    */
@@ -52,16 +52,16 @@ public class XmlReportFormatter
   }
   
   /**
-   * Factory method for creating {@link XmlReportFormatter}.
+   * Factory method for creating {@link ReportXmlFormatter}.
    * 
    * @param lintReport
    *          {@link LintReport} to build xml reports from.
    */
-  public static XmlReportFormatter create(final LintReport<LintItem> lintReport, final FormatterType formatterType) {
-    return new XmlReportFormatter(lintReport, formatterType);
+  public static ReportXmlFormatter create(final LintReport<LintItem> lintReport, final FormatterType formatterType) {
+    return new ReportXmlFormatter(lintReport, formatterType);
   }
   
-  public static XmlReportFormatter createForLinterError(final LintReport<LinterError> lintReport, final FormatterType formatterType) {
+  public static ReportXmlFormatter createForLinterError(final LintReport<LinterError> lintReport, final FormatterType formatterType) {
     return createInternal(lintReport, formatterType, new Function<LinterError, LintItem>() {
       @Override
       public LintItem apply(final LinterError input)
@@ -71,7 +71,7 @@ public class XmlReportFormatter
     });
   }
   
-  public static XmlReportFormatter createForCssLintError(final LintReport<CssLintError> lintReport, final FormatterType formatterType) {
+  public static ReportXmlFormatter createForCssLintError(final LintReport<CssLintError> lintReport, final FormatterType formatterType) {
     return createInternal(lintReport, formatterType, new Function<CssLintError, LintItem>() {
       @Override
       public LintItem apply(final CssLintError input)
@@ -91,7 +91,7 @@ public class XmlReportFormatter
    * @param adapter
    *          a {@link Function} responsible for adapting a type <F> into {@link LintItem}
    */
-  private static <F> XmlReportFormatter createInternal(final LintReport<F> lintReport, final FormatterType formatterType,
+  private static <F> ReportXmlFormatter createInternal(final LintReport<F> lintReport, final FormatterType formatterType,
       final Function<F, LintItem> adapter) {
     final LintReport<LintItem> report = new LintReport<LintItem>();
     for (ResourceLintReport<F> item : lintReport.getReports()) {
@@ -105,14 +105,14 @@ public class XmlReportFormatter
       }
       report.addReport(ResourceLintReport.create(item.getResourcePath(), lints));
     }
-    return new XmlReportFormatter(report, formatterType);
+    return new ReportXmlFormatter(report, formatterType);
   }
   
   /**
    * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
    */
-  protected XmlReportFormatter(final LintReport<LintItem> lintReport, final FormatterType type) {
+  protected ReportXmlFormatter(final LintReport<LintItem> lintReport, final FormatterType type) {
     super(lintReport);
     notNull(type);
     this.formatterType = type;

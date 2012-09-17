@@ -22,39 +22,39 @@ import com.google.gson.reflect.TypeToken;
 /**
  * @author Alex Objelean
  */
-public class TestXmlReportFormatter {
+public class TestReportXmlFormatter {
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullLintReport() {
-    XmlReportFormatter.create(null, XmlReportFormatter.FormatterType.LINT);
+    ReportXmlFormatter.create(null, ReportXmlFormatter.FormatterType.LINT);
   }
   
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullType() {
-    XmlReportFormatter.create(new LintReport<LintItem>(), null);
+    ReportXmlFormatter.create(new LintReport<LintItem>(), null);
   }
   
   @Test
   public void shouldFormatLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/lint");
-    checkFormattedReportsFromFolder(url, XmlReportFormatter.FormatterType.LINT);
+    checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.LINT);
   }
   
   @Test
   public void shouldFormatCheckstypeReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/checkstyle");
-    checkFormattedReportsFromFolder(url, XmlReportFormatter.FormatterType.CHECKSTYLE);
+    checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.CHECKSTYLE);
   }
   
   @Test
   public void shouldFormatCssLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/csslint");
-    checkFormattedReportsFromFolder(url, XmlReportFormatter.FormatterType.CSSLINT);
+    checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.CSSLINT);
   }
 
-  private void checkFormattedReportsFromFolder(final URL url, final XmlReportFormatter.FormatterType formatterType)
+  private void checkFormattedReportsFromFolder(final URL url, final ReportXmlFormatter.FormatterType formatterType)
       throws IOException {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -64,7 +64,7 @@ public class TestXmlReportFormatter {
           throws IOException {
         final Type type = new TypeToken<LintReport<LinterError>>() {}.getType();
         final LintReport<LinterError> errors = new Gson().fromJson(reader, type);
-        XmlReportFormatter.createForLinterError(errors, formatterType).write(
+        ReportXmlFormatter.createForLinterError(errors, formatterType).write(
             new WriterOutputStream(writer));
       }
     });
