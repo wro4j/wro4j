@@ -7,7 +7,6 @@ import java.util.Map;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
-import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
 /**
