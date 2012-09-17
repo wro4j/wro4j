@@ -17,7 +17,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
-import ro.isdc.wro.extensions.support.lint.XmlReportFormatter;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
@@ -102,7 +102,7 @@ public class JsLintMojo
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        XmlReportFormatter.createForLinterError(lintReport, XmlReportFormatter.FormatterType.LINT).write(
+        ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.LINT).write(
             new FileOutputStream(reportFile));
       } catch (IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);

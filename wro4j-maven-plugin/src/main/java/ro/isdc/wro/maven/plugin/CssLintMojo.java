@@ -18,7 +18,7 @@ import ro.isdc.wro.extensions.processor.support.csslint.CssLintError;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
-import ro.isdc.wro.extensions.support.lint.XmlReportFormatter;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
@@ -102,7 +102,7 @@ public class CssLintMojo
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        XmlReportFormatter.createForCssLintError(lintReport, XmlReportFormatter.FormatterType.CSSLINT).write(
+        ReportXmlFormatter.createForCssLintError(lintReport, ReportXmlFormatter.FormatterType.CSSLINT).write(
             new FileOutputStream(reportFile));
       } catch (IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
