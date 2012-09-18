@@ -3,18 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor.support;
 
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.regex.PatternSyntaxException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Writer;
+import java.util.*;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Css minify barryvan implementation.
@@ -26,7 +21,7 @@ public class CSSMin {
   public void formatFile(final String input, final Writer writer)
     throws Exception {
     try {
-      final StringBuffer sb = new StringBuffer(input.replaceAll("[\t\n\r]", "").replaceAll("  ", " "));
+      final StringBuilder sb = new StringBuilder(input.replaceAll("[\t\n\r]", "").replaceAll("  ", " "));
       int k, n;
 
       // Find the start of the comment
@@ -38,22 +33,20 @@ public class CSSMin {
         sb.delete(n, k + 2);
       }
 
-      final Vector selectors = new Vector();
+      final List<Selector> selectors = new LinkedList<Selector>();
       n = 0;
       while ((k = sb.indexOf("}", n)) != -1) {
         try {
-          selectors.addElement(new Selector(sb.substring(n, k + 1)));
+          selectors.add(new Selector(sb.substring(n, k + 1)));
         } catch (final Exception e) {
           // skip
         }
         n = k + 1;
       }
 
-      final Iterator iterSelectors = selectors.iterator();
-      while (iterSelectors.hasNext()) {
-        final Selector selector = (Selector)iterSelectors.next();
-        writer.write(selector.toString());
-      }
+        for (Selector selector : selectors) {
+            writer.write(selector.toString());
+        }
       writer.write("\r\n");
       writer.flush();
     } catch (final Exception e) {
@@ -83,13 +76,13 @@ class Selector {
     }
     this.selector = parts[0].trim();
     String contents = parts[1].trim();
-    if (contents.length() == 0) {
+    if (contents.length() <= 1) {
       throw new Exception("Warning: Empty selector body: " + selector);
     }
     if (contents.charAt(contents.length() - 1) != '}') { // Ensure that we have a leading and trailing brace.
       throw new Exception("Warning: Unterminated selector: " + selector);
     }
-    contents = contents.substring(0, contents.length() - 2);
+    contents = StringUtils.substringBefore(contents, "}");
     properties = parseProperties(contents);
     sortProperties(properties);
   }
@@ -100,7 +93,7 @@ class Selector {
    */
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append(selector).append("{");
     for (final Property property : properties) {
       if (property != null) {
@@ -121,18 +114,17 @@ class Selector {
     final String[] parts = contents.split(";");
     final List<Property> resultsAsList = new ArrayList<Property>();
 
-    for (int i = 0; i < parts.length; i++) {
-      try {
-        final String part = parts[i];
-        // ignore empty parts
-        if (!StringUtils.isEmpty(part.trim())) {
-          resultsAsList.add(new Property(part));
-        }
-      } catch (final Exception e) {
-        LOG.warn(e.getMessage(), e);
+      for (String part : parts) {
+          try {
+              // ignore empty parts
+              if (!StringUtils.isEmpty(part.trim())) {
+                  resultsAsList.add(new Property(part));
+              }
+          } catch (final Exception e) {
+              LOG.warn(e.getMessage(), e);
+          }
       }
-    }
-    return resultsAsList.toArray(new Property[] {});
+    return resultsAsList.toArray(new Property[resultsAsList.size()]);
   }
 
 
@@ -184,7 +176,7 @@ class Property
    */
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append(property).append(":");
     for (final Value v : values) {
       sb.append(v.toString()).append(",");
@@ -231,7 +223,7 @@ class Value {
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     for (final String part : parts) {
       sb.append(part).append(" ");
     }
