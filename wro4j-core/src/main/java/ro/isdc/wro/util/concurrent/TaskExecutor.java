@@ -1,18 +1,23 @@
 package ro.isdc.wro.util.concurrent;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -42,7 +47,11 @@ public class TaskExecutor<T> {
   
   public ExecutorService getExecutor() {
     if (completionExecutor == null) {
+      StopWatch watch = new StopWatch();
+      watch.start("create executor");
       completionExecutor = newExecutor();
+      watch.stop();
+      System.out.println(watch.prettyPrint());
     }
     return completionExecutor;
   }
@@ -53,7 +62,7 @@ public class TaskExecutor<T> {
   private ExecutorService getConsumerService() {
     if (consumerService == null) {
       // it is enough to use an executor with a single thread.
-      consumerService = Executors.newFixedThreadPool(1);
+      consumerService = Executors.newFixedThreadPool(5);
     }
     return consumerService;
   }
@@ -62,7 +71,7 @@ public class TaskExecutor<T> {
    * @return the {@link ExecutorService} responsible for running the tasks.
    */
   protected ExecutorService newExecutor() {
-    return Executors.newFixedThreadPool(5);
+    return Executors.newFixedThreadPool(3);
   }
   
   /**
@@ -74,21 +83,56 @@ public class TaskExecutor<T> {
   public final void submit(final Collection<Callable<T>> callables)
       throws Exception {
     Validate.notNull(callables);
+    
+    StopWatch watch = new StopWatch();
+    watch.start("init");
+    final long start = System.currentTimeMillis();
+    final AtomicLong totalTime = new AtomicLong();
     LOG.debug("running {} tasks", callables.size());
+    
     if (callables.size() == 1) {
       final T result = callables.iterator().next().call();
       onResultAvailable(result);
     } else {
       LOG.debug("Running tasks in parallel");
+      watch.stop();
+      
+      watch.start("submit tasks");
       for (final Callable<T> callable : callables) {
-        getCompletionService().submit(callable);
+        getCompletionService().submit(decorate(callable, totalTime));
       }
+      watch.stop();
+      
+      watch.start("consume results");
       for (int i = 0; i < callables.size(); i++) {
         doConsumeResult();
       }
-      //need to find out how to safely shutdown the executor
-      //getExecutor().shutdown();
+      watch.stop();
     }
+    watch.start("destroy");
+    destroy();
+    watch.stop();
+    
+    LOG.debug("Number of Tasks: {}", callables.size());
+    LOG.debug("Average Execution Time: {}", totalTime.longValue()/callables.size());
+    LOG.debug("Total Task Time: {}", totalTime);
+    LOG.debug("Grand Total Execution Time: {}", System.currentTimeMillis() - start);
+    LOG.debug(watch.prettyPrint());
+  }
+  
+  private <T> Callable<T> decorate(final Callable<T> decorated, final AtomicLong totalTime) {
+    return new Callable<T>() {
+      public T call()
+          throws Exception {
+        long begin = System.currentTimeMillis();
+        try {
+          return decorated.call();
+        } finally {
+          long end = System.currentTimeMillis();
+          totalTime.addAndGet(end - begin);
+        }
+      }
+    };
   }
   
   /**
@@ -110,6 +154,11 @@ public class TaskExecutor<T> {
         return null;
       }
     });
+    // try {
+    // doConsumeResult();
+    // } catch(Exception e) {
+    // thWroRuntimeException.wrap(e);
+    // }
   }
   
   /**
@@ -149,8 +198,9 @@ public class TaskExecutor<T> {
    * Shutdown all executors used by this class.
    */
   public void destroy() {
-    consumerService.shutdownNow();
-    completionExecutor.shutdownNow();
+    if (consumerService != null)
+      consumerService.shutdown();
+    completionExecutor.shutdown();
   }
   
   private static void printDate() {
@@ -163,26 +213,27 @@ public class TaskExecutor<T> {
       @Override
       protected void onResultAvailable(final String result)
           throws Exception {
-        System.out.println("result available: " + result);
+        System.out.println("<<< [OK] result available: " + result);
         System.out.println("\n===============\n");
         printDate();
       }
-      
     };
-    executor.submit(new Callable<String>() {
+    List<Callable<String>> tasks = new ArrayList<Callable<String>>();
+    tasks.add(new Callable<String>() {
       public String call()
           throws Exception {
         printDate();
         String result = Thread.currentThread().getName();
-        System.out.println("\n[START]===============\nThread " + result + " started...");
-        double sleep = 2000;
+        System.out.println("\n>>> [START]===============\nThread " + result + " started...");
+        double sleep = 1000;
         System.out.println("Sleeping for: " + sleep);
         Thread.sleep((long) sleep);
         return result;
       }
     });
-    for (int i = 0; i < 10; i++) {
-      executor.submit(new Callable<String>() {
+    final int index = 100;
+    for (int i = 0; i < index; i++) {
+      tasks.add(new Callable<String>() {
         public String call()
             throws Exception {
           printDate();
@@ -195,5 +246,10 @@ public class TaskExecutor<T> {
         }
       });
     }
+    StopWatch watch = new StopWatch();
+    watch.start("submit tasks");
+    executor.submit(tasks);
+    watch.stop();
+    System.out.println(watch.prettyPrint());
   }
 }

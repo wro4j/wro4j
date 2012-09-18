@@ -109,7 +109,7 @@ public class Wro4jMojo
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("groupNameMappingFile: " + groupNameMappingFile);
-    boolean parallel = false;
+    boolean parallel = true;
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     StopWatch watch = new StopWatch();
     watch.start("processGroups: " + groupsAsList);
@@ -135,7 +135,6 @@ public class Wro4jMojo
     }
     if (parallel) {
       getTaskExecutor().submit(callables);
-      // getTaskExecutor().shutdown();
     }
     watch.stop();
     System.out.println(watch.prettyPrint());
