@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,6 +102,7 @@ public class TestGroupsProcessor {
       public boolean accept(final String uri) {
         return true;
       }
+      
       public InputStream locate(final String uri)
           throws IOException {
         return new ByteArrayInputStream(uri.getBytes());
@@ -123,5 +127,14 @@ public class TestGroupsProcessor {
     
     final String actual = victim.process(key);
     Assert.assertEquals("1.js2.js", actual);
+  }
+  
+  @Test
+  public void shouldCleanupProperlyWhenDestroyed() {
+    PreProcessorExecutor mockPreProcessorExecutor = mock(PreProcessorExecutor.class);
+    victim.setPreProcessorExecutor(mockPreProcessorExecutor);
+    victim.destroy();
+    
+    verify(mockPreProcessorExecutor).destroy();
   }
 }

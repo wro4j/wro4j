@@ -94,19 +94,35 @@ public class WroManager
   private ResourceBundleProcessor resourceBundleProcessor;
   
   public WroManager() {
-    cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
-      @Override
-      protected Runnable initialize() {
-        return new ReloadCacheRunnable(WroManager.this);
-      }
-    }, ReloadCacheRunnable.class.getSimpleName());
-    modelSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
+    cacheSchedulerHelper = newCacheSchedulerHelper();
+    modelSchedulerHelper = newModelSchedulerHelper();
+    resourceBundleProcessor = new ResourceBundleProcessor();
+  }
+
+  /**
+   * @VisibleForTesting
+   * @return the scheduler responsible for clearing the model periodically.
+   */
+  SchedulerHelper newModelSchedulerHelper() {
+    return SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return new ReloadModelRunnable(WroManager.this);
       }
     }, ReloadModelRunnable.class.getSimpleName());
-    resourceBundleProcessor = new ResourceBundleProcessor();
+  }
+
+  /**
+   * @VisibleForTesting
+   * @return the scheduler responsible for clearing the cache periodically.
+   */
+  SchedulerHelper newCacheSchedulerHelper() {
+    return SchedulerHelper.create(new LazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return new ReloadCacheRunnable(WroManager.this);
+      }
+    }, ReloadCacheRunnable.class.getSimpleName());
   }
   
   /**
@@ -191,6 +207,7 @@ public class WroManager
       modelSchedulerHelper.destroy();
       cacheStrategy.destroy();
       modelFactory.destroy();
+      groupsProcessor.destroy();
     } catch (final Exception e) {
       LOG.error("Exception occured during manager destroy!!!");
     } finally {
@@ -313,10 +330,13 @@ public class WroManager
     return groupExtractor;
   }
   
-  public final GroupsProcessor getGroupsProcessor() {
-    return this.groupsProcessor;
+  /**
+   * @VisibleForTesting
+   */
+  final void setGroupsProcessor(final GroupsProcessor groupsProcessor) {
+    this.groupsProcessor = groupsProcessor;
   }
-  
+
   /**
    * Registers a callback.
    * 

@@ -151,7 +151,7 @@ public class PreProcessorExecutor {
     if (taskExecutor == null) {
       taskExecutor = new TaskExecutor<String>() {
         @Override
-        protected void onException(Exception e) {
+        protected void onException(final Exception e) {
           // propagate original cause
           final Throwable cause = e.getCause();
           if (cause instanceof WroRuntimeException) {
@@ -256,5 +256,12 @@ public class PreProcessorExecutor {
     } finally {
       IOUtils.closeQuietly(is);
     }
+  }
+  
+  /**
+   * Perform cleanUp on service shut down.
+   */
+  public void destroy() {
+    getTaskExecutor().destroy();
   }
 }

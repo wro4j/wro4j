@@ -146,4 +146,18 @@ public class GroupsProcessor {
     injector.inject(decorated);
     return decorated;
   }
+  
+  /**
+   * @VisibleForTesting
+   */
+  final void setPreProcessorExecutor(final PreProcessorExecutor preProcessorExecutor) {
+    this.preProcessorExecutor = preProcessorExecutor;
+  }
+
+  /**
+   * Perform cleanup when taken out of service.
+   */
+  public void destroy() {
+    preProcessorExecutor.destroy();
+  }
 }

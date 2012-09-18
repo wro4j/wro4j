@@ -145,6 +145,14 @@ public class TaskExecutor<T> {
     }
   }
   
+  /**
+   * Shutdown all executors used by this class.
+   */
+  public void destroy() {
+    consumerService.shutdownNow();
+    completionExecutor.shutdownNow();
+  }
+  
   private static void printDate() {
     System.out.println(new SimpleDateFormat("HH:ss:S").format(new Date()));
   }
