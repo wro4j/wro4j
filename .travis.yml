@@ -1,1 +1,2 @@
-script: mvn clean test 
+script: mvn clean install
+
