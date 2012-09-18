@@ -1,0 +1,10 @@
+.opacity (@opacity) {
+    opacity: @opacity;
+    -ms-filter: ~`"progid:DXImageTransform.Microsoft.Alpha(opacity=(" + "@{opacity}" * 100 + "))"`; 
+    filter: ~`"alpha(opacity = (" + "@{opacity}" * 100 + "))"`;
+    /*This one is used only to test that btoa() function computes correctly*/
+    top: ~`btoa("1234")`;
+}
+#someId {
+	.opacity(1);
+}
