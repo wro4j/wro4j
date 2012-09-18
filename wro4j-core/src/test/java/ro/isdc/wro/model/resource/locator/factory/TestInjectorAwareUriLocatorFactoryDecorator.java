@@ -14,6 +14,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
@@ -33,18 +34,18 @@ public class TestInjectorAwareUriLocatorFactoryDecorator {
   
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullFactory() {
-    new InjectorAwareUriLocatorFactoryDecorator(null, injector);
+    InjectorAwareUriLocatorFactoryDecorator.decorate(null, injector);
   }
   
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullWithNullInjector() {
-    new InjectorAwareUriLocatorFactoryDecorator(mockLocatorFactory, null);
+    InjectorAwareUriLocatorFactoryDecorator.decorate(mockLocatorFactory, null);
   }
   
   @Test
   public void shouldInjectFieldsOfTheDecoratedFactory() {
     final SampleUriLocatorFactory locatorFactory = new SampleUriLocatorFactory();
-    new InjectorAwareUriLocatorFactoryDecorator(locatorFactory, injector);
+    InjectorAwareUriLocatorFactoryDecorator.decorate(locatorFactory, injector);
     Assert.assertNotNull(locatorFactory.processorsFactory);
   }
   
@@ -52,12 +53,28 @@ public class TestInjectorAwareUriLocatorFactoryDecorator {
   public void shouldInjectFieldsOfAddedLocators() {
     final SampleLocator locator = new SampleLocator();
     final UriLocatorFactory sampleFactory = new SimpleUriLocatorFactory().addUriLocator(locator);
-    final UriLocatorFactory factory = new InjectorAwareUriLocatorFactoryDecorator(sampleFactory, injector);
+    final UriLocatorFactory factory = InjectorAwareUriLocatorFactoryDecorator.decorate(sampleFactory, injector);
     //trigger injection processing
     factory.getInstance("/uri");
     Assert.assertNotNull(locator.processorsFactory);
   }
   
+
+  @Test
+  public void shouldDecorateOnce() {
+    final UriLocatorFactory original = new SimpleUriLocatorFactory();
+    final UriLocatorFactory factory = InjectorAwareUriLocatorFactoryDecorator.decorate(original, injector);
+    Assert.assertTrue(factory instanceof InjectorAwareUriLocatorFactoryDecorator);
+    Assert.assertSame(original, ((ObjectDecorator<?>) factory).getDecoratedObject());
+  }
+  
+  @Test
+  public void shouldNotRedundantlyDecorate() {
+    final UriLocatorFactory original = InjectorAwareUriLocatorFactoryDecorator.decorate(new SimpleUriLocatorFactory(), injector);
+    final UriLocatorFactory factory = InjectorAwareUriLocatorFactoryDecorator.decorate(original, injector);
+    Assert.assertTrue(factory instanceof InjectorAwareUriLocatorFactoryDecorator);
+    Assert.assertSame(original, factory);
+  }
   
   private static class SampleUriLocatorFactory extends SimpleUriLocatorFactory {
     @Inject

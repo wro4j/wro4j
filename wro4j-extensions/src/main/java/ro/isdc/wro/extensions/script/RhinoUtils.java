@@ -40,17 +40,17 @@ public class RhinoUtils {
    * @return detailed string message.
    */
   public static String createExceptionMessage(final RhinoException e) {
-    String message = "Could not execute the script because: ";
+    StringBuffer message = new StringBuffer("Could not execute the script because: \n");
     if (e instanceof JavaScriptException) {
-      message += toJson(((JavaScriptException) e).getValue());
+      message.append(toJson(((JavaScriptException) e).getValue()));
     } else if (e instanceof EcmaError) {
       final EcmaError ecmaError = (EcmaError)e;
-      message += String.format("Error message: %s at line: %s. \nSource: %s", ecmaError.getErrorMessage(),
-        ecmaError.lineNumber(), ecmaError.lineSource());
+      message.append(String.format("Error message: %s at line: %s. \nSource: %s", ecmaError.getErrorMessage(),
+        ecmaError.lineNumber(), ecmaError.lineSource()));
     } else {
-      message += e.getMessage();
+      message.append(e.getMessage());
     }
-    return message;
+    return message.toString();
   }
 
   /**
@@ -70,7 +70,7 @@ public class RhinoUtils {
    * @see RhinoUtils#convertSpecial(Object)
    */
   public static String toJson(final Object object) {
-    return toJson(object, false);
+    return toJson(object, true);
   }
 
   /**

@@ -125,5 +125,17 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
-  /**/
+  bootstrap {
+    css("/bootstrap/less/bootstrap.less")
+    js("/bootstrap/js/*.js");
+  }
+  googleCodePrettify {
+    css("/module/bootstrapDemo/google-code-prettify/*.css")
+    js("/module/bootstrapDemo/google-code-prettify/*.js")
+  }
+  bootstrapDemo {
+    js("/module/bootstrapDemo/jquery.js")
+    bootstrap()
+    googleCodePrettify()
+  }
 }

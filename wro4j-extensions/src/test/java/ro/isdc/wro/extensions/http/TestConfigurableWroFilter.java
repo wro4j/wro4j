@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.http.ConfigurableWroFilter;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
@@ -64,7 +64,7 @@ public class TestConfigurableWroFilter {
   @Test
   public void shouldAcceptValidProcessorNameConfiguration()
       throws Exception {
-    genericProcessorNameConfigurationTest(LessCssProcessor.ALIAS);
+    genericProcessorNameConfigurationTest(RhinoLessCssProcessor.ALIAS);
   }
 
 

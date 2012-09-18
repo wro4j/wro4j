@@ -55,7 +55,7 @@ public class PreProcessorExecutor {
   @Inject
   private WroConfiguration config;
   @Inject
-  private LifecycleCallbackRegistry callbackRegistry;  
+  private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private Injector injector;
   /**
@@ -190,7 +190,19 @@ public class PreProcessorExecutor {
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
-    String resourceContent = getResourceContent(resource);
+    
+    String resourceContent = null;
+    try {
+      resourceContent = getResourceContent(resource);
+    } catch (final IOException e) {
+      LOG.debug("Invalid resource found: {}", resource);
+      if (config.isIgnoreMissingResources()) {
+        return StringUtils.EMPTY;
+      } else {
+        LOG.error("Cannot ignore missing resource:  {}", resource);
+        throw e;
+      }
+    }
     if (processors.isEmpty()) {
       return resourceContent;
     }
@@ -223,7 +235,8 @@ public class PreProcessorExecutor {
    * Decorates preProcessor with mandatory decorators.
    */
   private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
-    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(processor)); 
+    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(
+        processor));
     injector.inject(decorated);
     return decorated;
   }
@@ -237,7 +250,7 @@ public class PreProcessorExecutor {
    */
   private String getResourceContent(final Resource resource)
       throws IOException {
-    InputStream is = null; 
+    InputStream is = null;
     try {
       is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
@@ -245,14 +258,6 @@ public class PreProcessorExecutor {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }
       return result;
-    } catch (final IOException e) {
-      LOG.debug("Invalid resource found: {}", resource);
-      if (config.isIgnoreMissingResources()) {
-        return StringUtils.EMPTY;
-      } else {
-        LOG.error("Cannot ignore missing resource:  {}", resource);
-        throw e;
-      }
     } finally {
       IOUtils.closeQuietly(is);
     }

@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +103,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       Validate.notNull(originalUrl);
       if (isReplaceNeeded(originalUrl)) {
         final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
-        LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, StringUtils.abbreviate(modifiedUrl, 40));
+        LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
         /**
          * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
          * from stackoverflow: @see

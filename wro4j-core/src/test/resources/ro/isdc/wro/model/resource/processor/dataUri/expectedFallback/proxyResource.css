@@ -6,10 +6,10 @@ input.button {
 .multilineAndSpaces {
   background: 
      url( "/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png " );background: 
-     url(data:image/png;base64,iVBORw0KG);
+     url( "data:image/png;base64,iVBORw0KG" );
   background-image : 
      url( "/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png " );background-image : 
-     url(data:image/png;base64,iVBORw0KG)     
+     url( "data:image/png;base64,iVBORw0KG" )     
 }
 @font-face {
     src: url(/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png);src: url(data:image/png;base64,iVBORw0KG);

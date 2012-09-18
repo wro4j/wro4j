@@ -105,11 +105,26 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     extendPluginClasspath();
     Context.set(Context.standaloneContext());
     try {
+      onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
       getLog().error("Exception occured while executing maven plugin", e);
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
+    } finally {
+      onAfterExecute();
     }
+  }
+
+  /**
+   * Invoked before execution is performed. 
+   */
+  protected void onBeforeExecute() {
+  }
+
+  /**
+   * Invoked right after execution complete, no matter if it failed or not.
+   */
+  protected void onAfterExecute() {
   }
 
 

@@ -271,6 +271,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet()
       throws Exception {
+    // this test fails only when debug is turned off.
     when(mockFilterConfig.getInitParameter(ConfigConstants.header.name())).thenReturn("ETag 998989 expires 1");
     victim.init(mockFilterConfig);
   }

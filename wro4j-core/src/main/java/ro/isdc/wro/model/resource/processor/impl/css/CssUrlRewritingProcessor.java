@@ -260,6 +260,7 @@ public class CssUrlRewritingProcessor
    * @param uri
    *          to check if is allowed.
    * @return true if passed argument is contained in allowed list.
+   * @VisibleFortesting
    */
   public final boolean isUriAllowed(final String uri) {
     return authorizationManager.isAuthorized(uri);

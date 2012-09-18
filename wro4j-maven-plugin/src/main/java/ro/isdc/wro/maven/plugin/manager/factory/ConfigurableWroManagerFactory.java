@@ -6,7 +6,6 @@ package ro.isdc.wro.maven.plugin.manager.factory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -15,10 +14,6 @@ import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAware
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;

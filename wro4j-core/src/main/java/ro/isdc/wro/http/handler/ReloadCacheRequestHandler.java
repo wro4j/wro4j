@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
@@ -40,7 +41,7 @@ public class ReloadCacheRequestHandler
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     context.getConfig().reloadCache();
-    WroUtil.addNoCacheHeaders(response);
+    ResponseHeadersConfigurer.noCache().setHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("Cache is reloaded");
   }
