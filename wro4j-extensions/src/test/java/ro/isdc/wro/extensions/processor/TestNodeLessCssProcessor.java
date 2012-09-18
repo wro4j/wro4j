@@ -5,7 +5,6 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -20,7 +19,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
-import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.Function;
@@ -106,17 +104,6 @@ public class TestNodeLessCssProcessor {
       }
     });
   }
-
-  @Test
-  public void shouldBePossibleToExtendLessCssWithDifferentScriptStream() {
-    new LessCss() {
-      @Override
-      protected InputStream getScriptAsStream() {
-        return LessCss.class.getResourceAsStream(LessCss.DEFAULT_LESS_JS);
-      }
-    }.less("#id {}");
-  }
-  
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
