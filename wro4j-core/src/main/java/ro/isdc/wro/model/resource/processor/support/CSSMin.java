@@ -76,13 +76,12 @@ class Selector {
     }
     this.selector = parts[0].trim();
     String contents = parts[1].trim();
-    if (contents.length() == 0) {
+    if (contents.length() <= 1) {
       throw new Exception("Warning: Empty selector body: " + selector);
     }
     if (contents.charAt(contents.length() - 1) != '}') { // Ensure that we have a leading and trailing brace.
       throw new Exception("Warning: Unterminated selector: " + selector);
     }
-    //contents = contents.substring(0, contents.length() - 2);
     contents = StringUtils.substringBefore(contents, "}");
     properties = parseProperties(contents);
     sortProperties(properties);
