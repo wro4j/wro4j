@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
@@ -21,13 +23,17 @@ public class ConfigurableHashStrategy
    * Property name to specify alias.
    */
   public static final String KEY = "hashStrategy";
+  @Inject
+  private Injector injector;
   
   /**
    * {@inheritDoc}
    */
   public String getHash(final InputStream inputStream)
       throws IOException {
-    return getConfiguredStrategy().getHash(inputStream);
+    final HashStrategy hashStrategy = getConfiguredStrategy();
+    injector.inject(hashStrategy);
+    return hashStrategy.getHash(inputStream);
   }
   
   /**

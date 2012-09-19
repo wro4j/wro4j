@@ -16,6 +16,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
@@ -25,7 +26,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -92,7 +92,7 @@ public class TestWro4jCommandLineRunner {
       
       @Override
       protected void onRunnerException(final Exception e) {
-        WroUtil.wrapWithWroRuntimeException(e);
+        throw WroRuntimeException.wrap(e);
       }
     }.doMain(args);
   }

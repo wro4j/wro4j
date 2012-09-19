@@ -16,41 +16,4 @@
     <js>/bootstrap/js/bootstrap-carousel.js</js>
     <js>/bootstrap/js/bootstrap-typeahead.js</js>
   </group>
-
-  <group name="basic">
-    <js>/javascript/jquery-1.4.2-oua.js</js>
-    <js>/javascript/jquery-ui-1.8.10.custom.js</js>
-    <js>/javascript/jquery-password-checker-1.0.1.js</js>
-    <js>/javascript/jquery.MultiFile.pack.js</js>
-    <js>/javascript/jquery.ui.tabs.js</js>
-    <js>/javascript/jquery.scrollTo-min.js</js>
-    <js>/javascript/chosen.jquery.min.js</js>
-    <js>/javascript/bootstrap-oua.js</js>
-    <js>/javascript/jquery.fancybox-1.3.4.pack.js</js>
-    <js>/javascript/jquery.easing-1.3.pack.js</js>
-    <js>/javascript/jquery.tablesorter.js</js>
-    <js>/javascript/jquery.infieldlabel.js</js>
-    <js>/javascript/website.js</js>
-    <js>/javascript/unobar.js</js>
-    <js>/javascript/study-tracker.js</js>
-    <js>/javascript/wro.js</js>
-    <css>/css/wro-charset.css</css>
-    <css>/css/bootstrap.min.css</css>
-    <css>/css/jquery-ui-1.8.10.custom.css</css>
-    <css>/css/jquery.fancybox-1.3.4.css</css>
-    <css>/css/oua-basic.css</css>
-    <css>/css/oua-enhanced.css</css>
-    <css>/css/oua-print.css</css>
-    <css>/css/oua-ps.css</css>
-    <css>/css/uni-bar-basic.css</css>
-    <css>/css/study-tracker-basic.css</css>
-  </group>
-
-  <group name="preview">
-    <css>/css/oua-preview.css</css>
-  </group>
-
-  <group name="extract">
-    <css>/css/oua-extract.css</css>
-  </group>
 </groups>

@@ -56,15 +56,14 @@ public class InjectorBuilder {
    */
   private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   private WroManagerFactory managerFactory;
-  private final LazyInitializer<UriLocatorFactory> uriLocatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
+  private final LazyInitializer<UriLocatorFactory> locatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
     @Override
     protected UriLocatorFactory initialize() {
       final WroManager manager = managerFactory.create();
-      final UriLocatorFactory decorated = new InjectorAwareUriLocatorFactoryDecorator(manager.getUriLocatorFactory(),
-          injector);
       // update manager with new decorated factory
-      manager.setUriLocatorFactory(decorated);
-      return decorated;
+      manager.setUriLocatorFactory(InjectorAwareUriLocatorFactoryDecorator.decorate(manager.getUriLocatorFactory(),
+          injector));
+      return manager.getUriLocatorFactory();
     }
   };
   private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
@@ -73,11 +72,10 @@ public class InjectorBuilder {
     @Override
     protected WroModelFactory initialize() {
       final WroManager manager = managerFactory.create();
-      final WroModelFactory decorated = new DefaultWroModelFactoryDecorator(manager.getModelFactory(),
-          manager.getModelTransformers());
       // update manager with new decorated factory
-      manager.setModelFactory(decorated);
-      return decorated;
+      manager.setModelFactory(DefaultWroModelFactoryDecorator.decorate(manager.getModelFactory(),
+          manager.getModelTransformers()));
+      return manager.getModelFactory();
     }
   };
   /**
@@ -87,11 +85,9 @@ public class InjectorBuilder {
     @Override
     protected CacheStrategy<CacheEntry, ContentHashEntry> initialize() {
       final WroManager manager = managerFactory.create();
-      final CacheStrategy<CacheEntry, ContentHashEntry> decorated = new DefaultSynchronizedCacheStrategyDecorator(
-          managerFactory.create().getCacheStrategy());
       // update manager with new decorated strategy
-      manager.setCacheStrategy(decorated);
-      return decorated;
+      manager.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(manager.getCacheStrategy()));
+      return manager.getCacheStrategy();
     }
   };
 
@@ -150,7 +146,7 @@ public class InjectorBuilder {
     });
     map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        return uriLocatorFactoryInitializer.get();
+        return locatorFactoryInitializer.get();
       }
     });
     map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
@@ -172,6 +168,13 @@ public class InjectorBuilder {
         return namingStrategy;
       }
     });
+    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
+      public HashStrategy create() {
+        final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
+        injector.inject(hashStrategy);
+        return hashStrategy;
+      }
+    });
     map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
     map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
@@ -188,11 +191,6 @@ public class InjectorBuilder {
     map.put(ResourceAuthorizationManager.class, new InjectorObjectFactory<ResourceAuthorizationManager>() {
       public ResourceAuthorizationManager create() {
         return authorizationManager;
-      }
-    });
-    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
-      public HashStrategy create() {
-        return managerFactory.create().getHashStrategy();
       }
     });
   }

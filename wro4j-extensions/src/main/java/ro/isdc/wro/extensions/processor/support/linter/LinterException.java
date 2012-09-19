@@ -21,7 +21,7 @@ public class LinterException extends Exception {
    */
   public Collection<LinterError> getErrors() {
     if (errors == null) {
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
     return this.errors;
   }

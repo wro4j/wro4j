@@ -6,14 +6,12 @@ package ro.isdc.wro.extensions.processor.support.sass;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -76,8 +74,6 @@ public class SassCss {
       final String execute = "exports.render(" + WroUtil.toJSMultiLineString(data) + ");";
       final Object result = builder.evaluate(execute, "sassRender");
       return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

@@ -31,7 +31,7 @@ import ro.isdc.wro.util.Transformer;
  * @created 13 Mar 2011
  * @since 1.4.6
  */
-public class DefaultWroModelFactoryDecorator
+public final class DefaultWroModelFactoryDecorator
     implements WroModelFactory, ObjectDecorator<WroModelFactory> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWroModelFactoryDecorator.class);
 
@@ -91,11 +91,20 @@ public class DefaultWroModelFactoryDecorator
 
   private final List<Transformer<WroModel>> modelTransformers;
   
-  public DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
+  /**
+   * Factory method which takes care of redundant decoration.
+   */
+  public static WroModelFactory decorate(final WroModelFactory decorated, final List<Transformer<WroModel>> modelTransformers) {
+    return decorated instanceof DefaultWroModelFactoryDecorator ? decorated : new DefaultWroModelFactoryDecorator(decorated, modelTransformers);
+  }
+  
+  private DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
       final List<Transformer<WroModel>> modelTransformers) {
+    Validate.notNull(decorated);
+    Validate.notNull(modelTransformers);
+    
     this.modelTransformers = modelTransformers;
     this.decorated = decorated;
-    Validate.notNull(modelTransformers);
   }
   
   /**

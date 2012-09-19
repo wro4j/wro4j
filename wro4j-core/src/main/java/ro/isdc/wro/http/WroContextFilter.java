@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 
 
@@ -55,13 +57,30 @@ public class WroContextFilter
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
     try {
-      Context.set(Context.webContext(request, response, this.filterConfig));
+      Context.set(Context.webContext(request, response, this.filterConfig), getWroConfiguration());
       chain.doFilter(request, response);
     } finally {
       Context.unset();
     }
   }
 
+  /**
+   * @return the {@link WroConfiguration} extracted from {@link ServletContext} if exist or default one otherwise. 
+   */
+  private WroConfiguration getWroConfiguration() {
+    final WroConfiguration configAttribute = getServletContextAttributeHelper().getWroConfiguration();
+    final WroConfiguration config = configAttribute != null ? configAttribute : new WroConfiguration();
+    return config;
+  }
+
+  /**
+   * @VisibleForTesting
+   * @return the instance responsible for {@link WroConfiguration} lookup.
+   */
+  ServletContextAttributeHelper getServletContextAttributeHelper() {
+    return ServletContextAttributeHelper.create(filterConfig);
+  }
+  
   /**
    * {@inheritDoc}
    */

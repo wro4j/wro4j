@@ -67,7 +67,7 @@ public class DispatcherStreamLocator {
         final ServletRequest servletRequest = getWrappedServletRequest(request, location);
         // Wrap response
         final ServletResponse servletResponse = new RedirectedStreamServletResponseWrapper(os, response);
-        LOG.debug("dispatching request to location: " + location);
+        LOG.debug("dispatching request to location: {}", location);
         // use dispatcher
         dispatcher.include(servletRequest, servletResponse);
         warnOnEmptyStream = true;
@@ -77,21 +77,18 @@ public class DispatcherStreamLocator {
         servletResponse.getWriter().flush();
         os.close();
       }
-      //fallback to external resource locator if the dispatcher is empty
-      if (os.size() == 0) {
-        // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
-        // the thread responsible for refreshing resources)
-        // Returns the part URL from the protocol name up to the query string and contextPath.
-        final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-        final String absolutePath = servletContextPath + location;
-        return createExternalResourceLocator().locate(absolutePath);
-      }
     } catch (final Exception e) {
+      LOG.debug("[FAIL] Error while dispatching the request for location {}", location);
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
       // included.
-      LOG.debug("[FAIL] Error while dispatching the request for location {}", location);
-      throw new IOException("Error while dispatching the request for location " + location);
+      return locateExternal(request, location);
+    }
+    try {
+      //fallback to external resource locator if the dispatcher is empty
+      if (os.size() == 0) {
+        return locateExternal(request, location);
+      }
     } finally {
       if (warnOnEmptyStream && os.size() == 0) {
         LOG.debug("Wrong or empty resource with location: {}", location);
@@ -102,6 +99,16 @@ public class DispatcherStreamLocator {
       }
     }
     return new ByteArrayInputStream(os.toByteArray());
+  }
+
+  private InputStream locateExternal(final HttpServletRequest request, final String location)
+      throws IOException {
+    // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
+    // the thread responsible for refreshing resources)
+    // Returns the part URL from the protocol name up to the query string and contextPath.
+    final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
+    final String absolutePath = servletContextPath + location;
+    return createExternalResourceLocator().locate(absolutePath);
   }
 
   /**

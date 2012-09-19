@@ -3,15 +3,14 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static junit.framework.Assert.fail;
+
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +18,6 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.RubySassCssProcessor;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -35,32 +33,21 @@ public class TestRubySassCssProcessor {
   private final URL url = getClass().getResource("rubysasscss");
   
   /** A RubySassEngine to test */
-  private RubySassCssProcessor rubySassCss;
+  private RubySassCssProcessor processor;
   
   @Before
-  public void initEngine() {
-    rubySassCss = new RubySassCssProcessor();
+  public void setUp() {
+    processor = new RubySassCssProcessor();
   }
   
   @Test
-  public void shouldProcessResourcesFromFolder()
-          throws Exception {
-      final URL url = getClass().getResource("rubysass");
-      final ResourcePreProcessor processor = new RubySassCssProcessor();
-
-      final File testFolder = new File(url.getFile(), "templates");
-      final File expectedFolder = new File(url.getFile(), "results");
-      WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
-  }
-
-  @Test
-  public void testFromFolder()
-      throws IOException {
+  public void shouldTestFromFolder()
+      throws Exception {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByName(testFolder, expectedFolder, "scss", "css", rubySassCss);
+    WroTestUtils.compareFromDifferentFoldersByName(testFolder, expectedFolder, "css", "css", processor);
   }
-  
+
   @Test
   public void executeMultipleTimesDoesntThrowOutOfMemoryException() {
     RubySassEngine engine = new RubySassEngine();
@@ -73,9 +60,11 @@ public class TestRubySassCssProcessor {
   public void shouldBeThreadSafe()
       throws Exception {
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
-          rubySassCss.process(new StringReader("$side: top;$radius: 10px;.rounded-#{$side} {border-#{$side}-radius: $radius;}"), new StringWriter());
+          processor.process(new StringReader(
+              "$side: top;$radius: 10px;.rounded-#{$side} {border-#{$side}-radius: $radius;}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
@@ -86,9 +75,7 @@ public class TestRubySassCssProcessor {
   }
   
   /**
-   * Test that processing invalid sass css produces exceptions
-   * 
-   * @throws Exception
+   * Test that processing invalid sass css produces exceptions.
    */
   @Test
   public void shouldFailWhenInvalidSassCssIsProcessed()
@@ -99,14 +86,30 @@ public class TestRubySassCssProcessor {
       public Void apply(final File input)
           throws Exception {
         try {
-          rubySassCss.process(null, new FileReader(input), new StringWriter());
-          Assert.fail("Expected to fail, but didn't");
+          processor.process(null, new FileReader(input), new StringWriter());
+          fail("Shouldn't have failed");
         } catch (final WroRuntimeException e) {
           // expected to throw exception, continue
         }
         return null;
       }
     });
+  }
+  
+  /**
+   * This test proves that Sass Engine behave strangely after the first failure.
+   */
+  @Test
+  public void shouldSucceedAfterAFailure()
+      throws Exception {
+    try {
+      processor.process(null, new StringReader("$base= #f938ab;"), new StringWriter());
+      fail("Should have failed");
+    } catch (Exception e) {
+      
+    }
+    final String sass = ".valid {color: red}  @mixin rounded($side, $radius: 10px) { border-#{$side}-radius: $radius; -moz-border-radius-#{$side}: $radius; -webkit-border-#{$side}-radius: $radius;}#navbar li { @include rounded(top); }";
+    processor.process(null, new StringReader(sass), new StringWriter());
   }
   
 }

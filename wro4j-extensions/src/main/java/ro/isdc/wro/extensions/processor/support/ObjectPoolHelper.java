@@ -59,7 +59,9 @@ public class ObjectPoolHelper<T> {
     return objectPool;
   }
 
-
+  /**
+   * @return object from the pool.
+   */
   public T getObject() {
     try {
       return objectPool.borrowObject();
@@ -79,8 +81,6 @@ public class ObjectPoolHelper<T> {
       throw new RuntimeException("Cannot get object from the pool", e);
     }
   }
-  
-
   
   /**
    * Use a custom {@link GenericObjectPool}.

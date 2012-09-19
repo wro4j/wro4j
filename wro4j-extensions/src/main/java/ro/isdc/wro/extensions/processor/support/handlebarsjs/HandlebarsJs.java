@@ -24,8 +24,8 @@ public class HandlebarsJs extends AbstractJsTemplateCompiler {
   @Override
   public String compile(final String content, final String name) {
 
-    return HANDLEBARS_JS_TEMPLATES_INIT + "templates['" + name + "'] = template("
-        + super.compile(content, name) + " ); })();";
+    return HANDLEBARS_JS_TEMPLATES_INIT + "templates[" + name + "] = template("
+        + super.compile(content, "") + " ); })();";
   }
 
   @Override

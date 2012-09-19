@@ -10,31 +10,39 @@ import org.junit.Test;
  * @author Alex Objelean
  */
 public class TestJsHint {
+  private static final String VALID_JS = "alert(1);";
   private final JsHint jsHint = new JsHint();
-
+  
+  @Test(expected=LinterException.class)
+  public void cannotValidateEmptyString()
+    throws Exception {
+    final String options = null;
+    jsHint.setOptions(options);
+    jsHint.validate("");
+  }
+  
   @Test
   public void testSetNullOptions()
     throws Exception {
     final String options = null;
     jsHint.setOptions(options);
-    jsHint.validate("");
+    jsHint.validate(VALID_JS);
   }
 
 
   @Test
   public void shouldValidateWithNoOptions()
     throws Exception {
-    jsHint.validate("");
+    jsHint.validate(VALID_JS);
   }
 
 
   @Test
   public void shouldValidateWithMultipleOptions()
     throws Exception {
-    jsHint.setOptions("undef,eqeqeq");
-    jsHint.validate("");
+    jsHint.setOptions("indent,eqeqeq");
+    jsHint.validate(VALID_JS);
   }
-
 
   @Test(expected = LinterException.class)
   public void shouldNotAcceptBadOptions()
@@ -78,5 +86,19 @@ public class TestJsHint {
     throws Exception {
     jsHint.setOptions("eqeqeq");
     jsHint.validate("if (text == 0) {win.location.href = link; }");
+  }
+  
+  @Test(expected=LinterException.class)
+  public void shouldFailWhenIndentationIsNotCorrect()
+    throws Exception {
+    jsHint.setOptions("indent=2,white");
+    jsHint.validate("function test() {\n     alert(1);\n}");
+  }
+  
+  @Test
+  public void shouldNotFailWhenIndentationIsCorrect()
+    throws Exception {
+    jsHint.setOptions("indent=2,white");
+    jsHint.validate("function test() {\n  alert(1);\n}");
   }
 }

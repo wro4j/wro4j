@@ -45,12 +45,12 @@ public class TestRubySassEngine {
   @Test
   public void shouldProcessValidCss()
     throws IOException {
-    Assert.assertNotNull(engine.process("#element {color: red;}"));
+    Assert.assertEquals("#element {\n  color: red; }\n", engine.process("#element {color: red;}"));
   }
 
   @Test
   public void shouldProcessValidSass()
     throws IOException {
-    Assert.assertNotNull(engine.process("#element { #child {color: red;}}"));
+    Assert.assertEquals("#element #child {\n  color: red; }\n", engine.process("#element { #child {color: red;}}"));
   }
 }

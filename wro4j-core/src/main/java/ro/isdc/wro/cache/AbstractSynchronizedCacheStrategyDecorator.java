@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     extends CacheStrategyDecorator<K, V> {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSynchronizedCacheStrategyDecorator.class);
-  private ConcurrentMap<K, ReadWriteLock> locks = new ConcurrentHashMap<K, ReadWriteLock>();
+  private final ConcurrentMap<K, ReadWriteLock> locks = new ConcurrentHashMap<K, ReadWriteLock>();
   
   public AbstractSynchronizedCacheStrategyDecorator(final CacheStrategy<K, V> decorated) {
     super(decorated);
@@ -31,10 +31,13 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
   /**
    * {@inheritDoc}
    */
-  public V get(final K key) {
+  @Override
+  public final V get(final K key) {
     Validate.notNull(key);
     LOG.debug("Searching cache key: {}", key);
     V value = null;
+    //invoke this callback method before the lock is acquired to avoid dead-lock
+    onBeforeGet(key);
     final ReadWriteLock lock = getLockForKey(key);
     lock.readLock().lock();
     try {
@@ -60,9 +63,17 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
   }
   
   /**
+   * Invoked just before the get method is invoked. Can be useful for checking if resources are stale and invalidating
+   * the cache.
+   */
+  protected void onBeforeGet(final K key) {
+  }
+  
+  /**
    * {@inheritDoc}
    */
-  public void put(K key, V value) {
+  @Override
+  public final void put(final K key, final V value) {
     final ReadWriteLock lock = getLockForKey(key);
     lock.writeLock().lock();
     try {
