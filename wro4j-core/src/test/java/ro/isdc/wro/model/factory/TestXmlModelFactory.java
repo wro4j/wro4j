@@ -62,7 +62,7 @@ public class TestXmlModelFactory {
     Context.get().getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
-  
+
   // TODO use two concurrent calls
   @Test
   public void testTwoConcurrentCreationCalls() {

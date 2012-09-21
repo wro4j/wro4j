@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010. All rights reserved.
  */
-package ro.isdc.wro.model.factory;
+package ro.isdc.wro.model;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -20,6 +20,8 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.Resource;
@@ -55,33 +57,11 @@ public class TestWroModel {
     Assert.assertEquals(1, group.getResources().size());
   }
   
-  @Test
-  public void testGetGroupNames() {
-    final List<String> groupNames = victim.getGroupNames();
-    Collections.sort(groupNames);
-    final List<String> expected = Arrays.asList("g1", "g2", "g3");
-    Assert.assertEquals(expected, groupNames);
-  }
   
   @Test(expected = InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
     Assert.assertFalse(victim.getGroups().isEmpty());
     victim.getGroupByName("INVALID_GROUP");
-  }
-  
-  @Test
-  public void shouldReturnAllResourcesFromModel() {
-    assertEquals(3, victim.getAllResources().size());
-  }
-  
-  @Test
-  public void shouldNotReturnDuplicatedResources() {
-    victim = new WroModel();
-    assertEquals(0, victim.getAllResources().size());
-    
-    victim.addGroup(new Group("one").addResource(Resource.create("/one.js"))).addGroup(
-        new Group("two").addResource(Resource.create("/one.js")));
-    assertEquals(1, victim.getAllResources().size());
   }
   
   /**
@@ -97,22 +77,5 @@ public class TestWroModel {
     // the uriLocator factory doesn't have any locators set...
     final WroModel model = factory.create();
     return model;
-  }
-  
-  @Test
-  public void shouldReturnEmptyCollectionWhenAResourceIsNotContainedInAnyGroup() {
-    assertTrue(victim.getGroupNamesContainingResource("/someResource.js").isEmpty());
-  }
-  
-  @Test
-  public void shouldFindTheGroupContainingResource() {
-    Collection<String> groups = victim.getGroupNamesContainingResource("/path/to/resource");
-    assertEquals(2, groups.size());
-    assertEquals("[g2, g3]", Arrays.toString(groups.toArray()));
-  }
-  
-  @Test(expected = NullPointerException.class)
-  public void cannotGetGroupsUsingNullResource() {
-    victim.getGroupNamesContainingResource(null);
   }
 }
