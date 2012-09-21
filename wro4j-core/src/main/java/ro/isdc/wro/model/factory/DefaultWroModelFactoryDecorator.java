@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
@@ -82,7 +83,7 @@ public final class DefaultWroModelFactoryDecorator
      */
     private void authorizeModelResources(final WroModel model) {
       if (model != null && config.isDebug()) {
-        for (Resource resource : model.getAllResources()) {
+        for (Resource resource : new WroModelInspector(model).getAllResources()) {
           authorizationManager.add(resource.getUri());
         }
       }

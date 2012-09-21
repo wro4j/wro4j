@@ -188,6 +188,19 @@ public class TestXmlModelFactory {
     assertEquals(5, group.getResources().size());
   }
   
+  @Test(expected = WroRuntimeException.class)
+  public void shouldDetectInvalidGroupReference() {
+    final WroModel model = loadModelFromLocation("shouldDetectInvalidGroupReference.xml");
+    assertTrue(model.getGroups().isEmpty());
+  }
+  
+  @Test
+  public void shouldDetectGroupReferenceFromImportedModel() {
+    final WroModel model = loadModelFromLocation("shouldDetectGroupReferenceFromImportedModel.xml");
+    assertEquals(2, model.getGroups().size());
+  }
+  
+  
   private WroModel loadModelFromLocation(final String location) {
     final WroModelFactory factory = new XmlModelFactory() {
       @Override
