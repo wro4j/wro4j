@@ -196,7 +196,7 @@ public final class WroConfiguration
    * @param newValue value to set.
    */
   private void reloadCacheWithNewValue(final Long newValue) {
-    final long newValueAsPrimitive = newValue == null ? getModelUpdatePeriod() : newValue;
+    final long newValueAsPrimitive = newValue == null ? getCacheUpdatePeriod() : newValue;
     LOG.debug("invoking {} listeners", cacheUpdatePeriodListeners.size());
     for (final PropertyChangeListener listener : cacheUpdatePeriodListeners) {
       final PropertyChangeEvent event = new PropertyChangeEvent(
