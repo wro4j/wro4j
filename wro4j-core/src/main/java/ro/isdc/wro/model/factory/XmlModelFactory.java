@@ -33,9 +33,11 @@ import org.xml.sax.SAXException;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -122,6 +124,8 @@ public class XmlModelFactory
    */
   @Inject
   private UriLocatorFactory locatorFactory;
+  @Inject
+  private Injector injector;
   /**
    * Used to detect recursive import processing.
    */
@@ -130,33 +134,51 @@ public class XmlModelFactory
    * Flag for enabling xml validation.
    */
   private boolean validateXml = true;
+  /**
+   * The model being created.
+   */
+  private WroModel model;
+
+  /**
+   * Default constructor.
+   */
+  public XmlModelFactory() {
+  }
+  
+  /**
+   * Allow aggregate processed imports during recursive model creation.
+   */
+  private XmlModelFactory(final Set<String> processedImports) {
+    Validate.notNull(processedImports);
+    this.processedImports.addAll(processedImports);
+  }
   
   /**
    * {@inheritDoc}
    */
   public synchronized WroModel create() {
-    // TODO cache model based on application Mode (DEPLOYMENT, DEVELOPMENT)
+    model = new WroModel();
     final StopWatch stopWatch = new StopWatch("Create Wro Model from XML");
     try {
       stopWatch.start("createDocument");
       final Document document = createDocument();
       stopWatch.stop();
-      
+
       stopWatch.start("processGroups");
       processGroups(document);
       stopWatch.stop();
-      
-      stopWatch.start("createModel");
-      final WroModel model = createModel();
+
+      stopWatch.start("processImports");
+      processImports(document);
       stopWatch.stop();
       
-      stopWatch.start("processImports");
-      processImports(document, model);
+      stopWatch.start("createModel");
+      parseGroups();
+      stopWatch.stop();
       return model;
     } finally {
       // clear the processed imports even when the model creation fails.
       processedImports.clear();
-      stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
     }
   }
@@ -209,7 +231,7 @@ public class XmlModelFactory
     }
   }
   
-  private void processImports(final Document document, final WroModel model) {
+  private void processImports(final Document document) {
     final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
     LOG.debug("number of imports: {}", importsList.getLength());
     for (int i = 0; i < importsList.getLength(); i++) {
@@ -217,16 +239,6 @@ public class XmlModelFactory
       final String name = element.getTextContent();
       LOG.debug("processing import: {}", name);
       Validate.notNull(locatorFactory, "The Locator cannot be null!");
-      final XmlModelFactory importedModelFactory = new XmlModelFactory() {
-        @Override
-        protected InputStream getModelResourceAsStream()
-            throws IOException {
-          LOG.debug("build model from import: {}", name);
-          return new AutoCloseInputStream(locatorFactory.locate(name));
-        };
-      };
-      // pass the reference of the uriLocatorFactory to the anonymously created factory.
-      importedModelFactory.locatorFactory = this.locatorFactory;
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
         LOG.error(message);
@@ -234,26 +246,39 @@ public class XmlModelFactory
       }
       
       processedImports.add(name);
-      importedModelFactory.processedImports.addAll(this.processedImports);
-      model.merge(importedModelFactory.create());
+      model.merge(createImportedModel(name));
     }
+  }
+
+  /**
+   * @param modelLocation the path where the model is located.
+   * @return the {@link WroModel} created from provided modelLocation.
+   */
+  private WroModel createImportedModel(final String modelLocation) {
+    final XmlModelFactory importedModelFactory = new XmlModelFactory(this.processedImports) {
+      @Override
+      protected InputStream getModelResourceAsStream()
+          throws IOException {
+        LOG.debug("build model from import: {}", modelLocation);
+        return new AutoCloseInputStream(locatorFactory.locate(modelLocation));
+      };
+    };
+    //inject manually created modelFactory 
+    injector.inject(importedModelFactory);
+    return importedModelFactory.create();
   }
   
   /**
-   * Parse the document and creates the model.
+   * Parse the document and creates groups which are added to the provided model.
    * 
    * @param document
    *          to parse.
-   * @return {@link WroModel} object.
    */
-  private WroModel createModel() {
-    final WroModel model = new WroModel();
-    final Set<Group> groups = new HashSet<Group>();
+  private void parseGroups() {
+    //use groups created by imports (if any)
     for (final Element element : allGroupElements.values()) {
-      parseGroup(element, groups);
+      parseGroup(element);
     }
-    model.setGroups(groups);
-    return model;
   }
   
   /**
@@ -266,7 +291,7 @@ public class XmlModelFactory
    *          list of parsed groups where the parsed group is added..
    * @return list of resources associated with this resource
    */
-  private Collection<Resource> parseGroup(final Element element, final Collection<Group> groups) {
+  private Collection<Resource> parseGroup(final Element element) {
     final String name = element.getAttribute(ATTR_GROUP_NAME);
     final String isAbstractAsString = element.getAttribute(ATTR_GROUP_ABSTRACT);
     boolean isAbstractGroup = StringUtils.isNotEmpty(isAbstractAsString) && Boolean.valueOf(isAbstractAsString);
@@ -274,10 +299,10 @@ public class XmlModelFactory
       throw new RecursiveGroupDefinitionException("Infinite Recursion detected for the group: " + name
           + ". Recursion path: " + groupsInProcess);
     }
+    LOG.debug("\tadding group: {}", name);
     groupsInProcess.add(name);
-    LOG.debug("\tgroupName={}", name);
     // skip if this group is already parsed
-    final Group parsedGroup = getGroupByName(name, groups);
+    final Group parsedGroup = new WroModelInspector(model).getGroupByName(name);
     if (parsedGroup != null) {
       // remove before returning
       // this group is parsed, remove from unparsed groups collection
@@ -291,7 +316,7 @@ public class XmlModelFactory
       final Node node = resourceNodeList.item(i);
       if (node instanceof Element) {
         final Element resourceElement = (Element) node;
-        parseResource(resourceElement, resources, groups);
+        parseResource(resourceElement, resources);
       }
     }
     group.setResources(resources);
@@ -299,28 +324,9 @@ public class XmlModelFactory
     groupsInProcess.remove(name);
     if (!isAbstractGroup) {
       //add only non abstract groups
-      groups.add(group);
+      model.addGroup(group);
     }
     return resources;
-  }
-  
-  /**
-   * Check if the group with name <code>name</code> was already parsed and returns Group object with it's resources
-   * initialized.
-   * 
-   * @param name
-   *          the group to check.
-   * @param groups
-   *          list of parsed groups.
-   * @return parsed Group by it's name.
-   */
-  private Group getGroupByName(final String name, final Collection<Group> groups) {
-    for (final Group group : groups) {
-      if (name.equals(group.getName())) {
-        return group;
-      }
-    }
-    return null;
   }
   
   /**
@@ -331,8 +337,7 @@ public class XmlModelFactory
    * @param resources
    *          list of parsed resources where the parsed resource is added.
    */
-  private void parseResource(final Element resourceElement, final Collection<Resource> resources,
-      final Collection<Group> groups) {
+  private void parseResource(final Element resourceElement, final Collection<Resource> resources) {
     ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
@@ -342,8 +347,7 @@ public class XmlModelFactory
       type = ResourceType.CSS;
     } else if (TAG_GROUP_REF.equals(tagName)) {
       // uri in this case is the group name
-      final Element groupElement = allGroupElements.get(uri);
-      resources.addAll(parseGroup(groupElement, groups));
+      resources.addAll(getResourcesForGroup(uri));
     }
     if (type != null) {
       final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
@@ -351,8 +355,27 @@ public class XmlModelFactory
           : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
       final Resource resource = Resource.create(uri, type);
       resource.setMinimize(minimize);
+      LOG.debug("\t\tadding resource: {}", resource);
       resources.add(resource);
     }
+  }
+
+  /**
+   * Search for all resources for a group with a given name.
+   */
+  private Collection<Resource> getResourcesForGroup(final String groupName) {
+    final WroModelInspector modelInspector = new WroModelInspector(model);
+    final Group foundGroup = modelInspector.getGroupByName(groupName);
+    if (foundGroup == null) {
+      Collection<Resource> groupResources = null;
+      final Element groupElement = allGroupElements.get(groupName);
+      if (groupElement == null) {
+        throw new WroRuntimeException("Invalid group-ref: " + groupName);
+      }
+      groupResources = parseGroup(groupElement);
+      return groupResources;      
+    }
+    return foundGroup.getResources();
   }
   
   /**

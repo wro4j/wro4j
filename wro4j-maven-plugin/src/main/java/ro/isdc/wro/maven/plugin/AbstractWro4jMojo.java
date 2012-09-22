@@ -24,6 +24,7 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 
 
 /**
@@ -212,7 +213,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     throws Exception {
     if (getTargetGroups() == null) {
       final WroModel model = getManagerFactory().create().getModelFactory().create();
-      return model.getGroupNames();
+      return new WroModelInspector(model).getGroupNames();
     }
     return Arrays.asList(getTargetGroups().split(","));
   }

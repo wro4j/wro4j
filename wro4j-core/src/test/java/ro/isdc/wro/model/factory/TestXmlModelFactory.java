@@ -21,6 +21,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.Resource;
@@ -62,7 +63,7 @@ public class TestXmlModelFactory {
     Context.get().getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
-  
+
   // TODO use two concurrent calls
   @Test
   public void testTwoConcurrentCreationCalls() {
@@ -86,7 +87,7 @@ public class TestXmlModelFactory {
   @Test
   public void testMinimizeAttributePresence() {
     final WroModel model = loadModelFromLocation("wro-minimizeAttribute.xml");
-    final Group group = model.getGroupByName(model.getGroupNames().get(0));
+    final Group group = model.getGroupByName(new WroModelInspector(model).getGroupNames().get(0));
     final List<Resource> resourceList = group.getResources();
     LOG.debug("resources: " + resourceList);
     assertEquals(false, resourceList.get(0).isMinimize());
@@ -98,7 +99,7 @@ public class TestXmlModelFactory {
   @Test
   public void testValidImports() {
     final WroModel model = loadModelFromLocation("testimport/validImports.xml");
-    assertEquals(2, model.getGroupNames().size());
+    assertEquals(2, new WroModelInspector(model).getGroupNames().size());
     LOG.debug("model: " + model);
   }
   
@@ -187,6 +188,19 @@ public class TestXmlModelFactory {
     assertEquals("nonAbstract", group.getName());
     assertEquals(5, group.getResources().size());
   }
+  
+  @Test(expected = WroRuntimeException.class)
+  public void shouldDetectInvalidGroupReference() {
+    final WroModel model = loadModelFromLocation("shouldDetectInvalidGroupReference.xml");
+    assertTrue(model.getGroups().isEmpty());
+  }
+  
+  @Test
+  public void shouldDetectGroupReferenceFromImportedModel() {
+    final WroModel model = loadModelFromLocation("shouldDetectGroupReferenceFromImportedModel.xml");
+    assertEquals(2, model.getGroups().size());
+  }
+  
   
   private WroModel loadModelFromLocation(final String location) {
     final WroModelFactory factory = new XmlModelFactory() {

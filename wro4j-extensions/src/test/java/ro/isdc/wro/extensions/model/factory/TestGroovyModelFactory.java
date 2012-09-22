@@ -25,6 +25,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
@@ -73,7 +74,7 @@ public class TestGroovyModelFactory {
     };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
-    Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
+    Assert.assertEquals(Arrays.asList("g2", "g1"), new WroModelInspector(model).getGroupNames());
     Assert.assertEquals(2, model.getGroupByName("g1").getResources().size());
     Assert.assertTrue(model.getGroupByName("g1").getResources().get(0).isMinimize());
     Assert.assertEquals("/static/app.js", model.getGroupByName("g1").getResources().get(0).getUri());
