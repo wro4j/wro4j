@@ -103,7 +103,7 @@ public final class WroModel {
     final WroModelInspector modelInspector = new WroModelInspector(this);
     final Group group = modelInspector.getGroupByName(name);
     if (group == null) {
-      throw new InvalidGroupNameException(String.format("There is no such group: '%s'. Available groups are: %s", name,
+      throw new InvalidGroupNameException(String.format("There is no such group: '%s'. Available groups are: [%s]", name,
           modelInspector.getGroupNamesAsString()));  
     }
     return group;
@@ -117,8 +117,8 @@ public final class WroModel {
   public void merge(final WroModel importedModel) {
     Validate.notNull(importedModel, "imported model cannot be null!");
     LOG.debug("merging importedModel: {}", importedModel);
-    for (final String groupName : importedModel.getGroupNames()) {
-      if (getGroupNames().contains(groupName)) {
+    for (final String groupName : new WroModelInspector(importedModel).getGroupNames()) {
+      if (new WroModelInspector(this).getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);
       }
       addGroup(importedModel.getGroupByName(groupName));
@@ -133,15 +133,6 @@ public final class WroModel {
     Validate.notNull(group);
     groups.add(group);
     return this;
-  }
-
-  /**
-   * @return the set of all resources from all the groups of the model (no particular order).
-   * @deprecated use {@link WroModelInspector#getAllResources()}
-   */
-  @Deprecated
-  public Set<Resource> getAllResources() {
-    return new WroModelInspector(this).getAllResources();
   }
   
   /**

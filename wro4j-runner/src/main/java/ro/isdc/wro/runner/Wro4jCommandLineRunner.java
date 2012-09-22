@@ -41,6 +41,7 @@ import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFacto
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -160,7 +161,7 @@ public class Wro4jCommandLineRunner {
   private List<String> getTargetGroupsAsList() {
     if (targetGroups == null) {
       final WroModel model = getManagerFactory().create().getModelFactory().create();
-      return model.getGroupNames();
+      return new WroModelInspector(model).getGroupNames();
     }
     return Arrays.asList(targetGroups.split(","));
   }

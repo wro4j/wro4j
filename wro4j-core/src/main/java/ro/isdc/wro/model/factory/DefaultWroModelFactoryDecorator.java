@@ -83,7 +83,7 @@ public final class DefaultWroModelFactoryDecorator
      */
     private void authorizeModelResources(final WroModel model) {
       if (model != null && config.isDebug()) {
-        for (Resource resource : new WroModelInspector(model).getAllResources()) {
+        for (Resource resource : new WroModelInspector(model).getAllUniqueResources()) {
           authorizationManager.add(resource.getUri());
         }
       }

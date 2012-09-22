@@ -4,13 +4,8 @@
 package ro.isdc.wro.model;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -19,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -78,4 +72,16 @@ public class TestWroModel {
     final WroModel model = factory.create();
     return model;
   }
+  
+  @Test
+  public void shouldNotReturnDuplicatedResources() {
+    final WroModel model = new WroModel();
+    
+    assertEquals(0, new WroModelInspector(model).getAllUniqueResources().size());
+    
+    model.addGroup(new Group("one").addResource(Resource.create("/one.js"))).addGroup(
+        new Group("two").addResource(Resource.create("/one.js")));
+    assertEquals(1, new WroModelInspector(model).getAllUniqueResources().size());
+  }
+
 }
