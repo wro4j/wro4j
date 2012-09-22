@@ -13,6 +13,7 @@ import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
@@ -84,7 +85,9 @@ public final class DefaultWroModelFactoryDecorator
     private void authorizeModelResources(final WroModel model) {
       if (model != null && config.isDebug()) {
         for (Resource resource : new WroModelInspector(model).getAllUniqueResources()) {
-          authorizationManager.add(resource.getUri());
+          if (authorizationManager instanceof MutableResourceAuthorizationManager) {
+            ((MutableResourceAuthorizationManager) authorizationManager).add(resource.getUri());      
+          }
         }
       }
     }
@@ -122,7 +125,9 @@ public final class DefaultWroModelFactoryDecorator
     LOG.debug("Destroy model");
     modelInitializer.destroy();
     getDecoratedObject().destroy();
-    authorizationManager.clear();
+    if (authorizationManager instanceof MutableResourceAuthorizationManager) {
+      ((MutableResourceAuthorizationManager) authorizationManager).clear();      
+    }
   }
   
   /**

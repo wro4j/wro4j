@@ -30,6 +30,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
@@ -92,6 +93,8 @@ public class WroManager
    */
   private final SchedulerHelper cacheSchedulerHelper;
   private ResourceBundleProcessor resourceBundleProcessor;
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
   
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -209,7 +212,8 @@ public class WroManager
     Validate.notNull(groupExtractor, "GroupExtractor was not set!");
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
-    Validate.notNull(hashStrategy, "HashBuilder was not set!");
+    Validate.notNull(hashStrategy, "HashStrategy was not set!");
+    Validate.notNull(authorizationManager, "authorizationManager was not set!");
   }
   
   /**
@@ -336,12 +340,20 @@ public class WroManager
     this.modelTransformers = modelTransformers;
   }
  
-  
   public LifecycleCallbackRegistry getCallbackRegistry() {
     // TODO check if initialization is required.
     if (callbackRegistry == null) {
       callbackRegistry = new LifecycleCallbackRegistry();
     }
     return callbackRegistry;
+  }
+
+  public ResourceAuthorizationManager getResourceAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  public void setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
+    Validate.notNull(authorizationManager);
+    this.authorizationManager = authorizationManager;
   }
 }

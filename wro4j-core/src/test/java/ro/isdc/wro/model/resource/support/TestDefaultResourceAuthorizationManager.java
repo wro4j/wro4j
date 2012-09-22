@@ -11,12 +11,12 @@ import org.junit.Test;
 /**
  * @author Alex Objelean
  */
-public class TestResourceAuthorizationManager {
-  private ResourceAuthorizationManager victim;
+public class TestDefaultResourceAuthorizationManager {
+  private DefaultResourceAuthorizationManager victim;
   
   @Before
   public void setUp() {
-    victim = new ResourceAuthorizationManager();
+    victim = new DefaultResourceAuthorizationManager();
   }
   
   @Test(expected = NullPointerException.class)

@@ -66,7 +66,13 @@ public class InjectorBuilder {
       return manager.getUriLocatorFactory();
     }
   };
-  private ResourceAuthorizationManager authorizationManager = new ResourceAuthorizationManager();
+  private LazyInitializer<ResourceAuthorizationManager> authorizationManagerInitializer = new LazyInitializer<ResourceAuthorizationManager>() {
+    @Override
+    protected ResourceAuthorizationManager initialize() {
+      final WroManager manager = managerFactory.create();
+      return manager.getResourceAuthorizationManager();
+    }
+  };
   
   private final LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
     @Override
@@ -190,7 +196,7 @@ public class InjectorBuilder {
     });
     map.put(ResourceAuthorizationManager.class, new InjectorObjectFactory<ResourceAuthorizationManager>() {
       public ResourceAuthorizationManager create() {
-        return authorizationManager;
+        return authorizationManagerInitializer.get();
       }
     });
   }
@@ -217,12 +223,6 @@ public class InjectorBuilder {
     // first initialize the map
     initMap();
     return injector = new Injector(Collections.unmodifiableMap(map));
-  }
-  
-  public InjectorBuilder setResourceAuthorizationManager(final ResourceAuthorizationManager authManager) {
-    Validate.notNull(authManager);
-    this.authorizationManager = authManager;
-    return this;
   }
   
   /**

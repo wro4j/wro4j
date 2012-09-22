@@ -393,8 +393,9 @@ public class TestWroFilter {
       
       @Override
       Injector getInjector() {
-        return new InjectorBuilder(new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory)).setResourceAuthorizationManager(
-            mockAuthorizationManager).build();
+        return new InjectorBuilder(
+            new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).setResourceAuthorizationManager(
+                mockAuthorizationManager)).build();
       }
     };
   }

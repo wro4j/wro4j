@@ -20,6 +20,8 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 
@@ -121,7 +123,9 @@ public class CssUrlRewritingProcessor
    */
   @Override
   protected void onProcessCompleted() {
-    LOG.debug("allowed urls: {}", authorizationManager.list());
+    if (authorizationManager instanceof DefaultResourceAuthorizationManager) {
+      LOG.debug("allowed urls: {}", ((DefaultResourceAuthorizationManager) authorizationManager).list());
+    }
   }
   
   /**
@@ -131,7 +135,10 @@ public class CssUrlRewritingProcessor
   protected void onUrlReplaced(final String replacedUrl) {
     final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
     LOG.debug("adding allowed url: {}", allowedUrl);
-    authorizationManager.add(allowedUrl);
+    //add only if add is supported
+    if (authorizationManager instanceof MutableResourceAuthorizationManager) {
+      ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);      
+    }
   }
   
   /**
