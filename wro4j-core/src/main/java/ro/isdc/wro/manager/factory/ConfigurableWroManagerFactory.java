@@ -12,6 +12,10 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ConfigurableCacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
@@ -152,6 +156,21 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   }
   
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
+    return new ConfigurableCacheStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableCacheStrategy.KEY);
+        return props;
+      }
+    };
+  }
+  
+  /**
    * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
    * This method helps to ensure backward compatibility of the filterConfig vs configProperties configuration.
    * 
@@ -213,5 +232,4 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     this.configProperties = configProperties;
     return this;
   }
-
 }

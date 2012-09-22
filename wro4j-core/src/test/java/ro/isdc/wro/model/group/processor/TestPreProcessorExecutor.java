@@ -68,10 +68,10 @@ public class TestPreProcessorExecutor {
   @Mock
   private ResourceLocator mockLocator;
   private PreProcessorExecutor executor;
-
-
+  
   @Before
-  public void setUp() throws Exception {
+  public void setUp()
+      throws Exception {
     initMocks(this);
     
     when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
@@ -83,13 +83,12 @@ public class TestPreProcessorExecutor {
     
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
     Context.set(context);
-    //force parallel execution
+    // force parallel execution
     Context.get().getConfig().setParallelPreprocessing(true);
     Context.get().getConfig().setIgnoreFailingProcessor(true);
     initExecutor();
   }
-
-
+  
   private WroManagerFactory createWroManager(final ResourceProcessor... preProcessors) {
     final SimpleProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
     for (final ResourceProcessor resourcePreProcessor : preProcessors) {
@@ -100,8 +99,7 @@ public class TestPreProcessorExecutor {
     wroManagerFactory.setLocatorFactory(mockLocatorFactory);
     return wroManagerFactory;
   }
-
-
+  
   /**
    * @param wroManagerFactory
    */
@@ -111,15 +109,13 @@ public class TestPreProcessorExecutor {
     executor = new PreProcessorExecutor();
     injector.inject(executor);
   }
-
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullArguments()
-    throws Exception {
+      throws Exception {
     executor.processAndMerge(null, true);
   }
-
-
+  
   /**
    * Creates a slow pre processor which sleeps for a given amount of milliseconds and doesn't change the processed
    * content.
@@ -127,7 +123,7 @@ public class TestPreProcessorExecutor {
   private ResourceProcessor createSlowPreProcessor(final long time) {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
+          throws IOException {
         try {
           IOUtils.copy(reader, writer);
           Thread.sleep(time);
@@ -136,81 +132,74 @@ public class TestPreProcessorExecutor {
       }
     };
   }
-
-
+  
   private ResourceProcessor createProcessorUsingMissingResource() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
+          throws IOException {
         LOG.debug("executing processor which will throw IOException");
         throw new IOException("Invalid resource found!");
       }
     };
   }
-
-
+  
   private ResourceProcessor createProcessorWhichFails() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
+          throws IOException {
         LOG.debug("executing failing processor...");
         throw new WroRuntimeException("Boom!");
       }
     };
   }
-
-
+  
   @Test
   public void processEmptyList()
-    throws Exception {
+      throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
     final Group group = new Group("dummy");
     group.setResources(resources);
     Assert.assertEquals("", executor.processAndMerge(group, true));
     Assert.assertEquals("", executor.processAndMerge(group, false));
   }
-
-
+  
   @Test
   public void shouldNotFailWhenNoResourcesProcessed()
-    throws Exception {
+      throws Exception {
     initExecutor(createProcessorUsingMissingResource());
     executor.processAndMerge(createGroup(), true);
   }
-
-
-	private Group createGroup(final Resource... resources) {
-		final Group group = new Group("dummy");
-		final List<Resource> resourcesList = new ArrayList<Resource>();
-		for (final Resource resource : resources) {
-			resourcesList.add(resource);
-		}
-		group.setResources(resourcesList);
-		return group;
-	}
-
-
+  
+  private Group createGroup(final Resource... resources) {
+    final Group group = new Group("dummy");
+    final List<Resource> resourcesList = new ArrayList<Resource>();
+    for (final Resource resource : resources) {
+      resourcesList.add(resource);
+    }
+    group.setResources(resourcesList);
+    return group;
+  }
+  
   @Test(expected = IOException.class)
   public void shouldFailWhenProcessingInvalidResource()
-    throws Exception {
+      throws Exception {
     when(mockLocator.getInputStream()).thenThrow(IOException.class);
     Context.get().getConfig().setIgnoreMissingResources(false);
     shouldNotFailWhenProcessingInvalidResource();
   }
-
+  
   @Test
   public void shouldNotFailWhenProcessingInvalidResource()
-    throws IOException {
+      throws IOException {
     initExecutor(createProcessorUsingMissingResource());
     final Group group = createGroup(Resource.create("/uri", ResourceType.JS));
     final String result = executor.processAndMerge(group, true);
     Assert.assertEquals("", result);
   }
-
-
+  
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenUsingFailingPreProcessor()
-    throws Exception {
+      throws Exception {
     genericUseFailingPreProcessorWithIngoreFlag(false);
   }
   
@@ -219,62 +208,68 @@ public class TestPreProcessorExecutor {
       throws Exception {
     genericUseFailingPreProcessorWithIngoreFlag(true);
   }
-
-  private void genericUseFailingPreProcessorWithIngoreFlag(final boolean ignoreFlag) throws Exception {
+  
+  private void genericUseFailingPreProcessorWithIngoreFlag(final boolean ignoreFlag)
+      throws Exception {
     Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
     initExecutor(createProcessorWhichFails());
     final Group group = createGroup(Resource.create("", ResourceType.JS));
     final String result = executor.processAndMerge(group, true);
     Assert.assertEquals("", result);
-
+    
   }
   
   /**
-   * This test should work when running at least on dual-core.
-   * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))
+   * This test should work when running at least on dual-core. It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) +
+   * P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))
    */
   @Test
   public void preProcessingInParallelIsFaster()
-    throws Exception {
-    final StopWatch watch = new StopWatch();
-    WroConfiguration config = Context.get().getConfig();
-
-    initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
-    final Group group = createGroup(Resource.create("r1", ResourceType.JS),
-      Resource.create("r2", ResourceType.JS));
-
-    //warm up
-    config.setParallelPreprocessing(true);
-    executor.processAndMerge(group, true);
-    
-    //parallel
-    watch.start("parallel preProcessing");
-    config.setParallelPreprocessing(true);
-    executor.processAndMerge(group, true);
-    watch.stop();
-    long parallelExecution = watch.getLastTaskTimeMillis();
-    
-    //sequential
-    config.setParallelPreprocessing(false);
-    watch.start("sequential preProcessing");
-    executor.processAndMerge(group, true);
-    watch.stop();
-    final long sequentialExecution = watch.getLastTaskTimeMillis();
-
-    final String message = "Processing details: \n" + watch.prettyPrint();
-    LOG.debug(message);
-
-    // prove that running in parallel is faster
-    // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it normally
-    // should be about 100%).
-    double delta = parallelExecution * 0.8;
-    Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
-        sequentialExecution > parallelExecution + delta);
+      throws Exception {
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+    LOG.info("availableProcessors: {}", availableProcessors);
+    // test it only if number there are more than 1 CPU cores are available
+    if (availableProcessors > 1) {
+      final StopWatch watch = new StopWatch();
+      WroConfiguration config = Context.get().getConfig();
+      
+      initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
+      final Group group = createGroup(Resource.create("r1", ResourceType.JS), Resource.create("r2", ResourceType.JS));
+      
+      // warm up
+      config.setParallelPreprocessing(true);
+      executor.processAndMerge(group, true);
+      
+      // parallel
+      watch.start("parallel preProcessing");
+      config.setParallelPreprocessing(true);
+      executor.processAndMerge(group, true);
+      watch.stop();
+      long parallelExecution = watch.getLastTaskTimeMillis();
+      
+      // sequential
+      config.setParallelPreprocessing(false);
+      watch.start("sequential preProcessing");
+      executor.processAndMerge(group, true);
+      watch.stop();
+      final long sequentialExecution = watch.getLastTaskTimeMillis();
+      
+      final String message = "Processing details: \n" + watch.prettyPrint();
+      LOG.debug(message);
+      
+      // prove that running in parallel is faster
+      // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it
+      // normally
+      // should be about 100%).
+      double delta = parallelExecution * 0.8;
+      Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
+          sequentialExecution > parallelExecution + delta);
+    }
   }
-
+  
   @Test
   public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
-    throws Exception {
+      throws Exception {
     Resource resource = Resource.create("classpath:1.js");
     resource.setMinimize(false);
     ResourceProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
@@ -288,12 +283,13 @@ public class TestPreProcessorExecutor {
     Group group = new Group("group").addResource(resource);
     executor.processAndMerge(group, true);
   }
-
+  
   /**
    * When an empty resource is processed, the processing should not fail (warn only).
    */
   @Test
-  public void shouldNotFailWhenEmptyResourceIsFound() throws Exception {
+  public void shouldNotFailWhenEmptyResourceIsFound()
+      throws Exception {
     final WroConfiguration config = Context.get().getConfig();
     config.setIgnoreMissingResources(false);
     
@@ -308,7 +304,7 @@ public class TestPreProcessorExecutor {
         return emptyStreamLocator;
       }
     };
-    //init executor
+    // init executor
     WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(locatorFactory);
     InjectorBuilder.create(managerFactory).build().inject(executor);
     

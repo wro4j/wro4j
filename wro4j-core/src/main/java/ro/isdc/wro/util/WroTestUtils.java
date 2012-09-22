@@ -228,8 +228,7 @@ public class WroTestUtils {
    * @throws IOException
    */
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
-      final Transformer<String> toTargetFileName, final ResourceProcessor processor)
-      throws IOException {
+      final Transformer<String> toTargetFileName, final ResourceProcessor processor) {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
@@ -252,9 +251,11 @@ public class WroTestUtils {
           throw e;
         }
         processedNumber++;
-      } catch (final Exception e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: "
+      } catch (final IOException e) {
+        LOG.debug("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: "
             + e.getCause());
+      } catch(final Exception e) {
+        throw WroRuntimeException.wrap(e);
       }
     }
     logSuccess(processedNumber);
@@ -359,7 +360,8 @@ public class WroTestUtils {
         }
         processedNumber++;
       } catch (final IOException e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + "\n. Original exception: " + e.getCause());
+        LOG.debug("Skip comparison because couldn't find the TARGET file " + targetFile.getPath()
+            + "\n. Original exception: " + e.getCause());
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }
