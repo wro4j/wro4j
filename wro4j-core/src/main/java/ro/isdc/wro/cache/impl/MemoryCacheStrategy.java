@@ -25,7 +25,7 @@ public class MemoryCacheStrategy<K, V> implements CacheStrategy<K, V> {
   /**
    * Aliased used by provider for this implementation
    */
-  public static final String ALIAS = "inMemory";
+  public static final String ALIAS = "memory";
   /**
    * Map containing cached items.
    */

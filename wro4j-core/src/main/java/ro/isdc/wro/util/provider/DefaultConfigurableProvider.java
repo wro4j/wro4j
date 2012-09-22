@@ -2,6 +2,9 @@ package ro.isdc.wro.util.provider;
 
 import java.util.Map;
 
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.CacheStrategyProvider;
+import ro.isdc.wro.cache.DefaultCacheStrategyProvider;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.DefaultLocatorProvider;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
@@ -27,8 +30,9 @@ public class DefaultConfigurableProvider
     extends ConfigurableProviderSupport {
   private ProcessorProvider processorProvider = new DefaultProcessorProvider();
   private NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
-  private HashStrategyProvider hashBuilderProvider = new DefaultHashStrategyProvider();
+  private HashStrategyProvider hashStrategyProvider = new DefaultHashStrategyProvider();
   private LocatorProvider locatorProvider = new DefaultLocatorProvider();
+  private CacheStrategyProvider cacheStrategyProvider = new DefaultCacheStrategyProvider();
   
   /**
    * {@inheritDoc}
@@ -50,7 +54,7 @@ public class DefaultConfigurableProvider
    */
   @Override
   public Map<String, HashStrategy> provideHashStrategies() {
-    return hashBuilderProvider.provideHashStrategies();
+    return hashStrategyProvider.provideHashStrategies();
   }
   
   /**
@@ -59,6 +63,14 @@ public class DefaultConfigurableProvider
   @Override
   public Map<String, NamingStrategy> provideNamingStrategies() {
     return namingStrategyProvider.provideNamingStrategies();
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Map<String, CacheStrategy> provideCacheStrategies() {
+    return cacheStrategyProvider.provideCacheStrategies();
   }
   
   /**
