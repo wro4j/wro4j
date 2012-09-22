@@ -1,5 +1,6 @@
 package ro.isdc.wro.util.provider;
 
+import ro.isdc.wro.cache.CacheStrategyProvider;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
@@ -13,5 +14,5 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
  * @since 1.4.7
  */
 public interface ConfigurableProvider
-    extends ProcessorProvider, NamingStrategyProvider, HashStrategyProvider, LocatorProvider {
+    extends ProcessorProvider, NamingStrategyProvider, HashStrategyProvider, LocatorProvider, CacheStrategyProvider {
 }
