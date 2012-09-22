@@ -204,8 +204,7 @@ public class WroTestUtils {
   }
   
   public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
-      final Transformer<String> toTargetFileName, final ResourcePreProcessor processor)
-      throws IOException {
+      final Transformer<String> toTargetFileName, final ResourcePreProcessor processor) {
     final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     for (final File file : files) {
@@ -228,9 +227,11 @@ public class WroTestUtils {
           throw e;
         }
         processedNumber++;
-      } catch (final Exception e) {
-        LOG.warn("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: "
+      } catch (final IOException e) {
+        LOG.debug("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: "
             + e.getCause());
+      } catch(final Exception e) {
+        throw WroRuntimeException.wrap(e);
       }
     }
     logSuccess(processedNumber);

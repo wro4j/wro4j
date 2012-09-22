@@ -229,41 +229,47 @@ public class TestPreProcessorExecutor {
    */
   @Test
   public void preProcessingInParallelIsFaster()
-    throws Exception {
-    final StopWatch watch = new StopWatch();
-    WroConfiguration config = Context.get().getConfig();
-
-    initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
-    final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
-      Resource.create("r2", ResourceType.JS));
-
-    //warm up
-    config.setParallelPreprocessing(true);
-    executor.processAndMerge(resources, true);
-    
-    //parallel
-    watch.start("parallel preProcessing");
-    config.setParallelPreprocessing(true);
-    executor.processAndMerge(resources, true);
-    watch.stop();
-    long parallelExecution = watch.getLastTaskTimeMillis();
-    
-    //sequential
-    config.setParallelPreprocessing(false);
-    watch.start("sequential preProcessing");
-    executor.processAndMerge(resources, true);
-    watch.stop();
-    long sequentialExecution = watch.getLastTaskTimeMillis();
-
-    String message = "Processing details: \n" + watch.prettyPrint();
-    LOG.debug(message);
-
-    // prove that running in parallel is faster
-    // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it normally
-    // should be about 100%).
-    double delta = parallelExecution * 0.8;
-    Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
-        sequentialExecution > parallelExecution + delta);
+      throws Exception {
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+    LOG.info("availableProcessors: {}", availableProcessors);
+    //test it only if number there are more than 1 CPU cores are available
+    if (availableProcessors > 1) {
+      final StopWatch watch = new StopWatch();
+      WroConfiguration config = Context.get().getConfig();
+      
+      initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
+      final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
+          Resource.create("r2", ResourceType.JS));
+      
+      // warm up
+      config.setParallelPreprocessing(true);
+      executor.processAndMerge(resources, true);
+      
+      // parallel
+      watch.start("parallel preProcessing");
+      config.setParallelPreprocessing(true);
+      executor.processAndMerge(resources, true);
+      watch.stop();
+      long parallelExecution = watch.getLastTaskTimeMillis();
+      
+      // sequential
+      config.setParallelPreprocessing(false);
+      watch.start("sequential preProcessing");
+      executor.processAndMerge(resources, true);
+      watch.stop();
+      long sequentialExecution = watch.getLastTaskTimeMillis();
+      
+      String message = "Processing details: \n" + watch.prettyPrint();
+      LOG.debug(message);
+      
+      // prove that running in parallel is faster
+      // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it
+      // normally
+      // should be about 100%).
+      double delta = parallelExecution * 0.8;
+      Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
+          sequentialExecution > parallelExecution + delta);
+    }
   }
 
   @Test
