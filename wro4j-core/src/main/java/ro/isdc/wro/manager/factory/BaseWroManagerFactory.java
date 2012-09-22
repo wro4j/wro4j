@@ -27,6 +27,8 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -59,6 +61,7 @@ public class BaseWroManagerFactory
   private ResourceLocatorFactory resourceLocatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
+  private ResourceAuthorizationManager authorizationManager;
   /**
    * Handles the lazy synchronized creation of the manager
    */
@@ -91,6 +94,9 @@ public class BaseWroManagerFactory
       if (namingStrategy == null) {
         namingStrategy = newNamingStrategy();
       }
+      if (authorizationManager == null) {
+        authorizationManager = newAuthorizationManager();
+      }
 
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
@@ -100,6 +106,7 @@ public class BaseWroManagerFactory
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
+      manager.setResourceAuthorizationManager(authorizationManager);
       
       onAfterInitializeManager(manager);
       
@@ -113,6 +120,13 @@ public class BaseWroManagerFactory
    */
   public final WroManager create() {
     return managerInitializer.get();
+  }
+
+  /**
+   * @return default implementation of {@link ResourceAuthorizationManager}.
+   */
+  protected ResourceAuthorizationManager newAuthorizationManager() {
+    return new DefaultResourceAuthorizationManager();
   }
 
   /**
@@ -327,6 +341,12 @@ public class BaseWroManagerFactory
 
   public WroModelFactory getModelFactory() {
     return modelFactory;
+  }
+  
+  
+  public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+    return this;
   }
 
   /**

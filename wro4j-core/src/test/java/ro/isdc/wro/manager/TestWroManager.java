@@ -63,7 +63,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
@@ -80,12 +80,12 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
-  @Mock
-  private ResourceAuthorizationManager mockAuthorizationManager;
   /**
    * Used to test simple operations.
    */
   private WroManager victim;
+  @Mock
+  private MutableResourceAuthorizationManager mockAuthorizationManager;
   /**
    * Used to test more complex use-cases.
    */
@@ -99,10 +99,10 @@ public class TestWroManager {
 
     Context.set(context, newConfigWithUpdatePeriodValue(0));
     
-    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setResourceAuthorizationManager(
+        mockAuthorizationManager);
     
-    final Injector injector = new InjectorBuilder(managerFactory).setResourceAuthorizationManager(
-        mockAuthorizationManager).build();
+    final Injector injector = new InjectorBuilder(managerFactory).build();
     victim = managerFactory.create();
     injector.inject(victim);
   }

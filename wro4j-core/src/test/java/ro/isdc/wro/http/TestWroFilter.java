@@ -93,9 +93,9 @@ public class TestWroFilter {
   @Mock
   private ResourceAuthorizationManager mockAuthorizationManager;
   @Mock
-  private ResourceLocatorFactory mockUriLocatorFactory;
+  private ResourceLocatorFactory mockLocatorFactory;
   @Mock
-  private ResourceLocator mockUriLocator;
+  private ResourceLocator mockLocator;
   
   @Before
   public void setUp()
@@ -103,8 +103,8 @@ public class TestWroFilter {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     
-    when(mockUriLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockUriLocator);
-    when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
+    when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
+    when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
     
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);
     when(mockManagerFactory.create()).thenReturn(new BaseWroManagerFactory().create());
@@ -392,8 +392,9 @@ public class TestWroFilter {
       
       @Override
       Injector getInjector() {
-        return new InjectorBuilder(new BaseWroManagerFactory().setLocatorFactory(mockUriLocatorFactory)).setResourceAuthorizationManager(
-            mockAuthorizationManager).build();
+        return new InjectorBuilder(
+            new BaseWroManagerFactory().setLocatorFactory(mockLocatorFactory).setResourceAuthorizationManager(
+                mockAuthorizationManager)).build();
       }
     };
   }

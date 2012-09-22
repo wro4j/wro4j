@@ -55,7 +55,7 @@ public class TestResourceProxyRequestHandler {
   @Mock
   private ResourceAuthorizationManager mockAuthorizationManager;
   @Mock
-  private ResourceLocatorFactory mockUriLocatorFactory;
+  private ResourceLocatorFactory mockLocatorFactory;
   @Mock
   private ResourceLocator mockUriLocator;
   
@@ -75,11 +75,11 @@ public class TestResourceProxyRequestHandler {
     Context.set(Context.webContext(request, response, filterConfig));
     // a more elaborate way to build injector, used to instruct it use a different instance of authorizationManager
     final Injector injector = new InjectorBuilder(
-        new BaseWroManagerFactory().setLocatorFactory(mockUriLocatorFactory)).setResourceAuthorizationManager(
-        mockAuthorizationManager).build();
+        new BaseWroManagerFactory().setLocatorFactory(mockLocatorFactory).setResourceAuthorizationManager(
+        mockAuthorizationManager)).build();
     injector.inject(victim);
     
-    when(mockUriLocatorFactory.getLocator(anyString())).thenReturn(mockUriLocator);
+    when(mockLocatorFactory.getLocator(anyString())).thenReturn(mockUriLocator);
     when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
     
     packagePath = WroUtil.toPackageAsFolder(this.getClass());
