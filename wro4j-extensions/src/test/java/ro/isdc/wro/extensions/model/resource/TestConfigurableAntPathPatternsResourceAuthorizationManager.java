@@ -11,11 +11,11 @@ import org.junit.Test;
 /**
  * @author Alex Objelean
  */
-public class TestAntPathConfigurableResourceAuthorizationManager {
-  private AntPathConfigurableResourceAuthorizationManager victim;
+public class TestConfigurableAntPathPatternsResourceAuthorizationManager {
+  private ConfigurableAntPathPatternsResourceAuthorizationManager victim;
   @Before
   public void setUp() {
-    victim = new AntPathConfigurableResourceAuthorizationManager();
+    victim = new ConfigurableAntPathPatternsResourceAuthorizationManager();
   }
   
   @Test
