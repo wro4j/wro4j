@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -46,13 +45,11 @@ public final class WroModel {
   
   /**
    * @return a set of group names.
+   * @deprecated use {@link WroModelInspector#getGroupNames()}
    */
+  @Deprecated
   public final List<String> getGroupNames() {
-    final List<String> groupNames = new ArrayList<String>();
-    for (final Group group : getGroups()) {
-      groupNames.add(group.getName());
-    }
-    return groupNames;
+    return new WroModelInspector(this).getGroupNames();
   }
 
   /**
@@ -70,18 +67,13 @@ public final class WroModel {
   /**
    * @param resource
    *          the {@link Resource} to search in all available groups.
-   * @return t collection of group names containing provided resource. If the resource is not availalbe, an empty collection
-   *         will be returned.
+   * @return t collection of group names containing provided resource. If the resource is not availalbe, an empty
+   *         collection will be returned.
+   * @deprecated use {@link WroModelInspector#getGroupNamesContainingResource(String)}
    */
+  @Deprecated
   public Collection<String> getGroupNamesContainingResource(final String resourceUri) {
-    Validate.notNull(resourceUri);
-    final Set<String> groupNames = new HashSet<String>();
-    for (Group group : getGroups()) {
-      if (group.hasResource(resourceUri)) {
-        groupNames.add(group.getName());
-      }
-    }
-    return groupNames;
+    return new WroModelInspector(this).getGroupNamesContainingResource(resourceUri);
   }
 
   /**
@@ -108,28 +100,13 @@ public final class WroModel {
    *           exception if group is not found.
    */
   public Group getGroupByName(final String name) {
-    for (final Group group : groups) {
-      if (name.equals(group.getName())) {
-        return group;
-      }
+    final WroModelInspector modelInspector = new WroModelInspector(this);
+    final Group group = modelInspector.getGroupByName(name);
+    if (group == null) {
+      throw new InvalidGroupNameException(String.format("There is no such group: '%s'. Available groups are: [%s]", name,
+          modelInspector.getGroupNamesAsString()));  
     }
-    throw new InvalidGroupNameException(String.format("There is no such group: '%s'. Available groups are: %s", name,
-        getGroupNames(groups)));
-  }
-
-  /**
-   * This implementation would be simpler if java would have closures :).
-   *
-   * @param groups
-   *          a collection of groups to get as string.
-   * @return a comma separated list of group names.
-   */
-  private String getGroupNames(final Collection<Group> groups) {
-    final Set<String> groupNames = new HashSet<String>();
-    for (final Group group : groups) {
-      groupNames.add(group.getName());
-    }
-    return String.format("[%s]", StringUtils.join(groupNames, ", "));
+    return group;
   }
 
 /**
@@ -140,8 +117,8 @@ public final class WroModel {
   public void merge(final WroModel importedModel) {
     Validate.notNull(importedModel, "imported model cannot be null!");
     LOG.debug("merging importedModel: {}", importedModel);
-    for (final String groupName : importedModel.getGroupNames()) {
-      if (getGroupNames().contains(groupName)) {
+    for (final String groupName : new WroModelInspector(importedModel).getGroupNames()) {
+      if (new WroModelInspector(this).getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);
       }
       addGroup(importedModel.getGroupByName(groupName));
@@ -156,17 +133,6 @@ public final class WroModel {
     Validate.notNull(group);
     groups.add(group);
     return this;
-  }
-
-  /**
-   * @return the set of all resources from all the groups of the model (no particular order).
-   */
-  public Set<Resource> getAllResources() {
-    final Set<Resource> resources = new HashSet<Resource>();
-    for (final Group group : getGroups()) {
-      resources.addAll(group.getResources());
-    }
-    return resources;
   }
   
   /**

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
@@ -88,7 +89,7 @@ public class TestJsonModelFactory {
     };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
-    Assert.assertEquals(Arrays.asList("g2", "g1"), model.getGroupNames());
+    Assert.assertEquals(Arrays.asList("g2", "g1"), new WroModelInspector(model).getGroupNames());
     LOG.debug("model: {}", model);
   }
   

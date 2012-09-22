@@ -27,7 +27,7 @@
 						use="optional" default="true" />
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="group-ref" type="xsd:IDREF" />
+			<xsd:element name="group-ref" type="xsd:string" />
 		</xsd:choice>
 		<xsd:attribute name="name" type="xsd:ID" use="required" />
 		<xsd:attribute name="abstract" type="xsd:boolean"
