@@ -17,7 +17,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * @since 1.4.10
  * @created 22 Sep 2012
  */
-public class AntPathConfigurableResourceAuthorizationManager
+public class ConfigurableAntPathPatternsResourceAuthorizationManager
     implements ResourceAuthorizationManager {
   private AntPathMatcher matcher = new AntPathMatcher();
   private List<String> patterns = new ArrayList<String>();
