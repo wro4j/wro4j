@@ -1,1 +1,1 @@
-ro.isdc.wro.extensions.processor.support.DefaultProcessorProvider
+ro.isdc.wro.extensions.support.spi.DefaultConfigurableProvider
