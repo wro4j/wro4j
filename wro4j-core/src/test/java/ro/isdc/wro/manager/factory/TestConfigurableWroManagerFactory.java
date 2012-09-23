@@ -359,6 +359,30 @@ public class TestConfigurableWroManagerFactory {
     Assert.assertEquals(MemoryCacheStrategy.class, actual.getClass());
   }
 
+  /**
+   * TODO Implement
+   */
+  @Test(expected = WroRuntimeException.class)
+  public void cannotConfigureInvalidRequestHandler() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableCacheStrategy.KEY, "INVALID");
+    victim.setConfigProperties(configProperties);
+    victim.create().getCacheStrategy().clear();
+  }
+  
+  /**
+   * TODO Implement
+   */
+  @Test
+  public void shouldUseConfiguredRequestHandler() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableCacheStrategy.KEY, MemoryCacheStrategy.ALIAS);
+    victim.setConfigProperties(configProperties);
+    final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) victim.create().getCacheStrategy()).getConfiguredStrategy();
+    Assert.assertEquals(MemoryCacheStrategy.class, actual.getClass());
+  }
+
+  
   @Test
   public void shouldConsiderContributeMethodsWhenManagerFactoryIsExtended() {
     final String alias = "contributed";

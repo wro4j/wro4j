@@ -6,6 +6,7 @@ import java.util.Map;
 import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 
 
 /**
@@ -23,6 +24,7 @@ public class DefaultRequestHandlerProvider implements RequestHandlerProvider {
     final Map<String, RequestHandler> map = new HashMap<String, RequestHandler>();
     map.put(ReloadCacheRequestHandler.ALIAS, new ReloadCacheRequestHandler());
     map.put(ReloadModelRequestHandler.ALIAS, new ReloadModelRequestHandler());
+    map.put(ResourceProxyRequestHandler.ALIAS, new ResourceProxyRequestHandler());
     return map;
   }
 }
