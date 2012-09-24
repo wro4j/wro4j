@@ -12,6 +12,7 @@ import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
+import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
@@ -74,8 +75,12 @@ public class WroServletContextListener
     return new ServletContextPropertyWroConfigurationFactory(servletContext).create();
   }
   
+  /**
+   * @return decorated instance of {@link WroManagerFactory}.
+   */
   private WroManagerFactory createManagerFactory() {
-    return this.managerFactory != null ? this.managerFactory : newManagerFactory();
+    final WroManagerFactory factory = this.managerFactory != null ? this.managerFactory : newManagerFactory();
+    return new InjectableWroManagerFactoryDecorator(factory);
   }
   
   /**
