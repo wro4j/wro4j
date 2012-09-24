@@ -34,7 +34,7 @@ public class ExternalResourceServlet extends HttpServlet {
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
     throws ServletException, IOException {
     final ServletContextAttributeHelper helper = new ServletContextAttributeHelper(getServletContext());
-    final WroManagerFactory managerFactory = new InjectableWroManagerFactoryDecorator(helper.getManagerFactory());
+    final WroManagerFactory managerFactory = helper.getManagerFactory();
     System.out.println("managerFactory: " + managerFactory);
     final WroManager wroManager = managerFactory.create();
     
