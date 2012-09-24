@@ -3,13 +3,16 @@
  */
 package ro.isdc.wro.model.resource.processor.support;
 
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Writer;
-import java.util.*;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Css minify barryvan implementation.

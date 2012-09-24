@@ -393,11 +393,10 @@ public class WroFilter
   }
   
   /**
-   * @VisibleForTesting
-   * @return configured {@link WroManagerFactory} instance.
+   * @return configured and decorated {@link WroManagerFactory} instance. 
    */
   public final WroManagerFactory getWroManagerFactory() {
-    return this.wroManagerFactory.getOriginalDecoratedObject();
+    return this.wroManagerFactory;
   }
   
   /**
