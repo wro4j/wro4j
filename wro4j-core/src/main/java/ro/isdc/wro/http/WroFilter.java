@@ -400,16 +400,6 @@ public class WroFilter
   }
   
   /**
-   * DO NOT INVOKE THIS METHOD directly. It is used solely for testing.
-   * 
-   * @return the originally configured factory.
-   * @VisibleForTesting
-   */
-  public WroManagerFactory getConfiguredWroManagerFactory() {
-    return this.wroManagerFactory.getOriginalDecoratedObject();
-  }
-  
-  /**
    * Sets the RequestHandlerFactory used to create the collection of requestHandlers
    * 
    * @param requestHandlerFactory
