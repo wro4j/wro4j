@@ -144,6 +144,6 @@ public class TestServletContextAttributeHelper {
     //reset it because it was initialized in test setup.
     filter.setWroManagerFactory(null);
     filter.init(mockFilterConfig);
-    Assert.assertSame(expectedManagerFactory, filter.getWroManagerFactory());
+    Assert.assertSame(expectedManagerFactory, filter.getConfiguredWroManagerFactory());
   }
 }

@@ -166,7 +166,8 @@ public class TestWroFilter {
       throws Exception {
     when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
     victim.init(mockFilterConfig);
-    Assert.assertSame(mockManagerFactory, victim.getWroManagerFactory());
+    
+    Assert.assertSame(mockManagerFactory, victim.getConfiguredWroManagerFactory());
   }
   
   /**
@@ -220,7 +221,7 @@ public class TestWroFilter {
         managerClass.getName());
     
     victim.init(mockFilterConfig);
-    Class<?> actualClass = ((DefaultWroManagerFactory) victim.getWroManagerFactory()).getFactory().getClass();
+    Class<?> actualClass = ((DefaultWroManagerFactory) victim.getConfiguredWroManagerFactory()).getFactory().getClass();
     Assert.assertSame(managerClass, actualClass);
   }
   
@@ -712,7 +713,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(createValidManagerFactory());
     victim.init(mockFilterConfig);
     
-    final WroManager manager = victim.getWroManagerFactory().create();
+    final WroManager manager = victim.getConfiguredWroManagerFactory().create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);
@@ -734,7 +735,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(createValidManagerFactory());
     victim.init(mockFilterConfig);
     
-    final WroManager manager = victim.getWroManagerFactory().create();
+    final WroManager manager = victim.getConfiguredWroManagerFactory().create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);

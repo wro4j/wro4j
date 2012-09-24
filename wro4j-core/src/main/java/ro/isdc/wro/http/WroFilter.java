@@ -393,10 +393,19 @@ public class WroFilter
   }
   
   /**
-   * @VisibleForTesting
-   * @return configured {@link WroManagerFactory} instance.
+   * @return configured and decorated {@link WroManagerFactory} instance. 
    */
   public final WroManagerFactory getWroManagerFactory() {
+    return this.wroManagerFactory;
+  }
+  
+  /**
+   * DO NOT INVOKE THIS METHOD directly. It is used solely for testing.
+   * 
+   * @return the originally configured factory.
+   * @VisibleForTesting
+   */
+  public WroManagerFactory getConfiguredWroManagerFactory() {
     return this.wroManagerFactory.getOriginalDecoratedObject();
   }
   
