@@ -11,12 +11,13 @@ import java.io.Reader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
 
 
 /**
@@ -122,7 +123,7 @@ public class RhinoScriptBuilder {
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
       if (e instanceof RhinoException) {
-        LOG.error("RhinoException: " + RhinoUtils.createExceptionMessage((RhinoException) e));
+        LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage((RhinoException) e));
       }
       throw e;
     } finally {
@@ -187,9 +188,10 @@ public class RhinoScriptBuilder {
     // make sure we have a context associated with current thread
     try {
       return getContext().evaluateString(scope, script, sourceName, 1, null);
-    } catch (final JavaScriptException e) {
-      LOG.error("JavaScriptException occured: " + e.getMessage());
-      throw e;
+    } catch (final RhinoException e) {
+      final String message = RhinoUtils.createExceptionMessage(e);
+      LOG.error("JavaScriptException occured: {}", message);
+      throw new WroRuntimeException(message);
     } finally {
       // Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
       if (Context.getCurrentContext() != null) {

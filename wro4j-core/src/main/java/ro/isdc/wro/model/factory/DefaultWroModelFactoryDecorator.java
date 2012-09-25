@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
@@ -31,7 +33,7 @@ import ro.isdc.wro.util.Transformer;
  * @created 13 Mar 2011
  * @since 1.4.6
  */
-public class DefaultWroModelFactoryDecorator
+public final class DefaultWroModelFactoryDecorator
     implements WroModelFactory, ObjectDecorator<WroModelFactory> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWroModelFactoryDecorator.class);
 
@@ -82,8 +84,10 @@ public class DefaultWroModelFactoryDecorator
      */
     private void authorizeModelResources(final WroModel model) {
       if (model != null && config.isDebug()) {
-        for (Resource resource : model.getAllResources()) {
-          authorizationManager.add(resource.getUri());
+        for (Resource resource : new WroModelInspector(model).getAllUniqueResources()) {
+          if (authorizationManager instanceof MutableResourceAuthorizationManager) {
+            ((MutableResourceAuthorizationManager) authorizationManager).add(resource.getUri());      
+          }
         }
       }
     }
@@ -91,11 +95,20 @@ public class DefaultWroModelFactoryDecorator
 
   private final List<Transformer<WroModel>> modelTransformers;
   
-  public DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
+  /**
+   * Factory method which takes care of redundant decoration.
+   */
+  public static WroModelFactory decorate(final WroModelFactory decorated, final List<Transformer<WroModel>> modelTransformers) {
+    return decorated instanceof DefaultWroModelFactoryDecorator ? decorated : new DefaultWroModelFactoryDecorator(decorated, modelTransformers);
+  }
+  
+  private DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
       final List<Transformer<WroModel>> modelTransformers) {
+    Validate.notNull(decorated);
+    Validate.notNull(modelTransformers);
+    
     this.modelTransformers = modelTransformers;
     this.decorated = decorated;
-    Validate.notNull(modelTransformers);
   }
   
   /**
@@ -112,7 +125,9 @@ public class DefaultWroModelFactoryDecorator
     LOG.debug("Destroy model");
     modelInitializer.destroy();
     getDecoratedObject().destroy();
-    authorizationManager.clear();
+    if (authorizationManager instanceof MutableResourceAuthorizationManager) {
+      ((MutableResourceAuthorizationManager) authorizationManager).clear();      
+    }
   }
   
   /**

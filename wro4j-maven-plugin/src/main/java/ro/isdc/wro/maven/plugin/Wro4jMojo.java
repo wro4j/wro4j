@@ -213,6 +213,11 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
+      final File parentFolder = destinationFile.getParentFile();
+      if (!parentFolder.exists()) {
+        //make directories if required
+        parentFolder.mkdirs();
+      }
       destinationFile.createNewFile();
       // allow the same stream to be read again
       resultInputStream.reset();

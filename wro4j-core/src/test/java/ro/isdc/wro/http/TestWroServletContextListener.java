@@ -23,6 +23,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.util.AbstractDecorator;
 
 
 /**
@@ -90,13 +91,13 @@ public class TestWroServletContextListener {
   @Test
   public void shouldCreateBaseWroManagerFactoryByDefault() {
     victim.contextInitialized(mockServletContextEvent);
-    Assert.assertEquals(DefaultWroManagerFactory.class, victim.getManagerFactory().getClass());
+    Assert.assertEquals(DefaultWroManagerFactory.class, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()).getClass());
   }
   
   @Test
   public void shouldCreateWroManagerFactorySpecifiedByWroConfiguration() {
     victim.contextInitialized(mockServletContextEvent);
-    Assert.assertEquals(DefaultWroManagerFactory.class, victim.getManagerFactory().getClass());
+    Assert.assertEquals(DefaultWroManagerFactory.class, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()).getClass());
   }
   
   @Test(expected = NullPointerException.class)
@@ -135,10 +136,10 @@ public class TestWroServletContextListener {
 
   @Test
   public void shouldUseTheWroManagerSet() {
-    WroManagerFactory managerFactory = new BaseWroManagerFactory();
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory();
     victim.setManagerFactory(managerFactory);
     victim.contextInitialized(mockServletContextEvent);
-    Assert.assertSame(managerFactory, victim.getManagerFactory());
+    Assert.assertSame(managerFactory, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()));
   }
   
 
@@ -152,6 +153,6 @@ public class TestWroServletContextListener {
       }
     };
     victim.contextInitialized(mockServletContextEvent);
-    Assert.assertSame(managerFactory, victim.getManagerFactory());
+    Assert.assertSame(managerFactory, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()));
   }
 }

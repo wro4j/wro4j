@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+
+  <group name="g1">
+    <js>/g1.js</js>
+    <group-ref>imported</group-ref>
+  </group>
+  <import>classpath:ro/isdc/wro/model/factory/imported.xml</import>
+</groups>

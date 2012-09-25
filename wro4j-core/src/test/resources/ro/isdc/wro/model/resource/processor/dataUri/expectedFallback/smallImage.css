@@ -6,10 +6,10 @@ input.button {
 .multilineAndSpaces {
   background: 
      url( "btn_icons.png " );background: 
-     url(data:image/png;base64,iVBORw0KG);
+     url( "data:image/png;base64,iVBORw0KG" );
   background-image : 
      url( "btn_icons.png " );background-image : 
-     url(data:image/png;base64,iVBORw0KG)     
+     url( "data:image/png;base64,iVBORw0KG" )     
 }
 @font-face {
     src: url(btn_icons.png);src: url(data:image/png;base64,iVBORw0KG);

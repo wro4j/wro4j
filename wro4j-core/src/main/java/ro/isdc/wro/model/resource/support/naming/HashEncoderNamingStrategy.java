@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
@@ -20,6 +21,7 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  *
  * @author Alex Objelean
  * @created 15 Aug 2010
+ * @deprecated prefer Using {@link DefaultHashEncoderNamingStrategy}.
  */
 public class HashEncoderNamingStrategy
   implements NamingStrategy {
@@ -33,12 +35,23 @@ public class HashEncoderNamingStrategy
   protected HashStrategy newHashStrategy() {
     return new CRC32HashStrategy();
   }
+  
+  /**
+   * @return the {@link HashStrategy} to use for renaming. By default the used strategy is the same as the one
+   *         configured by wro4j. Override this method to provide a custom {@link HashStrategy}.
+   */
+  protected HashStrategy getHashStrategy() {
+    return hashStrategy;
+  }
+
 
   /**
    * {@inheritDoc}
    */
   public String rename(final String originalName, final InputStream inputStream)
     throws IOException {
+    Validate.notNull(originalName);
+    Validate.notNull(inputStream);
     final String baseName = FilenameUtils.getBaseName(originalName);
     final String extension = FilenameUtils.getExtension(originalName);
     final String hash = hashStrategy.getHash(inputStream);

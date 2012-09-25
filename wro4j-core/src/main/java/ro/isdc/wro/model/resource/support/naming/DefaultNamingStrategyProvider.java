@@ -21,8 +21,9 @@ public class DefaultNamingStrategyProvider
     final Map<String, NamingStrategy> map = new HashMap<String, NamingStrategy>();
     map.put(TimestampNamingStrategy.ALIAS, new TimestampNamingStrategy());
     map.put(NoOpNamingStrategy.ALIAS, new NoOpNamingStrategy());
+    map.put(DefaultHashEncoderNamingStrategy.ALIAS, new DefaultHashEncoderNamingStrategy());
     map.put(HashEncoderNamingStrategy.ALIAS, new HashEncoderNamingStrategy());
+    map.put(FolderHashEncoderNamingStrategy.ALIAS, new FolderHashEncoderNamingStrategy());
     return map;
   }
-  
 }

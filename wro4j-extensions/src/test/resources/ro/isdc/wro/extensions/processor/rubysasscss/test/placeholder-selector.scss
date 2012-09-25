@@ -1,0 +1,7 @@
+// This ruleset won't be rendered on its own.
+#context a%extreme {
+  color: blue;
+  font-weight: bold;
+  font-size: 2em;
+}
+.notice { @extend %extreme; }

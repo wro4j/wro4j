@@ -27,7 +27,6 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -50,6 +49,7 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.runnable.ReloadModelRunnable;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
@@ -61,7 +61,7 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
@@ -81,10 +81,9 @@ public class TestWroManager {
   /**
    * Used to test simple operations.
    */
-  @InjectMocks
   private WroManager victim;
   @Mock
-  private ResourceAuthorizationManager mockAuthorizationManager;
+  private MutableResourceAuthorizationManager mockAuthorizationManager;
   /**
    * Used to test more complex use-cases.
    */
@@ -92,14 +91,17 @@ public class TestWroManager {
   
   @Before
   public void setUp() {
+    MockitoAnnotations.initMocks(this);
     final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    managerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()));
-    MockitoAnnotations.initMocks(this);
     
-    final Injector injector = new InjectorBuilder(managerFactory).setResourceAuthorizationManager(
-        mockAuthorizationManager).build();
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setResourceAuthorizationManager(
+        mockAuthorizationManager);
+    
+    final Injector injector = new InjectorBuilder(managerFactory).build();
+    victim = managerFactory.create();
     injector.inject(victim);
   }
 
@@ -462,7 +464,7 @@ public class TestWroManager {
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
         new CRC32HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
@@ -472,7 +474,7 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashBuilder(
+    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
         new MD5HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);

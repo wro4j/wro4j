@@ -8,19 +8,19 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.config.WroConfigurationChangeListener;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.runnable.ReloadCacheRunnable;
+import ro.isdc.wro.manager.runnable.ReloadModelRunnable;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -30,6 +30,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
@@ -92,6 +93,8 @@ public class WroManager
    */
   private final SchedulerHelper cacheSchedulerHelper;
   private ResourceBundleProcessor resourceBundleProcessor;
+  @Inject
+  private ResourceAuthorizationManager authorizationManager;
   
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -194,7 +197,7 @@ public class WroManager
     } catch (final Exception e) {
       LOG.error("Exception occured during manager destroy!!!");
     } finally {
-      LOG.info("WroManager destroyed");
+      LOG.debug("WroManager destroyed");
     }
   }
   
@@ -209,7 +212,8 @@ public class WroManager
     Validate.notNull(groupExtractor, "GroupExtractor was not set!");
     Validate.notNull(modelFactory, "ModelFactory was not set!");
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
-    Validate.notNull(hashStrategy, "HashBuilder was not set!");
+    Validate.notNull(hashStrategy, "HashStrategy was not set!");
+    Validate.notNull(authorizationManager, "authorizationManager was not set!");
   }
   
   /**
@@ -336,19 +340,20 @@ public class WroManager
     this.modelTransformers = modelTransformers;
   }
  
-  
   public LifecycleCallbackRegistry getCallbackRegistry() {
+    // TODO check if initialization is required.
     if (callbackRegistry == null) {
       callbackRegistry = new LifecycleCallbackRegistry();
     }
     return callbackRegistry;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  public ResourceAuthorizationManager getResourceAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  public void setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
+    Validate.notNull(authorizationManager);
+    this.authorizationManager = authorizationManager;
   }
 }

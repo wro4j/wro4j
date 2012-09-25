@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-    	<version>1.4.8-SNAPSHOT</version>
+    	<version>1.4.10-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wro4j-extensions</artifactId>
@@ -61,12 +61,11 @@
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
-      <version>1.6.7.2</version>
+      <version>1.6.8</version>
     </dependency>
     <dependency>
       <groupId>me.n4u.sass</groupId>
       <artifactId>sass-gems</artifactId>
-      <version>3.1.16</version>
     </dependency>
     <dependency>
       <groupId>nz.co.edmi</groupId>

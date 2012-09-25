@@ -9,7 +9,7 @@ import javax.imageio.spi.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.WroRuntimeException;
 
 
 /**
@@ -22,7 +22,7 @@ import ro.isdc.wro.util.WroUtil;
 public class ProviderFinder<T> {
   private static final Logger LOG = LoggerFactory.getLogger(ProviderFinder.class);
   
-  private Class<T> type;
+  private final Class<T> type;
   
   /**
    * @VisibleForTesting.
@@ -40,7 +40,7 @@ public class ProviderFinder<T> {
    *          the type of providers to search.
    * @return {@link ProviderFinder} handling providers lookup.
    */
-  public static <T> ProviderFinder<T> of(Class<T> type) {
+  public static <T> ProviderFinder<T> of(final Class<T> type) {
     return new ProviderFinder<T>(type);
   }
   
@@ -59,7 +59,7 @@ public class ProviderFinder<T> {
       collectConfigurableProviders(providers);
     } catch (Exception e) {
       LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
-      WroUtil.wrapWithWroRuntimeException(e);
+      throw WroRuntimeException.wrap(e);
     }
     return providers;
   }
@@ -91,7 +91,7 @@ public class ProviderFinder<T> {
    * @VisibleForTesting
    * @return the iterator of found providers.
    */
-  <P> Iterator<P> lookupProviders(Class<P> clazz) {
+  <P> Iterator<P> lookupProviders(final Class<P> clazz) {
     LOG.debug("searching for providers of type : {}", clazz);
     return ServiceRegistry.lookupProviders(clazz);
   }

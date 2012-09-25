@@ -66,6 +66,7 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
 
@@ -166,7 +167,8 @@ public class TestWroFilter {
       throws Exception {
     when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
     victim.init(mockFilterConfig);
-    Assert.assertSame(mockManagerFactory, victim.getWroManagerFactory());
+    
+    Assert.assertSame(mockManagerFactory, AbstractDecorator.getOriginalDecoratedObject(victim.getWroManagerFactory()));
   }
   
   /**
@@ -220,7 +222,7 @@ public class TestWroFilter {
         managerClass.getName());
     
     victim.init(mockFilterConfig);
-    Class<?> actualClass = ((DefaultWroManagerFactory) victim.getWroManagerFactory()).getFactory().getClass();
+    Class<?> actualClass = ((DefaultWroManagerFactory) AbstractDecorator.getOriginalDecoratedObject(victim.getWroManagerFactory())).getFactory().getClass();
     Assert.assertSame(managerClass, actualClass);
   }
   
@@ -271,6 +273,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet()
       throws Exception {
+    // this test fails only when debug is turned off.
     when(mockFilterConfig.getInitParameter(ConfigConstants.header.name())).thenReturn("ETag 998989 expires 1");
     victim.init(mockFilterConfig);
   }
@@ -392,8 +395,9 @@ public class TestWroFilter {
       
       @Override
       Injector getInjector() {
-        return new InjectorBuilder(new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory)).setResourceAuthorizationManager(
-            mockAuthorizationManager).build();
+        return new InjectorBuilder(
+            new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).setResourceAuthorizationManager(
+                mockAuthorizationManager)).build();
       }
     };
   }
@@ -710,7 +714,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(createValidManagerFactory());
     victim.init(mockFilterConfig);
     
-    final WroManager manager = victim.getWroManagerFactory().create();
+    final WroManager manager = AbstractDecorator.getOriginalDecoratedObject(victim.getWroManagerFactory()).create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);
@@ -732,7 +736,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(createValidManagerFactory());
     victim.init(mockFilterConfig);
     
-    final WroManager manager = victim.getWroManagerFactory().create();
+    final WroManager manager = AbstractDecorator.getOriginalDecoratedObject(victim.getWroManagerFactory()).create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);

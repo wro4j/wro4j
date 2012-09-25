@@ -4,6 +4,7 @@
 package ro.isdc.wro.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -11,14 +12,16 @@ import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -26,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
@@ -248,15 +250,6 @@ public final class WroUtil {
     result.append("].join(\"\\n\")");
     return result.toString();
   }
-
-  /**
-   * Add no-cache headers to response.
-   */
-  public static void addNoCacheHeaders(final HttpServletResponse response) {
-    response.setHeader(HttpHeader.PRAGMA.toString(), "no-cache");
-    response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
-    response.setDateHeader(HttpHeader.EXPIRES.toString(), 0);
-  }
   
   /**
    * Utility used to verify that requestURI matches provided path
@@ -317,7 +310,9 @@ public final class WroUtil {
    * 
    * @param e
    *          the exception to wrap.
+   * @deprecated use {@link WroRuntimeException#wrap(Exception)}
    */
+  @Deprecated
   public static void wrapWithWroRuntimeException(final Exception e) {
     LOG.error("Exception occured: " + e.getClass(), e.getCause());
     if (e instanceof WroRuntimeException) {
@@ -341,5 +336,36 @@ public final class WroUtil {
     } catch (IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
     }
+  }
+
+  /**
+   * @return the implementation version of wro4j.
+   */
+  public static String getImplementationVersion() {
+    return WroUtil.class.getPackage().getImplementationVersion();
+  }
+  
+  /**
+   * Copy and close the reader and writer streams.
+   *
+   * @param reader The source stream.
+   * @param writer The destination stream.
+   * @throws IOException If content cannot be copy.
+   */
+  public static void safeCopy(final Reader reader, final Writer writer)
+      throws IOException {
+    try {
+      IOUtils.copy(reader, writer);
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(writer);
+    }
+  }
+  
+  /**
+   * @return a generated {@link File} with unique name located in temp folder. 
+   */
+  public static File createTempFile() {
+    return new File(FileUtils.getTempDirectory(), "wro4j" + UUID.randomUUID().toString());
   }
 }

@@ -12,6 +12,10 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ConfigurableCacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
@@ -24,7 +28,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
-import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
@@ -147,7 +150,21 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         final Properties props = new Properties();
         updatePropertiesWithConfiguration(props, ConfigurableHashStrategy.KEY);
         return props;
-
+      }
+    };
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
+    return new ConfigurableCacheStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableCacheStrategy.KEY);
+        return props;
       }
     };
   }
@@ -214,5 +231,4 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     this.configProperties = configProperties;
     return this;
   }
-
 }

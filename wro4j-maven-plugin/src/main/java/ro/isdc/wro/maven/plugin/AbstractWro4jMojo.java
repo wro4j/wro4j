@@ -25,6 +25,7 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 
 
 /**
@@ -110,10 +111,25 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     extendPluginClasspath();
     Context.set(Context.standaloneContext());
     try {
+      onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
+    } finally {
+      onAfterExecute();
     }
+  }
+
+  /**
+   * Invoked before execution is performed. 
+   */
+  protected void onBeforeExecute() {
+  }
+
+  /**
+   * Invoked right after execution complete, no matter if it failed or not.
+   */
+  protected void onAfterExecute() {
   }
 
 
@@ -203,7 +219,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     throws Exception {
     if (getTargetGroups() == null) {
       final WroModel model = getManagerFactory().create().getModelFactory().create();
-      return model.getGroupNames();
+      return new WroModelInspector(model).getGroupNames();
     }
     return Arrays.asList(getTargetGroups().split(","));
   }

@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -29,6 +31,8 @@ import ro.isdc.wro.http.WroFilter;
  */
 public class Context
     implements ReadOnlyContext {
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
+
   /**
    * Maps correlationId with a Context.
    */
@@ -272,5 +276,4 @@ public class Context
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
-
 }

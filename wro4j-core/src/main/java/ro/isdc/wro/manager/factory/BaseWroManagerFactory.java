@@ -27,6 +27,8 @@ import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -58,10 +60,11 @@ public class BaseWroManagerFactory
   private UriLocatorFactory uriLocatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
+  private ResourceAuthorizationManager authorizationManager;
   /**
    * Handles the lazy synchronized creation of the manager
    */
-  private DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
+  private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
     @Override
     protected WroManager initialize() {
       final WroManager manager = new WroManager();
@@ -90,6 +93,9 @@ public class BaseWroManagerFactory
       if (namingStrategy == null) {
         namingStrategy = newNamingStrategy();
       }
+      if (authorizationManager == null) {
+        authorizationManager = newAuthorizationManager();
+      }
       
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
@@ -99,6 +105,7 @@ public class BaseWroManagerFactory
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
+      manager.setResourceAuthorizationManager(authorizationManager);
       
       // initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);
@@ -115,6 +122,13 @@ public class BaseWroManagerFactory
     return managerInitializer.get();
   }
   
+  /**
+   * @return default implementation of {@link ResourceAuthorizationManager}.
+   */
+  protected ResourceAuthorizationManager newAuthorizationManager() {
+    return new DefaultResourceAuthorizationManager();
+  }
+
   /**
    * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
    * callbacks. Default implementation does nothing. Do not set anything else except callbacks in this method, otherwise
@@ -232,7 +246,7 @@ public class BaseWroManagerFactory
           "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
       return smartFactoryClass.newInstance();
     } catch (final Exception e) {
-      LOG.info("SmartWroModelFactory is not available. Using default model factory.");
+      LOG.debug("SmartWroModelFactory is not available. Using default model factory.");
       LOG.debug("Reason: {}", e.getMessage());
     }
     return new XmlModelFactory();
@@ -257,11 +271,23 @@ public class BaseWroManagerFactory
   }
   
   /**
+   * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
    * @param hashBuilder
    *          the hashBuilder to set
    */
+  @Deprecated
   public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
     this.hashStrategy = hashBuilder;
+    return this;
+  }
+  
+
+  /**
+   * @param hashBuilder
+   *          the hashBuilder to set
+   */
+  public BaseWroManagerFactory setHashStrategy(final HashStrategy hashStrategy) {
+    this.hashStrategy = hashStrategy;
     return this;
   }
   
@@ -315,6 +341,12 @@ public class BaseWroManagerFactory
     return modelFactory;
   }
   
+  
+  public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+    return this;
+  }
+
   /**
    * {@inheritDoc}
    */

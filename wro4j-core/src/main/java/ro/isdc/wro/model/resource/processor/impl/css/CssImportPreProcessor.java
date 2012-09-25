@@ -5,6 +5,7 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +58,18 @@ public class CssImportPreProcessor
   @Inject
   private WroConfiguration configuration;
   /**
-   * List of processed resources, useful for detecting deep recursion.
+   * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
+   * processor is thread-safe and doesn't eroneously detect recursion when running in concurrent environment.
    */
-  private final List<Resource> processed = new ArrayList<Resource>();
+  private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
+    @Override
+    protected List<String> initialValue() {
+      return new ArrayList<String>();
+    };
+  }; 
   private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
-
+  private static final String REGEX_IMPORT_FROM_COMMENTS = WroUtil.loadRegexpWithKey("cssImportFromComments");
+  
   /**
    * {@inheritDoc}
    */
@@ -71,11 +80,15 @@ public class CssImportPreProcessor
     try {
       final String result = parseCss(resource, reader);
       writer.write(result);
-      processed.clear();
+      getProcessedList().clear();
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+  private List<String> getProcessedList() {
+    return processedImports.get();
   }
 
   /**
@@ -86,7 +99,6 @@ public class CssImportPreProcessor
     Validate.notNull(preProcessorExecutor);
   }
 
-
   /**
    * @param resource {@link Resource} to process.
    * @param reader Reader for processed resource.
@@ -94,11 +106,12 @@ public class CssImportPreProcessor
    */
   private String parseCss(final Resource resource, final Reader reader)
     throws IOException {
-    if (processed.contains(resource)) {
+    if (getProcessedList().contains(resource.getUri())) {
       LOG.debug("[WARN] Recursive import detected: {}", resource);
+      onRecursiveImportDetected();
       return "";
     }
-    processed.add(resource);
+    getProcessedList().add(resource.getUri().replace(File.separatorChar,'/'));
     final StringBuffer sb = new StringBuffer();
     final List<Resource> importsCollector = getImportedResources(resource);
     // for now, minimize always
@@ -111,6 +124,15 @@ public class CssImportPreProcessor
     sb.append(IOUtils.toString(reader));
     LOG.debug("importsCollector: {}", importsCollector);
     return removeImportStatements(sb.toString());
+  }
+
+  /**
+   * Invoked when a recursive import is detected. Used to assert the recursive import detection correct behavior. By
+   * default this method does nothing.
+   * 
+   * @VisibleForTesting
+   */
+  protected void onRecursiveImportDetected() {
   }
 
   /**
@@ -136,16 +158,19 @@ public class CssImportPreProcessor
     final List<Resource> imports = new ArrayList<Resource>();
     String css = EMPTY;
     try {
-      css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()), configuration.getEncoding());
+      css = IOUtils.toString(new AutoCloseInputStream(uriLocatorFactory.locate(resource.getUri())),
+          configuration.getEncoding());
     } catch (IOException e) {
       if (!configuration.isIgnoreMissingResources()) {
         LOG.error("Invalid import detected: {}", resource.getUri());
         throw e;
       }
     }
+    //remove imports from comments before parse the file
+    css = css.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
     final Matcher m = PATTERN.matcher(css);
     while (m.find()) {
-      final Resource importedResource = buildImportedResource(resource, m.group(1));
+      final Resource importedResource = buildImportedResource(resource.getUri(), m.group(1));
       // check if already exist
       if (imports.contains(importedResource)) {
         LOG.debug("[WARN] Duplicate imported resource: {}", importedResource);
@@ -160,8 +185,8 @@ public class CssImportPreProcessor
   /**
    * Build a {@link Resource} object from a found importedResource inside a given resource.
    */
-  private Resource buildImportedResource(final Resource resource, final String importUrl) {
-    final String absoluteUrl = computeAbsoluteUrl(resource, importUrl);
+  private Resource buildImportedResource(final String resourceUri, final String importUrl) {
+    final String absoluteUrl = computeAbsoluteUrl(resourceUri, importUrl);
     return Resource.create(absoluteUrl, ResourceType.CSS);
   }
 
@@ -169,12 +194,12 @@ public class CssImportPreProcessor
   /**
    * Computes absolute url of the imported resource.
    *
-   * @param relativeResource {@link Resource} where the import statement is found.
+   * @param relativeResourceUri uri of the resource containing the import statement.
    * @param importUrl found import url.
    * @return absolute url of the resource to import.
    */
-  private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
-    final String folder = FilenameUtils.getFullPath(relativeResource.getUri());
+  private String computeAbsoluteUrl(final String relativeResourceUri, final String importUrl) {
+    final String folder = FilenameUtils.getFullPath(relativeResourceUri);
     // remove '../' & normalize the path.
     final String absoluteImportUrl = StringUtils.cleanPath(folder + importUrl);
     return absoluteImportUrl;

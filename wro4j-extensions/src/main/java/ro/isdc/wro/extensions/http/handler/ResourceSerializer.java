@@ -30,12 +30,15 @@ import com.google.gson.JsonSerializer;
 public class ResourceSerializer implements JsonSerializer<Resource> {
   private final String basePath;
 
-  public ResourceSerializer(String requestURI) {
+  public ResourceSerializer(final String requestURI) {
     this.basePath = requestURI;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public JsonElement serialize(final Resource resource, final Type type, final JsonSerializationContext jsonSerializationContext) {
+  public JsonElement serialize(final Resource resource, final Type type, final JsonSerializationContext context) {
     final JsonObject jsonObject = new JsonObject();
     final String uri = resource.getUri();
     jsonObject.add("type", new JsonPrimitive(resource.getType().toString()));
@@ -46,16 +49,16 @@ public class ResourceSerializer implements JsonSerializer<Resource> {
   }
 
   private String getExternalUri(final String uri) {
-    if(isExternal(uri)) {
-      return uri;
+    String result = uri;
+    if (!isExternal(uri)) {
+      final StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append(basePath);
+      stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
+      stringBuilder.append("?id=");
+      stringBuilder.append(uri);
+      result = stringBuilder.toString();
     }
-
-    final StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(basePath);
-    stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
-    stringBuilder.append("?id=");
-    stringBuilder.append(uri);
-    return stringBuilder.toString();
+    return result;
   }
 
   private boolean isExternal(final String uri) {

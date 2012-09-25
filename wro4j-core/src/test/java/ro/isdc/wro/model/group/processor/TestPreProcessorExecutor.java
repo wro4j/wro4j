@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDe
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -59,17 +61,23 @@ public class TestPreProcessorExecutor {
   private FilterConfig mockFilterConfig;
   @Mock
   private ServletContext mockServletContext;
-
+  @Mock
+  private UriLocatorFactory mockLocatorFactory;
+  @Mock
+  private UriLocator mockLocator;
   private PreProcessorExecutor executor;
 
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     initMocks(this);
     
     when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     when(mockRequest.getServletPath()).thenReturn("");
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
+    when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+    when(mockLocator.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+    when(mockLocatorFactory.getInstance(Mockito.anyString())).thenReturn(mockLocator);
     
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
     Context.set(context);
@@ -87,6 +95,7 @@ public class TestPreProcessorExecutor {
     }
     final BaseWroManagerFactory wroManagerFactory = new BaseWroManagerFactory();
     wroManagerFactory.setProcessorsFactory(processorsFactory);
+    wroManagerFactory.setUriLocatorFactory(mockLocatorFactory);
     return wroManagerFactory;
   }
 
@@ -178,10 +187,10 @@ public class TestPreProcessorExecutor {
   @Test(expected = IOException.class)
   public void shouldFailWhenProcessingInvalidResource()
     throws Exception {
+    when(mockLocator.locate(Mockito.anyString())).thenThrow(IOException.class);
     Context.get().getConfig().setIgnoreMissingResources(false);
     shouldNotFailWhenProcessingInvalidResource();
   }
-
 
   @Test
   public void shouldNotFailWhenProcessingInvalidResource()
@@ -205,7 +214,7 @@ public class TestPreProcessorExecutor {
     genericUseFailingPreProcessorWithIngoreFlag(true);
   }
 
-  private void genericUseFailingPreProcessorWithIngoreFlag(boolean ignoreFlag) throws Exception {
+  private void genericUseFailingPreProcessorWithIngoreFlag(final boolean ignoreFlag) throws Exception {
     Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
@@ -220,41 +229,47 @@ public class TestPreProcessorExecutor {
    */
   @Test
   public void preProcessingInParallelIsFaster()
-    throws Exception {
-    final StopWatch watch = new StopWatch();
-    WroConfiguration config = Context.get().getConfig();
-
-    initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
-    final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
-      Resource.create("r2", ResourceType.JS));
-
-    //warm up
-    config.setParallelPreprocessing(true);
-    executor.processAndMerge(resources, true);
-    
-    //parallel
-    watch.start("parallel preProcessing");
-    config.setParallelPreprocessing(true);
-    executor.processAndMerge(resources, true);
-    watch.stop();
-    long parallelExecution = watch.getLastTaskTimeMillis();
-    
-    //sequential
-    config.setParallelPreprocessing(false);
-    watch.start("sequential preProcessing");
-    executor.processAndMerge(resources, true);
-    watch.stop();
-    long sequentialExecution = watch.getLastTaskTimeMillis();
-
-    String message = "Processing details: \n" + watch.prettyPrint();
-    LOG.debug(message);
-
-    // prove that running in parallel is faster
-    // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it normally
-    // should be about 100%).
-    double delta = parallelExecution * 0.8;
-    Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
-        sequentialExecution > parallelExecution + delta);
+      throws Exception {
+    final int availableProcessors = Runtime.getRuntime().availableProcessors();
+    LOG.info("availableProcessors: {}", availableProcessors);
+    //test it only if number there are more than 1 CPU cores are available
+    if (availableProcessors > 1) {
+      final StopWatch watch = new StopWatch();
+      WroConfiguration config = Context.get().getConfig();
+      
+      initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
+      final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
+          Resource.create("r2", ResourceType.JS));
+      
+      // warm up
+      config.setParallelPreprocessing(true);
+      executor.processAndMerge(resources, true);
+      
+      // parallel
+      watch.start("parallel preProcessing");
+      config.setParallelPreprocessing(true);
+      executor.processAndMerge(resources, true);
+      watch.stop();
+      long parallelExecution = watch.getLastTaskTimeMillis();
+      
+      // sequential
+      config.setParallelPreprocessing(false);
+      watch.start("sequential preProcessing");
+      executor.processAndMerge(resources, true);
+      watch.stop();
+      long sequentialExecution = watch.getLastTaskTimeMillis();
+      
+      String message = "Processing details: \n" + watch.prettyPrint();
+      LOG.debug(message);
+      
+      // prove that running in parallel is faster
+      // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it
+      // normally
+      // should be about 100%).
+      double delta = parallelExecution * 0.8;
+      Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
+          sequentialExecution > parallelExecution + delta);
+    }
   }
 
   @Test

@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.ContextPropagatingCallable;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
@@ -54,7 +54,7 @@ public class PreProcessorExecutor {
   @Inject
   private WroConfiguration config;
   @Inject
-  private LifecycleCallbackRegistry callbackRegistry;  
+  private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private Injector injector;
   /**
@@ -167,7 +167,19 @@ public class PreProcessorExecutor {
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
-    String resourceContent = getResourceContent(resource);
+    
+    String resourceContent = null;
+    try {
+      resourceContent = getResourceContent(resource);
+    } catch (final IOException e) {
+      LOG.debug("Invalid resource found: {}", resource);
+      if (config.isIgnoreMissingResources()) {
+        return StringUtils.EMPTY;
+      } else {
+        LOG.error("Cannot ignore missing resource:  {}", resource);
+        throw e;
+      }
+    }
     if (processors.isEmpty()) {
       return resourceContent;
     }
@@ -200,7 +212,8 @@ public class PreProcessorExecutor {
    * Decorates preProcessor with mandatory decorators.
    */
   private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
-    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(processor)); 
+    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(
+        processor));
     injector.inject(decorated);
     return decorated;
   }
@@ -214,22 +227,16 @@ public class PreProcessorExecutor {
    */
   private String getResourceContent(final Resource resource)
       throws IOException {
+    InputStream is = null;
     try {
-      final InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
+      is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
       final String result = IOUtils.toString(is, config.getEncoding());
-      is.close();
       if (StringUtils.isEmpty(result)) {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }
       return result;
-    } catch (final IOException e) {
-      LOG.debug("Invalid resource found: {}", resource);
-      if (config.isIgnoreMissingResources()) {
-        return StringUtils.EMPTY;
-      } else {
-        LOG.error("Cannot ignore missing resource:  {}", resource);
-        throw e;
-      }
+    } finally {
+      IOUtils.closeQuietly(is);
     }
   }
 }

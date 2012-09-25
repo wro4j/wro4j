@@ -43,7 +43,9 @@ public class SchedulerHelper {
    * Period in seconds (how often a runnable should run).
    */
   private volatile long period = 0;
-
+  /**
+   * The name of this scheduler (used for logging).
+   */
   private final String name;
   /**
    * The future of the currently running task. Allows reschedule operation by cancelling execution of the running
@@ -115,7 +117,7 @@ public class SchedulerHelper {
       Validate.notNull(runnable);
       // avoid reject when this method is accessed concurrently.
       if (!poolInitializer.get().isShutdown()) {
-        LOG.debug("[START] Scheduling thread with period of {} - {}", period, Thread.currentThread().getId());
+        LOG.debug("[START] Scheduling thread with period of {} seconds. ThreadId:  {}", period, Thread.currentThread().getId());
         future = poolInitializer.get().scheduleWithFixedDelay(runnable, 0, period, timeUnit);
       }
     }

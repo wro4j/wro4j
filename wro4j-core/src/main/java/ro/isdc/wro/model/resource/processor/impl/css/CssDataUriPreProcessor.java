@@ -4,9 +4,11 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -80,8 +82,10 @@ public class CssDataUriPreProcessor
       fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
+    InputStream is = null;
     try {
-      final String dataUri = getDataUriGenerator().generateDataURI(uriLocatorFactory.locate(fullPath), fileName);
+      is = uriLocatorFactory.locate(fullPath);
+      final String dataUri = getDataUriGenerator().generateDataURI(is, fileName);
       if (isReplaceAccepted(dataUri)) {
         result = dataUri;
         LOG.debug("dataUri replacement: {}", StringUtils.abbreviate(dataUri, 30));
@@ -89,6 +93,8 @@ public class CssDataUriPreProcessor
     } catch (final IOException e) {
       LOG.warn("[FAIL] extract dataUri from: {}, because: {}. "
           + "A possible cause: using CssUrlRewritingProcessor before CssDataUriPreProcessor.", fullPath, e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(is);
     }
     return result;
   }

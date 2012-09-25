@@ -6,15 +6,12 @@ package ro.isdc.wro.extensions.processor.support.coffeescript;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -82,8 +79,6 @@ public class CoffeeScript {
         buildOptions());
       final String result = (String)builder.evaluate(compileScript, "CoffeeScript.compile");
       return result;
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       watch.stop();
       LOG.debug(watch.prettyPrint());
