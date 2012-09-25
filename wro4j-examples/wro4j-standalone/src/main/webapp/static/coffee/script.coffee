@@ -7,5 +7,5 @@ function hey() {
 
 function sup() {
     var f;
-    var g;
+    var g; 
 }

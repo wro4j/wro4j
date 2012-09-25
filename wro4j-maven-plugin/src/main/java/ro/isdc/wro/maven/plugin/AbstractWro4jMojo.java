@@ -232,6 +232,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       result = Arrays.asList(getTargetGroups().split(","));
     }
     persistResourceFingerprints(result);
+    getLog().info("targetGroupsAsList: " + result);
     return result;
   }
 
@@ -269,8 +270,10 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       for (final Resource resource : group.getResources()) {
         getLog().debug("checking delta for resource: " + resource);
         if (isResourceUriChanged(resource.getUri())) {
-          getLog().info("detected change for resource: " + resource);
+          getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
           changedGroupNames.add(group.getName());
+          //no need to check rest of resources from this group
+          break;
         }
       }
     }
@@ -286,33 +289,11 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       getLog().debug("current fingerprint: " + fingerprint);
       final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resourceUri)) : null;
       getLog().debug("previous fingerprint: " + previousFingerprint);
-      return fingerprint != null && previousFingerprint.equals(fingerprint);
+      return fingerprint != null && !fingerprint.equals(previousFingerprint);
     } catch (IOException e) {
       getLog().debug("failed to check for delta resource: " + resourceUri);
     }
     return false;
-  }
-  
-  private boolean isResourceUriChangedUseDelta(final String resourceUri) {
-    final File file = getFileForUri(resourceUri);
-    if (file != null && buildContext.hasDelta(file)) {
-      getLog().info("detected change for file: " + file.getPath());
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * @return the {@link File} of the provided uri.
-   */
-  private File getFileForUri(final String uri) {
-    if (uri.startsWith(ServletContextUriLocator.PREFIX)) {
-      return new File(contextFolder, uri);
-    }
-    if (ClasspathUriLocator.isValid(uri)) {
-      
-    }
-    return null;
   }
 
   private boolean isIncrementalBuild() {
