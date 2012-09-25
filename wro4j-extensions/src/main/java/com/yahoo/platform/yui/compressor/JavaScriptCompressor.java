@@ -35,9 +35,9 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 public class JavaScriptCompressor {
 
-    private static final List ones;
-    private static final List twos;
-    private static final List threes;
+    static final List ones;
+    static final List twos;
+    static final List threes;
 
     private static final Set builtin = new HashSet();
     private static final Map literals = new HashMap();
@@ -84,12 +84,15 @@ public class JavaScriptCompressor {
         threes = new ArrayList();
         for (int i = 0; i < twos.size(); i++) {
             final String two = (String) twos.get(i);
-            for (char c = 'a'; c <= 'z'; c++)
+            for (char c = 'a'; c <= 'z'; c++) {
                 threes.add(two + Character.toString(c));
-            for (char c = 'A'; c <= 'Z'; c++)
+            }
+            for (char c = 'A'; c <= 'Z'; c++) {
                 threes.add(two + Character.toString(c));
-            for (char c = '0'; c <= '9'; c++)
+            }
+            for (char c = '0'; c <= '9'; c++) {
                 threes.add(two + Character.toString(c));
+            }
         }
 
         // Remove three-letter JavaScript reserved words and built-in globals...
@@ -518,7 +521,6 @@ public class JavaScriptCompressor {
      * Transforms 'foo': ... into foo: ... whenever possible, saving 2 bytes.
      */
     private static void optimizeObjLitMemberDecl(final ArrayList tokens) {
-
         String tv;
         int i, length;
         JavaScriptToken token;
