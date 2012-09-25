@@ -33,8 +33,11 @@ public final class ReloadModelRunnable
     LOG.debug("Reloading Model....");
     try {
       // TODO: do not destroy, until the creation is done and the new model is different than the new one
-      wroManagerReference.get().getModelFactory().destroy();
-      wroManagerReference.get().getCacheStrategy().clear();
+      final WroManager manager = wroManagerReference.get();
+      if (manager != null) {
+        manager.getModelFactory().destroy();
+        manager.getCacheStrategy().clear();
+      }
     } catch (final Exception e) {
       LOG.error("Exception occured during cache reload: ", e);
     }

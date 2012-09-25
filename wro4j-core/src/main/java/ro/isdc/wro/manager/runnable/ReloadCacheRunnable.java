@@ -31,7 +31,10 @@ public final class ReloadCacheRunnable
   public void run() {
     LOG.debug("Reloading Cache....");
     try {
-      wroManagerReference.get().getCacheStrategy().clear();
+      final WroManager manager = wroManagerReference.get();
+      if (manager != null) {
+        manager.getCacheStrategy().clear();        
+      }
     } catch (final Exception e) {
       LOG.error("Exception occured during cache reload: ", e);
     }

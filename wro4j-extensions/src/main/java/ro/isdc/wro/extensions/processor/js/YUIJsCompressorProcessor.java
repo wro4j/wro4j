@@ -35,7 +35,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)
-public class YUIJsCompressorProcessor
+public final class YUIJsCompressorProcessor
   implements ResourcePostProcessor, ResourcePreProcessor {
   /**
    * Logger for this class.
@@ -49,6 +49,7 @@ public class YUIJsCompressorProcessor
    */
   private static final class YUIErrorReporter
     implements ErrorReporter {
+    @Override
     public void warning(final String message, final String sourceName, final int line, final String lineSource,
       final int lineOffset) {
       if (line < 0) {
@@ -59,6 +60,7 @@ public class YUIJsCompressorProcessor
     }
 
 
+    @Override
     public void error(final String message, final String sourceName, final int line, final String lineSource,
       final int lineOffset) {
       if (line < 0) {
@@ -69,6 +71,7 @@ public class YUIJsCompressorProcessor
     }
 
 
+    @Override
     public EvaluatorException runtimeError(final String message, final String sourceName, final int line,
       final String lineSource, final int lineOffset) {
       error(message, sourceName, line, lineSource, lineOffset);
@@ -81,10 +84,10 @@ public class YUIJsCompressorProcessor
   /**
    * Renames variables.
    */
-  boolean munge = false;
-  boolean verbose = false;
-  boolean preserveAllSemiColons = true;
-  boolean disableOptimizations = false;
+  private boolean munge = false;
+  private final boolean verbose = false;
+  private final boolean preserveAllSemiColons = true;
+  private final boolean disableOptimizations = false;
 
   /**
    * Allows creation of compressor specifying if the munge should apply or not.
@@ -105,6 +108,7 @@ public class YUIJsCompressorProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     process(null, reader, writer);
@@ -113,6 +117,7 @@ public class YUIJsCompressorProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final StopWatch watch = new StopWatch();
