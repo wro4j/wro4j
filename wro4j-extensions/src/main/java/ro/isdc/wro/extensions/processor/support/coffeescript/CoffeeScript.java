@@ -108,8 +108,8 @@ public class CoffeeScript {
    * @param options the options to set
    */
   public CoffeeScript setOptions(final String... options) {
-    LOG.debug("setOptions: {}", Arrays.asList(options));
     this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
     return this;
   }
 }

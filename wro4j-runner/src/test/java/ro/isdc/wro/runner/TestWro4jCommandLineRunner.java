@@ -161,11 +161,11 @@ public class TestWro4jCommandLineRunner {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
     
-    final String[] args = String.format(
-        "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
-          wroFile, contextFolder, destinationFolder.getAbsolutePath()
-        }).split(" ");
     try {
+      final String[] args = String.format(
+          "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
+            wroFile, contextFolder, destinationFolder.getAbsolutePath()
+          }).split(" ");
       invokeRunner(args);
     } catch (final Exception e) {
       Assert.assertEquals(LinterException.class, e.getCause().getClass());

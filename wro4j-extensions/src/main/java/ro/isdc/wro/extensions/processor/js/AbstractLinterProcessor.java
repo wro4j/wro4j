@@ -7,6 +7,7 @@ package ro.isdc.wro.extensions.processor.js;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,13 +54,15 @@ public abstract class AbstractLinterProcessor
   }
 
   public AbstractLinterProcessor setOptions(final String... options) {
-    this.options = options;
+    this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
     return this;
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
@@ -98,6 +101,7 @@ public abstract class AbstractLinterProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer) throws IOException {
     process(null, reader, writer);
   }

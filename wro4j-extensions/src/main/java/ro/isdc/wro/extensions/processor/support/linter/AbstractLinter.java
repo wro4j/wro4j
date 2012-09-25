@@ -111,12 +111,12 @@ public abstract class AbstractLinter {
    *          the options to set
    */
   public AbstractLinter setOptions(final String... options) {
-    LOG.debug("setOptions: {}", Arrays.asList(options));
     if (options != null) {
       this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
     } else {
       this.options = ArrayUtils.EMPTY_STRING_ARRAY;
     }
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
     return this;
   }
 }
