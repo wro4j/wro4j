@@ -64,7 +64,7 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
     final Callable<Void> task = new Callable<Void>() {
       public Void call() {
         try {
-          processor.process(new StringReader("alert(1);"), new StringWriter());
+          processor.process(null, new StringReader("alert(1);"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

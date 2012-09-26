@@ -101,13 +101,13 @@ public class WroManager
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return new ReloadCacheRunnable(WroManager.this);
+        return new ReloadCacheRunnable(getCacheStrategy());
       }
     }, ReloadCacheRunnable.class.getSimpleName());
     modelSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return new ReloadModelRunnable(WroManager.this);
+        return new ReloadModelRunnable(getModelFactory());
       }
     }, ReloadModelRunnable.class.getSimpleName());
     resourceBundleProcessor = new ResourceBundleProcessor();

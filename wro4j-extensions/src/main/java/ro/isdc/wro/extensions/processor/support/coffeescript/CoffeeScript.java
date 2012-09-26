@@ -5,6 +5,7 @@ package ro.isdc.wro.extensions.processor.support.coffeescript;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -77,8 +78,7 @@ public class CoffeeScript {
       watch.start("compile");
       final String compileScript = String.format("CoffeeScript.compile(%s, %s);", WroUtil.toJSMultiLineString(data),
         buildOptions());
-      final String result = (String)builder.evaluate(compileScript, "CoffeeScript.compile");
-      return result;
+      return (String)builder.evaluate(compileScript, "CoffeeScript.compile");
     } finally {
       watch.stop();
       LOG.debug(watch.prettyPrint());
@@ -93,7 +93,7 @@ public class CoffeeScript {
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {
-        sb.append(options[i] + ": true");
+        sb.append(options[i]).append(": true");
         if (i < options.length - 1) {
           sb.append(",");
         }
@@ -108,8 +108,8 @@ public class CoffeeScript {
    * @param options the options to set
    */
   public CoffeeScript setOptions(final String... options) {
-    LOG.debug("setOptions: {}", options);
     this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
     return this;
   }
 }

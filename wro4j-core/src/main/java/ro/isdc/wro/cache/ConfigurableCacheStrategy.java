@@ -3,6 +3,7 @@ package ro.isdc.wro.cache;
 import java.util.Map;
 
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.cache.spi.CacheStrategyProvider;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;

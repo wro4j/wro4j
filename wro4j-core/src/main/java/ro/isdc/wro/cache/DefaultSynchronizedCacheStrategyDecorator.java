@@ -151,8 +151,9 @@ public class DefaultSynchronizedCacheStrategyDecorator
    * @return true if the provided key should be checked for change. 
    */
   private boolean shouldWatchForChange(final CacheEntry key) {
-    LOG.debug("shouldWatchForChange");
-    return getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
+    final boolean result = getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
+    LOG.debug("shouldWatchForChange: {}", result);
+    return result;
   }
 
   @Override

@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.RequestHandlerSupport;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
@@ -37,6 +39,13 @@ public class ModelAsJsonRequestHandler
    * API - reload cache method call
    */
   public static final String ENDPOINT_URI = PATH_API + "/model";
+  /**
+   * The alias of this {@link RequestHandler} used for configuration.
+   */
+  public static final String ALIAS = "modelAsJson";
+  @Inject
+  private WroConfiguration config;
+
   @Inject
   private WroModelFactory modelFactory;
   
@@ -55,14 +64,14 @@ public class ModelAsJsonRequestHandler
     newGson(request).toJson(modelFactory.create(), response.getWriter());
     response.getWriter().flush();
   }
-
+  
   /**
    * @return customized {@link Gson} instance.
    */
   protected Gson newGson(final HttpServletRequest request) {
     return new GsonBuilder().registerTypeAdapter(Resource.class, new ResourceSerializer(getWroBasePath(request))).setPrettyPrinting().disableHtmlEscaping().create();
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -72,6 +81,15 @@ public class ModelAsJsonRequestHandler
   }
   
   private String getWroBasePath(HttpServletRequest request) {
-     return request.getRequestURI().replaceAll("(?i)" + ENDPOINT_URI, "");
-   }
+    return request.getRequestURI().replaceAll("(?i)" + ENDPOINT_URI, "");
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isEnabled() {
+    System.out.println("config: " + config);
+    return config.isDebug();
+  }
 }

@@ -85,7 +85,7 @@ public class NodeLessCssProcessor
     }
   }
   
-  private String process(final String resourceUri, final String content) throws Exception {
+  private String process(final String resourceUri, final String content) {
     InputStream shellIn = null;
     // the file holding the input file to process
     File temp = null;
@@ -113,6 +113,8 @@ public class NodeLessCssProcessor
         throw new WroRuntimeException(errorMessage);
       }
       return result;
+    } catch (Exception e) {
+      throw WroRuntimeException.wrap(e);
     } finally {
       IOUtils.closeQuietly(shellIn);
       // always cleanUp

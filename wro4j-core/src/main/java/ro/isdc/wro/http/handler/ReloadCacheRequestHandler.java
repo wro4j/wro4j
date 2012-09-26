@@ -28,6 +28,10 @@ public class ReloadCacheRequestHandler
     extends RequestHandlerSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ReloadCacheRequestHandler.class);
   /**
+   * The alias of this {@link RequestHandler} used for configuration.
+   */
+  public static final String ALIAS = "reloadCache";
+  /**
    * API - reload cache method call
    */
   public static final String ENDPOINT_URI = PATH_API + "/reloadCache";

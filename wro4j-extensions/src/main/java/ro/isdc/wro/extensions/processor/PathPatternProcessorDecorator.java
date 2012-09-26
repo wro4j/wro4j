@@ -29,7 +29,7 @@ import ro.isdc.wro.util.WroUtil;
  * @since 1.4.10
  * @created 15 Sep 2012
  */
-public class PathPatternProcessorDecorator
+public final class PathPatternProcessorDecorator
     extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(PathPatternProcessorDecorator.class);
   /**
@@ -45,7 +45,7 @@ public class PathPatternProcessorDecorator
   /**
    * Shall we include paths?
    */
-  private boolean includes;
+  private final boolean includes;
   
   /**
    * Decorates the processor which should be applied or not (based on includes parameter) on resources which matches the
@@ -141,7 +141,7 @@ public class PathPatternProcessorDecorator
   @Override
   public String toString() {
     final String processorName = getOriginalDecoratedObject().getClass().getSimpleName();
-    StringBuilder buffer = new StringBuilder(processorName + ": ").append(includes ? "(" : "!(");
+    StringBuilder buffer = new StringBuilder(processorName).append(": ").append(includes ? "(" : "!(");
     String separator = includes ? " || " : " && ";
     for (String pattern : patterns) {
       buffer.append(pattern).append(separator);

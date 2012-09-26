@@ -216,8 +216,6 @@ public class BaseWroManagerFactory
   public void onModelPeriodChanged(final long period) {
     try {
       managerInitializer.get().onModelPeriodChanged(period);
-      // update cache too.
-      managerInitializer.get().getCacheStrategy().clear();
     } catch (final WroRuntimeException e) {
       LOG.warn("[FAIL] Unable to reload model, probably because invoked outside of context");
     }

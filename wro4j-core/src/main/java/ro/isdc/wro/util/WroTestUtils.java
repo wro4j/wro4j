@@ -252,9 +252,9 @@ public class WroTestUtils {
         }
         processedNumber++;
       } catch (final IOException e) {
-        LOG.debug("Skip comparison because couldn't find the TARGET file " + targetFile.getPath() + ". Original cause: "
-            + e.getCause());
-      } catch(final Exception e) {
+        LOG.debug("Skip comparison because couldn't find the TARGET file {}. Original cause: {}", targetFile,
+            e.getCause());
+      } catch (final Exception e) {
         throw WroRuntimeException.wrap(e);
       }
     }
@@ -360,8 +360,8 @@ public class WroTestUtils {
         }
         processedNumber++;
       } catch (final IOException e) {
-        LOG.debug("Skip comparison because couldn't find the TARGET file " + targetFile.getPath()
-            + "\n. Original exception: " + e.getCause());
+        LOG.debug("Skip comparison because couldn't find the TARGET file {}\n. Original exception: {}", targetFile,
+            e.getCause());
       } catch (final Exception e) {
         throw new WroRuntimeException("A problem during transformation occured", e);
       }

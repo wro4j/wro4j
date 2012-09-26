@@ -77,7 +77,7 @@ public class CssLintProcessor
         LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
         onCssLintException(e, resource);
       } catch (final Exception ex) {
-        throw WroRuntimeException.wrap(e);
+        throw WroRuntimeException.wrap(ex);
       }
     } catch (final WroRuntimeException e) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
