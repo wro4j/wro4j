@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -82,7 +83,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
-
 
   /**
    * {@inheritDoc}

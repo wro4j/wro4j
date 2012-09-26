@@ -3,6 +3,10 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,12 +27,17 @@ import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -36,6 +45,7 @@ import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactor
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.FolderHashEncoderNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -48,18 +58,32 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
  */
 public class TestWro4jMojo {
   private static final Logger LOG = LoggerFactory.getLogger(TestWro4jMojo.class);
-  private Wro4jMojo mojo;
+  @Mock
+  private BuildContext mockBuildContext;
+  @Mock
+  private HashStrategy mockHashStrategy;
   private File cssDestinationFolder;
   private File jsDestinationFolder;
   private File destinationFolder;
   private File extraConfigFile;
+  private Wro4jMojo mojo;
+  
 
 
   @Before
   public void setUp()
     throws Exception {
+    MockitoAnnotations.initMocks(this);
     Context.set(Context.standaloneContext());
     mojo = new Wro4jMojo();
+    setUpMojo(mojo);
+  }
+
+  /**
+   * Perform basic initialization with valid values of the provided mojo.
+   */
+  private void setUpMojo(final Wro4jMojo mojo)
+      throws Exception {
     mojo.setIgnoreMissingResources(false);
     mojo.setMinimize(true);
     setWroWithValidResources();
@@ -380,6 +404,36 @@ public class TestWro4jMojo {
     }
   }
   
+  @Test
+  public void testIncrementalChange() throws Exception {
+    mojo = new Wro4jMojo() {
+      @Override
+      protected StandaloneContextAwareManagerFactory getManagerFactory()
+          throws Exception {
+        final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
+        final StandaloneContextAwareManagerFactory spiedFactory = Mockito.spy(factory);
+        
+        final WroManager manager = factory.create();
+        manager.setHashStrategy(mockHashStrategy);
+        
+        Mockito.when(spiedFactory.create()).thenReturn(manager);
+        return spiedFactory;
+      }
+    };
+    setUpMojo(mojo);
+    final String hashValue = "SomeHashValue";
+    when(mockHashStrategy.getHash(Mockito.any(InputStream.class))).thenReturn(hashValue);
+    when(mockBuildContext.isIncremental()).thenReturn(true);
+    when(mockBuildContext.getValue(Mockito.anyString())).thenReturn(hashValue);
+    mojo.setIgnoreMissingResources(true);
+    mojo.setBuildContext(mockBuildContext);
+    //incremental build detects no change
+    assertTrue(mojo.getTargetGroupsAsList().isEmpty());
+    
+    //incremental change detects change for all resources
+    when(mockHashStrategy.getHash(Mockito.any(InputStream.class))).thenReturn("TotallyDifferentValue");
+    assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+  }
 
   @After
   public void tearDown()

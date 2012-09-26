@@ -4,6 +4,7 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -15,9 +16,12 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
@@ -25,6 +29,10 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFacto
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 
 /**
@@ -84,7 +92,14 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * @optional
    */
   private File extraConfigFile;
-
+  /**
+   * Responsible for identifying the resources changed during incremental build.
+   * <p/>
+   * Read more about it <a href="http://wiki.eclipse.org/M2E_compatible_maven_plugins#BuildContext">here</a>
+   * 
+   * @component
+   */
+  private BuildContext buildContext;
 
   /**
    * {@inheritDoc}
@@ -100,7 +115,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
     getLog().debug("wroManagerFactory: " + this.wroManagerFactory);
     getLog().debug("extraConfig: " + extraConfigFile);
-
 
     extendPluginClasspath();
     Context.set(Context.standaloneContext());
@@ -126,7 +140,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected void onAfterExecute() {
   }
 
-
   /**
    * Creates a {@link StandaloneContext} by setting properties passed after mojo is initialized.
    */
@@ -139,13 +152,11 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return runContext;
   }
 
-
   /**
    * Perform actual plugin processing.
    */
   protected abstract void doExecute()
     throws Exception;
-
 
   /**
    * This method will ensure that you have a right and initialized instance of
@@ -187,7 +198,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return factory;
   }
 
-
   /**
    * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
    */
@@ -207,15 +217,100 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
 
 
   /**
-   * @return a list containing all groups needs to be processed.
+   * @return a list of groups which will be processed.
    */
   protected final List<String> getTargetGroupsAsList()
     throws Exception {
-    if (getTargetGroups() == null) {
-      final WroModel model = getManagerFactory().create().getModelFactory().create();
-      return new WroModelInspector(model).getGroupNames();
+    List<String> result = null;
+    if (isIncrementalBuild()) {
+      result = getIncrementalGroupNames();
+    } else if (getTargetGroups() == null) {
+      result = getAllModelGroupNames();
+    } else {
+      result = Arrays.asList(getTargetGroups().split(","));
     }
-    return Arrays.asList(getTargetGroups().split(","));
+    persistResourceFingerprints(result);
+    getLog().info("The following groups will be processed: " + result);
+    return result;
+  }
+
+  /**
+   * Store digest for all resources contained inside the list of provided groups. 
+   */
+  private void persistResourceFingerprints(final List<String> groupNames) {
+    if (buildContext != null) {
+      final WroModelInspector modelInspector = new WroModelInspector(getModel());
+      final WroManager manager = getWroManager();
+      final HashStrategy hashStrategy = manager.getHashStrategy();
+      final ResourceLocatorFactory locatorFactory = manager.getResourceLocatorFactory();
+      for (final String groupName : groupNames) {
+        final Group group = modelInspector.getGroupByName(groupName);
+        if (group != null) {
+          for (final Resource resource : group.getResources()) {
+            try {
+              final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+              buildContext.setValue(resource.getUri(), fingerprint);
+            } catch (IOException e) {
+              getLog().debug("could not check fingerprint of resource: " + resource);
+            }
+          } 
+        }
+      }
+    }
+  }
+
+  /**
+   * @return a list of groups changed by incremental builds.
+   */
+  private List<String> getIncrementalGroupNames() throws Exception {
+    final List<String> changedGroupNames = new ArrayList<String>();
+    for (final Group group : getModel().getGroups()) {
+      for (final Resource resource : group.getResources()) {
+        getLog().debug("checking delta for resource: " + resource);
+        if (isResourceUriChanged(resource.getUri())) {
+          getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
+          changedGroupNames.add(group.getName());
+          //no need to check rest of resources from this group
+          break;
+        }
+      }
+    }
+    return changedGroupNames;
+  }
+
+  private boolean isResourceUriChanged(final String resourceUri) {
+    final WroManager manager = getWroManager();
+    final HashStrategy hashStrategy = manager.getHashStrategy();
+    final ResourceLocatorFactory locatorFactory = manager.getResourceLocatorFactory();
+    try {
+      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resourceUri));
+      final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resourceUri)) : null;
+      getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
+      return fingerprint != null && !fingerprint.equals(previousFingerprint);
+    } catch (IOException e) {
+      getLog().debug("failed to check for delta resource: " + resourceUri);
+    }
+    return false;
+  }
+
+  private boolean isIncrementalBuild() {
+    return buildContext != null && buildContext.isIncremental();
+  }
+
+  private List<String> getAllModelGroupNames() {
+    return new WroModelInspector(getModel()).getGroupNames();
+  }
+
+  private WroModel getModel() {
+      return getWroManager().getModelFactory().create();
+  }
+  
+  private WroManager getWroManager() {
+    try {
+      return getManagerFactory().create();
+    } catch (Exception e) {
+      throw WroRuntimeException.wrap(e);
+    }
   }
 
 
@@ -231,7 +326,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       throw new MojoExecutionException("contextFolder was not set!");
     }
   }
-
 
   /**
    * Update the classpath.
@@ -333,7 +427,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return this.ignoreMissingResources;
   }
 
-
   /**
    * Used for testing.
    *
@@ -343,14 +436,12 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.mavenProject = mavenProject;
   }
 
-
   /**
    * @return the targetGroups
    */
   public String getTargetGroups() {
     return this.targetGroups;
   }
-
 
   /**
    * @param versionEncoder(targetGroups) comma separated group names.
@@ -359,14 +450,12 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.targetGroups = targetGroups;
   }
 
-
   /**
-   * @param wroManagerFactory to set
+   * @param wroManagerFactory fully qualified name of the {@link WroManagerFactory} class.
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
   }
-
 
   /**
    * @param extraConfigFile the extraConfigFile to set
@@ -375,4 +464,10 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     this.extraConfigFile = extraConfigFile;
   }
 
+  /**
+   * @VisibleForTesting
+   */
+  void setBuildContext(final BuildContext buildContext) {
+    this.buildContext = buildContext;
+  }
 }
