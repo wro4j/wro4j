@@ -1,5 +1,5 @@
 var a;
-var c;
+var c, e;
 
 function hey() {
     var d, e;
@@ -7,5 +7,5 @@ function hey() {
 
 function sup() {
     var f;
-    var g;
+    var g; 
 }
