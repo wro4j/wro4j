@@ -490,7 +490,7 @@ public class TestWroManager {
   }
   
   @Test
-  public void cacheShouldBeClearedAfterModelReload()
+  public void cacheShouldNotBeClearedAfterModelReload()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS);
@@ -509,9 +509,9 @@ public class TestWroManager {
     final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager.getCacheStrategy());
     Assert.assertNotNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
     
-    final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager);
+    final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager.getModelFactory());
     reloadModelRunnable.run();
-    Assert.assertNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
+    Assert.assertNotNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
   }
 
   @Test
