@@ -32,7 +32,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
-  private OptionsBuilder optionsBuilder = new OptionsBuilder();
+  private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
    */
@@ -43,12 +43,10 @@ public abstract class AbstractLinter {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      RhinoScriptBuilder builder = null;
       // reusing the scope doesn't work here. Get the following error: TypeError: Cannot find function create in object
       // function Object() { [native code for Object.Object, arity=1] }
       // TODO investigate why
-      builder = RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
-      return builder;
+      return RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
     }
@@ -105,8 +103,7 @@ public abstract class AbstractLinter {
    * @return Script used to pack and return the packed result.
    */
   private String buildLinterScript(final String data, final String... options) {
-    final String script = String.format("%s(%s,%s);", getLinterName(), data, optionsBuilder.build(options));
-    return script;
+    return String.format("%s(%s,%s);", getLinterName(), data, optionsBuilder.build(options));
   }
   
   /**
@@ -114,12 +111,12 @@ public abstract class AbstractLinter {
    *          the options to set
    */
   public AbstractLinter setOptions(final String... options) {
-    LOG.debug("setOptions: {}", options);
     if (options != null) {
       this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
     } else {
       this.options = ArrayUtils.EMPTY_STRING_ARRAY;
     }
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
     return this;
   }
 }

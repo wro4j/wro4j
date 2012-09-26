@@ -117,7 +117,8 @@ public final class Injector {
             value = ((InjectorObjectFactory<?>) value).create();
           }
           field.set(object, value);
-          return accept = true;
+          accept = true;
+          break;
         }
       }
     }

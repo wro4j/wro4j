@@ -26,10 +26,11 @@ import ro.isdc.wro.WroRuntimeException;
  *
  * @author Alex Objelean
  */
-public class RhinoScriptBuilder {
+public final class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
+  private static final String SCRIPT_ENV = "env.rhino.min.js";
+  private static final String SCRIPT_JSON = "json2.min.js";
   private final ScriptableObject scope;
-
 
   private RhinoScriptBuilder() {
     this(null);
@@ -84,7 +85,6 @@ public class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
-      final String SCRIPT_ENV = "env.rhino.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
       evaluateChain(script, SCRIPT_ENV);
       return this;
@@ -96,9 +96,8 @@ public class RhinoScriptBuilder {
 
   public RhinoScriptBuilder addJSON() {
     try {
-      final String SCRIPT_ENV = "json2.min.js";
-      final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluateChain(script, SCRIPT_ENV);
+      final InputStream script = getClass().getResourceAsStream(SCRIPT_JSON);
+      evaluateChain(script, SCRIPT_JSON);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);
@@ -120,11 +119,13 @@ public class RhinoScriptBuilder {
     try {
       getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
+    } catch(final RhinoException e) {
+      if (e instanceof RhinoException) {
+        LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage(e));
+      }
+      throw e;
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
-      if (e instanceof RhinoException) {
-        LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage((RhinoException) e));
-      }
       throw e;
     } finally {
       stream.close();

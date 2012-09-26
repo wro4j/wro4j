@@ -3,6 +3,7 @@ package ro.isdc.wro.extensions.processor.support.sass;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -25,14 +26,12 @@ import ro.isdc.wro.util.StopWatch;
  * @since 1.4.4
  */
 public class RubySassEngine {
-  
   private static final Logger LOG = LoggerFactory.getLogger(RubySassEngine.class);
-  
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
   
-  private final LinkedHashSet<String> requires;
+  private final Set<String> requires;
   
   public RubySassEngine() {
     requires = new LinkedHashSet<String>();
@@ -97,15 +96,15 @@ public class RubySassEngine {
     script.flush();
     return raw.toString();
   }
-  
-  private void debugRubyEnvironment(final PrintWriter script) {
-    script.println("  dir_contents = Dir.entries(Dir.pwd)    ");
-    script.println("  puts dir_contents   ");
-    script.println("  puts '--classpath--'   ");
-    script.println("  puts $:   ");
-    script.println("  puts '--classpath--'   ");
-    script.println(" puts '--working dir--'  ");
-    script.println("  puts Dir.pwd  ");
-    script.println(" puts '--working dir--'  ");
-  }
+//  
+//  private void debugRubyEnvironment(final PrintWriter script) {
+//    script.println("  dir_contents = Dir.entries(Dir.pwd)    ");
+//    script.println("  puts dir_contents   ");
+//    script.println("  puts '--classpath--'   ");
+//    script.println("  puts $:   ");
+//    script.println("  puts '--classpath--'   ");
+//    script.println(" puts '--working dir--'  ");
+//    script.println("  puts Dir.pwd  ");
+//    script.println(" puts '--working dir--'  ");
+//  }
 }

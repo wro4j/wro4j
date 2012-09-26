@@ -31,6 +31,10 @@ public class ReloadModelRequestHandler
    * API - reload model method call
    */
   public static final String ENDPOINT_URI = PATH_API + "/reloadModel";
+  /**
+   * The alias of this {@link RequestHandler} used for configuration.
+   */
+  public static final String ALIAS = "reloadModel";
   @Inject
   private ReadOnlyContext context;
   

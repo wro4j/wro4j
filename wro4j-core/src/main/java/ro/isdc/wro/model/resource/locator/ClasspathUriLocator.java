@@ -102,7 +102,7 @@ public class ClasspathUriLocator
     }
   }
   
-  private InputStream locateWildcardStream(final String uri, URL url)
+  private InputStream locateWildcardStream(final String uri, final URL url)
       throws IOException {
     if (url == null) {
       LOG.debug("Failed to locate stream for {} because URL is null", uri);

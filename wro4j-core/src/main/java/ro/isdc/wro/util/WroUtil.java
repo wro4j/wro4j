@@ -61,7 +61,7 @@ public final class WroUtil {
   private static final Pattern PATTERN_GZIP = Pattern.compile(loadRegexpWithKey("requestHeader.gzip"));
 
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
-  public static InputStream EMPTY_STREAM = new ByteArrayInputStream("".getBytes());
+  public static final InputStream EMPTY_STREAM = new ByteArrayInputStream("".getBytes());
 
   /**
    * @return {@link ThreadFactory} with daemon threads.

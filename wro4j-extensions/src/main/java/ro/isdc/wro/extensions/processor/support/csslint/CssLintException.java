@@ -14,6 +14,7 @@ import java.util.Collections;
  * @since 1.3.8
  * @created 19 Jun 2011
  */
+@SuppressWarnings("serial")
 public class CssLintException extends Exception {
   private Collection<CssLintError> errors;
 

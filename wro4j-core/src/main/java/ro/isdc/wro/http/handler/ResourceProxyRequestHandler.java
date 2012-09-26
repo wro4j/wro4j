@@ -35,6 +35,10 @@ public class ResourceProxyRequestHandler
 
   public static final String PARAM_RESOURCE_ID = "id";
   public static final String PATH_RESOURCES = "wroResources";
+  /**
+   * The alias of this {@link RequestHandler} used for configuration.
+   */
+  public static final String ALIAS = "resourceProxy";
   
   @Inject
   private UriLocatorFactory locatorFactory;

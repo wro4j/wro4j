@@ -150,9 +150,9 @@ public class UglifyJs {
     // TODO handle reservedNames
     final String optionsAsJson = createOptionsAsJson();
     Validate.notNull(optionsAsJson);
-    final String invokeScript = String.format(getInvokeScript(), originalCode, optionsAsJson);
+    final String scriptAsString = String.format(getInvokeScript(), originalCode, optionsAsJson);
     watch.start(uglify ? "uglify" : "beautify");
-    final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
+    final Object result = builder.evaluate(scriptAsString, "uglifyIt");
     
     watch.stop();
     LOG.debug(watch.prettyPrint());

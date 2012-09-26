@@ -84,12 +84,12 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    * @return default list of factories to be used by {@link SmartWroModelFactory}.
    */
   protected List<WroModelFactory> newWroModelFactoryFactoryList() {
-    final List<WroModelFactory> factoryList = new ArrayList<WroModelFactory>();
+    final List<WroModelFactory> list = new ArrayList<WroModelFactory>();
     LOG.debug("auto detect wroFile: {}", autoDetectWroFile);
-    factoryList.add(newXmlModelFactory());
-    factoryList.add(newGroovyModelFactory());
-    factoryList.add(newJsonModelFactory());
-    return factoryList;
+    list.add(newXmlModelFactory());
+    list.add(newGroovyModelFactory());
+    list.add(newJsonModelFactory());
+    return list;
   }
 
 

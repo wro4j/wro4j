@@ -1,8 +1,11 @@
-package ro.isdc.wro.cache;
+package ro.isdc.wro.cache.spi;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;

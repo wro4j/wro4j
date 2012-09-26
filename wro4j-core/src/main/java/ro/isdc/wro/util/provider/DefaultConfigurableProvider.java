@@ -3,8 +3,11 @@ package ro.isdc.wro.util.provider;
 import java.util.Map;
 
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.CacheStrategyProvider;
-import ro.isdc.wro.cache.DefaultCacheStrategyProvider;
+import ro.isdc.wro.cache.spi.CacheStrategyProvider;
+import ro.isdc.wro.cache.spi.DefaultCacheStrategyProvider;
+import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.http.handler.spi.DefaultRequestHandlerProvider;
+import ro.isdc.wro.http.handler.spi.RequestHandlerProvider;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.DefaultLocatorProvider;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
@@ -33,6 +36,7 @@ public class DefaultConfigurableProvider
   private HashStrategyProvider hashStrategyProvider = new DefaultHashStrategyProvider();
   private LocatorProvider locatorProvider = new DefaultLocatorProvider();
   private CacheStrategyProvider cacheStrategyProvider = new DefaultCacheStrategyProvider();
+  private RequestHandlerProvider requestHandlerProvider = new DefaultRequestHandlerProvider();
   
   /**
    * {@inheritDoc}
@@ -79,5 +83,13 @@ public class DefaultConfigurableProvider
   @Override
   public Map<String, UriLocator> provideLocators() {
     return locatorProvider.provideLocators();
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Map<String, RequestHandler> provideRequestHandlers() {
+    return requestHandlerProvider.provideRequestHandlers();
   }
 }
