@@ -1,5 +1,5 @@
 var a;
-var c;
+var c, e;
 
 function hey() {
     var d, e;

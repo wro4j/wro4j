@@ -31,8 +31,6 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
@@ -219,7 +217,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
 
 
   /**
-   * @return a list containing all groups needs to be processed.
+   * @return a list of groups which will be processed.
    */
   protected final List<String> getTargetGroupsAsList()
     throws Exception {
@@ -232,7 +230,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       result = Arrays.asList(getTargetGroups().split(","));
     }
     persistResourceFingerprints(result);
-    getLog().info("targetGroupsAsList: " + result);
+    getLog().info("The following groups will be processed: " + result);
     return result;
   }
 
@@ -286,9 +284,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resourceUri));
-      getLog().debug("current fingerprint: " + fingerprint);
       final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resourceUri)) : null;
-      getLog().debug("previous fingerprint: " + previousFingerprint);
+      getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
       return fingerprint != null && !fingerprint.equals(previousFingerprint);
     } catch (IOException e) {
       getLog().debug("failed to check for delta resource: " + resourceUri);
@@ -329,7 +326,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       throw new MojoExecutionException("contextFolder was not set!");
     }
   }
-
 
   /**
    * Update the classpath.
@@ -455,7 +451,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
   /**
-   * @param wroManagerFactory to set
+   * @param wroManagerFactory fully qualified name of the {@link WroManagerFactory} class.
    */
   public void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
@@ -466,5 +462,12 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    */
   public void setExtraConfigFile(final File extraConfigFile) {
     this.extraConfigFile = extraConfigFile;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  void setBuildContext(final BuildContext buildContext) {
+    this.buildContext = buildContext;
   }
 }

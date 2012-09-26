@@ -23,7 +23,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**
- * Maven plugin which use a singe processor.
+ * Maven plugin which use a single processor.
  *
  * @author Alex Objelean
  */
