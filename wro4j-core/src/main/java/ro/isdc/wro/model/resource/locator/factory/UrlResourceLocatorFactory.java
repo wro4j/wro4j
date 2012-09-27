@@ -9,7 +9,7 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
  * 
  * @author Alex Objelean
  * @created 9 Jul 2012
- * @since 1.5.0
+ * @since 2.0
  */
 public class UrlResourceLocatorFactory
     extends AbstractResourceLocatorFactory {

@@ -108,7 +108,7 @@ public abstract class AbstractProcessorDecoratorSupport
   /**
    * @return the decorated processor. The type of the returned object is {@link Object} because we don't really care and
    *         we need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
-   *         removed in 1.5.0.
+   *         removed in 2.0.
    */
   public abstract Object getDecoratedObject();
   

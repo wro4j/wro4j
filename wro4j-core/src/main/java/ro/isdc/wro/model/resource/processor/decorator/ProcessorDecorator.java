@@ -32,7 +32,7 @@ public class ProcessorDecorator
 
   /**
    * Hides the postProcessor adaptation logic. This exist due to differences between pre & post processor interface.
-   * This will be removed in 1.5.0 when all processors will have an unified interface.
+   * This will be removed in 2.0 when all processors will have an unified interface.
    */
   public ProcessorDecorator(final ResourceProcessor processor) {
     Validate.notNull(processor);

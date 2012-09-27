@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.locator.support.ResourceLocatorDecorator;
  * 
  * @author Alex Objelean
  * @created 24 Apr 2012
- * @since 1.5.0
+ * @since 2.0
  */
 public final class InjectorAwareResourceLocatorFactoryDecorator
     extends ResourceLocatorFactoryDecorator {

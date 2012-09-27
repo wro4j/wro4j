@@ -9,7 +9,7 @@ import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
  * 
  * @author Alex Objelean
  * @created 9 Jul 2012
- * @since 1.5.0
+ * @since 2.0
  */
 public class ClasspathResourceLocatorFactory
     extends AbstractResourceLocatorFactory {
