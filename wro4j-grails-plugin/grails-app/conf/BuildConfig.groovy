@@ -9,6 +9,11 @@ grails.project.dependency.resolution = {
         // excludes 'ehcache'
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    checksums true
+
+    def gebVersion = "0.7.2"
+    def seleniumVersion = "2.25.0"
+
     repositories {
         grailsPlugins()
         grailsHome()
@@ -16,7 +21,7 @@ grails.project.dependency.resolution = {
 
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
-        mavenLocal("C:/jde/software/maven-repository/repository/")
+        mavenLocal()
         mavenCentral()
         //mavenRepo "http://snapshots.repository.codehaus.org"
         mavenRepo "http://repository.codehaus.org"
@@ -27,13 +32,35 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
-      runtime('ro.isdc.wro4j:wro4j-extensions:1.4.0') {
+      runtime('ro.isdc.wro4j:wro4j-extensions:1.4.5') {
         excludes('slf4j-log4j12', 'spring-web', 'gmaven-runtime-1.6', 'servlet-api', 'ant', 'groovy-all')
       }
 
-      test("org.seleniumhq.selenium:selenium-firefox-driver:2.2.0") {
+      test("org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion",
+          "org.codehaus.geb:geb-spock:$gebVersion") {
         exclude 'selenium-server'
         export = false
-      }      
+      }
+
+      provided("org.codehaus.groovy.modules.http-builder:http-builder:0.5.2"){
+        export = false
+        excludes 'nekohtml', "httpclient", "httpcore","xml-apis","groovy"
+      }
+      provided('net.sourceforge.nekohtml:nekohtml:1.9.15') {
+        export = false
+        excludes "xml-apis"
+      }
+
+    }
+    plugins {
+      build(":tomcat:$grailsVersion",
+            ":release:2.0.4",
+            ":rest-client-builder:1.0.2") {
+        excludes 'nekohtml', "httpclient"
+        export = false
+      }
+      test(":spock:0.6", ":geb:$gebVersion") {
+        export = false
+      }
     }
 }

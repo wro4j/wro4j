@@ -149,7 +149,7 @@ public class GroupsProcessor {
    * @return a decorated postProcessor.
    */
   private ResourceProcessor decorateProcessor(final ResourceProcessor processor) {
-    ResourceProcessor decorated = new ExceptionHandlingProcessorDecorator(processor);
+    final ResourceProcessor decorated = new ExceptionHandlingProcessorDecorator(processor);
     injector.inject(decorated);
     return decorated;
   }
