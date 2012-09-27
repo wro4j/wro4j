@@ -17,7 +17,6 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -35,7 +34,6 @@ public class ExternalResourceServlet extends HttpServlet {
     throws ServletException, IOException {
     final ServletContextAttributeHelper helper = new ServletContextAttributeHelper(getServletContext());
     final WroManagerFactory managerFactory = helper.getManagerFactory();
-    System.out.println("managerFactory: " + managerFactory);
     final WroManager wroManager = managerFactory.create();
     
     final CacheEntry cacheKey = new CacheEntry("login", ResourceType.CSS, false);
