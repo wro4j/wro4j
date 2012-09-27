@@ -32,7 +32,7 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
-      runtime('ro.isdc.wro4j:wro4j-extensions:1.4.5') {
+      runtime('ro.isdc.wro4j:wro4j-extensions:1.4.9') {
         excludes('slf4j-log4j12', 'spring-web', 'gmaven-runtime-1.6', 'servlet-api', 'ant', 'groovy-all')
       }
 
