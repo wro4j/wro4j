@@ -9,11 +9,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
@@ -59,6 +61,7 @@ public class JSMinProcessor implements ResourcePreProcessor,
     } finally {
       IOUtils.closeQuietly(is);
       IOUtils.closeQuietly(os);
+    }
   }
 
   /**
