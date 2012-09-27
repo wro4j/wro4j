@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
  * 
  * @author Alex Objelean
  * @created 30 Jul 2011
- * @since 1.4.10
+ * @since 1.5.0
  */
 public class ConfigurableRequestHandlerFactory
     extends AbstractConfigurableMultipleStrategy<RequestHandler, RequestHandlerProvider>

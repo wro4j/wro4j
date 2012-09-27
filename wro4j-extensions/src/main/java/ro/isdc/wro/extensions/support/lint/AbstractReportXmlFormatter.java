@@ -22,7 +22,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * Builds an XML report for lint errors based on provided collection of {@link LinterError}'s.
  * 
  * @author Alex Objelean
- * @since 1.4.10
+ * @since 1.5.0
  * @created 15 Sep 2012
  */
 public abstract class AbstractReportXmlFormatter<T> {

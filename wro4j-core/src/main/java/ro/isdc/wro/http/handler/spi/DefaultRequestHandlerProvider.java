@@ -13,7 +13,7 @@ import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
  * Provides {@link RequestHandler} implementation from core module.
  * 
  * @author Alex Objelena
- * @since 1.4.10
+ * @since 1.5.0
  * @created 23 Sep 2012
  */
 public class DefaultRequestHandlerProvider implements RequestHandlerProvider {

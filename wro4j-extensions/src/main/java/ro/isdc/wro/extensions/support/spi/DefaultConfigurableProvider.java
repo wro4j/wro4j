@@ -16,7 +16,7 @@ import ro.isdc.wro.util.provider.ConfigurableProviderSupport;
  * 
  * @author Alex Objelean
  * @created 23 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 public class DefaultConfigurableProvider
     extends ConfigurableProviderSupport {

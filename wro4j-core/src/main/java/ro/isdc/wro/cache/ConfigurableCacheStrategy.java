@@ -14,7 +14,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
  * 
  * @author Alex Objelean
  * @created 22 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 public class ConfigurableCacheStrategy
     extends AbstractConfigurableSingleStrategy<CacheStrategy, CacheStrategyProvider>
