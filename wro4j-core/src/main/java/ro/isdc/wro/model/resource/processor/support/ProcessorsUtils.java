@@ -50,29 +50,4 @@ public class ProcessorsUtils {
     }
     return found;
   }
-  
-  /**
-   * @return preProcessor of type processorClass if any found or null otherwise.
-   */
-  @SuppressWarnings("unchecked")
-  public static final <T extends ResourcePreProcessor> T findPreProcessorByClass(final Class<T> processorClass,
-      final Collection<ResourcePreProcessor> preProcessors) {
-    T found = null;
-    if (preProcessors != null) {
-      // TODO reuse common code
-      for (final ResourcePreProcessor processor : preProcessors) {
-        if (processorClass.isInstance(processor)) {
-          found = (T) processor;
-          return found;
-        } else if (processor instanceof ProcessorDecorator) {
-          final T decorated = (T) ((ProcessorDecorator) processor).getOriginalDecoratedObject();
-          if (processorClass.isInstance(decorated)) {
-            found = decorated;
-            return found;
-          }
-        }
-      }
-    }
-    return null;
-  }
 }

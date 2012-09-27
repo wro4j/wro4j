@@ -1,8 +1,8 @@
 package wro4j.grails.plugin
 
-import grails.plugin.geb.GebSpec
+import geb.spock.GebReportingSpec
 
-class WroSpec extends GebSpec {
+class WroSpec extends GebReportingSpec {
   def setupSpec() {
   }
 

@@ -9,11 +9,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
@@ -44,19 +46,22 @@ public class JSMinProcessor implements ResourcePreProcessor,
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
-    try {
+  @SuppressWarnings("resource")
+  public void process(final Resource resource, final Reader reader,
+    final Writer writer) throws IOException {
       final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, getEncoding())) {};
       final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, getEncoding()));
-      
+    try {
       new JSMin(is, os).jsmin();
       
       is.close();
       os.close();
 		} catch (final Exception e) {
-      throw new IOException(e);
-    } 
+      throw WroRuntimeException.wrap(e);
+    } finally {
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(os);
+    }
   }
 
   /**
