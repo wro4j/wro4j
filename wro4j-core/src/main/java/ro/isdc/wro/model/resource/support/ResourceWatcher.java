@@ -72,7 +72,8 @@ public class ResourceWatcher {
       }
       currentHashes.clear();
     } catch (Exception e) {
-      LOG.error("Exception while checking for resource changes", e);
+      LOG.error("Exception while checking for resource changes because: {}", e.getMessage());
+      LOG.debug("[FAIL] detecting resource change ", e);
     } finally {
       watch.stop();
       LOG.debug("resource watcher info: {}", watch.prettyPrint());
