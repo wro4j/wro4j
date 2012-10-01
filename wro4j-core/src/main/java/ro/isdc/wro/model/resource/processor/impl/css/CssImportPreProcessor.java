@@ -59,7 +59,7 @@ public class CssImportPreProcessor
   private WroConfiguration configuration;
   /**
    * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
-   * processor is thread-safe and doesn't eroneously detect recursion when running in concurrent environment.
+   * processor is thread-safe and doesn't erroneously detect recursion when running in concurrent environment.
    */
   private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
     @Override
@@ -111,19 +111,37 @@ public class CssImportPreProcessor
       onRecursiveImportDetected();
       return "";
     }
-    getProcessedList().add(resource.getUri().replace(File.separatorChar,'/'));
+    final String importedUri = resource.getUri().replace(File.separatorChar,'/');
+    getProcessedList().add(importedUri);
     final StringBuffer sb = new StringBuffer();
     final List<Resource> importsCollector = getImportedResources(resource);
     // for now, minimize always
     // TODO: find a way to get minimize property dynamically.
     //groupExtractor.isMinimized(Context.get().getRequest())
-    sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
+    sb.append(getImportedContent(importsCollector));
     if (!importsCollector.isEmpty()) {
       LOG.debug("Imported resources found : {}", importsCollector.size());
     }
     sb.append(IOUtils.toString(reader));
     LOG.debug("importsCollector: {}", importsCollector);
     return removeImportStatements(sb.toString());
+  }
+
+  /**
+   * Process the found imports and build the content.
+   * @param foundImports the list of imported resources found in this css.
+   * @return the processed content of imported resources.
+   */
+  protected String getImportedContent(final List<Resource> foundImports)
+      throws IOException {
+    return preProcessorExecutor.processAndMerge(foundImports, true);
+  }
+
+  /**
+   * Invoked when an import is detected. By default this method does nothing.
+   * @param importedUri the uri of the detected imported resource
+   */
+  protected void onImportDetected(final String importedUri) {
   }
 
   /**
@@ -176,6 +194,7 @@ public class CssImportPreProcessor
         LOG.debug("[WARN] Duplicate imported resource: {}", importedResource);
       } else {
         imports.add(importedResource);
+        onImportDetected(importedResource.getUri());
       }
     }
     return imports;
