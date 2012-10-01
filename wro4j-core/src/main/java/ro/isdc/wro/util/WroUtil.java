@@ -47,8 +47,7 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile(loadRegexpWithKey("emptyLine"),
-      Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile(loadRegexpWithKey("emptyLine"), Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header.
    */
@@ -59,10 +58,10 @@ public final class WroUtil {
    */
   private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(loadRegexpWithKey("requestHeader.acceptEncoding"));
   private static final Pattern PATTERN_GZIP = Pattern.compile(loadRegexpWithKey("requestHeader.gzip"));
-
+  
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
   public static final InputStream EMPTY_STREAM = new ByteArrayInputStream("".getBytes());
-
+  
   /**
    * @return {@link ThreadFactory} with daemon threads.
    */
@@ -70,7 +69,7 @@ public final class WroUtil {
     return new ThreadFactory() {
       private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
       private final AtomicInteger threadNumber = new AtomicInteger(1);
-
+      
       public Thread newThread(final Runnable runnable) {
         final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
         thread.setDaemon(true);
@@ -78,7 +77,7 @@ public final class WroUtil {
       }
     };
   }
-
+  
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
    * 
@@ -89,7 +88,7 @@ public final class WroUtil {
   public static String toDateAsString(final long milliseconds) {
     return DATE_FORMAT.format(milliseconds);
   }
-
+  
   /**
    * Retrieve pathInfo from a given location.
    * 
@@ -118,7 +117,7 @@ public final class WroUtil {
     final String pathInfo = noSlash.substring(nextSlash);
     return pathInfo;
   }
-
+  
   /**
    * <p>
    * Case insensitive check if a String starts with a specified prefix.
@@ -147,7 +146,7 @@ public final class WroUtil {
   public static boolean startsWithIgnoreCase(final String str, final String prefix) {
     return startsWith(str, prefix, true);
   }
-
+  
   /**
    * Creates a folder like implementation for a class. Ex: com.mycompany.MyClass -> com/mycompany/
    * 
@@ -159,7 +158,7 @@ public final class WroUtil {
     Validate.notNull(clazz, "Class cannot be null!");
     return clazz.getPackage().getName().replace('.', '/');
   }
-
+  
   /**
    * <p>
    * Check if a String starts with a specified prefix (optionally case insensitive).
@@ -183,7 +182,7 @@ public final class WroUtil {
     }
     return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
   }
-
+  
   /**
    * Retrieve servletPath from a given location.
    * 
@@ -194,7 +193,7 @@ public final class WroUtil {
   public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
     return location.replace(getPathInfoFromLocation(request, location), "");
   }
-
+  
   /**
    * Analyze headers of the request and searches for mangled (by proxy) for "Accept-Encoding" header and its mangled
    * variations and gzip header value and its mangled variations.
@@ -219,7 +218,7 @@ public final class WroUtil {
     }
     return false;
   }
-
+  
   /**
    * Transforms a java multi-line string into javascript multi-line string. This technique was found at {@link http
    * ://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
@@ -262,7 +261,7 @@ public final class WroUtil {
     }
     return false;
   }
-
+  
   /**
    * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
    * 
@@ -279,7 +278,7 @@ public final class WroUtil {
       }
     };
   }
-
+  
   /**
    * A simple way to create a {@link WroModelFactory}.
    * 
@@ -296,7 +295,7 @@ public final class WroUtil {
       }
     };
   }
-
+  
   public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
     return new ObjectFactory<T>() {
       public T create() {
@@ -304,7 +303,7 @@ public final class WroUtil {
       }
     };
   }
-
+  
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
    * 
@@ -337,7 +336,7 @@ public final class WroUtil {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
     }
   }
-
+  
   /**
    * @return the implementation version of wro4j.
    */
@@ -347,10 +346,13 @@ public final class WroUtil {
   
   /**
    * Copy and close the reader and writer streams.
-   *
-   * @param reader The source stream.
-   * @param writer The destination stream.
-   * @throws IOException If content cannot be copy.
+   * 
+   * @param reader
+   *          The source stream.
+   * @param writer
+   *          The destination stream.
+   * @throws IOException
+   *           If content cannot be copy.
    */
   public static void safeCopy(final Reader reader, final Writer writer)
       throws IOException {
@@ -363,9 +365,15 @@ public final class WroUtil {
   }
   
   /**
-   * @return a generated {@link File} with unique name located in temp folder. 
+   * @return a generated {@link File} with unique name located in temp folder.
    */
   public static File createTempFile() {
-    return new File(FileUtils.getTempDirectory(), "wro4j" + UUID.randomUUID().toString());
+    try {
+      final File file = new File(FileUtils.getTempDirectory(), "wro4j-" + UUID.randomUUID().toString());
+      file.createNewFile();
+      return file;
+    } catch (IOException e) {
+      throw WroRuntimeException.wrap(e);
+    }
   }
 }
