@@ -20,7 +20,6 @@
 		<dwr.version>3.0.M1</dwr.version>
 		<guice.version>3.0</guice.version>
 		<project_charset>UTF-8</project_charset>
-		<wro4j.version>1.4.8</wro4j.version>
 	</properties>
 
 	<dependencies>
@@ -28,9 +27,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wro4j-extensions</artifactId>
-			<!--  
 			<version>${wro4j.version}</version>
-			-->
 		</dependency>
 		<!-- GAE doesn't have any script managers - use those provided by thirdparty -->
 		<dependency>

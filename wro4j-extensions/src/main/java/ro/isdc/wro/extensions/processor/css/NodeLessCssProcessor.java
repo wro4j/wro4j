@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor.css;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,9 +98,8 @@ public class NodeLessCssProcessor
       final String encoding = "UTF-8";
       IOUtils.write(content, new FileOutputStream(temp), encoding);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
-      final String tempFilePath = temp.getPath();
 
-      final Process process = createProcess(tempFilePath);
+      final Process process = createProcess(temp);
       /**
        * It is important to read before waitFor is invoked because read stream is blocking stdout while Java application
        * doesn't read the whole buffer. It hangs when processing large files. The lessc isn't closing till all STDOUT
@@ -110,7 +112,7 @@ public class NodeLessCssProcessor
         LOG.error("exitStatus: {}", exitStatus);
         // find a way to get rid of escape character found at the end (minor issue)
         final String errorMessage = MessageFormat.format("Error in LESS: \n{0}",
-            result.replace(tempFilePath, resourceUri));
+            result.replace(temp.getPath(), resourceUri));
         throw new WroRuntimeException(errorMessage);
       }
       return result;
@@ -148,17 +150,17 @@ public class NodeLessCssProcessor
   /**
    * Creates process responsible for running lessc shell command by reading the file content from the sourceFilePath
    *
-   * @param sourceFilePath
+   * @param sourceFile
    *          the source path of the file from where the lessc will read the less file.
    * @throws IOException
    *           when the process execution fails.
    */
-  private Process createProcess(final String sourceFilePath)
+  private Process createProcess(final File sourceFile)
       throws IOException {
-    final String[] commandLine = getCommandLine(sourceFilePath);
-    LOG.debug("commandLine arguments: {}", Arrays.asList(commandLine));
-    final ProcessBuilder processBuilder = new ProcessBuilder(commandLine).redirectErrorStream(true);
-    return processBuilder.start();
+    notNull(sourceFile);
+    final String[] commandLine = getCommandLine(sourceFile.getPath());
+    LOG.debug("CommandLine arguments: {}", Arrays.asList(commandLine));
+    return new ProcessBuilder(commandLine).redirectErrorStream(true).start();
   }
 
   /**
@@ -167,9 +169,12 @@ public class NodeLessCssProcessor
    */
   @Override
   public boolean isSupported() {
+    File temp = null;
     try {
-      int exitValue = new ProcessBuilder(getCommandLine("")).start().waitFor();
-      LOG.debug("exitValue {}", exitValue);
+      temp = WroUtil.createTempFile();
+      final Process process = createProcess(temp);
+      int exitValue = process.waitFor();
+      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
       if (exitValue != 0) {
         throw new UnsupportedOperationException("Lessc is not a supported operation on this platform");
       }
@@ -179,6 +184,8 @@ public class NodeLessCssProcessor
       LOG.debug("Unsupported processor", e);
       LOG.warn("The {} processor is not supported.", getClass().getName());
       return false;
+    } finally {
+      FileUtils.deleteQuietly(temp);
     }
   }
 

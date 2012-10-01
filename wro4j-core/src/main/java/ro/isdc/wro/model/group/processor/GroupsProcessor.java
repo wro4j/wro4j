@@ -121,7 +121,7 @@ public class GroupsProcessor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
-      stopWatch.start("Using " + processor.getClass().getSimpleName());
+      stopWatch.start("Using " + processor.toString());
       writer = new StringWriter();
       try {
         callbackRegistry.onBeforePostProcess();
