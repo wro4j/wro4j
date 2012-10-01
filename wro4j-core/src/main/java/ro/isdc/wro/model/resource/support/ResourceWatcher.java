@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -100,6 +101,7 @@ public class ResourceWatcher {
     boolean isChanged = false;
     for (Resource resource : resources) {
       if (isChanged = isChanged(resource)) {
+        onResourceChanged(resource);
         break;
       }
     }
@@ -107,6 +109,14 @@ public class ResourceWatcher {
   }
   
   
+  /**
+   * Invoked when the change of the resource is detected.
+   * @param resource the {@link Resource} which changed. 
+   * @VisibleForTesting
+   */
+  void onResourceChanged(final Resource resource) {
+  }
+
   /**
    * Invoked when a resource change detected.
    * 
@@ -139,6 +149,7 @@ public class ResourceWatcher {
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
+        LOG.debug("cssContent: {}", IOUtils.toString(locatorFactory.locate(uri)));
         //detect changes in imported resources.
         createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
       }
@@ -176,6 +187,10 @@ public class ResourceWatcher {
         return CssImportPreProcessor.class.getSimpleName();
       }
     };
+    /**
+     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
+     * change.
+     */
     final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
       @Override
       protected boolean isIgnoreFailingProcessor() {

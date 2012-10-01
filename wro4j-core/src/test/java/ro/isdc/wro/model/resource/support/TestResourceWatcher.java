@@ -2,18 +2,23 @@ package ro.isdc.wro.model.resource.support;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.Context;
@@ -36,9 +41,9 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestResourceWatcher {
-  private static final String RESOURCE_URI = "/test.js";
+  private static final String RESOURCE_URI = "/test.css";
   private static final String GROUP_NAME = "g1";
-  private CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.JS, true);
+  private CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
   private ResourceWatcher victim;
   @Mock
   private UriLocator mockLocator;
@@ -139,5 +144,51 @@ public class TestResourceWatcher {
     
     victim.check(cacheEntry);
     assertEquals(1, victim.getPreviousHashes().keySet().size());
+  }
+  
+  @Test
+  public void shouldDetectChangeOfImportedResource() throws Exception {
+    final String importResourceUri = "imported.css";
+    final AtomicBoolean groupChanged = new AtomicBoolean(false);
+    final AtomicBoolean importResourceChanged = new AtomicBoolean(false);
+    final CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
+    victim = new ResourceWatcher() {
+      @Override
+      void onResourceChanged(final Resource resource) {
+        if (importResourceUri.equals(resource.getUri())) {
+          importResourceChanged.set(true);
+        }
+      }
+      @Override
+      void onGroupChanged(final CacheEntry key) {
+        groupChanged.set(true);
+      }
+    };
+    createInjector().inject(victim);
+    when(mockLocator.locate(RESOURCE_URI)).thenAnswer(new Answer<InputStream>() {
+      public InputStream answer(InvocationOnMock invocation)
+          throws Throwable {
+        return new ByteArrayInputStream("@import(imported.css)".getBytes());
+      }
+    });
+    when(mockLocator.locate(importResourceUri)).thenAnswer(new Answer<InputStream>() {
+      public InputStream answer(InvocationOnMock invocation)
+          throws Throwable {
+        return new ByteArrayInputStream("original".getBytes());
+      }
+    });
+    
+    victim.check(cacheEntry);
+    
+    when(mockLocator.locate(importResourceUri)).thenAnswer(new Answer<InputStream>() {
+      public InputStream answer(InvocationOnMock invocation)
+          throws Throwable {
+        return new ByteArrayInputStream("changed".getBytes());
+      }
+    });
+    
+    victim.check(cacheEntry);
+    assertTrue(groupChanged.get());
+    assertTrue(importResourceChanged.get());
   }
 }
