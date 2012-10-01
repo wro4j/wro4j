@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-    	<version>1.5.0</version>
+    	<version>${wro4j.version}</version>
 	</parent>
 
 	<artifactId>wro4j-extensions</artifactId>
