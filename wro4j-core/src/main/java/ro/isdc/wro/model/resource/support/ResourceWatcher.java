@@ -29,6 +29,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.StopWatch;
@@ -150,7 +151,7 @@ public class ResourceWatcher {
   }
 
   private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
-    final ResourcePreProcessor cssImportProcessor = new CssImportPreProcessor() {
+    final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       protected void onImportDetected(final String importedUri) {
         //avoid recursivity
         if (!resource.getUri().equals(importedUri)) {
@@ -165,7 +166,7 @@ public class ResourceWatcher {
         }
       };
       @Override
-      protected String getImportedContent(final List<Resource> foundImports)
+      protected String doTransform(final String cssContent, final List<Resource> foundImports)
           throws IOException {
         //no need to build the content, since we are interested in finding imported resources only
         return "";
