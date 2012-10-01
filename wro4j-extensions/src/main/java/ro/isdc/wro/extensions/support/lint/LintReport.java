@@ -14,7 +14,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * 
  * @author Alex Objelean
  * @created 16 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 public final class LintReport<T> {
   private List<ResourceLintReport<T>> reports;

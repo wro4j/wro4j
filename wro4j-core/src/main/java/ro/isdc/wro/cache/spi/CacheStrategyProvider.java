@@ -9,7 +9,7 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  * A service provider responsible for providing new implementations of {@link HashStrategy}.
  * 
  * @author Alex Objelean
- * @since 1.4.10
+ * @since 1.5.0
  * @created 22 Sep 2012
  */
 public interface CacheStrategyProvider {

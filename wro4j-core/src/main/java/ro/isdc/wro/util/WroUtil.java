@@ -345,6 +345,12 @@ public final class WroUtil {
    * @return a generated {@link File} with unique name located in temp folder. 
    */
   public static File createTempFile() {
-    return new File(FileUtils.getTempDirectory(), "wro4j" + UUID.randomUUID().toString());
+    try {
+      final File file = new File(FileUtils.getTempDirectory(), "wro4j-" + UUID.randomUUID().toString());
+      file.createNewFile();
+      return file;
+    } catch (IOException e) {
+      throw WroRuntimeException.wrap(e);
+    }
   }
 }

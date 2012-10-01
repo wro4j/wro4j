@@ -7,7 +7,7 @@ package ro.isdc.wro.model.resource.processor;
  * 
  * @author Alex Objelean
  * @created 11 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 public interface SupportAware {
   /**

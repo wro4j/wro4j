@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @author Alex Objelean
  * @created 15 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 public class ResourceLintReport<T> {
   private static final String UNKNOWN_PATH = "UnknownFile";

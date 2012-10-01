@@ -89,7 +89,6 @@ public class ModelAsJsonRequestHandler
    */
   @Override
   public boolean isEnabled() {
-    System.out.println("config: " + config);
     return config.isDebug();
   }
 }

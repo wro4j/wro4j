@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 
  * @author Alex Objelean
  * @created 17 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 @SuppressWarnings("serial")
 public class LintItem implements Serializable {

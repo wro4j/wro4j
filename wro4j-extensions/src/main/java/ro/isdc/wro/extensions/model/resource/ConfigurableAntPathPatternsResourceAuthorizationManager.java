@@ -14,7 +14,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * matched using antPath support.
  * 
  * @author Alex Objelean
- * @since 1.4.10
+ * @since 1.5.0
  * @created 22 Sep 2012
  */
 public class ConfigurableAntPathPatternsResourceAuthorizationManager

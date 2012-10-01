@@ -21,7 +21,7 @@ import ro.isdc.wro.util.LazyInitializer;
  * fallback to rhino based processor.
  * 
  * @author Alex Objelean
- * @since 1.4.10
+ * @since 1.5.0
  * @created 11 Sep 2012
  */
 @SupportedResourceType(ResourceType.CSS)

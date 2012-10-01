@@ -26,7 +26,7 @@ import ro.isdc.wro.util.WroUtil;
  * Edgar Espina.
  * 
  * @author Alex Objelean
- * @since 1.4.10
+ * @since 1.5.0
  * @created 15 Sep 2012
  */
 public final class PathPatternProcessorDecorator

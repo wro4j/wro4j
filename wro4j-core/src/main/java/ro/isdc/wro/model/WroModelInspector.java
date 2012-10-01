@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.Resource;
  * 
  * @author Alex Objelean
  * @created 21 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 public class WroModelInspector {
   private Map<String, Group> map = new HashMap<String, Group>();
