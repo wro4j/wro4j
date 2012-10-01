@@ -1,6 +1,7 @@
 import org.springframework.context.ApplicationContext
 import org.springframework.web.filter.DelegatingFilterProxy
 import wro4j.grails.plugin.ReloadableWroFilter
+import wro4j.grails.plugin.GrailsWroManagerFactory
 import wro4j.grails.plugin.WroConfigHandler
 import wro4j.grails.plugin.WroDSLHandler
 
@@ -58,6 +59,7 @@ Web Resource Optimizer for Grails
     def config = WroConfigHandler.getConfig()
     wroFilter(ReloadableWroFilter) {
       properties = config.toProperties()
+      wroManagerFactory = new GrailsWroManagerFactory()
     }
   }
 
