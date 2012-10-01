@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
-import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -124,11 +123,14 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   private void writeGroupNameMap()
       throws Exception {
     if (groupNameMappingFile != null) {
+      FileOutputStream outputStream = null; 
       try {
-        final FileOutputStream outputStream = new FileOutputStream(groupNameMappingFile);
+        outputStream = new FileOutputStream(groupNameMappingFile);
         groupNames.store(outputStream, "Mapping of defined group name to renamed group name");
       } catch (final FileNotFoundException ex) {
         throw new MojoExecutionException("Unable to save group name mapping file", ex);
+      } finally {
+        IOUtils.closeQuietly(outputStream);
       }
     }
   }
