@@ -55,15 +55,16 @@ public class ExceptionHandlingProcessorDecorator
       super.process(resource, innerReader, innerWriter);
       writer.write(innerWriter.toString());
     } catch (final Exception e) {
-      final String processorName = getOriginalDecoratedObject().getClass().getSimpleName();
-      LOG.debug("Failed to process the resource: {} using processor: {}", resource, processorName);
+      final String processorName = toString();
+      LOG.debug("Failed to process the resource: {} using processor: {}. Reason: {}", resource, processorName, e.getMessage());
+      LOG.debug("Original Exception", e);
       if (isIgnoreFailingProcessor()) {
         writer.write(resourceContent);
         // don't wrap exception unless required
       } else if (e instanceof RuntimeException) {
         throw (RuntimeException) e;
       } else {
-        throw new WroRuntimeException("The processor: " + processorName + " failed", e);
+        throw WroRuntimeException.wrap(e, "The processor: " + processorName + " failed");
       }
     } finally {
       reader.close();
