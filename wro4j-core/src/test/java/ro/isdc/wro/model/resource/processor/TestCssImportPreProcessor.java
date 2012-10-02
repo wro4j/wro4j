@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -11,6 +13,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +44,6 @@ public class TestCssImportPreProcessor {
     WroTestUtils.initProcessor(processor);
   }
 
-
   @Test
   public void testFromFolder()
       throws Exception {
@@ -53,7 +55,6 @@ public class TestCssImportPreProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
   
-
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
@@ -70,12 +71,28 @@ public class TestCssImportPreProcessor {
     processInvalidImport();
   }
 
-  
   private void processInvalidImport()
       throws IOException {
     final Resource resource = Resource.create("someResource.css"); 
     final Reader reader = new StringReader("@import('/path/to/invalid.css');");
     processor.process(resource, reader, new StringWriter());
+  }
+  
+  @Test
+  public void shouldInvokeImportDetected()
+      throws IOException {
+    final AtomicInteger times = new AtomicInteger();
+    processor = new CssImportPreProcessor() {
+      @Override
+      protected void onImportDetected(final String foundImportUri) {
+        times.incrementAndGet();
+      }
+    };
+    WroTestUtils.initProcessor(processor);
+    final Resource resource = Resource.create("someResource.css"); 
+    final Reader reader = new StringReader("@import('/path/to/invalid.css');");
+    processor.process(resource, reader, new StringWriter());
+    assertEquals(1, times.get());
   }
   
   /**

@@ -267,7 +267,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     for (final Group group : getModel().getGroups()) {
       for (final Resource resource : group.getResources()) {
         getLog().debug("checking delta for resource: " + resource);
-        if (isResourceUriChanged(resource.getUri())) {
+        if (isResourceChanged(resource)) {
           getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
           changedGroupNames.add(group.getName());
           //no need to check rest of resources from this group
@@ -278,17 +278,17 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return changedGroupNames;
   }
 
-  private boolean isResourceUriChanged(final String resourceUri) {
+  private boolean isResourceChanged(final Resource resource) {
     final WroManager manager = getWroManager();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final ResourceLocatorFactory locatorFactory = manager.getResourceLocatorFactory();
     try {
-      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resourceUri));
-      final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resourceUri)) : null;
+      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+      final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resource.getUri())) : null;
       getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
       return fingerprint != null && !fingerprint.equals(previousFingerprint);
     } catch (IOException e) {
-      getLog().debug("failed to check for delta resource: " + resourceUri);
+      getLog().debug("failed to check for delta resource: " + resource);
     }
     return false;
   }

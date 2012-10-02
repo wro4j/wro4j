@@ -50,7 +50,7 @@ public final class ContentHashEntry
       os.close();
       return baos.toByteArray();
     } catch (final IOException e) {
-      throw new WroRuntimeException("Problem while computing gzipped content", e).logError();
+      throw WroRuntimeException.wrap(e, "Problem while computing gzipped content").logError();
     }
   };
 
