@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -155,9 +154,7 @@ public class TestResourceWatcher {
     victim = new ResourceWatcher() {
       @Override
       void onResourceChanged(final Resource resource) {
-        if (importResourceUri.equals(resource.getUri())) {
-          importResourceChanged.set(true);
-        }
+        importResourceChanged.set(true);
       }
       @Override
       void onGroupChanged(final CacheEntry key) {
@@ -165,30 +162,25 @@ public class TestResourceWatcher {
       }
     };
     createInjector().inject(victim);
-    when(mockLocator.locate(RESOURCE_URI)).thenAnswer(new Answer<InputStream>() {
-      public InputStream answer(InvocationOnMock invocation)
-          throws Throwable {
-        return new ByteArrayInputStream("@import(imported.css)".getBytes());
-      }
-    });
-    when(mockLocator.locate(importResourceUri)).thenAnswer(new Answer<InputStream>() {
-      public InputStream answer(InvocationOnMock invocation)
-          throws Throwable {
-        return new ByteArrayInputStream("original".getBytes());
-      }
-    });
+    when(mockLocator.locate(Mockito.anyString())).thenAnswer(answerWithContent("initial"));
+    when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(answerWithContent(String.format("@import url(%s)", importResourceUri)));
     
     victim.check(cacheEntry);
     
-    when(mockLocator.locate(importResourceUri)).thenAnswer(new Answer<InputStream>() {
-      public InputStream answer(InvocationOnMock invocation)
-          throws Throwable {
-        return new ByteArrayInputStream("changed".getBytes());
-      }
-    });
+    when(mockLocator.locate(Mockito.anyString())).thenAnswer(answerWithContent("changed"));
+    when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(answerWithContent(String.format("@import url(%s)", importResourceUri)));
     
     victim.check(cacheEntry);
     assertTrue(groupChanged.get());
     assertTrue(importResourceChanged.get());
+  }
+
+  private Answer<InputStream> answerWithContent(final String content) {
+    return new Answer<InputStream>() {
+      public InputStream answer(final InvocationOnMock invocation)
+          throws Throwable {
+        return new ByteArrayInputStream(content.getBytes());
+      }
+    };
   }
 }

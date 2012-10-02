@@ -149,7 +149,6 @@ public class ResourceWatcher {
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
-        LOG.debug("cssContent: {}", IOUtils.toString(locatorFactory.locate(uri)));
         //detect changes in imported resources.
         createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
       }
@@ -165,7 +164,7 @@ public class ResourceWatcher {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       protected void onImportDetected(final String importedUri) {
         //avoid recursivity
-        if (!resource.getUri().equals(importedUri)) {
+        //if (!resource.getUri().equals(importedUri)) {
           LOG.debug("Found @import {}", importedUri);
           boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS));
           LOG.debug("\tisImportChanged: {}", isImportChanged);
@@ -174,7 +173,7 @@ public class ResourceWatcher {
             // no need to continue
             throw new WroRuntimeException("Change detected. No need to continue processing");
           }
-        }
+        //}
       };
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)

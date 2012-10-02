@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -16,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
