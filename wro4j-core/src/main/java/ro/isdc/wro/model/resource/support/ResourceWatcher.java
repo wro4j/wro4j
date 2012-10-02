@@ -64,6 +64,7 @@ public class ResourceWatcher {
    * Contains the resource uri's with associated hash values retrieved from currently performed check.
    */
   private final Map<String, String> currentHashes = new ConcurrentHashMap<String, String>();
+  
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
    * 
@@ -108,15 +109,16 @@ public class ResourceWatcher {
     return isChanged;
   }
   
-  
   /**
    * Invoked when the change of the resource is detected.
-   * @param resource the {@link Resource} which changed. 
+   * 
+   * @param resource
+   *          the {@link Resource} which changed.
    * @VisibleForTesting
    */
   void onResourceChanged(final Resource resource) {
   }
-
+  
   /**
    * Invoked when a resource change detected.
    * 
@@ -128,7 +130,7 @@ public class ResourceWatcher {
     LOG.debug("detected change for cacheKey: {}", key);
     cacheStrategy.put(key, null);
   }
-
+  
   /**
    * Check if the resource was changed from previous run. The implementation uses resource content digest (hash) to
    * check for change.
@@ -143,13 +145,13 @@ public class ResourceWatcher {
       final String uri = resource.getUri();
       final String currentHash = getCurrentHash(uri);
       final String previousHash = previousHashes.get(uri);
-      //using AtomicBoolean because we need to mutate this variable inside an anonymous class.
+      // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
       final AtomicBoolean changeDetected = new AtomicBoolean(false);
       changeDetected.set(previousHash != null ? !previousHash.equals(currentHash) : false);
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
-        //detect changes in imported resources.
+        // detect changes in imported resources.
         createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
       }
       return changeDetected.get();
@@ -159,28 +161,27 @@ public class ResourceWatcher {
       return false;
     }
   }
-
+  
   private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       protected void onImportDetected(final String importedUri) {
-        //avoid recursivity
-        //if (!resource.getUri().equals(importedUri)) {
-          LOG.debug("Found @import {}", importedUri);
-          boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS));
-          LOG.debug("\tisImportChanged: {}", isImportChanged);
-          if (isImportChanged) {
-            changeDetected.set(true);
-            // no need to continue
-            throw new WroRuntimeException("Change detected. No need to continue processing");
-          }
-        //}
+        LOG.debug("Found @import {}", importedUri);
+        boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS));
+        LOG.debug("\tisImportChanged: {}", isImportChanged);
+        if (isImportChanged) {
+          changeDetected.set(true);
+          // no need to continue
+          throw new WroRuntimeException("Change detected. No need to continue processing");
+        }
       };
+      
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
           throws IOException {
-        //no need to build the content, since we are interested in finding imported resources only
+        // no need to build the content, since we are interested in finding imported resources only
         return "";
       }
+      
       @Override
       public String toString() {
         return CssImportPreProcessor.class.getSimpleName();
