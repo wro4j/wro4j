@@ -2,6 +2,7 @@ package ro.isdc.wro.model.resource.support;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -14,9 +15,11 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.slf4j.IMarkerFactory;
 
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.config.Context;
@@ -30,10 +33,9 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
-import ro.isdc.wro.model.resource.locator.factory.AbstractResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.AbstractResourceLocator;
 import ro.isdc.wro.util.WroTestUtils;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -44,36 +46,27 @@ public class TestResourceWatcher {
   private static final String GROUP_NAME = "g1";
   private CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
   private ResourceWatcher victim;
+  @Mock
   private ResourceLocator mockLocator;
+  @Mock
+  private ResourceLocatorFactory mockLocatorFactory;
   
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     initMocks(this);
     Context.set(Context.standaloneContext());
     victim = new ResourceWatcher();
     createInjector().inject(victim);
   }
 
-  public Injector createInjector() {
-    final ResourceLocatorFactory locatorFactory = new AbstractResourceLocatorFactory() {
-      public ResourceLocator getLocator(final String uri) {
-        if (mockLocator == null) {
-          // Mock interface directly instead of WroTestUtils.createResourceMockingLocator because of mockito bug
-          mockLocator = Mockito.spy(new AbstractResourceLocator() {
-            public InputStream getInputStream()
-                throws IOException {
-              return new ByteArrayInputStream(uri.getBytes());
-            }
-          });
-        }
-        return mockLocator;
-      }
-    };
+  public Injector createInjector() throws Exception {
+    when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
+    when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
     
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
     final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setLocatorFactory(
-        locatorFactory);
+        mockLocatorFactory);
     final Injector injector = InjectorBuilder.create(factory).build();
     return injector;
   }
@@ -158,13 +151,17 @@ public class TestResourceWatcher {
       }
     };
     createInjector().inject(victim);
-    when(mockLocator.getInputStream()).thenAnswer(answerWithContent("initial"));
-//    when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(answerWithContent(String.format("@import url(%s)", importResourceUri)));
+    when(mockLocator.getInputStream()).then(answerWithContent(String.format("@import url(%s)", importResourceUri)));
+    
+    final ResourceLocator mockImportedResourceLocator = mock(ResourceLocator.class);
+    when(mockImportedResourceLocator.getInputStream()).then(answerWithContent("initial"));
+    
+    when(mockLocatorFactory.getLocator(Mockito.eq("/" + RESOURCE_URI))).thenReturn(mockLocator);
+    when(mockLocatorFactory.getLocator(Mockito.eq("/" + importResourceUri))).thenReturn(mockImportedResourceLocator);
     
     victim.check(cacheEntry);
     
-    when(mockLocator.getInputStream()).thenAnswer(answerWithContent("changed"));
-//    when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(answerWithContent(String.format("@import url(%s)", importResourceUri)));
+    when(mockImportedResourceLocator.getInputStream()).then(answerWithContent("changed"));
     
     victim.check(cacheEntry);
     assertTrue(groupChanged.get());
