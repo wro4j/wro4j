@@ -204,6 +204,11 @@
         <artifactId>sass-gems</artifactId>
         <version>3.2.1</version>
       </dependency>
+      <dependency>
+        <groupId>com.github.sommeri</groupId>
+        <artifactId>less4j</artifactId>
+        <version>0.0.1</version>
+      </dependency>
       <!-- Unit tests -->
       <dependency>
         <groupId>junit</groupId>

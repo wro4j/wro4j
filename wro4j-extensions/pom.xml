@@ -72,6 +72,10 @@
       <artifactId>bourbon-gem-jar</artifactId>
       <version>2.1.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.sommeri</groupId>
+      <artifactId>less4j</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.codehaus.gmaven.runtime</groupId>
 			<artifactId>gmaven-runtime-1.7</artifactId>
