@@ -8,4 +8,7 @@ groups {
   coffee {
     js("/static/coffee/**")
   }
+  encoding {
+    js("/static/encoding/*.js")
+  }
 }
