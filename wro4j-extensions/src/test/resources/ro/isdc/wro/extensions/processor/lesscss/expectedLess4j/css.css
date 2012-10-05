@@ -68,13 +68,13 @@ p + h1 {
   width: .1em;
   background-color: #009998;
   background-image: url(images/image.jpg);
-  background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), to(#0000ff));
+  background: -webkit-gradient(linear, left top, left bottom, from(red), to(blue));
   margin: ;
 }
 #important {
   color: red !important;
-  width: 100%!important;
-  height: 20px ! important;
+  width: 100% !important;
+  height: 20px !important;
 }
 #data-uri {
   background: url(data:image/png;charset=utf-8;base64,
