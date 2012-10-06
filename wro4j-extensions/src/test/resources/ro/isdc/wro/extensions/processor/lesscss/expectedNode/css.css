@@ -8,9 +8,7 @@ div {
 * {
   min-width: 45em;
 }
-h1,
-h2 > a > p,
-h3 {
+h1, h2 > a > p, h3 {
   color: none;
 }
 div.class {
@@ -35,12 +33,10 @@ div#id {
   font-family: 'Garamond Pro';
   src: url("/fonts/garamond-pro.ttf");
 }
-a:hover,
-a:link {
+a:hover, a:link {
   color: #999;
 }
-p,
-p:first-child {
+p, p:first-child {
   text-transform: none;
 }
 q:lang(no) {

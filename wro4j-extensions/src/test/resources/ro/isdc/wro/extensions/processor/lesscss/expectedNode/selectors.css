@@ -27,7 +27,6 @@ td {
   margin: 0;
   padding: 0;
 }
-td,
-input {
+td, input {
   line-height: 1em;
 }
