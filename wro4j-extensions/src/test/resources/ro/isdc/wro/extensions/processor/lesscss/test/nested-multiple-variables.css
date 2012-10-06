@@ -1,0 +1,33 @@
+@xxx: 4px;
+@variable: 10;
+
+first:something(@variable), second:pseudoclass(@xxx) {
+  @xxx: 'string';
+  @variable: 'other';
+
+  declaration: value;
+
+  nested1:length(@xxx), nested2:content(@variable) {
+    declaration: value;
+  }
+  nested3:content(@variable), nested4:length(@xxx) {
+    declaration: value;
+  }
+}
+
+first:something(@variable), second:pseudoclass(@xxx) {
+  @xxx: 'string';
+  @variable: 'other';
+
+  declaration: value;
+
+  nested1:length(@xxx), nested2:content(@variable) {
+    declaration: value;
+    deep1:length(@xxx), deep2:content(@variable) {
+      declaration: 1 2;
+    }
+    deep3, deep4 {
+      declaration: 3 4;
+    }
+  }
+}

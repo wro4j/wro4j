@@ -1,0 +1,46 @@
+first:something(10),
+second:pseudoclass(4px) {
+  declaration: value;
+}
+first:something(10) nested1:length('string'),
+second:pseudoclass(4px) nested1:length('string'),
+first:something(10) nested2:content('other'),
+second:pseudoclass(4px) nested2:content('other') {
+  declaration: value;
+}
+first:something(10) nested3:content('other'),
+second:pseudoclass(4px) nested3:content('other'),
+first:something(10) nested4:length('string'),
+second:pseudoclass(4px) nested4:length('string') {
+  declaration: value;
+}
+first:something(10),
+second:pseudoclass(4px) {
+  declaration: value;
+}
+first:something(10) nested1:length('string'),
+second:pseudoclass(4px) nested1:length('string'),
+first:something(10) nested2:content('other'),
+second:pseudoclass(4px) nested2:content('other') {
+  declaration: value;
+}
+first:something(10) nested1:length('string') deep1:length('string'),
+second:pseudoclass(4px) nested1:length('string') deep1:length('string'),
+first:something(10) nested2:content('other') deep1:length('string'),
+second:pseudoclass(4px) nested2:content('other') deep1:length('string'),
+first:something(10) nested1:length('string') deep2:content('other'),
+second:pseudoclass(4px) nested1:length('string') deep2:content('other'),
+first:something(10) nested2:content('other') deep2:content('other'),
+second:pseudoclass(4px) nested2:content('other') deep2:content('other') {
+  declaration: 1 2;
+}
+first:something(10) nested1:length('string') deep3,
+second:pseudoclass(4px) nested1:length('string') deep3,
+first:something(10) nested2:content('other') deep3,
+second:pseudoclass(4px) nested2:content('other') deep3,
+first:something(10) nested1:length('string') deep4,
+second:pseudoclass(4px) nested1:length('string') deep4,
+first:something(10) nested2:content('other') deep4,
+second:pseudoclass(4px) nested2:content('other') deep4 {
+  declaration: 3 4;
+}
