@@ -38,7 +38,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 /**
  * Utility class.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 13, 2008
  */
@@ -58,10 +58,10 @@ public final class WroUtil {
    */
   private static final Pattern PATTERN_ACCEPT_ENCODING = Pattern.compile(loadRegexpWithKey("requestHeader.acceptEncoding"));
   private static final Pattern PATTERN_GZIP = Pattern.compile(loadRegexpWithKey("requestHeader.gzip"));
-  
+
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
   public static final InputStream EMPTY_STREAM = new ByteArrayInputStream("".getBytes());
-  
+
   /**
    * @return {@link ThreadFactory} with daemon threads.
    */
@@ -69,7 +69,7 @@ public final class WroUtil {
     return new ThreadFactory() {
       private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
       private final AtomicInteger threadNumber = new AtomicInteger(1);
-      
+
       public Thread newThread(final Runnable runnable) {
         final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
         thread.setDaemon(true);
@@ -77,10 +77,10 @@ public final class WroUtil {
       }
     };
   }
-  
+
   /**
    * Transforms milliseconds into date format for response header of this form: Sat, 10 Apr 2010 17:31:31 GMT.
-   * 
+   *
    * @param milliseconds
    *          to transform
    * @return string representation of the date.
@@ -88,10 +88,10 @@ public final class WroUtil {
   public static String toDateAsString(final long milliseconds) {
     return DATE_FORMAT.format(milliseconds);
   }
-  
+
   /**
    * Retrieve pathInfo from a given location.
-   * 
+   *
    * @param request
    * @param location
    *          where to search contextPath.
@@ -117,7 +117,7 @@ public final class WroUtil {
     final String pathInfo = noSlash.substring(nextSlash);
     return pathInfo;
   }
-  
+
   /**
    * <p>
    * Case insensitive check if a String starts with a specified prefix.
@@ -126,7 +126,7 @@ public final class WroUtil {
    * <code>null</code>s are handled without exceptions. Two <code>null</code> references are considered to be equal. The
    * comparison is case insensitive.
    * </p>
-   * 
+   *
    * <pre>
    * StringUtils.startsWithIgnoreCase(null, null)      = true
    * StringUtils.startsWithIgnoreCase(null, "abcdef")  = false
@@ -134,7 +134,7 @@ public final class WroUtil {
    * StringUtils.startsWithIgnoreCase("abc", "abcdef") = true
    * StringUtils.startsWithIgnoreCase("abc", "ABCDEF") = true
    * </pre>
-   * 
+   *
    * @see java.lang.String#startsWith(String)
    * @param str
    *          the String to check, may be null
@@ -146,10 +146,10 @@ public final class WroUtil {
   public static boolean startsWithIgnoreCase(final String str, final String prefix) {
     return startsWith(str, prefix, true);
   }
-  
+
   /**
    * Creates a folder like implementation for a class. Ex: com.mycompany.MyClass -> com/mycompany/
-   * 
+   *
    * @param clazz
    *          used as a base location for determining the package path.
    * @return a string representation of the path where the class resides.
@@ -158,12 +158,12 @@ public final class WroUtil {
     Validate.notNull(clazz, "Class cannot be null!");
     return clazz.getPackage().getName().replace('.', '/');
   }
-  
+
   /**
    * <p>
    * Check if a String starts with a specified prefix (optionally case insensitive).
    * </p>
-   * 
+   *
    * @see java.lang.String#startsWith(String)
    * @param str
    *          the String to check, may be null
@@ -182,10 +182,10 @@ public final class WroUtil {
     }
     return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
   }
-  
+
   /**
    * Retrieve servletPath from a given location.
-   * 
+   *
    * @param location
    *          where to search the servletPath.
    * @return ServletPath string value.
@@ -193,11 +193,11 @@ public final class WroUtil {
   public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
     return location.replace(getPathInfoFromLocation(request, location), "");
   }
-  
+
   /**
    * Analyze headers of the request and searches for mangled (by proxy) for "Accept-Encoding" header and its mangled
    * variations and gzip header value and its mangled variations.
-   * 
+   *
    * @return true if this request support gzip encoding.
    */
   @SuppressWarnings("unchecked")
@@ -218,11 +218,11 @@ public final class WroUtil {
     }
     return false;
   }
-  
+
   /**
    * Transforms a java multi-line string into javascript multi-line string. This technique was found at {@link http
    * ://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
-   * 
+   *
    * @param data
    *          a string containing new lines.
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
@@ -249,7 +249,7 @@ public final class WroUtil {
     result.append("].join(\"\\n\")");
     return result.toString();
   }
-  
+
   /**
    * Utility used to verify that requestURI matches provided path
    */
@@ -261,10 +261,10 @@ public final class WroUtil {
     }
     return false;
   }
-  
+
   /**
    * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
-   * 
+   *
    * @param preProcessor
    *          {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
    * @return instance of {@link ResourceProcessor}.
@@ -278,10 +278,10 @@ public final class WroUtil {
       }
     };
   }
-  
+
   /**
    * A simple way to create a {@link WroModelFactory}.
-   * 
+   *
    * @param model
    *          {@link WroModel} instance to be returned by the factory.
    */
@@ -290,12 +290,12 @@ public final class WroUtil {
       public WroModel create() {
         return model;
       }
-      
+
       public void destroy() {
       }
     };
   }
-  
+
   public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
     return new ObjectFactory<T>() {
       public T create() {
@@ -303,10 +303,10 @@ public final class WroUtil {
       }
     };
   }
-  
+
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
-   * 
+   *
    * @param e
    *          the exception to wrap.
    * @deprecated use {@link WroRuntimeException#wrap(Exception)}
@@ -319,10 +319,10 @@ public final class WroUtil {
     }
     throw new WroRuntimeException(e.getMessage(), e);
   }
-  
+
   /**
    * Load the regular expression stored in in regexp.properties resource file.
-   * 
+   *
    * @param key
    *          the key of the regexp to load.
    * @return regular expression value.
@@ -332,21 +332,21 @@ public final class WroUtil {
       final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
       final Properties props = new RegexpProperties().load(stream);
       return props.getProperty(key);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
     }
   }
-  
+
   /**
    * @return the implementation version of wro4j.
    */
   public static String getImplementationVersion() {
     return WroUtil.class.getPackage().getImplementationVersion();
   }
-  
+
   /**
    * Copy and close the reader and writer streams.
-   * 
+   *
    * @param reader
    *          The source stream.
    * @param writer
@@ -363,16 +363,25 @@ public final class WroUtil {
       IOUtils.closeQuietly(writer);
     }
   }
-  
+
   /**
    * @return a generated {@link File} with unique name located in temp folder.
    */
   public static File createTempFile() {
+    return createTempFile("temp");
+  }
+
+  /**
+   * Creates a temp file which has a certain extension.
+   * @param extension of the created temp file.
+   */
+  public static File createTempFile(final String extension) {
     try {
-      final File file = new File(FileUtils.getTempDirectory(), "wro4j-" + UUID.randomUUID().toString());
+      final String fileName = String.format("wro4j-%s.%s", UUID.randomUUID().toString(), extension);
+      final File file = new File(FileUtils.getTempDirectory(), fileName);
       file.createNewFile();
       return file;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
   }

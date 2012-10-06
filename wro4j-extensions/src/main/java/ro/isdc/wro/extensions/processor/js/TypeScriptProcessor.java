@@ -6,6 +6,7 @@ package ro.isdc.wro.extensions.processor.js;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,9 @@ import ro.isdc.wro.util.WroUtil;
 @SupportedResourceType(ResourceType.JS)
 public class TypeScriptProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, SupportAware {
+  private static final String TYPESCRIPT_EXTENSION = "ts";
   private static final String SHELL_COMMAND = "tsc";
+  private static final String ARG_OUT = "--out";
   private static final Logger LOG = LoggerFactory.getLogger(TypeScriptProcessor.class);
   public static final String ALIAS = "typeScript";
   /**
@@ -88,28 +90,25 @@ public class TypeScriptProcessor
   private String process(final String resourceUri, final String content) {
     final InputStream shellIn = null;
     // the file holding the input file to process
-    File temp = null;
+    File tempSource = null;
+    File tempDest = null;
     try {
-      temp = WroUtil.createTempFile();
+      tempSource = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
+      tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       final String encoding = "UTF-8";
-      IOUtils.write(content, new FileOutputStream(temp), encoding);
-      LOG.debug("absolute path: {}", temp.getAbsolutePath());
+      IOUtils.write(content, new FileOutputStream(tempSource), encoding);
+      LOG.debug("absolute path: {}", tempSource.getAbsolutePath());
 
-      final Process process = createProcess(temp);
-      /**
-       * It is important to read before waitFor is invoked because read stream is blocking stdout while Java application
-       * doesn't read the whole buffer. It hangs when processing large files. The lessc isn't closing till all STDOUT
-       * flushed. This blocks io and Node does not exit because of that.
-       */
-      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
+      final Process process = createProcess(tempSource, tempDest);
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
-
+      final String result = IOUtils.toString(new FileInputStream(tempDest), encoding);
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
+        String errorMessage = IOUtils.toString(process.getInputStream(), encoding);
         // find a way to get rid of escape character found at the end (minor issue)
-        final String errorMessage = MessageFormat.format("Error in Typescript: \n{0}",
-            result.replace(temp.getPath(), resourceUri));
-        throw new WroRuntimeException(errorMessage);
+        errorMessage = MessageFormat.format("Error in Typescript: \n{0}",
+            errorMessage.replace(tempSource.getPath(), resourceUri));
+        throw new WroRuntimeException(errorMessage).logError();
       }
       return result;
     } catch (final Exception e) {
@@ -117,7 +116,8 @@ public class TypeScriptProcessor
     } finally {
       IOUtils.closeQuietly(shellIn);
       // always cleanUp
-      FileUtils.deleteQuietly(temp);
+      FileUtils.deleteQuietly(tempSource);
+      FileUtils.deleteQuietly(tempDest);
     }
   }
 
@@ -148,13 +148,15 @@ public class TypeScriptProcessor
    *
    * @param sourceFile
    *          the source path of the file from where the lessc will read the less file.
+   * @param destFile
+   *          the destination of the compiled file.
    * @throws IOException
    *           when the process execution fails.
    */
-  private Process createProcess(final File sourceFile)
+  private Process createProcess(final File sourceFile, final File destFile)
       throws IOException {
     notNull(sourceFile);
-    final String[] commandLine = getCommandLine(sourceFile.getPath());
+    final String[] commandLine = getCommandLine(sourceFile.getPath(), destFile.getPath());
     LOG.debug("CommandLine arguments: {}", Arrays.asList(commandLine));
     return new ProcessBuilder(commandLine).redirectErrorStream(true).start();
   }
@@ -165,10 +167,12 @@ public class TypeScriptProcessor
    */
   @Override
   public boolean isSupported() {
-    File temp = null;
+    File tempSource = null;
+    File tempDest = null;
     try {
-      temp = WroUtil.createTempFile();
-      final Process process = createProcess(temp);
+      tempSource = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
+      tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
+      final Process process = createProcess(tempSource, tempDest);
       final int exitValue = process.waitFor();
       LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
       if (exitValue != 0) {
@@ -181,7 +185,8 @@ public class TypeScriptProcessor
       LOG.warn("The {} processor is not supported.", getClass().getName());
       return false;
     } finally {
-      FileUtils.deleteQuietly(temp);
+      FileUtils.deleteQuietly(tempSource);
+      FileUtils.deleteQuietly(tempDest);
     }
   }
 
@@ -191,25 +196,25 @@ public class TypeScriptProcessor
    *
    * @return arguments for command line. The implementation will take care of OS differences.
    */
-  protected String[] getCommandLine(final String filePath) {
-    return isWindows ? buildArgumentsForWindows(filePath) : buildArgumentsForUnix(filePath);
+  protected String[] getCommandLine(final String filePath, final String outFilePath) {
+    return isWindows ? buildArgumentsForWindows(filePath, outFilePath) : buildArgumentsForUnix(filePath, outFilePath);
   }
 
   /**
    * @return arguments required to run lessc on non Windows platform.
    */
-  private String[] buildArgumentsForUnix(final String filePath) {
+  private String[] buildArgumentsForUnix(final String filePath, final String outFilePath) {
     return new String[] {
-      SHELL_COMMAND, filePath
+      SHELL_COMMAND, filePath, ARG_OUT, outFilePath
     };
   }
 
   /**
    * @return arguments required to run lessc on Windows platform.
    */
-  private String[] buildArgumentsForWindows(final String filePath) {
+  private String[] buildArgumentsForWindows(final String filePath, final String outFilePath) {
     return new String[] {
-      "cmd", "/c", SHELL_COMMAND, filePath
+      "cmd", "/c", SHELL_COMMAND, filePath, ARG_OUT, outFilePath
     };
   }
 }

@@ -1,28 +1,40 @@
-class Animal {
-    constructor(public name) { }
-    move(meters) {
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+}
+var Animal = (function () {
+    function Animal(name) {
+        this.name = name;
+    }
+    Animal.prototype.move = function (meters) {
         alert(this.name + " moved " + meters + "m.");
+    };
+    return Animal;
+})();
+var Snake = (function (_super) {
+    __extends(Snake, _super);
+    function Snake(name) {
+        _super.call(this, name);
     }
-}
-
-class Snake extends Animal {
-    constructor(name) { super(name); }
-    move() {
+    Snake.prototype.move = function () {
         alert("Slithering...");
-        super.move(5);
+        _super.prototype.move.call(this, 5);
+    };
+    return Snake;
+})(Animal);
+var Horse = (function (_super) {
+    __extends(Horse, _super);
+    function Horse(name) {
+        _super.call(this, name);
     }
-}
-
-class Horse extends Animal {
-    constructor(name) { super(name); }
-    move() {
+    Horse.prototype.move = function () {
         alert("Galloping...");
-        super.move(45);
-    }
-}
-
-var sam = new Snake("Sammy the Python")
-var tom: Animal = new Horse("Tommy the Palomino")
-
-sam.move()
-tom.move(34)
+        _super.prototype.move.call(this, 45);
+    };
+    return Horse;
+})(Animal);
+var sam = new Snake("Sammy the Python");
+var tom = new Horse("Tommy the Palomino");
+sam.move();
+tom.move(34);

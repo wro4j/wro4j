@@ -79,14 +79,14 @@ public class TestTypeScriptProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    WroTestUtils.runConcurrently(task, 7);
   }
 
   /**
    * Test that processing invalid less css produces exceptions
    */
   @Test
-  public void shouldFailWhenInvalidLessCssIsProcessed()
+  public void shouldFailWhenInvalidTypeScriptIsProcessed()
       throws Exception {
     final ResourcePreProcessor processor = new TypeScriptProcessor();
     final URL url = getClass().getResource("typescript");
