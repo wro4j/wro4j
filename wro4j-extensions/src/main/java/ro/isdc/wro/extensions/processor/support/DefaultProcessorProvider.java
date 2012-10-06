@@ -25,6 +25,7 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
+import ro.isdc.wro.extensions.processor.js.TypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -239,6 +240,12 @@ public class DefaultProcessorProvider
       @Override
       protected ResourceProcessor initialize() {
         return new HandlebarsJsProcessor();
+      }
+    }));
+    map.put(TypeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new TypeScriptProcessor();
       }
     }));
     return map;
