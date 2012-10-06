@@ -88,7 +88,7 @@ public class WroTestUtils {
       throws IOException {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
-    WroTestUtils.compare(resultReader, expectedReader, processor);
+    compare(resultReader, expectedReader, processor);
   }
 
   private static Reader getReaderFromUri(final String uri)
@@ -185,9 +185,9 @@ public class WroTestUtils {
 
       Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
-    } catch (final Exception e) {
+    } catch (final ComparisonFailure e) {
       LOG.error("Compare.... [FAIL]", e.getMessage());
-      throw WroRuntimeException.wrap(e);
+      throw e;
     }
   }
 

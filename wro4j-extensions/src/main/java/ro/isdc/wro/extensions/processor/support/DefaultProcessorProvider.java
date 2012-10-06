@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import ro.isdc.wro.extensions.processor.css.BourbonCssProcessor;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.css.Less4jProcessor;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
@@ -38,7 +39,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 
 /**
  * The implementation which contributes with processors from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
@@ -51,7 +52,7 @@ public class DefaultProcessorProvider
   public Map<String, ResourcePreProcessor> providePreProcessors() {
     return createMap();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -63,12 +64,12 @@ public class DefaultProcessorProvider
      * interfaces which will be resolved in next major version.
      */
     final Map<String, ResourcePreProcessor> preProcessorsMap = createMap();
-    for (Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
+    for (final Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
       resultMap.put(entry.getKey(), new ProcessorDecorator(entry.getValue()));
     }
     return resultMap;
   }
-  
+
   /**
    * @return the map of pre processors.
    */
@@ -129,6 +130,12 @@ public class DefaultProcessorProvider
       @Override
       protected ResourcePreProcessor initialize() {
         return new NodeLessCssProcessor();
+      }
+    }));
+    map.put(Less4jProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new Less4jProcessor();
       }
     }));
     map.put(LessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
