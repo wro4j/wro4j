@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.Reader;
 import java.io.Writer;
 
@@ -15,6 +17,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
 
 /**
@@ -30,7 +33,7 @@ public class TestSupportAwareProcessorDecorator {
   @Mock
   private Writer mockWriter;
 
-  private ResourceProcessor victim;
+  private SupportAwareProcessorDecorator victim;
 
   private static interface MockProcessor
       extends ResourceProcessor, SupportAware {
@@ -51,6 +54,13 @@ public class TestSupportAwareProcessorDecorator {
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullProcessor() {
     new SupportAwareProcessorDecorator(null);
+  }
+
+
+  @Test
+  public void shouldCorrectlyDetectSupportOfDeepNestedProcessor() {
+    victim = new SupportAwareProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(new JSMinProcessor())));
+    assertTrue(victim.isSupported());
   }
 
   @Test
