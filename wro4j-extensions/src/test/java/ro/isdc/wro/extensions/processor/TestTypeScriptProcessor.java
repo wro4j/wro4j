@@ -12,7 +12,6 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class TestTypeScriptProcessor {
    */
   @Before
   public void beforeMethod() {
-    Assume.assumeTrue(isSupported);
+    //Assume.assumeTrue(isSupported);
   }
 
   @Test

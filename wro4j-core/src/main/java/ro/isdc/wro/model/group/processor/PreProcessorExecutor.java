@@ -29,8 +29,7 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
-import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
@@ -42,7 +41,7 @@ import ro.isdc.wro.util.WroUtil;
  * String.
  * <p>
  * This is useful when you want to preProcess a resource which is not a part of the model (css import use-case).
- * 
+ *
  * @author Alex Objelean
  */
 public class PreProcessorExecutor {
@@ -61,10 +60,10 @@ public class PreProcessorExecutor {
    * Runs the preProcessing in parallel.
    */
   private ExecutorService executor;
-  
+
   /**
    * Apply preProcessors on resources and merge them.
-   * 
+   *
    * @param resources
    *          what are the resources to merge.
    * @param minimize
@@ -91,16 +90,16 @@ public class PreProcessorExecutor {
       callbackRegistry.onAfterMerge();
     }
   }
-  
+
   private boolean shouldRunInParallel(final List<Resource> resources) {
     final boolean isParallel = config.isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
-  
+
   /**
    * runs the pre processors in parallel.
-   * 
+   *
    * @return merged and pre processed content.
    */
   private String runInParallel(final List<Resource> resources, final boolean minimize)
@@ -123,7 +122,7 @@ public class PreProcessorExecutor {
     for (final Callable<String> callable : callables) {
       futures.add(exec.submit(callable));
     }
-    
+
     for (final Future<String> future : futures) {
       try {
         result.append(future.get());
@@ -141,7 +140,7 @@ public class PreProcessorExecutor {
     }
     return result.toString();
   }
-  
+
   private ExecutorService getExecutorService() {
     if (executor == null) {
       // use at most the number of available processors (true parallelism)
@@ -152,10 +151,10 @@ public class PreProcessorExecutor {
     }
     return executor;
   }
-  
+
   /**
    * Apply a list of preprocessors on a resource.
-   * 
+   *
    * @param resource
    *          the {@link Resource} on which processors will be applied
    * @param processors
@@ -167,7 +166,7 @@ public class PreProcessorExecutor {
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
-    
+
     String resourceContent = null;
     try {
       resourceContent = getResourceContent(resource);
@@ -187,9 +186,9 @@ public class PreProcessorExecutor {
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
       stopWatch.start("Processor: " + processor.getClass().getSimpleName());
-      
+
       callbackRegistry.onBeforePreProcess();
-      
+
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
@@ -207,17 +206,16 @@ public class PreProcessorExecutor {
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
-  
+
   /**
    * Decorates preProcessor with mandatory decorators.
    */
   private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
-    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(
-        processor));
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor);
     injector.inject(decorated);
     return decorated;
   }
-  
+
   /**
    * @return a Reader for the provided resource.
    * @param resource

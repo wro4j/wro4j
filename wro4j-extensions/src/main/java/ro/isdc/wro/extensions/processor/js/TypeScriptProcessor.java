@@ -182,7 +182,7 @@ public class TypeScriptProcessor
       return true;
     } catch (final Exception e) {
       LOG.debug("Unsupported processor", e);
-      LOG.warn("The {} processor is not supported.", getClass().getName());
+      LOG.warn("The {} processor is not supported. Because: {}", getClass().getName(), e.getMessage());
       return false;
     } finally {
       FileUtils.deleteQuietly(tempSource);

@@ -24,7 +24,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
@@ -32,7 +32,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -48,14 +48,14 @@ public class GroupsProcessor {
   private WroConfiguration config;
   @Inject
   private Injector injector;
-  
+
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-  
+
   /**
    * @param cacheKey
    *          to process.
@@ -84,10 +84,10 @@ public class GroupsProcessor {
       callbackRegistry.onProcessingComplete();
     }
   }
-  
+
   /**
    * Perform postProcessing.
-   * 
+   *
    * @return the post processed contents.
    */
   private String doPostProcess(final String content, final CacheEntry cacheEntry)
@@ -101,10 +101,10 @@ public class GroupsProcessor {
         cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
     return applyPostProcessors(processors, content);
   }
-  
+
   /**
    * Apply resourcePostProcessors.
-   * 
+   *
    * @param processors
    *          a collection of processors to apply on the content from the supplied writer.
    * @param content
@@ -137,12 +137,12 @@ public class GroupsProcessor {
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
-  
+
   /**
    * @return a decorated postProcessor.
    */
   private ResourcePostProcessor decorateProcessor(final ResourcePostProcessor processor) {
-    final ResourcePostProcessor decorated = new ExceptionHandlingProcessorDecorator(processor);
+    final ResourcePostProcessor decorated = new DefaultProcessorDecorator(processor);
     injector.inject(decorated);
     return decorated;
   }

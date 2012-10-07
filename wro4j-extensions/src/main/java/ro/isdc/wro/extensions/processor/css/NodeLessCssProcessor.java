@@ -17,7 +17,6 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ public class NodeLessCssProcessor
     final String resourceUri = resource == null ? "unknown.less" : resource.getUri();
     try {
       writer.write(process(resourceUri, content));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
           + " resource, no processing applied...", e);
       LOG.error(e.getMessage(), e);
@@ -90,7 +89,7 @@ public class NodeLessCssProcessor
   }
 
   private String process(final String resourceUri, final String content) {
-    InputStream shellIn = null;
+    final InputStream shellIn = null;
     // the file holding the input file to process
     File temp = null;
     try {
@@ -106,7 +105,7 @@ public class NodeLessCssProcessor
        * flushed. This blocks io and Node does not exit because of that.
        */
       final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
-      int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
+      final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
 
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
@@ -116,7 +115,7 @@ public class NodeLessCssProcessor
         throw new WroRuntimeException(errorMessage);
       }
       return result;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
       IOUtils.closeQuietly(shellIn);
@@ -173,16 +172,16 @@ public class NodeLessCssProcessor
     try {
       temp = WroUtil.createTempFile();
       final Process process = createProcess(temp);
-      int exitValue = process.waitFor();
+      final int exitValue = process.waitFor();
       LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
       if (exitValue != 0) {
         throw new UnsupportedOperationException("Lessc is not a supported operation on this platform");
       }
       LOG.debug("The {} processor is supported.", getClass().getName());
       return true;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.debug("Unsupported processor", e);
-      LOG.warn("The {} processor is not supported.", getClass().getName());
+      LOG.warn("The {} processor is not supported. Because: {}", getClass().getName(), e.getMessage());
       return false;
     } finally {
       FileUtils.deleteQuietly(temp);
