@@ -41,7 +41,6 @@ public class TestSupportAwareProcessorDecorator {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     victim = new SupportAwareProcessorDecorator(mockProcessor);
-    // WroTestUtils.createInjector().inject(victim);
   }
 
   @After
