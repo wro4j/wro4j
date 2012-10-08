@@ -87,8 +87,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    * {@inheritDoc}
    */
   @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory()
-    throws Exception {
+  protected StandaloneContextAwareManagerFactory getManagerFactory() {
     final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
     factory.setProcessorsFactory(createSingleProcessorsFactory());
     return factory;

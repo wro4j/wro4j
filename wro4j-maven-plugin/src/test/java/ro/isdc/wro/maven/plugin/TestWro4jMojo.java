@@ -7,6 +7,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +31,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
@@ -39,6 +42,11 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -48,6 +56,7 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.FolderHashEncoderNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -61,18 +70,24 @@ public class TestWro4jMojo {
   private BuildContext mockBuildContext;
   @Mock
   private HashStrategy mockHashStrategy;
+  @Mock
+  private UriLocatorFactory mockLocatorFactory;
+  @Mock
+  private UriLocator mockLocator;
   private File cssDestinationFolder;
   private File jsDestinationFolder;
   private File destinationFolder;
   private File extraConfigFile;
   private Wro4jMojo mojo;
-  
+
 
 
   @Before
   public void setUp()
     throws Exception {
     MockitoAnnotations.initMocks(this);
+    when(mockLocatorFactory.getInstance(Mockito.anyString())).thenReturn(mockLocator);
+
     Context.set(Context.standaloneContext());
     mojo = new Wro4jMojo();
     setUpMojo(mojo);
@@ -348,11 +363,11 @@ public class TestWro4jMojo {
 
     final File extraConfigFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
 
-    Properties props = new Properties();
+    final Properties props = new Properties();
     //TODO create a properties builder
     props.setProperty(ConfigurableNamingStrategy.KEY, FolderHashEncoderNamingStrategy.ALIAS);
     props.list(new PrintStream(extraConfigFile));
-    
+
     mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
     mojo.setExtraConfigFile(extraConfigFile);
     mojo.setIgnoreMissingResources(true);
@@ -408,14 +423,13 @@ public class TestWro4jMojo {
   public void testIncrementalChange() throws Exception {
     mojo = new Wro4jMojo() {
       @Override
-      protected StandaloneContextAwareManagerFactory getManagerFactory()
-          throws Exception {
+      protected StandaloneContextAwareManagerFactory getManagerFactory() {
         final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
         final StandaloneContextAwareManagerFactory spiedFactory = Mockito.spy(factory);
-        
+
         final WroManager manager = factory.create();
         manager.setHashStrategy(mockHashStrategy);
-        
+
         Mockito.when(spiedFactory.create()).thenReturn(manager);
         return spiedFactory;
       }
@@ -429,10 +443,61 @@ public class TestWro4jMojo {
     mojo.setBuildContext(mockBuildContext);
     //incremental build detects no change
     assertTrue(mojo.getTargetGroupsAsList().isEmpty());
-    
+
     //incremental change detects change for all resources
     when(mockHashStrategy.getHash(Mockito.any(InputStream.class))).thenReturn("TotallyDifferentValue");
     assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+  }
+
+  @Test
+  public void shouldDetectIncrementalChangeOfImportedCss() throws Exception {
+    final String parentResource = "parent.css";
+    final String importResource = "imported.css";
+
+    final WroModel model = new WroModel();
+    model.addGroup(new Group("g1").addResource(Resource.create(parentResource)));
+    when(mockLocator.locate(Mockito.anyString())).thenAnswer(answerWithContent(""));
+    final String parentContent = String.format("@import url(%s)", importResource);
+    when(mockLocator.locate(Mockito.eq(parentResource))).thenAnswer(answerWithContent(parentContent));
+
+    mojo = new Wro4jMojo() {
+      @Override
+      protected StandaloneContextAwareManagerFactory newWroManagerFactory()
+          throws MojoExecutionException {
+        final DefaultStandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory();
+        managerFactory.setUriLocatorFactory(mockLocatorFactory);
+        managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(model));
+        return managerFactory;
+      }
+    };
+    final HashStrategy hashStrategy = mojo.getManagerFactory().create().getHashStrategy();
+    setUpMojo(mojo);
+
+    final String importedInitialContent = "initial";
+
+    when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent(importedInitialContent));
+    when(mockBuildContext.isIncremental()).thenReturn(true);
+    when(mockBuildContext.getValue(Mockito.eq(parentResource))).thenReturn(
+        hashStrategy.getHash(new ByteArrayInputStream(parentContent.getBytes())));
+    when(mockBuildContext.getValue(Mockito.eq(importResource))).thenReturn(
+        hashStrategy.getHash(new ByteArrayInputStream(importedInitialContent.getBytes())));
+    mojo.setIgnoreMissingResources(true);
+    mojo.setBuildContext(mockBuildContext);
+
+    //incremental build detects no change
+    assertTrue(mojo.getTargetGroupsAsList().isEmpty());
+
+    when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
+    assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+  }
+
+  private Answer<InputStream> answerWithContent(final String content) {
+    return new Answer<InputStream>() {
+      public InputStream answer(final InvocationOnMock invocation)
+          throws Throwable {
+        return new ByteArrayInputStream(content.getBytes());
+      }
+    };
   }
 
   @After
