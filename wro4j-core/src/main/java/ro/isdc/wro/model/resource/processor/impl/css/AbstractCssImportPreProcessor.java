@@ -68,7 +68,6 @@ public abstract class AbstractCssImportPreProcessor
    */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    LOG.debug("Applying {} processor", toString());
     validate();
     try {
       final String result = parseCss(resource, IOUtils.toString(reader));
