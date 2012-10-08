@@ -312,7 +312,7 @@ public final class WroUtil {
       final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
       final Properties props = new RegexpProperties().load(stream);
       return props.getProperty(key);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
     }
   }
@@ -345,11 +345,20 @@ public final class WroUtil {
    * @return a generated {@link File} with unique name located in temp folder. 
    */
   public static File createTempFile() {
+    return createTempFile("temp");
+  }
+
+  /**
+   * Creates a temp file which has a certain extension.
+   * @param extension of the created temp file.
+   */
+  public static File createTempFile(final String extension) {
     try {
-      final File file = new File(FileUtils.getTempDirectory(), "wro4j-" + UUID.randomUUID().toString());
+      final String fileName = String.format("wro4j-%s.%s", UUID.randomUUID().toString(), extension);
+      final File file = new File(FileUtils.getTempDirectory(), fileName);
       file.createNewFile();
       return file;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
   }

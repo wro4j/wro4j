@@ -88,7 +88,7 @@ public class WroTestUtils {
       throws IOException {
     final Reader resultReader = getReaderFromUri(inputResourceUri);
     final Reader expectedReader = getReaderFromUri(expectedContentResourceUri);
-    WroTestUtils.compare(resultReader, expectedReader, processor);
+    compare(resultReader, expectedReader, processor);
   }
 
   private static Reader getReaderFromUri(final String uri)
@@ -196,7 +196,7 @@ public class WroTestUtils {
       Assert.assertEquals(in, out);
       LOG.debug("Compare.... [OK]");
     } catch (final ComparisonFailure e) {
-      LOG.debug("Compare.... [FAIL]", e.getMessage());
+      LOG.error("Compare.... [FAIL]", e.getMessage());
       throw e;
     }
   }
@@ -246,7 +246,7 @@ public class WroTestUtils {
               processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
             }
           });
-        } catch (ComparisonFailure e) {
+        } catch (final ComparisonFailure e) {
           LOG.error("Failed comparing: {}", file.getName());
           throw e;
         }
@@ -348,7 +348,7 @@ public class WroTestUtils {
             }
             try {
               preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
-            } catch (IOException e) {
+            } catch (final Exception e) {
               LOG.error("processing failed...", e);
               throw new WroRuntimeException("Processing failed...", e);
             }
@@ -443,10 +443,10 @@ public class WroTestUtils {
    */
   public static void assertProcessorSupportResourceTypes(final ResourceProcessor processor,
       final ResourceType... expectedResourceTypes) {
-    ResourceType[] actualResourceTypes = new ProcessorDecorator(processor).getSupportedResourceTypes();
+    final ResourceType[] actualResourceTypes = new ProcessorDecorator(processor).getSupportedResourceTypes();
     try {
       Assert.assertTrue(Arrays.equals(expectedResourceTypes, actualResourceTypes));
-    } catch (AssertionFailedError e) {
+    } catch (final AssertionFailedError e) {
       final String message = "actual resourceTypes: " + Arrays.toString(actualResourceTypes) + ", expected are: "
           + Arrays.toString(expectedResourceTypes);
       LOG.error(message);

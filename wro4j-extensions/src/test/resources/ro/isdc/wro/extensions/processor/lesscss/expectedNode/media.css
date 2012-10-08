@@ -5,8 +5,7 @@
   .class .sub {
     width: 42;
   }
-  .top,
-  header > h1 {
+  .top, header > h1 {
     color: #444444;
   }
 }

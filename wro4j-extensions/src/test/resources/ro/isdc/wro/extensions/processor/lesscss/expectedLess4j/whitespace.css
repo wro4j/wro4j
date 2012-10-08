@@ -11,26 +11,24 @@
   color: white;
 }
 .whitespace {
-  color: white ;
+  color: white;
 }
-.white, .space, .mania {
+.white,
+.space,
+.mania {
   color: white;
 }
 .no-semi-column {
-  color: #ffffff;
+  color: white;
 }
 .no-semi-column {
   color: white;
   white-space: pre;
 }
 .no-semi-column {
-  border: 2px solid #ffffff;
+  border: 2px solid white;
 }
 .newlines {
-  background: the,
-              great,
-              wall;
-  border: 2px
-          solid
-          black;
+  background: the, great, wall;
+  border: 2px solid black;
 }

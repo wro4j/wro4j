@@ -25,7 +25,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
@@ -33,7 +33,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -49,14 +49,14 @@ public class GroupsProcessor {
   private WroConfiguration config;
   @Inject
   private Injector injector;
-  
+
   /**
    * This field is transient because {@link PreProcessorExecutor} is not serializable (according to findbugs eclipse
    * plugin).
    */
   @Inject
   private transient PreProcessorExecutor preProcessorExecutor;
-  
+
   /**
    * @param cacheKey
    *          to process.
@@ -85,10 +85,10 @@ public class GroupsProcessor {
       callbackRegistry.onProcessingComplete();
     }
   }
-  
+
   /**
    * Perform postProcessing.
-   * 
+   *
    * @return the post processed contents.
    */
   private String doPostProcess(final Group group, final String content, final CacheEntry cacheEntry) throws IOException {
@@ -99,7 +99,7 @@ public class GroupsProcessor {
     }
     final Collection<? extends ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(
         cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
-    
+
     final String resourceName = group.getName() + "." + cacheEntry.getType().name().toLowerCase();
     final Resource mergedResource = Resource.create(resourceName, cacheEntry.getType());
     mergedResource.setMinimize(cacheEntry.isMinimize());
@@ -107,10 +107,10 @@ public class GroupsProcessor {
 
     return applyPostProcessors(mergedResource, processors, content);
   }
-  
+
   /**
    * Apply resourcePostProcessors.
-   * 
+   *
    * @param processors
    *          a collection of processors to apply on the content from the supplied writer.
    * @param content
@@ -144,12 +144,12 @@ public class GroupsProcessor {
     LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
-  
+
   /**
    * @return a decorated postProcessor.
    */
   private ResourceProcessor decorateProcessor(final ResourceProcessor processor) {
-    final ResourceProcessor decorated = new ExceptionHandlingProcessorDecorator(processor);
+    final ResourceProcessor decorated = new DefaultProcessorDecorator(processor);
     injector.inject(decorated);
     return decorated;
   }
