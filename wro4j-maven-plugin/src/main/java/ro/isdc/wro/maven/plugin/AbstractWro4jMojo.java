@@ -5,11 +5,15 @@ package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -30,8 +34,14 @@ import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
 
@@ -96,7 +106,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * Responsible for identifying the resources changed during incremental build.
    * <p/>
    * Read more about it <a href="http://wiki.eclipse.org/M2E_compatible_maven_plugins#BuildContext">here</a>
-   * 
+   *
    * @component
    */
   private BuildContext buildContext;
@@ -129,7 +139,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
   /**
-   * Invoked before execution is performed. 
+   * Invoked before execution is performed.
    */
   protected void onBeforeExecute() {
   }
@@ -162,19 +172,22 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * This method will ensure that you have a right and initialized instance of
    * {@link StandaloneContextAwareManagerFactory}. When overriding this method, ensure that creating managerFactory
    * performs injection during manager creation, otherwise the manager won't be initialized porperly.
-   * 
+   *
    * @return {@link WroManagerFactory} implementation.
    */
-  protected StandaloneContextAwareManagerFactory getManagerFactory()
-    throws Exception {
+  protected StandaloneContextAwareManagerFactory getManagerFactory() {
     if (managerFactory == null) {
-      managerFactory = new InjectableContextAwareManagerFactory(newWroManagerFactory());
+      try {
+        managerFactory = new InjectableContextAwareManagerFactory(newWroManagerFactory());
+      } catch (final MojoExecutionException e) {
+        throw WroRuntimeException.wrap(e);
+      }
       // initialize before process.
       managerFactory.initialize(createStandaloneContext());
     }
     return managerFactory;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -235,7 +248,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
   /**
-   * Store digest for all resources contained inside the list of provided groups. 
+   * Store digest for all resources contained inside the list of provided groups.
    */
   private void persistResourceFingerprints(final List<String> groupNames) {
     if (buildContext != null) {
@@ -250,13 +263,53 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
             try {
               final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
               buildContext.setValue(resource.getUri(), fingerprint);
-            } catch (IOException e) {
+            } catch (final IOException e) {
               getLog().debug("could not check fingerprint of resource: " + resource);
             }
-          } 
+          }
         }
       }
     }
+  }
+
+  private ResourceProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
+    final ResourceProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
+      @Override
+      protected void onImportDetected(final String importedUri) {
+        getLog().debug("Found @import " + importedUri);
+        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
+        getLog().debug("\tisImportChanged: " + isImportChanged);
+        if (isImportChanged) {
+          changeDetected.set(true);
+          // no need to continue
+          throw new WroRuntimeException("Change detected. No need to continue processing");
+        }
+      };
+
+      @Override
+      protected String doTransform(final String cssContent, final List<Resource> foundImports)
+          throws IOException {
+        // no need to build the content, since we are interested in finding imported resources only
+        return "";
+      }
+
+      @Override
+      public String toString() {
+        return CssImportPreProcessor.class.getSimpleName();
+      }
+    };
+    /**
+     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
+     * change.
+     */
+    final ResourceProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
+      @Override
+      protected boolean isIgnoreFailingProcessor() {
+        return true;
+      }
+    };
+    InjectorBuilder.create(getManagerFactory()).build().inject(processor);
+    return processor;
   }
 
   /**
@@ -282,12 +335,23 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     final WroManager manager = getWroManager();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final ResourceLocatorFactory locatorFactory = manager.getResourceLocatorFactory();
+    // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
+    final AtomicBoolean changeDetected = new AtomicBoolean(false);
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
       final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resource.getUri())) : null;
       getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
-      return fingerprint != null && !fingerprint.equals(previousFingerprint);
-    } catch (IOException e) {
+
+      changeDetected.set(fingerprint != null && !fingerprint.equals(previousFingerprint));
+
+      if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
+        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+        getLog().debug("Check @import directive from " + resource);
+        // detect changes in imported resources.
+        createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
+      }
+      return changeDetected.get();
+    } catch (final IOException e) {
       getLog().debug("failed to check for delta resource: " + resource);
     }
     return false;
@@ -304,11 +368,11 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   private WroModel getModel() {
       return getWroManager().getModelFactory().create();
   }
-  
+
   private WroManager getWroManager() {
     try {
       return getManagerFactory().create();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     }
   }
