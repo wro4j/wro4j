@@ -19,40 +19,38 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Default implementation which can decorate a processor. This class is still named {@link ProcessorDecorator},
  * though it is not abstract (for backward compatibility reasons). It will be renamed to ProcessorDecorator.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Sep 2011
  * @since 1.4.1
  */
 public class ProcessorDecorator
-  extends AbstractProcessorDecoratorSupport {
-  /**
-   * Decorated processor.
-   */
-  private final ResourcePreProcessor decoratedProcessor;
+  extends AbstractProcessorDecoratorSupport<ResourcePreProcessor> {
 
   /**
    * Hides the postProcessor adaptation logic. This exist due to differences between pre & post processor interface.
    * This will be removed in 1.5.0 when all processors will have an unified interface.
    */
   public ProcessorDecorator(final Object processor) {
+    super(transform(processor));
+  }
+
+  private static ResourcePreProcessor transform(final Object processor) {
     Validate.notNull(processor);
     if (processor instanceof ResourcePreProcessor) {
-      this.decoratedProcessor = (ResourcePreProcessor) processor;
+      return (ResourcePreProcessor) processor;
     } else if (processor instanceof ResourcePostProcessor) {
-      this.decoratedProcessor = toPreProcessor((ResourcePostProcessor) processor);
-    } else throw new IllegalArgumentException("Invalid processor: " + processor); 
+      return toPreProcessor((ResourcePostProcessor) processor);
+    } else {
+      throw new IllegalArgumentException("Invalid processor: " + processor);
+    }
   }
 
   /**
    * Transforms a post processor into pre processor.
    */
-  private ResourcePreProcessor toPreProcessor(final ResourcePostProcessor postProcessor) {
-    return new AbstractProcessorDecoratorSupport() {
-      @Override
-      public Object getDecoratedObject() {
-        return postProcessor;
-      }
+  private static ResourcePreProcessor toPreProcessor(final ResourcePostProcessor postProcessor) {
+    return new AbstractProcessorDecoratorSupport<ResourcePostProcessor>(postProcessor) {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         postProcessor.process(reader, writer);
@@ -69,24 +67,16 @@ public class ProcessorDecorator
   }
 
   /**
-   * @return the decorated processor.
-   */
-  @Override
-  public final ResourcePreProcessor getDecoratedObject() {
-    return decoratedProcessor;
-  }
-  
-  /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    decoratedProcessor.process(resource, reader, writer);
+    getDecoratedObject().process(resource, reader, writer);
   }
 
   /**
    * Indicates if the processor is eligible for usage based on provided criteria.
-   * 
+   *
    * @param minimize
    *          - when true the processor should be minimize aware.
    * @param searchedType
@@ -96,15 +86,15 @@ public class ProcessorDecorator
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {
     Validate.notNull(searchedType);
-    
+
     final SupportedResourceType supportedType = getSupportedResourceType();
     final boolean isTypeSatisfied = supportedType == null
         || (supportedType != null && searchedType == supportedType.value());
     final boolean isMinimizedSatisfied = minimize == true || !isMinimize();
-    
+
     return isTypeSatisfied && isMinimizedSatisfied;
   }
-  
+
   /**
    * {@inheritDoc}
    */
