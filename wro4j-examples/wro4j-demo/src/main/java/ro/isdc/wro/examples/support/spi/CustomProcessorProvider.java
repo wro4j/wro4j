@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ro.isdc.wro.examples.support.processor.CustomProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 
 
@@ -17,14 +16,14 @@ import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 public class CustomProcessorProvider
     implements ProcessorProvider {
   @Override
-  public Map<String, ResourcePreProcessor> providePreProcessors() {
-    final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
+  public Map<String, ResourceProcessor> providePreProcessors() {
+    final Map<String, ResourceProcessor> map = new HashMap<String, ResourceProcessor>();
     map.put(CustomProcessor.ALIAS, new CustomProcessor());
     return map;
   }
 
   @Override
-  public Map<String, ResourcePostProcessor> providePostProcessors() {
-    return new HashMap<String, ResourcePostProcessor>();
+  public Map<String, ResourceProcessor> providePostProcessors() {
+    return new HashMap<String, ResourceProcessor>();
   }
 }

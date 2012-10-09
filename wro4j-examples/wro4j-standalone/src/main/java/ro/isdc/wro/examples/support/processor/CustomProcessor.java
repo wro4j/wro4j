@@ -9,21 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 
 public class CustomProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CustomProcessor.class);
   public static String ALIAS = "customProcessor";
-  /**
-   * {@inheritDoc}
-   */
-  public void process(final Reader reader, final Writer writer)
-      throws IOException {
-    process(null, reader, writer);
-  }
 
   /**
    * {@inheritDoc}

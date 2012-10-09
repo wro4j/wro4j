@@ -17,7 +17,7 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.LazyInitializer;
 
 
@@ -42,9 +42,9 @@ public class TestLazyProcessorDecorator {
   @Test(expected = NullPointerException.class)
   public void cannotProcessNullLazyProcessor()
       throws Exception {
-    victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+    victim = new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
       @Override
-      protected ResourcePreProcessor initialize() {
+      protected ResourceProcessor initialize() {
         return null;
       }
     });
@@ -65,9 +65,9 @@ public class TestLazyProcessorDecorator {
       }
     });
     when(mockProcessor.isSupported()).thenReturn(false);
-    victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+    victim = new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
       @Override
-      protected ResourcePreProcessor initialize() {
+      protected ResourceProcessor initialize() {
         return mockProcessor;
       }
     });
