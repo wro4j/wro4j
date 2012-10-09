@@ -11,26 +11,19 @@ import ro.isdc.wro.util.LazyInitializer;
 
 /**
  * Decorates a {@link LazyInitializer} which creates a processor.
- * 
+ *
  * @author Alex Objelean
  * @since 1.4.6
  */
 public final class LazyProcessorDecorator
     extends AbstractProcessorDecoratorSupport {
-  private LazyInitializer<ResourcePreProcessor> processorInitializer;
-  
+  private final LazyInitializer<ResourcePreProcessor> processorInitializer;
+
   public LazyProcessorDecorator(final LazyInitializer<ResourcePreProcessor> processor) {
+    super(processor);
     this.processorInitializer = processor;
   }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ResourcePreProcessor getDecoratedObject() {
-    return processorInitializer.get();
-  }
-  
+
   /**
    * {@inheritDoc}
    */
