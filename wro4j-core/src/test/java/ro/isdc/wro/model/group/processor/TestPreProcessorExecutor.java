@@ -71,14 +71,14 @@ public class TestPreProcessorExecutor {
   @Before
   public void setUp() throws Exception {
     initMocks(this);
-    
+
     when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     when(mockRequest.getServletPath()).thenReturn("");
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
     when(mockLocator.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
     when(mockLocatorFactory.getInstance(Mockito.anyString())).thenReturn(mockLocator);
-    
+
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
     Context.set(context);
     //force parallel execution
@@ -207,7 +207,7 @@ public class TestPreProcessorExecutor {
     throws Exception {
     genericUseFailingPreProcessorWithIngoreFlag(false);
   }
-  
+
   @Test
   public void shouldNotFailWhenUsingFailingPreProcessor()
       throws Exception {
@@ -222,7 +222,7 @@ public class TestPreProcessorExecutor {
     Assert.assertEquals("", result);
 
   }
-  
+
   /**
    * This test should work when running at least on dual-core.
    * It assumes that (P1(r1) + P2(r1) + P3(r1)) + (P1(r2) + P2(r2) + P3(r2)) > Parallel(P1(r1) + P2(r1) + P3(r1) | P1(r2) + P2(r2) + P3(r2))
@@ -235,38 +235,38 @@ public class TestPreProcessorExecutor {
     //test it only if number there are more than 1 CPU cores are available
     if (availableProcessors > 1) {
       final StopWatch watch = new StopWatch();
-      WroConfiguration config = Context.get().getConfig();
-      
+      final WroConfiguration config = Context.get().getConfig();
+
       initExecutor(createSlowPreProcessor(100), createSlowPreProcessor(100), createSlowPreProcessor(100));
       final List<Resource> resources = createResources(Resource.create("r1", ResourceType.JS),
           Resource.create("r2", ResourceType.JS));
-      
+
       // warm up
       config.setParallelPreprocessing(true);
       executor.processAndMerge(resources, true);
-      
+
       // parallel
       watch.start("parallel preProcessing");
       config.setParallelPreprocessing(true);
       executor.processAndMerge(resources, true);
       watch.stop();
-      long parallelExecution = watch.getLastTaskTimeMillis();
-      
+      final long parallelExecution = watch.getLastTaskTimeMillis();
+
       // sequential
       config.setParallelPreprocessing(false);
       watch.start("sequential preProcessing");
       executor.processAndMerge(resources, true);
       watch.stop();
-      long sequentialExecution = watch.getLastTaskTimeMillis();
-      
-      String message = "Processing details: \n" + watch.prettyPrint();
+      final long sequentialExecution = watch.getLastTaskTimeMillis();
+
+      final String message = "Processing details: \n" + watch.prettyPrint();
       LOG.debug(message);
-      
+
       // prove that running in parallel is faster
       // delta indicates the improvement relative to parallel execution (we use 80% relative improvement, but it
       // normally
       // should be about 100%).
-      double delta = parallelExecution * 0.8;
+      final double delta = parallelExecution * 0.8;
       Assert.assertTrue(String.format("%s  > %s + %s", sequentialExecution, parallelExecution, delta),
           sequentialExecution > parallelExecution + delta);
     }
@@ -297,7 +297,7 @@ public class TestPreProcessorExecutor {
   public void shouldNotFailWhenEmptyResourceIsFound() throws Exception {
     final WroConfiguration config = Context.get().getConfig();
     config.setIgnoreMissingResources(false);
-    
+
     final UriLocator emptyStreamLocator = new UriLocator() {
       public boolean accept(final String uri) {
         return true;
@@ -309,14 +309,14 @@ public class TestPreProcessorExecutor {
     };
     final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(emptyStreamLocator);
     //init executor
-    WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory);
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory);
     InjectorBuilder.create(managerFactory).build().inject(executor);
-    
+
     final List<Resource> resources = new ArrayList<Resource>();
     resources.add(Resource.create("/resource.js"));
     executor.processAndMerge(resources, true);
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();

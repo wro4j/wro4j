@@ -1,0 +1,6 @@
+ @import "import/mixins.less";
+    
+.some-class {
+  .border-radius(5px);
+  color: red;
+}

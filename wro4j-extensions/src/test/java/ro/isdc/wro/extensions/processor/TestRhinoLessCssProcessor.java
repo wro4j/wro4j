@@ -13,11 +13,13 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -35,6 +37,11 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestRhinoLessCssProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(TestRhinoLessCssProcessor.class);
+
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
 
   @Test
   public void testFromFolder()
@@ -65,6 +72,7 @@ public class TestRhinoLessCssProcessor {
       }
     };
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
           processor.process(new StringReader("#id {.class {color: red;}}"), new StringWriter());
@@ -117,7 +125,6 @@ public class TestRhinoLessCssProcessor {
       }
     }.less("#id {}");
   }
-  
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
