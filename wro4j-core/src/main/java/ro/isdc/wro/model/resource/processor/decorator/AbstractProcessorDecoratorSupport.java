@@ -15,7 +15,6 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 import ro.isdc.wro.util.AbstractDecorator;
-import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
@@ -25,8 +24,12 @@ import ro.isdc.wro.util.ObjectDecorator;
  * @created 11 Apr 2012
  * @since 1.4.6
  */
-public abstract class AbstractProcessorDecoratorSupport
-  implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware, ObjectDecorator<Object> {
+public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorator<ResourceProcessor>
+  implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware {
+
+  public AbstractProcessorDecoratorSupport(final ResourceProcessor decorated) {
+    super(decorated);
+  }
 
   /**
    * This method is final, because it intends to preserve the getSupportedResourceType flag of the decorated processor.
@@ -103,20 +106,6 @@ public abstract class AbstractProcessorDecoratorSupport
     return supportedType == null ? ResourceType.values() : new ResourceType[] {
       supportedType.value()
     };
-  }
-
-  /**
-   * @return the decorated processor. The type of the returned object is {@link Object} because we don't really care and
-   *         we need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
-   *         removed in 2.0.
-   */
-  public abstract Object getDecoratedObject();
-
-  /**
-   * {@inheritDoc}
-   */
-  public Object getOriginalDecoratedObject() {
-    return AbstractDecorator.getOriginalDecoratedObject(getDecoratedObject());
   }
 
   /**

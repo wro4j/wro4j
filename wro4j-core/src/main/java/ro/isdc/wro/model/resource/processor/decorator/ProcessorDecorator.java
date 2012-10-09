@@ -18,46 +18,33 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 /**
  * Default implementation which can decorate a processor. This class is still named {@link ProcessorDecorator},
  * though it is not abstract (for backward compatibility reasons). It will be renamed to ProcessorDecorator.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Sep 2011
  * @since 1.4.1
  */
 public class ProcessorDecorator
   extends AbstractProcessorDecoratorSupport {
-  /**
-   * Decorated processor.
-   */
-  private final ResourceProcessor decoratedProcessor;
 
   /**
    * Hides the postProcessor adaptation logic. This exist due to differences between pre & post processor interface.
    * This will be removed in 2.0 when all processors will have an unified interface.
    */
   public ProcessorDecorator(final ResourceProcessor processor) {
-    Validate.notNull(processor);
-    this.decoratedProcessor = processor;
+    super(processor);
   }
 
-  /**
-   * @return the decorated processor.
-   */
-  @Override
-  public final ResourceProcessor getDecoratedObject() {
-    return decoratedProcessor;
-  }
-  
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    decoratedProcessor.process(resource, reader, writer);
+    getDecoratedObject().process(resource, reader, writer);
   }
 
   /**
    * Indicates if the processor is eligible for usage based on provided criteria.
-   * 
+   *
    * @param minimize
    *          - when true the processor should be minimize aware.
    * @param searchedType
@@ -67,15 +54,15 @@ public class ProcessorDecorator
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {
     Validate.notNull(searchedType);
-    
+
     final SupportedResourceType supportedType = getSupportedResourceType();
     final boolean isTypeSatisfied = supportedType == null
         || (supportedType != null && searchedType == supportedType.value());
     final boolean isMinimizedSatisfied = minimize == true || !isMinimize();
-    
+
     return isTypeSatisfied && isMinimizedSatisfied;
   }
-  
+
   /**
    * {@inheritDoc}
    */

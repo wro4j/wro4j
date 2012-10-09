@@ -5,37 +5,63 @@ import java.io.Reader;
 import java.io.Writer;
 
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.SupportAware;
+import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
+import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
 
 /**
  * Decorates a {@link LazyInitializer} which creates a processor.
- * 
+ *
  * @author Alex Objelean
  * @since 1.4.6
  */
 public final class LazyProcessorDecorator
-    extends AbstractProcessorDecoratorSupport {
-  private LazyInitializer<ResourceProcessor> processorInitializer;
-  
+    extends AbstractDecorator<LazyInitializer<ResourceProcessor>>
+    implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware {
+  private ProcessorDecorator processor;
+
   public LazyProcessorDecorator(final LazyInitializer<ResourceProcessor> processor) {
-    this.processorInitializer = processor;
+    super(processor);
   }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ResourceProcessor getDecoratedObject() {
-    return processorInitializer.get();
+
+  private AbstractProcessorDecoratorSupport getProcessorDecorator() {
+    if (processor == null) {
+      processor = new ProcessorDecorator(getDecoratedObject().get());
+    }
+    return processor;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    processorInitializer.get().process(resource, reader, writer);
+    getProcessorDecorator().process(resource, reader, writer);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public SupportedResourceType getSupportedResourceType() {
+    return getProcessorDecorator().getSupportedResourceType();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isMinimize() {
+    return getProcessorDecorator().isMinimize();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isSupported() {
+    return getProcessorDecorator().isSupported();
   }
 }

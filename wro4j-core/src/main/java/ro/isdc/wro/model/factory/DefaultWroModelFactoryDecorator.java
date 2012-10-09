@@ -17,7 +17,6 @@ import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
-import ro.isdc.wro.util.ObjectDecorator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.Transformer;
 
@@ -33,11 +32,9 @@ import ro.isdc.wro.util.Transformer;
  * @created 13 Mar 2011
  * @since 1.4.6
  */
-public final class DefaultWroModelFactoryDecorator
-    implements WroModelFactory, ObjectDecorator<WroModelFactory> {
+public final class DefaultWroModelFactoryDecorator extends AbstractDecorator<WroModelFactory>
+    implements WroModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWroModelFactoryDecorator.class);
-
-  private final WroModelFactory decorated;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
@@ -57,7 +54,7 @@ public final class DefaultWroModelFactoryDecorator
       watch.start("createModel");
       WroModel model = null;
       try {
-        final WroModelFactory modelFactory = decorate(decorated);
+        final WroModelFactory modelFactory = decorate(getDecoratedObject());
         injector.inject(modelFactory);
         model = modelFactory.create();
         return model;
@@ -104,11 +101,10 @@ public final class DefaultWroModelFactoryDecorator
   
   private DefaultWroModelFactoryDecorator(final WroModelFactory decorated,
       final List<Transformer<WroModel>> modelTransformers) {
-    Validate.notNull(decorated);
+    super(decorated);
     Validate.notNull(modelTransformers);
     
     this.modelTransformers = modelTransformers;
-    this.decorated = decorated;
   }
   
   /**
@@ -128,20 +124,5 @@ public final class DefaultWroModelFactoryDecorator
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
       ((MutableResourceAuthorizationManager) authorizationManager).clear();      
     }
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public WroModelFactory getDecoratedObject() {
-    return this.decorated;
-  }
-  
-
-  /**
-   * {@inheritDoc}
-   */
-  public WroModelFactory getOriginalDecoratedObject() {
-    return AbstractDecorator.getOriginalDecoratedObject(getDecoratedObject());
   }
 }
