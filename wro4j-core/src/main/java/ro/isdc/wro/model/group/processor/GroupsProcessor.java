@@ -97,6 +97,7 @@ public class GroupsProcessor {
     if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
       LOG.debug("[WARN] No processors defined. Please, check if your configuration is correct.");
     }
+    //TODO deprecate ProcessorsUtils and filter processor inside a specialized ProcessorDecorator
     final Collection<ResourcePostProcessor> processors = ProcessorsUtils.filterProcessorsToApply(
         cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
     return applyPostProcessors(processors, content);

@@ -162,7 +162,7 @@ public class PreProcessorExecutor {
    */
   private String applyPreProcessors(final Resource resource, final boolean minimize)
       throws IOException {
-    //TODO: apply filtering inside a specialized decorator
+    // TODO: apply filtering inside a specialized decorator
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
         resource.getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
@@ -192,9 +192,9 @@ public class PreProcessorExecutor {
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
-        //decorate and process
+        // decorate and process
         decoratePreProcessor(processor).process(resource, reader, writer);
-        //use the outcome for next input
+        // use the outcome for next input
         resourceContent = writer.toString();
       } finally {
         stopWatch.stop();
