@@ -1,1 +1,2 @@
- find ./* -name pom.xml -exec sed -i 's/<version>${wro4j.version}<\/version>/<version>1.5.1-SNAPSHOT<\/version>/g' {} \;
+# Change the version number
+find ./* -name pom.xml -exec sed -i 's/<version>${wro4j.version}<\/version>/<version>1.5.1-SNAPSHOT<\/version>/g' {} \;
