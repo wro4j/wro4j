@@ -4,26 +4,25 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.imageio.spi.ServiceRegistry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import sun.misc.Service;
 
 
 /**
  * Helps to find available providers of any supported type.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class ProviderFinder<T> {
   private static final Logger LOG = LoggerFactory.getLogger(ProviderFinder.class);
-  
+
   private final Class<T> type;
-  
+
   /**
    * @VisibleForTesting.
    * @param type
@@ -32,10 +31,10 @@ public class ProviderFinder<T> {
   ProviderFinder(final Class<T> type) {
     this.type = type;
   }
-  
+
   /**
    * Creates a {@link ProviderFinder} which will find providers of type provided as argument..
-   * 
+   *
    * @param type
    *          the type of providers to search.
    * @return {@link ProviderFinder} handling providers lookup.
@@ -43,7 +42,7 @@ public class ProviderFinder<T> {
   public static <T> ProviderFinder<T> of(final Class<T> type) {
     return new ProviderFinder<T>(type);
   }
-  
+
   /**
    * @return the list of all providers found in classpath.
    */
@@ -57,17 +56,17 @@ public class ProviderFinder<T> {
         providers.add(provider);
       }
       collectConfigurableProviders(providers);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
       throw WroRuntimeException.wrap(e);
     }
     return providers;
   }
-  
+
   /**
    * Collects also providers of type {@link ConfigurableProvider} if the T type is a supertype of
    * {@link ConfigurableProvider}.
-   * 
+   *
    * @param providers
    *          the list where found providers will be added.
    */
@@ -76,16 +75,16 @@ public class ProviderFinder<T> {
     if (type.isAssignableFrom(ConfigurableProvider.class)) {
       final Iterator<ConfigurableProvider> iterator = lookupProviders(ConfigurableProvider.class);
       for (; iterator.hasNext();) {
-        T provider = (T) iterator.next();
+        final T provider = (T) iterator.next();
         LOG.debug("found provider: {}", provider);
         providers.add(provider);
       }
     }
   }
-  
+
   /**
    * This method is useful for mocking the lookup operation.
-   * 
+   *
    * @param clazz
    *          the class of the provider to lookup.
    * @VisibleForTesting
@@ -93,6 +92,6 @@ public class ProviderFinder<T> {
    */
   <P> Iterator<P> lookupProviders(final Class<P> clazz) {
     LOG.debug("searching for providers of type : {}", clazz);
-    return ServiceRegistry.lookupProviders(clazz);
+    return Service.providers(clazz);
   }
 }
