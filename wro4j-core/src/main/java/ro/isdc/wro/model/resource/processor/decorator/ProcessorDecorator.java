@@ -63,6 +63,10 @@ public class ProcessorDecorator
       protected SupportedResourceType getSupportedResourceTypeInternal() {
         return getSupportedResourceTypeForProcessor(postProcessor);
       }
+      @Override
+      public String toString() {
+        return postProcessor.toString();
+      }
     };
   }
 
@@ -100,6 +104,6 @@ public class ProcessorDecorator
    */
   @Override
   public String toString() {
-    return getOriginalDecoratedObject().toString();
+    return getDecoratedObject().toString();
   }
 }

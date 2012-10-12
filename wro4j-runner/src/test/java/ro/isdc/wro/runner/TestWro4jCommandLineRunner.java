@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
@@ -34,18 +35,18 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 public class TestWro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(TestWro4jCommandLineRunner.class);
   private File destinationFolder;
-  
+
   @Before
   public void setUp() {
     destinationFolder = new File(FileUtils.getTempDirectory(), "wroTemp-" + new Date().getTime());
     destinationFolder.mkdir();
   }
-  
+
   @After
   public void tearDown() {
     FileUtils.deleteQuietly(destinationFolder);
   }
-  
+
   @Test
   public void cannotProcessWrongArgument()
       throws Exception {
@@ -59,7 +60,7 @@ public class TestWro4jCommandLineRunner {
       Assert.assertEquals(CmdLineException.class, e.getCause().getClass());
     }
   }
-  
+
   @Test
   public void cannotProcessNoArguments()
       throws Exception {
@@ -69,7 +70,7 @@ public class TestWro4jCommandLineRunner {
       Assert.assertEquals(CmdLineException.class, e.getCause().getClass());
     }
   }
-  
+
   @Test
   public void processCorrectArguments()
       throws Exception {
@@ -80,7 +81,7 @@ public class TestWro4jCommandLineRunner {
     }).split(" ");
     invokeRunner(args);
   }
-  
+
   private void invokeRunner(final String[] args)
       throws Exception {
     new Wro4jCommandLineRunner() {
@@ -89,19 +90,19 @@ public class TestWro4jCommandLineRunner {
           setDestinationFolder(destinationFolder);
         }
       }
-      
+
       @Override
       protected void onRunnerException(final Exception e) {
         throw WroRuntimeException.wrap(e);
       }
     }.doMain(args);
   }
-  
+
   @Test
   public void shouldApplyCssUrlRewriterProperly()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
-    
+
     final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
     final String processorsList = AbstractConfigurableMultipleStrategy.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
@@ -111,19 +112,19 @@ public class TestWro4jCommandLineRunner {
         }).split(" ");
     invokeRunner(args);
   }
-  
+
   @Test
   public void shouldUseMultiplePreProcessors()
       throws Exception {
     invokeMultipleProcessors("--preProcessors");
   }
-  
+
   @Test
   public void shouldUseMultiplePostProcessors()
       throws Exception {
     invokeMultipleProcessors("--postProcessors");
   }
-  
+
   private void invokeMultipleProcessors(final String processorsType)
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
@@ -137,14 +138,14 @@ public class TestWro4jCommandLineRunner {
         }).split(" ");
     invokeRunner(args);
   }
-  
+
   @Test
   public void shouldApplyCssLint()
       throws Exception {
     try {
       final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
       final String wroFile = contextFolder + File.separator + "wro.xml";
-      
+
       final String[] args = String.format(
           "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + CssLintProcessor.ALIAS, new Object[] {
             wroFile, contextFolder, destinationFolder.getAbsolutePath()
@@ -154,13 +155,27 @@ public class TestWro4jCommandLineRunner {
       Assert.assertEquals(CssLintException.class, e.getCause().getClass());
     }
   }
-  
+
+  @Test
+  public void shouldApplyYuiCssMinAsPostProcessor()
+      throws Exception {
+    final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
+    final String wroFile = contextFolder + File.separator + "wro.xml";
+
+    final String[] args = String.format(
+        "--wroFile %s --contextFolder %s --destinationFolder %s -m --postProcessors " + YUICssCompressorProcessor.ALIAS,
+        new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+        }).split(" ");
+    invokeRunner(args);
+  }
+
   @Test
   public void shouldApplyJsHint()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
-    
+
     try {
       final String[] args = String.format(
           "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
@@ -171,29 +186,29 @@ public class TestWro4jCommandLineRunner {
       Assert.assertEquals(LinterException.class, e.getCause().getClass());
     }
   }
-  
+
   @Test
   public void shouldProcessTestWroXml()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
-    
+
     LOG.debug(wroFile);
     final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
       wroFile, contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
     invokeRunner(args);
   }
-  
+
   @Test
   public void shouldAcceptGroovyDSLUsingSmartModelFactory() {
     final File contextFolderFile = new File(getClass().getResource("").getFile(), "dsl");
     final String contextFolder = contextFolderFile.getAbsolutePath();
-    
+
     final String[] args = String.format("-m --contextFolder %s --destinationFolder %s", new Object[] {
       contextFolder, destinationFolder.getAbsolutePath()
     }).split(" ");
-    
+
     // invoke runner
     new Wro4jCommandLineRunner() {
       {
@@ -201,12 +216,12 @@ public class TestWro4jCommandLineRunner {
           setDestinationFolder(destinationFolder);
         }
       }
-      
+
       @Override
       protected File newDefaultWroFile() {
         return new File(contextFolderFile, "wro.xml");
       }
-      
+
       @Override
       protected void onRunnerException(final Exception e) {
         LOG.error("Exception occured: ", e.getCause());
