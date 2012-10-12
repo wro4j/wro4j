@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.spi.ServiceRegistry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import sun.misc.Service;
 
 
 /**
@@ -83,15 +84,26 @@ public class ProviderFinder<T> {
   }
 
   /**
-   * This method is useful for mocking the lookup operation.
+   * This method is useful for mocking the lookup operation. The implementation will try to use java.util.ServiceLoader
+   * by default (available in jdk6) and will fallback to ServiceRegistry for earlier JDK versions. The reason for this
+   * is to support GAE environment which doesn't contain the ServiceRegistry in its whitelist.
    *
-   * @param clazz
+   * @param providerClass
    *          the class of the provider to lookup.
    * @VisibleForTesting
    * @return the iterator of found providers.
    */
-  <P> Iterator<P> lookupProviders(final Class<P> clazz) {
-    LOG.debug("searching for providers of type : {}", clazz);
-    return Service.providers(clazz);
+  @SuppressWarnings("unchecked")
+  <P> Iterator<P> lookupProviders(final Class<P> providerClass) {
+    LOG.debug("searching for providers of type : {}", providerClass);
+    try {
+      final Class<?> serviceLoader = getClass().getClassLoader().loadClass("java.util.ServiceLoader");
+      LOG.debug("using {} to lookupProviders", serviceLoader.getName());
+      return ((Iterable<P>) serviceLoader.getMethod("load", Class.class).invoke(serviceLoader, providerClass)).iterator();
+    } catch (final Exception e) {
+      LOG.debug("ServiceLoader is not available. Falling back to ServiceRegistry.", e);
+    }
+    LOG.debug("using {} to lookupProviders", ServiceRegistry.class.getName());
+    return ServiceRegistry.lookupProviders(providerClass);
   }
 }
