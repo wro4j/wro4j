@@ -135,4 +135,9 @@ groups {
     bootstrap()
     googleCodePrettify()
   }
+  missingResources {
+    dynamic()
+    css("/some/invalid.css")
+    js("/some/invalid.css")
+  }
 }
