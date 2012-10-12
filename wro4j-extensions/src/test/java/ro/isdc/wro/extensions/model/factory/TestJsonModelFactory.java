@@ -89,7 +89,7 @@ public class TestJsonModelFactory {
     };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
-    Assert.assertEquals(Arrays.asList("g2", "g1"), new WroModelInspector(model).getGroupNames());
+    Assert.assertEquals(Arrays.asList("g1", "g2"), new WroModelInspector(model).getGroupNames());
     LOG.debug("model: {}", model);
   }
   

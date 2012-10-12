@@ -170,8 +170,7 @@ public class NodeLessCssProcessor
       LOG.debug("The {} processor is supported.", getClass().getName());
       return true;
     } catch (final Exception e) {
-      LOG.debug("Unsupported processor", e);
-      LOG.warn("The {} processor is not supported. Because: {}", getClass().getName(), e.getMessage());
+      LOG.debug("The {} processor is not supported. Because: {}", getClass().getName(), e.getMessage());
       return false;
     } finally {
       FileUtils.deleteQuietly(temp);

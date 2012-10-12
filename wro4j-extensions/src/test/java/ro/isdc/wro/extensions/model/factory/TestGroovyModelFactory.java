@@ -38,19 +38,19 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test {@link GroovyModelFactory}
- * 
+ *
  * @author Romain Philibert
  * @created 19 Jul 2011
  */
 public class TestGroovyModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestGroovyModelFactory.class);
   private WroModelFactory factory;
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void testInvalidStream()
       throws Exception {
@@ -62,7 +62,7 @@ public class TestGroovyModelFactory {
     };
     factory.create();
   }
-  
+
   @Test
   public void createValidModel() {
     factory = new GroovyModelFactory() {
@@ -73,7 +73,7 @@ public class TestGroovyModelFactory {
     };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
-    Assert.assertEquals(Arrays.asList("g2", "g1"), new WroModelInspector(model).getGroupNames());
+    Assert.assertEquals(Arrays.asList("g1", "g2"), new WroModelInspector(model).getGroupNames());
     Assert.assertEquals(2, model.getGroupByName("g1").getResources().size());
     Assert.assertTrue(model.getGroupByName("g1").getResources().get(0).isMinimize());
     Assert.assertEquals("/static/app.js", model.getGroupByName("g1").getResources().get(0).getUri());
@@ -83,10 +83,10 @@ public class TestGroovyModelFactory {
     Assert.assertEquals(ResourceType.CSS, model.getGroupByName("g1").getResources().get(1).getType());
     Assert.assertEquals(2, model.getGroupByName("g2").getResources().size());
     Assert.assertFalse(model.getGroupByName("g2").getResources().get(1).isMinimize());
-    
+
     LOG.debug("model: ", model);
   }
-  
+
   @Test
   public void createValidModelContainingHiphen() {
     factory = new GroovyModelFactory() {
@@ -98,7 +98,7 @@ public class TestGroovyModelFactory {
     final WroModel model = factory.create();
     Assert.assertNotNull(model.getGroupByName("group-with-hiphen"));
   }
-  
+
   @Test
   public void createGroupReferenceOrderShouldNotMatter() {
     factory = new GroovyModelFactory() {
@@ -109,7 +109,7 @@ public class TestGroovyModelFactory {
     };
     Assert.assertNotNull(factory.create());
   }
-  
+
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testRecursiveGroupReference() {
     factory = new GroovyModelFactory() {
@@ -120,7 +120,7 @@ public class TestGroovyModelFactory {
     };
     factory.create();
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void testDuplicateGroupName() {
     factory = new GroovyModelFactory() {
@@ -131,7 +131,7 @@ public class TestGroovyModelFactory {
     };
     factory.create();
   }
-  
+
   /**
    * Test the usecase when the resource has no URI.
    */
@@ -145,7 +145,7 @@ public class TestGroovyModelFactory {
     };
     factory.create();
   }
-  
+
   @Test
   public void shouldBeThreadSafe()
       throws Exception {
@@ -166,13 +166,13 @@ public class TestGroovyModelFactory {
       }
     });
   }
-  
+
   @Test
   public void decoratedModelshouldBeThreadSafe()
       throws Exception {
-    List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
+    final List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
     modelTransformers.add(new WildcardExpanderModelTransformer());
-    
+
     factory = DefaultWroModelFactoryDecorator.decorate(new GroovyModelFactory() {
       @Override
       protected ResourceLocator getModelResourceLocator() {

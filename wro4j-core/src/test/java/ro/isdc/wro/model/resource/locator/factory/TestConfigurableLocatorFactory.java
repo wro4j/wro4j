@@ -38,37 +38,37 @@ public class TestConfigurableLocatorFactory {
   @Mock
   private ProviderFinder<LocatorProvider> mockProviderFinder;
   private ConfigurableLocatorFactory victim;
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     Context.set(Context.standaloneContext());
     victim = new ConfigurableLocatorFactory();
   }
-  
+
   @Test
   public void shouldHaveEmptyConfiguredStrategiesByDefault() {
     assertTrue(victim.getConfiguredStrategies().isEmpty());
   }
-  
+
   @Test
   public void shouldHaveNonEmptyListOfAvailableStrategies() {
     assertEquals(5, victim.getAvailableStrategies().size());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void cannotSetInvalidLocatorAlias() {
     final Properties props = createPropsWithLocators("invalid");
     victim.setProperties(props);
     victim.getConfiguredStrategies();
   }
-  
+
   private Properties createPropsWithLocators(final String locatorsAsString) {
     final Properties props = new Properties();
     props.setProperty(ConfigurableLocatorFactory.PARAM_URI_LOCATORS, locatorsAsString);
     return props;
   }
-  
+
   @Test
   public void shouldDetectConfiguredLocator() {
     final String locatorsAsString = ServletContextResourceLocator.ALIAS_DISPATCHER_FIRST;
@@ -79,7 +79,7 @@ public class TestConfigurableLocatorFactory {
     assertEquals(1, locators.size());
     assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(locators.iterator().next().getClass()));
   }
-  
+
   @Test
   public void shouldDetectConfiguredLocators() {
     final String locatorsAsString = ConfigurableLocatorFactory.createItemsAsString(
@@ -99,13 +99,13 @@ public class TestConfigurableLocatorFactory {
     assertEquals(ClasspathResourceLocatorFactory.class, iterator.next().getClass());
     assertEquals(UrlResourceLocatorFactory.class, iterator.next().getClass());
   }
-  
+
   @Test
   public void shouldUseDefaultLocatorWhenNoneIsConfigured() {
     final ResourceLocator locator = victim.getInstance("/");
     assertEquals(ServletContextResourceLocator.class, locator.getClass());
   }
-  
+
   @Test
   public void shouldOverrideAvailableLocator() {
     victim = new ConfigurableLocatorFactory() {
@@ -141,7 +141,7 @@ public class TestConfigurableLocatorFactory {
     when(mockProviderFinder.find()).thenReturn(providers);
     assertTrue(victim.getAvailableStrategies().isEmpty());
   }
-  
+
   @Test
   public void shouldComputeCorrectlyAvailableStrategiesDependingOnProviderFinder() {
     victim = new ConfigurableLocatorFactory() {
@@ -152,7 +152,7 @@ public class TestConfigurableLocatorFactory {
     };
     when(mockProviderFinder.find()).thenReturn(new ArrayList<LocatorProvider>());
     assertTrue(victim.getAvailableStrategies().isEmpty());
-    
+
     final List<LocatorProvider> providers = new ArrayList<LocatorProvider>();
     providers.add(new LocatorProvider() {
       public Map<String, ResourceLocatorFactory> provideLocators() {
@@ -170,6 +170,6 @@ public class TestConfigurableLocatorFactory {
     };
     when(mockProviderFinder.find()).thenReturn(providers);
     assertEquals(2, victim.getAvailableStrategies().size());
-    assertEquals("[second, first]", victim.getAvailableAliases().toString());
+    assertEquals("[first, second]", victim.getAvailableAliases().toString());
   }
 }

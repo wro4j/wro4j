@@ -14,16 +14,16 @@ import ro.isdc.wro.WroRuntimeException;
 
 /**
  * Helps to find available providers of any supported type.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class ProviderFinder<T> {
   private static final Logger LOG = LoggerFactory.getLogger(ProviderFinder.class);
-  
+
   private final Class<T> type;
-  
+
   /**
    * @VisibleForTesting.
    * @param type
@@ -32,10 +32,10 @@ public class ProviderFinder<T> {
   ProviderFinder(final Class<T> type) {
     this.type = type;
   }
-  
+
   /**
    * Creates a {@link ProviderFinder} which will find providers of type provided as argument..
-   * 
+   *
    * @param type
    *          the type of providers to search.
    * @return {@link ProviderFinder} handling providers lookup.
@@ -43,7 +43,7 @@ public class ProviderFinder<T> {
   public static <T> ProviderFinder<T> of(final Class<T> type) {
     return new ProviderFinder<T>(type);
   }
-  
+
   /**
    * @return the list of all providers found in classpath.
    */
@@ -57,17 +57,17 @@ public class ProviderFinder<T> {
         providers.add(provider);
       }
       collectConfigurableProviders(providers);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
       throw WroRuntimeException.wrap(e);
     }
     return providers;
   }
-  
+
   /**
    * Collects also providers of type {@link ConfigurableProvider} if the T type is a supertype of
    * {@link ConfigurableProvider}.
-   * 
+   *
    * @param providers
    *          the list where found providers will be added.
    */
@@ -76,23 +76,34 @@ public class ProviderFinder<T> {
     if (type.isAssignableFrom(ConfigurableProvider.class)) {
       final Iterator<ConfigurableProvider> iterator = lookupProviders(ConfigurableProvider.class);
       for (; iterator.hasNext();) {
-        T provider = (T) iterator.next();
+        final T provider = (T) iterator.next();
         LOG.debug("found provider: {}", provider);
         providers.add(provider);
       }
     }
   }
-  
+
   /**
-   * This method is useful for mocking the lookup operation.
-   * 
-   * @param clazz
+   * This method is useful for mocking the lookup operation. The implementation will try to use java.util.ServiceLoader
+   * by default (available in jdk6) and will fallback to ServiceRegistry for earlier JDK versions. The reason for this
+   * is to support GAE environment which doesn't contain the ServiceRegistry in its whitelist.
+   *
+   * @param providerClass
    *          the class of the provider to lookup.
    * @VisibleForTesting
    * @return the iterator of found providers.
    */
-  <P> Iterator<P> lookupProviders(final Class<P> clazz) {
-    LOG.debug("searching for providers of type : {}", clazz);
-    return ServiceRegistry.lookupProviders(clazz);
+  @SuppressWarnings("unchecked")
+  <P> Iterator<P> lookupProviders(final Class<P> providerClass) {
+    LOG.debug("searching for providers of type : {}", providerClass);
+    try {
+      final Class<?> serviceLoader = getClass().getClassLoader().loadClass("java.util.ServiceLoader");
+      LOG.debug("using {} to lookupProviders", serviceLoader.getName());
+      return ((Iterable<P>) serviceLoader.getMethod("load", Class.class).invoke(serviceLoader, providerClass)).iterator();
+    } catch (final Exception e) {
+      LOG.debug("ServiceLoader is not available. Falling back to ServiceRegistry.", e);
+    }
+    LOG.debug("using {} to lookupProviders", ServiceRegistry.class.getName());
+    return ServiceRegistry.lookupProviders(providerClass);
   }
 }
