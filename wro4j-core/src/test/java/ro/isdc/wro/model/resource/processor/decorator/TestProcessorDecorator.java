@@ -35,7 +35,7 @@ public class TestProcessorDecorator {
   }
 
   @Test
-  public void shouldDecorateAProcessor() {
+  public void shouldCreateHelperWithPreProcessor() {
     new ProcessorDecorator(new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -46,33 +46,33 @@ public class TestProcessorDecorator {
   @Test
   public void shouldPreserveProcessorMetadataAfterTransform() {
     final ResourceProcessor postProcessor = new JSMinProcessor();
-    ProcessorDecorator decorator = new ProcessorDecorator(postProcessor);
+    final ProcessorDecorator decorator = new ProcessorDecorator(postProcessor);
     assertTrue(Arrays.equals(new ResourceType[] {ResourceType.JS}, decorator.getSupportedResourceTypes()));
     assertTrue(decorator.isMinimize());
   }
-  
+
   @Test
   public void shouldComputeCorrectlySupportedResourceTypes() {
     assertTrue(Arrays.equals(new ResourceType[] {ResourceType.JS}, new ProcessorDecorator(new JSMinProcessor()).getSupportedResourceTypes()));
     assertTrue(Arrays.equals(new ResourceType[] {ResourceType.CSS}, new ProcessorDecorator(new CssMinProcessor()).getSupportedResourceTypes()));
     assertTrue(Arrays.equals(ResourceType.values(), new ProcessorDecorator(new CommentStripperProcessor()).getSupportedResourceTypes()));
   }
-  
+
   @Test
   public void shouldDetectJsMinAsMinimizeAwareProcessor() {
     assertTrue(new ProcessorDecorator(new JSMinProcessor()).isMinimize());
   }
-  
+
   @Test
   public void shouldDetectANonMinimizeAwareProcessor() {
     assertFalse(new ProcessorDecorator(new SemicolonAppenderPreProcessor()).isMinimize());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullResourceTypeForIsEligible() {
     assertTrue(new ProcessorDecorator(new JSMinProcessor()).isEligible(true, null));
   }
-  
+
   @Test
   public void shouldComputeEligibilityForMinimizeAwareProcessorWithJsType() {
     assertTrue(new ProcessorDecorator(new JSMinProcessor()).isEligible(true, ResourceType.JS));
@@ -96,7 +96,7 @@ public class TestProcessorDecorator {
     assertFalse(new ProcessorDecorator(new CssVariablesProcessor()).isEligible(true, ResourceType.JS));
     assertFalse(new ProcessorDecorator(new CssVariablesProcessor()).isEligible(false, ResourceType.JS));
   }
-  
+
 
   @Test
   public void shouldComputeEligibilityForMinimizeAwareProcessorWithCssType() {
@@ -105,11 +105,11 @@ public class TestProcessorDecorator {
     assertFalse(new ProcessorDecorator(new CssMinProcessor()).isEligible(true, ResourceType.JS));
     assertFalse(new ProcessorDecorator(new CssMinProcessor()).isEligible(false, ResourceType.JS));
   }
-  
+
 
   @Test
   public void shouldComputeEligibilityForProcessorWithNoTypeAndNotMinimizeAware() {
-    ResourceProcessor noOpProcessor = new ResourceProcessor() {
+    final ResourceProcessor noOpProcessor = new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
       }
@@ -119,10 +119,10 @@ public class TestProcessorDecorator {
     assertTrue(new ProcessorDecorator(noOpProcessor).isEligible(true, ResourceType.JS));
     assertTrue(new ProcessorDecorator(noOpProcessor).isEligible(false, ResourceType.JS));
   }
-  
+
   @Test
   public void shouldChangeMinimizaFlagWhenInternalMethodIsOverriden() {
-    ResourceProcessor processor = new ProcessorDecorator(new JSMinProcessor()) {
+    final ResourceProcessor processor = new ProcessorDecorator(new JSMinProcessor()) {
       @Override
       protected boolean isMinimizeInternal() {
         return false;
@@ -130,10 +130,10 @@ public class TestProcessorDecorator {
     };
     assertFalse(new ProcessorDecorator(processor).isMinimize());
   }
-  
+
   @Test
   public void shouldChangeSupportedTypesWhenInternalMethodIsOverriden() {
-    ResourceProcessor processor = new ProcessorDecorator(new JSMinProcessor()) {
+    final ResourceProcessor processor = new ProcessorDecorator(new JSMinProcessor()) {
       @Override
       protected SupportedResourceType getSupportedResourceTypeInternal() {
         return null;
@@ -141,28 +141,45 @@ public class TestProcessorDecorator {
     };
     assertNull(null, new ProcessorDecorator(processor).getSupportedResourceType());
   }
-  
+
   @Test
   public void shouldComputeIsMinimizeFlagOfDeepNestedDecoratedProcessor() {
     final ProcessorDecorator processor = new ProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(new JSMinProcessor())));
     assertTrue(processor.isMinimize());
   }
-  
+
   private static class SupportAwareProcessor extends JSMinProcessor implements SupportAware {
    public boolean isSupported() {
       return true;
-    } 
+    }
   }
-  
+
   @Test
   public void shouldIdentifyProcessorSupport() {
     final SupportAwareProcessor supportAwareProcessor = mock(SupportAwareProcessor.class);
-    ProcessorDecorator decorator = new ProcessorDecorator(supportAwareProcessor);
-    
+    final ProcessorDecorator decorator = new ProcessorDecorator(supportAwareProcessor);
+
     when(supportAwareProcessor.isSupported()).thenReturn(true);
     assertEquals(true, decorator.isSupported());
-    
+
     when(supportAwareProcessor.isSupported()).thenReturn(false);
     assertEquals(false, decorator.isSupported());
+  }
+
+  @Test
+  public void shouldDecoratePostProcessor() {
+    final String expected = "TestProcessor";
+    final ResourceProcessor postProcessor = new ResourceProcessor() {
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+      }
+      @Override
+      public String toString() {
+        return expected;
+      }
+    };
+    final ProcessorDecorator decorator = new ProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(
+        postProcessor)));
+    assertEquals(expected, decorator.toString());
   }
 }

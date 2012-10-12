@@ -68,6 +68,6 @@ public class ProcessorDecorator
    */
   @Override
   public String toString() {
-    return getOriginalDecoratedObject().toString();
+    return getDecoratedObject().toString();
   }
 }
