@@ -12,6 +12,10 @@
 	<artifactId>wro4j-runner</artifactId>
 	<packaging>jar</packaging>
 	<name>wro4j runner</name>
+	
+	<properties>
+	   <wro4j.runner.mainClass>ro.isdc.wro.runner.Wro4jCommandLineRunner</wro4j.runner.mainClass>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -49,6 +53,30 @@
 	<build>
 		<plugins>
 			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-shade-plugin</artifactId>
+			    <version>1.5</version>
+			    <executions>
+			        <execution>
+			             <phase>package</phase>
+			            <goals>
+			                 <goal>shade</goal>
+			            </goals>
+			            <configuration>
+			                <transformers>
+		                        <transformer  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+	                               <mainClass>${wro4j.runner.mainClass}</mainClass>
+			                    </transformer>
+			                    <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+	                               <resource>META-INF/services/ro.isdc.wro.util.provider.ConfigurableProvider</resource>
+		                         </transformer>
+			                </transformers>
+			            </configuration>
+			        </execution>
+			    </executions>
+            </plugin>
+		    <!-- 
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.2</version>
@@ -74,6 +102,7 @@
 				<dependencies>
 				</dependencies>
 			</plugin>
+			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -82,6 +111,7 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			 
 		</plugins>
 	</build>
 </project>
