@@ -35,58 +35,58 @@ public class TestConfigurableLocatorFactory {
   @Mock
   private ProviderFinder<LocatorProvider> mockProviderFinder;
   private ConfigurableLocatorFactory victim;
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     victim = new ConfigurableLocatorFactory();
   }
-  
+
   @Test
   public void shouldHaveEmptyConfiguredStrategiesByDefault() {
     assertTrue(victim.getConfiguredStrategies().isEmpty());
   }
-  
+
   @Test
   public void shouldHaveNonEmptyListOfAvailableStrategies() {
     assertEquals(5, victim.getAvailableStrategies().size());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void cannotSetInvalidLocatorAlias() {
     final Properties props = createPropsWithLocators("invalid");
     victim.setProperties(props);
     victim.getConfiguredStrategies();
   }
-  
+
   private Properties createPropsWithLocators(final String locatorsAsString) {
     final Properties props = new Properties();
     props.setProperty(ConfigurableLocatorFactory.PARAM_URI_LOCATORS, locatorsAsString);
     return props;
   }
-  
+
   @Test
   public void shouldDetectConfiguredLocator() {
     final String locatorsAsString = ServletContextUriLocator.ALIAS_DISPATCHER_FIRST;
     victim.setProperties(createPropsWithLocators(locatorsAsString));
-    
+
     final List<UriLocator> locators = victim.getConfiguredStrategies();
 
     assertEquals(1, locators.size());
     assertEquals(ServletContextUriLocator.class, locators.iterator().next().getClass());
   }
-  
+
   @Test
   public void shouldDetectConfiguredLocators() {
     final String locatorsAsString = ConfigurableLocatorFactory.createItemsAsString(
         ServletContextUriLocator.ALIAS_DISPATCHER_FIRST, ServletContextUriLocator.ALIAS_SERVLET_CONTEXT_FIRST,
         ServletContextUriLocator.ALIAS, ClasspathUriLocator.ALIAS, UrlUriLocator.ALIAS);
     victim.setProperties(createPropsWithLocators(locatorsAsString));
-    
+
     final List<UriLocator> locators = victim.getConfiguredStrategies();
-    
+
     assertEquals(5, locators.size());
-    
+
     final Iterator<UriLocator> iterator = locators.iterator();
     assertEquals(ServletContextUriLocator.class, iterator.next().getClass());
     assertEquals(ServletContextUriLocator.class, iterator.next().getClass());
@@ -94,13 +94,13 @@ public class TestConfigurableLocatorFactory {
     assertEquals(ClasspathUriLocator.class, iterator.next().getClass());
     assertEquals(UrlUriLocator.class, iterator.next().getClass());
   }
-  
+
   @Test
   public void shouldUseDefaultLocatorWhenNoneIsConfigured() {
     final UriLocator locator = victim.getInstance("/");
     assertEquals(ServletContextUriLocator.class, locator.getClass());
   }
-  
+
   @Test
   public void shouldOverrideAvailableLocator() {
     victim = new ConfigurableLocatorFactory() {
@@ -114,7 +114,7 @@ public class TestConfigurableLocatorFactory {
     victim.setProperties(createPropsWithLocators(locatorsAsString));
     final List<UriLocator> locators = victim.getConfiguredStrategies();
     assertEquals(1, locators.size());
-    
+
     final Iterator<UriLocator> iterator = locators.iterator();
     assertSame(mockUriLocator, iterator.next());
   }
@@ -136,7 +136,7 @@ public class TestConfigurableLocatorFactory {
     when(mockProviderFinder.find()).thenReturn(providers);
     assertTrue(victim.getAvailableStrategies().isEmpty());
   }
-  
+
   @Test
   public void shouldComputeCorrectlyAvailableStrategiesDependingOnProviderFinder() {
     victim = new ConfigurableLocatorFactory() {
@@ -147,7 +147,7 @@ public class TestConfigurableLocatorFactory {
     };
     when(mockProviderFinder.find()).thenReturn(new ArrayList<LocatorProvider>());
     assertTrue(victim.getAvailableStrategies().isEmpty());
-    
+
     final List<LocatorProvider> providers = new ArrayList<LocatorProvider>();
     providers.add(new LocatorProvider() {
       public Map<String, UriLocator> provideLocators() {
@@ -165,6 +165,6 @@ public class TestConfigurableLocatorFactory {
     };
     when(mockProviderFinder.find()).thenReturn(providers);
     assertEquals(2, victim.getAvailableStrategies().size());
-    assertEquals("[second, first]", victim.getAvailableAliases().toString());
+    assertEquals("[first, second]", victim.getAvailableAliases().toString());
   }
 }

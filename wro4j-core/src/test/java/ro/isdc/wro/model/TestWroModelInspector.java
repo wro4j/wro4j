@@ -25,7 +25,7 @@ import ro.isdc.wro.model.resource.Resource;
  */
 public class TestWroModelInspector {
   private WroModelInspector victim;
-  
+
   @Before
   public void setUp() {
     victim = new WroModelInspector(buildValidModel());
@@ -43,39 +43,39 @@ public class TestWroModelInspector {
     };
     return factory.create();
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullModel() {
     new WroModelInspector(null);
   }
-  
+
   public void test() {
-    victim.getAllUniqueResources(); 
+    victim.getAllUniqueResources();
   }
-  
+
   @Test
   public void shouldReturnEmptyCollectionWhenAResourceIsNotContainedInAnyGroup() {
     assertTrue(victim.getGroupNamesContainingResource("/resourceMissingFromModel.js").isEmpty());
   }
-  
+
   @Test
   public void shouldFindTheGroupContainingResource() {
-    Collection<String> groups = victim.getGroupNamesContainingResource("/path/to/resource");
+    final Collection<String> groups = victim.getGroupNamesContainingResource("/path/to/resource");
     assertEquals(2, groups.size());
     assertEquals("[g2, g3]", Arrays.toString(groups.toArray()));
   }
-  
+
   @Test
   public void shouldGetGroupNamesAsString() {
-    assertEquals("g2, g1, g3", victim.getGroupNamesAsString());
+    assertEquals("g1, g2, g3", victim.getGroupNamesAsString());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotGetGroupsUsingNullResource() {
     victim.getGroupNamesContainingResource(null);
   }
-  
-  
+
+
   @Test
   public void shouldReturnAllResourcesFromModel() {
     assertEquals(3, victim.getAllUniqueResources().size());
@@ -88,8 +88,8 @@ public class TestWroModelInspector {
     final List<String> expected = Arrays.asList("g1", "g2", "g3");
     Assert.assertEquals(expected, groupNames);
   }
-  
-  
+
+
   /**
    * Proves that inspector works only with model snapshot and does not reflect model changes performed after inspector
    * is constructed.
@@ -98,9 +98,9 @@ public class TestWroModelInspector {
   public void shouldReturnSameResultAfterModelChange() {
     final WroModel model = new WroModel();
     victim = new WroModelInspector(model);
-    
+
     assertEquals(0, victim.getAllUniqueResources().size());
-    
+
     model.addGroup(new Group("one").addResource(Resource.create("/one.js"))).addGroup(
         new Group("two").addResource(Resource.create("/one.js")));
     //should still be zero, even if the model changed
@@ -108,7 +108,7 @@ public class TestWroModelInspector {
     assertEquals(1, new WroModelInspector(model).getAllUniqueResources().size());
     assertEquals(2, new WroModelInspector(model).getAllResources().size());
   }
-  
+
   @Test
   public void testHasGroup() {
     assertFalse(victim.hasGroup("NOT_EXIST"));

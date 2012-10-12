@@ -50,7 +50,7 @@ import ro.isdc.wro.util.WroUtil;
 /**
  * Main entry point. Perform the request processing by identifying the type of the requested resource. Depending on the
  * way it is configured.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Oct 31, 2008
  */
@@ -78,7 +78,7 @@ public class WroFilter
    * Used to create the collection of requestHandlers to apply
    */
   private RequestHandlerFactory requestHandlerFactory = newRequestHandlerFactory();
-  
+
   private ResponseHeadersConfigurer headersConfigurer;
 
   /**
@@ -95,11 +95,11 @@ public class WroFilter
     initJMX();
     doInit(config);
   }
-  
+
   /**
    * Creates configuration by looking up in servletContext attributes. If none is found, a new one will be created using
    * the configuration factory.
-   * 
+   *
    * @return {@link WroConfiguration} object.
    */
   private WroConfiguration createConfiguration() {
@@ -108,7 +108,7 @@ public class WroFilter
     final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
     return configAttribute != null ? configAttribute : newWroConfigurationFactory(filterConfig).create();
   }
-  
+
   /**
    * Creates {@link WroManagerFactory}.
    */
@@ -122,7 +122,7 @@ public class WroFilter
     LOG.debug("created managerFactory: {}", wroManagerFactory);
     return this.wroManagerFactory;
   }
-  
+
   /**
    * Expose MBean to tell JMX infrastructure about our MBean.
    */
@@ -141,7 +141,7 @@ public class WroFilter
       LOG.error("Exception occured while registering MBean", e);
     }
   }
-  
+
   /**
    * @return the name of MBean to be used by JMX to configure wro4j.
    */
@@ -173,7 +173,7 @@ public class WroFilter
 
   /**
    * Override this method if you want to provide a different MBeanServer.
-   * 
+   *
    * @return {@link MBeanServer} to use for JMX.
    */
   protected MBeanServer getMBeanServer() {
@@ -199,7 +199,7 @@ public class WroFilter
     });
     LOG.debug("Cache & Model change listeners were registered");
   }
-  
+
   /**
    * @return the {@link ResponseHeadersConfigurer}.
    */
@@ -215,7 +215,7 @@ public class WroFilter
       }
     };
   }
-  
+
   /**
    * @return default implementation of {@link RequestHandlerFactory}
    */
@@ -227,10 +227,10 @@ public class WroFilter
     Validate.notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
   }
-  
+
   /**
    * Allow configuration of default headers. This is useful when you need to set custom expires headers.
-   * 
+   *
    * @param map
    *          the {@link Map} where key represents the header name, and value - header value.
    * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and {@link ResponseHeadersConfigurer#configureDefaultHeaders(Map)}
@@ -238,10 +238,10 @@ public class WroFilter
   @Deprecated
   protected void configureDefaultHeaders(final Map<String, String> map) {
   }
-  
+
   /**
    * Custom filter initialization - can be used for extended classes.
-   * 
+   *
    * @see Filter#init(FilterConfig).
    */
   protected void doInit(final FilterConfig config)
@@ -261,7 +261,7 @@ public class WroFilter
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-        
+
         if (!handledWithRequestHandler(request, response)) {
           processRequest(request, response);
           onRequestProcessed();
@@ -305,7 +305,7 @@ public class WroFilter
     }
     return false;
   }
-  
+
   /**
    * @return {@link Injector} used to inject {@link RequestHandler}'s.
    * @VisibleForTesting
@@ -319,7 +319,7 @@ public class WroFilter
    */
   protected void onRequestProcessed() {
   }
-  
+
   /**
    * Perform actual processing.
    */
@@ -333,20 +333,20 @@ public class WroFilter
   /**
    * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation redirects
    * to 404 {@link WroRuntimeException} is thrown when in DEPLOYMENT mode.
-   * 
+   *
    * @param e
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
     final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(
-        "Unexected exception", e);
+        e.getMessage(), e);
     onRuntimeException(re, response, chain);
   }
 
   /**
    * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
    * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
-   * 
+   *
    * @param e
    *          {@link RuntimeException} thrown during request processing.
    * @deprecated use {@link WroFilter#onException(Exception, HttpServletResponse, FilterChain)}
@@ -354,7 +354,7 @@ public class WroFilter
   @Deprecated
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
       final FilterChain chain) {
-    LOG.debug("Exception occured", e);
+    LOG.debug("Exception occured", e.getMessage());
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);
@@ -367,7 +367,7 @@ public class WroFilter
   /**
    * Method called for each request and responsible for setting response headers, used mostly for cache control.
    * Override this method if you want to change the way headers are set.<br>
-   * 
+   *
    * @param response
    *          {@link HttpServletResponse} object.
    */
@@ -380,7 +380,7 @@ public class WroFilter
    * default {@link WroManagerFactory} initialization won't work anymore.
    * <p/>
    * Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.
-   * 
+   *
    * @param wroManagerFactory
    *          the wroManagerFactory to set
    */
@@ -391,17 +391,17 @@ public class WroFilter
       this.wroManagerFactory = (InjectableWroManagerFactoryDecorator) wroManagerFactory;
     }
   }
-  
+
   /**
-   * @return configured and decorated {@link WroManagerFactory} instance. 
+   * @return configured and decorated {@link WroManagerFactory} instance.
    */
   public final WroManagerFactory getWroManagerFactory() {
     return this.wroManagerFactory;
   }
-  
+
   /**
    * Sets the RequestHandlerFactory used to create the collection of requestHandlers
-   * 
+   *
    * @param requestHandlerFactory
    *          to set
    */
@@ -409,7 +409,7 @@ public class WroFilter
     Validate.notNull(requestHandlerFactory);
     this.requestHandlerFactory = requestHandlerFactory;
   }
-  
+
   /**
    * Factory method for {@link WroManagerFactory}.
    * <p/>
@@ -418,7 +418,7 @@ public class WroFilter
    * </p>
    * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
    * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
-   * 
+   *
    * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory newWroManagerFactory() {
@@ -431,7 +431,7 @@ public class WroFilter
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
   }
-  
+
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.
    * @VisibleForTesting
@@ -439,10 +439,10 @@ public class WroFilter
   public final WroConfiguration getConfiguration() {
     return this.wroConfiguration;
   }
-  
+
   /**
    * Once set, this configuration will be used, instead of the one built by the factory.
-   * 
+   *
    * @param config
    *          a not null {@link WroConfiguration} to set.
    */

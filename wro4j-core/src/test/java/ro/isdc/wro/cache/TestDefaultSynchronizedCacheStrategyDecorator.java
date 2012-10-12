@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +36,8 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   private static final String RESOURCE_URI = "/test.js";
 
   private CacheStrategy<CacheEntry, ContentHashEntry> victim;
-  private ResourceWatcher mockResourceWatcher; 
+  private ResourceWatcher mockResourceWatcher;
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
@@ -45,7 +47,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
         //use milliseconds to make test faster
         return TimeUnit.MILLISECONDS;
       }
-      
+
       @Override
       ResourceWatcher getResourceWatcher() {
         if (mockResourceWatcher == null) {
@@ -58,7 +60,13 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     //invoke getter explicitly to be sure we have a not null reference
     ((DefaultSynchronizedCacheStrategyDecorator) victim).getResourceWatcher();
   }
-  
+
+  @After
+  public void tearDown() {
+    //have to reset it, otherwise a test fails when testing entire project.
+    Mockito.reset(mockResourceWatcher);
+  }
+
   public Injector createInjector() {
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
@@ -70,12 +78,12 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     return injector;
   }
 
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullKey() {
     victim.get(null);
   }
-  
+
   @Test
   public void shouldNotCheckForChangesWhenResourceWatcherPeriodIsNotSet() throws Exception {
     final CacheEntry key = new CacheEntry("g1", ResourceType.JS, true);
@@ -83,7 +91,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     victim.get(key);
     Mockito.verify(mockResourceWatcher, never()).check(key);
   }
-  
+
   /**
    * Proves that even if the get() is invoked more times, the check is performed only after a certain period of time.
    */
@@ -92,24 +100,28 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final long updatePeriod = 100;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheEntry key = new CacheEntry("g1", ResourceType.JS, true);
-    long start = System.currentTimeMillis();
+    final long start = System.currentTimeMillis();
     while(System.currentTimeMillis() - start < updatePeriod) {
       victim.get(key);
     }
     victim.get(key);
     Mockito.verify(mockResourceWatcher, times(2)).check(key);
   }
-  
+
   @Test
   public void shouldCheckDifferentGroups() throws Exception {
-    final long updatePeriod = 100;
+    final long updatePeriod = 90;
+    //Using delta to avoid inconsistent test results related to test timing
+    final long delta = 10;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheEntry key1 = new CacheEntry(GROUP_NAME, ResourceType.JS, true);
     final CacheEntry key2 = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
-    long start = System.currentTimeMillis();
-    while(System.currentTimeMillis() - start < updatePeriod) {
+    final long start = System.currentTimeMillis();
+    do {
       victim.get(key1);
-    }
+    } while (System.currentTimeMillis() - start < updatePeriod - delta);
+    Thread.sleep(delta);
+    victim.get(key1);
     victim.get(key2);
     Mockito.verify(mockResourceWatcher, times(2)).check(key1);
     Mockito.verify(mockResourceWatcher, times(1)).check(key2);
@@ -122,12 +134,12 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
 
   @Test
   public void shouldDecorateCacheStrategy() {
-    CacheStrategy<CacheEntry, ContentHashEntry> original = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
+    final CacheStrategy<CacheEntry, ContentHashEntry> original = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     Assert.assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     Assert.assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
   }
-  
+
   /**
    * Fix Issue 528:  Redundant CacheStrategy decoration (which has unclear cause, but it is safe to prevent redundant decoration anyway).
    */
