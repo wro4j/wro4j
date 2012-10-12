@@ -28,7 +28,7 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test {@link JsonModelFactory}
- * 
+ *
  * @author Alex Objelean
  * @created 13 Mar 2011
  * @since 1.3.6
@@ -36,17 +36,17 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestJsonModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestJsonModelFactory.class);
   private JsonModelFactory factory;
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void testInvalidStream()
       throws Exception {
@@ -59,7 +59,7 @@ public class TestJsonModelFactory {
     };
     factory.create();
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void testInvalidContent() {
     factory = new JsonModelFactory() {
@@ -71,7 +71,7 @@ public class TestJsonModelFactory {
     };
     Assert.assertNull(factory.create());
   }
-  
+
   @Test
   public void createValidModel() {
     factory = new JsonModelFactory() {
@@ -83,10 +83,10 @@ public class TestJsonModelFactory {
     };
     final WroModel model = factory.create();
     Assert.assertNotNull(model);
-    Assert.assertEquals(Arrays.asList("g2", "g1"), new WroModelInspector(model).getGroupNames());
+    Assert.assertEquals(Arrays.asList("g1", "g2"), new WroModelInspector(model).getGroupNames());
     LOG.debug("model: {}", model);
   }
-  
+
   /**
    * Test the usecase when the resource has no type. For now, it is ok to have it null because you'll get a NPE
    * exception during processing if no type is specified anyway.
@@ -107,7 +107,7 @@ public class TestJsonModelFactory {
     Assert.assertNull(group.getResources().get(0).getType());
     LOG.debug("model: {}", model);
   }
-  
+
   @Test
   public void shouldBeThreadSafe()
       throws Exception {
@@ -121,6 +121,7 @@ public class TestJsonModelFactory {
     WroTestUtils.init(factory);
     final WroModel expected = factory.create();
     WroTestUtils.runConcurrently(new Callable<Void>() {
+      @Override
       public Void call()
           throws Exception {
         Assert.assertEquals(expected, factory.create());
