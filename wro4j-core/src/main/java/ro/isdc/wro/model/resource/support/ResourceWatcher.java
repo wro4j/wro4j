@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +57,60 @@ public class ResourceWatcher {
   @Inject
   private Injector injector;
   /**
-   * Contains the resource uri's with associated hash values retrieved from last successful check.
+   * Map between a resource uri and a corresponding {@link ResourceInfo} object.
    */
-  private final Map<String, String> previousHashes = new ConcurrentHashMap<String, String>();
+  private final Map<String, ResourceInfo> resourceInfoMap = new ConcurrentHashMap<String, ResourceInfo>() {
+    @Override
+    public ResourceInfo get(final Object key) {
+      ResourceInfo result = super.get(key);
+      if (result == null) {
+        result = new ResourceInfo();
+        put((String) key, result);
+      }
+      return result;
+    }
+  };
+
   /**
-   * Contains the resource uri's with associated hash values retrieved from currently performed check.
+   * Holds details about hashes of watched resources and the group which were detected as changed.
    */
-  private final Map<String, String> currentHashes = new ConcurrentHashMap<String, String>();
+  private class ResourceInfo {
+    private String currentHash;
+    private String prevHash;
+    private final Set<String> groups;
+
+    public ResourceInfo() {
+      groups = new HashSet<String>();
+    }
+
+    public void updateHashForGroup(final String currentHash, final String groupName) {
+      this.currentHash = currentHash;
+      groups.clear();
+      groups.add(groupName);
+    }
+
+    public void cleanUp() {
+      System.out.println("cleanUp " + this);
+      this.prevHash = currentHash;
+      this.currentHash = null;
+    }
+
+    public boolean isChanged(final String groupName) {
+      final boolean result = prevHash != null && (prevHash.equals(currentHash) ? groups.contains(groupName) : true);
+      LOG.info("resourceInfo: {}, changed: {}", this, result);
+      return result;
+    }
+
+    public boolean isCheckRequiredForGroup(final String groupName) {
+      groups.add(groupName);
+      return currentHash == null;
+    }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder.reflectionToString(this);
+    }
+  }
 
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
@@ -80,11 +128,10 @@ public class ResourceWatcher {
       if (isGroupChanged(group)) {
         onGroupChanged(cacheEntry);
       }
-      // cleanUp
-      for (final Entry<String, String> entry : currentHashes.entrySet()) {
-        previousHashes.put(entry.getKey(), entry.getValue());
+      System.err.println("cleaningUp: " + resourceInfoMap.values());
+      for (final ResourceInfo resourceInfo : resourceInfoMap.values()) {
+        resourceInfo.cleanUp();
       }
-      currentHashes.clear();
     } catch (final Exception e) {
       onException(e);
     } finally {
@@ -97,7 +144,7 @@ public class ResourceWatcher {
    * Invoked when exception occurs.
    */
   protected void onException(final Exception e) {
-    //not using ERROR log intentionally, since this error is not that important
+    // not using ERROR log intentionally, since this error is not that important
     LOG.info("Could not chef for resource changes because: {}", e.getMessage());
     LOG.debug("[FAIL] detecting resource change ", e);
   }
@@ -108,7 +155,7 @@ public class ResourceWatcher {
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (final Resource resource : resources) {
-      if (isChanged = isChanged(resource)) {
+      if (isChanged = isChanged(resource, group.getName())) {
         onResourceChanged(resource);
         break;
       }
@@ -146,20 +193,18 @@ public class ResourceWatcher {
    *          the {@link Resource} to check.
    * @return true if the resource was changed.
    */
-  private boolean isChanged(final Resource resource) {
+  private boolean isChanged(final Resource resource, final String groupName) {
     LOG.debug("Check change for resource {}", resource.getUri());
     try {
       final String uri = resource.getUri();
-      final String currentHash = getCurrentHash(uri);
-      final String previousHash = previousHashes.get(uri);
+      final ResourceInfo resourceInfo = updateCurrentHash(uri, groupName);
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-      final AtomicBoolean changeDetected = new AtomicBoolean(false);
-      changeDetected.set(previousHash != null ? !previousHash.equals(currentHash) : false);
+      final AtomicBoolean changeDetected = new AtomicBoolean(resourceInfo.isChanged(groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
         // detect changes in imported resources.
-        createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
+        createCssImportProcessor(resource, changeDetected, groupName).process(resource, reader, new StringWriter());
       }
       return changeDetected.get();
     } catch (final IOException e) {
@@ -169,12 +214,13 @@ public class ResourceWatcher {
     }
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
+  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected,
+      final String groupName) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         LOG.debug("Found @import {}", importedUri);
-        final boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS));
+        final boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS), groupName);
         LOG.debug("\tisImportChanged: {}", isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
@@ -215,15 +261,15 @@ public class ResourceWatcher {
    * @return the hash for a given resource uri.
    * @throws IOException
    */
-  private String getCurrentHash(final String uri)
+  private ResourceInfo updateCurrentHash(final String uri, final String groupName)
       throws IOException {
-    String currentHash = currentHashes.get(uri);
-    if (currentHash == null) {
+    final ResourceInfo resourceInfo = resourceInfoMap.get(uri);
+    if (resourceInfo.isCheckRequiredForGroup(groupName)) {
       LOG.debug("Checking if resource {} is changed..", uri);
-      currentHash = hashStrategy.getHash(new AutoCloseInputStream(locatorFactory.locate(uri)));
-      currentHashes.put(uri, currentHash);
+      final String currentHash = hashStrategy.getHash(new AutoCloseInputStream(locatorFactory.locate(uri)));
+      resourceInfo.updateHashForGroup(currentHash, groupName);
     }
-    return currentHash;
+    return resourceInfo;
   }
 
   /**
@@ -231,7 +277,8 @@ public class ResourceWatcher {
    * @VisibleForTesting
    */
   Map<String, String> getPreviousHashes() {
-    return Collections.unmodifiableMap(previousHashes);
+    // return Collections.unmodifiableMap(previousHashes);
+    return null;
   }
 
   /**
@@ -239,6 +286,7 @@ public class ResourceWatcher {
    * @VisibleForTesting
    */
   Map<String, String> getCurrentHashes() {
-    return Collections.unmodifiableMap(currentHashes);
+    // return Collections.unmodifiableMap(currentHashes);
+    return null;
   }
 }
