@@ -3,11 +3,14 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -30,7 +33,19 @@ import ro.isdc.wro.util.ObjectDecorator;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final Map<Class<?>, Object> map;
-
+  /**
+   * Keep reference of already injected object to avoid recursion.
+   */
+  final SoftReference<Set<Object>> injectedObjects = new SoftReference<Set<Object>>(new HashSet<Object>()) {
+    @Override
+    public Set<Object> get() {
+      Set<Object> initial = super.get();
+      if (initial == null) {
+        initial = new HashSet<Object>();
+      }
+      return initial;
+    };
+  };
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
    */
@@ -47,8 +62,8 @@ public final class Injector {
   public void inject(final Object object) {
     Validate.notNull(object);
     processInjectAnnotation(object);
+    LOG.debug("Injection complete. Clearing the Object Set");
   }
-
 
   /**
    * Check for each field from the passed object if @Inject annotation is present & inject the required field if
@@ -57,6 +72,10 @@ public final class Injector {
    * @param object to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
+    if (injectedObjects.get().contains(object)) {
+      return;
+    }
+    injectedObjects.get().add(object);
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
@@ -70,7 +89,7 @@ public final class Injector {
       }
       //handle special cases like decorators. Perform recursive injection
       if (object instanceof ObjectDecorator) {
-        inject(((ObjectDecorator<?>) object).getDecoratedObject());
+        processInjectAnnotation(((ObjectDecorator<?>) object).getDecoratedObject());
       }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);
@@ -123,7 +142,7 @@ public final class Injector {
       }
       //accept injecting unsupported but initialized types
       if (accept |= field.get(object) != null) {
-        inject(field.get(object));
+        processInjectAnnotation(field.get(object));
       }
     }
     return accept;

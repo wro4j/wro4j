@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
@@ -25,7 +24,7 @@ import ro.isdc.wro.util.SchedulerHelper;
 
 /**
  * Responsible for invoking {@link GroupsProcessor} when cache key is missed.
- * 
+ *
  * @author Alex Objelean
  * @crated 2 May 2012
  * @since 1.4.6
@@ -40,16 +39,15 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Inject
   private ResourceAuthorizationManager authorizationManager;
   @Inject
-  private Injector injector;
-  @Inject
   private ReadOnlyContext context;
-  private ResourceWatcher resourceWatcher;
+  @Inject
+  private final ResourceWatcher resourceWatcher = new ResourceWatcher();
   /**
-   * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again. 
+   * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again.
    */
   private final Set<CacheEntry> checkedKeys = Collections.synchronizedSet(new HashSet<CacheEntry>());
   private SchedulerHelper resourceWatcherScheduler;
-  
+
   /**
    * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the
    * operation is redundant.
@@ -59,7 +57,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
     return decorated instanceof DefaultSynchronizedCacheStrategyDecorator ? decorated
         : new DefaultSynchronizedCacheStrategyDecorator(decorated);
   }
-  
+
   /**
    * @VisibleForTesting
    */
@@ -76,7 +74,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
       }
     }, "resourceWatcherScheduler");
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -96,7 +94,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
   }
 
   /**
-   * @return {@link TimeUnit} used to run resourceWatcher. 
+   * @return {@link TimeUnit} used to run resourceWatcher.
    * @VisibleForTesting
    */
   TimeUnit getTimeUnitForResourceWatcher() {
@@ -118,11 +116,11 @@ public class DefaultSynchronizedCacheStrategyDecorator
       final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
       LOG.debug("computed entry: {}", entry);
       return entry;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Should never happen", e);
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -134,21 +132,17 @@ public class DefaultSynchronizedCacheStrategyDecorator
       checkedKeys.add(key);
     }
   }
-  
+
   /**
    * @return the {@link ResourceWatcher} instance handling check for stale resources.
    * @VisibleForTesting
    */
   ResourceWatcher getResourceWatcher() {
-    if (resourceWatcher == null) {
-      resourceWatcher = new ResourceWatcher();
-      injector.inject(resourceWatcher);
-    }
     return resourceWatcher;
   }
 
   /**
-   * @return true if the provided key should be checked for change. 
+   * @return true if the provided key should be checked for change.
    */
   private boolean shouldWatchForChange(final CacheEntry key) {
     final boolean result = getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
@@ -161,7 +155,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
     super.clear();
     // reset authorization manager (clear any stored uri's).
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
-      ((MutableResourceAuthorizationManager) authorizationManager).clear();      
+      ((MutableResourceAuthorizationManager) authorizationManager).clear();
     }
   }
 }
