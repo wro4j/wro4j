@@ -1,6 +1,8 @@
 package ro.isdc.wro.model.resource.support.change;
 
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -89,11 +91,9 @@ public class TestResourceWatcher {
   }
 
   @Test
-  public void shouldPopulatePreviousHashesAfterFirstRun() {
+  public void shouldDetectChangeAfterFirstRun() throws Exception {
     victim.check(cacheEntry);
-
-//    assertTrue(victim.getCurrentHashes().keySet().isEmpty());
-//    assertEquals(1, victim.getPreviousHashes().keySet().size());
+    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
   }
 
   @Test
@@ -115,13 +115,13 @@ public class TestResourceWatcher {
     };
     createInjector().inject(victim);
     victim.check(cacheEntry);
-//    assertEquals(1, victim.getPreviousHashes().keySet().size());
+    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
 
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenReturn(
         new ByteArrayInputStream("different".getBytes()));
 
     victim.check(cacheEntry);
-//    assertEquals(1, victim.getPreviousHashes().keySet().size());
+    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
     assertTrue(flag.get());
   }
 
@@ -136,13 +136,14 @@ public class TestResourceWatcher {
       }
     };
     createInjector().inject(victim);
+    final ResourceChangeDetector mockChangeDetector = Mockito.spy(victim.getResourceChangeDetector());
     victim.check(cacheEntry);
-//    assertEquals(1, victim.getPreviousHashes().keySet().size());
+    verify(mockChangeDetector, never()).checkChangeForGroup(Mockito.anyString(), Mockito.anyString());
 
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
 
     victim.check(cacheEntry);
-//    assertEquals(1, victim.getPreviousHashes().keySet().size());
+    verify(mockChangeDetector, never()).checkChangeForGroup(Mockito.anyString(), Mockito.anyString());
   }
 
   @Test

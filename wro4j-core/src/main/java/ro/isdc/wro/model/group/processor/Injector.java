@@ -68,7 +68,7 @@ public final class Injector {
           }
         }
       }
-      //handle special cases like decorators. Perform recursive injection 
+      //handle special cases like decorators. Perform recursive injection
       if (object instanceof ObjectDecorator) {
         inject(((ObjectDecorator<?>) object).getDecoratedObject());
       }
@@ -120,6 +120,10 @@ public final class Injector {
           accept = true;
           break;
         }
+      }
+      //accept injecting unsupported but initialized types
+      if (accept |= field.get(object) != null) {
+        inject(field.get(object));
       }
     }
     return accept;

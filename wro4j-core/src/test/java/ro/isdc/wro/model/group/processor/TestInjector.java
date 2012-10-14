@@ -3,11 +3,12 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static junit.framework.Assert.assertNotNull;
+
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,21 +23,23 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 
+
 /**
  * @author Alex Objelean
  * @created 12 Dec 2011
  */
 public class TestInjector {
-  private Injector injector;
+  private Injector victim;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
+    initializeValidInjector();
   }
 
-  @Test(expected=NullPointerException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotAcceptNullMap() {
-    injector = new Injector(null);
+    victim = new Injector(null);
   }
 
   @Test
@@ -45,40 +48,41 @@ public class TestInjector {
   }
 
   private void initializeValidInjector() {
-    injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
+    victim = InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void cannotInjectUnsupportedType() {
+  @Test(expected = WroRuntimeException.class)
+  public void cannotInjectUnsupportedAndUnitializedType() {
     initializeValidInjector();
     final Object inner = new Object() {
       @Inject
       private Object object;
     };
-    injector.inject(inner);
+    victim.inject(inner);
   }
 
-
   @Test
-  public void shouldInjectSupportedType() throws Exception {
+  public void shouldInjectSupportedType()
+      throws Exception {
     initializeValidInjector();
     final Callable<?> inner = new Callable<Void>() {
       @Inject
       private LifecycleCallbackRegistry object;
+
       public Void call()
-        throws Exception {
+          throws Exception {
         Assert.assertNotNull(object);
         return null;
       }
     };
-    injector.inject(inner);
+    victim.inject(inner);
     inner.call();
   }
 
   @Test
-  public void shouldInjectContext() throws Exception {
+  public void shouldInjectContext()
+      throws Exception {
     // Cannot reuse this part, because generic type is not inferred correctly at runtime
-    initializeValidInjector();
     final Callable<?> inner = new Callable<Void>() {
       @Inject
       private ReadOnlyContext object;
@@ -89,10 +93,10 @@ public class TestInjector {
         return null;
       }
     };
-    injector.inject(inner);
+    victim.inject(inner);
     inner.call();
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void canInjectContextOutsideOfContextScope()
       throws Exception {
@@ -102,22 +106,24 @@ public class TestInjector {
   }
 
   @Test
-  public void shouldInjectWroConfiguration() throws Exception {
-    initializeValidInjector();
+  public void shouldInjectWroConfiguration()
+      throws Exception {
     final Callable<?> inner = new Callable<Void>() {
       @Inject
       private WroConfiguration object;
+
       public Void call()
-        throws Exception {
+          throws Exception {
         Assert.assertNotNull(object);
         return null;
       }
     };
-    injector.inject(inner);
+    victim.inject(inner);
     inner.call();
   }
 
-  private class TestProcessor extends JSMinProcessor {
+  private class TestProcessor
+      extends JSMinProcessor {
     @Inject
     private ReadOnlyContext context;
   }
@@ -129,9 +135,20 @@ public class TestInjector {
 
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     injector.inject(processor);
-    Assert.assertNotNull(testProcessor.context);
+    assertNotNull(testProcessor.context);
   }
 
+  @Test
+  public void shouldInjectUnsupportedButInitializedTypes() {
+    final InnerTest inner = new InnerTest();
+    victim.inject(inner);
+    Assert.assertEquals(new InnerTest().unsupportedInitializedType, inner.unsupportedInitializedType);
+  }
+
+  private static class InnerTest {
+    @Inject
+    private final String unsupportedInitializedType = "";
+  }
 
   @After
   public void tearDown() {

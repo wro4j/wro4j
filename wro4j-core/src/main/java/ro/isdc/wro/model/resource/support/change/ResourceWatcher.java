@@ -47,6 +47,7 @@ public class ResourceWatcher {
   private UriLocatorFactory locatorFactory;
   @Inject
   private Injector injector;
+  @Inject
   private final ResourceChangeDetector changeDetector = new ResourceChangeDetector();
 
   /**
