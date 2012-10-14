@@ -1,19 +1,14 @@
-package ro.isdc.wro.model.resource.support;
+package ro.isdc.wro.model.resource.support.change;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +27,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -53,64 +47,8 @@ public class ResourceWatcher {
   @Inject
   private UriLocatorFactory locatorFactory;
   @Inject
-  private HashStrategy hashStrategy;
-  @Inject
   private Injector injector;
-  /**
-   * Map between a resource uri and a corresponding {@link ResourceInfo} object.
-   */
-  private final Map<String, ResourceInfo> resourceInfoMap = new ConcurrentHashMap<String, ResourceInfo>() {
-    @Override
-    public ResourceInfo get(final Object key) {
-      ResourceInfo result = super.get(key);
-      if (result == null) {
-        result = new ResourceInfo();
-        put((String) key, result);
-      }
-      return result;
-    }
-  };
-
-  /**
-   * Holds details about hashes of watched resources and the group which were detected as changed.
-   */
-  private class ResourceInfo {
-    private String currentHash;
-    private String prevHash;
-    private final Set<String> groups;
-
-    public ResourceInfo() {
-      groups = new HashSet<String>();
-    }
-
-    public void updateHashForGroup(final String currentHash, final String groupName) {
-      this.currentHash = currentHash;
-      groups.clear();
-      groups.add(groupName);
-    }
-
-    public void cleanUp() {
-      System.out.println("cleanUp " + this);
-      this.prevHash = currentHash;
-      this.currentHash = null;
-    }
-
-    public boolean isChanged(final String groupName) {
-      final boolean result = prevHash != null && (prevHash.equals(currentHash) ? groups.contains(groupName) : true);
-      LOG.info("resourceInfo: {}, changed: {}", this, result);
-      return result;
-    }
-
-    public boolean isCheckRequiredForGroup(final String groupName) {
-      groups.add(groupName);
-      return currentHash == null;
-    }
-
-    @Override
-    public String toString() {
-      return ToStringBuilder.reflectionToString(this);
-    }
-  }
+  private final ResourceChangeDetector changeDetector = new ResourceChangeDetector();
 
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
@@ -128,10 +66,7 @@ public class ResourceWatcher {
       if (isGroupChanged(group)) {
         onGroupChanged(cacheEntry);
       }
-      System.err.println("cleaningUp: " + resourceInfoMap.values());
-      for (final ResourceInfo resourceInfo : resourceInfoMap.values()) {
-        resourceInfo.cleanUp();
-      }
+      changeDetector.cleanUp();
     } catch (final Exception e) {
       onException(e);
     } finally {
@@ -197,9 +132,8 @@ public class ResourceWatcher {
     LOG.debug("Check change for resource {}", resource.getUri());
     try {
       final String uri = resource.getUri();
-      final ResourceInfo resourceInfo = updateCurrentHash(uri, groupName);
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-      final AtomicBoolean changeDetected = new AtomicBoolean(resourceInfo.isChanged(groupName));
+      final AtomicBoolean changeDetected = new AtomicBoolean(changeDetector.checkChangeForGroup(uri, groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
@@ -255,22 +189,6 @@ public class ResourceWatcher {
     return processor;
   }
 
-  /**
-   * @param uri
-   *          of the resource to get the hash for.
-   * @return the hash for a given resource uri.
-   * @throws IOException
-   */
-  private ResourceInfo updateCurrentHash(final String uri, final String groupName)
-      throws IOException {
-    final ResourceInfo resourceInfo = resourceInfoMap.get(uri);
-    if (resourceInfo.isCheckRequiredForGroup(groupName)) {
-      LOG.debug("Checking if resource {} is changed..", uri);
-      final String currentHash = hashStrategy.getHash(new AutoCloseInputStream(locatorFactory.locate(uri)));
-      resourceInfo.updateHashForGroup(currentHash, groupName);
-    }
-    return resourceInfo;
-  }
 
   /**
    * @return the map storing the hash of accumulated resources from previous runs.

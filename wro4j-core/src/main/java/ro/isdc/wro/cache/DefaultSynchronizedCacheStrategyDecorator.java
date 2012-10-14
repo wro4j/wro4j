@@ -17,7 +17,7 @@ import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
-import ro.isdc.wro.model.resource.support.ResourceWatcher;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.SchedulerHelper;

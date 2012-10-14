@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.resource.support;
+package ro.isdc.wro.model.resource.support.change;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -33,6 +33,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.AbstractUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.util.WroTestUtils;
 
 

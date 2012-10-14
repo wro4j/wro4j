@@ -24,7 +24,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.support.ResourceWatcher;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.util.ObjectDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
