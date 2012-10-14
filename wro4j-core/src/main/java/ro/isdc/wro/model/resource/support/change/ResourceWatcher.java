@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.Validate;
@@ -66,7 +65,7 @@ public class ResourceWatcher {
       if (isGroupChanged(group)) {
         onGroupChanged(cacheEntry);
       }
-      changeDetector.cleanUp();
+      changeDetector.reset();
     } catch (final Exception e) {
       onException(e);
     } finally {
@@ -189,22 +188,11 @@ public class ResourceWatcher {
     return processor;
   }
 
-
   /**
-   * @return the map storing the hash of accumulated resources from previous runs.
    * @VisibleForTesting
+   * @return
    */
-  Map<String, String> getPreviousHashes() {
-    // return Collections.unmodifiableMap(previousHashes);
-    return null;
-  }
-
-  /**
-   * @return the map storing the hash of resources from current run.
-   * @VisibleForTesting
-   */
-  Map<String, String> getCurrentHashes() {
-    // return Collections.unmodifiableMap(currentHashes);
-    return null;
+  ResourceChangeDetector getResourceChangeDetector() {
+    return changeDetector;
   }
 }

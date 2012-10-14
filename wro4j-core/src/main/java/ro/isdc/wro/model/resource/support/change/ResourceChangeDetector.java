@@ -26,7 +26,8 @@ public class ResourceChangeDetector {
   @Inject
   private HashStrategy hashStrategy;
   /**
-   * Map between a resource uri and a corresponding {@link ResourceChangeInfo} object.
+   * Map between a resource uri and a corresponding {@link ResourceChangeInfo} object. It is ensured that any get(key)
+   * operation will return a not null object.
    */
   private final Map<String, ResourceChangeInfo> changeInfoMap = new ConcurrentHashMap<String, ResourceChangeInfo>() {
     @Override
@@ -40,7 +41,10 @@ public class ResourceChangeDetector {
     }
   };
 
-  public void cleanUp() {
+  /**
+   * Notifies the {@link ResourceChangeDetector} that the change cycle completes and a new one is prepared.
+   */
+  public void reset() {
     for (final ResourceChangeInfo resourceInfo : changeInfoMap.values()) {
       resourceInfo.reset();
     }
