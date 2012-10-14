@@ -3,9 +3,6 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +30,13 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.ObjectFactory;
+import ro.isdc.wro.util.ProxyFactory;
 
 
 /**
  * Responsible for building the {@link Injector}. It can build an {@link Injector} without needing a {@link WroManager},
  * but just by providing required dependencies.
- * 
+ *
  * @author Alex Objelean
  * @since 1.4.3
  * @created 6 Jan 2012
@@ -66,21 +64,21 @@ public class InjectorBuilder {
       return manager.getUriLocatorFactory();
     }
   };
-  private LazyInitializer<ResourceAuthorizationManager> authorizationManagerInitializer = new LazyInitializer<ResourceAuthorizationManager>() {
+  private final LazyInitializer<ResourceAuthorizationManager> authorizationManagerInitializer = new LazyInitializer<ResourceAuthorizationManager>() {
     @Override
     protected ResourceAuthorizationManager initialize() {
       final WroManager manager = managerFactory.create();
       return manager.getResourceAuthorizationManager();
     }
   };
-  
+
   private final LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
     @Override
     protected WroModelFactory initialize() {
       final WroManager manager = managerFactory.create();
       // update manager with new decorated factory
-      manager.setModelFactory(DefaultWroModelFactoryDecorator.decorate(manager.getModelFactory(),
-          manager.getModelTransformers()));
+      manager.setModelFactory(DefaultWroModelFactoryDecorator.decorate(manager.getModelFactory(), manager
+          .getModelTransformers()));
       return manager.getModelFactory();
     }
   };
@@ -99,12 +97,12 @@ public class InjectorBuilder {
 
   /**
    * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
-   * 
+   *
    * @VisibleForTesting
    */
   public InjectorBuilder() {
   }
-  
+
   /**
    * Factory method which uses a managerFactory to initialize injected fields.
    */
@@ -112,12 +110,12 @@ public class InjectorBuilder {
     Validate.notNull(managerFactory);
     return new InjectorBuilder(managerFactory);
   }
-  
+
   public InjectorBuilder(final WroManagerFactory managerFactory) {
     Validate.notNull(managerFactory);
     this.managerFactory = managerFactory;
   }
-  
+
   private void initMap() {
     map.put(PreProcessorExecutor.class, new InjectorObjectFactory<PreProcessorExecutor>() {
       public PreProcessorExecutor create() {
@@ -150,73 +148,98 @@ public class InjectorBuilder {
         return injector;
       }
     });
-    map.put(UriLocatorFactory.class, new InjectorObjectFactory<UriLocatorFactory>() {
-      public UriLocatorFactory create() {
-        return locatorFactoryInitializer.get();
-      }
-    });
-    map.put(ProcessorsFactory.class, new InjectorObjectFactory<ProcessorsFactory>() {
-      public ProcessorsFactory create() {
-        return managerFactory.create().getProcessorsFactory();
-      }
-    });
-    map.put(WroModelFactory.class, new InjectorObjectFactory<WroModelFactory>() {
-      public WroModelFactory create() {
-        final WroModelFactory modelFactory = modelFactoryInitializer.get();
-        injector.inject(modelFactory);
-        return modelFactory;
-      }
-    });
-    map.put(NamingStrategy.class, new InjectorObjectFactory<NamingStrategy>() {
-      public NamingStrategy create() {
-        NamingStrategy namingStrategy = managerFactory.create().getNamingStrategy();
-        injector.inject(namingStrategy);
-        return namingStrategy;
-      }
-    });
-    map.put(HashStrategy.class, new InjectorObjectFactory<HashStrategy>() {
-      public HashStrategy create() {
-        final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
-        injector.inject(hashStrategy);
-        return hashStrategy;
-      }
-    });
+    map.put(UriLocatorFactory.class, createLocatorFactoryProxy());
+    map.put(ProcessorsFactory.class, createProcessorFactoryProxy());
+    map.put(WroModelFactory.class, createModelFactoryProxy());
+    map.put(NamingStrategy.class, createNamingStrategyProxy());
+    map.put(HashStrategy.class, createHashStrategyProxy());
     map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
     map.put(WroConfiguration.class, new InjectorObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return Context.get().getConfig();
       }
     });
-    map.put(CacheStrategy.class, new InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>>() {
+    map.put(CacheStrategy.class, createCacheStrategyProxy());
+    map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
+  }
+
+  private InjectorObjectFactory<ProcessorsFactory> createProcessorFactoryProxy() {
+    return new InjectorObjectFactory<ProcessorsFactory>() {
+      public ProcessorsFactory create() {
+        return managerFactory.create().getProcessorsFactory();
+      }
+    };
+  }
+
+  private InjectorObjectFactory<UriLocatorFactory> createLocatorFactoryProxy() {
+    return new InjectorObjectFactory<UriLocatorFactory>() {
+      public UriLocatorFactory create() {
+        return locatorFactoryInitializer.get();
+      }
+    };
+  }
+
+  private ResourceAuthorizationManager createResourceAuthorizationManagerProxy() {
+    return new ProxyFactory<ResourceAuthorizationManager>(new ObjectFactory<ResourceAuthorizationManager>() {
+      public ResourceAuthorizationManager create() {
+        return authorizationManagerInitializer.get();
+      }
+    }, ResourceAuthorizationManager.class).create();
+  }
+
+  private WroModelFactory createModelFactoryProxy() {
+    return new ProxyFactory<WroModelFactory>(new ObjectFactory<WroModelFactory>() {
+      public WroModelFactory create() {
+        final WroModelFactory modelFactory = modelFactoryInitializer.get();
+        injector.inject(modelFactory);
+        return modelFactory;
+      }
+    }, WroModelFactory.class).create();
+  }
+
+  private NamingStrategy createNamingStrategyProxy() {
+    return new ProxyFactory<NamingStrategy>(new ObjectFactory<NamingStrategy>() {
+      public NamingStrategy create() {
+        final NamingStrategy namingStrategy = managerFactory.create().getNamingStrategy();
+        injector.inject(namingStrategy);
+        return namingStrategy;
+      }
+    }, NamingStrategy.class).create();
+  }
+
+  private HashStrategy createHashStrategyProxy() {
+    return new ProxyFactory<HashStrategy>(new ObjectFactory<HashStrategy>() {
+      public HashStrategy create() {
+        final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
+        injector.inject(hashStrategy);
+        return hashStrategy;
+      }
+    }, HashStrategy.class).create();
+  }
+
+  /**
+   * TODO use {@link ProxyFactory}.
+   */
+  private InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>> createCacheStrategyProxy() {
+    return new InjectorObjectFactory<CacheStrategy<CacheEntry, ContentHashEntry>>() {
       public CacheStrategy<CacheEntry, ContentHashEntry> create() {
         final CacheStrategy<CacheEntry, ContentHashEntry> decorated = cacheStrategyInitializer.get();
         injector.inject(decorated);
         return decorated;
       }
-    });
-    map.put(ResourceAuthorizationManager.class, new InjectorObjectFactory<ResourceAuthorizationManager>() {
-      public ResourceAuthorizationManager create() {
-        return authorizationManagerInitializer.get();
-      }
-    });
+    };
   }
-  
+
   /**
    * @return a proxy of {@link ReadOnlyContext} object. This solution is preferred to {@link InjectorObjectFactory}
    *         because the injected field ensure thread-safe behavior.
    */
   private ReadOnlyContext createReadOnlyContextProxy() {
-    InvocationHandler handler = new InvocationHandler() {
-      public Object invoke(final Object proxy, final Method method, final Object[] args)
-          throws Throwable {
-        return method.invoke(Context.get(), args);
+    return new ProxyFactory<ReadOnlyContext>(new ObjectFactory<ReadOnlyContext>() {
+      public ReadOnlyContext create() {
+        return Context.get();
       }
-    };
-    final ReadOnlyContext readOnlyContext = (ReadOnlyContext) Proxy.newProxyInstance(
-        ReadOnlyContext.class.getClassLoader(), new Class[] {
-          ReadOnlyContext.class
-        }, handler);
-    return readOnlyContext;
+    }, ReadOnlyContext.class).create();
   }
 
   public Injector build() {
@@ -224,7 +247,7 @@ public class InjectorBuilder {
     initMap();
     return injector = new Injector(Collections.unmodifiableMap(map));
   }
-  
+
   /**
    * A special type used for lazy object injection only in context of this class.
    */

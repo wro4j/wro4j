@@ -62,7 +62,6 @@ public final class Injector {
   public void inject(final Object object) {
     Validate.notNull(object);
     processInjectAnnotation(object);
-    LOG.debug("Injection complete. Clearing the Object Set");
   }
 
   /**

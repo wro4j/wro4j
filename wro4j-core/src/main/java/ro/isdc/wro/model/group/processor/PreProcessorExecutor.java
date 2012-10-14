@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -172,7 +173,8 @@ public class PreProcessorExecutor {
       resourceContent = getResourceContent(resource);
     } catch (final IOException e) {
       LOG.debug("Invalid resource found: {}", resource);
-      if (config.isIgnoreMissingResources()) {
+      LOG.debug("config: {}", config);
+      if (Context.get().getConfig().isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
         LOG.error("Cannot ignore missing resource:  {}", resource);
