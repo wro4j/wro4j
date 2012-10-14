@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.group.processor;
 
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.Callable;
 
@@ -19,6 +20,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -140,15 +142,45 @@ public class TestInjector {
 
   @Test
   public void shouldInjectUnsupportedButInitializedTypes() {
-    final InnerTest inner = new InnerTest();
-    victim.inject(inner);
-    Assert.assertEquals(new InnerTest().unsupportedInitializedType, inner.unsupportedInitializedType);
+    final String initialValue = "initial";
+    final Callable<?> object = new Callable<Void>() {
+      @Inject
+      String unsupportedInitializedType = initialValue;
+
+      public Void call()
+          throws Exception {
+        assertEquals(initialValue, unsupportedInitializedType);
+        return null;
+      }
+    };
+    victim.inject(object);
   }
 
-  private static class InnerTest {
-    @Inject
-    private final String unsupportedInitializedType = "";
+
+  @Test
+  public void shouldInjectInnerObject() throws Exception {
+    final Callable<?> outer = new Callable<Void>() {
+      @Inject
+      private final Callable<?> inner = new Callable<Void>() {
+        @Inject
+        UriLocatorFactory locatorFactory;
+        public Void call()
+            throws Exception {
+          Assert.assertNotNull(locatorFactory);
+          return null;
+        }
+      };
+
+      public Void call()
+          throws Exception {
+        inner.call();
+        return null;
+      }
+    };
+    victim.inject(outer);
+    outer.call();
   }
+
 
   @After
   public void tearDown() {
