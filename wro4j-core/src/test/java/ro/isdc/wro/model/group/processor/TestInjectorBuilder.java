@@ -3,11 +3,16 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertSame;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static ro.isdc.wro.config.Context.set;
 
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -36,7 +41,7 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
-import ro.isdc.wro.util.AbstractDecorator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -107,34 +112,41 @@ public class TestInjectorBuilder {
   }
 
   @Test
-  public void shouldBuildValidInjectorWithSomeFieldsSet() {
-    final NamingStrategy namingStrategy = Mockito.mock(NamingStrategy.class);
-    final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
-    final UriLocatorFactory uriLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+  public void shouldBuildValidInjectorWithSomeFieldsSet() throws Exception {
+    final NamingStrategy mockNamingStrategy = Mockito.mock(NamingStrategy.class);
+    final ProcessorsFactory mockProcessorsFactory = Mockito.mock(ProcessorsFactory.class);
+    final UriLocatorFactory mockLocatorFactory = Mockito.mock(UriLocatorFactory.class);
 
     final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
-    managerFactroy.setNamingStrategy(namingStrategy);
-    managerFactroy.setProcessorsFactory(processorsFactory);
-    managerFactroy.setUriLocatorFactory(uriLocatorFactory);
+    managerFactroy.setNamingStrategy(mockNamingStrategy);
+    managerFactroy.setProcessorsFactory(mockProcessorsFactory);
+    managerFactroy.setUriLocatorFactory(mockLocatorFactory);
 
     final Injector injector = InjectorBuilder.create(managerFactroy).build();
     Assert.assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
-    Assert.assertSame(namingStrategy, sample.namingStrategy);
-    Assert.assertNotNull(sample.preProcessorExecutor);
+    assertTrue(Proxy.isProxyClass(sample.namingStrategy.getClass()));
+    assertNotNull(sample.preProcessorExecutor);
 
-    Assert.assertSame(processorsFactory, AbstractDecorator.getOriginalDecoratedObject(sample.processorsFactory));
-    Assert.assertSame(uriLocatorFactory, AbstractDecorator.getOriginalDecoratedObject(sample.uriLocatorFactory));
-    Assert.assertNotNull(sample.callbackRegistry);
-    Assert.assertSame(injector, sample.injector);
-    Assert.assertNotNull(sample.groupsProcessor);
-    Assert.assertNotNull(sample.modelFactory);
-    Assert.assertNotNull(sample.groupExtractor);
-    Assert.assertNotNull(sample.cacheStrategy);
-    Assert.assertNotNull(sample.hashBuilder);
-    Assert.assertNotNull(sample.readOnlyContext);
+    sample.namingStrategy.rename("", WroUtil.EMPTY_STREAM);
+    verify(mockNamingStrategy).rename("", WroUtil.EMPTY_STREAM);
+
+    sample.processorsFactory.getPostProcessors();
+    verify(mockProcessorsFactory).getPostProcessors();
+
+    sample.uriLocatorFactory.getInstance("");
+    verify(mockLocatorFactory).getInstance("");
+
+    assertNotNull(sample.callbackRegistry);
+    assertSame(injector, sample.injector);
+    assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.modelFactory);
+    assertNotNull(sample.groupExtractor);
+    assertNotNull(sample.cacheStrategy);
+    assertNotNull(sample.hashBuilder);
+    assertNotNull(sample.readOnlyContext);
   }
 
   @Test(expected = IOException.class)

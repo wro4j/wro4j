@@ -24,8 +24,8 @@ import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
- * Injector scans some object fields and checks if a value can be provided to a field; Injector will ignore
- * all non-null fields.
+ * Injector scans some object fields and checks if a value can be provided to a field; Injector will ignore all non-null
+ * fields.
  *
  * @author Alex Objelean
  * @created 20 Nov 2010
@@ -46,6 +46,7 @@ public final class Injector {
       return initial;
     };
   };
+
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
    */
@@ -57,7 +58,8 @@ public final class Injector {
   /**
    * Scans the object and inject the supported values into the fields having @Inject annotation present.
    *
-   * @param object {@link Object} which will be scanned for @Inject annotation presence.
+   * @param object
+   *          {@link Object} which will be scanned for @Inject annotation presence.
    */
   public void inject(final Object object) {
     Validate.notNull(object);
@@ -68,12 +70,14 @@ public final class Injector {
    * Check for each field from the passed object if @Inject annotation is present & inject the required field if
    * supported, otherwise warns about invalid usage.
    *
-   * @param object to check for annotation presence.
+   * @param object
+   *          to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
     if (injectedObjects.get().contains(object)) {
       return;
     }
+    LOG.debug("injecting: {}", object);
     injectedObjects.get().add(object);
     try {
       final Collection<Field> fields = getAllFields(object);
@@ -86,7 +90,7 @@ public final class Injector {
           }
         }
       }
-      //handle special cases like decorators. Perform recursive injection
+      // handle special cases like decorators. Perform recursive injection
       if (object instanceof ObjectDecorator) {
         processInjectAnnotation(((ObjectDecorator<?>) object).getDecoratedObject());
       }
@@ -95,7 +99,6 @@ public final class Injector {
       throw new WroRuntimeException("Exception while trying to process @Inject annotation", e);
     }
   }
-
 
   /**
    * Return all fields for given object, also those from the super classes.
@@ -116,13 +119,15 @@ public final class Injector {
    * Analyze the field containing {@link Inject} annotation and set its value to appropriate value. Override this method
    * if you want to inject something else but uriLocatorFactory.
    *
-   * @param object an object containing @Inject annotation.
-   * @param field {@link Field} object containing {@link Inject} annotation.
+   * @param object
+   *          an object containing @Inject annotation.
+   * @param field
+   *          {@link Field} object containing {@link Inject} annotation.
    * @return true if field was injected with some not null value.
    * @throws IllegalAccessException
    */
   private boolean acceptAnnotatedField(final Object object, final Field field)
-    throws IllegalAccessException {
+      throws IllegalAccessException {
     boolean accept = false;
     // accept private modifiers
     field.setAccessible(true);
@@ -139,9 +144,13 @@ public final class Injector {
           break;
         }
       }
-      //accept injecting unsupported but initialized types
-      if (accept |= field.get(object) != null) {
-        processInjectAnnotation(field.get(object));
+      // accept injecting unsupported but initialized types
+      if (!accept) {
+        accept = field.get(object) != null;
+        // if (accept |= field.get(object) != null) {
+        if (accept) {
+          processInjectAnnotation(field.get(object));
+        }
       }
     }
     return accept;
