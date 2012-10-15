@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -171,12 +172,12 @@ public class TestCssUrlRewritingProcessor {
     Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
     Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
   }
-  
+
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
-  
+
   /**
    * Tests that the Context injected into processor is thread safe and uses the values of set by the thread which runs
    * the processor.
@@ -184,10 +185,10 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void shouldUseCorrectAggregatedFolderSetEvenWhenContextIsChangedInAnotherThread()
       throws Exception {
-    WroTestUtils.runConcurrently(new Callable<Void>() {
+    Context.set(Context.standaloneContext());
+    WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        Context.set(Context.standaloneContext());
         WroTestUtils.createInjector().inject(processor);
         if (new Random().nextBoolean()) {
           Thread.sleep(150);
@@ -198,6 +199,6 @@ public class TestCssUrlRewritingProcessor {
         }
         return null;
       }
-    }, 20);
+    }), 20);
   }
 }

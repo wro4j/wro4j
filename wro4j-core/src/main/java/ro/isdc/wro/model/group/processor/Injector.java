@@ -74,11 +74,13 @@ public final class Injector {
    *          to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
+    //TODO find a better way to avoid recursion
     if (injectedObjects.get().contains(object)) {
       return;
     }
-    LOG.debug("injecting: {}", object);
     injectedObjects.get().add(object);
+    LOG.debug("injecting: {}", object);
+
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {

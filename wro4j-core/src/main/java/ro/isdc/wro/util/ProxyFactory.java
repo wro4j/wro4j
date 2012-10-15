@@ -6,6 +6,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,10 @@ public class ProxyFactory<T>
     this.genericType = genericType;
   }
 
+  public ProxyFactory(final T object) {
+    this(object, (Class<T>) object.getClass());
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -51,13 +57,29 @@ public class ProxyFactory<T>
         try {
           return method.invoke(getDecoratedObject(), args);
         } catch (final InvocationTargetException ex) {
+          //Preserve original exception
           throw ex.getCause();
         }
       }
     };
     LOG.debug("genericType: {}", genericType);
-    return (T) Proxy.newProxyInstance(genericType.getClassLoader(), new Class[] {
-      genericType
-    }, handler);
+    return (T) Proxy.newProxyInstance(getDecoratedObject().getClass().getClassLoader(),
+        getInterfacesSet().toArray(new Class[] {}), handler);
+  }
+
+  /**
+   * @return a set of interfaces supported by proxied object.
+   */
+  private Set<Class<?>> getInterfacesSet() {
+    final Set<Class<?>> set = new HashSet<Class<?>>();
+    if (genericType.isInterface()) {
+      set.add(genericType);
+    }
+    final Class[] classes = getDecoratedObject().getClass().getInterfaces();
+    for (final Class<?> clazz : classes) {
+      set.add(clazz);
+    }
+    LOG.debug("interfaces set: {}", set);
+    return set;
   }
 }
