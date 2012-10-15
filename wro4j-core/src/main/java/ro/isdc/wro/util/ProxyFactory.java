@@ -22,10 +22,11 @@ import org.slf4j.LoggerFactory;
  * @param <T>
  *          the type of the object to create.
  */
-public class ProxyFactory<T>
-    extends AbstractDecorator<T> {
+public class ProxyFactory<T> {
   private static final Logger LOG = LoggerFactory.getLogger(ProxyFactory.class);
   private final Class<T> genericType;
+
+  private final ObjectFactory<T> objectFactory;
 
   /**
    * Creates a proxy for the provided object.
@@ -36,35 +37,41 @@ public class ProxyFactory<T>
    *          the Class of the generic object, required to create the proxy. This argument is required because of type
    *          erasure and generics info aren't available at runtime.
    */
-  public ProxyFactory(final T object, final Class<T> genericType) {
-    super(object);
+  private ProxyFactory(final ObjectFactory<T> objectFactory, final Class<T> genericType) {
+    notNull(objectFactory);
     notNull(genericType);
+    this.objectFactory = objectFactory;
     this.genericType = genericType;
   }
 
-  public ProxyFactory(final T object) {
-    this(object, (Class<T>) object.getClass());
+  public static <T> T proxy(final ObjectFactory<T> objectFactory, final Class<T> genericType) {
+    try {
+      return new ProxyFactory<T>(objectFactory, genericType).create();
+    } catch (final RuntimeException e) {
+      LOG.error("exception", e);
+      throw e;
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public T create() {
+  private T create() {
     final InvocationHandler handler = new InvocationHandler() {
       public Object invoke(final Object proxy, final Method method, final Object[] args)
           throws Throwable {
         try {
-          return method.invoke(getDecoratedObject(), args);
+          return method.invoke(objectFactory.create(), args);
         } catch (final InvocationTargetException ex) {
-          //Preserve original exception
+          // Preserve original exception
           throw ex.getCause();
         }
       }
     };
     LOG.debug("genericType: {}", genericType);
-    return (T) Proxy.newProxyInstance(getDecoratedObject().getClass().getClassLoader(),
-        getInterfacesSet().toArray(new Class[] {}), handler);
+    return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), getInterfacesSet().toArray(
+        new Class[] {}), handler);
   }
 
   /**
@@ -75,7 +82,7 @@ public class ProxyFactory<T>
     if (genericType.isInterface()) {
       set.add(genericType);
     }
-    final Class[] classes = getDecoratedObject().getClass().getInterfaces();
+    final Class[] classes = objectFactory.create().getClass().getInterfaces();
     for (final Class<?> clazz : classes) {
       set.add(clazz);
     }

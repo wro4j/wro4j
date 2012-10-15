@@ -6,7 +6,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
@@ -41,7 +41,7 @@ public final class DefaultWroModelFactoryDecorator
   @Inject
   private ResourceAuthorizationManager authorizationManager;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   @Inject
   private Injector injector;
   /**
@@ -81,7 +81,7 @@ public final class DefaultWroModelFactoryDecorator
      *          {@link WroModel} created by decorated factory.
      */
     private void authorizeModelResources(final WroModel model) {
-      if (model != null && config.isDebug()) {
+      if (model != null && context.getConfig().isDebug()) {
         if (authorizationManager instanceof MutableResourceAuthorizationManager) {
           for (final Resource resource : new WroModelInspector(model).getAllUniqueResources()) {
             ((MutableResourceAuthorizationManager) authorizationManager).add(resource.getUri());

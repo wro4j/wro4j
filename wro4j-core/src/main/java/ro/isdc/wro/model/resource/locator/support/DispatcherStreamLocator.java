@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -29,11 +31,13 @@ import ro.isdc.wro.util.WroUtil;
 /**
  * Responsible to locate a context relative resource. It attempts to locate the resource using {@link RequestDispatcher}
  * . If the dispatcher fails, it will fallback resource retrieval to a http call using {@link UrlUriLocator}.
- * 
+ *
  * @author Alex Objelean
  */
 public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
+  @Inject
+  private Injector injector;
   /**
    * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent {@link StackOverflowError}.
    * @VisibleForTesting
@@ -53,7 +57,7 @@ public class DispatcherStreamLocator {
     throws IOException {
     Validate.notNull(request);
     Validate.notNull(response);
-    
+
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
@@ -117,14 +121,16 @@ public class DispatcherStreamLocator {
    * @VisibleForTesting
    */
   UriLocator createExternalResourceLocator() {
-    return new UrlUriLocator() {
+    final UriLocator locator = new UrlUriLocator() {
       @Override
       public boolean isEnableWildcards() {
         return false;
       };
     };
+    injector.inject(locator);
+    return locator;
   }
-  
+
   /**
    * Build a wrapped servlet request which will be used for dispatching.
    */

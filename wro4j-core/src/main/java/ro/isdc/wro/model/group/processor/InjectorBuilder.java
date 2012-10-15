@@ -67,14 +67,6 @@ public class InjectorBuilder {
       return manager.getUriLocatorFactory();
     }
   };
-  private final LazyInitializer<ResourceAuthorizationManager> authorizationManagerInitializer = new LazyInitializer<ResourceAuthorizationManager>() {
-    @Override
-    protected ResourceAuthorizationManager initialize() {
-      final WroManager manager = managerFactory.create();
-      return manager.getResourceAuthorizationManager();
-    }
-  };
-
   private final LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
     @Override
     protected WroModelFactory initialize() {
@@ -186,8 +178,7 @@ public class InjectorBuilder {
       public GroupExtractor create() {
         final GroupExtractor groupExtractor = managerFactory.create().getGroupExtractor();
         injector.inject(groupExtractor);
-        final GroupExtractor proxy = new ProxyFactory<GroupExtractor>(groupExtractor, GroupExtractor.class).create();
-        return proxy;
+        return groupExtractor;
       }
     };
   }
@@ -195,9 +186,7 @@ public class InjectorBuilder {
   private Object createProcessorFactoryProxy() {
     return new InjectorObjectFactory<ProcessorsFactory>() {
       public ProcessorsFactory create() {
-        final ProcessorsFactory proxy = new ProxyFactory<ProcessorsFactory>(
-            managerFactory.create().getProcessorsFactory(), ProcessorsFactory.class).create();
-        return proxy;
+        return managerFactory.create().getProcessorsFactory();
       }
     };
   }
@@ -205,9 +194,7 @@ public class InjectorBuilder {
   private Object createLocatorFactoryProxy() {
     return new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        final UriLocatorFactory proxy = new ProxyFactory<UriLocatorFactory>(locatorFactoryInitializer.get(),
-            UriLocatorFactory.class).create();
-        return proxy;
+        return locatorFactoryInitializer.get();
       }
     };
   }
@@ -215,9 +202,7 @@ public class InjectorBuilder {
   private Object createResourceAuthorizationManagerProxy() {
     return new InjectorObjectFactory<ResourceAuthorizationManager>() {
       public ResourceAuthorizationManager create() {
-        final ResourceAuthorizationManager proxy = new ProxyFactory<ResourceAuthorizationManager>(
-            authorizationManagerInitializer.get(), ResourceAuthorizationManager.class).create();
-        return proxy;
+        return managerFactory.create().getResourceAuthorizationManager();
       }
     };
   }
@@ -227,8 +212,8 @@ public class InjectorBuilder {
       public WroModelFactory create() {
         final WroModelFactory modelFactory = modelFactoryInitializer.get();
         injector.inject(modelFactory);
-        final WroModelFactory proxy = new ProxyFactory<WroModelFactory>(modelFactory, WroModelFactory.class).create();
-        return proxy;
+        //final WroModelFactory proxy = ProxyFactory.proxy(modelFactory, WroModelFactory.class).create();
+        return modelFactory;
       }
     };
   }
@@ -238,8 +223,8 @@ public class InjectorBuilder {
       public NamingStrategy create() {
         final NamingStrategy namingStrategy = managerFactory.create().getNamingStrategy();
         injector.inject(namingStrategy);
-        final NamingStrategy proxy = new ProxyFactory<NamingStrategy>(namingStrategy, NamingStrategy.class).create();
-        return proxy;
+        //final NamingStrategy proxy = new ProxyFactory<NamingStrategy>(namingStrategy, NamingStrategy.class).create();
+        return namingStrategy;
       }
     };
   }
@@ -249,8 +234,7 @@ public class InjectorBuilder {
       public HashStrategy create() {
         final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
         injector.inject(hashStrategy);
-        final HashStrategy proxy = new ProxyFactory<HashStrategy>(hashStrategy, HashStrategy.class).create();
-        return proxy;
+        return hashStrategy;
       }
     };
   }
@@ -261,8 +245,7 @@ public class InjectorBuilder {
       public CacheStrategy create() {
         final CacheStrategy<CacheEntry, ContentHashEntry> decorated = cacheStrategyInitializer.get();
         injector.inject(decorated);
-        final CacheStrategy<?, ?> proxy = new ProxyFactory<CacheStrategy>(decorated, CacheStrategy.class).create();
-        return proxy;
+        return decorated;
       }
     };
   }
@@ -272,12 +255,11 @@ public class InjectorBuilder {
    *         because the injected field ensure thread-safe behavior.
    */
   private Object createReadOnlyContextProxy() {
-    return new InjectorObjectFactory<ReadOnlyContext>() {
+    return ProxyFactory.proxy(new ObjectFactory<ReadOnlyContext>() {
       public ReadOnlyContext create() {
-        final ReadOnlyContext proxy = new ProxyFactory<ReadOnlyContext>(Context.get(), ReadOnlyContext.class).create();
-        return proxy;
+        return Context.get();
       }
-    };
+    }, ReadOnlyContext.class);
   }
 
   public Injector build() {

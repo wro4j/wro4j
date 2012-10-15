@@ -75,10 +75,10 @@ public final class Injector {
    */
   private void processInjectAnnotation(final Object object) {
     //TODO find a better way to avoid recursion
-    if (injectedObjects.get().contains(object)) {
-      return;
-    }
-    injectedObjects.get().add(object);
+//    if (injectedObjects.get().contains(object)) {
+//      return;
+//    }
+//    injectedObjects.get().add(object);
     LOG.debug("injecting: {}", object);
 
     try {

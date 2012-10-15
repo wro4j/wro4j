@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
@@ -71,7 +72,7 @@ public class WroManager
   @Inject
   private GroupsProcessor groupsProcessor;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
@@ -119,6 +120,7 @@ public class WroManager
       throws IOException {
     validate();
     // reschedule cache & model updates
+    final WroConfiguration config = context.getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
     resourceBundleProcessor.serveProcessedBundle();

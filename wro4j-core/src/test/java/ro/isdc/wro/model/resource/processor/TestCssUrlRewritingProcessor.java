@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
@@ -185,13 +184,12 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void shouldUseCorrectAggregatedFolderSetEvenWhenContextIsChangedInAnotherThread()
       throws Exception {
-    Context.set(Context.standaloneContext());
-    WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
+    WroTestUtils.createInjector().inject(processor);
+    WroTestUtils.runConcurrently(new Callable<Void>() {
       public Void call()
           throws Exception {
-        WroTestUtils.createInjector().inject(processor);
+        Context.set(Context.standaloneContext());
         if (new Random().nextBoolean()) {
-          Thread.sleep(150);
           processServletContextResourceTypeWithAggregatedFolderSet();
         } else {
           // ensure that a thread uses null aggregatedFolderPath which is injected into processor.
@@ -199,6 +197,6 @@ public class TestCssUrlRewritingProcessor {
         }
         return null;
       }
-    }), 20);
+    }, 20);
   }
 }

@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
@@ -51,7 +52,7 @@ public class GoogleClosureCompressorProcessor
   private CompilationLevel compilationLevel;
   private CompilerOptions compilerOptions;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   private String encoding;
 
   /**
@@ -122,8 +123,9 @@ public class GoogleClosureCompressorProcessor
 
   private String getEncoding() {
     if (encoding == null) {
-      //use config is available to get encoding
-      this.encoding = config == null ? WroConfiguration.DEFAULT_ENCODING : config.getEncoding();
+      // use config is available to get encoding
+      this.encoding = context.getConfig() == null ? WroConfiguration.DEFAULT_ENCODING : context.getConfig()
+          .getEncoding();
     }
     return encoding;
   }
