@@ -14,4 +14,7 @@
     <group name="application">
         <css>/assets/stylesheets/application.css</css>
     </group>
+    <group name="less">
+        <css>/static/less/**.less</css>
+    </group>
 </groups>

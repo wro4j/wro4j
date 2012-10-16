@@ -126,19 +126,19 @@ public class PreProcessorExecutor {
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
-      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
-      callables.add(new ContextPropagatingCallable<String>(new Callable<String>() {
+      callables.add(new Callable<String>() {
         public String call()
             throws Exception {
           LOG.debug("Callable started for resource: {} ...", resource);
           return applyPreProcessors(resource, minimize, type);
         }
-      }));
+      });
     }
     final ExecutorService exec = getExecutorService();
     final List<Future<String>> futures = new ArrayList<Future<String>>();
     for (final Callable<String> callable : callables) {
-      futures.add(exec.submit(callable));
+      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
+      futures.add(exec.submit(new ContextPropagatingCallable<String>(callable)));
     }
 
     for (final Future<String> future : futures) {
