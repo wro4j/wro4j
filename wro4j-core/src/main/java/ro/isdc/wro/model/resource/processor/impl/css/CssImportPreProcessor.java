@@ -25,7 +25,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
  * <p/>
  * When processor finds an import which is not valid, it will check the
  * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
- * 
+ *
  * @author Alex Objelean
  */
 @SupportedResourceType(ResourceType.CSS)
@@ -40,12 +40,13 @@ public class CssImportPreProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   protected String doTransform(final String cssContent, final List<Resource> foundImports)
       throws IOException {
     final StringBuffer sb = new StringBuffer();
     // for now, minimize always
     // TODO: find a way to get minimize property dynamically.
-    sb.append(preProcessorExecutor.processAndMerge(foundImports, true));
+    sb.append(preProcessorExecutor.processAndMerge(foundImports, false));
     if (!foundImports.isEmpty()) {
       LOG.debug("Imported resources found : {}", foundImports.size());
     }
