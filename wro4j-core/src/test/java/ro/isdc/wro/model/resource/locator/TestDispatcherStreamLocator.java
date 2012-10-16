@@ -21,6 +21,7 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -42,6 +43,7 @@ public class TestDispatcherStreamLocator {
     Mockito.when(mockRequest.getServletPath()).thenReturn("");
     Context.set(Context.standaloneContext());
     locator = new DispatcherStreamLocator();
+    WroTestUtils.createInjector().inject(locator);
   }
 
   @Test(expected = NullPointerException.class)
@@ -68,7 +70,7 @@ public class TestDispatcherStreamLocator {
     Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     Assert.assertNotNull(locator.getInputStream(mockRequest, mockResponse, "http://www.google.com"));
   }
-  
+
   @Test(expected = IOException.class)
   public void testDispatchIncludeHasNoValidResource()
       throws Exception {
@@ -90,7 +92,7 @@ public class TestDispatcherStreamLocator {
       public Void answer(final InvocationOnMock invocation)
           throws Throwable {
         // do nothing
-        HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+        final HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
         response.getOutputStream().write("dummyContent".getBytes());
         return null;
       }
