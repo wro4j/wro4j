@@ -171,12 +171,12 @@ public class TestCssUrlRewritingProcessor {
     Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
     Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
   }
-  
+
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
-  
+
   /**
    * Tests that the Context injected into processor is thread safe and uses the values of set by the thread which runs
    * the processor.
@@ -184,13 +184,12 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void shouldUseCorrectAggregatedFolderSetEvenWhenContextIsChangedInAnotherThread()
       throws Exception {
+    WroTestUtils.createInjector().inject(processor);
     WroTestUtils.runConcurrently(new Callable<Void>() {
       public Void call()
           throws Exception {
         Context.set(Context.standaloneContext());
-        WroTestUtils.createInjector().inject(processor);
         if (new Random().nextBoolean()) {
-          Thread.sleep(150);
           processServletContextResourceTypeWithAggregatedFolderSet();
         } else {
           // ensure that a thread uses null aggregatedFolderPath which is injected into processor.

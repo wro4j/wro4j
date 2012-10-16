@@ -22,7 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
@@ -51,7 +52,7 @@ public class PreProcessorExecutor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
@@ -92,7 +93,7 @@ public class PreProcessorExecutor {
   }
 
   private boolean shouldRunInParallel(final List<Resource> resources) {
-    final boolean isParallel = config.isParallelPreprocessing();
+    final boolean isParallel = context.getConfig().isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
@@ -172,7 +173,7 @@ public class PreProcessorExecutor {
       resourceContent = getResourceContent(resource);
     } catch (final IOException e) {
       LOG.debug("Invalid resource found: {}", resource);
-      if (config.isIgnoreMissingResources()) {
+      if (Context.get().getConfig().isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
         LOG.error("Cannot ignore missing resource:  {}", resource);
@@ -228,7 +229,7 @@ public class PreProcessorExecutor {
     InputStream is = null;
     try {
       is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
-      final String result = IOUtils.toString(is, config.getEncoding());
+      final String result = IOUtils.toString(is, context.getConfig().getEncoding());
       if (StringUtils.isEmpty(result)) {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }

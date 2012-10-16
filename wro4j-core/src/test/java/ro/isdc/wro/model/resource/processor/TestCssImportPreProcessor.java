@@ -21,6 +21,7 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -54,17 +55,17 @@ public class TestCssImportPreProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-  
+
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
-  
+
   @Test
   public void shouldNotFailWhenInvalidResourceIsFound() throws Exception {
     processInvalidImport();
   }
-  
+
   @Test(expected = IOException.class)
   public void shouldFailWhenInvalidResourceIsFound() throws Exception {
     Context.get().getConfig().setIgnoreMissingResources(false);
@@ -73,11 +74,11 @@ public class TestCssImportPreProcessor {
 
   private void processInvalidImport()
       throws IOException {
-    final Resource resource = Resource.create("someResource.css"); 
+    final Resource resource = Resource.create("someResource.css");
     final Reader reader = new StringReader("@import('/path/to/invalid.css');");
     processor.process(resource, reader, new StringWriter());
   }
-  
+
   @Test
   public void shouldInvokeImportDetected()
       throws IOException {
@@ -89,12 +90,12 @@ public class TestCssImportPreProcessor {
       }
     };
     WroTestUtils.initProcessor(processor);
-    final Resource resource = Resource.create("someResource.css"); 
+    final Resource resource = Resource.create("someResource.css");
     final Reader reader = new StringReader("@import('/path/to/invalid.css');");
     processor.process(resource, reader, new StringWriter());
     assertEquals(1, times.get());
   }
-  
+
   /**
    * Fixes <a href="http://code.google.com/p/wro4j/issues/detail?id=505">CssImport processor recursion detection is not
    * thread-safe</a> issue.
@@ -108,7 +109,7 @@ public class TestCssImportPreProcessor {
       }
     };
     WroTestUtils.initProcessor(processor);
-    WroTestUtils.runConcurrently(new Callable<Void>() {
+    WroTestUtils.runConcurrently(new ContextPropagatingCallable(new Callable<Void>() {
       public Void call()
           throws Exception {
         final Reader reader = new StringReader("@import('/path/to/imported');");
@@ -121,6 +122,6 @@ public class TestCssImportPreProcessor {
         }
         return null;
       }
-    });
+    }));
   }
 }

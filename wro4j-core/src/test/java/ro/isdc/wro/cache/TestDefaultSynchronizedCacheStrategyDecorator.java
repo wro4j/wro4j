@@ -24,7 +24,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
-import ro.isdc.wro.model.resource.support.ResourceWatcher;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.util.ObjectDecorator;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -97,20 +97,22 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
    */
   @Test
   public void shouldCheckOnlyAfterTimeout() throws Exception {
-    final long updatePeriod = 100;
+    final long updatePeriod = 30;
+    final long delta = 5;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheEntry key = new CacheEntry("g1", ResourceType.JS, true);
     final long start = System.currentTimeMillis();
-    while(System.currentTimeMillis() - start < updatePeriod) {
+    while(System.currentTimeMillis() - start < updatePeriod - delta) {
       victim.get(key);
     }
+    Thread.sleep(delta);
     victim.get(key);
     Mockito.verify(mockResourceWatcher, times(2)).check(key);
   }
 
   @Test
   public void shouldCheckDifferentGroups() throws Exception {
-    final long updatePeriod = 90;
+    final long updatePeriod = 30;
     //Using delta to avoid inconsistent test results related to test timing
     final long delta = 10;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);

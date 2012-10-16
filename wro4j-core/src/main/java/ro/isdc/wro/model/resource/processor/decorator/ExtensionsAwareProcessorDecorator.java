@@ -67,6 +67,7 @@ public class ExtensionsAwareProcessorDecorator
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     if (resource != null) {
@@ -83,5 +84,4 @@ public class ExtensionsAwareProcessorDecorator
       getDecoratedObject().process(resource, reader, writer);
     }
   }
-
 }
