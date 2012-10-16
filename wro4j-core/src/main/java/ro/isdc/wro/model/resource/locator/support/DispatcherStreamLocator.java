@@ -66,6 +66,7 @@ public class DispatcherStreamLocator {
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
 
+    //TODO check if this is required anymore
     // preserve context, in case it is unset during dispatching
     final Context originalContext = Context.get();
     try {
@@ -86,6 +87,7 @@ public class DispatcherStreamLocator {
         os.close();
       }
     } catch (final Exception e) {
+      LOG.error("Error while dispatching to location: " + location, e);
       LOG.debug("[FAIL] Error while dispatching the request for location {}", location);
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
@@ -101,6 +103,7 @@ public class DispatcherStreamLocator {
       if (warnOnEmptyStream && os.size() == 0) {
         LOG.debug("Wrong or empty resource with location: {}", location);
       }
+      //TODO probably not required anymore
       // Put the context back
       if (!Context.isContextSet()) {
         Context.set(originalContext);

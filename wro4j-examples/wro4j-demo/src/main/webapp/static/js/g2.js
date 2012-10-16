@@ -1,3 +1,3 @@
 (function() {
-	alert("g2b");
+	alert("g2");
 })();
