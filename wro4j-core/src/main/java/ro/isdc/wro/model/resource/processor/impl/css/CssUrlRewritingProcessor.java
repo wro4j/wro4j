@@ -105,7 +105,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * <p/>
  * The algorithm requires two types of {@link UriLocator} objects, one for resolving url resources & one for classpath
  * resources. Both need to be injected using IoC when creating the instance of {@link CssUrlRewritingProcessor} class.
- * 
+ *
  * @author Alex Objelean
  * @created Nov 19, 2008
  */
@@ -117,7 +117,7 @@ public class CssUrlRewritingProcessor
   private ResourceAuthorizationManager authorizationManager;
   @Inject
   private ReadOnlyContext context;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -127,7 +127,7 @@ public class CssUrlRewritingProcessor
       LOG.debug("allowed urls: {}", ((DefaultResourceAuthorizationManager) authorizationManager).list());
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -137,13 +137,13 @@ public class CssUrlRewritingProcessor
     LOG.debug("adding allowed url: {}", allowedUrl);
     //add only if add is supported
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
-      ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);      
+      ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);
     }
   }
-  
+
   /**
    * Replace provided url with the new url if needed.
-   * 
+   *
    * @param cssUri
    *          Uri of the parsed css.
    * @param imageUrl
@@ -174,7 +174,7 @@ public class CssUrlRewritingProcessor
         final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
         return computeNewImageLocation(externalServerCssUri, imageUrl);
       }
-      return computeNewImageLocation(cssUri, imageUrl);      
+      return computeNewImageLocation(cssUri, imageUrl);
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
@@ -194,12 +194,12 @@ public class CssUrlRewritingProcessor
       //the uri should end mandatory with /
       exernalServerCssUri = serverHost + ServletContextUriLocator.PREFIX;
       LOG.debug("using {} host as cssUri", exernalServerCssUri);
-    } catch(MalformedURLException e) {
+    } catch(final MalformedURLException e) {
       //should never happen
     }
     return exernalServerCssUri;
   }
-  
+
   /**
    * @return the path to be prefixed after css aggregation. This depends on the aggregated css destination folder. This
    *         is a fix for the following issue: {@link http://code.google.com/p/wro4j/issues/detail?id=259}
@@ -222,10 +222,10 @@ public class CssUrlRewritingProcessor
     LOG.debug("computedPrefix: {}", computedPrefix);
     return computedPrefix;
   }
-  
+
   /**
    * Concatenates cssUri and imageUrl after few changes are applied to both input parameters.
-   * 
+   *
    * @param cssUri
    *          the URI of css resource.
    * @param imageUrl
@@ -262,7 +262,7 @@ public class CssUrlRewritingProcessor
     LOG.debug("computedImageLocation: {}", computedImageLocation);
     return computedImageLocation;
   }
-  
+
   /**
    * @param uri
    *          to check if is allowed.

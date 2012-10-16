@@ -5,10 +5,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,6 +25,7 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
+import ro.isdc.wro.model.group.processor.ProcessingType;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
@@ -95,8 +99,14 @@ public class TestLessCssProcessor {
     injector.inject(preProcessorExecutor);
 
     final List<Resource> resources = new ArrayList<Resource>();
-    resources.add(Resource.create("classpath:ro/isdc/wro/extensions/processor/lesscss/test/import.css"));
-    final String actual = preProcessorExecutor.processAndMerge(resources, true);
-    assertEquals("", actual);
+    final String baseFolder = "ro/isdc/wro/extensions/processor/lesscss";
+    resources.add(Resource.create(String.format("classpath:%s/test/import.css", baseFolder)));
+    final String noImports = preProcessorExecutor.processAndMerge(resources, true, ProcessingType.IMPORT_ONLY);
+    final StringWriter actual = new StringWriter();
+    new LessCssProcessor().process(null, new StringReader(noImports), actual);
+
+    final String expected = IOUtils.toString(managerFactory.create().getUriLocatorFactory().locate(
+        String.format("classpath:%s/expected/import.cssx", baseFolder)));
+    assertEquals(expected, actual.toString());
   }
 }

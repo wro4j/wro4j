@@ -18,9 +18,9 @@ import ro.isdc.wro.util.LazyInitializer;
 
 
 /**
- * Similar to {@link RhinoLessCssProcessor} but will prefer using {@link NodeLessCssProcessor} if it is supported and will
- * fallback to rhino based processor.
- * 
+ * Similar to {@link RhinoLessCssProcessor} but will prefer using {@link NodeLessCssProcessor} if it is supported and
+ * will fallback to rhino based processor.<br/>
+ *
  * @author Alex Objelean
  * @since 1.5.0
  * @created 11 Sep 2012
@@ -31,7 +31,7 @@ public class LessCssProcessor
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   public static final String ALIAS = "lessCss";
   private final ResourcePreProcessor lessProcessor;
-  
+
   public LessCssProcessor() {
     lessProcessor = initializeProcessor();
   }
@@ -46,14 +46,14 @@ public class LessCssProcessor
   }
 
   /**
-   * @return {@link NodeLessCssProcessor} used as a primary LessProcessor. 
+   * @return {@link NodeLessCssProcessor} used as a primary LessProcessor.
    * @VisibleForTesting
    */
   protected NodeLessCssProcessor createNodeProcessor() {
     LOG.debug("creating NodeLess processor");
     return new NodeLessCssProcessor();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -62,7 +62,7 @@ public class LessCssProcessor
       throws IOException {
     lessProcessor.process(resource, reader, writer);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -71,9 +71,10 @@ public class LessCssProcessor
       throws IOException {
     process(null, reader, writer);
   }
-  
+
   /**
    * Lazily initialize the rhinoProcessor.
+   *
    * @return {@link ResourcePostProcessor} used as a fallback lessCss processor.
    * @VisibleFortesTesting
    */

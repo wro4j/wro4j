@@ -25,6 +25,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
@@ -33,13 +34,13 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * A processor responsible for rewriting url's from inside the css resources.
- * 
+ *
  * @author Alex Objelean
  * @created Created on 9 May, 2010
  */
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssUrlRewritingProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor, ImportAware {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
   /**
    * Compiled pattern.
@@ -54,10 +55,10 @@ public abstract class AbstractCssUrlRewritingProcessor
       throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
   }
-  
+
   /**
    * Parse the css content and transform found url's.
-   * 
+   *
    * @param cssContent
    *          to parse.
    * @param cssUri
@@ -72,7 +73,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       final int declarationIndex = 1;
       /**
        * index of the group containing an url inside a declaration of this form:
-       * 
+       *
        * <pre>
        * body {
        *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
@@ -87,7 +88,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       final int urlIndexA = 2;
       /**
        * index of the group containing an url inside a declaration of this form:
-       * 
+       *
        * <pre>
        * body {
        *     background: #B3B3B3 url(img.gif);color:red;
@@ -99,7 +100,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       final String originalDeclaration = matcher.group(declarationIndex);
       final String originalUrl = matcher.group(urlIndexA) != null ? matcher.group(urlIndexA) : matcher.group(urlIndexB);
       LOG.debug("urlGroup: {}", originalUrl);
-      
+
       Validate.notNull(originalUrl);
       if (isReplaceNeeded(originalUrl)) {
         final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
@@ -118,7 +119,7 @@ public abstract class AbstractCssUrlRewritingProcessor
     matcher.appendTail(sb);
     return sb.toString();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -137,23 +138,23 @@ public abstract class AbstractCssUrlRewritingProcessor
       writer.close();
     }
   }
-  
+
   /**
    * Invoked when the process operation is completed. Useful to invoke some post processing logic or for custom logging.
    */
   protected void onProcessCompleted() {
   }
-  
+
   /**
    * Invoked to replace the entire css declaration.
-   * <p/> 
+   * <p/>
    * An example of css declaration:
    * <pre>
    * background: url(/image.png);
    * </pre>
    * Useful when the css declaration should be changed. The use-case is:
    * {@link FallbackCssDataUriProcessor}.
-   * 
+   *
    * @param originalDeclaration
    *          the original, unchanged declaration.
    * @param modifiedDeclaration
@@ -163,19 +164,19 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected String replaceDeclaration(final String originalDeclaration, final String modifiedDeclaration) {
     return modifiedDeclaration;
   }
-  
+
   /**
    * Invoked when an url is replaced. Useful if you need to do something with newly replaced url.
-   * 
+   *
    * @param replacedUrl
    *          the newly computed url created as a result of url rewriting.
    */
   protected void onUrlReplaced(final String replacedUrl) {
   }
-  
+
   /**
    * Replace provided url with the new url if needed.
-   * 
+   *
    * @param cssUri
    *          Uri of the parsed css.
    * @param imageUrl
@@ -183,10 +184,10 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @return replaced url.
    */
   protected abstract String replaceImageUrl(final String cssUri, final String imageUrl);
-  
+
   /**
    * Cleans the image url by triming result and removing \' or \" characters if such exists.
-   * 
+   *
    * @param imageUrl
    *          to clean.
    * @return cleaned image URL.
@@ -194,10 +195,10 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected final String cleanImageUrl(final String imageUrl) {
     return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
   }
-  
+
   /**
    * Check if url must be replaced or not.
-   * 
+   *
    * @param url
    *          to check.
    * @return true if url needs to be replaced or remain unchanged.
@@ -207,10 +208,10 @@ public abstract class AbstractCssUrlRewritingProcessor
     // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
   }
-  
+
   /**
    * This method has protected modifier in order to be accessed by unit test class.
-   * 
+   *
    * @return urlPrefix value.
    * @VisibleForTesting
    */
@@ -218,14 +219,14 @@ public abstract class AbstractCssUrlRewritingProcessor
     final String requestURI = context.getRequest().getRequestURI();
     return FilenameUtils.getFullPath(requestURI) + getProxyResourcePath();
   }
-  
+
   /**
    * @return the part of the url used to identify a proxy resource.
    */
   private String getProxyResourcePath() {
     return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
-  
+
   /**
    * @param url
    *          of the resource to check.
@@ -234,5 +235,13 @@ public abstract class AbstractCssUrlRewritingProcessor
   final boolean isProxyResource(final String url) {
     Validate.notNull(url);
     return url.contains(getProxyResourcePath());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    //We want this processor to be applied when processing resources referred with @import directive
+    return true;
   }
 }

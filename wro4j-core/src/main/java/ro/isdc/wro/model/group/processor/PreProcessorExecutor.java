@@ -63,21 +63,6 @@ public class PreProcessorExecutor {
   private ExecutorService executor;
 
   /**
-   * A type of processing to apply during preProcessor execution.
-   */
-  public static enum Type {
-    /**
-     * Applies all eligible processors.
-     */
-    ALL,
-    /**
-     * Applies only processors which are interested of being applied for imported resources (ex: using @import directive
-     * for css). This is necessary to fix the problem of LessCss processor (or similar) when using as preProcessor.
-     */
-    IMPORT_ONLY
-  }
-
-  /**
    * Apply preProcessors on resources and merge them after all preProcessors are applied.
    *
    * @param resources
@@ -88,7 +73,7 @@ public class PreProcessorExecutor {
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
       throws IOException {
-    return processAndMerge(resources, minimize, Type.ALL);
+    return processAndMerge(resources, minimize, ProcessingType.ALL);
   }
 
   /**
@@ -102,7 +87,7 @@ public class PreProcessorExecutor {
    *          the type of processor selection to apply before merging.
    * @return preProcessed merged content.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize, final Type type)
+  public String processAndMerge(final List<Resource> resources, final boolean minimize, final ProcessingType type)
       throws IOException {
     callbackRegistry.onBeforeMerge();
     try {
@@ -134,7 +119,7 @@ public class PreProcessorExecutor {
    *
    * @return merged and pre processed content.
    */
-  private String runInParallel(final List<Resource> resources, final boolean minimize, final Type type)
+  private String runInParallel(final List<Resource> resources, final boolean minimize, final ProcessingType type)
       throws IOException {
     LOG.debug("Running preProcessing in Parallel");
     final StringBuffer result = new StringBuffer();
@@ -192,7 +177,7 @@ public class PreProcessorExecutor {
    * @param processors
    *          the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final boolean minimize, final Type type)
+  private String applyPreProcessors(final Resource resource, final boolean minimize, final ProcessingType processingType)
       throws IOException {
     // TODO: apply filtering inside a specialized decorator
     final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
@@ -225,7 +210,7 @@ public class PreProcessorExecutor {
       final Reader reader = new StringReader(resourceContent);
       try {
         // decorate and process
-        decoratePreProcessor(processor).process(resource, reader, writer);
+        decoratePreProcessor(processor, processingType).process(resource, reader, writer);
         // use the outcome for next input
         resourceContent = writer.toString();
       } finally {
@@ -242,8 +227,8 @@ public class PreProcessorExecutor {
   /**
    * Decorates preProcessor with mandatory decorators.
    */
-  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
-    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor);
+  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor, final ProcessingType processingType) {
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, processingType);
     injector.inject(decorated);
     return decorated;
   }
