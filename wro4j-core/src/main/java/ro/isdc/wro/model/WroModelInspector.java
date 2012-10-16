@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -18,30 +19,30 @@ import ro.isdc.wro.model.resource.Resource;
 /**
  * Helper for querying a snapshot of a model. Any changes of the model performed after model inspector instantiation
  * will not be reflected.
- * 
+ *
  * @author Alex Objelean
  * @created 21 Sep 2012
  * @since 1.5.0
  */
 public class WroModelInspector {
-  private Map<String, Group> map = new HashMap<String, Group>();
+  private final Map<String, Group> map = new HashMap<String, Group>();
   public WroModelInspector(final WroModel model) {
     Validate.notNull(model);
-    for (Group group : model.getGroups()) {
+    for (final Group group : model.getGroups()) {
       map.put(group.getName(), group);
     }
   }
-  
+
   /**
    * @param name
    *          of group to find.
    * @return group with searched name (if available) or null otherwise.
-   * 
+   *
    */
   public Group getGroupByName(final String name) {
     return map.get(name);
   }
-  
+
   /**
    * @param resource
    *          the {@link Resource} to search in all available groups.
@@ -50,22 +51,23 @@ public class WroModelInspector {
    */
   public Collection<String> getGroupNamesContainingResource(final String resourceUri) {
     Validate.notNull(resourceUri);
-    final Set<String> groupNames = new HashSet<String>();
-    for (Group group : map.values()) {
+    final Set<String> groupNames = new TreeSet<String>();
+    for (final Group group : map.values()) {
       if (group.hasResource(resourceUri)) {
         groupNames.add(group.getName());
       }
     }
     return groupNames;
   }
-  
+
   /**
    * @return a set of group names.
    */
   public final List<String> getGroupNames() {
-    return new ArrayList<String>(map.keySet());
+    //decorate with tree set to keep them sorted (for jdk5).
+    return new ArrayList<String>(new TreeSet<String>(map.keySet()));
   }
-  
+
   /**
    * @param groupName the nam of the group to check.
    * @return true if the provided groupName is available.
@@ -73,7 +75,7 @@ public class WroModelInspector {
   public boolean hasGroup(final String groupName) {
     return map.containsKey(groupName);
   }
-  
+
   /**
    * This implementation would be simpler if java would have closures :).
    *
@@ -89,7 +91,7 @@ public class WroModelInspector {
   public Collection<Resource> getAllUniqueResources() {
     return collectResources(new HashSet<Resource>());
   }
-  
+
   /**
    * @return the set of all resources from all the groups of the model (no particular order).
    */

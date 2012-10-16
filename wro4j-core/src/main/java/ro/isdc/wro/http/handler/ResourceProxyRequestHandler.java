@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
@@ -24,7 +24,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 /**
  * Provides access to wro resources via a resource proxy.
- * 
+ *
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
  * @since 1.4.7
@@ -39,13 +39,13 @@ public class ResourceProxyRequestHandler
    * The alias of this {@link RequestHandler} used for configuration.
    */
   public static final String ALIAS = "resourceProxy";
-  
+
   @Inject
   private UriLocatorFactory locatorFactory;
 
   @Inject
-  private WroConfiguration config;
-  
+  private ReadOnlyContext context;
+
   @Inject
   private ResourceAuthorizationManager authManager;
   private ResponseHeadersConfigurer headersConfigurer;
@@ -73,7 +73,7 @@ public class ResourceProxyRequestHandler
       throws IOException {
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
     final OutputStream outputStream = response.getOutputStream();
-    response.setContentType(ContentTypeResolver.get(resourceUri, config.getEncoding()));
+    response.setContentType(ContentTypeResolver.get(resourceUri, context.getConfig().getEncoding()));
 
     // set expiry headers
     getHeadersConfigurer().setHeaders(response);
@@ -82,7 +82,7 @@ public class ResourceProxyRequestHandler
     InputStream is = null;
     try {
       is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
-      int length = IOUtils.copy(is, outputStream);
+      final int length = IOUtils.copy(is, outputStream);
       // servlet engine may ignore this if content body is flushed to client
       response.setContentLength(length);
     } finally {
@@ -98,7 +98,7 @@ public class ResourceProxyRequestHandler
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
     }
   }
-  
+
   private final ResponseHeadersConfigurer getHeadersConfigurer() {
     if (headersConfigurer == null) {
       headersConfigurer = newResponseHeadersConfigurer();
@@ -110,6 +110,6 @@ public class ResourceProxyRequestHandler
    * @return the {@link ResponseHeadersConfigurer}.
    */
   protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
-    return ResponseHeadersConfigurer.fromConfig(config);
+    return ResponseHeadersConfigurer.fromConfig(context.getConfig());
   }
 }

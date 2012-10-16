@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.RequestHandlerSupport;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
@@ -25,7 +24,7 @@ import com.google.gson.GsonBuilder;
  * Expose the {@link WroModel} as JSON when the following uri is accessed: "wroAPI/model". This {@link RequestHandler}
  * is useful to inspect the model and to simulate the behavior of the page when all resources are included (one by one)
  * without being merged.
- * 
+ *
  * @author Alex Objelean
  * @author Ivar Conradi Østhus
  * @created 31 May 2012
@@ -44,11 +43,11 @@ public class ModelAsJsonRequestHandler
    */
   public static final String ALIAS = "modelAsJson";
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
 
   @Inject
   private WroModelFactory modelFactory;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -59,19 +58,19 @@ public class ModelAsJsonRequestHandler
     ResponseHeadersConfigurer.noCache().setHeaders(response);
     response.setContentType(CONTENT_TYPE);
     response.setStatus(HttpServletResponse.SC_OK);
-    
+
     // Build content
     newGson(request).toJson(modelFactory.create(), response.getWriter());
     response.getWriter().flush();
   }
-  
+
   /**
    * @return customized {@link Gson} instance.
    */
   protected Gson newGson(final HttpServletRequest request) {
     return new GsonBuilder().registerTypeAdapter(Resource.class, new ResourceSerializer(getWroBasePath(request))).setPrettyPrinting().disableHtmlEscaping().create();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -79,16 +78,16 @@ public class ModelAsJsonRequestHandler
   public boolean accept(final HttpServletRequest request) {
     return WroUtil.matchesUrl(request, ENDPOINT_URI);
   }
-  
-  private String getWroBasePath(HttpServletRequest request) {
+
+  private String getWroBasePath(final HttpServletRequest request) {
     return request.getRequestURI().replaceAll("(?i)" + ENDPOINT_URI, "");
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public boolean isEnabled() {
-    return config.isDebug();
+    return context.getConfig().isDebug();
   }
 }
