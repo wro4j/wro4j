@@ -1,13 +1,11 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import static org.apache.commons.lang3.Validate.notNull;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.processor.ProcessingType;
 import ro.isdc.wro.model.resource.Resource;
 
 
@@ -21,22 +19,26 @@ import ro.isdc.wro.model.resource.Resource;
 public class ImportAwareProcessorDecorator
     extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(ImportAwareProcessorDecorator.class);
-  public ImportAwareProcessorDecorator(final Object processor) {
+  private final ProcessingType processingType;
+  public ImportAwareProcessorDecorator(final Object processor, final ProcessingType processingType) {
     super(processor);
+    notNull(processingType);
+    this.processingType = processingType;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
-    final ProcessorDecorator decorator = new ProcessorDecorator(getDecoratedObject());
-    if (decorator.isImportAware()) {
-      super.process(resource, reader, writer);
-    } else {
-      LOG.debug("Skipping processor: {}", getDecoratedObject());
-      IOUtils.copy(reader, writer);
-    }
+  protected boolean isEnabled(final Resource resource) {
+    return super.isEnabled(resource) && isApplicable();
+  }
+
+  /**
+   * @return true if processor can be applied based on configured {@link ProcessingType}
+   */
+  private boolean isApplicable() {
+    return ProcessingType.ALL == processingType || isImportAware()
+        && processingType == ProcessingType.IMPORT_ONLY;
   }
 }

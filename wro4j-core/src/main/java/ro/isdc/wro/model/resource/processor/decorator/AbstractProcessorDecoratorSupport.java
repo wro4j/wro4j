@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -26,13 +29,16 @@ import ro.isdc.wro.util.AbstractDecorator;
  * @created 11 Apr 2012
  * @since 1.4.6
  */
-public abstract class AbstractProcessorDecoratorSupport<T> extends AbstractDecorator<T>
-  implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware, ImportAware {
-
+public abstract class AbstractProcessorDecoratorSupport<T>
+    extends AbstractDecorator<T>
+    implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware,
+    ImportAware {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractProcessorDecoratorSupport.class);
   /**
-   * @param the decorated processor. The type of the returned object is {@link Object} because we don't really care and
-   *         we need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
-   *         removed in 1.5.0.
+   * @param the
+   *          decorated processor. The type of the returned object is {@link Object} because we don't really care and we
+   *          need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
+   *          removed in 1.5.0.
    */
   public AbstractProcessorDecoratorSupport(final T decorated) {
     super(decorated);
@@ -126,7 +132,7 @@ public abstract class AbstractProcessorDecoratorSupport<T> extends AbstractDecor
    * {@inheritDoc}
    */
   public final void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
+      throws IOException {
+      process(null, reader, writer);
   }
 }

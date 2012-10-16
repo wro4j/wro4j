@@ -1,6 +1,6 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import static org.junit.Assert.assertNotNull;
+import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -22,9 +22,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 public class DefaultProcessorDecorator
     extends ProcessorDecorator {
-  private final ProcessingType processingType;
   @Inject
   private Injector injector;
+  private final ProcessingType processingType;
+
 
   public DefaultProcessorDecorator(final Object processor) {
     this(processor, ProcessingType.ALL);
@@ -32,10 +33,9 @@ public class DefaultProcessorDecorator
 
   public DefaultProcessorDecorator(final Object processor, final ProcessingType processingType) {
     super(processor);
-    assertNotNull(processingType);
+    notNull(processingType);
     this.processingType = processingType;
   }
-
   /**
    * {@inheritDoc}
    */
@@ -46,16 +46,9 @@ public class DefaultProcessorDecorator
   }
 
   private ResourcePreProcessor getDecoratedProcessor() {
-    ProcessorDecorator decoratedProcessor = new SupportAwareProcessorDecorator(new MinimizeAwareProcessorDecorator(
-        getDecoratedObject()));
-    decoratedProcessor = new ImportAwareProcessorDecorator(decoratedProcessor) {
-      @Override
-      public boolean isImportAware() {
-        return super.isImportAware() && processingType == ProcessingType.IMPORT_ONLY;
-      }
-    };
-    //use exceptionHandling as last decorator
-    final ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(decoratedProcessor);
+    // use exceptionHandling as last decorator
+    final ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
+        new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(getDecoratedObject(), processingType))));
     injector.inject(decorated);
     return decorated;
   }

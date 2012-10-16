@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -26,6 +29,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 public class ProcessorDecorator
   extends AbstractProcessorDecoratorSupport<ResourcePreProcessor> {
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessorDecorator.class);
 
   /**
    * Hides the postProcessor adaptation logic. This exist due to differences between pre & post processor interface.
@@ -75,7 +79,12 @@ public class ProcessorDecorator
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    getDecoratedObject().process(resource, reader, writer);
+    if (isEnabled(resource)) {
+      getDecoratedObject().process(resource, reader, writer);
+    } else {
+      LOG.debug("Skipping processor: {}", getDecoratedObject());
+      IOUtils.copy(reader, writer);
+    }
   }
 
   /**
@@ -97,6 +106,16 @@ public class ProcessorDecorator
     final boolean isMinimizedSatisfied = minimize == true || !isMinimize();
 
     return isTypeSatisfied && isMinimizedSatisfied;
+  }
+
+  /**
+   * @param resource
+   *          {@link ResourcePreProcessor} for which enabled flag should be checked.
+   * @return a flag indicating if this processor is enabled. When false, the processing will be skipped and the content
+   *         will be left unchanged. This value is true by default.
+   */
+  protected boolean isEnabled(final Resource resource) {
+    return true;
   }
 
   /**

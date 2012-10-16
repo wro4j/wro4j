@@ -205,17 +205,18 @@ public class TestPreProcessorExecutor {
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenUsingFailingPreProcessor()
     throws Exception {
-    genericUseFailingPreProcessorWithIngoreFlag(false);
+    Context.get().getConfig().setIgnoreFailingProcessor(false);
+    useFailingPreProcessor();
   }
 
   @Test
   public void shouldNotFailWhenUsingFailingPreProcessor()
       throws Exception {
-    genericUseFailingPreProcessorWithIngoreFlag(true);
+    Context.get().getConfig().setIgnoreFailingProcessor(true);
+    useFailingPreProcessor();
   }
 
-  private void genericUseFailingPreProcessorWithIngoreFlag(final boolean ignoreFlag) throws Exception {
-    Context.get().getConfig().setIgnoreFailingProcessor(ignoreFlag);
+  private void useFailingPreProcessor() throws Exception {
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
     final String result = executor.processAndMerge(resources, true);

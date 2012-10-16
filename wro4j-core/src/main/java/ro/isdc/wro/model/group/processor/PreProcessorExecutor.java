@@ -83,23 +83,24 @@ public class PreProcessorExecutor {
    *          what are the resources to merge.
    * @param minimize
    *          whether minimize aware processors must be applied or not.
-   * @param type
+   * @param processingType
    *          the type of processor selection to apply before merging.
    * @return preProcessed merged content.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize, final ProcessingType type)
+  public String processAndMerge(final List<Resource> resources, final boolean minimize, final ProcessingType processingType)
       throws IOException {
+    LOG.debug("minimize: {}, processingType: {}", minimize, processingType);
     callbackRegistry.onBeforeMerge();
     try {
       Validate.notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
-        result.append(runInParallel(resources, minimize, type));
+        result.append(runInParallel(resources, minimize, processingType));
       } else {
         for (final Resource resource : resources) {
           LOG.debug("\tmerging resource: {}", resource);
-          result.append(applyPreProcessors(resource, minimize, type));
+          result.append(applyPreProcessors(resource, minimize, processingType));
         }
       }
       return result.toString();

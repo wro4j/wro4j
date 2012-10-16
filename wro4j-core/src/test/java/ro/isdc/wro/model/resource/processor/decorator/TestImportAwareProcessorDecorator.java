@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.group.processor.ProcessingType;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -65,19 +66,19 @@ public class TestImportAwareProcessorDecorator {
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullProcessor() {
-    victim = new ImportAwareProcessorDecorator(null);
+    victim = new ImportAwareProcessorDecorator(null, ProcessingType.ALL);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void cannotAcceptObjectWhichIsNotProcessor() {
-    victim = new ImportAwareProcessorDecorator(new Object());
+    victim = new ImportAwareProcessorDecorator(new Object(), ProcessingType.ALL);
   }
 
   @Test
   public void shouldInvokePreProcessorWhenImportIsSupported()
       throws Exception {
     final ResourcePreProcessor processor = Mockito.spy(new ImportAwareProcessor());
-    victim = new ImportAwareProcessorDecorator(processor);
+    victim = new ImportAwareProcessorDecorator(processor, ProcessingType.IMPORT_ONLY);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(processor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
@@ -87,7 +88,7 @@ public class TestImportAwareProcessorDecorator {
   @Test
   public void shouldNotInvokeProcessorWhichIsNotImportAware()
       throws Exception {
-    victim = new ImportAwareProcessorDecorator(mockPreProcessor);
+    victim = new ImportAwareProcessorDecorator(mockPreProcessor, ProcessingType.IMPORT_ONLY);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(mockPreProcessor, Mockito.never()).process(Mockito.any(Resource.class),
@@ -97,7 +98,7 @@ public class TestImportAwareProcessorDecorator {
   @Test
   public void shouldNotInvokePostProcessorWhichIsNotImportAware()
       throws Exception {
-    victim = new ImportAwareProcessorDecorator(mockPostProcessor);
+    victim = new ImportAwareProcessorDecorator(mockPostProcessor, ProcessingType.IMPORT_ONLY);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(mockPostProcessor, Mockito.never()).process(Mockito.any(Reader.class),
@@ -107,7 +108,7 @@ public class TestImportAwareProcessorDecorator {
   @Test
   public void shouldLeaveContentUnchangedWhenProcessorIsSkipped()
       throws Exception {
-    victim = new ImportAwareProcessorDecorator(mockPreProcessor);
+    victim = new ImportAwareProcessorDecorator(mockPreProcessor, ProcessingType.IMPORT_ONLY);
     initVictim();
     final String resourceContent = "var i      =     1;";
     final StringWriter writer = new StringWriter();
@@ -121,7 +122,7 @@ public class TestImportAwareProcessorDecorator {
   public void shouldInvokeImportAwareProcessor()
       throws Exception {
     mockPreProcessor = Mockito.spy(new ImportAwareProcessor());
-    victim = new ImportAwareProcessorDecorator(mockPreProcessor);
+    victim = new ImportAwareProcessorDecorator(mockPreProcessor, ProcessingType.IMPORT_ONLY);
     initVictim();
     victim.process(null, mockReader, mockWriter);
     Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
