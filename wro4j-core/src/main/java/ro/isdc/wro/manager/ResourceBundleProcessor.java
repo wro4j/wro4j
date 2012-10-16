@@ -54,7 +54,6 @@ public class ResourceBundleProcessor {
    */
   public void serveProcessedBundle()
       throws IOException {
-    final Context context = Context.get();
     final WroConfiguration configuration = context.getConfig();
 
     final HttpServletRequest request = context.getRequest();

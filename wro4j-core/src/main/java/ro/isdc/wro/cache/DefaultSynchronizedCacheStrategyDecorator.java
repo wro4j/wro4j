@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
@@ -41,7 +42,8 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Inject
   private ReadOnlyContext context;
   @Inject
-  private final ResourceWatcher resourceWatcher = new ResourceWatcher();
+  private Injector injector;
+  private ResourceWatcher resourceWatcher;
   /**
    * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again.
    */
@@ -138,6 +140,10 @@ public class DefaultSynchronizedCacheStrategyDecorator
    * @VisibleForTesting
    */
   ResourceWatcher getResourceWatcher() {
+    if (resourceWatcher == null) {
+      resourceWatcher = new ResourceWatcher();
+      injector.inject(resourceWatcher);
+    }
     return resourceWatcher;
   }
 

@@ -6,6 +6,9 @@ package ro.isdc.wro.model.group.processor;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
@@ -20,6 +23,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
@@ -140,8 +144,8 @@ public class TestInjector {
     assertNotNull(testProcessor.context);
   }
 
-  @Test
-  public void shouldInjectUnsupportedButInitializedTypes() {
+  @Test(expected = WroRuntimeException.class)
+  public void shouldNotInjectUnsupportedAndInitializedTypes() {
     final String initialValue = "initial";
     final Callable<?> object = new Callable<Void>() {
       @Inject
@@ -156,14 +160,33 @@ public class TestInjector {
     victim.inject(object);
   }
 
-
   @Test
-  public void shouldInjectInnerObject() throws Exception {
+  public void shouldNotChangeAfterInjectionSupportedNotNullObject()
+      throws Exception {
+    final Callable<?> outer = new Callable<Void>() {
+      @Inject
+      private final ResourcePreProcessor inner = new ResourcePreProcessor() {
+        public void process(final Resource resource, final Reader reader, final Writer writer)
+            throws IOException {
+        }
+      };
+      public Void call()
+          throws Exception {
+        Assert.assertNotNull(inner);
+        return null;
+      }
+    };
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void cannotInjectUnsupportedInnerObject()
+      throws Exception {
     final Callable<?> outer = new Callable<Void>() {
       @Inject
       private final Callable<?> inner = new Callable<Void>() {
         @Inject
         UriLocatorFactory locatorFactory;
+
         public Void call()
             throws Exception {
           Assert.assertNotNull(locatorFactory);
@@ -180,7 +203,6 @@ public class TestInjector {
     victim.inject(outer);
     outer.call();
   }
-
 
   @After
   public void tearDown() {

@@ -47,8 +47,7 @@ public class ResourceWatcher {
   private UriLocatorFactory locatorFactory;
   @Inject
   private Injector injector;
-  @Inject
-  private final ResourceChangeDetector changeDetector = new ResourceChangeDetector();
+  private ResourceChangeDetector changeDetector;
 
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
@@ -133,7 +132,8 @@ public class ResourceWatcher {
     try {
       final String uri = resource.getUri();
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-      final AtomicBoolean changeDetected = new AtomicBoolean(changeDetector.checkChangeForGroup(uri, groupName));
+      final AtomicBoolean changeDetected = new AtomicBoolean(getResourceChangeDetector().checkChangeForGroup(uri,
+          groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
@@ -194,6 +194,11 @@ public class ResourceWatcher {
    * @return
    */
   ResourceChangeDetector getResourceChangeDetector() {
+    if (changeDetector == null) {
+      changeDetector = new ResourceChangeDetector();
+      injector.inject(changeDetector);
+    }
     return changeDetector;
   }
 }
+

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -60,11 +61,12 @@ public class ServletContextUriLocator
    * Constant for WEB-INF folder.
    */
   private static final String PROTECTED_PREFIX = "/WEB-INF/";
+  @Inject
+  private Injector injector;
   /**
    * Locates a stream using request dispatcher.
    */
-  @Inject
-  private final DispatcherStreamLocator dispatcherStreamLocator = new DispatcherStreamLocator();
+  private DispatcherStreamLocator dispatcherStreamLocator;
   /**
    * Determines the order of dispatcher resource locator and servlet context based resource locator.
    */
@@ -201,7 +203,15 @@ public class ServletContextUriLocator
     final HttpServletResponse response = context.getResponse();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
-    return dispatcherStreamLocator.getInputStream(request, response, uri);
+    return getDispatcherStreamLocator().getInputStream(request, response, uri);
+  }
+
+  private DispatcherStreamLocator getDispatcherStreamLocator() {
+    if (dispatcherStreamLocator == null) {
+      dispatcherStreamLocator = new DispatcherStreamLocator();
+      injector.inject(dispatcherStreamLocator);
+    }
+    return dispatcherStreamLocator;
   }
 
   private InputStream servletContextBasedStreamLocator(final String uri)

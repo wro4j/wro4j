@@ -27,6 +27,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -91,7 +92,8 @@ public class WroManager
    */
   private final SchedulerHelper cacheSchedulerHelper;
   @Inject
-  private final ResourceBundleProcessor resourceBundleProcessor = new ResourceBundleProcessor();
+  private Injector injector;
+  private ResourceBundleProcessor resourceBundleProcessor;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
 
@@ -123,7 +125,15 @@ public class WroManager
     final WroConfiguration config = context.getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
-    resourceBundleProcessor.serveProcessedBundle();
+    getResourceBundleProcessor().serveProcessedBundle();
+  }
+
+  private ResourceBundleProcessor getResourceBundleProcessor() {
+    if (resourceBundleProcessor == null) {
+      resourceBundleProcessor = new ResourceBundleProcessor();
+      injector.inject(resourceBundleProcessor);
+    }
+    return resourceBundleProcessor;
   }
 
   /**
