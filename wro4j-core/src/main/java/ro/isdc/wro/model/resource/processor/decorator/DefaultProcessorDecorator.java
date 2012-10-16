@@ -24,18 +24,42 @@ public class DefaultProcessorDecorator
     extends ProcessorDecorator {
   @Inject
   private Injector injector;
-  private final ProcessingType processingType;
+  private final Criteria criteria;
 
+  public static class Criteria {
+    private ProcessingType processingType = ProcessingType.ALL;
+    private boolean minimize = false;
+
+    public ProcessingType getProcessingType() {
+      return processingType;
+    }
+
+    public Criteria setProcessingType(final ProcessingType processingType) {
+      notNull(processingType);
+      this.processingType = processingType;
+      return this;
+    }
+
+    public boolean isMinimize() {
+      return minimize;
+    }
+
+    public Criteria setMinimize(final boolean minimize) {
+      this.minimize = minimize;
+      return this;
+    }
+  }
 
   public DefaultProcessorDecorator(final Object processor) {
-    this(processor, ProcessingType.ALL);
+    this(processor, new Criteria());
   }
 
-  public DefaultProcessorDecorator(final Object processor, final ProcessingType processingType) {
+  public DefaultProcessorDecorator(final Object processor, final Criteria criteria) {
     super(processor);
-    notNull(processingType);
-    this.processingType = processingType;
+    notNull(criteria);
+    this.criteria = criteria;
   }
+
   /**
    * {@inheritDoc}
    */
@@ -48,7 +72,8 @@ public class DefaultProcessorDecorator
   private ResourcePreProcessor getDecoratedProcessor() {
     // use exceptionHandling as last decorator
     final ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
-        new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(getDecoratedObject(), processingType))));
+        new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(getDecoratedObject(), criteria
+            .getProcessingType()))));
     injector.inject(decorated);
     return decorated;
   }

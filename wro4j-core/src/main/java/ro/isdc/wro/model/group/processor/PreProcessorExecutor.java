@@ -87,7 +87,8 @@ public class PreProcessorExecutor {
    *          the type of processor selection to apply before merging.
    * @return preProcessed merged content.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize, final ProcessingType processingType)
+  public String processAndMerge(final List<Resource> resources, final boolean minimize,
+      final ProcessingType processingType)
       throws IOException {
     LOG.debug("minimize: {}, processingType: {}", minimize, processingType);
     callbackRegistry.onBeforeMerge();
@@ -164,8 +165,8 @@ public class PreProcessorExecutor {
       // use at most the number of available processors (true parallelism)
       final int threadPoolSize = Runtime.getRuntime().availableProcessors();
       LOG.debug("Parallel thread pool size: {}", threadPoolSize);
-      executor = Executors.newFixedThreadPool(threadPoolSize,
-          WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
+      executor = Executors.newFixedThreadPool(threadPoolSize, WroUtil
+          .createDaemonThreadFactory("parallelPreprocessing"));
     }
     return executor;
   }
@@ -181,8 +182,8 @@ public class PreProcessorExecutor {
   private String applyPreProcessors(final Resource resource, final boolean minimize, final ProcessingType processingType)
       throws IOException {
     // TODO: apply filtering inside a specialized decorator
-    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
-        resource.getType(), processorsFactory.getPreProcessors());
+    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resource
+        .getType(), processorsFactory.getPreProcessors());
     LOG.debug("applying preProcessors: {}", processors);
 
     String resourceContent = null;
@@ -211,7 +212,7 @@ public class PreProcessorExecutor {
       final Reader reader = new StringReader(resourceContent);
       try {
         // decorate and process
-        decoratePreProcessor(processor, processingType).process(resource, reader, writer);
+        decoratePreProcessor(processor, minimize, processingType).process(resource, reader, writer);
         // use the outcome for next input
         resourceContent = writer.toString();
       } finally {
@@ -228,8 +229,11 @@ public class PreProcessorExecutor {
   /**
    * Decorates preProcessor with mandatory decorators.
    */
-  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor, final ProcessingType processingType) {
-    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, processingType);
+  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor, final boolean minimize,
+      final ProcessingType processingType) {
+    final DefaultProcessorDecorator.Criteria criteria = new DefaultProcessorDecorator.Criteria().setMinimize(minimize)
+        .setProcessingType(processingType);
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria);
     injector.inject(decorated);
     return decorated;
   }
