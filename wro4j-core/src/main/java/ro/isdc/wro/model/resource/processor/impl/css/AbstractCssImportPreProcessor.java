@@ -36,7 +36,7 @@ import ro.isdc.wro.util.WroUtil;
  * <p/>
  * When processor finds an import which is not valid, it will check the
  * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
- * 
+ *
  * @author Alex Objelean
  */
 @SupportedResourceType(ResourceType.CSS)
@@ -48,8 +48,6 @@ public abstract class AbstractCssImportPreProcessor
    */
   @Inject
   private ResourceLocatorFactory locatorFactory;
-  @Inject
-  private WroConfiguration configuration;
   /**
    * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
    * processor is thread-safe and doesn't erroneously detect recursion when running in concurrent environment.
@@ -59,10 +57,10 @@ public abstract class AbstractCssImportPreProcessor
     protected List<String> initialValue() {
       return new ArrayList<String>();
     };
-  }; 
+  };
   protected static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
   private static final String REGEX_IMPORT_FROM_COMMENTS = WroUtil.loadRegexpWithKey("cssImportFromComments");
-  
+
   /**
    * {@inheritDoc}
    */
@@ -156,7 +154,7 @@ public abstract class AbstractCssImportPreProcessor
 
   /**
    * Perform actual transformation of provided cssContent and the list of found import resources.
-   * 
+   *
    * @param cssContent
    *          the css to transform.
    * @param importedResources
@@ -176,7 +174,7 @@ public abstract class AbstractCssImportPreProcessor
   /**
    * Invoked when a recursive import is detected. Used to assert the recursive import detection correct behavior. By
    * default this method does nothing.
-   * 
+   *
    * @VisibleForTesting
    */
   protected void onRecursiveImportDetected() {

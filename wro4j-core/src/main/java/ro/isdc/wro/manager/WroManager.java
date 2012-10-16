@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
@@ -42,7 +43,7 @@ import ro.isdc.wro.util.Transformer;
  * Contains all the factories used by optimizer in order to perform the logic. This object should be created through
  * {@link WroManagerFactory}, in order to ensure that all dependencies are injected properly. In other words, avoid
  * setting the fields explicitly after creating a new instance of {@link WroManager}
- * 
+ *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
@@ -72,14 +73,12 @@ public class WroManager
   @Inject
   private GroupsProcessor groupsProcessor;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
   @Inject
   private HashStrategy hashStrategy;
-  @Inject
-  private Injector injector;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
@@ -92,6 +91,8 @@ public class WroManager
    * Schedules the cache update.
    */
   private final SchedulerHelper cacheSchedulerHelper;
+  @Inject
+  private Injector injector;
   private ResourceBundleProcessor resourceBundleProcessor;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
@@ -110,12 +111,11 @@ public class WroManager
         return new ReloadModelRunnable(getModelFactory());
       }
     }, ReloadModelRunnable.class.getSimpleName());
-    resourceBundleProcessor = new ResourceBundleProcessor();
   }
-  
+
   /**
    * Perform processing of the uri.
-   * 
+   *
    * @throws IOException
    *           when any IO related problem occurs or if the request cannot be processed.
    */
@@ -123,23 +123,23 @@ public class WroManager
       throws IOException {
     validate();
     // reschedule cache & model updates
+    final WroConfiguration config = context.getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
-    // Inject
-    injector.inject(getResourceBundleProcessor());
     getResourceBundleProcessor().serveProcessedBundle();
   }
 
   private ResourceBundleProcessor getResourceBundleProcessor() {
     if (resourceBundleProcessor == null) {
       resourceBundleProcessor = new ResourceBundleProcessor();
+      injector.inject(resourceBundleProcessor);
     }
     return resourceBundleProcessor;
   }
-  
+
   /**
    * Encodes a fingerprint of the resource into the path. The result may look like this: ${fingerprint}/myGroup.js
-   * 
+   *
    * @return a path to the resource with the fingerprint encoded as a folder name.
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
@@ -150,12 +150,12 @@ public class WroManager
     // encode the fingerprint of the resource into the resource path
     return formatVersionedResource(cacheValue.getHash(), groupUrl);
   }
-  
+
   /**
    * Format the version of the resource in the path. Default implementation use hash as a folder: <hash>/groupName.js.
    * The implementation can be changed to follow a different versioning style, like version parameter:
    * /groupName.js?version=<hash>
-   * 
+   *
    * @param hash
    *          Hash of the resource.
    * @param resourcePath
@@ -175,7 +175,7 @@ public class WroManager
     // flush the cache by destroying it.
     cacheStrategy.clear();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -185,7 +185,7 @@ public class WroManager
     getModelFactory().destroy();
     modelSchedulerHelper.scheduleWithPeriod(period);
   }
-  
+
   /**
    * Called when {@link WroManager} is being taken out of service.
    */
@@ -201,7 +201,7 @@ public class WroManager
       LOG.debug("WroManager destroyed");
     }
   }
-  
+
   /**
    * Check if all dependencies are set.
    */
@@ -216,7 +216,7 @@ public class WroManager
     Validate.notNull(hashStrategy, "HashStrategy was not set!");
     Validate.notNull(authorizationManager, "authorizationManager was not set!");
   }
-  
+
   /**
    * @param groupExtractor
    *          the uriProcessor to set
@@ -226,13 +226,13 @@ public class WroManager
     this.groupExtractor = groupExtractor;
     return this;
   }
-  
+
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
     Validate.notNull(modelFactory);
     this.modelFactory = modelFactory;
     return this;
   }
-  
+
   /**
    * @param cacheStrategy
    *          the cache to set
@@ -242,7 +242,7 @@ public class WroManager
     this.cacheStrategy = cacheStrategy;
     return this;
   }
-  
+
   /**
    * @param hashStrategy
    *          the contentDigester to set
@@ -252,25 +252,25 @@ public class WroManager
     this.hashStrategy = hashStrategy;
     return this;
   }
-  
+
   public final HashStrategy getHashStrategy() {
     return hashStrategy;
   }
-  
+
   /**
    * @return the modelFactory
    */
   public final WroModelFactory getModelFactory() {
     return modelFactory;
   }
-  
+
   /**
    * @return the processorsFactory used by this WroManager.
    */
   public final ProcessorsFactory getProcessorsFactory() {
     return processorsFactory;
   }
-  
+
   /**
    * @param processorsFactory
    *          the processorsFactory to set
@@ -279,11 +279,11 @@ public class WroManager
     this.processorsFactory = processorsFactory;
     return this;
   }
-  
+
   public final void setNamingStrategy(final NamingStrategy namingStrategy) {
     this.namingStrategy = namingStrategy;
   }
-  
+
   /**
    * @param resourceLocatorFactory the resourceLocatorFactory to set
    */
@@ -291,39 +291,39 @@ public class WroManager
     this.resourceLocatorFactory = resourceLocatorFactory;
     return this;
   }
-  
+
   /**
    * @return the cacheStrategy
    */
   public final CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
     return cacheStrategy;
   }
-  
+
   /**
    * @return the resourceLocatorFactory
    */
   public ResourceLocatorFactory getResourceLocatorFactory() {
     return resourceLocatorFactory;
   }
-  
+
   /**
    * @return The strategy used to rename bundled resources.
    */
   public final NamingStrategy getNamingStrategy() {
     return this.namingStrategy;
   }
-  
+
   public final GroupExtractor getGroupExtractor() {
     return groupExtractor;
   }
-  
+
   public final GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
   }
-  
+
   /**
    * Registers a callback.
-   * 
+   *
    * @param callback
    *          {@link LifecycleCallback} to register.
    */
@@ -331,15 +331,15 @@ public class WroManager
     Validate.notNull(callback);
     getCallbackRegistry().registerCallback(callback);
   }
-  
+
   public final List<Transformer<WroModel>> getModelTransformers() {
     return modelTransformers;
   }
-  
+
   public final void setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
     this.modelTransformers = modelTransformers;
   }
- 
+
   public LifecycleCallbackRegistry getCallbackRegistry() {
     // TODO check if initialization is required.
     if (callbackRegistry == null) {

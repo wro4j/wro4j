@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
 import ro.isdc.wro.util.StringUtils;
@@ -26,7 +27,7 @@ import ro.isdc.wro.util.StringUtils;
 /**
  * {@link org.springframework.core.io.Resource} implementation for {@link javax.servlet.ServletContext} resources,
  * interpreting relative paths within the web application root directory.
- * 
+ *
  * @author Alex Objelean, Ivar Conradi Østhus
  * @created Created on Nov 10, 2008, Updated on March 2, 2012
  */
@@ -34,7 +35,7 @@ public class ServletContextResourceLocator
     extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ServletContextResourceLocator.class);
   /**
-   * Alias used to register this locator with {@link LocatorProvider}. 
+   * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "servletContext";
   /**
@@ -48,7 +49,7 @@ public class ServletContextResourceLocator
    * of processed by container.
    */
   public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
-  
+
   /**
    * Prefix for url resources.
    */
@@ -58,13 +59,15 @@ public class ServletContextResourceLocator
   /**
    * Locates a stream using request dispatcher.
    */
-  private final DispatcherStreamLocator dispatcherStreamLocator = new DispatcherStreamLocator();  
+  private DispatcherStreamLocator dispatcherStreamLocator;
   /**
    * Determines the order of dispatcher resource locator and servlet context based resource locator.
    */
   private LocatorStrategy locatorStrategy = LocatorStrategy.DISPATCHER_FIRST;
   @Inject
   private ReadOnlyContext context;
+  @Inject
+  private Injector injector;
   /**
    * Available LocatorStrategies. DISPATCHER_FIRST is default option. This means this UriLocator will first try to
    * locate resource via the dispatcher stream locator. This will include dynamic resources produces by servlet's or
@@ -76,7 +79,7 @@ public class ServletContextResourceLocator
   public static enum LocatorStrategy {
     DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST
   }
-  
+
   /**
    * Sets the locator strategy to use.
    */
@@ -85,8 +88,8 @@ public class ServletContextResourceLocator
     this.locatorStrategy = locatorStrategy;
     return this;
   }
-  
-  
+
+
   public ServletContextResourceLocator(final ServletContext servletContext, final String path) {
     Validate.notNull(path);
     // allow null servletContext and prefer throwing IOException if null value is set.
@@ -97,7 +100,7 @@ public class ServletContextResourceLocator
     }
     this.path = pathToUse;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -136,7 +139,7 @@ public class ServletContextResourceLocator
       LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
-    
+
     InputStream inputStream = null;
     try {
       if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
@@ -146,12 +149,12 @@ public class ServletContextResourceLocator
       }
       validateInputStreamIsNotNull(inputStream, path);
       return inputStream;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       LOG.debug("Wrong or empty resource with location: {}", path);
       throw e;
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -163,7 +166,7 @@ public class ServletContextResourceLocator
     final String pathToUse = StringUtils.cleanPath(folder + relativePath);
     return new ServletContextResourceLocator(servletContext, pathToUse);
   }
-  
+
 
   private InputStream servletContextFirstStreamLocator(final String uri)
       throws IOException {
@@ -174,7 +177,7 @@ public class ServletContextResourceLocator
       return dispatcherBasedStreamLocator(uri);
     }
   }
-  
+
   private InputStream dispatcherFirstStreamLocator(final String uri)
       throws IOException {
     try {
@@ -184,22 +187,30 @@ public class ServletContextResourceLocator
       return servletContextBasedStreamLocator(uri);
     }
   }
-  
+
   private InputStream dispatcherBasedStreamLocator(final String uri)
       throws IOException {
     final HttpServletRequest request = context.getRequest();
     final HttpServletResponse response = context.getResponse();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
-    return dispatcherStreamLocator.getInputStream(request, response, uri);
+    return getDispatcherStreamLocator().getInputStream(request, response, uri);
   }
-  
+
+  private DispatcherStreamLocator getDispatcherStreamLocator() {
+    if (dispatcherStreamLocator == null) {
+      dispatcherStreamLocator = new DispatcherStreamLocator();
+      injector.inject(dispatcherStreamLocator);
+    }
+    return dispatcherStreamLocator;
+  }
+
   private InputStream servletContextBasedStreamLocator(final String uri)
       throws IOException {
     final ServletContext servletContext = context.getServletContext();
     return servletContext.getResourceAsStream(uri);
   }
-  
+
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {

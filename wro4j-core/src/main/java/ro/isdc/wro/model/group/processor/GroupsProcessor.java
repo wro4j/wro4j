@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheEntry;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -46,7 +46,7 @@ public class GroupsProcessor {
   @Inject
   private WroModelFactory modelFactory;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   @Inject
   private Injector injector;
 
@@ -73,7 +73,7 @@ public class GroupsProcessor {
       final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
       if (filteredGroup.getResources().isEmpty()) {
         LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
-        if (!config.isIgnoreEmptyGroup()) {
+        if (!context.getConfig().isIgnoreEmptyGroup()) {
           throw new WroRuntimeException("No resources found in group: " + group.getName());
         }
       }

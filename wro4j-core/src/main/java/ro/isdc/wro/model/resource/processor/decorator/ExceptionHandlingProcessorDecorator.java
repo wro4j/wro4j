@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
@@ -22,7 +23,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * <li>When the flag is false (default) - the exception is wrapped in {@link WroRuntimeException} and thrown further</li>
  * <li>When the flag is true - the exception is ignored and the writer will get the unchanged content from the reader. </li>
  * </ul>
- * 
+ *
  * @author Alex Objelean
  * @created 23 May 2012
  * @since 1.4.7
@@ -31,18 +32,18 @@ public class ExceptionHandlingProcessorDecorator
     extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandlingProcessorDecorator.class);
   @Inject
-  private WroConfiguration config;
-  
+  private ReadOnlyContext context;
+
   /**
    * Decorates a processor with failure handling ability.
-   * 
+   *
    * @param processor
    *          to decorate.
    */
   public ExceptionHandlingProcessorDecorator(final ResourceProcessor processor) {
     super(processor);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -77,6 +78,6 @@ public class ExceptionHandlingProcessorDecorator
    * @return true if the failure should be ignored. By default uses the {@link WroConfiguration} to get the flag value.
    */
   protected boolean isIgnoreFailingProcessor() {
-    return config.isIgnoreFailingProcessor();
+    return context.getConfig().isIgnoreFailingProcessor();
   }
 }

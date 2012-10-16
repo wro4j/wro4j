@@ -116,7 +116,7 @@ public class TestInjectorBuilder {
     managerFactroy.setNamingStrategy(namingStrategy);
     managerFactroy.setProcessorsFactory(processorsFactory);
     managerFactroy.setLocatorFactory(resourceLocatorFactory);
-    
+
     final Injector injector = InjectorBuilder.create(managerFactroy).build();
     Assert.assertNotNull(injector);
 
@@ -141,7 +141,7 @@ public class TestInjectorBuilder {
   public void shouldInjectEachLocatorProvidedByLocatorFactory()
       throws Exception {
     final ResourceLocatorFactory resourceLocatorFactory = new DefaultResourceLocatorFactory();
-    WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(resourceLocatorFactory);
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(resourceLocatorFactory);
     final Injector injector = InjectorBuilder.create(managerFactory).build();
 
     final Sample sample = new Sample();

@@ -1,17 +1,12 @@
-package ro.isdc.wro.model.resource.support;
+package ro.isdc.wro.model.resource.support.change;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +26,6 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -52,17 +46,8 @@ public class ResourceWatcher {
   @Inject
   private ResourceLocatorFactory locatorFactory;
   @Inject
-  private HashStrategy hashStrategy;
-  @Inject
   private Injector injector;
-  /**
-   * Contains the resource uri's with associated hash values retrieved from last successful check.
-   */
-  private final Map<String, String> previousHashes = new ConcurrentHashMap<String, String>();
-  /**
-   * Contains the resource uri's with associated hash values retrieved from currently performed check.
-   */
-  private final Map<String, String> currentHashes = new ConcurrentHashMap<String, String>();
+  private ResourceChangeDetector changeDetector;
 
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
@@ -80,11 +65,7 @@ public class ResourceWatcher {
       if (isGroupChanged(group)) {
         onGroupChanged(cacheEntry);
       }
-      // cleanUp
-      for (final Entry<String, String> entry : currentHashes.entrySet()) {
-        previousHashes.put(entry.getKey(), entry.getValue());
-      }
-      currentHashes.clear();
+      changeDetector.reset();
     } catch (final Exception e) {
       onException(e);
     } finally {
@@ -97,7 +78,7 @@ public class ResourceWatcher {
    * Invoked when exception occurs.
    */
   protected void onException(final Exception e) {
-    //not using ERROR log intentionally, since this error is not that important
+    // not using ERROR log intentionally, since this error is not that important
     LOG.info("Could not chef for resource changes because: {}", e.getMessage());
     LOG.debug("[FAIL] detecting resource change ", e);
   }
@@ -108,7 +89,7 @@ public class ResourceWatcher {
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (final Resource resource : resources) {
-      if (isChanged = isChanged(resource)) {
+      if (isChanged = isChanged(resource, group.getName())) {
         onResourceChanged(resource);
         break;
       }
@@ -146,20 +127,18 @@ public class ResourceWatcher {
    *          the {@link Resource} to check.
    * @return true if the resource was changed.
    */
-  private boolean isChanged(final Resource resource) {
+  private boolean isChanged(final Resource resource, final String groupName) {
     LOG.debug("Check change for resource {}", resource.getUri());
     try {
       final String uri = resource.getUri();
-      final String currentHash = getCurrentHash(uri);
-      final String previousHash = previousHashes.get(uri);
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-      final AtomicBoolean changeDetected = new AtomicBoolean(false);
-      changeDetected.set(previousHash != null ? !previousHash.equals(currentHash) : false);
+      final AtomicBoolean changeDetected = new AtomicBoolean(getResourceChangeDetector().checkChangeForGroup(uri,
+          groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
         // detect changes in imported resources.
-        createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
+        createCssImportProcessor(resource, changeDetected, groupName).process(resource, reader, new StringWriter());
       }
       return changeDetected.get();
     } catch (final IOException e) {
@@ -168,13 +147,14 @@ public class ResourceWatcher {
       return false;
     }
   }
-  
-  private ResourceProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
+
+  private ResourceProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected,
+      final String groupName) {
     final ResourceProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         LOG.debug("Found @import {}", importedUri);
-        final boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS));
+        final boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS), groupName);
         LOG.debug("\tisImportChanged: {}", isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
@@ -210,35 +190,15 @@ public class ResourceWatcher {
   }
 
   /**
-   * @param uri
-   *          of the resource to get the hash for.
-   * @return the hash for a given resource uri.
-   * @throws IOException
+   * @VisibleForTesting
+   * @return
    */
-  private String getCurrentHash(final String uri)
-      throws IOException {
-    String currentHash = currentHashes.get(uri);
-    if (currentHash == null) {
-      LOG.debug("Checking if resource {} is changed..", uri);
-      currentHash = hashStrategy.getHash(new AutoCloseInputStream(locatorFactory.locate(uri)));
-      currentHashes.put(uri, currentHash);
+  ResourceChangeDetector getResourceChangeDetector() {
+    if (changeDetector == null) {
+      changeDetector = new ResourceChangeDetector();
+      injector.inject(changeDetector);
     }
-    return currentHash;
-  }
-
-  /**
-   * @return the map storing the hash of accumulated resources from previous runs.
-   * @VisibleForTesting
-   */
-  Map<String, String> getPreviousHashes() {
-    return Collections.unmodifiableMap(previousHashes);
-  }
-
-  /**
-   * @return the map storing the hash of resources from current run.
-   * @VisibleForTesting
-   */
-  Map<String, String> getCurrentHashes() {
-    return Collections.unmodifiableMap(currentHashes);
+    return changeDetector;
   }
 }
+

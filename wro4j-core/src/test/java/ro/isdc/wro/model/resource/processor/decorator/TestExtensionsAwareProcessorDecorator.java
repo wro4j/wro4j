@@ -33,6 +33,7 @@ public class TestExtensionsAwareProcessorDecorator {
     final ResourceProcessor decoratedProcessor = new JSMinProcessor();
     final ResourceProcessor processor = ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor).addExtension(
         "js");
+    WroTestUtils.createInjector().inject(processor);
     //we use test resource relative to TestProcessorsUtils class
     final URL url = TestProcessorsUtils.class.getResource("extensionAware");
 
