@@ -124,8 +124,7 @@ public class GoogleClosureCompressorProcessor
   private String getEncoding() {
     if (encoding == null) {
       // use config is available to get encoding
-      this.encoding = context.getConfig() == null ? WroConfiguration.DEFAULT_ENCODING : context.getConfig()
-          .getEncoding();
+      this.encoding = Context.isContextSet() ? context.getConfig().getEncoding() : WroConfiguration.DEFAULT_ENCODING;
     }
     return encoding;
   }
