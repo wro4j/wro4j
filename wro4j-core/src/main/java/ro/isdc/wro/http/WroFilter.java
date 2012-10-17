@@ -80,6 +80,11 @@ public class WroFilter
   private RequestHandlerFactory requestHandlerFactory = newRequestHandlerFactory();
 
   private ResponseHeadersConfigurer headersConfigurer;
+  /**
+   * Flag used to toggle filter processing. When this flag is false, the filter will proceed with chaining. This flag is
+   * true by default.
+   */
+  private boolean enable = true;
 
   /**
    * {@inheritDoc}
@@ -256,8 +261,7 @@ public class WroFilter
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
 
-    //prevent StackOverflowError by skipping the already included wro request
-    if (!DispatcherStreamLocator.isIncludedRequest(request)) {
+    if (isFilterActive(request)) {
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
@@ -315,12 +319,6 @@ public class WroFilter
   }
 
   /**
-   * Useful for unit tests to check the post processing.
-   */
-  protected void onRequestProcessed() {
-  }
-
-  /**
    * Perform actual processing.
    */
   private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
@@ -328,6 +326,14 @@ public class WroFilter
     setResponseHeaders(response);
     // process the uri using manager
     wroManagerFactory.create().process();
+  }
+
+  /**
+   * @return true if the filter should be applied or proceed with chain otherwise.
+   */
+  private boolean isFilterActive(final HttpServletRequest request) {
+    //prevent StackOverflowError by skipping the already included wro request
+    return enable && !DispatcherStreamLocator.isIncludedRequest(request);
   }
 
   /**
@@ -449,6 +455,23 @@ public class WroFilter
   public final void setConfiguration(final WroConfiguration config) {
     Validate.notNull(config);
     this.wroConfiguration = config;
+  }
+
+
+  /**
+   * Sets the enable flag used to toggle filter. This might be useful when the filter has to be enabled/disabled based
+   * on environment configuration.
+   *
+   * @param enable flag for enabling the {@link WroFilter}.
+   */
+  public void setEnable(final boolean enable) {
+    this.enable = enable;
+  }
+
+  /**
+   * Useful for unit tests to check the post processing.
+   */
+  protected void onRequestProcessed() {
   }
 
   /**

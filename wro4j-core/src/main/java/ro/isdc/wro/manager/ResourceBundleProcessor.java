@@ -45,10 +45,6 @@ public class ResourceBundleProcessor {
   @Inject
   private GroupExtractor groupExtractor;
 
-  private boolean isGzipAllowed() {
-    return context.getConfig().isGzipEnabled() && isGzipSupported();
-  }
-
   /**
    * Write to stream the content of the processed resource bundle.
    */
@@ -116,6 +112,10 @@ public class ResourceBundleProcessor {
         IOUtils.closeQuietly(os);
       }
     }
+  }
+
+  private boolean isGzipAllowed() {
+    return context.getConfig().isGzipEnabled() && isGzipSupported();
   }
 
   /**
