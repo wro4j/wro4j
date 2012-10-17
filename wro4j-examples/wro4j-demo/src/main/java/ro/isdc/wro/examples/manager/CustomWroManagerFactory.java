@@ -9,7 +9,6 @@ import java.util.Properties;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.model.factory.GroovyModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
-import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -59,7 +58,6 @@ public class CustomWroManagerFactory
     factory.addPreProcessor(new CssImportPreProcessor());
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     //factory.addPreProcessor(new JSMinProcessor());
-    factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
     factory.addPreProcessor(new YUICssCompressorProcessor());
     factory.addPostProcessor(new CssVariablesProcessor());
 

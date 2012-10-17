@@ -1,8 +1,6 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
 import static org.apache.commons.lang3.Validate.notNull;
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
@@ -18,8 +16,6 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 public class DefaultProcessorDecorator
     extends ProcessorDecorator {
   private final ProcessingCriteria criteria;
-  @Inject
-  private Injector injector;
 
   public DefaultProcessorDecorator(final ResourceProcessor processor) {
     this(processor, ProcessingCriteria.createDefault());
