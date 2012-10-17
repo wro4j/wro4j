@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -32,7 +34,8 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -63,7 +66,7 @@ public class PreProcessorExecutor {
   private ExecutorService executor;
 
   /**
-   * Apply preProcessors on resources and merge them.
+   * Apply preProcessors on resources and merge them after all preProcessors are applied.
    *
    * @param resources
    *          what are the resources to merge.
@@ -73,17 +76,33 @@ public class PreProcessorExecutor {
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
       throws IOException {
+    return processAndMerge(resources, ProcessingCriteria.create(ProcessingType.ALL, minimize));
+  }
+
+  /**
+   * Apply preProcessors on resources and merge them.
+   *
+   * @param resources
+   *          what are the resources to merge.
+   * @param criteria
+   *          {@link ProcessingCriteria} used to identify the processors to apply and those to skip.
+   * @return preProcessed merged content.
+   */
+  public String processAndMerge(final List<Resource> resources, final ProcessingCriteria criteria)
+      throws IOException {
+    notNull(criteria);
+    LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
     try {
       Validate.notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
-        result.append(runInParallel(resources, minimize));
+        result.append(runInParallel(resources, criteria));
       } else {
         for (final Resource resource : resources) {
           LOG.debug("\tmerging resource: {}", resource);
-          result.append(applyPreProcessors(resource, minimize));
+          result.append(applyPreProcessors(resource, criteria));
         }
       }
       return result.toString();
@@ -103,25 +122,25 @@ public class PreProcessorExecutor {
    *
    * @return merged and pre processed content.
    */
-  private String runInParallel(final List<Resource> resources, final boolean minimize)
+  private String runInParallel(final List<Resource> resources, final ProcessingCriteria criteria)
       throws IOException {
     LOG.debug("Running preProcessing in Parallel");
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
-      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
-      callables.add(new ContextPropagatingCallable<String>(new Callable<String>() {
+      callables.add(new Callable<String>() {
         public String call()
             throws Exception {
           LOG.debug("Callable started for resource: {} ...", resource);
-          return applyPreProcessors(resource, minimize);
+          return applyPreProcessors(resource, criteria);
         }
-      }));
+      });
     }
     final ExecutorService exec = getExecutorService();
     final List<Future<String>> futures = new ArrayList<Future<String>>();
     for (final Callable<String> callable : callables) {
-      futures.add(exec.submit(callable));
+      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
+      futures.add(exec.submit(new ContextPropagatingCallable<String>(callable)));
     }
 
     for (final Future<String> future : futures) {
@@ -147,8 +166,8 @@ public class PreProcessorExecutor {
       // use at most the number of available processors (true parallelism)
       final int threadPoolSize = Runtime.getRuntime().availableProcessors();
       LOG.debug("Parallel thread pool size: {}", threadPoolSize);
-      executor = Executors.newFixedThreadPool(threadPoolSize,
-          WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
+      executor = Executors.newFixedThreadPool(threadPoolSize, WroUtil
+          .createDaemonThreadFactory("parallelPreprocessing"));
     }
     return executor;
   }
@@ -161,11 +180,9 @@ public class PreProcessorExecutor {
    * @param processors
    *          the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final boolean minimize)
+  private String applyPreProcessors(final Resource resource, final ProcessingCriteria criteria)
       throws IOException {
-    //TODO: apply filtering inside a specialized decorator
-    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
-        resource.getType(), processorsFactory.getPreProcessors());
+    final Collection<ResourcePreProcessor> processors = processorsFactory.getPreProcessors();
     LOG.debug("applying preProcessors: {}", processors);
 
     String resourceContent = null;
@@ -193,9 +210,9 @@ public class PreProcessorExecutor {
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       try {
-        //decorate and process
-        decoratePreProcessor(processor).process(resource, reader, writer);
-        //use the outcome for next input
+        // decorate and process
+        decoratePreProcessor(processor, criteria).process(resource, reader, writer);
+        // use the outcome for next input
         resourceContent = writer.toString();
       } finally {
         stopWatch.stop();
@@ -211,8 +228,9 @@ public class PreProcessorExecutor {
   /**
    * Decorates preProcessor with mandatory decorators.
    */
-  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
-    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor);
+  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
+      final ProcessingCriteria criteria) {
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria);
     injector.inject(decorated);
     return decorated;
   }

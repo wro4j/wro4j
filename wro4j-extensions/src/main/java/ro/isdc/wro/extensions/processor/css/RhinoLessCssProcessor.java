@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010.
- * All rights reserved.
+ * Copyright (C) 2010. All rights reserved.
  */
 package ro.isdc.wro.extensions.processor.css;
 
@@ -29,18 +28,17 @@ import ro.isdc.wro.util.ObjectFactory;
  * <p>
  * The main css goodies are: <br/>
  * <ul>
- * <li>
- * Variables - Variables allow you to specify widely used values in a single place, and then re-use them throughout the
- * style sheet, making global changes as easy as changing one line of code.<br/>
+ * <li>Variables - Variables allow you to specify widely used values in a single place, and then re-use them throughout
+ * the style sheet, making global changes as easy as changing one line of code.<br/>
  *
  * <pre>
  * @brand_color: #4D926F;
  * #header { color: @brand_color; }
  * h2 { color: @brand_color; }
  * </pre>
+ *
  * </li>
- * <li>
- * Mixins - Mixins allow you to embed all the properties of a class into another class by simply including the class
+ * <li>Mixins - Mixins allow you to embed all the properties of a class into another class by simply including the class
  * name as one of its properties. It's just like variables, but for whole classes. Mixins can also behave like
  * functions, and take arguments, as seen in the example bellow.</br>
  *
@@ -58,7 +56,8 @@ import ro.isdc.wro.util.ObjectFactory;
  * #footer {
  *   .rounded_corners(10px);
  * }
- *  </pre>
+ * </pre>
+ *
  * </li>
  * <li>Nested Rules - Rather than constructing long selector names to specify inheritance, in Less you can simply nest
  * selectors inside other selectors. This makes inheritance clear and style sheets shorter </br>
@@ -72,11 +71,11 @@ import ro.isdc.wro.util.ObjectFactory;
  *   }
  * }
  * </pre>
+ *
  * </li>
- * <li>
- * Operations - Are some elements in your style sheet proportional to other elements? Operations let you add, subtract,
- * divide and multiply property values and colors, giving you the power to do create complex relationships between
- * properties.</br>
+ * <li>Operations - Are some elements in your style sheet proportional to other elements? Operations let you add,
+ * subtract, divide and multiply property values and colors, giving you the power to do create complex relationships
+ * between properties.</br>
  *
  * <pre>
  *  @the-border: 1px;
@@ -91,7 +90,8 @@ import ro.isdc.wro.util.ObjectFactory;
  * #footer {
  *   color: (@base-color + #111) * 1.5;
  * }
- *  </pre>
+ * </pre>
+ *
  * </li>
  * </ul>
  * If processing encounter any issues during processing, no change will be applied to the resource.
@@ -103,7 +103,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class RhinoLessCssProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoLessCssProcessor.class);
 
   public static final String ALIAS = "rhinoLessCss";
@@ -124,7 +124,7 @@ public class RhinoLessCssProcessor
    */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     final String content = IOUtils.toString(reader);
     final LessCss lessCss = enginePool.getObject();
     try {
@@ -135,7 +135,7 @@ public class RhinoLessCssProcessor
           + " resource, no processing applied...", e);
       onException(e);
     } finally {
-      //return for later reuse
+      // return for later reuse
       enginePool.returnObject(lessCss);
       reader.close();
       writer.close();
@@ -157,14 +157,12 @@ public class RhinoLessCssProcessor
     return new LessCss();
   }
 
-
   /**
    * {@inheritDoc}
    */
   @Override
   public void process(final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     process(null, reader, writer);
   }
-
 }

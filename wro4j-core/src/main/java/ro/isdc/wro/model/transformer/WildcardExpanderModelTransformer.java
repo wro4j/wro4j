@@ -61,7 +61,7 @@ public class WildcardExpanderModelTransformer
   private static final Logger LOG = LoggerFactory.getLogger(WildcardExpanderModelTransformer.class);
   
   @Inject
-  private UriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory locatorFactory;
   
   /**
    * An instance of IOException having a special purpose: to skip subsequent attempts to localize a stream.
@@ -93,7 +93,7 @@ public class WildcardExpanderModelTransformer
    * Process each resource and replace it with a collection of resources if it contains wildcard.
    */
   private void processResource(final Group group, final Resource resource) {
-    final UriLocator uriLocator = uriLocatorFactory.getInstance(resource.getUri());
+    final UriLocator uriLocator = locatorFactory.getInstance(resource.getUri());
     
     if (uriLocator instanceof WildcardUriLocatorSupport) {
       final WildcardStreamLocator wildcardStreamLocator = ((WildcardUriLocatorSupport) uriLocator).getWildcardStreamLocator();

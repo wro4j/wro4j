@@ -24,6 +24,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StringUtils;
 import ro.isdc.wro.util.WroUtil;
@@ -41,7 +42,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssImportPreProcessor
-  implements ResourcePreProcessor {
+  implements ResourcePreProcessor, ImportAware {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssImportPreProcessor.class);
   /**
    * Contains a {@link UriLocatorFactory} reference injected externally.
@@ -180,5 +181,13 @@ public abstract class AbstractCssImportPreProcessor
    * @VisibleForTesting
    */
   protected void onRecursiveImportDetected() {
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    //We want this processor to be applied when processing resources referred with @import directive
+    return true;
   }
 }

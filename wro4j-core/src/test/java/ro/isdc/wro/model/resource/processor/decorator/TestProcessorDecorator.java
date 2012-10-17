@@ -6,21 +6,26 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -30,6 +35,14 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * @author Alex Objelean
  */
 public class TestProcessorDecorator {
+  @Mock
+  private ResourcePreProcessor mockProcessor;
+
+  @Before
+  public void setUp() {
+    initMocks(this);
+  }
+
   @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullProcessor() {
     new ProcessorDecorator(null);
@@ -196,5 +209,23 @@ public class TestProcessorDecorator {
     final ProcessorDecorator decorator = new ProcessorDecorator(new ProcessorDecorator(new ProcessorDecorator(
         postProcessor)));
     assertEquals(expected, decorator.toString());
+  }
+
+  @Test
+  public void shouldNotBeImportAwareForDefaultProcessor() {
+    final ProcessorDecorator decorator = new ProcessorDecorator(mockProcessor);
+    assertFalse(decorator.isImportAware());
+  }
+
+  @Test
+  public void shouldBeImportAwareForImportAwareProcessor() {
+    final ProcessorDecorator decorator = new ProcessorDecorator(new ImportAwareProcessor());
+    assertTrue(decorator.isImportAware());
+  }
+
+  private static class ImportAwareProcessor extends CssImportPreProcessor implements ImportAware {
+    public boolean isImportAware() {
+      return true;
+    }
   }
 }

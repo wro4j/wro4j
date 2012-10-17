@@ -14,6 +14,7 @@ import java.net.URLConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
@@ -89,7 +90,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    * @return connection timeout in milliseconds. By default uses connection timeout from {@link WroConfiguration}.
    */
   private int getConnectionTimeout() {
-    return context.getConfig() != null ? context.getConfig().getConnectionTimeout()
+    return Context.isContextSet() ? context.getConfig().getConnectionTimeout()
         : WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
   }
 }

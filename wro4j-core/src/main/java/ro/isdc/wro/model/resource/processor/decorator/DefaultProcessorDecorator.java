@@ -1,13 +1,13 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 
 
 /**
@@ -19,10 +19,15 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  */
 public class DefaultProcessorDecorator
     extends ProcessorDecorator {
-  @Inject
-  private Injector injector;
+  private final ProcessingCriteria criteria;
+
   public DefaultProcessorDecorator(final Object processor) {
-    super(processor);
+    this(processor, ProcessingCriteria.createDefault());
+  }
+
+  public DefaultProcessorDecorator(final Object processor, final ProcessingCriteria criteria) {
+    super(decorate(processor, criteria));
+    this.criteria = criteria;
   }
 
   /**
@@ -31,13 +36,22 @@ public class DefaultProcessorDecorator
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    getDecoratedProcessor().process(resource, reader, writer);
+    super.process(resource, reader, writer);
   }
 
-  private ResourcePreProcessor getDecoratedProcessor() {
-    final ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
-        new MinimizeAwareProcessorDecorator(getDecoratedObject())));
-    injector.inject(decorated);
-    return decorated;
+  private static ProcessorDecorator decorate(final Object processor, final ProcessingCriteria criteria) {
+    notNull(criteria);
+    return new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
+        new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(processor, criteria
+            .getProcessingType()))));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean isEnabled(final Resource resource) {
+    final boolean isApplicable = resource != null ? isEligible(criteria.isMinimize(), resource.getType()) : true;
+    return super.isEnabled(resource) && isApplicable;
   }
 }

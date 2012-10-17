@@ -26,7 +26,6 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -77,29 +76,12 @@ public class GroupsProcessor {
         }
       }
       final String result = preProcessorExecutor.processAndMerge(filteredGroup.getResources(), cacheKey.isMinimize());
-      return doPostProcess(result, cacheKey);
+      return applyPostProcessors(processorsFactory.getPostProcessors(), result);
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources: " + e.getMessage(), e).logError();
     } finally {
       callbackRegistry.onProcessingComplete();
     }
-  }
-
-  /**
-   * Perform postProcessing.
-   *
-   * @return the post processed contents.
-   */
-  private String doPostProcess(final String content, final CacheEntry cacheEntry)
-      throws IOException {
-    Validate.notNull(content);
-    final Collection<ResourcePostProcessor> allPostProcessors = processorsFactory.getPostProcessors();
-    if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
-      LOG.debug("[WARN] No processors defined. Please, check if your configuration is correct.");
-    }
-    final Collection<ResourcePostProcessor> processors = ProcessorsUtils.filterProcessorsToApply(
-        cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
-    return applyPostProcessors(processors, content);
   }
 
   /**

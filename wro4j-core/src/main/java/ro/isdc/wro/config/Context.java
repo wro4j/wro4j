@@ -148,7 +148,7 @@ public class Context
     CORRELATION_ID.set(correlationId);
     CONTEXT_MAP.put(correlationId, context);
   }
-  
+
   /**
    * @return a string representation of an unique id used to store Context in a map.
    */
@@ -248,7 +248,7 @@ public class Context
     Validate.notNull(correlationId);
     CORRELATION_ID.set(correlationId);
   }
-  
+
   /**
    * Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
    * with the correlationId. In order to remove context, call {@link Context#unset()}.
@@ -259,7 +259,7 @@ public class Context
   public static void unsetCorrelationId() {
     CORRELATION_ID.remove();
   }
-  
+
   /**
    * @return the correlationId associated with this thread.
    */
@@ -267,7 +267,7 @@ public class Context
     validateContext();
     return CORRELATION_ID.get();
   }
-  
+
 
   /**
    * {@inheritDoc}

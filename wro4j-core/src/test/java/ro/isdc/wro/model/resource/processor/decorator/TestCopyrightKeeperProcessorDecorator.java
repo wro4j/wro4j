@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.TestProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -31,7 +30,7 @@ public class TestCopyrightKeeperProcessorDecorator {
       throws Exception {
     final ResourcePreProcessor decoratedProcessor = new CssMinProcessor();
     final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    final URL url = TestProcessorsUtils.class.getResource("copyright");
+    final URL url = ResourcePreProcessor.class.getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
@@ -49,7 +48,7 @@ public class TestCopyrightKeeperProcessorDecorator {
       }
     };
     final ResourcePreProcessor processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
-    final URL url = TestProcessorsUtils.class.getResource("copyright");
+    final URL url = ResourcePreProcessor.class.getResource("copyright");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedCopyrightAware");

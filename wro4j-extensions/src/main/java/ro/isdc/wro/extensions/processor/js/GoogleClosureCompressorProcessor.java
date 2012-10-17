@@ -34,8 +34,10 @@ import com.google.javascript.jscomp.Result;
 
 
 /**
- * Uses Google closure compiler for js minimization. <p/>
- * In order to make this class {@link Context} agnostic, set the encoding explicitly using {@link GoogleClosureCompressorProcessor#setEncoding(String)}.
+ * Uses Google closure compiler for js minimization.
+ * <p/>
+ * In order to make this class {@link Context} agnostic, set the encoding explicitly using
+ * {@link GoogleClosureCompressorProcessor#setEncoding(String)}.
  *
  * @see http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html
  * @author Alex Objelean
@@ -43,7 +45,7 @@ import com.google.javascript.jscomp.Result;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
-  implements ResourcePostProcessor, ResourcePreProcessor {
+    implements ResourcePostProcessor, ResourcePreProcessor {
   public static final String ALIAS_SIMPLE = "googleClosureSimple";
   public static final String ALIAS_ADVANCED = "googleClosureAdvanced";
   /**
@@ -62,11 +64,11 @@ public class GoogleClosureCompressorProcessor
     this(CompilationLevel.SIMPLE_OPTIMIZATIONS);
   }
 
-
   /**
    * Uses google closure compiler with specified compilation level.
    *
-   * @param compilationLevel not null {@link CompilationLevel} enum.
+   * @param compilationLevel
+   *          not null {@link CompilationLevel} enum.
    */
   public GoogleClosureCompressorProcessor(final CompilationLevel compilationLevel) {
     Validate.notNull(compilationLevel);
@@ -78,7 +80,7 @@ public class GoogleClosureCompressorProcessor
    */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     final String content = IOUtils.toString(reader);
     try {
       Compiler.setLoggingLevel(Level.SEVERE);
@@ -89,12 +91,11 @@ public class GoogleClosureCompressorProcessor
 
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
       final JSSourceFile[] input = new JSSourceFile[] {
-        JSSourceFile.fromInputStream(fileName,
-        new ByteArrayInputStream(content.getBytes(getEncoding())))
+        JSSourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
       };
       JSSourceFile[] externs = getExterns(resource);
       if (externs == null) {
-        //fallback to empty array when null is provided.
+        // fallback to empty array when null is provided.
         externs = new JSSourceFile[] {};
       }
       Result result = null;
@@ -129,28 +130,28 @@ public class GoogleClosureCompressorProcessor
     return encoding;
   }
 
-
   /**
-   * @param encoding the encoding to set
+   * @param encoding
+   *          the encoding to set
    */
   public GoogleClosureCompressorProcessor setEncoding(final String encoding) {
     this.encoding = encoding;
     return this;
   }
 
-
   /**
-   * @param resource Currently processed resource. The resource can be null, when the closure compiler is used as a post
-   *        processor.
+   * @param resource
+   *          Currently processed resource. The resource can be null, when the closure compiler is used as a post
+   *          processor.
    * @return An Array of externs files for the resource to process.
    */
   protected JSSourceFile[] getExterns(final Resource resource) {
     return new JSSourceFile[] {};
   }
 
-
   /**
-   * @param compilerOptions the compilerOptions to set
+   * @param compilerOptions
+   *          the compilerOptions to set
    */
   public GoogleClosureCompressorProcessor setCompilerOptions(final CompilerOptions compilerOptions) {
     this.compilerOptions = compilerOptions;
@@ -158,7 +159,8 @@ public class GoogleClosureCompressorProcessor
   }
 
   /**
-   * @param compilationLevel the compilationLevel to set
+   * @param compilationLevel
+   *          the compilationLevel to set
    */
   public GoogleClosureCompressorProcessor setCompilationLevel(final CompilationLevel compilationLevel) {
     this.compilationLevel = compilationLevel;
@@ -171,13 +173,13 @@ public class GoogleClosureCompressorProcessor
   protected CompilerOptions newCompilerOptions() {
     final CompilerOptions options = new CompilerOptions();
     /**
-     * According to John Lenz from the Closure Compiler project, if you are using the Compiler API directly, you
-     * should specify a CodingConvention. {@link http://code.google.com/p/wro4j/issues/detail?id=155}
+     * According to John Lenz from the Closure Compiler project, if you are using the Compiler API directly, you should
+     * specify a CodingConvention. {@link http://code.google.com/p/wro4j/issues/detail?id=155}
      */
     options.setCodingConvention(new ClosureCodingConvention());
-    //use the wro4j encoding by default
+    // use the wro4j encoding by default
     options.setOutputCharset(getEncoding());
-    //set it to warning, otherwise compiler will fail
+    // set it to warning, otherwise compiler will fail
     options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES, CheckLevel.WARNING);
     return options;
   }
@@ -187,7 +189,7 @@ public class GoogleClosureCompressorProcessor
    */
   @Override
   public void process(final Reader reader, final Writer writer)
-    throws IOException {
+      throws IOException {
     process(null, reader, writer);
   }
 }
