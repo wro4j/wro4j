@@ -40,6 +40,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -65,7 +66,7 @@ public class TestPreProcessorExecutor {
   private UriLocatorFactory mockLocatorFactory;
   @Mock
   private UriLocator mockLocator;
-  private PreProcessorExecutor executor;
+  private PreProcessorExecutor victim;
 
 
   @Before
@@ -106,15 +107,15 @@ public class TestPreProcessorExecutor {
   private void initExecutor(final ResourcePreProcessor... preProcessors) {
     final WroManagerFactory wroManagerFactory = createWroManager(preProcessors);
     final Injector injector = InjectorBuilder.create(wroManagerFactory).build();
-    executor = new PreProcessorExecutor();
-    injector.inject(executor);
+    victim = new PreProcessorExecutor();
+    injector.inject(victim);
   }
 
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullArguments()
     throws Exception {
-    executor.processAndMerge(null, true);
+    victim.processAndMerge(null, true);
   }
 
 
@@ -162,8 +163,8 @@ public class TestPreProcessorExecutor {
   public void processEmptyList()
     throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
-    Assert.assertEquals("", executor.processAndMerge(resources, true));
-    Assert.assertEquals("", executor.processAndMerge(resources, false));
+    Assert.assertEquals("", victim.processAndMerge(resources, true));
+    Assert.assertEquals("", victim.processAndMerge(resources, false));
   }
 
 
@@ -171,7 +172,7 @@ public class TestPreProcessorExecutor {
   public void shouldNotFailWhenNoResourcesProcessed()
     throws Exception {
     initExecutor(createProcessorUsingMissingResource());
-    executor.processAndMerge(createResources(), true);
+    victim.processAndMerge(createResources(), true);
   }
 
 
@@ -197,7 +198,7 @@ public class TestPreProcessorExecutor {
     throws IOException {
     initExecutor(createProcessorUsingMissingResource());
     final List<Resource> resources = createResources(Resource.create("/uri", ResourceType.JS));
-    final String result = executor.processAndMerge(resources, true);
+    final String result = victim.processAndMerge(resources, true);
     Assert.assertEquals("", result);
   }
 
@@ -219,7 +220,7 @@ public class TestPreProcessorExecutor {
   private void useFailingPreProcessor() throws Exception {
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
-    final String result = executor.processAndMerge(resources, true);
+    final String result = victim.processAndMerge(resources, true);
     Assert.assertEquals("", result);
 
   }
@@ -244,19 +245,19 @@ public class TestPreProcessorExecutor {
 
       // warm up
       config.setParallelPreprocessing(true);
-      executor.processAndMerge(resources, true);
+      victim.processAndMerge(resources, true);
 
       // parallel
       watch.start("parallel preProcessing");
       config.setParallelPreprocessing(true);
-      executor.processAndMerge(resources, true);
+      victim.processAndMerge(resources, true);
       watch.stop();
       final long parallelExecution = watch.getLastTaskTimeMillis();
 
       // sequential
       config.setParallelPreprocessing(false);
       watch.start("sequential preProcessing");
-      executor.processAndMerge(resources, true);
+      victim.processAndMerge(resources, true);
       watch.stop();
       final long sequentialExecution = watch.getLastTaskTimeMillis();
 
@@ -288,7 +289,7 @@ public class TestPreProcessorExecutor {
       }
     });
     initExecutor(preProcessor);
-    executor.processAndMerge(resources, true);
+    victim.processAndMerge(resources, true);
   }
 
   /**
@@ -311,12 +312,30 @@ public class TestPreProcessorExecutor {
     final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(emptyStreamLocator);
     //init executor
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory);
-    InjectorBuilder.create(managerFactory).build().inject(executor);
+    InjectorBuilder.create(managerFactory).build().inject(victim);
 
     final List<Resource> resources = new ArrayList<Resource>();
     resources.add(Resource.create("/resource.js"));
-    executor.processAndMerge(resources, true);
+    victim.processAndMerge(resources, true);
   }
+
+
+  private static class AnyTypeProcessor
+      implements ResourcePreProcessor, ResourcePostProcessor {
+    public void process(final Resource resource, final Reader reader, final Writer writer)
+        throws IOException {
+    }
+
+    public void process(final Reader reader, final Writer writer)
+        throws IOException {
+    }
+  }
+
+  @Minimize
+  private static class MinimizeAwareProcessor
+      extends AnyTypeProcessor {
+  }
+
 
   @After
   public void tearDown() {

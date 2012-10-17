@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.TestProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -36,7 +35,7 @@ public class TestExtensionsAwareProcessorDecorator {
         "js");
     WroTestUtils.createInjector().inject(processor);
     // we use test resource relative to TestProcessorsUtils class
-    final URL url = TestProcessorsUtils.class.getResource("extensionAware");
+    final URL url = ResourcePreProcessor.class.getResource("extensionAware");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");

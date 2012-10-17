@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.group.processor;
+package ro.isdc.wro.model.resource.processor.support;
 
 /**
  * A type of processing to apply during preProcessor execution.

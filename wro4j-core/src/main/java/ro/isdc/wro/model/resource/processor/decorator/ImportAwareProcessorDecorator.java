@@ -5,8 +5,8 @@ import static org.apache.commons.lang3.Validate.notNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.group.processor.ProcessingType;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 
 
 /**

@@ -25,12 +25,13 @@ import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
-import ro.isdc.wro.model.group.processor.ProcessingType;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.LazyInitializer;
 
 /**
@@ -101,7 +102,7 @@ public class TestLessCssProcessor {
     final List<Resource> resources = new ArrayList<Resource>();
     final String baseFolder = "ro/isdc/wro/extensions/processor/lesscss";
     resources.add(Resource.create(String.format("classpath:%s/test/import.css", baseFolder)));
-    final String noImports = preProcessorExecutor.processAndMerge(resources, true, ProcessingType.IMPORT_ONLY);
+    final String noImports = preProcessorExecutor.processAndMerge(resources, ProcessingCriteria.create(ProcessingType.IMPORT_ONLY, true));
     final StringWriter actual = new StringWriter();
     new LessCssProcessor().process(null, new StringReader(noImports), actual);
 

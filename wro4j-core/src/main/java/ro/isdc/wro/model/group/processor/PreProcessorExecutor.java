@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -32,7 +34,8 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -73,7 +76,7 @@ public class PreProcessorExecutor {
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
       throws IOException {
-    return processAndMerge(resources, minimize, ProcessingType.ALL);
+    return processAndMerge(resources, ProcessingCriteria.create(ProcessingType.ALL, minimize));
   }
 
   /**
@@ -81,27 +84,25 @@ public class PreProcessorExecutor {
    *
    * @param resources
    *          what are the resources to merge.
-   * @param minimize
-   *          whether minimize aware processors must be applied or not.
-   * @param processingType
-   *          the type of processor selection to apply before merging.
+   * @param criteria
+   *          {@link ProcessingCriteria} used to identify the processors to apply and those to skip.
    * @return preProcessed merged content.
    */
-  public String processAndMerge(final List<Resource> resources, final boolean minimize,
-      final ProcessingType processingType)
+  public String processAndMerge(final List<Resource> resources, final ProcessingCriteria criteria)
       throws IOException {
-    LOG.debug("minimize: {}, processingType: {}", minimize, processingType);
+    notNull(criteria);
+    LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
     try {
       Validate.notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
-        result.append(runInParallel(resources, minimize, processingType));
+        result.append(runInParallel(resources, criteria));
       } else {
         for (final Resource resource : resources) {
           LOG.debug("\tmerging resource: {}", resource);
-          result.append(applyPreProcessors(resource, minimize, processingType));
+          result.append(applyPreProcessors(resource, criteria));
         }
       }
       return result.toString();
@@ -121,7 +122,7 @@ public class PreProcessorExecutor {
    *
    * @return merged and pre processed content.
    */
-  private String runInParallel(final List<Resource> resources, final boolean minimize, final ProcessingType type)
+  private String runInParallel(final List<Resource> resources, final ProcessingCriteria criteria)
       throws IOException {
     LOG.debug("Running preProcessing in Parallel");
     final StringBuffer result = new StringBuffer();
@@ -131,7 +132,7 @@ public class PreProcessorExecutor {
         public String call()
             throws Exception {
           LOG.debug("Callable started for resource: {} ...", resource);
-          return applyPreProcessors(resource, minimize, type);
+          return applyPreProcessors(resource, criteria);
         }
       });
     }
@@ -179,11 +180,9 @@ public class PreProcessorExecutor {
    * @param processors
    *          the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final boolean minimize, final ProcessingType processingType)
+  private String applyPreProcessors(final Resource resource, final ProcessingCriteria criteria)
       throws IOException {
-    // TODO: apply filtering inside a specialized decorator
-    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize, resource
-        .getType(), processorsFactory.getPreProcessors());
+    final Collection<ResourcePreProcessor> processors = processorsFactory.getPreProcessors();
     LOG.debug("applying preProcessors: {}", processors);
 
     String resourceContent = null;
@@ -212,7 +211,7 @@ public class PreProcessorExecutor {
       final Reader reader = new StringReader(resourceContent);
       try {
         // decorate and process
-        decoratePreProcessor(processor, minimize, processingType).process(resource, reader, writer);
+        decoratePreProcessor(processor, criteria).process(resource, reader, writer);
         // use the outcome for next input
         resourceContent = writer.toString();
       } finally {
@@ -229,10 +228,8 @@ public class PreProcessorExecutor {
   /**
    * Decorates preProcessor with mandatory decorators.
    */
-  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor, final boolean minimize,
-      final ProcessingType processingType) {
-    final DefaultProcessorDecorator.Criteria criteria = new DefaultProcessorDecorator.Criteria().setMinimize(minimize)
-        .setProcessingType(processingType);
+  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
+      final ProcessingCriteria criteria) {
     final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria);
     injector.inject(decorated);
     return decorated;

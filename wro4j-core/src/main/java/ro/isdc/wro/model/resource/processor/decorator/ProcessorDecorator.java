@@ -20,15 +20,15 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Default implementation which can decorate a processor. This class is still named {@link ProcessorDecorator},
- * though it is not abstract (for backward compatibility reasons). It will be renamed to ProcessorDecorator.
+ * Default implementation which can decorate a processor. This class is still named {@link ProcessorDecorator}, though
+ * it is not abstract (for backward compatibility reasons). It will be renamed to ProcessorDecorator.
  *
  * @author Alex Objelean
  * @created 16 Sep 2011
  * @since 1.4.1
  */
 public class ProcessorDecorator
-  extends AbstractProcessorDecoratorSupport<ResourcePreProcessor> {
+    extends AbstractProcessorDecoratorSupport<ResourcePreProcessor> {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessorDecorator.class);
 
   /**
@@ -59,14 +59,17 @@ public class ProcessorDecorator
           throws IOException {
         postProcessor.process(reader, writer);
       }
+
       @Override
       protected boolean isMinimizeInternal() {
         return isMinimizeForProcessor(postProcessor);
       }
+
       @Override
       protected SupportedResourceType getSupportedResourceTypeInternal() {
         return getSupportedResourceTypeForProcessor(postProcessor);
       }
+
       @Override
       public String toString() {
         return postProcessor.toString();
@@ -95,7 +98,13 @@ public class ProcessorDecorator
    * @param searchedType
    *          - the type of the accepted processor. If the processor will have no type specified it will still be
    *          eligible.
-   * @return true if the processor is eligible for the following criteria: minimize & type.
+   * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:
+   *         <ul>
+   *         <li>If you search by JS type - you'll get processors which can be applied on JS resources & any (null)
+   *         resources</li>
+   *         <li>If you search by CSS type - you'll get processors which can be applied on CSS resources & any (null)
+   *         resources</li>
+   *         </ul>
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {
     Validate.notNull(searchedType);

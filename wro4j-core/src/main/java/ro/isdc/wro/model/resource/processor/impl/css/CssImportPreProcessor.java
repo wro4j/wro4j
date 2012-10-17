@@ -13,10 +13,11 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
-import ro.isdc.wro.model.group.processor.ProcessingType;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 
 
 /**
@@ -47,7 +48,8 @@ public class CssImportPreProcessor
     final StringBuffer sb = new StringBuffer();
     // for now, minimize always
     // TODO: find a way to get minimize property dynamically.
-    sb.append(preProcessorExecutor.processAndMerge(foundImports, false, ProcessingType.IMPORT_ONLY));
+    sb.append(preProcessorExecutor.processAndMerge(foundImports,
+        ProcessingCriteria.create(ProcessingType.IMPORT_ONLY, false)));
     if (!foundImports.isEmpty()) {
       LOG.debug("Imported resources found : {}", foundImports.size());
     }
