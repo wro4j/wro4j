@@ -114,9 +114,8 @@ public class TestWroFilter {
 
     victim = new WroFilter() {
       @Override
-      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-          final FilterChain chain) {
-        throw e;
+      protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
+        throw WroRuntimeException.wrap(e);
       }
     };
     victim.setWroManagerFactory(mockManagerFactory);
@@ -656,13 +655,17 @@ public class TestWroFilter {
    */
   @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullRequestHandlers()
-      throws Exception {
+      throws Throwable {
     victim.setRequestHandlerFactory(new RequestHandlerFactory() {
       public Collection<RequestHandler> create() {
         return null;
       }
     });
-    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    try {
+      victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    } catch (final WroRuntimeException e) {
+      throw e.getCause();
+    }
   }
 
   @Test(expected = NullPointerException.class)
@@ -707,13 +710,10 @@ public class TestWroFilter {
     final WroConfiguration config = new WroConfiguration();
     config.setDisableCache(true);
 
-    when(mockRequest.getRequestURI()).thenReturn("/resource/g1.css");
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
-    victim.setConfiguration(config);
-    victim.setWroManagerFactory(createValidManagerFactory());
-    victim.init(mockFilterConfig);
+    prepareValidRequest(config);
 
-    final WroManager manager = ((AbstractDecorator<WroManagerFactory>)victim.getWroManagerFactory()).getOriginalDecoratedObject().create();
+    final WroManager manager = ((AbstractDecorator<WroManagerFactory>) victim.getWroManagerFactory())
+        .getOriginalDecoratedObject().create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);
@@ -723,19 +723,25 @@ public class TestWroFilter {
     verify(proxyModelFactory).destroy();
   }
 
+  private void prepareValidRequest(final WroConfiguration config)
+      throws ServletException {
+    when(mockRequest.getRequestURI()).thenReturn("/resource/g1.css");
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+    victim.setConfiguration(config);
+    victim.setWroManagerFactory(createValidManagerFactory());
+    victim.init(mockFilterConfig);
+  }
+
   @Test
   public void shouldNotDestroyWroModelWhenCacheIsNotDisabled()
       throws Exception {
     final WroConfiguration config = new WroConfiguration();
     config.setDisableCache(false);
 
-    when(mockRequest.getRequestURI()).thenReturn("/resource/g1.css");
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
-    victim.setConfiguration(config);
-    victim.setWroManagerFactory(createValidManagerFactory());
-    victim.init(mockFilterConfig);
+    prepareValidRequest(config);
 
-    final WroManager manager = ((AbstractDecorator<WroManagerFactory>)victim.getWroManagerFactory()).getOriginalDecoratedObject().create();
+    final WroManager manager = ((AbstractDecorator<WroManagerFactory>) victim.getWroManagerFactory())
+        .getOriginalDecoratedObject().create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
     // configure spied proxy for mocking
     manager.setModelFactory(proxyModelFactory);
@@ -767,7 +773,23 @@ public class TestWroFilter {
     when(mockRequest.getAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER)).thenReturn(Boolean.TRUE);
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verify(mockManagerFactory, Mockito.never()).create();
-    verify(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
+    verifyChainIsCalled(mockFilterChain);
+  }
+
+  @Test
+  public void shouldChainWhenFilterIsNotEnabled() throws Exception {
+    victim.setEnable(false);
+    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    verifyChainIsCalled(mockFilterChain);
+  }
+
+  @Test
+  public void shouldNotChainWhenFilterIsEnabled() throws Exception {
+    prepareValidRequest(new WroConfiguration());
+    victim.setEnable(true);
+
+    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
+    verifyChainIsNotCalled(mockFilterChain);
   }
 
   @After
