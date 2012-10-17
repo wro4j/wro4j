@@ -76,7 +76,7 @@ public class GroupsProcessor {
         }
       }
       final String result = preProcessorExecutor.processAndMerge(filteredGroup.getResources(), cacheKey.isMinimize());
-      return applyPostProcessors(processorsFactory.getPostProcessors(), result);
+      return applyPostProcessors(result);
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources: " + e.getMessage(), e).logError();
     } finally {
@@ -93,9 +93,9 @@ public class GroupsProcessor {
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Collection<ResourcePostProcessor> processors, final String content)
+  private String applyPostProcessors(final String content)
       throws IOException {
-    LOG.debug("postProcessors: {}", processors);
+    final Collection<ResourcePostProcessor> processors = processorsFactory.getPostProcessors();
     if (processors.isEmpty()) {
       return content;
     }
