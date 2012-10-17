@@ -27,7 +27,6 @@ import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.TypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
-import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
@@ -82,20 +81,6 @@ public class DefaultProcessorProvider
         return new YUICssCompressorProcessor();
       }
     }));
-    map.put(YUIJsCompressorProcessor.ALIAS_NO_MUNGE, new LazyProcessorDecorator(
-        new LazyInitializer<ResourcePreProcessor>() {
-          @Override
-          protected ResourcePreProcessor initialize() {
-            return YUIJsCompressorProcessor.noMungeCompressor();
-          }
-        }));
-    map.put(YUIJsCompressorProcessor.ALIAS_MUNGE, new LazyProcessorDecorator(
-        new LazyInitializer<ResourcePreProcessor>() {
-          @Override
-          protected ResourcePreProcessor initialize() {
-            return YUIJsCompressorProcessor.doMungeCompressor();
-          }
-        }));
     map.put(DojoShrinksafeCompressorProcessor.ALIAS, new LazyProcessorDecorator(
         new LazyInitializer<ResourcePreProcessor>() {
           @Override
