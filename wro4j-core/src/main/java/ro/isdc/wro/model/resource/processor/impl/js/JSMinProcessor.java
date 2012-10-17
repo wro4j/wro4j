@@ -16,6 +16,7 @@ import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
@@ -70,7 +71,7 @@ public class JSMinProcessor
   private String getEncoding() {
     if (encoding == null) {
       //use config is available to get encoding
-      this.encoding = context.getConfig() == null ? WroConfiguration.DEFAULT_ENCODING : context.getConfig().getEncoding();
+      this.encoding = Context.isContextSet() ? context.getConfig().getEncoding() : WroConfiguration.DEFAULT_ENCODING;
     }
     return encoding;
   }

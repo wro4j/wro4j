@@ -41,6 +41,7 @@ import ro.isdc.wro.util.WroUtil;
  * </pre>
  *
  * It is possible to test whether the lessc utility is available using {@link NodeLessCssProcessor#isSupported()}
+ * <p/>
  *
  * @author Alex Objelean
  * @since 1.5.0

@@ -197,7 +197,7 @@ public class CssUrlRewritingProcessor
       //the uri should end mandatory with /
       exernalServerCssUri = serverHost + ServletContextResourceLocator.PREFIX;
       LOG.debug("using {} host as cssUri", exernalServerCssUri);
-    } catch(MalformedURLException e) {
+    } catch(final MalformedURLException e) {
       //should never happen
     }
     return exernalServerCssUri;

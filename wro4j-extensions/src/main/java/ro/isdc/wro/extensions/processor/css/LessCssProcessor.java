@@ -17,9 +17,9 @@ import ro.isdc.wro.util.LazyInitializer;
 
 
 /**
- * Similar to {@link RhinoLessCssProcessor} but will prefer using {@link NodeLessCssProcessor} if it is supported and will
- * fallback to rhino based processor.
- * 
+ * Similar to {@link RhinoLessCssProcessor} but will prefer using {@link NodeLessCssProcessor} if it is supported and
+ * will fallback to rhino based processor.<br/>
+ *
  * @author Alex Objelean
  * @since 1.5.0
  * @created 11 Sep 2012
@@ -45,14 +45,14 @@ public class LessCssProcessor
   }
 
   /**
-   * @return {@link NodeLessCssProcessor} used as a primary LessProcessor. 
+   * @return {@link NodeLessCssProcessor} used as a primary LessProcessor.
    * @VisibleForTesting
    */
   protected NodeLessCssProcessor createNodeProcessor() {
     LOG.debug("creating NodeLess processor");
     return new NodeLessCssProcessor();
   }
-  
+
   /**
    * {@inheritDoc}
    */

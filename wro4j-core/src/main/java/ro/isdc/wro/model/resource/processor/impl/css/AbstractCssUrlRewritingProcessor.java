@@ -228,4 +228,12 @@ public abstract class AbstractCssUrlRewritingProcessor
     Validate.notNull(url);
     return url.contains(getProxyResourcePath());
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    //We want this processor to be applied when processing resources referred with @import directive
+    return true;
+  }
 }

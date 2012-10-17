@@ -1,14 +1,6 @@
-@import "import-test-d.css";
-#import {
+.some-class {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
   color: red;
-}
-.mixin {
-  height: 10px;
-  color: red;
-}
-#import-test {
-  height: 10px;
-  color: red;
-  width: 10px;
-  height: 30%;
 }

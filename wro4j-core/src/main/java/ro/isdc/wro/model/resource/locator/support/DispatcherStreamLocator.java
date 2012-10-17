@@ -28,8 +28,8 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Responsible to locate a context relative resource. It attempts to locate the resource using {@link RequestDispatcher}
- * . If the dispatcher fails, it will fallback resource retrieval to a http call using {@link UrlUriLocator}.
+ * Responsible to locate a context relative resource. Attempts to locate the resource using {@link RequestDispatcher} .
+ * If the dispatcher fails, it will fallback resource retrieval to a http call using {@link UrlUriLocator}.
  *
  * @author Alex Objelean
  */
@@ -65,9 +65,6 @@ public class DispatcherStreamLocator {
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
 
-    //TODO check if this is required anymore
-    // preserve context, in case it is unset during dispatching
-    final Context originalContext = Context.get();
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher != null) {
@@ -86,7 +83,6 @@ public class DispatcherStreamLocator {
         os.close();
       }
     } catch (final Exception e) {
-      LOG.error("Error while dispatching to location: " + location, e);
       LOG.debug("[FAIL] Error while dispatching the request for location {}", location);
       // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
       // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
@@ -102,19 +98,12 @@ public class DispatcherStreamLocator {
       if (warnOnEmptyStream && os.size() == 0) {
         LOG.debug("Wrong or empty resource with location: {}", location);
       }
-      //TODO probably not required anymore
-      // Put the context back
-      if (!Context.isContextSet()) {
-        Context.set(originalContext);
-      }
     }
     return new ByteArrayInputStream(os.toByteArray());
   }
 
   private InputStream locateExternal(final HttpServletRequest request, final String location)
       throws IOException {
-    // happens when dynamic servlet context relative resources are included outside of the request cycle (inside
-    // the thread responsible for refreshing resources)
     // Returns the part URL from the protocol name up to the query string and contextPath.
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
     final String absolutePath = servletContextPath + location;

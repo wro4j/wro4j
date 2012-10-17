@@ -7,9 +7,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
@@ -26,6 +30,7 @@ import ro.isdc.wro.util.AbstractDecorator;
  */
 public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorator<ResourceProcessor>
   implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractProcessorDecoratorSupport.class);
 
   public AbstractProcessorDecoratorSupport(final ResourceProcessor decorated) {
     super(decorated);
@@ -89,6 +94,13 @@ public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorato
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    return getDecoratedObject() instanceof ImportAware ? ((ImportAware) getDecoratedObject()).isImportAware() : false;
+  }
+
+  /**
    * @return true if passed processor is minimize aware.
    */
   final boolean isMinimizeForProcessor(final Object processor) {
@@ -112,7 +124,7 @@ public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorato
    * {@inheritDoc}
    */
   public final void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
+      throws IOException {
+      process(null, reader, writer);
   }
 }

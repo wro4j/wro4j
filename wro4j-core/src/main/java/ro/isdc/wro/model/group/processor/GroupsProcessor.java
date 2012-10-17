@@ -27,7 +27,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -78,34 +77,12 @@ public class GroupsProcessor {
         }
       }
       final String result = preProcessorExecutor.processAndMerge(filteredGroup, cacheKey.isMinimize());
-      return doPostProcess(group, result, cacheKey);
+      return applyPostProcessors(group, cacheKey, result);
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources: " + e.getMessage(), e).logError();
     } finally {
       callbackRegistry.onProcessingComplete();
     }
-  }
-
-  /**
-   * Perform postProcessing.
-   *
-   * @return the post processed contents.
-   */
-  private String doPostProcess(final Group group, final String content, final CacheEntry cacheEntry) throws IOException {
-    Validate.notNull(content);
-    final Collection<? extends ResourceProcessor> allPostProcessors = processorsFactory.getPostProcessors();
-    if (allPostProcessors.isEmpty() && processorsFactory.getPreProcessors().isEmpty()) {
-      LOG.debug("[WARN] No processors defined. Please, check if your configuration is correct.");
-    }
-    final Collection<? extends ResourceProcessor> processors = ProcessorsUtils.filterProcessorsToApply(
-        cacheEntry.isMinimize(), cacheEntry.getType(), allPostProcessors);
-
-    final String resourceName = group.getName() + "." + cacheEntry.getType().name().toLowerCase();
-    final Resource mergedResource = Resource.create(resourceName, cacheEntry.getType());
-    mergedResource.setMinimize(cacheEntry.isMinimize());
-    mergedResource.setType(cacheEntry.getType());
-
-    return applyPostProcessors(mergedResource, processors, content);
   }
 
   /**
@@ -117,15 +94,20 @@ public class GroupsProcessor {
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Resource mergedResource, final Collection<? extends ResourceProcessor> processors,
-    final String content)
+  private String applyPostProcessors(final Group group, final CacheEntry cacheEntry, final String content)
       throws IOException {
-    LOG.debug("postProcessors: {}", processors);
+    final Collection<ResourceProcessor> processors = processorsFactory.getPostProcessors();
     if (processors.isEmpty()) {
       return content;
     }
     Reader reader = new StringReader(content.toString());
     Writer writer = null;
+
+    final String resourceName = group.getName() + "." + cacheEntry.getType().name().toLowerCase();
+    final Resource mergedResource = Resource.create(resourceName, cacheEntry.getType());
+    mergedResource.setMinimize(cacheEntry.isMinimize());
+    mergedResource.setType(cacheEntry.getType());
+
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       stopWatch.start("Using " + processor.toString());

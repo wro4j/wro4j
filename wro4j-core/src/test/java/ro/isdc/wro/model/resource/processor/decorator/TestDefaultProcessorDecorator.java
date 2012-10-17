@@ -27,8 +27,7 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestDefaultProcessorDecorator {
   @Mock
   private MockProcessor mockProcessor;
-  @Mock
-  private Resource mockResource;
+  private final Resource testResource = Resource.create("/resource.js");
   @Mock
   private Reader mockReader;
   @Mock
@@ -45,7 +44,7 @@ public class TestDefaultProcessorDecorator {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     victim = new DefaultProcessorDecorator(mockProcessor);
-     WroTestUtils.createInjector().inject(victim);
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @After
@@ -75,9 +74,14 @@ public class TestDefaultProcessorDecorator {
     final StringWriter writer = new StringWriter();
     final Reader reader = new StringReader(resourceContent);
 
-    victim.process(mockResource, reader, writer);
+    victim.process(testResource, reader, writer);
     Mockito.verify(mockProcessor).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
     Assert.assertEquals(resourceContent, writer.toString());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullCriteria() {
+    new DefaultProcessorDecorator(mockProcessor, null);
   }
 }

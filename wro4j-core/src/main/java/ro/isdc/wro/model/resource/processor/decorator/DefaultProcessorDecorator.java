@@ -1,13 +1,11 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-
+import static org.apache.commons.lang3.Validate.notNull;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 
 
 /**
@@ -19,25 +17,32 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  */
 public class DefaultProcessorDecorator
     extends ProcessorDecorator {
+  private final ProcessingCriteria criteria;
   @Inject
   private Injector injector;
+
   public DefaultProcessorDecorator(final ResourceProcessor processor) {
-    super(processor);
+    this(processor, ProcessingCriteria.createDefault());
+  }
+
+  public DefaultProcessorDecorator(final ResourceProcessor processor, final ProcessingCriteria criteria) {
+    super(decorate(processor, criteria));
+    this.criteria = criteria;
+  }
+
+  private static ResourceProcessor decorate(final ResourceProcessor processor, final ProcessingCriteria criteria) {
+    notNull(criteria);
+    return new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
+        new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(processor, criteria
+            .getProcessingType()))));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
-    getDecoratedProcessor().process(resource, reader, writer);
-  }
-
-  private ResourceProcessor getDecoratedProcessor() {
-    final ResourceProcessor decorated = new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
-        new MinimizeAwareProcessorDecorator(getDecoratedObject())));
-    injector.inject(decorated);
-    return decorated;
+  protected boolean isEnabled(final Resource resource) {
+    final boolean isApplicable = resource != null ? isEligible(criteria.isMinimize(), resource.getType()) : true;
+    return super.isEnabled(resource) && isApplicable;
   }
 }

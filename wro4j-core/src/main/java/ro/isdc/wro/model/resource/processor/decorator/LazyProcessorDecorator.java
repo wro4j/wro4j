@@ -6,6 +6,7 @@ import java.io.Writer;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
@@ -22,7 +23,7 @@ import ro.isdc.wro.util.LazyInitializer;
  */
 public final class LazyProcessorDecorator
     extends AbstractDecorator<LazyInitializer<ResourceProcessor>>
-    implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware {
+    implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware, ImportAware {
   private ProcessorDecorator processor;
 
   public LazyProcessorDecorator(final LazyInitializer<ResourceProcessor> processor) {
@@ -63,5 +64,12 @@ public final class LazyProcessorDecorator
    */
   public boolean isSupported() {
     return getProcessorDecorator().isSupported();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    return getProcessorDecorator().isImportAware();
   }
 }
