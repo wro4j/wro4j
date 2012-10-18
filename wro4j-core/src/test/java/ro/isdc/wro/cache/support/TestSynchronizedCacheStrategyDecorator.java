@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache;
+package ro.isdc.wro.cache.support;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,7 +11,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
+import ro.isdc.wro.cache.support.AbstractSynchronizedCacheStrategyDecorator;
 
 /**
  * @author Alex Objelean

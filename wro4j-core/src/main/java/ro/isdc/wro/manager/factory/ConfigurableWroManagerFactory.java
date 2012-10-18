@@ -12,10 +12,10 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ConfigurableCacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
@@ -158,7 +158,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
+  protected CacheStrategy<CacheKey, CacheValue> newCacheStrategy() {
     return new ConfigurableCacheStrategy() {
       @Override
       protected Properties newProperties() {

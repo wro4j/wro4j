@@ -13,9 +13,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
@@ -35,7 +35,7 @@ public class TestBaseWroManagerFactory {
   @Mock
   private WroModelFactory mockModelFactory;
   @Mock
-  private CacheStrategy<CacheEntry, ContentHashEntry> mockCacheStrategy;
+  private CacheStrategy<CacheKey, CacheValue> mockCacheStrategy;
   private BaseWroManagerFactory victim;
   
   @Before

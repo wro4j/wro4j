@@ -18,14 +18,14 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
  */
 public class ConfigurableCacheStrategy
     extends AbstractConfigurableSingleStrategy<CacheStrategy, CacheStrategyProvider>
-    implements CacheStrategy<CacheEntry, ContentHashEntry> {
+    implements CacheStrategy<CacheKey, CacheValue> {
   /**
    * Property name to specify alias.
    */
   public static final String KEY = "cacheStrategy";
   @Inject
   private Injector injector;
-  private CacheStrategy<CacheEntry, ContentHashEntry> decorated;
+  private CacheStrategy<CacheKey, CacheValue> decorated;
 
   /**
    * {@inheritDoc}
@@ -44,18 +44,18 @@ public class ConfigurableCacheStrategy
   /**
    * {@inheritDoc}
    */
-  public ContentHashEntry get(final CacheEntry key) {
+  public CacheValue get(final CacheKey key) {
     return getDecoratedStrategy().get(key);
   }
   
   /**
    * {@inheritDoc}
    */
-  public void put(final CacheEntry key, final ContentHashEntry value) {
+  public void put(final CacheKey key, final CacheValue value) {
     getDecoratedStrategy().put(key, value); 
   }
   
-  private CacheStrategy<CacheEntry, ContentHashEntry> getDecoratedStrategy() {
+  private CacheStrategy<CacheKey, CacheValue> getDecoratedStrategy() {
     if (decorated == null) {
       decorated = getConfiguredStrategy();
       injector.inject(decorated);
@@ -75,8 +75,8 @@ public class ConfigurableCacheStrategy
    * {@inheritDoc}
    */
   @Override
-  protected CacheStrategy<CacheEntry, ContentHashEntry> getDefaultStrategy() {
-    return new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
+  protected CacheStrategy<CacheKey, CacheValue> getDefaultStrategy() {
+    return new LruMemoryCacheStrategy<CacheKey, CacheValue>();
   }
   
   /**

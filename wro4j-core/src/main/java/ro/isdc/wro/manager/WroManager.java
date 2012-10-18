@@ -11,9 +11,10 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.support.CacheKeyFactory;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.WroConfigurationChangeListener;
@@ -58,7 +59,7 @@ public class WroManager
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   @Inject
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
@@ -96,6 +97,7 @@ public class WroManager
   private ResourceBundleProcessor resourceBundleProcessor;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
+  private CacheKeyFactory cacheKeyFactory;
 
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -143,8 +145,8 @@ public class WroManager
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
       final boolean minimize) {
-    final CacheEntry key = new CacheEntry(groupName, resourceType, minimize);
-    final ContentHashEntry cacheValue = cacheStrategy.get(key);
+    final CacheKey key = new CacheKey(groupName, resourceType, minimize);
+    final CacheValue cacheValue = cacheStrategy.get(key);
     final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
     // encode the fingerprint of the resource into the resource path
     return formatVersionedResource(cacheValue.getHash(), groupUrl);
@@ -214,6 +216,7 @@ public class WroManager
     Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
     Validate.notNull(hashStrategy, "HashStrategy was not set!");
     Validate.notNull(authorizationManager, "authorizationManager was not set!");
+    Validate.notNull(cacheKeyFactory, "CacheKeyFactory was not set!");
   }
 
   /**
@@ -236,7 +239,7 @@ public class WroManager
    * @param cacheStrategy
    *          the cache to set
    */
-  public final WroManager setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  public final WroManager setCacheStrategy(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
     Validate.notNull(cacheStrategy);
     this.cacheStrategy = cacheStrategy;
     return this;
@@ -295,7 +298,7 @@ public class WroManager
   /**
    * @return the cacheStrategy
    */
-  public final CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
+  public final CacheStrategy<CacheKey, CacheValue> getCacheStrategy() {
     return cacheStrategy;
   }
 
@@ -319,6 +322,15 @@ public class WroManager
 
   public final GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
+  }
+
+
+  public CacheKeyFactory getCacheKeyFactory() {
+    return cacheKeyFactory;
+  }
+
+  public void setCacheKeyFactory(final CacheKeyFactory cacheKeyFactory) {
+    this.cacheKeyFactory = cacheKeyFactory;
   }
 
   /**

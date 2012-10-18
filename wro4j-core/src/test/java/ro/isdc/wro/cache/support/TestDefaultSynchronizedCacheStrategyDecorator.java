@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache;
+package ro.isdc.wro.cache.support;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -11,8 +11,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
+import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -35,13 +39,13 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   private static final String GROUP_NAME = "g1";
   private static final String RESOURCE_URI = "/test.js";
 
-  private CacheStrategy<CacheEntry, ContentHashEntry> victim;
+  private CacheStrategy<CacheKey, CacheValue> victim;
   private ResourceWatcher mockResourceWatcher;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    victim = new DefaultSynchronizedCacheStrategyDecorator(new MemoryCacheStrategy<CacheEntry, ContentHashEntry>()) {
+    victim = new DefaultSynchronizedCacheStrategyDecorator(new MemoryCacheStrategy<CacheKey, CacheValue>()) {
       @Override
       TimeUnit getTimeUnitForResourceWatcher() {
         //use milliseconds to make test faster
@@ -86,7 +90,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
 
   @Test
   public void shouldNotCheckForChangesWhenResourceWatcherPeriodIsNotSet() throws Exception {
-    final CacheEntry key = new CacheEntry("g1", ResourceType.JS, true);
+    final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
     victim.get(key);
     victim.get(key);
     Mockito.verify(mockResourceWatcher, never()).check(key);
@@ -100,7 +104,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final long updatePeriod = 30;
     final long delta = 5;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
-    final CacheEntry key = new CacheEntry("g1", ResourceType.JS, true);
+    final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
     final long start = System.currentTimeMillis();
     while(System.currentTimeMillis() - start < updatePeriod - delta) {
       victim.get(key);
@@ -116,8 +120,8 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     //Using delta to avoid inconsistent test results related to test timing
     final long delta = 10;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
-    final CacheEntry key1 = new CacheEntry(GROUP_NAME, ResourceType.JS, true);
-    final CacheEntry key2 = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
+    final CacheKey key1 = new CacheKey(GROUP_NAME, ResourceType.JS, true);
+    final CacheKey key2 = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
     final long start = System.currentTimeMillis();
     do {
       victim.get(key1);
@@ -136,7 +140,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
 
   @Test
   public void shouldDecorateCacheStrategy() {
-    final CacheStrategy<CacheEntry, ContentHashEntry> original = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
+    final CacheStrategy<CacheKey, CacheValue> original = new LruMemoryCacheStrategy<CacheKey, CacheValue>();
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     Assert.assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     Assert.assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
@@ -147,7 +151,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
    */
   @Test
   public void shouldNotRedundantlyDecorateCacheStrategy() {
-    final CacheStrategy<CacheEntry, ContentHashEntry> original = DefaultSynchronizedCacheStrategyDecorator.decorate(new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>());
+    final CacheStrategy<CacheKey, CacheValue> original = DefaultSynchronizedCacheStrategyDecorator.decorate(new LruMemoryCacheStrategy<CacheKey, CacheValue>());
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     Assert.assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     Assert.assertSame(original, victim);

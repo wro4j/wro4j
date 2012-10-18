@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -39,7 +39,7 @@ public class ResourceBundleProcessor {
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   @Inject
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   @Inject
   private ReadOnlyContext context;
   @Inject
@@ -66,8 +66,8 @@ public class ResourceBundleProcessor {
       }
       initAggregatedFolderPath(request, type);
 
-      final CacheEntry cacheKey = new CacheEntry(groupName, type, minimize);
-      final ContentHashEntry cacheValue = cacheStrategy.get(cacheKey);
+      final CacheKey cacheKey = new CacheKey(groupName, type, minimize);
+      final CacheValue cacheValue = cacheStrategy.get(cacheKey);
 
       // TODO move ETag check in wroManagerFactory
       final String ifNoneMatch = request.getHeader(HttpHeader.IF_NONE_MATCH.toString());

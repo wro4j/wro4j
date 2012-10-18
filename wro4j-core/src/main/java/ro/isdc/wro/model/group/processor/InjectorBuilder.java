@@ -11,10 +11,11 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.cache.DefaultSynchronizedCacheStrategyDecorator;
+import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.support.CacheKeyFactory;
+import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -80,9 +81,9 @@ public class InjectorBuilder {
   /**
    * Ensure the strategy is decorated only once.
    */
-  private final LazyInitializer<CacheStrategy<CacheEntry, ContentHashEntry>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheEntry, ContentHashEntry>>() {
+  private final LazyInitializer<CacheStrategy<CacheKey, CacheValue>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheKey, CacheValue>>() {
     @Override
-    protected CacheStrategy<CacheEntry, ContentHashEntry> initialize() {
+    protected CacheStrategy<CacheKey, CacheValue> initialize() {
       final WroManager manager = managerFactory.create();
       // update manager with new decorated strategy
       manager.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(manager.getCacheStrategy()));
@@ -126,6 +127,7 @@ public class InjectorBuilder {
     map.put(WroConfiguration.class, createConfigProxy());
     map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
+    map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
   }
 
   private InjectorObjectFactory<WroConfiguration> createConfigProxy() {
@@ -243,7 +245,7 @@ public class InjectorBuilder {
   private Object createCacheStrategyProxy() {
     return new InjectorObjectFactory<CacheStrategy>() {
       public CacheStrategy create() {
-        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = cacheStrategyInitializer.get();
+        final CacheStrategy<CacheKey, CacheValue> decorated = cacheStrategyInitializer.get();
         injector.inject(decorated);
         return decorated;
       }
@@ -260,6 +262,14 @@ public class InjectorBuilder {
         return Context.get();
       }
     }, ReadOnlyContext.class);
+  }
+
+  private Object createCacheKeyFactoryProxy() {
+    return ProxyFactory.proxy(new ObjectFactory<CacheKeyFactory>() {
+      public CacheKeyFactory create() {
+        return managerFactory.create().getCacheKeyFactory();
+      }
+    }, CacheKeyFactory.class);
   }
 
   public Injector build() {

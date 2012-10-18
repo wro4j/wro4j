@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
@@ -504,12 +504,12 @@ public class TestWroManager {
     wroManager.process();
 
     // use original decorated object because the decorated one trigger the processing for each cache lookup.
-    final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager.getCacheStrategy());
-    Assert.assertNotNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
+    final CacheStrategy<CacheKey, CacheValue> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager.getCacheStrategy());
+    Assert.assertNotNull(cacheStrategy.get(new CacheKey("g3", ResourceType.CSS, true)));
 
     final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager.getModelFactory());
     reloadModelRunnable.run();
-    Assert.assertNotNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
+    Assert.assertNotNull(cacheStrategy.get(new CacheKey("g3", ResourceType.CSS, true)));
   }
 
   @Test

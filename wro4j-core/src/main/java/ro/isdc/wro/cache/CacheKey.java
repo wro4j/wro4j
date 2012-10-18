@@ -1,9 +1,12 @@
 package ro.isdc.wro.cache;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import ro.isdc.wro.model.resource.ResourceType;
@@ -12,13 +15,17 @@ import ro.isdc.wro.model.resource.ResourceType;
  * Used as an entry for the cache.
  */
 @SuppressWarnings("serial")
-public final class CacheEntry implements Serializable {
+public final class CacheKey implements Serializable {
 	private final ResourceType type;
 	private final String groupName;
 	/**
 	 * Produce minimized version.
 	 */
-	private boolean minimize;
+	private final boolean minimize;
+	/**
+	 * A map of custom attributes.
+	 */
+	private final Map<String, String> map = new HashMap<String, String>();
 
 	/**
 	 *
@@ -26,7 +33,7 @@ public final class CacheEntry implements Serializable {
 	 * @param type resource type (js or css)
 	 * @param minimize true if the result should produce minimized version.
 	 */
-	public CacheEntry(final String groupName, final ResourceType type, final boolean minimize) {
+	public CacheKey(final String groupName, final ResourceType type, final boolean minimize) {
 	  Validate.notNull(groupName);
 	  Validate.notNull(type);
 		this.groupName = groupName;
@@ -58,14 +65,22 @@ public final class CacheEntry implements Serializable {
     return this.minimize;
   }
 
-
   /**
-   * @param minimize the minimize to set
+   * Add a custom attribute represented as a key-value pair. Each pair is added to an internal map. The custom
+   * attributes can be used to make the key more fine grained (Ex: based on browser version or a request parameter).
+   *
+   * @param key
+   *          not null string representing the key of the attribute.
+   * @param value
+   *          not null string representing the value of the attribute.
+   * @return reference to current {@link CacheKey} used for fluent interface.
    */
-  public void setMinimize(final boolean minimize) {
-    this.minimize = minimize;
+  public CacheKey addAttribute(final String key, final String value) {
+    Validate.notNull(key);
+    Validate.notNull(value);
+    map.put(key, value);
+    return this;
   }
-
 
   /**
    * {@inheritDoc}
@@ -80,11 +95,7 @@ public final class CacheEntry implements Serializable {
    */
 	@Override
 	public int hashCode() {
-	  int hash = 7;
-	  hash = 31 * hash + getGroupName().hashCode();
-	  hash = 31 * hash + getType().hashCode();
-	  hash = 31 * hash + Boolean.valueOf(isMinimize()).hashCode();
-	  return hash;
+	  return HashCodeBuilder.reflectionHashCode(this, false);
   }
 
 	/**

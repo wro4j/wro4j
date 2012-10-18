@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache;
+package ro.isdc.wro.cache.support;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
@@ -31,7 +34,7 @@ import ro.isdc.wro.util.SchedulerHelper;
  * @since 1.4.6
  */
 public class DefaultSynchronizedCacheStrategyDecorator
-    extends AbstractSynchronizedCacheStrategyDecorator<CacheEntry, ContentHashEntry> {
+    extends AbstractSynchronizedCacheStrategyDecorator<CacheKey, CacheValue> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultSynchronizedCacheStrategyDecorator.class);
   @Inject
   private GroupsProcessor groupsProcessor;
@@ -47,15 +50,15 @@ public class DefaultSynchronizedCacheStrategyDecorator
   /**
    * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again.
    */
-  private final Set<CacheEntry> checkedKeys = Collections.synchronizedSet(new HashSet<CacheEntry>());
+  private final Set<CacheKey> checkedKeys = Collections.synchronizedSet(new HashSet<CacheKey>());
   private SchedulerHelper resourceWatcherScheduler;
 
   /**
    * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the
    * operation is redundant.
    */
-  public static CacheStrategy<CacheEntry, ContentHashEntry> decorate(
-      final CacheStrategy<CacheEntry, ContentHashEntry> decorated) {
+  public static CacheStrategy<CacheKey, CacheValue> decorate(
+      final CacheStrategy<CacheKey, CacheValue> decorated) {
     return decorated instanceof DefaultSynchronizedCacheStrategyDecorator ? decorated
         : new DefaultSynchronizedCacheStrategyDecorator(decorated);
   }
@@ -63,7 +66,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
   /**
    * @VisibleForTesting
    */
-  DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
     super(cacheStrategy);
     resourceWatcherScheduler = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
@@ -81,7 +84,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
    * {@inheritDoc}
    */
   @Override
-  protected ContentHashEntry loadValue(final CacheEntry key) {
+  protected CacheValue loadValue(final CacheKey key) {
     resourceWatcherScheduler.scheduleWithPeriod(getResourceWatcherUpdatePeriod(), getTimeUnitForResourceWatcher());
     LOG.debug("load value in cache for key: {}", key);
     final String content = groupsProcessor.process(key);
@@ -104,9 +107,9 @@ public class DefaultSynchronizedCacheStrategyDecorator
   }
 
   /**
-   * Creates a {@link ContentHashEntry} based on provided content.
+   * Creates a {@link CacheValue} based on provided content.
    */
-  private ContentHashEntry computeCacheValueByContent(final String content) {
+  private CacheValue computeCacheValueByContent(final String content) {
     String hash = null;
     try {
       if (content != null) {
@@ -115,7 +118,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
         }
         hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
       }
-      final ContentHashEntry entry = ContentHashEntry.valueOf(content, hash);
+      final CacheValue entry = CacheValue.valueOf(content, hash);
       LOG.debug("computed entry: {}", entry);
       return entry;
     } catch (final IOException e) {
@@ -127,7 +130,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
    * {@inheritDoc}
    */
   @Override
-  protected void onBeforeGet(final CacheEntry key) {
+  protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
       LOG.debug("ResourceWatcher check key: {}", key);
       getResourceWatcher().check(key);
@@ -150,7 +153,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
   /**
    * @return true if the provided key should be checked for change.
    */
-  private boolean shouldWatchForChange(final CacheEntry key) {
+  private boolean shouldWatchForChange(final CacheKey key) {
     final boolean result = getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
     LOG.debug("shouldWatchForChange: {}", result);
     return result;
