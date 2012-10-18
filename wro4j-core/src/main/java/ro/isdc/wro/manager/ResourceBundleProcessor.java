@@ -16,6 +16,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.support.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -44,6 +45,8 @@ public class ResourceBundleProcessor {
   private ReadOnlyContext context;
   @Inject
   private GroupExtractor groupExtractor;
+  @Inject
+  private CacheKeyFactory cacheKeyFactory;
 
   /**
    * Write to stream the content of the processed resource bundle.
@@ -51,22 +54,17 @@ public class ResourceBundleProcessor {
   public void serveProcessedBundle()
       throws IOException {
     final WroConfiguration configuration = context.getConfig();
-
     final HttpServletRequest request = context.getRequest();
     final HttpServletResponse response = context.getResponse();
 
     OutputStream os = null;
     try {
-      // find names & type
-      final ResourceType type = groupExtractor.getResourceType(request);
-      final String groupName = groupExtractor.getGroupName(request);
-      final boolean minimize = groupExtractor.isMinimized(request);
-      if (groupName == null || type == null) {
-        throw new WroRuntimeException("No groups found for request: " + request.getRequestURI());
-      }
-      initAggregatedFolderPath(request, type);
 
-      final CacheKey cacheKey = new CacheKey(groupName, type, minimize);
+      final CacheKey cacheKey = cacheKeyFactory.create(request);
+      if (cacheKey == null) {
+        throw new WroRuntimeException("Cannot build valid CacheKey from request: " + request.getRequestURI());
+      }
+      initAggregatedFolderPath(request, cacheKey.getType());
       final CacheValue cacheValue = cacheStrategy.get(cacheKey);
 
       // TODO move ETag check in wroManagerFactory
@@ -86,9 +84,7 @@ public class ResourceBundleProcessor {
        * Set contentType before actual content is written, solves <br/>
        * <a href="http://code.google.com/p/wro4j/issues/detail?id=341">issue341</a>
        */
-      if (type != null) {
-        response.setContentType(type.getContentType() + "; charset=" + configuration.getEncoding());
-      }
+      response.setContentType(cacheKey.getType().getContentType() + "; charset=" + configuration.getEncoding());
       // set ETag header
       response.setHeader(HttpHeader.ETAG.toString(), etagValue);
 
@@ -122,14 +118,14 @@ public class ResourceBundleProcessor {
    * @return true if Gzip is Supported
    */
   private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(Context.get().getRequest());
+    return WroUtil.isGzipSupported(context.getRequest());
   }
 
   /**
    * Set the aggregatedFolderPath if required.
    */
   private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
-    if (ResourceType.CSS == type && Context.get().getAggregatedFolderPath() == null) {
+    if (ResourceType.CSS == type && context.getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());

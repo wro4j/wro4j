@@ -265,11 +265,13 @@ public class InjectorBuilder {
   }
 
   private Object createCacheKeyFactoryProxy() {
-    return ProxyFactory.proxy(new ObjectFactory<CacheKeyFactory>() {
+    return new InjectorObjectFactory<CacheKeyFactory>() {
       public CacheKeyFactory create() {
-        return managerFactory.create().getCacheKeyFactory();
+        final CacheKeyFactory factory = managerFactory.create().getCacheKeyFactory();
+        injector.inject(factory);
+        return factory;
       }
-    }, CacheKeyFactory.class);
+    };
   }
 
   public Injector build() {

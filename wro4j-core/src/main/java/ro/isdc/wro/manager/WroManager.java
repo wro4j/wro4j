@@ -145,6 +145,7 @@ public class WroManager
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
       final boolean minimize) {
+    //TODO use CacheKeyFactory
     final CacheKey key = new CacheKey(groupName, resourceType, minimize);
     final CacheValue cacheValue = cacheStrategy.get(key);
     final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
