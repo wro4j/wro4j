@@ -37,7 +37,7 @@ import ro.isdc.wro.util.WroUtil;
  * Installation instructions: Install the libnode-less package (Unix OS)
  *
  * <pre>
- *   sudo apt-get install libnode-less
+ *   sudo apt-get install node-less
  * </pre>
  *
  * It is possible to test whether the lessc utility is available using {@link NodeLessCssProcessor#isSupported()}
