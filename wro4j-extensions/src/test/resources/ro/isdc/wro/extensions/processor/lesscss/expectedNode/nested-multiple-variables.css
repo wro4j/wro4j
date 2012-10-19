@@ -1,4 +1,5 @@
-first:something(10), second:pseudoclass(4px) {
+first:something(10),
+second:pseudoclass(4px) {
   declaration: value;
 }
 first:something(10) nested1:length('string'),
@@ -13,7 +14,8 @@ first:something(10) nested4:length('string'),
 second:pseudoclass(4px) nested4:length('string') {
   declaration: value;
 }
-first:something(10), second:pseudoclass(4px) {
+first:something(10),
+second:pseudoclass(4px) {
   declaration: value;
 }
 first:something(10) nested1:length('string'),
