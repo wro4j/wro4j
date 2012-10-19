@@ -12,15 +12,15 @@
   <packaging>war</packaging>
   <name>wro4j standalone example</name>
 
-	<properties>
-		<project_charset>UTF-8</project_charset>
-	</properties>
+  <properties>
+    <project_charset>UTF-8</project_charset>
+  </properties>
   
   <dependencies>
     <!-- Project Dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>wro4j-extensions</artifactId>	  
+      <artifactId>wro4j-extensions</artifactId>   
     </dependency>        
     <dependency>
       <groupId>javax.servlet</groupId>
