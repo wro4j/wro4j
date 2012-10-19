@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache.support;
+package ro.isdc.wro.cache.factory;
 
 import static org.apache.commons.lang3.Validate.notNull;
 

@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache.support;
+package ro.isdc.wro.cache.factory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;

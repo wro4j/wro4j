@@ -10,7 +10,8 @@ import org.apache.commons.lang3.Validate;
  * @created 25 Apr 2012
  * @since 1.4.6
  */
-public abstract class AbstractDecorator<T> implements ObjectDecorator<T> {
+public abstract class AbstractDecorator<T>
+    implements ObjectDecorator<T> {
   private final T decorated;
 
   public AbstractDecorator(final T decorated) {
@@ -38,5 +39,13 @@ public abstract class AbstractDecorator<T> implements ObjectDecorator<T> {
   @SuppressWarnings("unchecked")
   public static <T> T getOriginalDecoratedObject(final T object) {
     return (object instanceof ObjectDecorator) ? ((ObjectDecorator<T>) object).getOriginalDecoratedObject() : object;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return getDecoratedObject().toString();
   }
 }

@@ -10,7 +10,7 @@ import ro.isdc.wro.manager.WroManager;
 
 /**
  * Load the WroManagerFactory configured in {@link WroConfiguration} or loads a default one if none is configured.
- * 
+ *
  * @author Alex Objelean
  * @created 7 May 2012
  * @since 1.4.6
@@ -18,7 +18,7 @@ import ro.isdc.wro.manager.WroManager;
 public class DefaultWroManagerFactory
     implements WroManagerFactory {
   private final WroManagerFactory factory;
-  
+
   public DefaultWroManagerFactory(final WroConfiguration configuration) {
     factory = initFactory(configuration);
   }
@@ -65,7 +65,7 @@ public class DefaultWroManagerFactory
   public void onModelPeriodChanged(final long value) {
     factory.onModelPeriodChanged(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -79,12 +79,17 @@ public class DefaultWroManagerFactory
   public void destroy() {
     factory.destroy();
   }
-  
+
   /**
    * @VisibleForTesting
    * @return the inner factory.
    */
   public final WroManagerFactory getFactory() {
     return factory;
+  }
+
+  @Override
+  public String toString() {
+    return factory.toString();
   }
 }

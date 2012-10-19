@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache.support;
+package ro.isdc.wro.cache.factory;
 
 import javax.servlet.http.HttpServletRequest;
 

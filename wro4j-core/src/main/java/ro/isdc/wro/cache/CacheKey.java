@@ -8,6 +8,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import ro.isdc.wro.model.resource.ResourceType;
 
@@ -103,6 +104,6 @@ public final class CacheKey implements Serializable {
 	 */
 	@Override
   public String toString() {
-    return new ToStringBuilder("").append(getGroupName()).append(getType()).append(isMinimize()).toString();
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }
