@@ -1,8 +1,11 @@
 package ro.isdc.wro.extensions.support.lint;
 
+import static junit.framework.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -27,31 +30,40 @@ public class TestReportXmlFormatter {
   public void cannotCreateBuilderWithNullLintReport() {
     ReportXmlFormatter.create(null, ReportXmlFormatter.FormatterType.LINT);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotCreateBuilderWithNullType() {
     ReportXmlFormatter.create(new LintReport<LintItem>(), null);
   }
-  
+
   @Test
   public void shouldFormatLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/lint");
     checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.LINT);
   }
-  
+
   @Test
   public void shouldFormatCheckstypeReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/checkstyle");
     checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.CHECKSTYLE);
   }
-  
+
   @Test
   public void shouldFormatCssLintReportFromFolder()
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/csslint");
     checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.CSSLINT);
+  }
+
+  @Test
+  public void shouldNotFailWhenNoErrorsAreReported() {
+    final LintReport<LinterError> lintReport = new LintReport<LinterError>();
+    lintReport.addReport(new ResourceLintReport<LinterError>());
+    final StringWriter writer = new StringWriter();
+    ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.LINT).write(new WriterOutputStream(writer));
+    assertNotNull(writer.toString());
   }
 
   private void checkFormattedReportsFromFolder(final URL url, final ReportXmlFormatter.FormatterType formatterType)
