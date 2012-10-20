@@ -6,9 +6,13 @@ package ro.isdc.wro.examples.manager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.extensions.model.factory.GroovyModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -65,6 +69,13 @@ public class CustomWroManagerFactory
     factory.addPreProcessor(new JawrCssMinifierProcessor());
 
     return factory;
+  }
+
+  @Override
+  protected MetaDataFactory newMetaDataFactory() {
+    final Map<String, Object> map = new HashMap<String, Object>();
+    map.put("jsHintOptions", "value");
+    return new DefaultMetaDataFactory(map);
   }
 
   private ResourcePreProcessor getPlaceholderProcessor() {

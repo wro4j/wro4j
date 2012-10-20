@@ -7,6 +7,7 @@ package ro.isdc.wro.extensions.processor.css;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,14 +56,6 @@ public class CssLintProcessor
     });
   }
 
-
-
-  public CssLintProcessor setOptions(final String... options) {
-    this.options = options;
-    return this;
-  }
-
-
   /**
    * {@inheritDoc}
    */
@@ -72,7 +65,7 @@ public class CssLintProcessor
     final String content = IOUtils.toString(reader);
     final CssLint cssLint = enginePool.getObject();
     try {
-      cssLint.setOptions(options).validate(content);
+      cssLint.setOptions(getOptions()).validate(content);
     } catch (final CssLintException e) {
       try {
         LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
@@ -128,5 +121,19 @@ public class CssLintProcessor
    */
   protected void onCssLintException(final CssLintException e, final Resource resource) throws Exception {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
+  }
+
+
+  public CssLintProcessor setOptions(final String... options) {
+    this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
+    return this;
+  }
+
+  /**
+   * @return an array of options used by jsHint.
+   */
+  protected String[] getOptions() {
+    return options;
   }
 }

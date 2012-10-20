@@ -6,6 +6,8 @@ package ro.isdc.wro.extensions.processor.support.csslint;
 import java.util.Collection;
 import java.util.Collections;
 
+import ro.isdc.wro.WroRuntimeException;
+
 
 /**
  * Exception caused by CssLint processing.
@@ -15,8 +17,12 @@ import java.util.Collections;
  * @created 19 Jun 2011
  */
 @SuppressWarnings("serial")
-public class CssLintException extends Exception {
+public class CssLintException extends WroRuntimeException {
   private Collection<CssLintError> errors;
+
+  public CssLintException() {
+    super("CssLint error found");
+  }
 
   /**
    * @return the errors
