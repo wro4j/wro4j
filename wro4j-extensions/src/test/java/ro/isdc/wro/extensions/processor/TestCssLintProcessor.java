@@ -51,8 +51,7 @@ public class TestCssLintProcessor {
       throws Exception {
     final CssLintProcessor lessCss = new CssLintProcessor() {
       @Override
-      protected void onCssLintException(final CssLintException e, final Resource resource)
-          throws Exception {
+      protected void onCssLintException(final CssLintException e, final Resource resource) {
         throw e;
       }
     };
@@ -97,8 +96,7 @@ public class TestCssLintProcessor {
       }
 
       @Override
-      protected void onCssLintException(final CssLintException e, final Resource resource)
-          throws Exception {
+      protected void onCssLintException(final CssLintException e, final Resource resource) {
         throw e;
       }
     };
