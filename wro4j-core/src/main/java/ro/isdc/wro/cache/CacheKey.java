@@ -67,19 +67,20 @@ public final class CacheKey implements Serializable {
   }
 
   /**
-   * Add a custom attribute represented as a key-value pair. Each pair is added to an internal map. The custom
-   * attributes can be used to make the key more fine grained (Ex: based on browser version or a request parameter).
+   * Add a custom key-value pair attribute. Each pair is added to an internal map. The custom attributes can be used to
+   * make the key more fine grained (Ex: based on browser version or a request parameter). Both elements of the
+   * attribute (key & value) should be not null. If any of these are null, the attribute won't be added.
    *
    * @param key
-   *          not null string representing the key of the attribute.
+   *          string representing the key of the attribute.
    * @param value
-   *          not null string representing the value of the attribute.
+   *          string representing the value of the attribute.
    * @return reference to current {@link CacheKey} used for fluent interface.
    */
   public CacheKey addAttribute(final String key, final String value) {
-    Validate.notNull(key);
-    Validate.notNull(value);
-    map.put(key, value);
+    if (key != null && value != null) {
+      map.put(key, value);
+    }
     return this;
   }
 

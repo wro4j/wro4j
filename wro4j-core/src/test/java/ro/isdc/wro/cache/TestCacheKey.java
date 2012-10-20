@@ -36,14 +36,16 @@ public class TestCacheKey {
     return new CacheKey("g1", ResourceType.JS, false);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void cannotAddNullAttributeKey() {
-    createValidCacheKey().addAttribute(null, "");
+  @Test
+  public void addingNullAttributeKeyShouldHaveNoEffect() {
+    final CacheKey key = createValidCacheKey().addAttribute(null, "");
+    assertEquals(key, createValidCacheKey());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void cannotAddNullAttributeValue() {
-    createValidCacheKey().addAttribute("key1", null);
+  @Test
+  public void addingNullAttributeValueShouldHaveNoEffect() {
+    final CacheKey key = createValidCacheKey().addAttribute("key1", null);
+    assertEquals(key, createValidCacheKey());
   }
 
   @Test
