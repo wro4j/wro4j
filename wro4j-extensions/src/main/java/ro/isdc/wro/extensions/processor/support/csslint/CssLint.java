@@ -26,7 +26,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * CssLint script engine utility. The underlying implementation uses CSSLint script utility<br/>
  * {@link https ://github.com/stubbornella/csslint}. The underlying csslint version is 0.9.9.
- * 
+ *
  * @author Alex Objelean
  * @since 1.3.8
  * @created 19 Jun 2011
@@ -43,7 +43,7 @@ public class CssLint {
    */
   private String[] options;
   private ScriptableObject scope;
-  
+
   /**
    * Initialize script builder for evaluation.
    */
@@ -61,18 +61,18 @@ public class CssLint {
       throw new IllegalStateException("Failed reading init script", ex);
     }
   }
-  
+
   /**
    * @return the stream of the csslint script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
     return CssLint.class.getResourceAsStream(DEFAULT_CSSLINT_JS);
   }
-  
+
   /**
    * Validates a js using jsHint and throws {@link CssLintException} if the js is invalid. If no exception is thrown,
    * the js is valid.
-   * 
+   *
    * @param data
    *          js content to process.
    * @throws CssLintException
@@ -102,23 +102,22 @@ public class CssLint {
     watch.stop();
     LOG.debug(watch.prettyPrint());
   }
-  
+
   private String buildCssLintScript(final String data, final String... options) {
     return String.format("var result = CSSLint.verify(%s,%s).messages", data, optionsBuilder.build(options));
   }
-  
+
   /**
    * @param options
    *          the options to set
    */
   public CssLint setOptions(final String... options) {
-    LOG.debug("setOptions: {}", options);
-    if (options != null) {
+    if (options != null && options.length > 0) {
       this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
     } else {
       this.options = ArrayUtils.EMPTY_STRING_ARRAY;
     }
-    
+    LOG.debug("options: {}", Arrays.asList(this.options));
     return this;
   }
 }

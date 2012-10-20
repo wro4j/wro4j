@@ -52,12 +52,6 @@ public abstract class AbstractLinterProcessor
     });
   }
 
-  public AbstractLinterProcessor setOptions(final String... options) {
-    this.options = options == null ? new String[] {} : options;
-    LOG.debug("setOptions: {}", Arrays.asList(this.options));
-    return this;
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -68,7 +62,7 @@ public abstract class AbstractLinterProcessor
     final AbstractLinter linter = enginePool.getObject();
     try {
       // TODO investigate why linter fails when trying to reuse the same instance twice
-      linter.setOptions(options).validate(content);
+      linter.setOptions(getOptions()).validate(content);
     } catch (final LinterException e) {
       onLinterException(e, resource);
     } catch (final WroRuntimeException e) {
@@ -98,6 +92,14 @@ public abstract class AbstractLinterProcessor
   protected abstract AbstractLinter newLinter();
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void process(final Reader reader, final Writer writer) throws IOException {
+    process(null, reader, writer);
+  }
+
+  /**
    * Called when {@link LinterException} is thrown. Allows subclasses to re-throw this exception as a
    * {@link RuntimeException} or handle it differently. The default implementation simply logs the errors.
    *
@@ -107,4 +109,23 @@ public abstract class AbstractLinterProcessor
   protected void onLinterException(final LinterException e, final Resource resource) {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
+
+  /**
+   * @return an array of options used for linting.
+   */
+  protected String[] getOptions() {
+    return options;
+  }
+
+
+  public AbstractLinterProcessor setOptions(final String... options) {
+    this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
+    return this;
+  }
+
+  /**
+   * @return the linter to use for js code validation.
+   */
+  protected abstract AbstractLinter newLinter();
 }

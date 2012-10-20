@@ -18,6 +18,7 @@ import ro.isdc.wro.cache.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -127,6 +128,17 @@ public class InjectorBuilder {
     map.put(WroConfiguration.class, createConfigProxy());
     map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
+    map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
+  }
+
+  private Object createMetaDataFactoryProxy() {
+    return new InjectorObjectFactory<MetaDataFactory>() {
+      public MetaDataFactory create() {
+        final MetaDataFactory factory = managerFactory.create().getMetaDataFactory();
+        injector.inject(factory);
+        return factory;
+      }
+    };
   }
 
   private InjectorObjectFactory<WroConfiguration> createConfigProxy() {

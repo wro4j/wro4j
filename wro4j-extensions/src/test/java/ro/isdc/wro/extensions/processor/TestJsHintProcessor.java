@@ -9,6 +9,8 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -25,7 +27,15 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  * @created Created on Feb 27, 2011
  */
-public class TestJsHintProcessor extends AbstractTestLinterProcessor {
+public class TestJsHintProcessor
+    extends AbstractTestLinterProcessor {
+  private JsHintProcessor victim;
+
+  @Before
+  public void setUp() {
+    victim = new JsHintProcessor();
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -33,7 +43,6 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
   protected ResourceProcessor newLinterProcessor() {
     return new JsHintProcessor();
   }
-
 
   @Test
   public void testWithOptionsSet()
@@ -53,15 +62,16 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
     Assert.assertNotNull(cause.get());
   }
 
-
   /**
    * This test was created initially to prove that {@link JsHintProcessor} is thread-safe, but it doesn't work well when
    * trying to reuse the scope. TODO: This needs to be investigated.
    */
   @Test
-  public void canBeExecutedMultipleTimes() throws Exception {
+  public void canBeExecutedMultipleTimes()
+      throws Exception {
     final JsHintProcessor processor = new JsHintProcessor();
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
           processor.process(null, new StringReader("alert(1);"), new StringWriter());
@@ -73,10 +83,34 @@ public class TestJsHintProcessor extends AbstractTestLinterProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(new JsHintProcessor(), ResourceType.JS);
   }
 
+  @Test
+  public void canSetNullOptions()
+      throws Exception {
+    final String[] options = null;
+    victim.setOptions(options);
+    victim.process(null, new StringReader("alert(1);"), new StringWriter());
+  }
+
+  @Test(expected = LinterException.class)
+  public void shouldOverrideDefaultOptions()
+      throws Exception {
+    victim = new JsHintProcessor() {
+      @Override
+      protected String[] getOptions() {
+        return ArrayUtils.toArray("bitwise");
+      }
+
+      @Override
+      protected void onLinterException(final LinterException e, final Resource resource) {
+        throw e;
+      }
+    };
+    victim.process(null, new StringReader("true & false"), new StringWriter());
+  }
 }

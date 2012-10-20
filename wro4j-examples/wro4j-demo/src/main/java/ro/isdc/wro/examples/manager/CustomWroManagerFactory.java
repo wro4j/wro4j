@@ -4,13 +4,21 @@
  */
 package ro.isdc.wro.examples.manager;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.extensions.model.factory.GroovyModelFactory;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
@@ -29,6 +37,8 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 public class CustomWroManagerFactory
     extends BaseWroManagerFactory {
+
+  private static final String KEY_JS_HINT_OPTIONS = "jsHintOptions";
 
   /**
    * {@inheritDoc}
@@ -62,8 +72,24 @@ public class CustomWroManagerFactory
     factory.addPostProcessor(new CssVariablesProcessor());
 
     factory.addPreProcessor(new JawrCssMinifierProcessor());
+    factory.addPreProcessor(new JsHintProcessor() {
+      @Inject
+      private MetaDataFactory metaDataFactory;
+      @Override
+      protected String[] getOptions() {
+        //Not very safe, probably can validate it before cast
+        return (String[]) metaDataFactory.create().get(KEY_JS_HINT_OPTIONS);
+      }
+    });
 
     return factory;
+  }
+
+  @Override
+  protected MetaDataFactory newMetaDataFactory() {
+    final Map<String, Object> map = new HashMap<String, Object>();
+    map.put(KEY_JS_HINT_OPTIONS, ArrayUtils.toArray("undef"));
+    return new DefaultMetaDataFactory(map);
   }
 
   private ResourceProcessor getPlaceholderProcessor() {

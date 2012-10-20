@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -77,64 +78,81 @@ public class TestInjectorBuilder {
   @Test
   public void shouldBuildInjectorWithValidWroManager() {
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
-    Assert.assertNotNull(injector);
+    assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
-    Assert.assertNotNull(sample.namingStrategy);
-    Assert.assertNotNull(sample.preProcessorExecutor);
-    Assert.assertNotNull(sample.processorsFactory);
-    Assert.assertNotNull(sample.resourceLocatorFactory);
-    Assert.assertNotNull(sample.callbackRegistry);
-    Assert.assertSame(injector, sample.injector);
-    Assert.assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.namingStrategy);
+    assertNotNull(sample.preProcessorExecutor);
+    assertNotNull(sample.processorsFactory);
+    assertNotNull(sample.resourceLocatorFactory);
+    assertNotNull(sample.callbackRegistry);
+    assertSame(injector, sample.injector);
+    assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.metaDataFactory);
   }
 
   @Test
-  public void shouldBuildValidInjectorWithBaseWromanagerFactory() {
+  public void shouldBuildValidInjectorWithBaseWroManagerFactory() {
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     Assert.assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
-    Assert.assertNotNull(sample.namingStrategy);
-    Assert.assertNotNull(sample.preProcessorExecutor);
-    Assert.assertNotNull(sample.processorsFactory);
-    Assert.assertNotNull(sample.resourceLocatorFactory);
-    Assert.assertNotNull(sample.callbackRegistry);
-    Assert.assertSame(injector, sample.injector);
-    Assert.assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.namingStrategy);
+    assertNotNull(sample.preProcessorExecutor);
+    assertNotNull(sample.processorsFactory);
+    assertNotNull(sample.resourceLocatorFactory);
+    assertNotNull(sample.callbackRegistry);
+    assertSame(injector, sample.injector);
+    assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.metaDataFactory);
   }
 
   @Test
-  public void shouldBuildValidInjectorWithSomeFieldsSet() {
-    final NamingStrategy namingStrategy = Mockito.mock(NamingStrategy.class);
-    final ProcessorsFactory processorsFactory = Mockito.mock(ProcessorsFactory.class);
-    final ResourceLocatorFactory resourceLocatorFactory = Mockito.mock(ResourceLocatorFactory.class);
+  public void shouldBuildValidInjectorWithFewFieldsSet() throws Exception {
+    final NamingStrategy mockNamingStrategy = Mockito.mock(NamingStrategy.class);
+    final ProcessorsFactory mockProcessorsFactory = Mockito.mock(ProcessorsFactory.class);
+    final ResourceLocatorFactory mockLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    final MetaDataFactory mockMetaDataFactory = Mockito.mock(MetaDataFactory.class);
 
     final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
     managerFactroy.setNamingStrategy(namingStrategy);
     managerFactroy.setProcessorsFactory(processorsFactory);
     managerFactroy.setLocatorFactory(resourceLocatorFactory);
+    managerFactroy.setMetaDataFactory(mockMetaDataFactory);
 
     final Injector injector = InjectorBuilder.create(managerFactroy).build();
-    Assert.assertNotNull(injector);
+    assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
-    Assert.assertSame(namingStrategy, sample.namingStrategy);
-    Assert.assertNotNull(sample.preProcessorExecutor);
+    assertNotNull(sample.preProcessorExecutor);
 
-    Assert.assertSame(processorsFactory, AbstractDecorator.getOriginalDecoratedObject(sample.processorsFactory));
-    Assert.assertSame(resourceLocatorFactory, AbstractDecorator.getOriginalDecoratedObject(sample.resourceLocatorFactory));
-    Assert.assertNotNull(sample.callbackRegistry);
-    Assert.assertSame(injector, sample.injector);
-    Assert.assertNotNull(sample.groupsProcessor);
-    Assert.assertNotNull(sample.modelFactory);
-    Assert.assertNotNull(sample.groupExtractor);
-    Assert.assertNotNull(sample.cacheStrategy);
-    Assert.assertNotNull(sample.hashBuilder);
-    Assert.assertNotNull(sample.readOnlyContext);
+    sample.namingStrategy.rename("", WroUtil.EMPTY_STREAM);
+    verify(mockNamingStrategy).rename("", WroUtil.EMPTY_STREAM);
+
+    sample.processorsFactory.getPostProcessors();
+    verify(mockProcessorsFactory).getPostProcessors();
+
+    sample.uriLocatorFactory.getInstance("");
+    verify(mockLocatorFactory).getInstance("");
+
+    sample.metaDataFactory.create();
+    verify(mockMetaDataFactory).create();
+
+    assertSame(processorsFactory, AbstractDecorator.getOriginalDecoratedObject(sample.processorsFactory));
+    assertSame(resourceLocatorFactory, AbstractDecorator.getOriginalDecoratedObject(sample.resourceLocatorFactory));
+
+    assertNotNull(sample.callbackRegistry);
+    assertSame(injector, sample.injector);
+    assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.modelFactory);
+    assertNotNull(sample.groupExtractor);
+    assertNotNull(sample.cacheStrategy);
+    assertNotNull(sample.hashBuilder);
+    assertNotNull(sample.readOnlyContext);
+    assertNotNull(sample.metaDataFactory);
   }
 
   @Test(expected = IOException.class)
@@ -180,5 +198,7 @@ public class TestInjectorBuilder {
     HashStrategy hashBuilder;
     @Inject
     ReadOnlyContext readOnlyContext;
+    @Inject
+    MetaDataFactory metaDataFactory;
   }
 }

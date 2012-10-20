@@ -6,6 +6,8 @@ package ro.isdc.wro.extensions.processor.support.linter;
 import java.util.Collection;
 import java.util.Collections;
 
+import ro.isdc.wro.WroRuntimeException;
+
 
 /**
  * Exception caused by JsHint processing.
@@ -13,8 +15,12 @@ import java.util.Collections;
  * @author Alex Objelean
  * @since 1.3.5
  */
-public class LinterException extends Exception {
+public class LinterException extends WroRuntimeException {
   private Collection<LinterError> errors;
+
+  public LinterException() {
+    super("Linter error detected");
+  }
 
   /**
    * @return the errors

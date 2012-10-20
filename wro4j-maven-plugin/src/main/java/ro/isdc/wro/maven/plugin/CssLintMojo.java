@@ -11,7 +11,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -26,7 +25,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
 /**
  * Maven plugin used to validate css code defined in wro model.
- * 
+ *
  * @goal csslint
  * @phase compile
  * @requiresDependencyResolution runtime
@@ -38,7 +37,7 @@ public class CssLintMojo
     extends AbstractSingleProcessorMojo {
   /**
    * File where the report will be written.
-   * 
+   *
    * @parameter default-value="${project.build.directory}/wro4j-reports/csslint.xml" expression="${reportFile}"
    * @optional
    */
@@ -47,7 +46,7 @@ public class CssLintMojo
    * Contains errors found during jshint processing which will be reported eventually.
    */
   private LintReport<CssLintError> lintReport;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -63,28 +62,27 @@ public class CssLintMojo
         //use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
         super.process(resource, reader, new StringWriter());
       }
-      
+
       @Override
       protected void onException(final WroRuntimeException e) {
         CssLintMojo.this.onException(e);
       }
-      
+
       @Override
-      protected void onCssLintException(final CssLintException e, final Resource resource)
-          throws Exception {
+      protected void onCssLintException(final CssLintException e, final Resource resource) {
         getLog().error(
             e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
                 + e.getErrors());
         // collect found errors
         lintReport.addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
         if (!isFailNever()) {
-          throw new MojoExecutionException("Errors found when validating resource: " + resource);
+          throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
       };
     }.setOptions(getOptions());
     return processor;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -93,7 +91,7 @@ public class CssLintMojo
     lintReport = new LintReport<CssLintError>();
     FileUtils.deleteQuietly(reportFile);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -106,19 +104,19 @@ public class CssLintMojo
         getLog().debug("creating report at location: " + reportFile);
         ReportXmlFormatter.createForCssLintError(lintReport, ReportXmlFormatter.FormatterType.CSSLINT).write(
             new FileOutputStream(reportFile));
-      } catch (IOException e) {
+      } catch (final IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
     }
   }
-  
+
   /**
    * @VisibleForTesting
    */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
   }
-  
+
   /**
    * Used by unit test to check if mojo doesn't fail.
    */
