@@ -16,6 +16,8 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -41,14 +43,14 @@ import ro.isdc.wro.util.Transformer;
 /**
  * Default implementation of {@link WroManagerFactory} which creates default locators and processors and handles the
  * injection logic by creating an {@link Injector} and injecting where it is appropriate.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
     implements WroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
-  
+
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
   private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
@@ -61,6 +63,7 @@ public class BaseWroManagerFactory
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
   private ResourceAuthorizationManager authorizationManager;
+  private MetaDataFactory metaDataFactory;
   /**
    * Handles the lazy synchronized creation of the manager
    */
@@ -96,7 +99,10 @@ public class BaseWroManagerFactory
       if (authorizationManager == null) {
         authorizationManager = newAuthorizationManager();
       }
-      
+      if (metaDataFactory == null) {
+        metaDataFactory = newMetaDataFactory();
+      }
+
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
       manager.setHashStrategy(hashStrategy);
@@ -106,10 +112,9 @@ public class BaseWroManagerFactory
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
       manager.setResourceAuthorizationManager(authorizationManager);
-      
-      // initialize before injection to allow injector do its job properly
+      manager.setMetaDataFactory(metaDataFactory);
+
       onAfterInitializeManager(manager);
-      
       return manager;
     }
   };
@@ -121,7 +126,7 @@ public class BaseWroManagerFactory
   public final WroManager create() {
     return managerInitializer.get();
   }
-  
+
   /**
    * @return default implementation of {@link ResourceAuthorizationManager}.
    */
@@ -133,13 +138,13 @@ public class BaseWroManagerFactory
    * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
    * callbacks. Default implementation does nothing. Do not set anything else except callbacks in this method, otherwise
    * the initialization will not be performed properly.
-   * 
+   *
    * @param manager
    *          initialized instance of {@link WroManager}.
    */
   protected void onAfterInitializeManager(final WroManager manager) {
   }
-  
+
   /**
    * @param namingStrategy
    *          the namingStrategy to set
@@ -148,14 +153,7 @@ public class BaseWroManagerFactory
     this.namingStrategy = namingStrategy;
     return this;
   }
-  
-  /**
-   * @return the namingStrategy
-   */
-  public NamingStrategy getNamingStrategy() {
-    return namingStrategy;
-  }
-  
+
   /**
    * @return default implementation of modelTransformers.
    */
@@ -163,39 +161,39 @@ public class BaseWroManagerFactory
     addModelTransformer(new WildcardExpanderModelTransformer());
     return this.modelTransformers;
   }
-  
+
   /**
    * Override to provide a different or modified default factory implementation.
-   * 
+   *
    * @return {@link ProcessorsFactory} object.
    */
   protected ProcessorsFactory newProcessorsFactory() {
     return new DefaultProcesorsFactory();
   }
-  
+
   /**
    * Override to provide a different or modified factory.
-   * 
+   *
    * @return {@link UriLocatorFactory} object.
    */
   protected UriLocatorFactory newUriLocatorFactory() {
     return new DefaultUriLocatorFactory();
   }
-  
+
   /**
    * @return {@link HashStrategy} instance.
    */
   protected HashStrategy newHashStrategy() {
     return new SHA1HashStrategy();
   }
-  
+
   /**
-   * @return default {@link NamingStrategy} to be used by this {@link WroManagerFactory} 
+   * @return default {@link NamingStrategy} to be used by this {@link WroManagerFactory}
    */
   protected NamingStrategy newNamingStrategy() {
     return new NoOpNamingStrategy();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -206,7 +204,7 @@ public class BaseWroManagerFactory
       LOG.warn("[FAIL] Unable to reload cache, probably because invoked outside of context");
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -217,21 +215,21 @@ public class BaseWroManagerFactory
       LOG.warn("[FAIL] Unable to reload model, probably because invoked outside of context");
     }
   }
-  
+
   /**
    * @return {@link CacheStrategy} instance for resources' group caching.
    */
   protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
     return new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
   }
-  
+
   /**
    * @return {@link GroupExtractor} implementation.
    */
   protected GroupExtractor newGroupExtractor() {
     return new DefaultGroupExtractor();
   }
-  
+
   /**
    * @param servletContext
    *          {@link ServletContext} which could be useful for creating dynamic {@link WroModel}.
@@ -249,7 +247,14 @@ public class BaseWroManagerFactory
     }
     return new XmlModelFactory();
   }
-  
+
+  /**
+   * @return default implementation of {@link MetaDataFactory} used when no {@link MetaDataFactory} is set.
+   */
+  protected MetaDataFactory newMetaDataFactory() {
+    return new DefaultMetaDataFactory();
+  }
+
   /**
    * @param groupExtractor
    *          the groupExtractor to set
@@ -258,7 +263,7 @@ public class BaseWroManagerFactory
     this.groupExtractor = groupExtractor;
     return this;
   }
-  
+
   /**
    * @param modelFactory
    *          the modelFactory to set
@@ -267,7 +272,7 @@ public class BaseWroManagerFactory
     this.modelFactory = modelFactory;
     return this;
   }
-  
+
   /**
    * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
    * @param hashBuilder
@@ -278,7 +283,6 @@ public class BaseWroManagerFactory
     this.hashStrategy = hashBuilder;
     return this;
   }
-  
 
   /**
    * @param hashBuilder
@@ -288,7 +292,7 @@ public class BaseWroManagerFactory
     this.hashStrategy = hashStrategy;
     return this;
   }
-  
+
   /**
    * @param modelTransformers
    *          the modelTransformers to set
@@ -297,7 +301,7 @@ public class BaseWroManagerFactory
     this.modelTransformers = modelTransformers;
     return this;
   }
-  
+
   /**
    * Add a single model transformer.
    */
@@ -308,7 +312,7 @@ public class BaseWroManagerFactory
     this.modelTransformers.add(modelTransformer);
     return this;
   }
-  
+
   /**
    * @param cacheStrategy
    *          the cacheStrategy to set
@@ -317,7 +321,7 @@ public class BaseWroManagerFactory
     this.cacheStrategy = cacheStrategy;
     return this;
   }
-  
+
   /**
    * @param uriLocatorFactory
    *          the uriLocatorFactory to set
@@ -326,7 +330,7 @@ public class BaseWroManagerFactory
     this.uriLocatorFactory = uriLocatorFactory;
     return this;
   }
-  
+
   /**
    * @param processorsFactory
    *          the processorsFactory to set
@@ -334,15 +338,14 @@ public class BaseWroManagerFactory
   public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
   }
-  
-  public WroModelFactory getModelFactory() {
-    return modelFactory;
-  }
-  
-  
+
   public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
     return this;
+  }
+
+  public void setMetaDataFactory(final MetaDataFactory metaDataFactory) {
+    this.metaDataFactory = metaDataFactory;
   }
 
   /**

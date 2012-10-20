@@ -25,7 +25,7 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * Encapsulates common code for utilities like jsHint or jsLint.
- * 
+ *
  * @author Alex Objelean
  * @created 19 Sept 2011
  * @since 1.4.2
@@ -37,7 +37,7 @@ public abstract class AbstractLinter {
    * Options to apply to js hint processing
    */
   private String[] options;
-  
+
   /**
    * Initialize script builder for evaluation.
    */
@@ -51,16 +51,16 @@ public abstract class AbstractLinter {
       throw new WroRuntimeException("Failed reading init script", e);
     }
   }
-  
+
   /**
    * @return the stream of the linter script. Override this method to provide a different script version.
    */
   protected abstract InputStream getScriptAsStream();
-  
+
   /**
    * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the
    * js is valid.
-   * 
+   *
    * @param data
    *          js content to process.
    */
@@ -87,15 +87,15 @@ public abstract class AbstractLinter {
     watch.stop();
     LOG.debug(watch.prettyPrint());
   }
-  
+
   /**
    * @return the name of the function used to perform the lint operation.
    */
   protected abstract String getLinterName();
-  
+
   /**
    * TODO this method is duplicated in {@link CssLint}. Extract and reuse it.
-   * 
+   *
    * @param data
    *          script to process.
    * @param options
@@ -105,13 +105,13 @@ public abstract class AbstractLinter {
   private String buildLinterScript(final String data, final String... options) {
     return String.format("%s(%s,%s);", getLinterName(), data, optionsBuilder.build(options));
   }
-  
+
   /**
    * @param options
    *          the options to set
    */
   public AbstractLinter setOptions(final String... options) {
-    if (options != null) {
+    if (options != null && options.length > 0) {
       this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
     } else {
       this.options = ArrayUtils.EMPTY_STRING_ARRAY;
