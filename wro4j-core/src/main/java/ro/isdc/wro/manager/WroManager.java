@@ -3,11 +3,12 @@
  */
 package ro.isdc.wro.manager;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -58,10 +60,11 @@ public class WroManager
   @Inject
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   private ProcessorsFactory processorsFactory;
-  private UriLocatorFactory uriLocatorFactory;
+  private UriLocatorFactory locatorFactory;
   /**
    * Rename the file name based on its original name and content.
    */
+  @Inject
   private NamingStrategy namingStrategy;
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
@@ -88,6 +91,7 @@ public class WroManager
   private ResourceBundleProcessor resourceBundleProcessor;
   private ResourceAuthorizationManager authorizationManager;
   private CacheKeyFactory cacheKeyFactory;
+  private MetaDataFactory metaDataFactory;
 
   public WroManager() {
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
@@ -190,16 +194,17 @@ public class WroManager
    * Check if all dependencies are set.
    */
   private void validate() {
-    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
-    Validate.notNull(groupsProcessor, "groupsProcessor was not set!");
-    Validate.notNull(uriLocatorFactory, "uriLocatorFactory was not set!");
-    Validate.notNull(processorsFactory, "processorsFactory was not set!");
-    Validate.notNull(groupExtractor, "GroupExtractor was not set!");
-    Validate.notNull(modelFactory, "ModelFactory was not set!");
-    Validate.notNull(cacheStrategy, "cacheStrategy was not set!");
-    Validate.notNull(hashStrategy, "HashStrategy was not set!");
-    Validate.notNull(authorizationManager, "authorizationManager was not set!");
-    Validate.notNull(cacheKeyFactory, "CacheKeyFactory was not set!");
+    notNull(cacheStrategy, "cacheStrategy was not set!");
+    notNull(groupsProcessor, "groupsProcessor was not set!");
+    notNull(locatorFactory, "uriLocatorFactory was not set!");
+    notNull(processorsFactory, "processorsFactory was not set!");
+    notNull(groupExtractor, "GroupExtractor was not set!");
+    notNull(modelFactory, "ModelFactory was not set!");
+    notNull(cacheStrategy, "cacheStrategy was not set!");
+    notNull(hashStrategy, "HashStrategy was not set!");
+    notNull(authorizationManager, "authorizationManager was not set!");
+    notNull(metaDataFactory, "metaDataFactory was not set!");
+    notNull(cacheKeyFactory, "CacheKeyFactory was not set!");
   }
 
   /**
@@ -207,13 +212,13 @@ public class WroManager
    *          the uriProcessor to set
    */
   public final WroManager setGroupExtractor(final GroupExtractor groupExtractor) {
-    Validate.notNull(groupExtractor);
+    notNull(groupExtractor);
     this.groupExtractor = groupExtractor;
     return this;
   }
 
   public final WroManager setModelFactory(final WroModelFactory modelFactory) {
-    Validate.notNull(modelFactory);
+    notNull(modelFactory);
     this.modelFactory = modelFactory;
     return this;
   }
@@ -223,7 +228,7 @@ public class WroManager
    *          the cache to set
    */
   public final WroManager setCacheStrategy(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
-    Validate.notNull(cacheStrategy);
+    notNull(cacheStrategy);
     this.cacheStrategy = cacheStrategy;
     return this;
   }
@@ -233,7 +238,7 @@ public class WroManager
    *          the contentDigester to set
    */
   public final WroManager setHashStrategy(final HashStrategy hashStrategy) {
-    Validate.notNull(hashStrategy);
+    notNull(hashStrategy);
     this.hashStrategy = hashStrategy;
     return this;
   }
@@ -274,7 +279,7 @@ public class WroManager
    *          the uriLocatorFactory to set
    */
   public final WroManager setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
+    this.locatorFactory = uriLocatorFactory;
     return this;
   }
 
@@ -289,7 +294,7 @@ public class WroManager
    * @return the uriLocatorFactory
    */
   public final UriLocatorFactory getUriLocatorFactory() {
-    return uriLocatorFactory;
+    return locatorFactory;
   }
 
   /**
@@ -316,6 +321,14 @@ public class WroManager
     this.cacheKeyFactory = cacheKeyFactory;
   }
 
+  public MetaDataFactory getMetaDataFactory() {
+    return metaDataFactory;
+  }
+
+  public void setMetaDataFactory(final MetaDataFactory metaDataFactory) {
+    this.metaDataFactory = metaDataFactory;
+  }
+
   /**
    * Registers a callback.
    *
@@ -323,7 +336,7 @@ public class WroManager
    *          {@link LifecycleCallback} to register.
    */
   public final void registerCallback(final LifecycleCallback callback) {
-    Validate.notNull(callback);
+    notNull(callback);
     getCallbackRegistry().registerCallback(callback);
   }
 
@@ -348,7 +361,7 @@ public class WroManager
   }
 
   public void setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
-    Validate.notNull(authorizationManager);
+    notNull(authorizationManager);
     this.authorizationManager = authorizationManager;
   }
 }

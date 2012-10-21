@@ -18,6 +18,8 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -67,6 +69,8 @@ public class BaseWroManagerFactory
   private NamingStrategy namingStrategy;
   private ResourceAuthorizationManager authorizationManager;
   private CacheKeyFactory cacheKeyFactory;
+  private MetaDataFactory metaDataFactory;
+
   /**
    * Handles the lazy synchronized creation of the manager
    */
@@ -105,6 +109,9 @@ public class BaseWroManagerFactory
       if (cacheKeyFactory == null) {
         cacheKeyFactory = newCacheKeyFactory();
       }
+      if (metaDataFactory == null) {
+        metaDataFactory = newMetaDataFactory();
+      }
 
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
@@ -116,10 +123,9 @@ public class BaseWroManagerFactory
       manager.setModelTransformers(modelTransformers);
       manager.setResourceAuthorizationManager(authorizationManager);
       manager.setCacheKeyFactory(cacheKeyFactory);
+      manager.setMetaDataFactory(metaDataFactory);
 
-      // initialize before injection to allow injector do its job properly
       onAfterInitializeManager(manager);
-
       return manager;
     }
   };
@@ -157,13 +163,6 @@ public class BaseWroManagerFactory
   public BaseWroManagerFactory setNamingStrategy(final NamingStrategy namingStrategy) {
     this.namingStrategy = namingStrategy;
     return this;
-  }
-
-  /**
-   * @return the namingStrategy
-   */
-  public NamingStrategy getNamingStrategy() {
-    return namingStrategy;
   }
 
   /**
@@ -268,6 +267,13 @@ public class BaseWroManagerFactory
   }
 
   /**
+   * @return default implementation of {@link MetaDataFactory} used when no {@link MetaDataFactory} is set.
+   */
+  protected MetaDataFactory newMetaDataFactory() {
+    return new DefaultMetaDataFactory();
+  }
+
+  /**
    * @param groupExtractor
    *          the groupExtractor to set
    */
@@ -357,14 +363,13 @@ public class BaseWroManagerFactory
     this.processorsFactory = processorsFactory;
   }
 
-  public WroModelFactory getModelFactory() {
-    return modelFactory;
-  }
-
-
   public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
     return this;
+  }
+
+  public void setMetaDataFactory(final MetaDataFactory metaDataFactory) {
+    this.metaDataFactory = metaDataFactory;
   }
 
   /**

@@ -105,7 +105,8 @@ public class TestWro4jCommandLineRunner {
 
     final String wroFile = contextFolder + File.separator + "wro.xml";
     LOG.debug("wroFile: {}", wroFile);
-    final String processorsList = AbstractConfigurableMultipleStrategy.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
+    final String processorsList = AbstractConfigurableMultipleStrategy
+        .createItemsAsString(CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format("--wroFile %s --contextFolder %s -m --preProcessors " + processorsList,
         new Object[] {
           wroFile, contextFolder
@@ -139,21 +140,17 @@ public class TestWro4jCommandLineRunner {
     invokeRunner(args);
   }
 
-  @Test
+  @Test(expected = CssLintException.class)
   public void shouldApplyCssLint()
       throws Exception {
-    try {
-      final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
-      final String wroFile = contextFolder + File.separator + "wro.xml";
+    final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
+    final String wroFile = contextFolder + File.separator + "wro.xml";
 
-      final String[] args = String.format(
-          "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + CssLintProcessor.ALIAS, new Object[] {
-            wroFile, contextFolder, destinationFolder.getAbsolutePath()
-          }).split(" ");
-      invokeRunner(args);
-    } catch (final Exception e) {
-      Assert.assertEquals(CssLintException.class, e.getCause().getClass());
-    }
+    final String[] args = String.format(
+        "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + CssLintProcessor.ALIAS, new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+        }).split(" ");
+    invokeRunner(args);
   }
 
   @Test
@@ -162,29 +159,26 @@ public class TestWro4jCommandLineRunner {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
 
-    final String[] args = String.format(
-        "--wroFile %s --contextFolder %s --destinationFolder %s -m --postProcessors " + YUICssCompressorProcessor.ALIAS,
-        new Object[] {
-          wroFile, contextFolder, destinationFolder.getAbsolutePath()
-        }).split(" ");
+    final String[] args = String
+        .format(
+            "--wroFile %s --contextFolder %s --destinationFolder %s -m --postProcessors "
+                + YUICssCompressorProcessor.ALIAS, new Object[] {
+              wroFile, contextFolder, destinationFolder.getAbsolutePath()
+            }).split(" ");
     invokeRunner(args);
   }
 
-  @Test
+  @Test(expected = LinterException.class)
   public void shouldApplyJsHint()
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
 
-    try {
-      final String[] args = String.format(
-          "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
-            wroFile, contextFolder, destinationFolder.getAbsolutePath()
-          }).split(" ");
-      invokeRunner(args);
-    } catch (final Exception e) {
-      Assert.assertEquals(LinterException.class, e.getCause().getClass());
-    }
+    final String[] args = String.format(
+        "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
+          wroFile, contextFolder, destinationFolder.getAbsolutePath()
+        }).split(" ");
+    invokeRunner(args);
   }
 
   @Test

@@ -18,8 +18,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +28,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -94,6 +93,7 @@ public class TestInjectorBuilder {
     assertNotNull(sample.callbackRegistry);
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.bundleProcessor);
   }
 
@@ -111,28 +111,29 @@ public class TestInjectorBuilder {
     assertNotNull(sample.callbackRegistry);
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.cacheKeyFactory);
     assertNotNull(sample.bundleProcessor);
-
   }
 
   @Test
-  public void shouldBuildValidInjectorWithSomeFieldsSet() throws Exception {
+  public void shouldBuildValidInjectorWithFewFieldsSet() throws Exception {
     final NamingStrategy mockNamingStrategy = mock(NamingStrategy.class);
     final ProcessorsFactory mockProcessorsFactory = mock(ProcessorsFactory.class);
     final UriLocatorFactory mockLocatorFactory = mock(UriLocatorFactory.class);
+    final MetaDataFactory mockMetaDataFactory = Mockito.mock(MetaDataFactory.class);
 
     final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
     managerFactroy.setNamingStrategy(mockNamingStrategy);
     managerFactroy.setProcessorsFactory(mockProcessorsFactory);
     managerFactroy.setUriLocatorFactory(mockLocatorFactory);
+    managerFactroy.setMetaDataFactory(mockMetaDataFactory);
 
     final Injector injector = InjectorBuilder.create(managerFactroy).build();
-    Assert.assertNotNull(injector);
+    assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
-//    assertTrue(Proxy.isProxyClass(sample.namingStrategy.getClass()));
     assertNotNull(sample.preProcessorExecutor);
 
     sample.namingStrategy.rename("", WroUtil.EMPTY_STREAM);
@@ -144,6 +145,9 @@ public class TestInjectorBuilder {
     sample.uriLocatorFactory.getInstance("");
     verify(mockLocatorFactory).getInstance("");
 
+    sample.metaDataFactory.create();
+    verify(mockMetaDataFactory).create();
+
     assertNotNull(sample.callbackRegistry);
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
@@ -152,6 +156,7 @@ public class TestInjectorBuilder {
     assertNotNull(sample.cacheStrategy);
     assertNotNull(sample.hashBuilder);
     assertNotNull(sample.readOnlyContext);
+    assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.cacheKeyFactory);
     assertNotNull(sample.bundleProcessor);
   }
@@ -199,6 +204,8 @@ public class TestInjectorBuilder {
     HashStrategy hashBuilder;
     @Inject
     ReadOnlyContext readOnlyContext;
+    @Inject
+    MetaDataFactory metaDataFactory;
     @Inject
     CacheKeyFactory cacheKeyFactory;
     @Inject

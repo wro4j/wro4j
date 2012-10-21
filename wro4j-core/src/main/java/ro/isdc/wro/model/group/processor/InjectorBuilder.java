@@ -19,6 +19,7 @@ import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -129,8 +130,9 @@ public class InjectorBuilder {
     map.put(WroConfiguration.class, createConfigProxy());
     map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
-    map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
+    map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
     map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
+    map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
   }
 
   private Object createResourceBundleProcessorProxy() {
@@ -141,6 +143,16 @@ public class InjectorBuilder {
           injector.inject(bundleProcessor);
         }
         return bundleProcessor;
+      }
+    };
+  }
+
+  private Object createMetaDataFactoryProxy() {
+    return new InjectorObjectFactory<MetaDataFactory>() {
+      public MetaDataFactory create() {
+        final MetaDataFactory factory = managerFactory.create().getMetaDataFactory();
+        injector.inject(factory);
+        return factory;
       }
     };
   }

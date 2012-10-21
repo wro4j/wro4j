@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -17,13 +20,14 @@ import ro.isdc.wro.util.Function;
 
 /**
  * Builds an XML report for lint errors based on provided collection of {@link LinterError}'s.
- * 
+ *
  * @author Alex Objelean
  * @since 1.5.0
  * @created 15 Sep 2012
  */
 public class ReportXmlFormatter
     extends AbstractReportXmlFormatter<LintItem> {
+  private static final Logger LOG = LoggerFactory.getLogger(ReportXmlFormatter.class);
   /**
    * Checkstyle related constants
    */
@@ -44,46 +48,48 @@ public class ReportXmlFormatter
   private static final String ATTR_CHARACTER = "char";
   private static final String ATTR_SEVERITY = "severity";
   private static final String ELEMENT_CSSLINT = "csslint";
-  
+
   private final FormatterType formatterType;
-  
+
   public static enum FormatterType {
     LINT, CHECKSTYLE, CSSLINT
   }
-  
+
   /**
    * Factory method for creating {@link ReportXmlFormatter}.
-   * 
+   *
    * @param lintReport
    *          {@link LintReport} to build xml reports from.
    */
   public static ReportXmlFormatter create(final LintReport<LintItem> lintReport, final FormatterType formatterType) {
     return new ReportXmlFormatter(lintReport, formatterType);
   }
-  
+
   public static ReportXmlFormatter createForLinterError(final LintReport<LinterError> lintReport, final FormatterType formatterType) {
     return createInternal(lintReport, formatterType, new Function<LinterError, LintItem>() {
       @Override
       public LintItem apply(final LinterError input)
           throws Exception {
+        notNull(input);
         return new LintItemAdapter(input);
       }
     });
   }
-  
+
   public static ReportXmlFormatter createForCssLintError(final LintReport<CssLintError> lintReport, final FormatterType formatterType) {
     return createInternal(lintReport, formatterType, new Function<CssLintError, LintItem>() {
       @Override
       public LintItem apply(final CssLintError input)
           throws Exception {
+        notNull(input);
         return new LintItemAdapter(input);
       }
     });
   }
-  
+
   /**
    * Creates a report which handles the adaptation of type <F> to {@link LintItem}.
-   * 
+   *
    * @param lintReport
    *          {@link LintReport} containing all lints.
    * @param formatterType
@@ -93,13 +99,15 @@ public class ReportXmlFormatter
    */
   private static <F> ReportXmlFormatter createInternal(final LintReport<F> lintReport, final FormatterType formatterType,
       final Function<F, LintItem> adapter) {
+    Validate.notNull(lintReport);
     final LintReport<LintItem> report = new LintReport<LintItem>();
-    for (ResourceLintReport<F> item : lintReport.getReports()) {
+    for (final ResourceLintReport<F> item : lintReport.getReports()) {
       final Collection<LintItem> lints = new ArrayList<LintItem>();
-      for (F lint : item.getLints()) {
+      for (final F lint : item.getLints()) {
         try {
+          LOG.debug("Adding lint: {}", lint);
           lints.add(adapter.apply(lint));
-        } catch (Exception e) {
+        } catch (final Exception e) {
           throw WroRuntimeException.wrap(e, "Problem while adapting lint item");
         }
       }
@@ -107,7 +115,7 @@ public class ReportXmlFormatter
     }
     return new ReportXmlFormatter(report, formatterType);
   }
-  
+
   /**
    * @param lintReport
    *          a not null collection of {@link LinterError} used to build an XML report from.
@@ -117,7 +125,7 @@ public class ReportXmlFormatter
     notNull(type);
     this.formatterType = type;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -125,78 +133,78 @@ public class ReportXmlFormatter
   protected void buildDocument() {
     final Element rootElement = getDocument().createElement(getRootElementName());
     getDocument().appendChild(rootElement);
-    
-    for (ResourceLintReport<LintItem> resourceErrors : getLintReport().getReports()) {
+
+    for (final ResourceLintReport<LintItem> resourceErrors : getLintReport().getReports()) {
       rootElement.appendChild(createFileElement(resourceErrors));
     }
   }
-  
+
   /**
    * Creates a {@link Node} containing informations about all errors associated to a single resource.
    */
   private Node createFileElement(final ResourceLintReport<LintItem> resourceErrors) {
     final Element fileElement = getDocument().createElement(ELEMENT_FILE);
     fileElement.setAttribute(ATTR_NAME, resourceErrors.getResourcePath());
-    for (LintItem error : resourceErrors.getLints()) {
+    for (final LintItem error : resourceErrors.getLints()) {
       fileElement.appendChild(createIssueElement(error));
     }
     return fileElement;
   }
-  
+
   /**
    * Creates a {@link Node} containing a detailed description of an issue.
    */
   private Node createIssueElement(final LintItem error) {
     final Element issueElement = getDocument().createElement(getIssueElementName());
-    
+
     final String column = String.valueOf(error.getColumn());
     if (StringUtils.isNotBlank(column)) {
       issueElement.setAttribute(getColumnAttributeName(), column);
     }
-    
+
     final String evidence = error.getEvidence();
     if (StringUtils.isNotBlank(evidence)) {
       issueElement.setAttribute(ATTR_EVIDENCE, evidence);
     }
-    
+
     final String line = String.valueOf(error.getLine());
     if (StringUtils.isNotBlank(line)) {
       issueElement.setAttribute(ATTR_LINE, line);
     }
-    
+
     final String reason = error.getReason();
     if (StringUtils.isNotBlank(reason)) {
       issueElement.setAttribute(getReasonAttributeName(), reason);
     }
-    
+
     final String severity = error.getSeverity();
     if (StringUtils.isNotBlank(severity)) {
       issueElement.setAttribute(ATTR_SEVERITY, severity);
     }
     return issueElement;
   }
-  
+
   /**
    * @return the name of the attribute indicating the character number where the issue is located.
    */
   protected String getColumnAttributeName() {
     return formatterType == FormatterType.CHECKSTYLE ? ATTR_COLUMN : ATTR_CHARACTER;
   }
-  
+
   /**
    * @return the name of the attribute indicating a reason of the issue.
    */
   protected String getReasonAttributeName() {
     return formatterType == FormatterType.CHECKSTYLE ? ATTR_MESSAGE : ATTR_REASON;
   }
-  
+
   /**
    * @return name of tag indicating an issue.
    */
   protected String getIssueElementName() {
     return formatterType == FormatterType.CHECKSTYLE ? ELEMENT_ERROR : ELEMENT_ISSUE;
   }
-  
+
   /**
    * @return the name of root element.
    */
