@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager;
 
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
@@ -466,7 +467,7 @@ public class TestWroManager {
         new CRC32HashStrategy()));
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
-    Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
+    assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
 
   @Test

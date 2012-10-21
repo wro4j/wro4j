@@ -5,6 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -29,6 +30,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -92,6 +94,7 @@ public class TestInjectorBuilder {
     assertNotNull(sample.callbackRegistry);
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
+    assertNotNull(sample.bundleProcessor);
   }
 
   @Test
@@ -109,13 +112,15 @@ public class TestInjectorBuilder {
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
     assertNotNull(sample.cacheKeyFactory);
+    assertNotNull(sample.bundleProcessor);
+
   }
 
   @Test
   public void shouldBuildValidInjectorWithSomeFieldsSet() throws Exception {
-    final NamingStrategy mockNamingStrategy = Mockito.mock(NamingStrategy.class);
-    final ProcessorsFactory mockProcessorsFactory = Mockito.mock(ProcessorsFactory.class);
-    final UriLocatorFactory mockLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    final NamingStrategy mockNamingStrategy = mock(NamingStrategy.class);
+    final ProcessorsFactory mockProcessorsFactory = mock(ProcessorsFactory.class);
+    final UriLocatorFactory mockLocatorFactory = mock(UriLocatorFactory.class);
 
     final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
     managerFactroy.setNamingStrategy(mockNamingStrategy);
@@ -148,6 +153,7 @@ public class TestInjectorBuilder {
     assertNotNull(sample.hashBuilder);
     assertNotNull(sample.readOnlyContext);
     assertNotNull(sample.cacheKeyFactory);
+    assertNotNull(sample.bundleProcessor);
   }
 
   @Test(expected = IOException.class)
@@ -195,5 +201,7 @@ public class TestInjectorBuilder {
     ReadOnlyContext readOnlyContext;
     @Inject
     CacheKeyFactory cacheKeyFactory;
+    @Inject
+    ResourceBundleProcessor bundleProcessor;
   }
 }

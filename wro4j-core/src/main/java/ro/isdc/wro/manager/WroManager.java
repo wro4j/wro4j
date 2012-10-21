@@ -28,7 +28,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -51,25 +50,19 @@ import ro.isdc.wro.util.Transformer;
 public class WroManager
     implements WroConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  @Inject
   private WroModelFactory modelFactory;
-  @Inject
   private GroupExtractor groupExtractor;
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   @Inject
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
-  @Inject
   private ProcessorsFactory processorsFactory;
-  @Inject
   private UriLocatorFactory uriLocatorFactory;
   /**
    * Rename the file name based on its original name and content.
    */
-  @Inject
   private NamingStrategy namingStrategy;
-  @Inject
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private GroupsProcessor groupsProcessor;
@@ -78,7 +71,6 @@ public class WroManager
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
-  @Inject
   private HashStrategy hashStrategy;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
@@ -93,9 +85,7 @@ public class WroManager
    */
   private final SchedulerHelper cacheSchedulerHelper;
   @Inject
-  private Injector injector;
   private ResourceBundleProcessor resourceBundleProcessor;
-  @Inject
   private ResourceAuthorizationManager authorizationManager;
   private CacheKeyFactory cacheKeyFactory;
 
@@ -127,15 +117,7 @@ public class WroManager
     final WroConfiguration config = context.getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
-    getResourceBundleProcessor().serveProcessedBundle();
-  }
-
-  private ResourceBundleProcessor getResourceBundleProcessor() {
-    if (resourceBundleProcessor == null) {
-      resourceBundleProcessor = new ResourceBundleProcessor();
-      injector.inject(resourceBundleProcessor);
-    }
-    return resourceBundleProcessor;
+    resourceBundleProcessor.serveProcessedBundle();
   }
 
   /**

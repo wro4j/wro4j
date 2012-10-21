@@ -19,6 +19,7 @@ import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -48,6 +49,7 @@ public class InjectorBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(InjectorBuilder.class);
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private ResourceBundleProcessor bundleProcessor;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
@@ -128,6 +130,19 @@ public class InjectorBuilder {
     map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
     map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
+    map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
+  }
+
+  private Object createResourceBundleProcessorProxy() {
+    return new InjectorObjectFactory<ResourceBundleProcessor>() {
+      public ResourceBundleProcessor create() {
+        if (bundleProcessor == null) {
+          bundleProcessor = new ResourceBundleProcessor();
+          injector.inject(bundleProcessor);
+        }
+        return bundleProcessor;
+      }
+    };
   }
 
   private InjectorObjectFactory<WroConfiguration> createConfigProxy() {
