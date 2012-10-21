@@ -10,6 +10,11 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import javax.servlet.http.HttpServletRequest;
+
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.factory.CacheKeyFactory;
+import ro.isdc.wro.cache.factory.CacheKeyFactoryDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
@@ -49,6 +54,23 @@ public class CustomWroManagerFactory
       @Override
       protected ResourceLocator getModelResourceLocator() {
         return new ServletContextResourceLocator(Context.get().getServletContext(), "/WEB-INF/wro.groovy");
+      }
+    };
+  }
+
+  @Override
+  protected CacheKeyFactory newCacheKeyFactory() {
+    return new CacheKeyFactoryDecorator(super.newCacheKeyFactory()) {
+      @Override
+      public CacheKey create(final HttpServletRequest request) {
+        final CacheKey key = super.create(request);
+        key.addAttribute("UserAgent", getBrowser(request));
+        return key;
+      }
+
+      private String getBrowser(final HttpServletRequest request) {
+        final String browser = request.getHeader("User-Agent");
+        return browser != null ? browser : "unknown";
       }
     };
   }

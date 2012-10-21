@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -40,7 +40,7 @@ import ro.isdc.wro.util.StopWatch;
 public class ResourceWatcher {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcher.class);
   @Inject
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   @Inject
   private WroModelFactory modelFactory;
   @Inject
@@ -55,7 +55,7 @@ public class ResourceWatcher {
    * @param cacheEntry
    *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
    */
-  public void check(final CacheEntry cacheEntry) {
+  public void check(final CacheKey cacheEntry) {
     Validate.notNull(cacheEntry);
     LOG.debug("ResourceWatcher started...");
     final StopWatch watch = new StopWatch();
@@ -111,10 +111,10 @@ public class ResourceWatcher {
    * Invoked when a resource change detected.
    *
    * @param key
-   *          {@link CacheEntry} which has to be invalidated because the corresponding group contains stale resources.
+   *          {@link CacheKey} which has to be invalidated because the corresponding group contains stale resources.
    * @VisibleForTesting
    */
-  void onGroupChanged(final CacheEntry key) {
+  void onGroupChanged(final CacheKey key) {
     LOG.debug("detected change for cacheKey: {}", key);
     cacheStrategy.put(key, null);
   }

@@ -21,7 +21,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -44,7 +44,7 @@ import ro.isdc.wro.util.WroUtil;
 public class TestResourceWatcher {
   private static final String RESOURCE_URI = "/test.css";
   private static final String GROUP_NAME = "g1";
-  private final CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
+  private final CacheKey cacheEntry = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
   private ResourceWatcher victim;
   @Mock
   private ResourceLocator mockLocator;
@@ -99,7 +99,7 @@ public class TestResourceWatcher {
     };
     victim = new ResourceWatcher() {
       @Override
-      void onGroupChanged(final CacheEntry cacheEntry) {
+      void onGroupChanged(final CacheKey cacheEntry) {
         super.onGroupChanged(cacheEntry);
         Assert.assertEquals(GROUP_NAME, cacheEntry.getGroupName());
         flag.set(Boolean.TRUE);
@@ -121,7 +121,7 @@ public class TestResourceWatcher {
       throws Exception {
     victim = new ResourceWatcher() {
       @Override
-      void onGroupChanged(final CacheEntry cacheEntry) {
+      void onGroupChanged(final CacheKey cacheEntry) {
         super.onGroupChanged(cacheEntry);
         Assert.fail("Should not detect the change");
       }
@@ -143,7 +143,7 @@ public class TestResourceWatcher {
     final String importResourceUri = "imported.css";
     final AtomicBoolean groupChanged = new AtomicBoolean(false);
     final AtomicBoolean importResourceChanged = new AtomicBoolean(false);
-    final CacheEntry cacheEntry = new CacheEntry(GROUP_NAME, ResourceType.CSS, true);
+    final CacheKey cacheEntry = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
     victim = new ResourceWatcher() {
       @Override
       void onResourceChanged(final Resource resource) {
@@ -151,7 +151,7 @@ public class TestResourceWatcher {
       }
 
       @Override
-      void onGroupChanged(final CacheEntry key) {
+      void onGroupChanged(final CacheKey key) {
         groupChanged.set(true);
       }
     };

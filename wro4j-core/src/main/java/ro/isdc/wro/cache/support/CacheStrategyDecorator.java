@@ -1,5 +1,6 @@
-package ro.isdc.wro.cache;
+package ro.isdc.wro.cache.support;
 
+import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
 
 /**

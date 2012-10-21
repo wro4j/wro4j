@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
@@ -61,7 +61,7 @@ public class GroupsProcessor {
    *          to process.
    * @return processed content.
    */
-  public String process(final CacheEntry cacheKey) {
+  public String process(final CacheKey cacheKey) {
     Validate.notNull(cacheKey);
     try {
       LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
@@ -94,7 +94,7 @@ public class GroupsProcessor {
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Group group, final CacheEntry cacheEntry, final String content)
+  private String applyPostProcessors(final Group group, final CacheKey cacheKey, final String content)
       throws IOException {
     final Collection<ResourceProcessor> processors = processorsFactory.getPostProcessors();
     if (processors.isEmpty()) {
@@ -103,10 +103,9 @@ public class GroupsProcessor {
     Reader reader = new StringReader(content.toString());
     Writer writer = null;
 
-    final String resourceName = group.getName() + "." + cacheEntry.getType().name().toLowerCase();
-    final Resource mergedResource = Resource.create(resourceName, cacheEntry.getType());
-    mergedResource.setMinimize(cacheEntry.isMinimize());
-    mergedResource.setType(cacheEntry.getType());
+    final String resourceName = group.getName() + "." + cacheKey.getType().name().toLowerCase();
+    final Resource mergedResource = Resource.create(resourceName, cacheKey.getType());
+    mergedResource.setMinimize(cacheKey.isMinimize());
 
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {

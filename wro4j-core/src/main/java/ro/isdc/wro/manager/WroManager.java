@@ -12,9 +12,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
@@ -29,7 +30,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -52,25 +52,20 @@ import ro.isdc.wro.util.Transformer;
 public class WroManager
     implements WroConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  @Inject
   private WroModelFactory modelFactory;
-  @Inject
   private GroupExtractor groupExtractor;
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   @Inject
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
-  @Inject
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   private ProcessorsFactory processorsFactory;
-  @Inject
   private ResourceLocatorFactory locatorFactory;
   /**
    * Rename the file name based on its original name and content.
    */
   @Inject
   private NamingStrategy namingStrategy;
-  @Inject
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
   private GroupsProcessor groupsProcessor;
@@ -79,7 +74,6 @@ public class WroManager
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
-  @Inject
   private HashStrategy hashStrategy;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
@@ -94,10 +88,9 @@ public class WroManager
    */
   private final SchedulerHelper cacheSchedulerHelper;
   @Inject
-  private Injector injector;
   private ResourceBundleProcessor resourceBundleProcessor;
-  @Inject
   private ResourceAuthorizationManager authorizationManager;
+  private CacheKeyFactory cacheKeyFactory;
   private MetaDataFactory metaDataFactory;
 
   public WroManager() {
@@ -128,15 +121,7 @@ public class WroManager
     final WroConfiguration config = context.getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
-    getResourceBundleProcessor().serveProcessedBundle();
-  }
-
-  private ResourceBundleProcessor getResourceBundleProcessor() {
-    if (resourceBundleProcessor == null) {
-      resourceBundleProcessor = new ResourceBundleProcessor();
-      injector.inject(resourceBundleProcessor);
-    }
-    return resourceBundleProcessor;
+    resourceBundleProcessor.serveProcessedBundle();
   }
 
   /**
@@ -146,8 +131,9 @@ public class WroManager
    */
   public final String encodeVersionIntoGroupPath(final String groupName, final ResourceType resourceType,
       final boolean minimize) {
-    final CacheEntry key = new CacheEntry(groupName, resourceType, minimize);
-    final ContentHashEntry cacheValue = cacheStrategy.get(key);
+    //TODO use CacheKeyFactory
+    final CacheKey key = new CacheKey(groupName, resourceType, minimize);
+    final CacheValue cacheValue = cacheStrategy.get(key);
     final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
     // encode the fingerprint of the resource into the resource path
     return formatVersionedResource(cacheValue.getHash(), groupUrl);
@@ -218,6 +204,7 @@ public class WroManager
     notNull(hashStrategy, "HashStrategy was not set!");
     notNull(authorizationManager, "authorizationManager was not set!");
     notNull(metaDataFactory, "metaDataFactory was not set!");
+    notNull(cacheKeyFactory, "CacheKeyFactory was not set!");
   }
 
   /**
@@ -240,7 +227,7 @@ public class WroManager
    * @param cacheStrategy
    *          the cache to set
    */
-  public final WroManager setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  public final WroManager setCacheStrategy(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
     notNull(cacheStrategy);
     this.cacheStrategy = cacheStrategy;
     return this;
@@ -299,7 +286,7 @@ public class WroManager
   /**
    * @return the cacheStrategy
    */
-  public final CacheStrategy<CacheEntry, ContentHashEntry> getCacheStrategy() {
+  public final CacheStrategy<CacheKey, CacheValue> getCacheStrategy() {
     return cacheStrategy;
   }
 
@@ -323,6 +310,15 @@ public class WroManager
 
   public final GroupsProcessor getGroupsProcessor() {
     return this.groupsProcessor;
+  }
+
+
+  public CacheKeyFactory getCacheKeyFactory() {
+    return cacheKeyFactory;
+  }
+
+  public void setCacheKeyFactory(final CacheKeyFactory cacheKeyFactory) {
+    this.cacheKeyFactory = cacheKeyFactory;
   }
 
   public MetaDataFactory getMetaDataFactory() {

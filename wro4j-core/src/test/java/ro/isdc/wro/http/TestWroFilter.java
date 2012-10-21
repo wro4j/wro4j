@@ -36,9 +36,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
@@ -496,7 +496,7 @@ public class TestWroFilter {
     when(mockRequest.getRequestURI()).thenReturn(ReloadCacheRequestHandler.ENDPOINT_URI);
     when(mockResponse.getWriter()).thenReturn(new PrintWriter(System.out));
 
-    final CacheStrategy<CacheEntry, ContentHashEntry> mockCacheStrategy = mock(CacheStrategy.class);
+    final CacheStrategy<CacheKey, CacheValue> mockCacheStrategy = mock(CacheStrategy.class);
 
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setCacheStrategy(mockCacheStrategy);
 

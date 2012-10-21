@@ -9,8 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.cache.CacheEntry;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
@@ -23,27 +23,27 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  * @since 1.3.6
  */
 public class TestMemoryCacheStrategy {
-  private MemoryCacheStrategy<CacheEntry, ContentHashEntry> cache;
+  private MemoryCacheStrategy<CacheKey, CacheValue> cache;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    cache = new MemoryCacheStrategy<CacheEntry, ContentHashEntry>();
+    cache = new MemoryCacheStrategy<CacheKey, CacheValue>();
   }
 
   @Test
   public void testCache() throws IOException {
     HashStrategy builder = new CRC32HashStrategy();
-    CacheEntry key = new CacheEntry("testGroup", ResourceType.JS, false);
+    CacheKey key = new CacheKey("testGroup", ResourceType.JS, false);
 
     String content = "var foo = 'Hello World';";
     String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
 
     Assert.assertNull(cache.get(key));
 
-    cache.put(key, ContentHashEntry.valueOf(content, hash));
+    cache.put(key, CacheValue.valueOf(content, hash));
 
-    ContentHashEntry entry = cache.get(key);
+    CacheValue entry = cache.get(key);
 
     Assert.assertNotNull(entry);
     Assert.assertEquals(hash, entry.getHash());
@@ -52,7 +52,7 @@ public class TestMemoryCacheStrategy {
     cache.clear();
     Assert.assertNull(cache.get(key));
 
-    cache.put(key, ContentHashEntry.valueOf(content, hash));
+    cache.put(key, CacheValue.valueOf(content, hash));
     Assert.assertNotNull(cache.get(key));
     cache.destroy();
     Assert.assertNull(cache.get(key));

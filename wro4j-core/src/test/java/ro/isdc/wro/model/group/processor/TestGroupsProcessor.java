@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -74,7 +74,7 @@ public class TestGroupsProcessor {
   
   @Test
   public void shouldReturnEmptyStringWhenGroupHasNoResources() {
-    final CacheEntry key = new CacheEntry(groupName, ResourceType.JS, true);
+    final CacheKey key = new CacheKey(groupName, ResourceType.JS, true);
     Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
   }
   
@@ -86,13 +86,13 @@ public class TestGroupsProcessor {
     WroConfiguration config = new WroConfiguration();
     config.setIgnoreEmptyGroup(false);
     initVictim(config);
-    final CacheEntry key = new CacheEntry("group", ResourceType.JS, true);
+    final CacheKey key = new CacheKey("group", ResourceType.JS, true);
     victim.process(key);
   }
   
   @Test
   public void shouldLeaveContentUnchangedWhenAProcessorFails() {
-    final CacheEntry key = new CacheEntry(groupName, ResourceType.JS, true);
+    final CacheKey key = new CacheKey(groupName, ResourceType.JS, true);
     final Group group = new Group(groupName).addResource(Resource.create("1.js")).addResource(Resource.create("2.js"));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(group));
     // the locator which returns the name of the resource as its content

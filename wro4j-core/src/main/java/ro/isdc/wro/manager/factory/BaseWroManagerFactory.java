@@ -12,9 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.factory.CacheKeyFactory;
+import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
@@ -24,7 +26,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
@@ -53,7 +54,7 @@ public class BaseWroManagerFactory
 
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
-  private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   private HashStrategy hashStrategy;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
@@ -63,7 +64,9 @@ public class BaseWroManagerFactory
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
   private ResourceAuthorizationManager authorizationManager;
+  private CacheKeyFactory cacheKeyFactory;
   private MetaDataFactory metaDataFactory;
+
   /**
    * Handles the lazy synchronized creation of the manager
    */
@@ -99,6 +102,9 @@ public class BaseWroManagerFactory
       if (authorizationManager == null) {
         authorizationManager = newAuthorizationManager();
       }
+      if (cacheKeyFactory == null) {
+        cacheKeyFactory = newCacheKeyFactory();
+      }
       if (metaDataFactory == null) {
         metaDataFactory = newMetaDataFactory();
       }
@@ -112,6 +118,7 @@ public class BaseWroManagerFactory
       manager.setModelFactory(modelFactory);
       manager.setModelTransformers(modelTransformers);
       manager.setResourceAuthorizationManager(authorizationManager);
+      manager.setCacheKeyFactory(cacheKeyFactory);
       manager.setMetaDataFactory(metaDataFactory);
 
       onAfterInitializeManager(manager);
@@ -220,8 +227,8 @@ public class BaseWroManagerFactory
   /**
    * @return {@link CacheStrategy} instance for resources' group caching.
    */
-  protected CacheStrategy<CacheEntry, ContentHashEntry> newCacheStrategy() {
-    return new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>();
+  protected CacheStrategy<CacheKey, CacheValue> newCacheStrategy() {
+    return new LruMemoryCacheStrategy<CacheKey, CacheValue>();
   }
 
   /**
@@ -229,6 +236,13 @@ public class BaseWroManagerFactory
    */
   protected GroupExtractor newGroupExtractor() {
     return new DefaultGroupExtractor();
+  }
+
+  /**
+   * @return default implementation of {@link CacheKeyFactory}.
+   */
+  protected CacheKeyFactory newCacheKeyFactory() {
+    return new DefaultCacheKeyFactory();
   }
 
   /**
@@ -295,6 +309,11 @@ public class BaseWroManagerFactory
     return this;
   }
 
+
+  public void setCacheKeyFactory(final CacheKeyFactory cacheKeyFactory) {
+    this.cacheKeyFactory = cacheKeyFactory;
+  }
+
   /**
    * @param modelTransformers
    *          the modelTransformers to set
@@ -319,7 +338,7 @@ public class BaseWroManagerFactory
    * @param cacheStrategy
    *          the cacheStrategy to set
    */
-  public BaseWroManagerFactory setCacheStrategy(final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy) {
+  public BaseWroManagerFactory setCacheStrategy(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
     this.cacheStrategy = cacheStrategy;
     return this;
   }
