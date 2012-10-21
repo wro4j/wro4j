@@ -16,6 +16,8 @@ import ro.isdc.wro.cache.CacheEntry;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.ContentHashEntry;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
+import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -23,8 +25,8 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
@@ -41,14 +43,14 @@ import ro.isdc.wro.util.Transformer;
 /**
  * Default implementation of {@link WroManagerFactory} which creates default locators and processors and handles the
  * injection logic by creating an {@link Injector} and injecting where it is appropriate.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
     implements WroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(BaseWroManagerFactory.class);
-  
+
   private GroupExtractor groupExtractor;
   private WroModelFactory modelFactory;
   private CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy;
@@ -57,10 +59,11 @@ public class BaseWroManagerFactory
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
   private List<Transformer<WroModel>> modelTransformers;
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory locatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
   private ResourceAuthorizationManager authorizationManager;
+  private MetaDataFactory metaDataFactory;
   /**
    * Handles the lazy synchronized creation of the manager
    */
@@ -86,8 +89,8 @@ public class BaseWroManagerFactory
       if (processorsFactory == null) {
         processorsFactory = newProcessorsFactory();
       }
-      if (uriLocatorFactory == null) {
-        uriLocatorFactory = newUriLocatorFactory();
+      if (locatorFactory == null) {
+        locatorFactory = newLocatorFactory();
       }
       // use NoOp as default naming strategy
       if (namingStrategy == null) {
@@ -103,7 +106,7 @@ public class BaseWroManagerFactory
       manager.setGroupExtractor(groupExtractor);
       manager.setCacheStrategy(cacheStrategy);
       manager.setHashStrategy(hashStrategy);
-      manager.setUriLocatorFactory(uriLocatorFactory);
+      manager.setResourceLocatorFactory(locatorFactory);
       manager.setProcessorsFactory(processorsFactory);
       manager.setNamingStrategy(namingStrategy);
       manager.setModelFactory(modelFactory);
@@ -112,7 +115,7 @@ public class BaseWroManagerFactory
       manager.setMetaDataFactory(metaDataFactory);
 
       onAfterInitializeManager(manager);
-      
+
       return manager;
     }
   };
@@ -124,7 +127,7 @@ public class BaseWroManagerFactory
   public final WroManager create() {
     return managerInitializer.get();
   }
-  
+
   /**
    * @return default implementation of {@link ResourceAuthorizationManager}.
    */
@@ -136,13 +139,13 @@ public class BaseWroManagerFactory
    * Allows factory to do additional manager configuration after it was initialzed. One use-case is to configure
    * callbacks. Default implementation does nothing. Do not set anything else except callbacks in this method, otherwise
    * the initialization will not be performed properly.
-   * 
+   *
    * @param manager
    *          initialized instance of {@link WroManager}.
    */
   protected void onAfterInitializeManager(final WroManager manager) {
   }
-  
+
   /**
    * @param namingStrategy
    *          the namingStrategy to set
@@ -162,20 +165,20 @@ public class BaseWroManagerFactory
 
   /**
    * Override to provide a different or modified default factory implementation.
-   * 
+   *
    * @return {@link ProcessorsFactory} object.
    */
   protected ProcessorsFactory newProcessorsFactory() {
     return new DefaultProcesorsFactory();
   }
-  
+
   /**
    * Override to provide a different or modified factory.
-   * 
+   *
    * @return {@link UriLocatorFactory} object.
    */
-  protected UriLocatorFactory newUriLocatorFactory() {
-    return new DefaultUriLocatorFactory();
+  protected ResourceLocatorFactory newLocatorFactory() {
+    return new DefaultResourceLocatorFactory();
   }
 
   /**
@@ -184,14 +187,14 @@ public class BaseWroManagerFactory
   protected HashStrategy newHashStrategy() {
     return new SHA1HashStrategy();
   }
-  
+
   /**
-   * @return default {@link NamingStrategy} to be used by this {@link WroManagerFactory} 
+   * @return default {@link NamingStrategy} to be used by this {@link WroManagerFactory}
    */
   protected NamingStrategy newNamingStrategy() {
     return new NoOpNamingStrategy();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -270,7 +273,7 @@ public class BaseWroManagerFactory
     this.modelFactory = modelFactory;
     return this;
   }
-  
+
   /**
    * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
    * @param hashBuilder
@@ -281,7 +284,7 @@ public class BaseWroManagerFactory
     this.hashStrategy = hashBuilder;
     return this;
   }
-  
+
 
   /**
    * @param hashBuilder
@@ -291,7 +294,7 @@ public class BaseWroManagerFactory
     this.hashStrategy = hashStrategy;
     return this;
   }
-  
+
   /**
    * @param modelTransformers
    *          the modelTransformers to set
@@ -300,7 +303,7 @@ public class BaseWroManagerFactory
     this.modelTransformers = modelTransformers;
     return this;
   }
-  
+
   /**
    * Add a single model transformer.
    */
@@ -311,7 +314,7 @@ public class BaseWroManagerFactory
     this.modelTransformers.add(modelTransformer);
     return this;
   }
-  
+
   /**
    * @param cacheStrategy
    *          the cacheStrategy to set
@@ -322,14 +325,14 @@ public class BaseWroManagerFactory
   }
 
   /**
-   * @param uriLocatorFactory
+   * @param locatorFactory
    *          the uriLocatorFactory to set
    */
-  public BaseWroManagerFactory setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.uriLocatorFactory = uriLocatorFactory;
+  public BaseWroManagerFactory setLocatorFactory(final ResourceLocatorFactory locatorFactory) {
+    this.locatorFactory = locatorFactory;
     return this;
   }
-  
+
   /**
    * @param processorsFactory
    *          the processorsFactory to set
@@ -340,6 +343,11 @@ public class BaseWroManagerFactory
 
   public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+    return this;
+  }
+
+  public BaseWroManagerFactory setMetaDataFactory(final MetaDataFactory metaDataFactory) {
+    this.metaDataFactory = metaDataFactory;
     return this;
   }
 

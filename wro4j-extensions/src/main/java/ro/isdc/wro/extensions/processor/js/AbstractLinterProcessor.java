@@ -87,19 +87,6 @@ public abstract class AbstractLinterProcessor
   }
 
   /**
-   * @return the linter to use for js code validation.
-   */
-  protected abstract AbstractLinter newLinter();
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void process(final Reader reader, final Writer writer) throws IOException {
-    process(null, reader, writer);
-  }
-
-  /**
    * Called when {@link LinterException} is thrown. Allows subclasses to re-throw this exception as a
    * {@link RuntimeException} or handle it differently. The default implementation simply logs the errors.
    *

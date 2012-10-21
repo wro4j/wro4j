@@ -77,7 +77,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    * {@inheritDoc}
    */
   @Override
-  protected ResourceLocatorFactory newResourceLocatorFactory() {
+  protected ResourceLocatorFactory newLocatorFactory() {
     final ConfigurableLocatorFactory factory = new ConfigurableLocatorFactory() {
       @Override
       protected Properties newProperties() {
@@ -110,13 +110,13 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         return props;
       }
       @Override
-      protected Map<String, ResourceProcessor> getPostProcessorStrategies(ProcessorProvider provider) {
+      protected Map<String, ResourceProcessor> getPostProcessorStrategies(final ProcessorProvider provider) {
         final Map<String, ResourceProcessor> map = super.getPostProcessorStrategies(provider);
         contributePostProcessors(map);
         return map;
       }
       @Override
-      protected Map<String, ResourceProcessor> getPreProcessorStrategies(ProcessorProvider provider) {
+      protected Map<String, ResourceProcessor> getPreProcessorStrategies(final ProcessorProvider provider) {
         final Map<String, ResourceProcessor> map = super.getPreProcessorStrategies(provider);
         contributePreProcessors(map);
         return map;
@@ -154,7 +154,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       }
     };
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -169,11 +169,11 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       }
     };
   }
-  
+
   /**
    * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
    * This method helps to ensure backward compatibility of the filterConfig vs configProperties configuration.
-   * 
+   *
    * @param props
    *          the {@link Properties} which will be populated with the value extracted from filterConfig or
    *          configProperties for the provided key.

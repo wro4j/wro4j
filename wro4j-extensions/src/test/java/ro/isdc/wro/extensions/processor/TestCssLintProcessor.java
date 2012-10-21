@@ -19,7 +19,6 @@ import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.Transformers;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -60,7 +59,7 @@ public class TestCssLintProcessor {
       @Override
       public Void call() {
         try {
-          lessCss.process(new StringReader(createValidCss()), new StringWriter());
+          lessCss.process(null, new StringReader(createValidCss()), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }

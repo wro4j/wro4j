@@ -68,7 +68,7 @@ public class DefaultStandaloneContextAwareManagerFactory
    * {@inheritDoc}
    */
   @Override
-  protected ResourceLocatorFactory newResourceLocatorFactory() {
+  protected ResourceLocatorFactory newLocatorFactory() {
     return DefaultResourceLocatorFactory.standaloneFactory(standaloneContext.getContextFolder());
   }
 }
