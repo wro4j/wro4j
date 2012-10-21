@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,6 +72,7 @@ public class TestCssLintProcessor {
     return ".label {color: red;}";
   }
 
+
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(victim, ResourceType.CSS);
@@ -91,8 +91,8 @@ public class TestCssLintProcessor {
       throws Exception {
     victim = new CssLintProcessor() {
       @Override
-      protected String[] getOptions() {
-        return ArrayUtils.toArray("import");
+      protected String getOptions() {
+        return "import";
       }
 
       @Override
