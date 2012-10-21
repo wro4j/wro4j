@@ -15,7 +15,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 /**
  * @author Alex Objelean
  */
-public class TestContentHashEntry {
+public class TestCacheValue {
   private static final String RAW_CONTENT = "[RAW_CONTENT]";
   @Before
   public void setUp() {
@@ -30,7 +30,7 @@ public class TestContentHashEntry {
 
   @Test
   public void shouldNotCacheGzippedContentByDefault() {
-    final ContentHashEntry entry = ContentHashEntry.valueOf(RAW_CONTENT, "hash");
+    final CacheValue entry = CacheValue.valueOf(RAW_CONTENT, "hash");
     Assert.assertEquals(RAW_CONTENT, entry.getRawContent());
     Assert.assertNull(entry.getGzippedContentInternal());
     Assert.assertNotNull(entry.getGzippedContent());
@@ -39,7 +39,7 @@ public class TestContentHashEntry {
   @Test
   public void shouldCacheGzippedContentByDefault() {
     Context.get().getConfig().setCacheGzippedContent(true);
-    final ContentHashEntry entry = ContentHashEntry.valueOf(RAW_CONTENT, "hash");
+    final CacheValue entry = CacheValue.valueOf(RAW_CONTENT, "hash");
     Assert.assertNotNull(null, entry.getGzippedContentInternal());
     Assert.assertNotNull(entry.getGzippedContent());
   }
@@ -48,7 +48,7 @@ public class TestContentHashEntry {
   public void changingFlagShouldHaveNoEffect() {
     final WroConfiguration config = Context.get().getConfig();
     config.setCacheGzippedContent(false);
-    final ContentHashEntry entry = ContentHashEntry.valueOf(RAW_CONTENT, "hash");
+    final CacheValue entry = CacheValue.valueOf(RAW_CONTENT, "hash");
     Assert.assertNull(null, entry.getGzippedContentInternal());
 
     config.setCacheGzippedContent(true);

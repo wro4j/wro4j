@@ -25,14 +25,14 @@ import ro.isdc.wro.config.Context;
  * @author Alex Objelean
  */
 @SuppressWarnings("serial")
-public final class ContentHashEntry
+public final class CacheValue
   implements Serializable {
-  private static final Logger LOG = LoggerFactory.getLogger(ContentHashEntry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CacheValue.class);
   private String rawContent;
   private byte[] gzippedContent;
   private String hash;
 
-  private ContentHashEntry(final String rawContent, final String hash) {
+  private CacheValue(final String rawContent, final String hash) {
     this.rawContent = rawContent;
     this.hash = hash;
     //the trade-off between the memory and processing time
@@ -58,10 +58,10 @@ public final class ContentHashEntry
   /**
    * Factory method.
    *
-   * @return {@link ContentHashEntry} based on supplied values.
+   * @return {@link CacheValue} based on supplied values.
    */
-  public static final ContentHashEntry valueOf(final String rawContent, final String hash) {
-    return new ContentHashEntry(rawContent, hash);
+  public static final CacheValue valueOf(final String rawContent, final String hash) {
+    return new CacheValue(rawContent, hash);
   }
 
   /**

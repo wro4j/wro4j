@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache;
+package ro.isdc.wro.cache.support;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.cache.CacheStrategy;
 
 
 /**

@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheEntry;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -36,8 +36,8 @@ public class ExternalResourceServlet extends HttpServlet {
     final WroManagerFactory managerFactory = helper.getManagerFactory();
     final WroManager wroManager = managerFactory.create();
     
-    final CacheEntry cacheKey = new CacheEntry("login", ResourceType.CSS, false);
-    ContentHashEntry cacheValue = wroManager.getCacheStrategy().get(cacheKey);
+    final CacheKey cacheKey = new CacheKey("login", ResourceType.CSS, false);
+    CacheValue cacheValue = wroManager.getCacheStrategy().get(cacheKey);
     LOG.info("cacheValue: {}", cacheValue);
     
     final WroModel model = wroManager.getModelFactory().create();

@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
@@ -60,7 +60,7 @@ public class GroupsProcessor {
    *          to process.
    * @return processed content.
    */
-  public String process(final CacheEntry cacheKey) {
+  public String process(final CacheKey cacheKey) {
     Validate.notNull(cacheKey);
     try {
       LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),

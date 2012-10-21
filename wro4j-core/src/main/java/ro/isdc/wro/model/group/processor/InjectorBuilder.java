@@ -11,14 +11,16 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
-import ro.isdc.wro.cache.DefaultSynchronizedCacheStrategyDecorator;
+import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.factory.CacheKeyFactory;
+import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
+import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -48,6 +50,7 @@ public class InjectorBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(InjectorBuilder.class);
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private ResourceBundleProcessor bundleProcessor;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
@@ -81,9 +84,9 @@ public class InjectorBuilder {
   /**
    * Ensure the strategy is decorated only once.
    */
-  private final LazyInitializer<CacheStrategy<CacheEntry, ContentHashEntry>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheEntry, ContentHashEntry>>() {
+  private final LazyInitializer<CacheStrategy<CacheKey, CacheValue>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheKey, CacheValue>>() {
     @Override
-    protected CacheStrategy<CacheEntry, ContentHashEntry> initialize() {
+    protected CacheStrategy<CacheKey, CacheValue> initialize() {
       final WroManager manager = managerFactory.create();
       // update manager with new decorated strategy
       manager.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(manager.getCacheStrategy()));
@@ -128,6 +131,20 @@ public class InjectorBuilder {
     map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
     map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
+    map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
+    map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
+  }
+
+  private Object createResourceBundleProcessorProxy() {
+    return new InjectorObjectFactory<ResourceBundleProcessor>() {
+      public ResourceBundleProcessor create() {
+        if (bundleProcessor == null) {
+          bundleProcessor = new ResourceBundleProcessor();
+          injector.inject(bundleProcessor);
+        }
+        return bundleProcessor;
+      }
+    };
   }
 
   private Object createMetaDataFactoryProxy() {
@@ -255,7 +272,7 @@ public class InjectorBuilder {
   private Object createCacheStrategyProxy() {
     return new InjectorObjectFactory<CacheStrategy>() {
       public CacheStrategy create() {
-        final CacheStrategy<CacheEntry, ContentHashEntry> decorated = cacheStrategyInitializer.get();
+        final CacheStrategy<CacheKey, CacheValue> decorated = cacheStrategyInitializer.get();
         injector.inject(decorated);
         return decorated;
       }
@@ -272,6 +289,16 @@ public class InjectorBuilder {
         return Context.get();
       }
     }, ReadOnlyContext.class);
+  }
+
+  private Object createCacheKeyFactoryProxy() {
+    return new InjectorObjectFactory<CacheKeyFactory>() {
+      public CacheKeyFactory create() {
+        final CacheKeyFactory factory = managerFactory.create().getCacheKeyFactory();
+        injector.inject(factory);
+        return factory;
+      }
+    };
   }
 
   public Injector build() {

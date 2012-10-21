@@ -5,6 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -17,8 +18,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +25,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
+import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -93,12 +94,13 @@ public class TestInjectorBuilder {
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
     assertNotNull(sample.metaDataFactory);
+    assertNotNull(sample.bundleProcessor);
   }
 
   @Test
   public void shouldBuildValidInjectorWithBaseWroManagerFactory() {
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
-    Assert.assertNotNull(injector);
+    assertNotNull(injector);
 
     final Sample sample = new Sample();
     injector.inject(sample);
@@ -110,13 +112,15 @@ public class TestInjectorBuilder {
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
     assertNotNull(sample.metaDataFactory);
+    assertNotNull(sample.cacheKeyFactory);
+    assertNotNull(sample.bundleProcessor);
   }
 
   @Test
   public void shouldBuildValidInjectorWithFewFieldsSet() throws Exception {
-    final NamingStrategy mockNamingStrategy = Mockito.mock(NamingStrategy.class);
-    final ProcessorsFactory mockProcessorsFactory = Mockito.mock(ProcessorsFactory.class);
-    final UriLocatorFactory mockLocatorFactory = Mockito.mock(UriLocatorFactory.class);
+    final NamingStrategy mockNamingStrategy = mock(NamingStrategy.class);
+    final ProcessorsFactory mockProcessorsFactory = mock(ProcessorsFactory.class);
+    final UriLocatorFactory mockLocatorFactory = mock(UriLocatorFactory.class);
     final MetaDataFactory mockMetaDataFactory = Mockito.mock(MetaDataFactory.class);
 
     final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
@@ -153,6 +157,8 @@ public class TestInjectorBuilder {
     assertNotNull(sample.hashBuilder);
     assertNotNull(sample.readOnlyContext);
     assertNotNull(sample.metaDataFactory);
+    assertNotNull(sample.cacheKeyFactory);
+    assertNotNull(sample.bundleProcessor);
   }
 
   @Test(expected = IOException.class)
@@ -200,5 +206,9 @@ public class TestInjectorBuilder {
     ReadOnlyContext readOnlyContext;
     @Inject
     MetaDataFactory metaDataFactory;
+    @Inject
+    CacheKeyFactory cacheKeyFactory;
+    @Inject
+    ResourceBundleProcessor bundleProcessor;
   }
 }
