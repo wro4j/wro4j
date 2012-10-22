@@ -25,8 +25,8 @@ public final class ProcessingCriteria {
     return new ProcessingCriteria().setProcessingType(processingType).setMinimize(minimize);
   }
 
-  public static ProcessingCriteria createDefault() {
-    return new ProcessingCriteria();
+  public static ProcessingCriteria createDefault(final boolean minimize) {
+    return new ProcessingCriteria().setMinimize(minimize);
   }
 
   public ProcessingCriteria setProcessingType(final ProcessingType processingType) {

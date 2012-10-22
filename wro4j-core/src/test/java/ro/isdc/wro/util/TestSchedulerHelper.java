@@ -4,6 +4,9 @@
  */
 package ro.isdc.wro.util;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,7 +14,10 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +26,14 @@ import org.slf4j.LoggerFactory;
  */
 public class TestSchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(TestSchedulerHelper.class);
+  @Mock
+  private Runnable mockRunnable;
   private SchedulerHelper helper;
+
+  @Before
+  public void setUp() {
+    initMocks(this);
+  }
 
   @Test(expected=NullPointerException.class)
   public void cannotAcceptNullArgument() {
@@ -54,16 +67,16 @@ public class TestSchedulerHelper {
     helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return createSleepingRunnable(100);
+        return createSleepingRunnable(10);
       }
     });
-    helper.scheduleWithPeriod(100);
-    Assert.assertEquals(100, helper.getPeriod());
-    Thread.sleep(200);
+    helper.scheduleWithPeriod(10);
+    Assert.assertEquals(10, helper.getPeriod());
+    Thread.sleep(20);
 
-    helper.scheduleWithPeriod(200);
-    Assert.assertEquals(200, helper.getPeriod());
-    Thread.sleep(400);
+    helper.scheduleWithPeriod(20);
+    Assert.assertEquals(20, helper.getPeriod());
+    Thread.sleep(40);
   }
 
   @Test
@@ -71,16 +84,16 @@ public class TestSchedulerHelper {
     helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return createSleepingRunnable(100);
+        return createSleepingRunnable(10);
       }
     });
-    helper.scheduleWithPeriod(100);
-    Assert.assertEquals(100, helper.getPeriod());
-    Thread.sleep(200);
+    helper.scheduleWithPeriod(10);
+    Assert.assertEquals(10, helper.getPeriod());
+    Thread.sleep(20);
 
-    helper.scheduleWithPeriod(100);
-    Assert.assertEquals(100, helper.getPeriod());
-    Thread.sleep(300);
+    helper.scheduleWithPeriod(10);
+    Assert.assertEquals(10, helper.getPeriod());
+    Thread.sleep(30);
   }
 
   @Test
@@ -92,7 +105,7 @@ public class TestSchedulerHelper {
           public void run() {
             try {
               LOG.debug("\tRunning thread ...");
-              Thread.sleep(400);
+              Thread.sleep(40);
             } catch (final Exception e) {
               LOG.error("runnable interrupted", e);
             }
@@ -109,7 +122,7 @@ public class TestSchedulerHelper {
 
     final ExecutorService service = Executors.newFixedThreadPool(5);
     for (int i = 0; i < 10; i++) {
-      period.set(period.get() + 100);
+      period.set(period.get() + 30);
       //Thread.sleep(300);
       service.execute(new Runnable() {
         public void run() {
@@ -117,7 +130,7 @@ public class TestSchedulerHelper {
         }
       });
     }
-    Thread.sleep(3000);
+    Thread.sleep(400);
     helper.destroy();
     service.shutdown();
   }
@@ -153,6 +166,19 @@ public class TestSchedulerHelper {
       }
     });
     helper.scheduleWithPeriod(period, timeUnit);
+  }
+
+  @Test
+  public void shouldNotInvokeRunnableImmediatelyAfterScheduleIsInvoked() throws Exception {
+    helper = SchedulerHelper.create(new DestroyableLazyInitializer<Runnable>() {
+      @Override
+      protected Runnable initialize() {
+        return mockRunnable;
+      }
+    });
+    helper.scheduleWithPeriod(7200);
+    Thread.sleep(10);
+    verify(mockRunnable, Mockito.never()).run();
   }
 
   @After

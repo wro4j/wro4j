@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -30,7 +27,6 @@ import ro.isdc.wro.util.AbstractDecorator;
  */
 public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorator<ResourceProcessor>
   implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractProcessorDecoratorSupport.class);
 
   public AbstractProcessorDecoratorSupport(final ResourceProcessor decorated) {
     super(decorated);

@@ -26,6 +26,7 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.util.StopWatch;
 
@@ -77,7 +78,7 @@ public class GroupsProcessor {
         }
       }
       final String result = preProcessorExecutor.processAndMerge(filteredGroup, cacheKey.isMinimize());
-      return applyPostProcessors(group, cacheKey, result);
+      return applyPostProcessors(cacheKey, result);
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources: " + e.getMessage(), e).logError();
     } finally {
@@ -88,24 +89,22 @@ public class GroupsProcessor {
   /**
    * Apply resourcePostProcessors.
    *
-   * @param processors
-   *          a collection of processors to apply on the content from the supplied writer.
+   * @param cacheKey
+   *          the {@link CacheKey} being processed.
    * @param content
    *          to process with all postProcessors.
    * @return the post processed content.
    */
-  private String applyPostProcessors(final Group group, final CacheKey cacheKey, final String content)
+  private String applyPostProcessors(final CacheKey cacheKey, final String content)
       throws IOException {
     final Collection<ResourceProcessor> processors = processorsFactory.getPostProcessors();
     if (processors.isEmpty()) {
       return content;
     }
+    final Resource resource = Resource.create(cacheKey.getGroupName(), cacheKey.getType());
+
     Reader reader = new StringReader(content.toString());
     Writer writer = null;
-
-    final String resourceName = group.getName() + "." + cacheKey.getType().name().toLowerCase();
-    final Resource mergedResource = Resource.create(resourceName, cacheKey.getType());
-    mergedResource.setMinimize(cacheKey.isMinimize());
 
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
@@ -113,7 +112,8 @@ public class GroupsProcessor {
       writer = new StringWriter();
       try {
         callbackRegistry.onBeforePostProcess();
-        decorateProcessor(processor).process(mergedResource, reader, writer);
+        //the processor is invoked as a pre processor. This is important for correct computation of eligibility.
+        decorateProcessor(processor, cacheKey.isMinimize()).process(resource, reader, writer);
       } finally {
         stopWatch.stop();
         callbackRegistry.onAfterPostProcess();
@@ -127,10 +127,10 @@ public class GroupsProcessor {
   }
 
   /**
-   * @return a decorated postProcessor.
+   * @return a decorated processor.
    */
-  private ResourceProcessor decorateProcessor(final ResourceProcessor processor) {
-    final ResourceProcessor decorated = new DefaultProcessorDecorator(processor);
+  private ProcessorDecorator decorateProcessor(final ResourceProcessor processor, final boolean minimize) {
+    final ProcessorDecorator decorated = new DefaultProcessorDecorator(processor, minimize);
     injector.inject(decorated);
     return decorated;
   }

@@ -43,7 +43,7 @@ public class TestDefaultProcessorDecorator {
   public void setUp() {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
-    victim = new DefaultProcessorDecorator(mockProcessor);
+    victim = new DefaultProcessorDecorator(mockProcessor, true);
     WroTestUtils.createInjector().inject(victim);
   }
 
@@ -54,7 +54,7 @@ public class TestDefaultProcessorDecorator {
 
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullProcessor() {
-    new DefaultProcessorDecorator(null);
+    new DefaultProcessorDecorator(null, false);
   }
 
   @Test
