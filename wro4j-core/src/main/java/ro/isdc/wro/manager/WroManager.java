@@ -19,6 +19,7 @@ import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.config.support.WroConfigurationChangeListener;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -97,13 +98,15 @@ public class WroManager
     cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return new ReloadCacheRunnable(getCacheStrategy());
+        //decorate with ContextPropagatingCallable to make context available in the new thread
+        return ContextPropagatingCallable.decorate(new ReloadCacheRunnable(getCacheStrategy()));
       }
     }, ReloadCacheRunnable.class.getSimpleName());
     modelSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
-        return new ReloadModelRunnable(getModelFactory());
+        //decorate with ContextPropagatingCallable to make context available in the new thread
+        return ContextPropagatingCallable.decorate(new ReloadModelRunnable(getModelFactory()));
       }
     }, ReloadModelRunnable.class.getSimpleName());
   }
