@@ -2,6 +2,7 @@ package ro.isdc.wro.model.resource.support.change;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,29 +27,38 @@ public final class ResourceChangeInfo {
    * A set of groups for which changes were detected. This set is required to handle the situations when the same
    * resource is contained in two different groups and only the first group is notified about the change.
    */
-  private final Set<String> groups = new HashSet<String>();
+  private final Set<String> groups = Collections.synchronizedSet(new HashSet<String>());
 
   /**
    * Updates the hash associated with the resource for a give groupName.
    *
-   * @param currentHash
+   * @param hash
    *          the most recent computed hash.
    * @param groupName
    *          name of the group for which the change of resource is detected.
    */
-  public void updateHashForGroup(final String currentHash, final String groupName) {
+  public void updateHashForGroup(final String hash, final String groupName) {
     notNull(groupName);
-    if (isChangedHash(currentHash)) {
-      this.currentHash = currentHash;
+    groups.add(groupName);
+    if (isChangedHash(hash)) {
+      this.currentHash = hash;
+      LOG.debug("Change detected for group '{}': {}", groupName, this);
       //remove all persisted groups. Starting over..
       groups.clear();
-      LOG.debug("Change detected: {}", this);
     }
-    groups.add(groupName);
   }
 
-  private boolean isChangedHash(final String currentHash) {
-    return currentHash != null && !currentHash.equals(this.currentHash);
+  private boolean isChangedHash(final String hash) {
+    LOG.debug("Check change for hash: {}. ResourceChageInfo: {}", hash, this);
+    boolean result = false;
+    if (currentHash != null) {
+      result = !currentHash.equals(hash);
+    } else if (hash != null) {
+      result = !hash.equals(this.prevHash);
+    }
+    //currentHash != null ? !this.currentHash.equals(hash) :
+    LOG.debug("Check change for hash: {}. ResourceChageInfo: {}", hash, this);
+    return result;
   }
 
   /**
@@ -68,7 +78,8 @@ public final class ResourceChangeInfo {
   public boolean isChanged(final String groupName) {
     notNull(groupName);
     LOG.debug("isChange for group: {}", groupName);
-    final boolean result = prevHash != null && (prevHash.equals(currentHash) ? groups.contains(groupName) : true);
+    final boolean result = prevHash != null
+        && (prevHash.equals(currentHash) ? !groups.contains(groupName) : true);
     LOG.debug("resourceInfo: {}, changed: {}", this, result);
     return result;
   }
