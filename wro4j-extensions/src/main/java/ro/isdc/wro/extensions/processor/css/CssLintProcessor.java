@@ -7,7 +7,6 @@ package ro.isdc.wro.extensions.processor.css;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,9 +39,9 @@ public class CssLintProcessor
   private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
   public static final String ALIAS = "cssLint";
   /**
-   * Options to use to configure jsHint.
+   * CSV Options.
    */
-  private String[] options;
+  private String options;
 
   private ObjectPoolHelper<CssLint> enginePool;
 
@@ -106,17 +105,39 @@ public class CssLintProcessor
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
 
-
-  public CssLintProcessor setOptions(final String... options) {
-    this.options = options == null ? new String[] {} : options;
-    LOG.debug("setOptions: {}", Arrays.asList(this.options));
+  /**
+   * @param options a CSV representation of options.
+   */
+  public CssLintProcessor setOptionsAsString(final String options) {
+    this.options = options;
     return this;
   }
 
   /**
-   * @return an array of options used by jsHint.
+   * Sets an array of options.
+   * Use {@link #setOptionsAsString(String)} instead.
    */
-  protected String[] getOptions() {
+  @Deprecated
+  public CssLintProcessor setOptions(final String... options) {
+    this.options = StringUtils.join(options, ',');
+    LOG.debug("setOptions: {}", this.options);
+    return this;
+  }
+
+  /**
+   * @return an options as CSV.
+   */
+  private String getOptions() {
+    if (options == null) {
+      options = createDefaultOptions();
+    }
     return options;
+  }
+
+  /**
+   * @return default options to use for linting.
+   */
+  protected String createDefaultOptions() {
+    return "";
   }
 }

@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -87,12 +86,25 @@ public class TestCssLintProcessor {
   }
 
   @Test(expected = CssLintException.class)
+  public void shouldFailWhenProcessingCssWithErrors()
+      throws Exception {
+    victim = new CssLintProcessor() {
+      @Override
+      protected void onCssLintException(final CssLintException e, final Resource resource) {
+        throw e;
+      }
+    };
+    victim.setOptions("import");
+    victim.process(null, new StringReader("@import url(more.css);"), new StringWriter());
+  }
+
+  @Test(expected = CssLintException.class)
   public void shouldOverrideDefaultOptions()
       throws Exception {
     victim = new CssLintProcessor() {
       @Override
-      protected String[] getOptions() {
-        return ArrayUtils.toArray("import");
+      protected String createDefaultOptions() {
+        return "import";
       }
 
       @Override

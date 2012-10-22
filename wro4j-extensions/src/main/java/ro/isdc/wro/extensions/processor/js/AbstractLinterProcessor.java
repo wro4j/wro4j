@@ -7,7 +7,6 @@ package ro.isdc.wro.extensions.processor.js;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +40,7 @@ public abstract class AbstractLinterProcessor
   /**
    * Options to use to configure the linter.
    */
-  private String[] options;
+  private String options;
 
   public AbstractLinterProcessor() {
     enginePool = new ObjectPoolHelper<AbstractLinter>(new ObjectFactory<AbstractLinter>() {
@@ -98,16 +97,35 @@ public abstract class AbstractLinterProcessor
   }
 
   /**
-   * @return an array of options used for linting.
+   * @return an options as CSV.
    */
-  protected String[] getOptions() {
+  private String getOptions() {
+    if (options == null) {
+      options = createDefaultOptions();
+    }
     return options;
   }
 
+  /**
+   * @return default options to use for linting.
+   */
+  protected String createDefaultOptions() {
+    return "";
+  }
 
+  public AbstractLinterProcessor setOptionsAsString(final String options) {
+    this.options = options;
+    return this;
+  }
+
+  /**
+   * Sets an array of options.
+   * Use {@link #setOptionsAsString(String)} instead.
+   */
+  @Deprecated
   public AbstractLinterProcessor setOptions(final String... options) {
-    this.options = options == null ? new String[] {} : options;
-    LOG.debug("setOptions: {}", Arrays.asList(this.options));
+    this.options = StringUtils.join(options, ',');
+    LOG.debug("setOptions: {}", this.options);
     return this;
   }
 

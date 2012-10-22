@@ -9,7 +9,6 @@ import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -102,8 +101,8 @@ public class TestJsHintProcessor
       throws Exception {
     victim = new JsHintProcessor() {
       @Override
-      protected String[] getOptions() {
-        return ArrayUtils.toArray("bitwise");
+      protected String createDefaultOptions() {
+        return "bitwise";
       }
 
       @Override

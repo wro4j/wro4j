@@ -6,10 +6,9 @@ package ro.isdc.wro.extensions.processor.support.linter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,7 @@ public abstract class AbstractLinter {
   /**
    * Options to apply to js hint processing
    */
-  private String[] options;
+  private String options;
 
   /**
    * Initialize script builder for evaluation.
@@ -71,8 +70,7 @@ public abstract class AbstractLinter {
     final RhinoScriptBuilder builder = initScriptBuilder();
     watch.stop();
     watch.start("lint");
-    LOG.debug("options: {}", Arrays.toString(this.options));
-    final String packIt = buildLinterScript(WroUtil.toJSMultiLineString(data), this.options);
+    final String packIt = buildLinterScript(WroUtil.toJSMultiLineString(data), getOptions());
     final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
     if (!valid) {
       final String json = builder.addJSON().evaluate(String.format("JSON.stringify(%s.errors)", getLinterName()),
@@ -102,8 +100,8 @@ public abstract class AbstractLinter {
    *          options to set as true
    * @return Script used to pack and return the packed result.
    */
-  private String buildLinterScript(final String data, final String... options) {
-    return String.format("%s(%s,%s);", getLinterName(), data, optionsBuilder.build(options));
+  private String buildLinterScript(final String data, final String options) {
+    return String.format("%s(%s,%s);", getLinterName(), data, optionsBuilder.buildFromCsv(options));
   }
 
   /**
@@ -111,12 +109,26 @@ public abstract class AbstractLinter {
    *          the options to set
    */
   public AbstractLinter setOptions(final String... options) {
-    if (options != null && options.length > 0) {
-      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
-    } else {
-      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
-    }
-    LOG.debug("setOptions: {}", Arrays.asList(this.options));
+    this.options = StringUtils.join(options, ',');
+    LOG.debug("setOptions: {}", this.options);
     return this;
+  }
+
+
+  /**
+   * @return an options as CSV.
+   */
+  private String getOptions() {
+    if (options == null) {
+      options = createDefaultOptions();
+    }
+    return options;
+  }
+
+  /**
+   * @return default options to use for linting.
+   */
+  protected String createDefaultOptions() {
+    return "";
   }
 }

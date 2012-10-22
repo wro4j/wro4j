@@ -6,10 +6,8 @@ package ro.isdc.wro.extensions.processor.support.csslint;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +37,9 @@ public class CssLint {
   private static final String DEFAULT_CSSLINT_JS = "csslint.min.js";
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
-   * Options to apply to js hint processing
+   * CSV Options to apply.
    */
-  private String[] options;
+  private String options;
   private ScriptableObject scope;
 
   /**
@@ -85,8 +83,8 @@ public class CssLint {
     final RhinoScriptBuilder builder = initScriptBuilder();
     watch.stop();
     watch.start("cssLint");
-    LOG.debug("options: {}", Arrays.toString(this.options));
-    final String script = buildCssLintScript(WroUtil.toJSMultiLineString(data), this.options);
+    LOG.debug("options: {}", this.options);
+    final String script = buildCssLintScript(WroUtil.toJSMultiLineString(data));
     LOG.debug("script: {}", script);
     builder.evaluate(script, "CSSLint.verify").toString();
     final boolean valid = Boolean.parseBoolean(builder.evaluate("result.length == 0", "checkNoErrors").toString());
@@ -103,21 +101,30 @@ public class CssLint {
     LOG.debug(watch.prettyPrint());
   }
 
-  private String buildCssLintScript(final String data, final String... options) {
-    return String.format("var result = CSSLint.verify(%s,%s).messages", data, optionsBuilder.build(options));
+  private String buildCssLintScript(final String data) {
+    return String.format("var result = CSSLint.verify(%s,%s).messages", data, optionsBuilder.buildFromCsv(options));
   }
 
   /**
-   * @param options
-   *          the options to set
+   * @param options CSV representation of the options.
    */
-  public CssLint setOptions(final String... options) {
-    if (options != null && options.length > 0) {
-      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
-    } else {
-      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
-    }
-    LOG.debug("options: {}", Arrays.asList(this.options));
+  public CssLint setOptions(final String options) {
+    this.options = options;
     return this;
   }
+
+//
+//  /**
+//   * @param options
+//   *          the options to set
+//   */
+//  public CssLint setOptions(final String... options) {
+//    if (options != null && options.length > 0) {
+//      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
+//    } else {
+//      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
+//    }
+//    LOG.debug("options: {}", Arrays.asList(this.options));
+//    return this;
+//  }
 }
