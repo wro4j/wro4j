@@ -113,7 +113,6 @@ public class ProcessorDecorator
     final boolean isTypeSatisfied = supportedType == null
         || (supportedType != null && searchedType == supportedType.value());
     final boolean isMinimizedSatisfied = minimize == true || !isMinimize();
-
     return isTypeSatisfied && isMinimizedSatisfied;
   }
 
