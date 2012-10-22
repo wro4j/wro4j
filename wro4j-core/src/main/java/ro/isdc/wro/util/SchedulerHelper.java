@@ -11,9 +11,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.support.ContextPropagatingCallable;
-
 
 /**
  * Encapsulates the logic which handles scheduler creation and destroy. This class is thread-safe.
@@ -124,16 +121,9 @@ public class SchedulerHelper {
             Thread.currentThread().getId());
         // do not execute immediately. Use period also for initial delay.
         final long initialDelay = period;
-        future = poolInitializer.get().scheduleWithFixedDelay(decorate(runnable), initialDelay, period, timeUnit);
+        future = poolInitializer.get().scheduleWithFixedDelay(runnable, initialDelay, period, timeUnit);
       }
     }
-  }
-
-  /**
-   * Decorates the runnable using {@link ContextPropagatingCallable} only if {@link Context} is set.
-   */
-  private Runnable decorate(final Runnable runnable) {
-    return Context.isContextSet() ? ContextPropagatingCallable.decorate(runnable) : runnable;
   }
 
   /**

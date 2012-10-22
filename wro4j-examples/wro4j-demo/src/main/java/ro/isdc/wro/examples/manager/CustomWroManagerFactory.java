@@ -10,8 +10,6 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.cache.factory.CacheKeyFactoryDecorator;
@@ -110,7 +108,7 @@ public class CustomWroManagerFactory
   @Override
   protected MetaDataFactory newMetaDataFactory() {
     final Map<String, Object> map = new HashMap<String, Object>();
-    map.put(KEY_JS_HINT_OPTIONS, ArrayUtils.toArray("undef"));
+    map.put(KEY_JS_HINT_OPTIONS, "undef");
     return new DefaultMetaDataFactory(map);
   }
 

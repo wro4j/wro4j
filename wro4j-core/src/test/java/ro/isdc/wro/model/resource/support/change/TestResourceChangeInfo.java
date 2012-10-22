@@ -21,13 +21,15 @@ public class TestResourceChangeInfo {
     victim = new ResourceChangeInfo();
   }
 
+
   @Test(expected = NullPointerException.class)
   public void cannotCheckChangeForNullGroupName() {
     victim.isChanged(null);
   }
 
   @Test
-  public void shouldDetectNoChangeByDefault() {
+  public void shouldDetectChangeByDefault() {
+    assertTrue(victim.isChanged(GROUP1_NAME));
     assertFalse(victim.isChanged(GROUP1_NAME));
   }
 
@@ -38,9 +40,13 @@ public class TestResourceChangeInfo {
 
   @Test
   public void shouldDetectChangeAfterHashChanged() {
+    assertTrue(victim.isChanged(GROUP1_NAME));
+    assertTrue(victim.isCheckRequiredForGroup(GROUP1_NAME));
     victim.updateHashForGroup("hash", GROUP1_NAME);
+    assertTrue(victim.isChanged(GROUP1_NAME));
     victim.reset();
     assertTrue(victim.isChanged(GROUP1_NAME));
+    assertTrue(victim.isChanged(GROUP2_NAME));
   }
 
   @Test(expected = NullPointerException.class)
@@ -70,10 +76,13 @@ public class TestResourceChangeInfo {
   }
 
   @Test
-  public void shouldNotDetectChangeBeforeReset() {
+  public void shouldDetectChangeAfterNewHashUpdate() {
     victim.updateHashForGroup("hash1", GROUP1_NAME);
+    assertTrue(victim.isChanged(GROUP1_NAME));
     victim.updateHashForGroup("hash1", GROUP2_NAME);
-    assertFalse(victim.isChanged(GROUP1_NAME));
+    assertTrue(victim.isChanged(GROUP2_NAME));
+    assertTrue(victim.isChanged(GROUP1_NAME));
+    assertTrue(victim.isChanged(GROUP1_NAME));
   }
 
   @Test
@@ -85,8 +94,8 @@ public class TestResourceChangeInfo {
     assertTrue(victim.isChanged(GROUP2_NAME));
     victim.updateHashForGroup("hash1", GROUP1_NAME);
     victim.updateHashForGroup("hash1", GROUP2_NAME);
-    assertTrue(victim.isChanged(GROUP1_NAME));
-    assertTrue(victim.isChanged(GROUP2_NAME));
-    assertFalse(victim.isChanged(GROUP3_NAME));
+    assertFalse(victim.isChanged(GROUP1_NAME));
+    assertFalse(victim.isChanged(GROUP2_NAME));
+    assertTrue(victim.isChanged(GROUP3_NAME));
   }
 }

@@ -153,7 +153,7 @@ public class PreProcessorExecutor {
         } else if (cause instanceof IOException) {
           throw (IOException) cause;
         } else {
-          throw new WroRuntimeException("Problem during parallel pre processing", e.getCause());
+          throw new WroRuntimeException("Problem during parallel pre processing", e);
         }
       }
     }
