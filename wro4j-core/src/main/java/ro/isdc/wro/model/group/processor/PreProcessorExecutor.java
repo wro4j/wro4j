@@ -140,7 +140,8 @@ public class PreProcessorExecutor {
     final List<Future<String>> futures = new ArrayList<Future<String>>();
     for (final Callable<String> callable : callables) {
       // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
-      futures.add(exec.submit(new ContextPropagatingCallable<String>(callable)));
+      final Callable<String> decoratedCallable = new ContextPropagatingCallable<String>(callable);
+      futures.add(exec.submit(decoratedCallable));
     }
 
     for (final Future<String> future : futures) {

@@ -16,7 +16,6 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
-import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -101,33 +100,29 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
    */
   @Test
   public void shouldCheckOnlyAfterTimeout() throws Exception {
-    final long updatePeriod = 30;
-    final long delta = 5;
+    final long updatePeriod = 50;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
+    victim.get(key);
     final long start = System.currentTimeMillis();
-    while(System.currentTimeMillis() - start < updatePeriod - delta) {
+    while(System.currentTimeMillis() - start < updatePeriod) {
       victim.get(key);
     }
-    Thread.sleep(delta);
-    victim.get(key);
     Mockito.verify(mockResourceWatcher, times(2)).check(key);
   }
 
   @Test
   public void shouldCheckDifferentGroups() throws Exception {
-    final long updatePeriod = 30;
-    //Using delta to avoid inconsistent test results related to test timing
-    final long delta = 10;
+    final long updatePeriod = 50;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key1 = new CacheKey(GROUP_NAME, ResourceType.JS, true);
     final CacheKey key2 = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
     final long start = System.currentTimeMillis();
+    victim.get(key1);
+    Thread.sleep(updatePeriod);
     do {
       victim.get(key1);
-    } while (System.currentTimeMillis() - start < updatePeriod - delta);
-    Thread.sleep(delta);
-    victim.get(key1);
+    } while (System.currentTimeMillis() - start < updatePeriod);
     victim.get(key2);
     Mockito.verify(mockResourceWatcher, times(2)).check(key1);
     Mockito.verify(mockResourceWatcher, times(1)).check(key2);

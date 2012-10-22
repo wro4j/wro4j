@@ -16,8 +16,8 @@ public class DefaultProcessorDecorator
     extends ProcessorDecorator {
   private final ProcessingCriteria criteria;
 
-  public DefaultProcessorDecorator(final Object processor) {
-    this(processor, ProcessingCriteria.createDefault());
+  public DefaultProcessorDecorator(final Object processor, final boolean minimize) {
+    this(processor, ProcessingCriteria.createDefault(minimize));
   }
 
   public DefaultProcessorDecorator(final Object processor, final ProcessingCriteria criteria) {
