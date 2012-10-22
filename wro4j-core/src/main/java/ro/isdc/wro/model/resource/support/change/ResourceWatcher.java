@@ -79,7 +79,7 @@ public class ResourceWatcher {
    */
   protected void onException(final Exception e) {
     // not using ERROR log intentionally, since this error is not that important
-    LOG.info("Could not chef for resource changes because: {}", e.getMessage());
+    LOG.info("Could not check for resource changes because: {}", e.getMessage());
     LOG.debug("[FAIL] detecting resource change ", e);
   }
 
@@ -137,8 +137,7 @@ public class ResourceWatcher {
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("Check @import directive from {}", resource);
-        // detect changes in imported resources.
-        createCssImportProcessor(resource, changeDetected, groupName).process(resource, reader, new StringWriter());
+        createCssImportProcessor(changeDetected, groupName).process(resource, reader, new StringWriter());
       }
       return changeDetected.get();
     } catch (final IOException e) {
@@ -148,7 +147,15 @@ public class ResourceWatcher {
     }
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected,
+  /**
+   * @param changeDetected
+   *          - flag indicating if the change is detected. When this value is true, the processing will be interrupted
+   *          by throwing a {@link RuntimeException}.
+   * @param groupName
+   *          the name of the group being processed.
+   * @return a processor used to detect changes in imported resources.
+   */
+  private ResourcePreProcessor createCssImportProcessor(final AtomicBoolean changeDetected,
       final String groupName) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
@@ -191,7 +198,6 @@ public class ResourceWatcher {
 
   /**
    * @VisibleForTesting
-   * @return
    */
   ResourceChangeDetector getResourceChangeDetector() {
     if (changeDetector == null) {

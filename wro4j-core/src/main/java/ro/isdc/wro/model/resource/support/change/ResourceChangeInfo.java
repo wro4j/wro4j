@@ -39,26 +39,16 @@ public final class ResourceChangeInfo {
    */
   public void updateHashForGroup(final String hash, final String groupName) {
     notNull(groupName);
-    groups.add(groupName);
-    if (isChangedHash(hash)) {
-      this.currentHash = hash;
-      LOG.debug("Change detected for group '{}': {}", groupName, this);
+    this.currentHash = hash;
+    if (isChangedHash()) {
+      LOG.debug("[CHANGE] for group {}", groupName);
       //remove all persisted groups. Starting over..
       groups.clear();
     }
   }
 
-  private boolean isChangedHash(final String hash) {
-    LOG.debug("Check change for hash: {}. ResourceChageInfo: {}", hash, this);
-    boolean result = false;
-    if (currentHash != null) {
-      result = !currentHash.equals(hash);
-    } else if (hash != null) {
-      result = !hash.equals(this.prevHash);
-    }
-    //currentHash != null ? !this.currentHash.equals(hash) :
-    LOG.debug("Check change for hash: {}. ResourceChageInfo: {}", hash, this);
-    return result;
+  private boolean isChangedHash() {
+    return currentHash != null ? !currentHash.equals(prevHash) : prevHash != null;
   }
 
   /**
@@ -77,10 +67,12 @@ public final class ResourceChangeInfo {
    */
   public boolean isChanged(final String groupName) {
     notNull(groupName);
-    LOG.debug("isChange for group: {}", groupName);
-    final boolean result = prevHash != null
-        && (prevHash.equals(currentHash) ? !groups.contains(groupName) : true);
-    LOG.debug("resourceInfo: {}, changed: {}", this, result);
+    final boolean result = isChangedHash() ? true : !groups.contains(groupName);
+    if (result) {
+      groups.add(groupName);
+    }
+    final String changedMessage = result ? "[YES]" : "[NO]";
+    LOG.debug("{} changed for: {}, ", changedMessage , groupName);
     return result;
   }
 
@@ -94,7 +86,6 @@ public final class ResourceChangeInfo {
    */
   public boolean isCheckRequiredForGroup(final String groupName) {
     notNull(groupName);
-    groups.add(groupName);
     return currentHash == null;
   }
 
