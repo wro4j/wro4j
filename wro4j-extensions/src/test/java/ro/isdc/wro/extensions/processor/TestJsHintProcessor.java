@@ -102,7 +102,7 @@ public class TestJsHintProcessor
       throws Exception {
     victim = new JsHintProcessor() {
       @Override
-      protected String getOptions() {
+      protected String createDefaultOptions() {
         return "bitwise";
       }
 

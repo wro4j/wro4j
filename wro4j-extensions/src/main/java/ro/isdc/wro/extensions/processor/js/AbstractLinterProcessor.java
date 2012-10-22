@@ -106,10 +106,20 @@ public abstract class AbstractLinterProcessor
   }
 
   /**
-   * @return an array of options used for linting.
+   * @return an options as CSV.
    */
-  protected String getOptions() {
+  private String getOptions() {
+    if (options == null) {
+      options = createDefaultOptions();
+    }
     return options;
+  }
+
+  /**
+   * @return default options to use for linting.
+   */
+  protected String createDefaultOptions() {
+    return "";
   }
 
   public AbstractLinterProcessor setOptionsAsString(final String options) {

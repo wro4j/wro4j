@@ -99,7 +99,7 @@ public class CustomWroManagerFactory
       @Inject
       private MetaDataFactory metaDataFactory;
       @Override
-      protected String getOptions() {
+      protected String createDefaultOptions() {
         //Not very safe, probably can validate it before cast
         return (String) metaDataFactory.create().get(KEY_JS_HINT_OPTIONS);
       }

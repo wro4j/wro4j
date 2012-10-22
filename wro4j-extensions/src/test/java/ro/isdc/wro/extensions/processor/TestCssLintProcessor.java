@@ -72,7 +72,6 @@ public class TestCssLintProcessor {
     return ".label {color: red;}";
   }
 
-
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(victim, ResourceType.CSS);
@@ -87,11 +86,24 @@ public class TestCssLintProcessor {
   }
 
   @Test(expected = CssLintException.class)
+  public void shouldFailWhenProcessingCssWithErrors()
+      throws Exception {
+    victim = new CssLintProcessor() {
+      @Override
+      protected void onCssLintException(final CssLintException e, final Resource resource) {
+        throw e;
+      }
+    };
+    victim.setOptions("import");
+    victim.process(null, new StringReader("@import url(more.css);"), new StringWriter());
+  }
+
+  @Test(expected = CssLintException.class)
   public void shouldOverrideDefaultOptions()
       throws Exception {
     victim = new CssLintProcessor() {
       @Override
-      protected String getOptions() {
+      protected String createDefaultOptions() {
         return "import";
       }
 
