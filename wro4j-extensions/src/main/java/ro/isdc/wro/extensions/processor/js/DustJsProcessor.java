@@ -9,7 +9,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 
 /**
- * A processor for dustJs template framework. Uses <a href="http://akdubya.github.com/dustjs/">dustjs</a> library to
+ * A processor for dustJs template framework. Uses <a href="https://github.com/linkedin/dustjs">dustjs</a> library to
  * transform a template into plain javascript.
  *
  * @author Eivind Barstad Waaler
@@ -26,7 +26,7 @@ public class DustJsProcessor extends JsTemplateCompilerProcessor {
   }
 
   @Override
-  protected String getArgument(Resource resource) {
+  protected String getArgument(final Resource resource) {
     final String name = resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
     return String.format("'%s'", name);
   }

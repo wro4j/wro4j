@@ -14,8 +14,8 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
  * @created 8 Mar 2012
  */
 public class DustJs extends AbstractJsTemplateCompiler {
-  private static final String DEFAULT_DUST_JS = "dust-full-0.3.0.min.js";
-  
+  private static final String DEFAULT_DUST_JS = "dust-full-1.1.1.min.js";
+
   /**
    * {@inheritDoc}
    */
