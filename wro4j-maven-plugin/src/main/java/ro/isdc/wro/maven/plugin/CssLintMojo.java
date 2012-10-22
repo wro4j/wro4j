@@ -79,7 +79,7 @@ public class CssLintMojo
           throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
       };
-    }.setOptions(getOptions());
+    }.setOptionsAsString(getOptions());
     return processor;
   }
 
