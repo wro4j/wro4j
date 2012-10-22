@@ -4,7 +4,7 @@ package ro.isdc.wro.model.resource.processor.support;
  * A type of processing to apply during preProcessor execution.
  *
  * @author Alex Objelean
- * @since 1.5.1
+ * @since 1.6.0
  * @created 16 Oct 2012
  */
 public enum ProcessingType {

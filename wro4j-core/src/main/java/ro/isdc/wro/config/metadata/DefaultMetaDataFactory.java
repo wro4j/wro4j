@@ -11,7 +11,7 @@ import java.util.Map;
  * Default implementation of {@link MetaDataFactory} which returns always a map created during construction.
  *
  * @author Alex Objelean
- * @since 1.5.1
+ * @since 1.6.0
  * @created 20 Oct 2012
  */
 public class DefaultMetaDataFactory

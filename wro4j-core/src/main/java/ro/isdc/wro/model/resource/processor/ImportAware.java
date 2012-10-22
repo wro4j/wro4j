@@ -6,7 +6,7 @@ package ro.isdc.wro.model.resource.processor;
  *
  * @author Alex Objelean
  * @created 16 Oct 2012
- * @since 1.5.1
+ * @since 1.6.0
  */
 public interface ImportAware {
   /**

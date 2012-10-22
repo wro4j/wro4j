@@ -7,7 +7,7 @@ import static org.apache.commons.lang3.Validate.notNull;
  * The criteria used to apply or skip the processor.
  *
  * @author Alex Objelean
- * @since 1.5.1
+ * @since 1.6.0
  * @created 17 Oct 2012
  */
 public final class ProcessingCriteria {
