@@ -11,7 +11,7 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
  *
  * @author Alex Objelean
  * @created 7 Oct 2012
- * @since 1.5.1
+ * @since 1.6.0
  */
 public class DefaultProcessorDecorator
     extends ProcessorDecorator {

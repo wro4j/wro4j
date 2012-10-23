@@ -21,7 +21,7 @@ import com.github.sommeri.less4j.core.DefaultLessCompiler;
  * Yet another processor which compiles less to css. This implementation uses open source java library called less4j.
  *
  * @author Alex Objelean
- * @since 1.5.1
+ * @since 1.6.0
  * @created 5 Oct 2012
  */
 @SupportedResourceType(ResourceType.CSS)

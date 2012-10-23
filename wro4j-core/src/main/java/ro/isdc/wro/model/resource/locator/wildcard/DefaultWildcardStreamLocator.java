@@ -62,7 +62,7 @@ public class DefaultWildcardStreamLocator
    * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
    */
   private Function<Collection<File>, Void> wildcardExpanderHandler;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -146,9 +146,9 @@ public class DefaultWildcardStreamLocator
     if (uri == null || folder == null || !folder.isDirectory()) {
       final StringBuffer message = new StringBuffer("Invalid folder provided");
       if (folder != null) {
-        message.append(", with path: " + folder.getPath());
+        message.append(", with path: ").append(folder.getPath());
       }
-      message.append(", with fileNameWithWildcard: " + uri);
+      message.append(", with fileNameWithWildcard: ").append(uri);
       throw new IOException(message.toString());
     }
     if (!hasWildcard(uri)) {
@@ -177,12 +177,11 @@ public class DefaultWildcardStreamLocator
     if (wildcardExpanderHandler != null) {
       try {
         wildcardExpanderHandler.apply(allFiles);
-      } catch (final Exception e) {
+      } catch(final IOException e) {
         // preserve exception type if the exception is already an IOException
-        if (e instanceof IOException) {
-          throw (IOException) e;
-        }
-        throw new IOException("Exception during expanding wildcard: " + e.getMessage());
+        throw e;
+      } catch (final Exception e) {
+        throw new IOException("Exception during expanding wildcard: ", e);
       }
     }
   }

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * An {@link ObjectFactory} used to create Proxy for objects initialized by provided {@link LazyInitializer}'s.
  *
  * @author Alex Objelean
- * @since 1.5.1
+ * @since 1.6.0
  * @created 14 Oct 2012
  * @param <T>
  *          the type of the object to create.

@@ -308,7 +308,6 @@ public class Base64 {
    * @param threeBytes the array to convert
    * @param numSigBytes the number of significant bytes in your array
    * @return four byte array in Base64 notation.
-   * @since 1.5.1
    */
   private static byte[] encode3to4(final byte[] b4, final byte[] threeBytes, final int numSigBytes, final int options) {
     encode3to4(threeBytes, 0, numSigBytes, b4, 0, options);
@@ -1491,7 +1490,7 @@ public class Base64 {
         } // end else: decoding
       } // end if: buffer partially full
 
-    } 
+    }
 
 
     /**
@@ -1511,30 +1510,27 @@ public class Base64 {
 
       buffer = null;
       out = null;
-    } 
+    }
 
 
     /**
      * Suspends encoding of the stream. May be helpful if you need to embed a piece of base64-encoded data in a stream.
      *
      * @throws java.io.IOException if there's an error flushing
-     * @since 1.5.1
      */
     public void suspendEncoding()
       throws java.io.IOException {
       flushBase64();
       this.suspendEncoding = true;
-    } 
+    }
 
 
     /**
      * Resumes encoding of the stream. May be helpful if you need to embed a piece of base64-encoded data in a stream.
-     *
-     * @since 1.5.1
      */
     public void resumeEncoding() {
       this.suspendEncoding = false;
-    } 
+    }
 
   }
 

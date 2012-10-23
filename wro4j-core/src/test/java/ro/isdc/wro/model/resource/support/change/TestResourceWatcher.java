@@ -1,5 +1,6 @@
 package ro.isdc.wro.model.resource.support.change;
 
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -81,10 +82,9 @@ public class TestResourceWatcher {
   }
 
   @Test
-  public void shouldDetectChangeAfterFirstRun()
-      throws Exception {
+  public void shouldNotDetectChangeAfterFirstRun() throws Exception {
     victim.check(cacheEntry);
-    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
+    assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
   }
 
   @Test
@@ -107,7 +107,7 @@ public class TestResourceWatcher {
     };
     createInjector().inject(victim);
     victim.check(cacheEntry);
-    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
+    assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
 
     Mockito.when(mockLocator.getInputStream()).thenReturn(new ByteArrayInputStream("different".getBytes()));
 
@@ -128,8 +128,6 @@ public class TestResourceWatcher {
     };
     createInjector().inject(victim);
     final ResourceChangeDetector mockChangeDetector = Mockito.spy(victim.getResourceChangeDetector());
-    victim.check(cacheEntry);
-    verify(mockChangeDetector, never()).checkChangeForGroup(Mockito.anyString(), Mockito.anyString());
 
     Mockito.when(mockLocator.getInputStream()).thenThrow(new IOException("Resource is unavailable"));
 
