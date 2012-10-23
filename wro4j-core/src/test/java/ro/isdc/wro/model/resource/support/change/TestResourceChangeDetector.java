@@ -47,9 +47,9 @@ public class TestResourceChangeDetector {
   }
 
   @Test
-  public void shouldNotRequireChangeAtFirstCheck()
+  public void shouldRequireChangeAtFirstCheck()
       throws Exception {
-    assertFalse(victim.checkChangeForGroup("resource", GROUP1_NAME));
+    assertTrue(victim.checkChangeForGroup("resource", GROUP1_NAME));
   }
 
 
@@ -58,7 +58,7 @@ public class TestResourceChangeDetector {
       throws Exception {
     victim.checkChangeForGroup("resource", GROUP1_NAME);
     victim.reset();
-    assertTrue(victim.checkChangeForGroup("resource", GROUP1_NAME));
+    assertFalse(victim.checkChangeForGroup("resource", GROUP1_NAME));
     assertTrue(victim.checkChangeForGroup("resource", GROUP2_NAME));
   }
 }
