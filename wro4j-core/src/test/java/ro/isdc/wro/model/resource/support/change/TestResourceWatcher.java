@@ -58,14 +58,14 @@ public class TestResourceWatcher {
     initMocks(this);
     Context.set(Context.standaloneContext());
     victim = new ResourceWatcher();
+    when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
+    when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
+
     createInjector().inject(victim);
   }
 
   public Injector createInjector()
       throws Exception {
-    when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
-    when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
-
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
     final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setLocatorFactory(
@@ -104,7 +104,7 @@ public class TestResourceWatcher {
     victim.check(cacheEntry);
     assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
 
-    Mockito.when(mockLocator.getInputStream()).thenReturn(new ByteArrayInputStream("different".getBytes()));
+    Mockito.when(mockLocator.getInputStream()).then(answerWithContent("different"));
 
     victim.check(cacheEntry);
     assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
