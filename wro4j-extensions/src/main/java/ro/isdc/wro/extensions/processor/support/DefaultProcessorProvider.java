@@ -24,7 +24,9 @@ import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
+import ro.isdc.wro.extensions.processor.js.NodeCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
+import ro.isdc.wro.extensions.processor.js.RhinoCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.TypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -162,6 +164,18 @@ public class DefaultProcessorProvider
             return new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS);
           }
         }));
+    map.put(RhinoCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new RhinoCoffeeScriptProcessor();
+      }
+    }));
+    map.put(NodeCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new NodeCoffeeScriptProcessor();
+      }
+    }));
     map.put(CoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
