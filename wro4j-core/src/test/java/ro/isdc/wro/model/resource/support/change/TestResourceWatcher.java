@@ -91,18 +91,13 @@ public class TestResourceWatcher {
   public void shouldDetectResourceChange()
       throws Exception {
     // flag used to assert that the expected code was invoked
-    final ThreadLocal<Boolean> flag = new ThreadLocal<Boolean>() {
-      @Override
-      protected Boolean initialValue() {
-        return Boolean.FALSE;
-      }
-    };
+    final AtomicBoolean flag = new AtomicBoolean(false);
     victim = new ResourceWatcher() {
       @Override
       void onGroupChanged(final CacheKey cacheEntry) {
         super.onGroupChanged(cacheEntry);
         Assert.assertEquals(GROUP_NAME, cacheEntry.getGroupName());
-        flag.set(Boolean.TRUE);
+        flag.set(true);
       }
     };
     createInjector().inject(victim);
