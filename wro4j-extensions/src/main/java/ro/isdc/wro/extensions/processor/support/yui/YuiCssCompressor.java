@@ -8,7 +8,7 @@
  * The copyrights embodied in the content of this file are licensed
  * by Yahoo! Inc. under the BSD (revised) open source license.
  */
-package com.yahoo.platform.yui.compressor;
+package ro.isdc.wro.extensions.processor.support.yui;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CssCompressor {
+public class YuiCssCompressor {
 
     private StringBuffer srcsb = new StringBuffer();
 
-    public CssCompressor(Reader in) throws IOException {
+    public YuiCssCompressor(Reader in) throws IOException {
         // Read the stream...
         int c;
         while ((c = in.read()) != -1) {

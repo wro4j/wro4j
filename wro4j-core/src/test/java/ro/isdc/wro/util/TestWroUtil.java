@@ -3,13 +3,15 @@
  */
 package ro.isdc.wro.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -17,7 +19,7 @@ import org.mockito.Mockito;
 
 /**
  * Test {@link WroUtil} class.
- * 
+ *
  * @author Alex Objelean
  */
 public class TestWroUtil {
@@ -25,35 +27,35 @@ public class TestWroUtil {
   public void cannotComputeEmptyLocation() {
     WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "");
   }
-  
+
   @Test
   public void computePathFromSomeLocation() {
     final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "location");
-    Assert.assertEquals("", result);
+    assertEquals("", result);
   }
-  
+
   @Test
   public void computePathFromNestedLocation() {
     final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "/a/b/c/d");
-    Assert.assertEquals("/b/c/d", result);
+    assertEquals("/b/c/d", result);
   }
 
   @Test
   public void computePathFromLocationWithContextRoot() {
     final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest("/a"), "/a/b/c/d");
-    Assert.assertEquals("/b/c/d", result);
+    assertEquals("/b/c/d", result);
   }
 
   @Test
   public void computePathFromLocationWithDifferentContextRoot() {
     final String result = WroUtil.getPathInfoFromLocation(mockContextPathRequest("/z"), "/a/b/c/d");
-    Assert.assertEquals("/a/b/c/d", result);
+    assertEquals("/a/b/c/d", result);
   }
 
   @Test
   public void computeServletPathFromLocation() {
     final String result = WroUtil.getServletPathFromLocation(mockContextPathRequest(null), "/a/b/c/d");
-    Assert.assertEquals("/a", result);
+    assertEquals("/a", result);
   }
 
   /**
@@ -64,39 +66,39 @@ public class TestWroUtil {
   public void testGzipSupport()
       throws Exception {
     HttpServletRequest request = mockRequestHeader("", "");
-    Assert.assertFalse(WroUtil.isGzipSupported(request));
-    
+    assertFalse(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("Accept-Encoding", "");
-    Assert.assertFalse(WroUtil.isGzipSupported(request));
-    
+    assertFalse(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("Accept-Encoding", "gzip, deflate");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
-    
+    assertTrue(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("Accept-Encoding", "XYZ");
-    Assert.assertFalse(WroUtil.isGzipSupported(request));
-    
+    assertFalse(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("Accept-EncodXng", "XXXXXXXXXXXXX");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
-    
+    assertTrue(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("X-cept-Encoding", "gzip,deflate");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
-    
+    assertTrue(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("XXXXXXXXXXXXXXX", "XXXXXXXXXXXXX");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
-    
+    assertTrue(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("XXXXXXXXXXXXXXXX", "gzip, deflate");
-    Assert.assertFalse(WroUtil.isGzipSupported(request));
-    
+    assertFalse(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("---------------", "-------------");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
-    
+    assertTrue(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("~~~~~~~~~~~~~~~", "~~~~~~~~~~~~~");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
-    
+    assertTrue(WroUtil.isGzipSupported(request));
+
     request = mockRequestHeader("Accept-Encoding", "gzip,deflate,sdch");
-    Assert.assertTrue(WroUtil.isGzipSupported(request));
+    assertTrue(WroUtil.isGzipSupported(request));
   }
-  
+
   /**
    * @param request
    * @param headerName
@@ -118,25 +120,29 @@ public class TestWroUtil {
 
   @Test
   public void testToJsMultilineString() {
-    Assert.assertEquals("[\"\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString(""));
-    Assert.assertEquals("[\"alert1\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString("alert1"));
-    Assert.assertEquals("[\"\",\"alert1\",\"alert2\"].join(\"\\n\")", WroUtil.toJSMultiLineString("\nalert1\nalert2"));
+    assertEquals("[\"\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString(""));
+    assertEquals("[\"alert1\\n\"].join(\"\\n\")", WroUtil.toJSMultiLineString("alert1"));
+    assertEquals("[\"\",\"alert1\",\"alert2\"].join(\"\\n\")", WroUtil.toJSMultiLineString("\nalert1\nalert2"));
   }
 
   @Test
   public void shouldMatchUrl() {
-    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("wroApi/test");
-    
-    Assert.assertTrue(WroUtil.matchesUrl(request, "wroApi/test"));
+
+    assertTrue(WroUtil.matchesUrl(request, "wroApi/test"));
   }
 
   @Test
   public void shouldNotMatchUrl() {
-    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("someresource.css");
 
-    Assert.assertFalse(WroUtil.matchesUrl(request, "wroApi/test"));
+    assertFalse(WroUtil.matchesUrl(request, "wroApi/test"));
   }
-  
+
+  @Test
+  public void shouldCreateMultiLineFromNullString() {
+    assertEquals("[].join(\"\\n\")", WroUtil.toJSMultiLineString(null));
+  }
 }
