@@ -103,6 +103,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final long updatePeriod = 50;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
+    Thread.sleep(updatePeriod);
     victim.get(key);
     final long start = System.currentTimeMillis();
     while(System.currentTimeMillis() - start < updatePeriod) {
