@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
@@ -25,24 +26,29 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestYUICssCompressorProcessor {
+  private ResourceProcessor victim;
+  @Before
+  public void setUp() {
+    victim = new YUICssCompressorProcessor();
+  }
+
   @Test
   public void shouldMininimizeCss()
     throws IOException {
-    final ResourceProcessor processor = new YUICssCompressorProcessor();
     final URL url = getClass().getResource("yui");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", victim);
   }
-  
+
   @Test
   public void shouldBeThreadSafe() throws Exception {
-    final ResourceProcessor processor = new YUICssCompressorProcessor();
     final Callable<Void> task = new Callable<Void>() {
+      @Override
       public Void call() {
         try {
-          processor.process(null, new StringReader("#id {.class {color: red;}}"), new StringWriter());
+          victim.process(null, new StringReader("#id {.class {color: red;}}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
@@ -51,10 +57,16 @@ public class TestYUICssCompressorProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
-    WroTestUtils.assertProcessorSupportResourceTypes(new YUICssCompressorProcessor(), ResourceType.CSS);
+    WroTestUtils.assertProcessorSupportResourceTypes(victim, ResourceType.CSS);
+  }
+
+
+  @Test
+  public void shouldNotFailWhenProcessingInvalidCss() throws Exception {
+    victim.process(null, new StringReader("invalid CSS!!@#!@#!"), new StringWriter());
   }
 }
