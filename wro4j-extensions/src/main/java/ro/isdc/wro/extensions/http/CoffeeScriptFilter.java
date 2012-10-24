@@ -3,7 +3,7 @@ package ro.isdc.wro.extensions.http;
 import java.util.ArrayList;
 import java.util.List;
 
-import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.RhinoCoffeeScriptProcessor;
 import ro.isdc.wro.http.support.AbstractProcessorsFilter;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
@@ -19,7 +19,7 @@ public class CoffeeScriptFilter
   private final List<ResourceProcessor> list = new ArrayList<ResourceProcessor>();
 
   public CoffeeScriptFilter() {
-    list.add(new CoffeeScriptProcessor());
+    list.add(new RhinoCoffeeScriptProcessor());
   }
 
   /**

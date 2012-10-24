@@ -30,7 +30,7 @@ public class LessCssProcessor
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   public static final String ALIAS = "lessCss";
   private final ResourceProcessor lessProcessor;
-  
+
   public LessCssProcessor() {
     lessProcessor = initializeProcessor();
   }
@@ -45,10 +45,10 @@ public class LessCssProcessor
   }
 
   /**
-   * @return {@link NodeLessCssProcessor} used as a primary LessProcessor.
+   * @return {@link ResourcePreProcessor} used as a primary LessProcessor.
    * @VisibleForTesting
    */
-  protected NodeLessCssProcessor createNodeProcessor() {
+  ResourceProcessor createNodeProcessor() {
     LOG.debug("creating NodeLess processor");
     return new NodeLessCssProcessor();
   }
@@ -61,13 +61,13 @@ public class LessCssProcessor
       throws IOException {
     lessProcessor.process(resource, reader, writer);
   }
-    
+
   /**
    * Lazily initialize the rhinoProcessor.
    * @return {@link ResourceProcessor} used as a fallback lessCss processor.
    * @VisibleFortesTesting
    */
-  protected ResourceProcessor createRhinoProcessor() {
+  ResourceProcessor createRhinoProcessor() {
     LOG.debug("NodeLess is not supported. Using fallback RhinoLess processor");
     return new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
       @Override

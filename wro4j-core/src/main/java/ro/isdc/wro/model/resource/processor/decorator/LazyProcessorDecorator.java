@@ -72,4 +72,9 @@ public final class LazyProcessorDecorator
   public boolean isImportAware() {
     return getProcessorDecorator().isImportAware();
   }
+
+  @Override
+  public String toString() {
+    return getProcessorDecorator().toString();
+  }
 }

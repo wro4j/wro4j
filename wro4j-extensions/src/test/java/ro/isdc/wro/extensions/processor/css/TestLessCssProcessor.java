@@ -1,4 +1,4 @@
-package ro.isdc.wro.extensions.processor;
+package ro.isdc.wro.extensions.processor.css;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -19,14 +19,13 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
-import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.LazyProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -34,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.LazyInitializer;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -62,12 +62,12 @@ public class TestLessCssProcessor {
       protected ResourceProcessor initialize() {
         return new LessCssProcessor() {
           @Override
-          protected ResourceProcessor createRhinoProcessor() {
+          ResourceProcessor createRhinoProcessor() {
             return mockRhinoProcessor;
           }
 
           @Override
-          protected NodeLessCssProcessor createNodeProcessor() {
+          NodeLessCssProcessor createNodeProcessor() {
             return mockNodeProcessor;
           }
         };
@@ -117,5 +117,11 @@ public class TestLessCssProcessor {
     final String expected = IOUtils.toString(managerFactory.create().getResourceLocatorFactory().locate(
         String.format("classpath:%s/expected/import.cssx", baseFolder)));
     assertEquals(expected, actual.toString());
+  }
+
+
+  @Test
+  public void shouldSupportCorrectResourceTypes() {
+    WroTestUtils.assertProcessorSupportResourceTypes(new LessCssProcessor(), ResourceType.CSS);
   }
 }
