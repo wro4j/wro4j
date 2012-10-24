@@ -48,12 +48,12 @@ import ro.isdc.wro.util.WroUtil;
 @SupportedResourceType(ResourceType.JS)
 public class NodeCoffeeScriptProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, SupportAware {
+  private static final Logger LOG = LoggerFactory.getLogger(NodeCoffeeScriptProcessor.class);
   /**
    * Options passed to coffee command. -c is for compile, -p is for print to stdout.
    */
   private static final String OPTION_COMPILE = "-cp";
   private static final String SHELL_COMMAND = "coffee";
-  private static final Logger LOG = LoggerFactory.getLogger(NodeCoffeeScriptProcessor.class);
   public static final String ALIAS = "nodeCoffeeScript";
   /**
    * Flag indicating that we are running on Windows platform. This will be initialized only once in constructor.
@@ -73,6 +73,7 @@ public class NodeCoffeeScriptProcessor
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
+    LOG.debug("processing {} resource", resource);
     final String content = IOUtils.toString(reader);
     final String resourceUri = resource == null ? "unknown.coffee" : resource.getUri();
     try {
@@ -100,7 +101,7 @@ public class NodeCoffeeScriptProcessor
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
 
       final Process process = createProcess(temp);
-      final String result = IOUtils.toString(new AutoCloseInputStream(process.getErrorStream()), encoding);
+      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
       if (exitStatus != 0) {
         final String compileError = result;

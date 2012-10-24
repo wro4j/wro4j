@@ -46,10 +46,10 @@ public class LessCssProcessor
   }
 
   /**
-   * @return {@link NodeLessCssProcessor} used as a primary LessProcessor.
+   * @return {@link ResourcePreProcessor} used as a primary LessProcessor.
    * @VisibleForTesting
    */
-  protected NodeLessCssProcessor createNodeProcessor() {
+  ResourcePreProcessor createNodeProcessor() {
     LOG.debug("creating NodeLess processor");
     return new NodeLessCssProcessor();
   }
@@ -78,7 +78,7 @@ public class LessCssProcessor
    * @return {@link ResourcePostProcessor} used as a fallback lessCss processor.
    * @VisibleFortesTesting
    */
-  protected ResourcePreProcessor createRhinoProcessor() {
+  ResourcePreProcessor createRhinoProcessor() {
     LOG.debug("NodeLess is not supported. Using fallback RhinoLess processor");
     return new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override

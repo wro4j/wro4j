@@ -204,7 +204,7 @@ public class PreProcessorExecutor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
-      stopWatch.start("Processor: " + processor.getClass().getSimpleName());
+      stopWatch.start("Processor: " + processor.toString());
 
       callbackRegistry.onBeforePreProcess();
 
