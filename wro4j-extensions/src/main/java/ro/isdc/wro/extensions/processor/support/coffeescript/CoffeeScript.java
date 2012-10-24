@@ -24,7 +24,7 @@ import ro.isdc.wro.util.WroUtil;
  * <p/>
  * The underlying implementation use the coffee-script version <code>1.3.3</code> project: {@link https
  * ://github.com/jashkenas/coffee-script}.
- * 
+ *
  * @author Alex Objelean
  * @since 1.3.6
  */
@@ -32,7 +32,7 @@ public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
   private String[] options;
   private ScriptableObject scope;
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.min.js";
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.4.0.min.js";
   /**
    * Initialize script builder for evaluation.
    */
