@@ -55,9 +55,9 @@ public class YUICssCompressorProcessor
     try {
       final YuiCssCompressor compressor = new YuiCssCompressor(reader);
       compressor.compress(writer, linebreakpos);
-    } catch(final IOException e) {
+    } catch(final Exception e) {
       LOG.error("Exception occured while processing resource: " + resource + " using processor: " + ALIAS);
-      onException(new WroRuntimeException("Exception during YuiCss processing of resource: " + resource, e));
+      onException(e);
     } finally {
       reader.close();
       writer.close();
@@ -68,7 +68,7 @@ public class YUICssCompressorProcessor
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final WroRuntimeException e) {
-    throw e;
+  protected void onException(final Exception e) {
+    throw WroRuntimeException.wrap(e);
   }
 }
