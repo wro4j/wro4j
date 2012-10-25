@@ -25,6 +25,7 @@ import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -107,12 +108,13 @@ public class GroupsProcessor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
-      stopWatch.start("Using " + processor.toString());
+      final ResourcePreProcessor decoratedProcessor = decorateProcessor(processor, cacheKey.isMinimize());
+      stopWatch.start("Using " + decoratedProcessor.toString());
       writer = new StringWriter();
       try {
         callbackRegistry.onBeforePostProcess();
         //the processor is invoked as a pre processor. This is important for correct computation of eligibility.
-        decorateProcessor(processor, cacheKey.isMinimize()).process(resource, reader, writer);
+        decoratedProcessor.process(resource, reader, writer);
       } finally {
         stopWatch.stop();
         callbackRegistry.onAfterPostProcess();

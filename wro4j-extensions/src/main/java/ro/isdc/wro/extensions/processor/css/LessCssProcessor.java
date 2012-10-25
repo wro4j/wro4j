@@ -7,6 +7,8 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -30,6 +32,8 @@ public class LessCssProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   public static final String ALIAS = "lessCss";
+  @Inject
+  private Injector injector;
   private final ResourcePreProcessor lessProcessor;
 
   public LessCssProcessor() {
@@ -60,6 +64,7 @@ public class LessCssProcessor
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
+    injector.inject(lessProcessor);
     lessProcessor.process(resource, reader, writer);
   }
 
