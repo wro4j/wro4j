@@ -83,6 +83,7 @@ public class ProcessorDecorator
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     if (isEnabled(resource)) {
+      LOG.debug("Applying processor: {}", toString());
       getDecoratedObject().process(resource, reader, writer);
     } else {
       LOG.debug("Skipping processor: {}", getDecoratedObject());

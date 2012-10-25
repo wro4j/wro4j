@@ -70,6 +70,7 @@ public final class ResourceChangeInfo {
     final boolean result = isChangedHash() ? true : !groups.contains(groupName);
     if (result) {
       groups.add(groupName);
+      LOG.debug("ChangeDetails: {}", this);
     }
     final String changedMessage = result ? "[YES]" : "[NO]";
     LOG.debug("{} changed for: {}, ", changedMessage , groupName);

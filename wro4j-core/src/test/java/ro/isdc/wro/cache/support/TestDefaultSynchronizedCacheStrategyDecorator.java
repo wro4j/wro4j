@@ -100,13 +100,14 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
    */
   @Test
   public void shouldCheckOnlyAfterTimeout() throws Exception {
-    final long updatePeriod = 50;
+    final long updatePeriod = 30;
+    final long delta = 10;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
-    Thread.sleep(updatePeriod);
     victim.get(key);
+    Thread.sleep(updatePeriod);
     final long start = System.currentTimeMillis();
-    while(System.currentTimeMillis() - start < updatePeriod) {
+    while(System.currentTimeMillis() - start < updatePeriod - delta) {
       victim.get(key);
     }
     Mockito.verify(mockResourceWatcher, times(2)).check(key);
