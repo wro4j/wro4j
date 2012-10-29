@@ -34,11 +34,7 @@ public class LessCssProcessor
   public static final String ALIAS = "lessCss";
   @Inject
   private Injector injector;
-  private final ResourcePreProcessor lessProcessor;
-
-  public LessCssProcessor() {
-    lessProcessor = initializeProcessor();
-  }
+  private ResourcePreProcessor lessProcessor;
 
   /**
    * Responsible for lessProcessor initialization. First the nodeLess processor will be used as a primary processor. If
@@ -64,8 +60,15 @@ public class LessCssProcessor
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    injector.inject(lessProcessor);
-    lessProcessor.process(resource, reader, writer);
+    getLessProcessor().process(resource, reader, writer);
+  }
+
+  private ResourcePreProcessor getLessProcessor() {
+    if (lessProcessor == null) {
+      lessProcessor = initializeProcessor();
+      injector.inject(lessProcessor);
+    }
+    return lessProcessor;
   }
 
   /**
