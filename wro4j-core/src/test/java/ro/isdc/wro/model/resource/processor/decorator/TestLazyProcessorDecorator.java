@@ -15,10 +15,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.LazyInitializer;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -36,6 +38,7 @@ public class TestLazyProcessorDecorator {
 
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
   }
 
@@ -48,6 +51,7 @@ public class TestLazyProcessorDecorator {
         return null;
       }
     });
+    WroTestUtils.createInjector().inject(victim);
     victim.process(null, mockReader, mockWriter);
   }
 
@@ -71,6 +75,7 @@ public class TestLazyProcessorDecorator {
         return mockProcessor;
       }
     });
+    WroTestUtils.createInjector().inject(victim);
     victim.process(null, mockReader, mockWriter);
     assertTrue(victim.isMinimize());
     assertFalse(victim.isSupported());
