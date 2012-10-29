@@ -13,12 +13,14 @@ import java.lang.annotation.Annotation;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -31,7 +33,6 @@ public class TestLazyProcessorDecorator {
   private Reader mockReader;
   @Mock
   private Writer mockWriter;
-  @Mock
   private ProcessorDecorator mockProcessor;
 
   private LazyProcessorDecorator victim;
@@ -40,6 +41,7 @@ public class TestLazyProcessorDecorator {
   public void setUp() {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
+    mockProcessor = Mockito.spy(new ProcessorDecorator(new JSMinProcessor()));
   }
 
   @Test(expected = NullPointerException.class)

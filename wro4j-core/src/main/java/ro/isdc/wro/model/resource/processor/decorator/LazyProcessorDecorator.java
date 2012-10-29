@@ -40,6 +40,7 @@ public final class LazyProcessorDecorator
   private ProcessorDecorator getProcessorDecorator() {
     if (processor == null) {
       processor = new ProcessorDecorator(getDecoratedObject().get());
+      injector.inject(processor);
     }
     return processor;
   }
@@ -49,7 +50,6 @@ public final class LazyProcessorDecorator
    */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    injector.inject(getDecoratedObject());
     getProcessorDecorator().process(resource, reader, writer);
   }
 
@@ -58,7 +58,6 @@ public final class LazyProcessorDecorator
    */
   public void process(final Reader reader, final Writer writer)
       throws IOException {
-    injector.inject(getDecoratedObject());
     getProcessorDecorator().process(reader, writer);
   }
 
