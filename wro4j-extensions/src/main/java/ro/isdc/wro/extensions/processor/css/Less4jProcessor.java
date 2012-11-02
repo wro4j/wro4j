@@ -15,6 +15,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
+import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 
@@ -31,7 +32,7 @@ public class Less4jProcessor
   private static final Logger LOG = LoggerFactory.getLogger(Less4jProcessor.class);
 
   public static final String ALIAS = "less4j";
-
+  private final LessCompiler compiler = new DefaultLessCompiler();
   /**
    * {@inheritDoc}
    */
@@ -48,7 +49,7 @@ public class Less4jProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      final String result = new DefaultLessCompiler().compile(IOUtils.toString(reader));
+      final String result = compiler.compile(IOUtils.toString(reader));
       writer.write(result);
     } catch (final Exception e) {
       LOG.error("Failed to compile less", e);
