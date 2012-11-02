@@ -61,7 +61,7 @@
   </developers>
   
   <properties>
-    <wro4j.version>2.0-SNAPSHOT</wro4j.version>
+    <wro4j.version>1.5.1-SNAPSHOT</wro4j.version>
     <commons-io.version>2.2</commons-io.version>
     <commons-lang.version>3.1</commons-lang.version>
     <commons-pool.version>1.6</commons-pool.version>
