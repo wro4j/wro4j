@@ -11,33 +11,28 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 /**
  * Encapsulates information about lint errors associated with a collection of resources. This class is generic, the type
  * <T> describe the type of lint errors.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Sep 2012
  * @since 1.5.0
  */
 public final class LintReport<T> {
-  private List<ResourceLintReport<T>> reports;
-  
+  private final List<ResourceLintReport<T>> reports;
+
   public LintReport() {
     reports = new ArrayList<ResourceLintReport<T>>() {};
   }
-  
+
   /**
    * @return a readonly collection of resource
    */
   public List<ResourceLintReport<T>> getReports() {
     return Collections.unmodifiableList(reports);
   }
-  
-  public void setReports(final List<ResourceLintReport<T>> reports) {
-    Validate.notNull(reports);
-    this.reports = reports;
-  }
-  
+
   /**
    * Add a single lint report to underlying collection.
-   * 
+   *
    * @param resourceLintReport
    *          {@link ResourceLintReport} to add.
    * @return reference to this {@link LintReport} object (fluent interface).
@@ -47,7 +42,7 @@ public final class LintReport<T> {
     reports.add(resourceLintReport);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
    */

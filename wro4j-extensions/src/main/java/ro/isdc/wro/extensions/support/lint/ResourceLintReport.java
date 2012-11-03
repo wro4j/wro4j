@@ -3,6 +3,7 @@ package ro.isdc.wro.extensions.support.lint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -45,7 +46,27 @@ public class ResourceLintReport<T> {
 
   private ResourceLintReport(final String resourcePath, final Collection<T> errors) {
     this.resourcePath = StringUtils.isEmpty(resourcePath) ? UNKNOWN_PATH : resourcePath;
-    this.lints = errors == null ? Collections.<T> emptyList() : errors;
+    this.lints = filter(errors);
+  }
+
+  /**
+   * This filtering is required, in order to ensure that no nulls are passed (which happens when using gson for
+   * deserializing json collection.
+   *
+   * @param collection
+   *          to filter.
+   * @return a null free collection of item by filtering found nulls.
+   */
+  private List<T> filter(final Collection<T> collection) {
+    final List<T> nullFreeList = new ArrayList<T>();
+    if (collection != null) {
+      for (final T item : collection) {
+        if (item != null) {
+          nullFreeList.add(item);
+        }
+      }
+    }
+    return nullFreeList;
   }
 
   /**
