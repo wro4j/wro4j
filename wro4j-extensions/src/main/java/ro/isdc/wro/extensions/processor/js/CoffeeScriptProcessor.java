@@ -7,6 +7,8 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -30,11 +32,9 @@ public class CoffeeScriptProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScriptProcessor.class);
   public static final String ALIAS = "coffeeScript";
-  private final ResourcePreProcessor processor;
-
-  public CoffeeScriptProcessor() {
-    processor = initializeProcessor();
-  }
+  @Inject
+  private Injector injector;
+  private ResourcePreProcessor processor;
 
   /**
    * Responsible for coffeeScriptProcessor initialization. First the nodeCoffeeScript processor will be used as a primary processor. If
@@ -60,7 +60,15 @@ public class CoffeeScriptProcessor
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    processor.process(resource, reader, writer);
+    getProcessor().process(resource, reader, writer);
+  }
+
+  private ResourcePreProcessor getProcessor() {
+    if (processor == null) {
+      processor = initializeProcessor();
+      injector.inject(processor);
+    }
+    return processor;
   }
 
   /**

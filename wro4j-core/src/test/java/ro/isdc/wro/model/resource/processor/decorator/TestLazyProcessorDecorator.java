@@ -7,18 +7,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.LazyInitializer;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -29,14 +36,15 @@ public class TestLazyProcessorDecorator {
   private Reader mockReader;
   @Mock
   private Writer mockWriter;
-  @Mock
-  private ProcessorDecorator mockProcessor;
+  private ProcessorDecorator mockProcessorDecorator;
 
   private LazyProcessorDecorator victim;
 
   @Before
   public void setUp() {
+    Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
+    mockProcessorDecorator = Mockito.spy(new ProcessorDecorator(new JSMinProcessor()));
   }
 
   @Test(expected = NullPointerException.class)
@@ -48,6 +56,7 @@ public class TestLazyProcessorDecorator {
         return null;
       }
     });
+    WroTestUtils.createInjector().inject(victim);
     victim.process(null, mockReader, mockWriter);
   }
 
@@ -55,8 +64,8 @@ public class TestLazyProcessorDecorator {
   public void shouldInvokeLazyProcessor()
       throws Exception {
     final ResourceType expectedResourceType = ResourceType.CSS;
-    when(mockProcessor.isMinimize()).thenReturn(true);
-    when(mockProcessor.getSupportedResourceType()).thenReturn(new SupportedResourceType() {
+    when(mockProcessorDecorator.isMinimize()).thenReturn(true);
+    when(mockProcessorDecorator.getSupportedResourceType()).thenReturn(new SupportedResourceType() {
       public Class<? extends Annotation> annotationType() {
         return SupportedResourceType.class;
       }
@@ -64,17 +73,19 @@ public class TestLazyProcessorDecorator {
         return expectedResourceType;
       }
     });
-    when(mockProcessor.isSupported()).thenReturn(false);
+    when(mockProcessorDecorator.isSupported()).thenReturn(false);
     victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
-        return mockProcessor;
+        return mockProcessorDecorator;
       }
     });
-    victim.process(null, mockReader, mockWriter);
+    WroTestUtils.createInjector().inject(victim);
+    victim.process(null, new StringReader(""), new StringWriter());
     assertTrue(victim.isMinimize());
     assertFalse(victim.isSupported());
     assertEquals(expectedResourceType, victim.getSupportedResourceType().value());
-    verify(mockProcessor).process(null, mockReader, mockWriter);
+    verify(mockProcessorDecorator).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
   }
 }
