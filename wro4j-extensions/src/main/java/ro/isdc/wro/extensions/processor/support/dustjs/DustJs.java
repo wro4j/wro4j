@@ -1,6 +1,12 @@
 package ro.isdc.wro.extensions.processor.support.dustjs;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
@@ -14,13 +20,30 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
  * @created 8 Mar 2012
  */
 public class DustJs extends AbstractJsTemplateCompiler {
+  private static final Logger LOG = LoggerFactory.getLogger(DustJs.class);
+
+  /**
+   * The name of the system property used to specify the path of the dust compiler. If this is not specified, the default
+   * compiler is used.
+   */
+  static final String PARAM_COMPILER_PATH = "dustJs.file.path";
   private static final String DEFAULT_DUST_JS = "dust-full-1.1.1.min.js";
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected InputStream getCompilerAsStream() {
+  protected InputStream getCompilerAsStream() throws IOException {
+    final String compilerPath = System.getProperty(PARAM_COMPILER_PATH);
+    LOG.debug("compilerPath: {}", compilerPath);
+    return StringUtils.isEmpty(compilerPath) ? getDefaultCompilerStream() : new FileInputStream(
+        compilerPath);
+  }
+
+  /**
+   * @return default stream of the compiler.
+   */
+  protected InputStream getDefaultCompilerStream() {
     return DustJs.class.getResourceAsStream(DEFAULT_DUST_JS);
   }
 
