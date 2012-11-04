@@ -12,17 +12,17 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * A base class for template processors like: dustJS or hoganJS.
- *  
+ *
  * @author Eivind Barstad Waaler
  * @since 1.4.7
  * @created 11 May 2012
  */
 public abstract class AbstractJsTemplateCompiler {
   private ScriptableObject scope;
-  
+
   /**
    * Compiles the javascript template into plain javascript.
-   * 
+   *
    * @param content
    *          the template to be compiled.
    * @param optionalArgument
@@ -43,20 +43,22 @@ public abstract class AbstractJsTemplateCompiler {
   protected abstract String getCompileCommand();
 
   /**
-   * @return additional arguments for the compiler. 
+   * @return additional arguments for the compiler.
    */
   protected String getArguments() {
     return null;
   }
 
-  private String createArgStr(String argument) {
+  private String createArgStr(final String argument) {
     return StringUtils.isNotBlank(argument) ? ", " + argument : "";
   }
-  
+
   /**
    * @return the stream of the compiler resource (javascript) used to compile templates.
+   * @throws IOException
+   *           if the stream could not be located.
    */
-  protected abstract InputStream getCompilerAsStream();
+  protected abstract InputStream getCompilerAsStream() throws IOException;
 
   private RhinoScriptBuilder initScriptBuilder() {
     try {
