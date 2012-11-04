@@ -23,10 +23,10 @@ public class DustJs extends AbstractJsTemplateCompiler {
   private static final Logger LOG = LoggerFactory.getLogger(DustJs.class);
 
   /**
-   * The system property name used to specify the path of the dust compiler. If this is not specified, the default
+   * The name of the system property used to specify the path of the dust compiler. If this is not specified, the default
    * compiler is used.
    */
-  static final String SYSTEM_PROPERTY_NAME = "dustJs.file.path";
+  static final String PARAM_COMPILER_PATH = "dustJs.file.path";
   private static final String DEFAULT_DUST_JS = "dust-full-1.1.1.min.js";
 
   /**
@@ -34,7 +34,7 @@ public class DustJs extends AbstractJsTemplateCompiler {
    */
   @Override
   protected InputStream getCompilerAsStream() throws IOException {
-    final String compilerPath = System.getProperty(SYSTEM_PROPERTY_NAME);
+    final String compilerPath = System.getProperty(PARAM_COMPILER_PATH);
     LOG.debug("compilerPath: {}", compilerPath);
     return StringUtils.isEmpty(compilerPath) ? getDefaultCompilerStream() : new FileInputStream(
         compilerPath);

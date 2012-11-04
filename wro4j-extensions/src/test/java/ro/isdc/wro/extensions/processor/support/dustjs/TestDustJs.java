@@ -35,7 +35,7 @@ public class TestDustJs {
       throws Exception {
     final File temp = WroUtil.createTempFile();
     IOUtils.copy(victim.getDefaultCompilerStream(), new FileOutputStream(temp));
-    System.setProperty(DustJs.SYSTEM_PROPERTY_NAME, temp.getPath());
+    System.setProperty(DustJs.PARAM_COMPILER_PATH, temp.getPath());
     assertEquals("(function(){dust.register(null,body_0);function body_0(chk,ctx){return chk;}return body_0;})();",
         victim.compile(null, null));
   }
@@ -43,7 +43,7 @@ public class TestDustJs {
   @Test(expected = WroRuntimeException.class)
   public void cannotCompileUsingWrongPathCompiler()
       throws Exception {
-    System.setProperty(DustJs.SYSTEM_PROPERTY_NAME, "/invalid/path/to/dust.js");
+    System.setProperty(DustJs.PARAM_COMPILER_PATH, "/invalid/path/to/dust.js");
     victim.compile(null, null);
   }
 }
