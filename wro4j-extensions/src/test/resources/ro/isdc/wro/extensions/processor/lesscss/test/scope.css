@@ -30,9 +30,3 @@
     }
   }
 }
-
-
-			Caused by: java.lang.NullPointerException
-			  at com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator.evaluate(ExpressionEvaluator.java:66)
-			  at com.github.sommeri.less4j.core.compiler.expressions.ExpressionEvaluator.evaluate(ExpressionEvaluator.java:104)
-			  at com.github.sommeri.less4j.core.compiler.LessToCssCompiler.evaluateExpressions(LessToCssCompiler.java:72)
