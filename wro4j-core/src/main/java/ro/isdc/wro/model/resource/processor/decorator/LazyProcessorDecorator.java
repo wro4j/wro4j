@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ImportAware;
@@ -24,6 +26,8 @@ import ro.isdc.wro.util.LazyInitializer;
 public final class LazyProcessorDecorator
     extends AbstractDecorator<LazyInitializer<ResourceProcessor>>
     implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware, ImportAware {
+  @Inject
+  private Injector injector;
   private ProcessorDecorator processor;
 
   public LazyProcessorDecorator(final LazyInitializer<ResourceProcessor> processor) {
@@ -33,6 +37,7 @@ public final class LazyProcessorDecorator
   private AbstractProcessorDecoratorSupport getProcessorDecorator() {
     if (processor == null) {
       processor = new ProcessorDecorator(getDecoratedObject().get());
+      injector.inject(processor);
     }
     return processor;
   }

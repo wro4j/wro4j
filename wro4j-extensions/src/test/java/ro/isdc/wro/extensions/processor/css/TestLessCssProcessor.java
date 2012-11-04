@@ -73,6 +73,7 @@ public class TestLessCssProcessor {
         };
       }
     });
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @Test
@@ -112,7 +113,10 @@ public class TestLessCssProcessor {
     final String noImports = preProcessorExecutor.processAndMerge(group,
         ProcessingCriteria.create(ProcessingType.IMPORT_ONLY, true));
     final StringWriter actual = new StringWriter();
-    new LessCssProcessor().process(null, new StringReader(noImports), actual);
+
+    victim = new LessCssProcessor();
+    WroTestUtils.createInjector().inject(victim);
+    victim.process(null, new StringReader(noImports), actual);
 
     final String expected = IOUtils.toString(managerFactory.create().getResourceLocatorFactory().locate(
         String.format("classpath:%s/expected/import.cssx", baseFolder)));

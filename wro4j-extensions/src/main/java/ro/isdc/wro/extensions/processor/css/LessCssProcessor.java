@@ -7,6 +7,8 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
@@ -29,11 +31,9 @@ public class LessCssProcessor
     implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(LessCssProcessor.class);
   public static final String ALIAS = "lessCss";
-  private final ResourceProcessor lessProcessor;
-
-  public LessCssProcessor() {
-    lessProcessor = initializeProcessor();
-  }
+  @Inject
+  private Injector injector;
+  private ResourceProcessor lessProcessor;
 
   /**
    * Responsible for lessProcessor initialization. First the nodeLess processor will be used as a primary processor. If
@@ -59,11 +59,20 @@ public class LessCssProcessor
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    lessProcessor.process(resource, reader, writer);
+    getLessProcessor().process(resource, reader, writer);
+  }
+
+  private ResourceProcessor getLessProcessor() {
+    if (lessProcessor == null) {
+      lessProcessor = initializeProcessor();
+      injector.inject(lessProcessor);
+    }
+    return lessProcessor;
   }
 
   /**
    * Lazily initialize the rhinoProcessor.
+   *
    * @return {@link ResourceProcessor} used as a fallback lessCss processor.
    * @VisibleFortesTesting
    */

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
@@ -62,7 +61,7 @@ public class ResourceWatcher {
     watch.start("detect changes");
     try {
       final Group group = modelFactory.create().getGroupByName(cacheEntry.getGroupName());
-      if (isGroupChanged(group)) {
+      if (isGroupChanged(group.collectResourcesOfType(cacheEntry.getType()))) {
         onGroupChanged(cacheEntry);
       }
       changeDetector.reset();
@@ -86,6 +85,7 @@ public class ResourceWatcher {
   private boolean isGroupChanged(final Group group) {
     LOG.debug("Checking if group {} is changed..", group.getName());
     // TODO run the check in parallel?
+
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (final Resource resource : resources) {
@@ -165,8 +165,7 @@ public class ResourceWatcher {
         LOG.debug("\tisImportChanged: {}", isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
+          // we need to continue in order to store the hash for all imported resources, otherwise the change won't be computed correctly.
         }
       };
 

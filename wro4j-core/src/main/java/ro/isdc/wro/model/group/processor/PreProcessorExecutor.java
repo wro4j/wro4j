@@ -202,7 +202,8 @@ public class PreProcessorExecutor {
     Writer writer = null;
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
-      stopWatch.start("Processor: " + processor.toString());
+      final ResourceProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
+      stopWatch.start("Processor: " + decoratedProcessor.toString());
 
       callbackRegistry.onBeforePreProcess();
 
@@ -210,7 +211,7 @@ public class PreProcessorExecutor {
       final Reader reader = new StringReader(resourceContent);
       try {
         //decorate and process
-        decoratePreProcessor(processor, criteria).process(resource, reader, writer);
+        decoratedProcessor.process(resource, reader, writer);
         //use the outcome for next input
         resourceContent = writer.toString();
       } finally {

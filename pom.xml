@@ -68,7 +68,7 @@
     <closure.version>r2180</closure.version>
     <slf4j.version>1.7.1</slf4j.version>    
     <maven.version>3.0.4</maven.version>    
-    <mockito.version>1.9.5-rc1</mockito.version>
+    <mockito.version>1.9.5</mockito.version>
     <junit.version>4.10</junit.version>    
     <rhino.version>1.7R3</rhino.version>
      

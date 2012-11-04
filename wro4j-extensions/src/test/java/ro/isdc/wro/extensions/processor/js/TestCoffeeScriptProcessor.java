@@ -58,6 +58,7 @@ public class TestCoffeeScriptProcessor {
         };
       }
     });
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @Test

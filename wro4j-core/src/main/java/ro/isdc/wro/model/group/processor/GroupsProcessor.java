@@ -108,12 +108,13 @@ public class GroupsProcessor {
 
     final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
-      stopWatch.start("Using " + processor.toString());
+      final ResourceProcessor decoratedProcessor = decorateProcessor(processor, cacheKey.isMinimize());
+      stopWatch.start("Using " + decoratedProcessor.toString());
       writer = new StringWriter();
       try {
         callbackRegistry.onBeforePostProcess();
         //the processor is invoked as a pre processor. This is important for correct computation of eligibility.
-        decorateProcessor(processor, cacheKey.isMinimize()).process(resource, reader, writer);
+        decoratedProcessor.process(resource, reader, writer);
       } finally {
         stopWatch.stop();
         callbackRegistry.onAfterPostProcess();
