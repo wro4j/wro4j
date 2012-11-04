@@ -23,7 +23,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
@@ -46,7 +45,7 @@ public class TestRhinoLessCssProcessor {
   @Test
   public void testFromFolder()
       throws Exception {
-    final ResourcePostProcessor processor = new RhinoLessCssProcessor();
+    final ResourcePreProcessor processor = new RhinoLessCssProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
