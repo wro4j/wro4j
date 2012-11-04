@@ -100,22 +100,21 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
    */
   @Test
   public void shouldCheckOnlyAfterTimeout() throws Exception {
-    final long updatePeriod = 30;
-    final long delta = 10;
+    final long updatePeriod = 10;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
     victim.get(key);
     Thread.sleep(updatePeriod);
     final long start = System.currentTimeMillis();
-    while(System.currentTimeMillis() - start < updatePeriod - delta) {
+    do {
       victim.get(key);
-    }
+    } while (System.currentTimeMillis() - start < updatePeriod);
     Mockito.verify(mockResourceWatcher, times(2)).check(key);
   }
 
   @Test
   public void shouldCheckDifferentGroups() throws Exception {
-    final long updatePeriod = 50;
+    final long updatePeriod = 10;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key1 = new CacheKey(GROUP_NAME, ResourceType.JS, true);
     final CacheKey key2 = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
