@@ -45,9 +45,11 @@ public class ResourceChangeDetector {
    * Notifies the {@link ResourceChangeDetector} that the change cycle completes and a new one is prepared.
    */
   public void reset() {
+    LOG.debug("changeInfoMap before reset: {}", changeInfoMap);
     for (final ResourceChangeInfo resourceInfo : changeInfoMap.values()) {
       resourceInfo.reset();
     }
+    LOG.debug("changeInfoMap after reset: {}", changeInfoMap);
   }
 
   /**

@@ -80,6 +80,7 @@ public final class LazyProcessorDecorator
 
   @Override
   public String toString() {
-    return getProcessorDecorator().toString();
+    //Handle situation when toString is invoked before this instance is injected.
+    return injector != null ? getProcessorDecorator().toString() : super.toString();
   }
 }

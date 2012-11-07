@@ -2,18 +2,15 @@
 <groups xmlns="http://www.isdc.ro/wro">
 
   <group name="bootstrap">
+    <js>/bootstrap/js/*.js</js>
     <css>/bootstrap/less/bootstrap.less</css>
-    <js>/bootstrap/js/bootstrap-transition.js</js>
-    <js>/bootstrap/js/bootstrap-alert.js</js>
-    <js>/bootstrap/js/bootstrap-modal.js</js>
-    <js>/bootstrap/js/bootstrap-dropdown.js</js>
-    <js>/bootstrap/js/bootstrap-scrollspy.js</js>
-    <js>/bootstrap/js/bootstrap-tab.js</js>
-    <js>/bootstrap/js/bootstrap-tooltip.js</js>
-    <js>/bootstrap/js/bootstrap-popover.js</js>
-    <js>/bootstrap/js/bootstrap-button.js</js>
-    <js>/bootstrap/js/bootstrap-collapse.js</js>
-    <js>/bootstrap/js/bootstrap-carousel.js</js>
-    <js>/bootstrap/js/bootstrap-typeahead.js</js>
   </group>
+  
+  <group name="bootstrapDemo">
+      <js>/module/bootstrapDemo/jquery.js</js>
+      <group-ref>bootstrap</group-ref>
+      <css>/module/bootstrapDemo/google-code-prettify/*.css</css>
+      <js>/module/bootstrapDemo/google-code-prettify/*.js</js>
+  </group>
+  
 </groups>
