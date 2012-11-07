@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
@@ -14,7 +15,7 @@ import ro.isdc.wro.util.ObjectFactory;
 
 /**
  * A base class for template processors like: dustJS or hoganJS.
- *  
+ *
  * @author Eivind Barstad Waaler
  * @since 1.4.7
  * @created 11 May 2012
@@ -35,7 +36,7 @@ public abstract class JsTemplateCompilerProcessor implements ResourcePreProcesso
    * {@inheritDoc}
    */
   @Override
-  public void process(Resource resource, Reader reader, Writer writer) throws IOException {
+  public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
     final String content = IOUtils.toString(reader);
     final AbstractJsTemplateCompiler jsCompiler = enginePool.getObject();
     try {
@@ -53,7 +54,8 @@ public abstract class JsTemplateCompilerProcessor implements ResourcePreProcesso
    * @return arguments consumed by the js compile script.
    */
   protected String getArgument(final Resource resource) {
-    return null;
+    final String name = resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
+    return name;
   }
 
   /**
