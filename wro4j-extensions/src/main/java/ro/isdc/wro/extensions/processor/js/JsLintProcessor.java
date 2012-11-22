@@ -11,8 +11,10 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 
 
 /**
- * Processor which analyze the js code and warns you about any problems. The processing result won't change no matter
- * if the processed script contains errors or not.
+ * Processor which analyze the js code and warns you about any problems. The processing result won't change no matter if
+ * the processed script contains errors or not.
+ * <p/>
+ * The version of jshint used by this processor is a snapshot committed on the following date: 2012-11-19 07:22:27.
  *
  * @author Alex Objelean
  * @since 1.4.2
