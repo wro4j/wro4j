@@ -144,10 +144,10 @@ public class TypeScriptProcessor
   }
 
   /**
-   * Creates process responsible for running lessc shell command by reading the file content from the sourceFilePath
+   * Creates process responsible for running tsc shell command by reading the file content from the sourceFilePath
    *
    * @param sourceFile
-   *          the source path of the file from where the lessc will read the less file.
+   *          the source path of the file from where the tsc will read the typescript file.
    * @param destFile
    *          the destination of the compiled file.
    * @throws IOException
@@ -176,7 +176,7 @@ public class TypeScriptProcessor
       final int exitValue = process.waitFor();
       LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
       if (exitValue != 0) {
-        throw new UnsupportedOperationException("Lessc is not a supported operation on this platform");
+        throw new UnsupportedOperationException("Tsc is not a supported operation on this platform");
       }
       LOG.debug("The {} processor is supported.", getClass().getName());
       return true;
@@ -191,7 +191,7 @@ public class TypeScriptProcessor
   }
 
   /**
-   * Creates the platform specific arguments to run the <code>lessc</code> shell utility. Default implementation handles
+   * Creates the platform specific arguments to run the <code>tsc</code> shell utility. Default implementation handles
    * windows and unix platforms.
    *
    * @return arguments for command line. The implementation will take care of OS differences.
@@ -201,7 +201,7 @@ public class TypeScriptProcessor
   }
 
   /**
-   * @return arguments required to run lessc on non Windows platform.
+   * @return arguments required to run tsc on non Windows platform.
    */
   private String[] buildArgumentsForUnix(final String filePath, final String outFilePath) {
     return new String[] {
@@ -210,7 +210,7 @@ public class TypeScriptProcessor
   }
 
   /**
-   * @return arguments required to run lessc on Windows platform.
+   * @return arguments required to run tsc on Windows platform.
    */
   private String[] buildArgumentsForWindows(final String filePath, final String outFilePath) {
     return new String[] {
