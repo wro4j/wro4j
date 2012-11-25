@@ -38,7 +38,7 @@ public class ReportXmlFormatter
   /**
    * Lint related constants
    */
-  private static final String ELEMENT_LINT = "lint";
+  private static final String ELEMENT_LINT = "jslint";
   private static final String ELEMENT_ISSUE = "issue";
   private static final String ELEMENT_FILE = "file";
   private static final String ATTR_NAME = "name";
