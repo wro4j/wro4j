@@ -3,21 +3,11 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
-import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
@@ -30,6 +20,15 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 import ro.isdc.wro.util.WroUtil;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
 
 
 /**
@@ -45,7 +44,12 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Compiled pattern.
    */
-  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
+  private final Pattern PATTERN;
+
+  public AbstractCssUrlRewritingProcessor() {
+      PATTERN = Pattern.compile(getPattern());
+  }
+
   @Inject
   private ReadOnlyContext context;
   /**
@@ -69,48 +73,24 @@ public abstract class AbstractCssUrlRewritingProcessor
     final Matcher matcher = PATTERN.matcher(cssContent);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
-      // index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
-      final int declarationIndex = 1;
-      /**
-       * index of the group containing an url inside a declaration of this form:
-       *
-       * <pre>
-       * body {
-       *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
-       * }
-       * </pre>
-       * or
-       * <pre>
-       * @font-face {
-       *   src: url(btn_icons.png);
-       * }
-       */
-      final int urlIndexA = 2;
-      /**
-       * index of the group containing an url inside a declaration of this form:
-       *
-       * <pre>
-       * body {
-       *     background: #B3B3B3 url(img.gif);color:red;
-       * }
-       * </pre>
-       * </pre>
-       */
-      final int urlIndexB = 3;
-      final String originalDeclaration = matcher.group(declarationIndex);
-      final String originalUrl = matcher.group(urlIndexA) != null ? matcher.group(urlIndexA) : matcher.group(urlIndexB);
+      int urlIndexA = getUrlIndexA();
+      int urlIndexB = getUrlIndexB();
+
+      String originalDeclaration = matcher.group(getDeclarationIndex());
+      String groupA = matcher.group(urlIndexA);
+      String originalUrl = groupA != null ? groupA : matcher.group(urlIndexB);
       LOG.debug("urlGroup: {}", originalUrl);
 
       Validate.notNull(originalUrl);
       if (isReplaceNeeded(originalUrl)) {
-        final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
+        String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
         LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
         /**
          * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
          * from stackoverflow: @see
          * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
          */
-        final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
+        String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
             modifiedUrl));
         onUrlReplaced(modifiedUrl);
         matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration));
@@ -244,4 +224,53 @@ public abstract class AbstractCssUrlRewritingProcessor
     //We want this processor to be applied when processing resources referred with @import directive
     return true;
   }
+
+
+  protected String getPattern() {
+      return WroUtil.loadRegexpWithKey(getRegexPatternKey());
+  }
+
+  protected String getRegexPatternKey() {
+      return "cssUrlRewrite";
+  }
+
+ /**
+  *
+  * @return index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
+  */
+  protected int getDeclarationIndex() {
+      return 0;
+  }
+
+  /**
+   * index of the group containing an url inside a declaration of this form:
+   *
+   * <pre>
+   * body {
+   *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
+   * }
+   * </pre>
+   * or
+   * <pre>
+   * @font-face {
+   *   src: url(btn_icons.png);
+   * }
+   */
+   protected int getUrlIndexA() {
+       return 1;
+   }
+
+   /**
+   * index of the group containing an url inside a declaration of this form:
+   *
+   * <pre>
+   * body {
+   *     background: #B3B3B3 url(img.gif);color:red;
+   * }
+   * </pre>
+   * </pre>
+   */
+   protected int getUrlIndexB() {
+      return 2;
+   }
 }
