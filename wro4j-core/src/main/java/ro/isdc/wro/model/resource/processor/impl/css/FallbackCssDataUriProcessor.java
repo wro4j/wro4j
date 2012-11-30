@@ -46,7 +46,7 @@ public class FallbackCssDataUriProcessor
     return originalDeclaration.equals(modifiedDeclaration) ? modifiedDeclaration : computeNewDeclaration(
         originalDeclaration, modifiedDeclaration);
   }
-  
+
   /**
    * @return the new declaration which contains both: old and new modified declarations.
    */
@@ -54,7 +54,27 @@ public class FallbackCssDataUriProcessor
     LOG.debug("originalDeclaration: {}", originalDeclaration);
     LOG.debug("modifiedDeclaration: {}", modifiedDeclaration);
     // helps to avoid duplicate unnecessary separator
-    final String separator = originalDeclaration.trim().endsWith(SEPARATOR) ? StringUtils.EMPTY : SEPARATOR;
+    String separator = originalDeclaration.trim().endsWith(SEPARATOR) ? StringUtils.EMPTY : SEPARATOR;
     return originalDeclaration + separator + modifiedDeclaration;
   }
+
+    @Override
+    protected String getRegexPatternKey() {
+        return "cssUrlRewrite.fallbackCssDataUriProcessor";
+    }
+
+    @Override
+    public int getDeclarationIndex() {
+        return 1;
+    }
+
+    @Override
+    protected int getUrlIndexA() {
+        return 2;
+    }
+
+    @Override
+    protected int getUrlIndexB() {
+        return 3;
+    }
 }
