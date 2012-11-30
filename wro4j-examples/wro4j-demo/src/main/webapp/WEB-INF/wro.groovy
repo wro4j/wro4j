@@ -1,15 +1,31 @@
 groups {
+
+  dynamic {
+    js("/resource/dynamic.js")
+  }
+  dynamicRandom {
+    css("/resource/random.css")
+  }
+  
   testPage {
     modules()
   }
+  
   modules {
+    dynamicRandom()  
     font()
     wildcard()
+    /*
     jar()
+    */
   }
+  
   wildcard {
+   
     css("/static/**.css")
+   /*
     js("/static/js/*.js")
+    */
     css("/WEB-INF/css/*.css")
     css("classpath:ro/isdc/wro/resources/**.cs?")
   }
@@ -95,15 +111,9 @@ groups {
     js("/external/any.js")
   }
   
-  dynamic {
-    js("/resource/dynamic.js")
-  }
   
   jar {
     css("classpath:com/app/**.css")
-  }
-  less {
-     css("/static/less/**")
   }
   coffeeScript {
      js("/static/coffee/**.coffee")
@@ -112,5 +122,22 @@ groups {
   cssUrlRewriting {
     css("/css/index.css");
   }
- /* */
+  bootstrap {
+    css("/bootstrap/less/bootstrap.less")
+    js("/bootstrap/js/*.js");
+  }
+  googleCodePrettify {
+    css("/module/bootstrapDemo/google-code-prettify/*.css")
+    js("/module/bootstrapDemo/google-code-prettify/*.js")
+  }
+  bootstrapDemo {
+    js("/module/bootstrapDemo/jquery.js")
+    bootstrap()
+    googleCodePrettify()
+  }
+  missingResources {
+    dynamic()
+    css("/some/invalid.css")
+    js("/some/invalid.css")
+  }
 }

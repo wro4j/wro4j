@@ -29,8 +29,17 @@ public class ObjectPoolHelper<T> {
 
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     Validate.notNull(objectFactory);
-    objectPool = newObjectPool(objectFactory);
+    objectPool = createObjectPool(objectFactory);
     Validate.notNull(objectPool);
+  }
+
+  /**
+   * Ensure that a not null pool will be created.
+   */
+  private GenericObjectPool<T> createObjectPool(final ObjectFactory<T> objectFactory) {
+    final GenericObjectPool<T> pool = newObjectPool(objectFactory);
+    Validate.notNull(pool);
+    return pool;
   }
 
   /**
@@ -38,28 +47,30 @@ public class ObjectPoolHelper<T> {
    */
   protected GenericObjectPool<T> newObjectPool(final ObjectFactory<T> objectFactory) {
     final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
-    final GenericObjectPool<T> objectPool = new GenericObjectPool<T>(new BasePoolableObjectFactory<T>() {
+    final GenericObjectPool<T> pool = new GenericObjectPool<T>(new BasePoolableObjectFactory<T>() {
       @Override
       public T makeObject()
         throws Exception {
         return objectFactory.create();
       }
     });
-    objectPool.setMaxActive(maxActive);
-    objectPool.setMaxIdle(MAX_IDLE);
-    objectPool.setMaxWait(MAX_WAIT);
+    pool.setMaxActive(maxActive);
+    pool.setMaxIdle(MAX_IDLE);
+    pool.setMaxWait(MAX_WAIT);
     /**
      * Use WHEN_EXHAUSTED_GROW strategy, otherwise the pool object retrieval can fail. More details here:
      * <a>http://code.google.com/p/wro4j/issues/detail?id=364</a>
      */
-    objectPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
+    pool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
     // make object elligible for eviction after a predefined amount of time.
-    objectPool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
-    objectPool.setTimeBetweenEvictionRunsMillis(EVICTABLE_IDLE_TIME);
-    return objectPool;
+    pool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
+    pool.setTimeBetweenEvictionRunsMillis(EVICTABLE_IDLE_TIME);
+    return pool;
   }
 
-
+  /**
+   * @return object from the pool.
+   */
   public T getObject() {
     try {
       return objectPool.borrowObject();
@@ -79,8 +90,6 @@ public class ObjectPoolHelper<T> {
       throw new RuntimeException("Cannot get object from the pool", e);
     }
   }
-  
-
   
   /**
    * Use a custom {@link GenericObjectPool}.

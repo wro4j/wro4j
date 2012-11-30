@@ -51,89 +51,105 @@ public class ConfigurableProcessorsFactory
    */
   private Properties properties;
   
-  private final AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider> configurablePreProcessors = new AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider>() {
-    @Override
-    protected String getStrategyKey() {
-      return PARAM_PRE_PROCESSORS;
-    }
-    
-    @Override
-    protected void overrideDefaultStrategyMap(final Map<String, ResourcePreProcessor> map) {
-      copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
-    }
+  private final AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider> configurablePreProcessors = createConfigurablePreProcessorsStrategy();
 
-    @Override
-    protected Map<String, ResourcePreProcessor> getStrategies(final ProcessorProvider provider) {
-      return provider.providePreProcessors();
-    }
-    
-    @Override
-    protected ResourcePreProcessor getStrategyForAlias(final String alias) {
-      ResourcePreProcessor processor = super.getStrategyForAlias(alias);
-      if (processor == null) {
-        final String extension = FilenameUtils.getExtension(alias);
-        boolean hasExtension = !StringUtils.isEmpty(extension);
-        if (hasExtension) {
-          final String processorName = FilenameUtils.getBaseName(alias);
-          LOG.debug("processorName: {}", processorName);
-          processor = super.getStrategyForAlias(processorName);
-          if (processor != null) {
-            LOG.debug("adding Extension: {}", extension);
-            processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
+  private final AbstractConfigurableMultipleStrategy<ResourcePostProcessor, ProcessorProvider> configurablePostProcessors = createConfigurablePostProcessorsStrategy();
+
+
+  /**
+   * @return the {@link AbstractConfigurableMultipleStrategy} responsible for providing postProcessors strategies.
+   */
+  private AbstractConfigurableMultipleStrategy<ResourcePostProcessor, ProcessorProvider> createConfigurablePostProcessorsStrategy() {
+    return new AbstractConfigurableMultipleStrategy<ResourcePostProcessor, ProcessorProvider>() {
+      @Override
+      protected String getStrategyKey() {
+        return PARAM_POST_PROCESSORS;
+      }
+      
+      @Override
+      protected void overrideDefaultStrategyMap(final Map<String, ResourcePostProcessor> map) {
+        copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
+      }
+      
+      @Override
+      protected Map<String, ResourcePostProcessor> getStrategies(final ProcessorProvider provider) {
+        return getPostProcessorStrategies(provider);
+      }
+      
+      @Override
+      protected ResourcePostProcessor getStrategyForAlias(final String alias) {
+        ResourcePostProcessor processor = super.getStrategyForAlias(alias);
+        if (processor == null) {
+          final String extension = FilenameUtils.getExtension(alias);
+          boolean hasExtension = !StringUtils.isEmpty(extension);
+          if (hasExtension) {
+            final String processorName = FilenameUtils.getBaseName(alias);
+            LOG.debug("processorName: {}", processorName);
+            processor = super.getStrategyForAlias(processorName);
+            if (processor != null) {
+              LOG.debug("adding Extension: {}", extension);
+              processor = ExtensionsAwareProcessorDecorator.decorate(new ProcessorDecorator(processor)).addExtension(
+                  extension);
+            }
           }
         }
+        return processor;
       }
-      return processor;
-    }
-
-    @Override
-    protected Properties newProperties() {
-      return ConfigurableProcessorsFactory.this.getProperties();
+      
+      @Override
+      protected Properties newProperties() {
+        return ConfigurableProcessorsFactory.this.getProperties();
+      }
     };
-  };
+  }
 
-  private final AbstractConfigurableMultipleStrategy<ResourcePostProcessor, ProcessorProvider> configurablePostProcessors = new AbstractConfigurableMultipleStrategy<ResourcePostProcessor, ProcessorProvider>() {
-    @Override
-    protected String getStrategyKey() {
-      return PARAM_POST_PROCESSORS;
-    }
-    
-    @Override
-    protected void overrideDefaultStrategyMap(final Map<String, ResourcePostProcessor> map) {
-      copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
-    }
-    
-    @Override
-    protected Map<String, ResourcePostProcessor> getStrategies(final ProcessorProvider provider) {
-      return provider.providePostProcessors();
-    }
-    
-    @Override
-    protected ResourcePostProcessor getStrategyForAlias(final String alias) {
-      ResourcePostProcessor processor = super.getStrategyForAlias(alias);
-      if (processor == null) {
-        final String extension = FilenameUtils.getExtension(alias);
-        boolean hasExtension = !StringUtils.isEmpty(extension);
-        if (hasExtension) {
-          final String processorName = FilenameUtils.getBaseName(alias);
-          LOG.debug("processorName: {}", processorName);
-          processor = super.getStrategyForAlias(processorName);
-          if (processor != null) {
-            LOG.debug("adding Extension: {}", extension);
-            processor = ExtensionsAwareProcessorDecorator.decorate(new ProcessorDecorator(processor)).addExtension(
-                extension);
+  /**
+   * @return the {@link AbstractConfigurableMultipleStrategy} responsible for providing preProcessors strategies.
+   */
+  private  AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider> createConfigurablePreProcessorsStrategy() {
+    return new AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider>() {
+      @Override
+      protected String getStrategyKey() {
+        return PARAM_PRE_PROCESSORS;
+      }
+      
+      @Override
+      protected void overrideDefaultStrategyMap(final Map<String, ResourcePreProcessor> map) {
+        copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
+      }
+
+      @Override
+      protected Map<String, ResourcePreProcessor> getStrategies(final ProcessorProvider provider) {
+        return getPreProcessorStrategies(provider);
+      }
+      
+      @Override
+      protected ResourcePreProcessor getStrategyForAlias(final String alias) {
+        ResourcePreProcessor processor = super.getStrategyForAlias(alias);
+        if (processor == null) {
+          final String extension = FilenameUtils.getExtension(alias);
+          boolean hasExtension = !StringUtils.isEmpty(extension);
+          if (hasExtension) {
+            final String processorName = FilenameUtils.getBaseName(alias);
+            LOG.debug("processorName: {}", processorName);
+            processor = super.getStrategyForAlias(processorName);
+            if (processor != null) {
+              LOG.debug("adding Extension: {}", extension);
+              processor = ExtensionsAwareProcessorDecorator.decorate(processor).addExtension(extension);
+            }
           }
         }
+        return processor;
       }
-      return processor;
-    }
-    
-    @Override
-    protected Properties newProperties() {
-      return ConfigurableProcessorsFactory.this.getProperties();
-    };
-  };
 
+      @Override
+      protected Properties newProperties() {
+        return ConfigurableProcessorsFactory.this.getProperties();
+      };
+    };
+  }
+
+  
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
    */
@@ -255,5 +271,13 @@ public class ConfigurableProcessorsFactory
    */
   Collection<ResourcePostProcessor> getAvailablePostProcessors() {
     return configurablePostProcessors.getAvailableStrategies();
+  }
+
+  protected Map<String, ResourcePostProcessor> getPostProcessorStrategies(final ProcessorProvider provider) {
+    return provider.providePostProcessors();
+  }
+
+  protected Map<String, ResourcePreProcessor> getPreProcessorStrategies(final ProcessorProvider provider) {
+    return provider.providePreProcessors();
   }
 }

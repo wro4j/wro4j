@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.BeautifyJsProcessor;
@@ -41,7 +41,6 @@ import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
-import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.MultiLineCommentStripperProcessor;
@@ -154,7 +153,7 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new CssVariablesProcessor());
       list.add(new VariablizeColorsCssProcessor());
 
-      list.add(new LessCssProcessor());
+      list.add(new RhinoLessCssProcessor());
       list.add(new SassCssProcessor());
       list.add(new YUICssCompressorProcessor());
       list.add(new JawrCssMinifierProcessor());
@@ -167,8 +166,6 @@ public class ResourceTransformerPanel extends Panel {
       list.add(new JSMinProcessor());
       list.add(new GoogleClosureCompressorProcessor());
       list.add(new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS));
-      list.add(YUIJsCompressorProcessor.doMungeCompressor());
-      list.add(YUIJsCompressorProcessor.noMungeCompressor());
       return list;
     }
     //inspect the classpath

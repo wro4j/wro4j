@@ -23,19 +23,19 @@ public class TestProviderFinder {
     victim = ProviderFinder.of(ProcessorProvider.class);
     Assert.assertFalse(victim.find().isEmpty());
   }
-  
+
   @Test
   public void shouldFindNamingStrategyProviders() {
     victim = ProviderFinder.of(NamingStrategyProvider.class);
     Assert.assertFalse(victim.find().isEmpty());
   }
-  
+
   @Test
   public void shouldFindHashBuilderProviders() {
     victim = ProviderFinder.of(HashStrategyProvider.class);
     Assert.assertFalse(victim.find().isEmpty());
   }
-  
+
   @Test
   public void shouldNotFindProviderWhenNoneIsAvailable() {
     victim = new ProviderFinder<ProcessorProvider>(ProcessorProvider.class) {
@@ -46,7 +46,7 @@ public class TestProviderFinder {
     };
     Assert.assertTrue(victim.find().isEmpty());
   }
-  
+
   @Test(expected=WroRuntimeException.class)
   public void cannotFindAnyProviderWhenLookupFails() {
     victim = new ProviderFinder<ProcessorProvider>(ProcessorProvider.class) {
@@ -56,5 +56,10 @@ public class TestProviderFinder {
       }
     };
     victim.find();
+  }
+
+  @Test
+  public void shouldFindProcessorProviders() {
+    Assert.assertNotNull(ProviderFinder.of(ProcessorProvider.class).find());
   }
 }

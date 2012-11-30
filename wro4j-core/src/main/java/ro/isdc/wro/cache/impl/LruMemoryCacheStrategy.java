@@ -15,7 +15,10 @@ import java.util.Map;
  * @since 1.3.6
  */
 public class LruMemoryCacheStrategy<K, V> extends MemoryCacheStrategy<K, V> {
-
+  /**
+   * Aliased used by provider for this implementation
+   */
+  public static final String ALIAS = "LRU-memory";
   /** Default cache size if no capacity is specified by the constructor. */
   public static final int DEFAULT_SIZE = 128;
 

@@ -276,9 +276,10 @@ public class CssCompressor {
     css = sb.toString();
 
     // Replace named colors where they are shorter hex values
-    css.replaceAll(":black", ":#000");
-    css.replaceAll(":white", ":#FFF");
-    css.replaceAll(":yellow", ":#FF0");
+    //Comment since it has no effect (reported by find-bug)
+//    css.replaceAll(":black", ":#000");
+//    css.replaceAll(":white", ":#FFF");
+//    css.replaceAll(":yellow", ":#FF0");
 
     // Remove empty rules.
     css = css.replaceAll("[^\\}]+\\{;\\}", "");

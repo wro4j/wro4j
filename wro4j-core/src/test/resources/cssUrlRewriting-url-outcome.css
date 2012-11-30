@@ -56,26 +56,28 @@
 }
 
 .contextPathWithWhitespaces {
-    background-image: url(http://www.site.com/absolute/path/to/image1.png);
-    background-image: url(http://www.site.com/absolute/path/to/image2.png);
-    background-image: url(http://www.site.com/absolute/path/to/image3.png);
-    background-image: url(http://www.site.com/absolute/path/to/image4.png");
-    background-image: url(http://www.site.com/absolute/path/to/image5.png');
-    background-image: url(http://www.site.com/absolute/path/to/image6.png);
-    background-image: url(http://www.site.com/static/css/absolute/path/to/image7.png);
-    background-image: url(http://www.site.com/static/css/absolute/path/to/image8.png);
-    background-image: url(http://www.site.com/static/css/absolute/path/to/image9.png);
+    background-image: url( "http://www.site.com/absolute/path/to/image1.png" );
+    background-image: url( 'http://www.site.com/absolute/path/to/image2.png' );
+    background-image: url( http://www.site.com/absolute/path/to/image3.png );
+    background-image: url( "http://www.site.com/absolute/path/to/image4.png");
+    background-image: url( 'http://www.site.com/absolute/path/to/image5.png');
+    background-image: url( http://www.site.com/absolute/path/to/image6.png);
+    background-image: url( "http://www.site.com/static/css/absolute/path/to/image7.png" );
+    background-image: url( 'http://www.site.com/static/css/absolute/path/to/image8.png' );
+    background-image: url( http://www.site.com/static/css/absolute/path/to/image9.png );
     background-image: url("http://www.site.com/static/css/absolute/path/to/image10.png");
     background-image: url('http://www.site.com/static/css/absolute/path/to/image11.png');
+    background-image: url("http://www.site.com/static/css/absolute/path/to/image11a.png" );
+    background-image: url('http://www.site.com/static/css/absolute/path/to/image11b.png' );
     background-image: url(http://www.site.com/static/css/absolute/path/to/image12.png);
 }
 
 .relativePathWithWhitespaces {
-    background-image: url(http://www.site.com/static/css/path/to/image.png);
-    background-image: url(http://www.site.com/static/css/path/to/image.png);
-    background-image: url(http://www.site.com/static/css/path/to/image.png);
+    background-image: url( "http://www.site.com/static/css/path/to/image.png" );
+    background-image: url( 'http://www.site.com/static/css/path/to/image.png' );
+    background-image: url( http://www.site.com/static/css/path/to/image.png );
 }
 
 .specialCharacters {
-    background-image: url(http://www.site.com/static/css/path/with/$pecial/character.png);
+    background-image: url( http://www.site.com/static/css/path/with/$pecial/character.png);
 }

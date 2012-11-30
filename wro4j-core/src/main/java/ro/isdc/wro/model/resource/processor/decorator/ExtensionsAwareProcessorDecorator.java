@@ -1,17 +1,12 @@
 /*
- * Copyright (C) 2011.
- * All rights reserved.
+ * Copyright (C) 2011. All rights reserved.
  */
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +32,7 @@ public class ExtensionsAwareProcessorDecorator
     extends ProcessorDecorator {
   private static final Logger LOG = LoggerFactory.getLogger(ExtensionsAwareProcessorDecorator.class);
   /**
-   * Set of extensions  on which the decorated processor will be applied.
+   * Set of extensions on which the decorated processor will be applied.
    */
   private final Set<String> extensions = new HashSet<String>();
 
@@ -52,7 +47,8 @@ public class ExtensionsAwareProcessorDecorator
   /**
    * Add one more extension to the set of extensions.
    *
-   * @param extension to add.
+   * @param extension
+   *          to add.
    */
   public ExtensionsAwareProcessorDecorator addExtension(final String extension) {
     Validate.notBlank(extension);
@@ -67,21 +63,23 @@ public class ExtensionsAwareProcessorDecorator
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-      throws IOException {
-    if (resource != null) {
-      final String resourceExtension = FilenameUtils.getExtension(resource.getUri());
-      if (extensions.contains(resourceExtension)) {
-        LOG.debug("[OK] Process resource {} with extension: {}", resource.getUri(), resourceExtension);
-        getDecoratedObject().process(resource, reader, writer);
-      } else {
-        LOG.debug("[SKIP] Process resource with extension: {}", resource.getUri(), resourceExtension);
-        IOUtils.copy(reader, writer);
-      }
-    } else {
-      LOG.debug("When used as a postProcessor, decorated processor is applied");
-      getDecoratedObject().process(resource, reader, writer);
-    }
+  @Override
+  protected boolean isEnabled(final Resource resource) {
+    return super.isEnabled(resource) && isApplicable(resource);
   }
 
+  /**
+   * @param resource
+   *          {@link Resource} being processed.
+   * @return true if the processed resource has one of the accepted extension.
+   */
+  private boolean isApplicable(final Resource resource) {
+    final String resourceExtension = FilenameUtils.getExtension(resource.getUri());
+    // null resource also means that processor is applicable, since we cannot check the extension (postProcessor).
+    final boolean isApplicable = resource == null || extensions.contains(resourceExtension);
+    if (isApplicable) {
+      LOG.debug("[OK] Process resource {} with extension: {}", resource.getUri(), resourceExtension);
+    }
+    return isApplicable;
+  }
 }

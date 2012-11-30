@@ -11,14 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.yui.YuiCssCompressor;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-
-import com.yahoo.platform.yui.compressor.CssCompressor;
 
 
 /**
@@ -41,6 +40,7 @@ public class YUICssCompressorProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     process(null, reader, writer);
@@ -49,14 +49,15 @@ public class YUICssCompressorProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
-      final CssCompressor compressor = new CssCompressor(reader);
+      final YuiCssCompressor compressor = new YuiCssCompressor(reader);
       compressor.compress(writer, linebreakpos);
-    } catch(IOException e) {
+    } catch(final Exception e) {
       LOG.error("Exception occured while processing resource: " + resource + " using processor: " + ALIAS);
-      onException(new WroRuntimeException("Exception during YuiCss processing of resource: " + resource, e));
+      onException(e);
     } finally {
       reader.close();
       writer.close();
@@ -67,7 +68,7 @@ public class YUICssCompressorProcessor
   /**
    * Invoked when a processing exception occurs.
    */
-  protected void onException(final WroRuntimeException e) {
-    throw e;
+  protected void onException(final Exception e) {
+    throw WroRuntimeException.wrap(e);
   }
 }

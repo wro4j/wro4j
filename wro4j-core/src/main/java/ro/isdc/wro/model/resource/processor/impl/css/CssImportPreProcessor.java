@@ -3,19 +3,10 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +16,8 @@ import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.util.StringUtils;
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 
 
 /**
@@ -38,78 +27,34 @@ import ro.isdc.wro.util.WroUtil;
  * <p/>
  * When processor finds an import which is not valid, it will check the
  * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
- * 
+ *
  * @author Alex Objelean
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssImportPreProcessor
-  implements ResourcePreProcessor {
+  extends AbstractCssImportPreProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssImportPreProcessor.class);
+
   public static final String ALIAS = "cssImport";
-  /**
-   * Contains a {@link UriLocatorFactory} reference injected externally.
-   */
-  @Inject
-  private UriLocatorFactory uriLocatorFactory;
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
-  @Inject
-  private WroConfiguration configuration;
-  /**
-   * List of processed resources, useful for detecting deep recursion.
-   */
-  private final List<Resource> processed = new ArrayList<Resource>();
-  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
 
   /**
    * {@inheritDoc}
    */
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    LOG.debug("Applying {} processor", CssImportPreProcessor.this.getClass().getSimpleName());
-    validate();
-    try {
-      final String result = parseCss(resource, reader);
-      writer.write(result);
-      processed.clear();
-    } finally {
-      reader.close();
-      writer.close();
-    }
-  }
-
-  /**
-   * Checks if required fields were injected.
-   */
-  private void validate() {
-    Validate.notNull(uriLocatorFactory);
-    Validate.notNull(preProcessorExecutor);
-  }
-
-
-  /**
-   * @param resource {@link Resource} to process.
-   * @param reader Reader for processed resource.
-   * @return css content with all imports processed.
-   */
-  private String parseCss(final Resource resource, final Reader reader)
-    throws IOException {
-    if (processed.contains(resource)) {
-      LOG.debug("[WARN] Recursive import detected: {}", resource);
-      return "";
-    }
-    processed.add(resource);
+  @Override
+  protected String doTransform(final String cssContent, final List<Resource> foundImports)
+      throws IOException {
     final StringBuffer sb = new StringBuffer();
-    final List<Resource> importsCollector = getImportedResources(resource);
     // for now, minimize always
     // TODO: find a way to get minimize property dynamically.
-    //groupExtractor.isMinimized(Context.get().getRequest())
-    sb.append(preProcessorExecutor.processAndMerge(importsCollector, true));
-    if (!importsCollector.isEmpty()) {
-      LOG.debug("Imported resources found : {}", importsCollector.size());
+    sb.append(preProcessorExecutor.processAndMerge(foundImports,
+        ProcessingCriteria.create(ProcessingType.IMPORT_ONLY, false)));
+    if (!foundImports.isEmpty()) {
+      LOG.debug("Imported resources found : {}", foundImports.size());
     }
-    sb.append(IOUtils.toString(reader));
-    LOG.debug("importsCollector: {}", importsCollector);
+    sb.append(cssContent);
+    LOG.debug("importsCollector: {}", foundImports);
     return removeImportStatements(sb.toString());
   }
 
@@ -125,58 +70,5 @@ public class CssImportPreProcessor
     }
     m.appendTail(sb);
     return sb.toString();
-  }
-
-  /**
-   * Find a set of imported resources inside a given resource.
-   */
-  private List<Resource> getImportedResources(final Resource resource)
-    throws IOException {
-    // it should be sorted
-    final List<Resource> imports = new ArrayList<Resource>();
-    String css = EMPTY;
-    try {
-      css = IOUtils.toString(uriLocatorFactory.locate(resource.getUri()), configuration.getEncoding());
-    } catch (IOException e) {
-      if (!configuration.isIgnoreMissingResources()) {
-        LOG.error("Invalid import detected: {}", resource.getUri());
-        throw e;
-      }
-    }
-    final Matcher m = PATTERN.matcher(css);
-    while (m.find()) {
-      final Resource importedResource = buildImportedResource(resource, m.group(1));
-      // check if already exist
-      if (imports.contains(importedResource)) {
-        LOG.debug("[WARN] Duplicate imported resource: {}", importedResource);
-      } else {
-        imports.add(importedResource);
-      }
-    }
-    return imports;
-  }
-
-
-  /**
-   * Build a {@link Resource} object from a found importedResource inside a given resource.
-   */
-  private Resource buildImportedResource(final Resource resource, final String importUrl) {
-    final String absoluteUrl = computeAbsoluteUrl(resource, importUrl);
-    return Resource.create(absoluteUrl, ResourceType.CSS);
-  }
-
-
-  /**
-   * Computes absolute url of the imported resource.
-   *
-   * @param relativeResource {@link Resource} where the import statement is found.
-   * @param importUrl found import url.
-   * @return absolute url of the resource to import.
-   */
-  private String computeAbsoluteUrl(final Resource relativeResource, final String importUrl) {
-    final String folder = FilenameUtils.getFullPath(relativeResource.getUri());
-    // remove '../' & normalize the path.
-    final String absoluteImportUrl = StringUtils.cleanPath(folder + importUrl);
-    return absoluteImportUrl;
   }
 }

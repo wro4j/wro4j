@@ -5,22 +5,22 @@
   <parent>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-examples</artifactId>
-    <version>1.4.8-SNAPSHOT</version>
+    <version>1.6.1</version>
   </parent>
 
   <artifactId>wro4j-standalone</artifactId>
   <packaging>war</packaging>
   <name>wro4j standalone example</name>
 
-	<properties>
-		<project_charset>UTF-8</project_charset>
-	</properties>
+  <properties>
+    <project_charset>UTF-8</project_charset>
+  </properties>
   
   <dependencies>
     <!-- Project Dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>wro4j-extensions</artifactId>	  
+      <artifactId>wro4j-extensions</artifactId>   
     </dependency>        
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -36,10 +36,26 @@
       </resource>          
     </resources>  
     <plugins>     
+        <plugin>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-maven-plugin</artifactId>
+        <version>1.6.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+           <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>              
+        </configuration>
+        
+      </plugin>
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>1.6.1</version>
         <executions>
           <execution>
             <goals>

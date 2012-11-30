@@ -6,23 +6,21 @@ package ro.isdc.wro.extensions.processor.support.less;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
  * This class is not thread-safe.<br/>
- * The underlying implementation use the less.js version <code>1.3.0</code> project: {@link https
+ * The underlying implementation use patched less.js from version <code>1.3.1</code> project: {@link https
  * ://github.com/cloudhead/less.js}.
- * 
+ *
  * @author Alex Objelean
  * @since 1.3.0
  */
@@ -31,7 +29,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  public static final String DEFAULT_LESS_JS = "less-1.3.0.min.js";
+  public static final String DEFAULT_LESS_JS = "less-1.3.1.min.js";
   private static final String SCRIPT_RUN = "run.js";
   private static final String SCRIPT_INIT = "init.js";
   private ScriptableObject scope;
@@ -90,8 +88,6 @@ public class LessCss {
       final String execute = "lessIt(" + WroUtil.toJSMultiLineString(data) + ");";
       final Object result = builder.evaluate(execute, "lessIt");
       return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e));
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());

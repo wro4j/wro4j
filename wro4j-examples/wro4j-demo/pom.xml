@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-examples</artifactId>
-		<version>1.4.8-SNAPSHOT</version>
+		<version>1.6.1</version>
 	</parent>
 
 	<artifactId>wro4j-demo</artifactId>
@@ -27,6 +27,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wro4j-extensions</artifactId>
+			<version>1.6.1</version>
 		</dependency>
 		<!-- GAE doesn't have any script managers - use those provided by thirdparty -->
 		<dependency>
@@ -79,11 +80,6 @@
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-servlet</artifactId>
 			<version>${guice.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-jcl</artifactId>
-			<version>1.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.appengine</groupId>

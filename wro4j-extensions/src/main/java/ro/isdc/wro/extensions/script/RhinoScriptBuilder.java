@@ -11,12 +11,13 @@ import java.io.Reader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
 
 
 /**
@@ -25,10 +26,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alex Objelean
  */
-public class RhinoScriptBuilder {
+public final class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
+  private static final String SCRIPT_ENV = "env.rhino.min.js";
+  private static final String SCRIPT_JSON = "json2.min.js";
   private final ScriptableObject scope;
-
 
   private RhinoScriptBuilder() {
     this(null);
@@ -83,7 +85,6 @@ public class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
-      final String SCRIPT_ENV = "env.rhino.min.js";
       final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
       evaluateChain(script, SCRIPT_ENV);
       return this;
@@ -95,9 +96,8 @@ public class RhinoScriptBuilder {
 
   public RhinoScriptBuilder addJSON() {
     try {
-      final String SCRIPT_ENV = "json2.min.js";
-      final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluateChain(script, SCRIPT_ENV);
+      final InputStream script = getClass().getResourceAsStream(SCRIPT_JSON);
+      evaluateChain(script, SCRIPT_JSON);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);
@@ -119,11 +119,13 @@ public class RhinoScriptBuilder {
     try {
       getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
+    } catch(final RhinoException e) {
+      if (e instanceof RhinoException) {
+        LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage(e));
+      }
+      throw e;
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
-      if (e instanceof RhinoException) {
-        LOG.error("RhinoException: " + RhinoUtils.createExceptionMessage((RhinoException) e));
-      }
       throw e;
     } finally {
       stream.close();
@@ -187,9 +189,10 @@ public class RhinoScriptBuilder {
     // make sure we have a context associated with current thread
     try {
       return getContext().evaluateString(scope, script, sourceName, 1, null);
-    } catch (final JavaScriptException e) {
-      LOG.error("JavaScriptException occured: " + e.getMessage());
-      throw e;
+    } catch (final RhinoException e) {
+      final String message = RhinoUtils.createExceptionMessage(e);
+      LOG.error("JavaScriptException occured: {}", message);
+      throw new WroRuntimeException(message);
     } finally {
       // Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
       if (Context.getCurrentContext() != null) {

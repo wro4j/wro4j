@@ -12,16 +12,22 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.ConfigurableCacheStrategy;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 import ro.isdc.wro.model.resource.support.hash.ConfigurableHashStrategy;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
@@ -78,6 +84,12 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         updatePropertiesWithConfiguration(props, ConfigurableLocatorFactory.PARAM_URI_LOCATORS);
         return props;
       }
+      @Override
+      protected Map<String, UriLocator> getStrategies(final LocatorProvider provider) {
+        final Map<String, UriLocator> map = super.getStrategies(provider);
+        contributeLocators(map);
+        return map;
+      }
     };
     return factory;
   }
@@ -95,6 +107,18 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS);
         updatePropertiesWithConfiguration(props, ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS);
         return props;
+      }
+      @Override
+      protected Map<String, ResourcePostProcessor> getPostProcessorStrategies(ProcessorProvider provider) {
+        final Map<String, ResourcePostProcessor> map = super.getPostProcessorStrategies(provider);
+        contributePostProcessors(map);
+        return map;
+      }
+      @Override
+      protected Map<String, ResourcePreProcessor> getPreProcessorStrategies(ProcessorProvider provider) {
+        final Map<String, ResourcePreProcessor> map = super.getPreProcessorStrategies(provider);
+        contributePreProcessors(map);
+        return map;
       }
     };
     return factory;
@@ -126,7 +150,21 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         final Properties props = new Properties();
         updatePropertiesWithConfiguration(props, ConfigurableHashStrategy.KEY);
         return props;
-
+      }
+    };
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected CacheStrategy<CacheKey, CacheValue> newCacheStrategy() {
+    return new ConfigurableCacheStrategy() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableCacheStrategy.KEY);
+        return props;
       }
     };
   }
@@ -193,5 +231,4 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     this.configProperties = configProperties;
     return this;
   }
-
 }

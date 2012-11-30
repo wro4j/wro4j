@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.util.WroUtil;
 
@@ -30,6 +31,10 @@ public class ReloadModelRequestHandler
    * API - reload model method call
    */
   public static final String ENDPOINT_URI = PATH_API + "/reloadModel";
+  /**
+   * The alias of this {@link RequestHandler} used for configuration.
+   */
+  public static final String ALIAS = "reloadModel";
   @Inject
   private ReadOnlyContext context;
   
@@ -40,7 +45,7 @@ public class ReloadModelRequestHandler
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     context.getConfig().reloadModel();
-    WroUtil.addNoCacheHeaders(response);
+    ResponseHeadersConfigurer.noCache().setHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("WroModel reloaded");
   }

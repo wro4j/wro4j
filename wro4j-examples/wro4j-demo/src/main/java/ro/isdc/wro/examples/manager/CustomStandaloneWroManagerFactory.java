@@ -4,9 +4,8 @@
  */
 package ro.isdc.wro.examples.manager;
 
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
-import ro.isdc.wro.extensions.processor.js.YUIJsCompressorProcessor;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -33,9 +32,8 @@ public class CustomStandaloneWroManagerFactory
     factory.addPreProcessor(new SemicolonAppenderPreProcessor());
     factory.addPreProcessor(new JSMinProcessor());
     factory.addPreProcessor(new YUICssCompressorProcessor());
-    factory.addPreProcessor(YUIJsCompressorProcessor.doMungeCompressor());
 
-    factory.addPostProcessor(new LessCssProcessor());
+    factory.addPostProcessor(new RhinoLessCssProcessor());
     factory.addPostProcessor(new CssVariablesProcessor());
     return factory;
   }

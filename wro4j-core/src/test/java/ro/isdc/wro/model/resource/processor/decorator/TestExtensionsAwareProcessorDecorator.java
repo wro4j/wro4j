@@ -13,10 +13,10 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.TestProcessorsUtils;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.WroTestUtils;
+
 
 /**
  * @author Alex Objelean
@@ -33,15 +33,16 @@ public class TestExtensionsAwareProcessorDecorator {
     final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
     final ResourcePreProcessor processor = ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor).addExtension(
         "js");
-    //we use test resource relative to TestProcessorsUtils class
-    final URL url = TestProcessorsUtils.class.getResource("extensionAware");
+    WroTestUtils.createInjector().inject(processor);
+    // we use test resource relative to TestProcessorsUtils class
+    final URL url = ResourcePreProcessor.class.getResource("extensionAware");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFolders(testFolder, expectedFolder, processor);
   }
 
-  @Test(expected=NullPointerException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotAcceptNullExtension() {
     final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
     ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor).addExtension(null);

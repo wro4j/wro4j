@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.RhinoCoffeeScriptProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -60,7 +60,7 @@ public class TestConfigurableWroFilterWithExtensions {
       throws Exception {
     final ConfigurableWroFilter filter = new ConfigurableWroFilter();
     final Properties properties = new Properties();
-    properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, CoffeeScriptProcessor.ALIAS);
+    properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, RhinoCoffeeScriptProcessor.ALIAS);
     filter.setProperties(properties);
     filter.init(mockFilterConfig);
     

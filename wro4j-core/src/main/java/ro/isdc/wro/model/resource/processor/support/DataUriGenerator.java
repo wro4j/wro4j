@@ -6,8 +6,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.util.Base64;
@@ -42,7 +40,7 @@ public class DataUriGenerator {
     return writer.toString();
   }
 
-  private String getMimeType(String fileName) {
+  private String getMimeType(final String fileName) {
     return ContentTypeResolver.get(fileName, "UTF-8").replaceAll(" ", "");
   }
 

@@ -41,7 +41,7 @@ public abstract class AbstractLinterProcessor
   /**
    * Options to use to configure the linter.
    */
-  private String[] options;
+  private String options;
 
   public AbstractLinterProcessor() {
     enginePool = new ObjectPoolHelper<AbstractLinter>(new ObjectFactory<AbstractLinter>() {
@@ -52,21 +52,17 @@ public abstract class AbstractLinterProcessor
     });
   }
 
-  public AbstractLinterProcessor setOptions(final String... options) {
-    this.options = options;
-    return this;
-  }
-
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
     final AbstractLinter linter = enginePool.getObject();
     try {
       // TODO investigate why linter fails when trying to reuse the same instance twice
-      linter.setOptions(options).validate(content);
+      linter.setOptions(getOptions()).validate(content);
     } catch (final LinterException e) {
       onLinterException(e, resource);
     } catch (final WroRuntimeException e) {
@@ -91,13 +87,9 @@ public abstract class AbstractLinterProcessor
   }
 
   /**
-   * @return the linter to use for js code validation.
-   */
-  protected abstract AbstractLinter newLinter();
-
-  /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer) throws IOException {
     process(null, reader, writer);
   }
@@ -112,4 +104,42 @@ public abstract class AbstractLinterProcessor
   protected void onLinterException(final LinterException e, final Resource resource) {
     LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
   }
+
+  /**
+   * @return an options as CSV.
+   */
+  private String getOptions() {
+    if (options == null) {
+      options = createDefaultOptions();
+    }
+    return options;
+  }
+
+  /**
+   * @return default options to use for linting.
+   */
+  protected String createDefaultOptions() {
+    return "";
+  }
+
+  public AbstractLinterProcessor setOptionsAsString(final String options) {
+    this.options = options;
+    return this;
+  }
+
+  /**
+   * Sets an array of options.
+   * Use {@link #setOptionsAsString(String)} instead.
+   */
+  @Deprecated
+  public AbstractLinterProcessor setOptions(final String... options) {
+    this.options = StringUtils.join(options, ',');
+    LOG.debug("setOptions: {}", this.options);
+    return this;
+  }
+
+  /**
+   * @return the linter to use for js code validation.
+   */
+  protected abstract AbstractLinter newLinter();
 }

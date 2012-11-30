@@ -1,5 +1,7 @@
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,12 +10,12 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -39,10 +41,10 @@ public class TestHoganJsProcessor {
 
   @Test
   public void testSimpleString() throws Exception {
-    StringWriter writer = new StringWriter();
-    processor.process(null, new StringReader("Hello {{name}}!"), writer);
-    String result = writer.toString();
-    Assert.assertTrue(result.matches("function.*name.*"));
+    final StringWriter writer = new StringWriter();
+    processor.process(Resource.create("template.js"), new StringReader("Hello {{name}}!"), writer);
+    final String result = writer.toString();
+    assertTrue(result.contains("Hogan.cache['template']"));
   }
 
   @Test
@@ -70,7 +72,7 @@ public class TestHoganJsProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
 
   @Test
   public void shouldSupportCorrectResourceTypes() {

@@ -4,7 +4,7 @@
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.4.8-SNAPSHOT</version>
+  <version>1.6.1</version>
   <packaging>pom</packaging>  
   
   <name>wro4j parent</name>
@@ -61,13 +61,14 @@
   </developers>
   
   <properties>
-    <commons-io.version>2.1</commons-io.version>
+    <wro4j.version>1.5.1-SNAPSHOT</wro4j.version>
+    <commons-io.version>2.2</commons-io.version>
     <commons-lang.version>3.1</commons-lang.version>
     <commons-pool.version>1.6</commons-pool.version>
-    <closure.version>r1918</closure.version>
-    <slf4j.version>1.6.6</slf4j.version>    
+    <closure.version>r2180</closure.version>
+    <slf4j.version>1.7.1</slf4j.version>    
     <maven.version>3.0.4</maven.version>    
-    <mockito.version>1.9.0</mockito.version>
+    <mockito.version>1.9.5</mockito.version>
     <junit.version>4.10</junit.version>    
     <rhino.version>1.7R3</rhino.version>
      
@@ -126,11 +127,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>        
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -196,6 +199,16 @@
         <artifactId>dojo-shrinksafe</artifactId>
         <version>1.7.2</version>
       </dependency>      
+      <dependency>
+        <groupId>me.n4u.sass</groupId>
+        <artifactId>sass-gems</artifactId>
+        <version>3.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.sommeri</groupId>
+        <artifactId>less4j</artifactId>
+        <version>0.0.4</version>
+      </dependency>
       <!-- Unit tests -->
       <dependency>
         <groupId>junit</groupId>
@@ -208,13 +221,7 @@
         <artifactId>mockito-core</artifactId>
         <version>${mockito.version}</version>
         <scope>test</scope>
-      </dependency>            
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>${mockito.version}</version>
-        <scope>test</scope>
-      </dependency>      
+      </dependency>                
     </dependencies>        
   </dependencyManagement>
   <dependencies>
@@ -308,6 +315,12 @@
           <tagBase>http://github.com/alexo/wro4j/tree/</tagBase>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>1.3.1</version>
+        <inherited>true</inherited>
+      </plugin>
     </plugins>
     <extensions>
       <extension>
@@ -340,7 +353,7 @@
   </reporting>
   <profiles>
     <profile>
-      <id>dev</id>
+      <id>no-examples</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -349,11 +362,34 @@
         <module>wro4j-extensions</module>
         <module>wro4j-maven-plugin</module>
         <module>wro4j-runner</module>           
-        <module>wro4j-examples</module>           
       </modules>
     </profile>  
     <profile>
-      <id>release-profile</id>
+      <id>all</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>   
+        <module>wro4j-core</module>          
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+        <module>wro4j-runner</module>           
+        <module>wro4j-examples</module>        
+      </modules>
+    </profile>  
+    <profile>
+      <id>install</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>   
+        <module>wro4j-core</module>          
+        <module>wro4j-extensions</module>
+        <module>wro4j-maven-plugin</module>
+      </modules>
+    </profile>    
+    <profile>
+      <id>release</id>
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>

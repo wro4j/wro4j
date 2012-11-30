@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -29,6 +31,8 @@ import ro.isdc.wro.http.WroFilter;
  */
 public class Context
     implements ReadOnlyContext {
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
+
   /**
    * Maps correlationId with a Context.
    */
@@ -144,7 +148,7 @@ public class Context
     CORRELATION_ID.set(correlationId);
     CONTEXT_MAP.put(correlationId, context);
   }
-  
+
   /**
    * @return a string representation of an unique id used to store Context in a map.
    */
@@ -244,7 +248,7 @@ public class Context
     Validate.notNull(correlationId);
     CORRELATION_ID.set(correlationId);
   }
-  
+
   /**
    * Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
    * with the correlationId. In order to remove context, call {@link Context#unset()}.
@@ -255,7 +259,7 @@ public class Context
   public static void unsetCorrelationId() {
     CORRELATION_ID.remove();
   }
-  
+
   /**
    * @return the correlationId associated with this thread.
    */
@@ -263,7 +267,7 @@ public class Context
     validateContext();
     return CORRELATION_ID.get();
   }
-  
+
 
   /**
    * {@inheritDoc}
@@ -272,5 +276,4 @@ public class Context
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
-
 }

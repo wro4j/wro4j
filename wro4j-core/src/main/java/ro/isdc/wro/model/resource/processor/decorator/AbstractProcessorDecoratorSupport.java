@@ -10,12 +10,13 @@ import java.io.Writer;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SupportAware;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 import ro.isdc.wro.util.AbstractDecorator;
-import ro.isdc.wro.util.ObjectDecorator;
 
 
 /**
@@ -25,14 +26,25 @@ import ro.isdc.wro.util.ObjectDecorator;
  * @created 11 Apr 2012
  * @since 1.4.6
  */
-public abstract class AbstractProcessorDecoratorSupport
-  implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, ObjectDecorator<Object> {
+public abstract class AbstractProcessorDecoratorSupport<T>
+    extends AbstractDecorator<T>
+    implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware,
+    ImportAware {
+  /**
+   * @param the
+   *          decorated processor. The type of the returned object is {@link Object} because we don't really care and we
+   *          need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
+   *          removed in 1.5.0.
+   */
+  public AbstractProcessorDecoratorSupport(final T decorated) {
+    super(decorated);
+  }
 
   /**
    * This method is final, because it intends to preserve the getSupportedResourceType flag of the decorated processor.
    * You still can override this behavior by implementing
    * {@link AbstractProcessorDecoratorSupport#getSupportedResourceTypeInternal()} on your own risk.
-   * 
+   *
    * @return the {@link SupportedResourceType} annotation of the decorated processor if one exist.
    */
   public final SupportedResourceType getSupportedResourceType() {
@@ -40,7 +52,7 @@ public abstract class AbstractProcessorDecoratorSupport
   }
 
   /**
-   * Allow subclass override the way getSupportedResourceType is used. 
+   * Allow subclass override the way getSupportedResourceType is used.
    */
   protected SupportedResourceType getSupportedResourceTypeInternal() {
     return getSupportedResourceTypeForProcessor(getDecoratedObject());
@@ -61,7 +73,7 @@ public abstract class AbstractProcessorDecoratorSupport
     }
     return supportedType;
   }
-  
+
   /**
    * This method is final, because it intends to preserve the minimize flag of the decorated processor. You still can
    * override this behavior by implementing {@link AbstractProcessorDecoratorSupport#isMinimizeInternal()} on your own
@@ -72,10 +84,24 @@ public abstract class AbstractProcessorDecoratorSupport
   }
 
   /**
-   * Allow subclass override the way isMinimized is used. 
+   * Allow subclass override the way isMinimized is used.
    */
   protected boolean isMinimizeInternal() {
     return isMinimizeForProcessor(getDecoratedObject());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isSupported() {
+    return getDecoratedObject() instanceof SupportAware ? ((SupportAware) getDecoratedObject()).isSupported() : true;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    return getDecoratedObject() instanceof ImportAware ? ((ImportAware) getDecoratedObject()).isImportAware() : false;
   }
 
   /**
@@ -87,7 +113,7 @@ public abstract class AbstractProcessorDecoratorSupport
     }
     return processor.getClass().isAnnotationPresent(Minimize.class);
   }
-  
+
   /**
    * @return the array of supported resources the processor can process.
    */
@@ -97,26 +123,12 @@ public abstract class AbstractProcessorDecoratorSupport
       supportedType.value()
     };
   }
-  
-  /**
-   * @return the decorated processor. The type of the returned object is {@link Object} because we don't really care and
-   *         we need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
-   *         removed in 1.5.0.
-   */
-  public abstract Object getDecoratedObject();
-  
-  /**
-   * {@inheritDoc}
-   */
-  public Object getOriginalDecoratedObject() {
-    return AbstractDecorator.getOriginalDecoratedObject(getDecoratedObject());
-  }
 
   /**
    * {@inheritDoc}
    */
   public final void process(final Reader reader, final Writer writer)
-    throws IOException {
-    process(null, reader, writer);
+      throws IOException {
+      process(null, reader, writer);
   }
 }

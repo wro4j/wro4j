@@ -3,6 +3,8 @@ package ro.isdc.wro.util.provider;
 import java.util.HashMap;
 import java.util.Map;
 
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -52,5 +54,19 @@ public class ConfigurableProviderSupport
    */
   public Map<String, UriLocator> provideLocators() {
     return new HashMap<String, UriLocator>();
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public Map<String, CacheStrategy> provideCacheStrategies() {
+    return new HashMap<String, CacheStrategy>();
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public Map<String, RequestHandler> provideRequestHandlers() {
+    return new HashMap<String, RequestHandler>();
   }
 }

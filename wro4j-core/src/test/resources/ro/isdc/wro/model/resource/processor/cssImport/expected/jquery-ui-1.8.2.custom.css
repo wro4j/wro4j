@@ -1,0 +1,50 @@
+/*
+* jQuery UI CSS Framework
+* Copyright (c) 2010 AUTHORS.txt (http://jqueryui.com/about)
+* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+*/
+
+/* Layout helpers
+----------------------------------*/
+.ui-helper-hidden { display: none; }
+.ui-helper-hidden-accessible { position: absolute; left: -99999999px; }
+.ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
+.ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.ui-helper-clearfix { display: inline-block; }
+/* required comment for clearfix to work in Opera \*/
+* html .ui-helper-clearfix { height:1%; }
+.ui-helper-clearfix { display:block; }
+/* end clearfix */
+.ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter:Alpha(Opacity=0); }
+
+
+/* Interaction Cues
+----------------------------------*/
+.ui-state-disabled { cursor: default !important; }
+
+
+/* Icons
+----------------------------------*/
+
+/* states and images */
+.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
+
+
+/* Misc visuals
+----------------------------------*/
+
+/* Overlays */
+.ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+
+/*
+* jQuery UI CSS Framework
+* Copyright (c) 2010 AUTHORS.txt (http://jqueryui.com/about)
+* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+* To view and modify this theme, visit http://jqueryui.com/themeroller/?ctl=themeroller&ffDefault=Verdana,Arial,sans-serif&fwDefault=bold&fsDefault=1.0em&cornerRadius=4px&bgColorHeader=909090&bgTextureHeader=01_flat.png&bgImgOpacityHeader=75&borderColorHeader=909090&fcHeader=000000&iconColorHeader=5c5c5c&bgColorContent=bdbdbd&bgTextureContent=03_highlight_soft.png&bgImgOpacityContent=50&borderColorContent=e4e4e4&fcContent=000000&iconColorContent=5c5c5c&bgColorDefault=c3c3c3&bgTextureDefault=03_highlight_soft.png&bgImgOpacityDefault=100&borderColorDefault=999999&fcDefault=000000&iconColorDefault=5c5c5c&bgColorHover=3468a2&bgTextureHover=03_highlight_soft.png&bgImgOpacityHover=30&borderColorHover=3468a2&fcHover=ffffff&iconColorHover=5c5c5c&bgColorActive=3468a2&bgTextureActive=03_highlight_soft.png&bgImgOpacityActive=30&borderColorActive=3468a2&fcActive=ffffff&iconColorActive=5c5c5c&bgColorHighlight=b0d9f7&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityError=30&borderColorError=cd0a0a&fcError=ffffff&iconColorError=ffcc00&bgColorOverlay=aaaaaa&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=0&opacityOverlay=30&bgColorShadow=aaaaaa&bgTextureShadow=01_flat.png
+*/
+
+
+/* Component containers
+----------------------------------*/
+.ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.0em; }

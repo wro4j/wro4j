@@ -10,20 +10,17 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the uglifyJs 1.3.2 version.
+ * The underlying implementation use untagged version (commited on 2012-09-08 14:15:12).
  * <p/>
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
@@ -145,25 +142,21 @@ public class UglifyJs {
    */
   public String process(final String filename, final String code)
       throws IOException {
-    try {
-      final StopWatch watch = new StopWatch();
-      watch.start("init " + filename);
-      final RhinoScriptBuilder builder = initScriptBuilder();
-      watch.stop();
-      final String originalCode = WroUtil.toJSMultiLineString(code);
-      // TODO handle reservedNames
-      final String optionsAsJson = createOptionsAsJson();
-      Validate.notNull(optionsAsJson);
-      final String invokeScript = String.format(getInvokeScript(), originalCode, optionsAsJson);
-      watch.start(uglify ? "uglify" : "beautify");
-      final Object result = builder.evaluate(invokeScript.toString(), "uglifyIt");
-      
-      watch.stop();
-      LOG.debug(watch.prettyPrint());
-      return String.valueOf(result);
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
-    } 
+    final StopWatch watch = new StopWatch();
+    watch.start("init " + filename);
+    final RhinoScriptBuilder builder = initScriptBuilder();
+    watch.stop();
+    final String originalCode = WroUtil.toJSMultiLineString(code);
+    // TODO handle reservedNames
+    final String optionsAsJson = createOptionsAsJson();
+    Validate.notNull(optionsAsJson);
+    final String scriptAsString = String.format(getInvokeScript(), originalCode, optionsAsJson);
+    watch.start(uglify ? "uglify" : "beautify");
+    final Object result = builder.evaluate(scriptAsString, "uglifyIt");
+    
+    watch.stop();
+    LOG.debug(watch.prettyPrint());
+    return String.valueOf(result);
   }
   
   /**

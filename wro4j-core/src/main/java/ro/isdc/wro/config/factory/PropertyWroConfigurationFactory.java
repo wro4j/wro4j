@@ -29,7 +29,7 @@ public class PropertyWroConfigurationFactory
   /**
    * Holds configuration options. If no properties are set, the default values will be used instead.
    */
-  private Properties properties;
+  private final Properties properties;
   
   public PropertyWroConfigurationFactory() {
     this(new Properties());
@@ -51,6 +51,8 @@ public class PropertyWroConfigurationFactory
     config.setJmxEnabled(valueAsBoolean(properties.get(ConfigConstants.jmxEnabled.name()), true));
     config.setCacheUpdatePeriod(valueAsLong(properties.get(ConfigConstants.cacheUpdatePeriod.name()), 0));
     config.setModelUpdatePeriod(valueAsLong(properties.get(ConfigConstants.modelUpdatePeriod.name()), 0));
+    config.setResourceWatcherUpdatePeriod(valueAsLong(
+        properties.get(ConfigConstants.resourceWatcherUpdatePeriod.name()), 0));
     config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
     config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     config.setIgnoreEmptyGroup(valueAsBoolean(properties.get(ConfigConstants.ignoreEmptyGroup.name()), true));

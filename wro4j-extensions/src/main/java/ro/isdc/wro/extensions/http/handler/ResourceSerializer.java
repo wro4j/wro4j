@@ -30,34 +30,38 @@ import com.google.gson.JsonSerializer;
 public class ResourceSerializer implements JsonSerializer<Resource> {
   private final String basePath;
 
-  public ResourceSerializer(String requestURI) {
+  public ResourceSerializer(final String requestURI) {
     this.basePath = requestURI;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public JsonElement serialize(Resource resource, Type type, JsonSerializationContext jsonSerializationContext) {
-    JsonObject jsonObject = new JsonObject();
-    String uri = resource.getUri();
+  public JsonElement serialize(final Resource resource, final Type type, final JsonSerializationContext context) {
+    final JsonObject jsonObject = new JsonObject();
+    final String uri = resource.getUri();
     jsonObject.add("type", new JsonPrimitive(resource.getType().toString()));
+    jsonObject.add("minimize", new JsonPrimitive(resource.isMinimize()));
     jsonObject.add("uri", new JsonPrimitive(uri));
     jsonObject.add("proxyUri", new JsonPrimitive(getExternalUri(uri)));
     return jsonObject;
   }
 
-  private String getExternalUri(String uri) {
-    if(isExternal(uri)) {
-      return uri;
+  private String getExternalUri(final String uri) {
+    String result = uri;
+    if (!isExternal(uri)) {
+      final StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append(basePath);
+      stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
+      stringBuilder.append("?id=");
+      stringBuilder.append(uri);
+      result = stringBuilder.toString();
     }
-
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(basePath);
-    stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
-    stringBuilder.append("?id=");
-    stringBuilder.append(uri);
-    return stringBuilder.toString();
+    return result;
   }
 
-  private boolean isExternal(String uri) {
-    return uri.toLowerCase().startsWith("http://");
+  private boolean isExternal(final String uri) {
+    return uri.toLowerCase().startsWith("http://") || uri.toLowerCase().startsWith("https://");
   }
 }

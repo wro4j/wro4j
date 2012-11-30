@@ -103,6 +103,7 @@ public abstract class AbstractProcessorsFilter
           injector.inject(processor);
 
           output = new StringWriter();
+          LOG.debug("Using {} processor", processor);
           processor.process(null, input, output);
 
           input = new StringReader(output.toString());

@@ -16,6 +16,7 @@ import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper.Attribute;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.util.AbstractDecorator;
 
 /**
  * @author Alex Objelean
@@ -144,6 +145,6 @@ public class TestServletContextAttributeHelper {
     //reset it because it was initialized in test setup.
     filter.setWroManagerFactory(null);
     filter.init(mockFilterConfig);
-    Assert.assertSame(expectedManagerFactory, filter.getWroManagerFactory());
+    Assert.assertSame(expectedManagerFactory, AbstractDecorator.getOriginalDecoratedObject(filter.getWroManagerFactory()));
   }
 }

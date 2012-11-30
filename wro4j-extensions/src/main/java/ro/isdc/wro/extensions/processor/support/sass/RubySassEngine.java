@@ -3,6 +3,7 @@ package ro.isdc.wro.extensions.processor.support.sass;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -25,14 +26,12 @@ import ro.isdc.wro.util.StopWatch;
  * @since 1.4.4
  */
 public class RubySassEngine {
-  
   private static final Logger LOG = LoggerFactory.getLogger(RubySassEngine.class);
-  
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
   
-  private LinkedHashSet<String> requires;
+  private final Set<String> requires;
   
   public RubySassEngine() {
     requires = new LinkedHashSet<String>();
@@ -47,7 +46,7 @@ public class RubySassEngine {
    * @param require
    *          The name of the require, e.g. bourbon
    */
-  public void addRequire(String require) {
+  public void addRequire(final String require) {
     if (require != null && require.trim().length() > 0) {
       requires.add(require.trim());
     }
@@ -63,16 +62,16 @@ public class RubySassEngine {
     if (StringUtils.isEmpty(content)) {
       return StringUtils.EMPTY;
     }
+    final StopWatch stopWatch = new StopWatch();
     try {
-      final StopWatch stopWatch = new StopWatch();
       stopWatch.start("process SCSS");
       final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
-      String result = rubyEngine.eval(buildUpdateScript(content)).toString();
-      stopWatch.stop();
-      LOG.debug(stopWatch.prettyPrint());
-      return result;
+      return rubyEngine.eval(buildUpdateScript(content)).toString();
     } catch (final ScriptException e) {
       throw new WroRuntimeException(e.getMessage(), e);
+    } finally {
+      stopWatch.stop();
+      LOG.debug(stopWatch.prettyPrint());
     }
   }
   
@@ -89,21 +88,23 @@ public class RubySassEngine {
     // if (LOG.isDebugEnabled()) {
     // debugRubyEnvironment(script);
     // }
-    script.println("  source = '" + content.replace("'", "\"") + "'                 ");
-    script.println("  engine = Sass::Engine.new(source, {" + sb.toString() + "})    ");
-    script.println("  result = engine.render                                        ");
+    final String scriptAsString = String.format("result = Sass::Engine.new('%s', {%s}).render",
+        content.replace("'", "\""),
+        sb.toString());
+    LOG.debug("scriptAsString: {}", scriptAsString);
+    script.println(scriptAsString);
     script.flush();
     return raw.toString();
   }
-  
-  private void debugRubyEnvironment(PrintWriter script) {
-    script.println("  dir_contents = Dir.entries(Dir.pwd)    ");
-    script.println("  puts dir_contents   ");
-    script.println("  puts '--classpath--'   ");
-    script.println("  puts $:   ");
-    script.println("  puts '--classpath--'   ");
-    script.println(" puts '--working dir--'  ");
-    script.println("  puts Dir.pwd  ");
-    script.println(" puts '--working dir--'  ");
-  }
+//  
+//  private void debugRubyEnvironment(final PrintWriter script) {
+//    script.println("  dir_contents = Dir.entries(Dir.pwd)    ");
+//    script.println("  puts dir_contents   ");
+//    script.println("  puts '--classpath--'   ");
+//    script.println("  puts $:   ");
+//    script.println("  puts '--classpath--'   ");
+//    script.println(" puts '--working dir--'  ");
+//    script.println("  puts Dir.pwd  ");
+//    script.println(" puts '--working dir--'  ");
+//  }
 }

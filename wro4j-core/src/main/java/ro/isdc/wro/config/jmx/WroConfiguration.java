@@ -43,6 +43,10 @@ public final class WroConfiguration
    */
   private long modelUpdatePeriod;
   /**
+   * How often to run a thread responsible for detecting resource changes.
+   */
+  private long resourceWatcherUpdatePeriod;
+  /**
    * Gzip enable flag.
    */
   private boolean gzipEnabled = true;
@@ -192,7 +196,7 @@ public final class WroConfiguration
    * @param newValue value to set.
    */
   private void reloadCacheWithNewValue(final Long newValue) {
-    final long newValueAsPrimitive = newValue == null ? getModelUpdatePeriod() : newValue;
+    final long newValueAsPrimitive = newValue == null ? getCacheUpdatePeriod() : newValue;
     LOG.debug("invoking {} listeners", cacheUpdatePeriodListeners.size());
     for (final PropertyChangeListener listener : cacheUpdatePeriodListeners) {
       final PropertyChangeEvent event = new PropertyChangeEvent(
@@ -465,6 +469,13 @@ public final class WroConfiguration
     this.ignoreFailingProcessor = ignoreFailingProcessor;
   }
 
+  public final long getResourceWatcherUpdatePeriod() {
+    return resourceWatcherUpdatePeriod;
+  }
+  
+  public final void setResourceWatcherUpdatePeriod(final long resourceWatcherUpdatePeriod) {
+    this.resourceWatcherUpdatePeriod = resourceWatcherUpdatePeriod;
+  }
 
   /**
    * {@inheritDoc}

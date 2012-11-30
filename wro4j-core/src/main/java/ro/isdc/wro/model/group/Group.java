@@ -192,7 +192,7 @@ public final class Group {
       if (!hasResource(resource)) {
         resources.add(resource);
       } else {
-        LOG.warn("Resource {} is already contained in this group, skiping it.", resource);
+        LOG.debug("Resource {} is already contained in this group, skipping it.", resource);
       }
     }
     return this;

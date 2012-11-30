@@ -5,13 +5,11 @@ package ro.isdc.wro.extensions.processor.support.jsonhpack;
 
 import java.io.InputStream;
 
-import org.mozilla.javascript.RhinoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.extensions.script.RhinoUtils;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -72,8 +70,6 @@ public class JsonHPack {
         resultAsString = removeEnclosedArray(resultAsString);
       }
       return resultAsString;
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
@@ -92,7 +88,6 @@ public class JsonHPack {
     stopWatch.stop();
 
     stopWatch.start("json.hpack");
-
     final boolean isEnclosedInArray = isEnclosedInArray(rawData);
     String data = rawData;
     if (!isEnclosedInArray) {
@@ -108,8 +103,6 @@ public class JsonHPack {
         resultAsString = removeEnclosedArray(resultAsString);
       }
       return resultAsString;
-    } catch (final RhinoException e) {
-      throw new WroRuntimeException(RhinoUtils.createExceptionMessage(e), e);
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
@@ -119,12 +112,9 @@ public class JsonHPack {
 
   /**
    * Remove first and last occurrence of '[' and ']' characters.
-   * @param resultAsString
-   * @return
    */
-  private String removeEnclosedArray(String resultAsString) {
-    resultAsString = resultAsString.replaceFirst("(?ims)\\[", "").replaceFirst("(?ims)\\](?!.*\\])", "");
-    return resultAsString;
+  private String removeEnclosedArray(final String resultAsString) {
+    return resultAsString.replaceFirst("(?ims)\\[", "").replaceFirst("(?ims)\\](?!.*\\])", "");
   }
 
 

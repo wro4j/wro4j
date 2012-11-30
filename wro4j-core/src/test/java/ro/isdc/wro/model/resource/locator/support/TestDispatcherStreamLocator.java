@@ -17,8 +17,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +28,7 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.util.WroTestUtils;
 
 
 /**
@@ -54,6 +52,7 @@ public class TestDispatcherStreamLocator {
     Mockito.when(mockRequest.getServletPath()).thenReturn("");
     Context.set(Context.standaloneContext());
     victim = new DispatcherStreamLocator();
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @Test(expected = NullPointerException.class)
@@ -80,7 +79,7 @@ public class TestDispatcherStreamLocator {
     when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     assertNotNull(victim.getInputStream(mockRequest, mockResponse, "http://www.google.com"));
   }
-  
+
   @Test(expected = IOException.class)
   public void testDispatchIncludeHasNoValidResource()
       throws Exception {
@@ -102,7 +101,7 @@ public class TestDispatcherStreamLocator {
     doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
           throws Throwable {
-        HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
+        final HttpServletResponse response = (HttpServletResponse) invocation.getArguments()[1];
         response.getOutputStream().write(content.getBytes());
         return null;
       }
@@ -110,7 +109,7 @@ public class TestDispatcherStreamLocator {
     assertEquals(content, IOUtils.toString(victim.getInputStream(mockRequest, mockResponse, "/static/*.js")));
     verify(mockUriLocator, never()).locate(Mockito.anyString());
   }
-  
+
   @Test
   public void shouldFallbackToExternalResourceLocatorWhenDispatcherReturns404() throws Exception {
     victim = new DispatcherStreamLocator() {
@@ -130,20 +129,20 @@ public class TestDispatcherStreamLocator {
     }).when(mockDispatcher).include(Mockito.any(HttpServletRequest.class),
         Mockito.any(HttpServletResponse.class));
     victim.getInputStream(mockRequest, mockResponse, location);
-    
+
     verify(mockUriLocator).locate(Mockito.anyString());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotCheckNullRequestAsIncluded() {
     DispatcherStreamLocator.isIncludedRequest(null);
   }
-  
+
   @Test
   public void shouldNotBeIncludedRequestByDefault() {
     assertFalse(DispatcherStreamLocator.isIncludedRequest(mockRequest));
   }
-  
+
   @Test
   public void shouldMarkAsIncludedTheRequestWhenDispatcherIsUsed() throws Exception {
     shouldReturnsResourceIncludedByDispatcher();

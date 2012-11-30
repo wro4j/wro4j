@@ -23,7 +23,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 
 
 /**
- * Maven plugin which use a singe processor.
+ * Maven plugin which use a single processor.
  *
  * @author Alex Objelean
  */
@@ -87,8 +87,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    * {@inheritDoc}
    */
   @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory()
-    throws Exception {
+  protected StandaloneContextAwareManagerFactory getManagerFactory() {
     final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
     factory.setProcessorsFactory(createSingleProcessorsFactory());
     return factory;
