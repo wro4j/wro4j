@@ -3,11 +3,21 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
+import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
@@ -20,15 +30,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 import ro.isdc.wro.util.WroUtil;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
-import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
 
 
 /**
@@ -47,11 +48,12 @@ public abstract class AbstractCssUrlRewritingProcessor
   private final Pattern PATTERN;
 
   public AbstractCssUrlRewritingProcessor() {
-      PATTERN = Pattern.compile(getPattern());
+    PATTERN = Pattern.compile(getPattern());
   }
 
   @Inject
   private ReadOnlyContext context;
+
   /**
    * {@inheritDoc}
    */
@@ -73,24 +75,24 @@ public abstract class AbstractCssUrlRewritingProcessor
     final Matcher matcher = PATTERN.matcher(cssContent);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
-      int urlIndexA = getUrlIndexA();
-      int urlIndexB = getUrlIndexB();
+      final int urlIndexA = getUrlIndexA();
+      final int urlIndexB = getUrlIndexB();
 
-      String originalDeclaration = matcher.group(getDeclarationIndex());
-      String groupA = matcher.group(urlIndexA);
-      String originalUrl = groupA != null ? groupA : matcher.group(urlIndexB);
+      final String originalDeclaration = matcher.group(getDeclarationGroupIndex());
+      final String groupA = matcher.group(urlIndexA);
+      final String originalUrl = groupA != null ? groupA : matcher.group(urlIndexB);
       LOG.debug("urlGroup: {}", originalUrl);
 
       Validate.notNull(originalUrl);
       if (isReplaceNeeded(originalUrl)) {
-        String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
+        final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
         LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
         /**
          * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
          * from stackoverflow: @see
          * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
          */
-        String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
+        final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
             modifiedUrl));
         onUrlReplaced(modifiedUrl);
         matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration));
@@ -129,11 +131,12 @@ public abstract class AbstractCssUrlRewritingProcessor
    * Invoked to replace the entire css declaration.
    * <p/>
    * An example of css declaration:
+   *
    * <pre>
    * background: url(/image.png);
    * </pre>
-   * Useful when the css declaration should be changed. The use-case is:
-   * {@link FallbackCssDataUriProcessor}.
+   *
+   * Useful when the css declaration should be changed. The use-case is: {@link FallbackCssDataUriProcessor}.
    *
    * @param originalDeclaration
    *          the original, unchanged declaration.
@@ -177,15 +180,14 @@ public abstract class AbstractCssUrlRewritingProcessor
   }
 
   /**
-   * Check if url must be replaced or not.
+   * Check if url must be replaced or not. The replacement is not needed if the url of the image is absolute (can be
+   * resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
    *
    * @param url
    *          to check.
    * @return true if url needs to be replaced or remain unchanged.
    */
   protected boolean isReplaceNeeded(final String url) {
-    // The replacement is not needed if the url of the image is absolute (can be
-    // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
   }
 
@@ -221,25 +223,22 @@ public abstract class AbstractCssUrlRewritingProcessor
    * {@inheritDoc}
    */
   public boolean isImportAware() {
-    //We want this processor to be applied when processing resources referred with @import directive
+    // We want this processor to be applied when processing resources referred with @import directive
     return true;
   }
 
-
+  /**
+   * @return the string representation of the pattern used to match url's inside the css.
+   */
   protected String getPattern() {
-      return WroUtil.loadRegexpWithKey(getRegexPatternKey());
+    return WroUtil.loadRegexpWithKey("cssUrlRewrite");
   }
 
-  protected String getRegexPatternKey() {
-      return "cssUrlRewrite";
-  }
-
- /**
-  *
-  * @return index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
-  */
-  protected int getDeclarationIndex() {
-      return 0;
+  /**
+   * @return index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
+   */
+  protected int getDeclarationGroupIndex() {
+    return 0;
   }
 
   /**
@@ -250,27 +249,30 @@ public abstract class AbstractCssUrlRewritingProcessor
    *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
    * }
    * </pre>
+   *
    * or
+   *
    * <pre>
    * @font-face {
    *   src: url(btn_icons.png);
    * }
+   * </pre>
    */
-   protected int getUrlIndexA() {
-       return 1;
-   }
+  protected int getUrlIndexA() {
+    return 1;
+  }
 
-   /**
+  /**
    * index of the group containing an url inside a declaration of this form:
    *
    * <pre>
    * body {
-   *     background: #B3B3B3 url(img.gif);color:red;
+   *     background: #B3B3B3 url(img.gif);
+   *     color:red;
    * }
    * </pre>
-   * </pre>
    */
-   protected int getUrlIndexB() {
-      return 2;
-   }
+  protected int getUrlIndexB() {
+    return 2;
+  }
 }
