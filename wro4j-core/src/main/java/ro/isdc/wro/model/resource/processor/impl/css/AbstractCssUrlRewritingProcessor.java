@@ -45,9 +45,15 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * Compiled pattern.
    */
-  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
+  private final Pattern PATTERN;
+
+  public AbstractCssUrlRewritingProcessor() {
+    PATTERN = Pattern.compile(getPattern());
+  }
+
   @Inject
   private ReadOnlyContext context;
+
   /**
    * {@inheritDoc}
    */
@@ -69,36 +75,12 @@ public abstract class AbstractCssUrlRewritingProcessor
     final Matcher matcher = PATTERN.matcher(cssContent);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
-      // index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
-      final int declarationIndex = 1;
-      /**
-       * index of the group containing an url inside a declaration of this form:
-       *
-       * <pre>
-       * body {
-       *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
-       * }
-       * </pre>
-       * or
-       * <pre>
-       * @font-face {
-       *   src: url(btn_icons.png);
-       * }
-       */
-      final int urlIndexA = 2;
-      /**
-       * index of the group containing an url inside a declaration of this form:
-       *
-       * <pre>
-       * body {
-       *     background: #B3B3B3 url(img.gif);color:red;
-       * }
-       * </pre>
-       * </pre>
-       */
-      final int urlIndexB = 3;
-      final String originalDeclaration = matcher.group(declarationIndex);
-      final String originalUrl = matcher.group(urlIndexA) != null ? matcher.group(urlIndexA) : matcher.group(urlIndexB);
+      final int urlIndexA = getUrlIndexA();
+      final int urlIndexB = getUrlIndexB();
+
+      final String originalDeclaration = matcher.group(getDeclarationGroupIndex());
+      final String groupA = matcher.group(urlIndexA);
+      final String originalUrl = groupA != null ? groupA : matcher.group(urlIndexB);
       LOG.debug("urlGroup: {}", originalUrl);
 
       Validate.notNull(originalUrl);
@@ -149,11 +131,12 @@ public abstract class AbstractCssUrlRewritingProcessor
    * Invoked to replace the entire css declaration.
    * <p/>
    * An example of css declaration:
+   *
    * <pre>
    * background: url(/image.png);
    * </pre>
-   * Useful when the css declaration should be changed. The use-case is:
-   * {@link FallbackCssDataUriProcessor}.
+   *
+   * Useful when the css declaration should be changed. The use-case is: {@link FallbackCssDataUriProcessor}.
    *
    * @param originalDeclaration
    *          the original, unchanged declaration.
@@ -197,15 +180,14 @@ public abstract class AbstractCssUrlRewritingProcessor
   }
 
   /**
-   * Check if url must be replaced or not.
+   * Check if url must be replaced or not. The replacement is not needed if the url of the image is absolute (can be
+   * resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
    *
    * @param url
    *          to check.
    * @return true if url needs to be replaced or remain unchanged.
    */
   protected boolean isReplaceNeeded(final String url) {
-    // The replacement is not needed if the url of the image is absolute (can be
-    // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
   }
 
@@ -241,7 +223,56 @@ public abstract class AbstractCssUrlRewritingProcessor
    * {@inheritDoc}
    */
   public boolean isImportAware() {
-    //We want this processor to be applied when processing resources referred with @import directive
+    // We want this processor to be applied when processing resources referred with @import directive
     return true;
+  }
+
+  /**
+   * @return the string representation of the pattern used to match url's inside the css.
+   */
+  protected String getPattern() {
+    return WroUtil.loadRegexpWithKey("cssUrlRewrite");
+  }
+
+  /**
+   * @return index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
+   */
+  protected int getDeclarationGroupIndex() {
+    return 0;
+  }
+
+  /**
+   * index of the group containing an url inside a declaration of this form:
+   *
+   * <pre>
+   * body {
+   *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
+   * }
+   * </pre>
+   *
+   * or
+   *
+   * <pre>
+   * @font-face {
+   *   src: url(btn_icons.png);
+   * }
+   * </pre>
+   */
+  protected int getUrlIndexA() {
+    return 1;
+  }
+
+  /**
+   * index of the group containing an url inside a declaration of this form:
+   *
+   * <pre>
+   * body {
+   *     background: #B3B3B3 url(img.gif);
+   *     color:red;
+   * }
+   * </pre>
+   */
+  protected int getUrlIndexB() {
+    return 2;
   }
 }

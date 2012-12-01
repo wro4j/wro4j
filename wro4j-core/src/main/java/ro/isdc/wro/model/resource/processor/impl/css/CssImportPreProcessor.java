@@ -3,13 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Matcher;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
@@ -18,6 +13,10 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -45,7 +44,7 @@ public class CssImportPreProcessor
   @Override
   protected String doTransform(final String cssContent, final List<Resource> foundImports)
       throws IOException {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     // for now, minimize always
     // TODO: find a way to get minimize property dynamically.
     sb.append(preProcessorExecutor.processAndMerge(foundImports,
