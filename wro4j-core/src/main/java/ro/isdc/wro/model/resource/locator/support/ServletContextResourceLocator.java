@@ -110,7 +110,7 @@ public class ServletContextResourceLocator
       throw new IOException("Cannot get stream for the following path: " + path
           + ", because no servletContext is detected.");
     }
-    LOG.debug("locating uri: " + path);
+    LOG.debug("locating uri: {}", path);
     try {
       if (getWildcardStreamLocator().hasWildcard(path)) {
         final String fullPath = FilenameUtils.getFullPath(path);
@@ -136,7 +136,7 @@ public class ServletContextResourceLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
+      LOG.debug("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
 

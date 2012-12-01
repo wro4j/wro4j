@@ -107,7 +107,7 @@ public class WildcardExpanderModelTransformer
           resourceLocator.getInputStream();
         } catch (final IOException e) {
           // log only
-          LOG.warn("[FAIL] problem while trying to expand wildcard for the following resource uri: {}",
+          LOG.debug("[FAIL] problem while trying to expand wildcard for the following resource uri: {}",
               resource.getUri());
         }
       }
@@ -199,10 +199,10 @@ public class WildcardExpanderModelTransformer
        * Find more details <a href="https://github.com/alexo/wro4j/pull/44">here</a>.
        */
       private String getFullPathNoEndSeparator(final Resource resource) {
-        String result = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
-        if (result != null && 1 == result.length() && 0 == FilenameUtils.indexOfLastSeparator(result))
+        final String result = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
+        if (result != null && 1 == result.length() && 0 == FilenameUtils.indexOfLastSeparator(result)) {
           return "";
-        
+        }
         return result;
       }
     };
