@@ -158,7 +158,7 @@ public class ServletContextUriLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
+      LOG.debug("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
 
