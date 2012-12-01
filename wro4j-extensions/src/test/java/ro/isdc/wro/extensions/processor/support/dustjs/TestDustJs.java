@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,5 +46,10 @@ public class TestDustJs {
       throws Exception {
     System.setProperty(DustJs.PARAM_COMPILER_PATH, "/invalid/path/to/dust.js");
     victim.compile(null, null);
+  }
+
+  @After
+  public void tearDown() {
+    System.setProperty(DustJs.PARAM_COMPILER_PATH, "");
   }
 }

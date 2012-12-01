@@ -81,3 +81,13 @@
 .specialCharacters {
     background-image: url( [WRO-PREFIX]?id=classpath:path/with/$pecial/character.png);
 }
+@font-face {
+    font-family: 'Trade Gothic Condensed Bold';
+    src: url('[WRO-PREFIX]?id=classpath:fonts/tradegothic-boldcondtwenty-webfont.eot');
+    src: url('[WRO-PREFIX]?id=classpath:fonts/tradegothic-boldcondtwenty-webfont.eot?#iefix') format('embedded-opentype'),
+    url('[WRO-PREFIX]?id=classpath:fonts/tradegothic-boldcondtwenty-webfont.woff') format('woff'),
+    url('[WRO-PREFIX]?id=classpath:fonts/tradegothic-boldcondtwenty-webfont.ttf') format('truetype'),
+    url('[WRO-PREFIX]?id=classpath:fonts/tradegothic-boldcondtwenty-webfont.svg#tradegothic-boldcondtwenty-webfont') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

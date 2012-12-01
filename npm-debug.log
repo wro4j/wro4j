@@ -1,0 +1,109 @@
+info it worked if it ends with ok
+verbose cli [ '/usr/bin/nodejs',
+verbose cli   '/usr/bin/npm',
+verbose cli   '-g',
+verbose cli   'install',
+verbose cli   'testacular' ]
+info using npm@1.1.4
+info using node@v0.6.19
+verbose config file /home/alex/.npmrc
+verbose config file /usr/etc/npmrc
+verbose config file /usr/share/npm/npmrc
+verbose cache add [ 'testacular', null ]
+silly cache add: name, spec, args [ undefined, 'testacular', [ 'testacular', null ] ]
+verbose parsed url { pathname: 'testacular',
+verbose parsed url   path: 'testacular',
+verbose parsed url   href: 'testacular' }
+verbose addNamed [ 'testacular', '' ]
+verbose addNamed [ null, '' ]
+silly name, range, hasData [ 'testacular', '', false ]
+verbose raw, before any munging testacular
+verbose url resolving [ 'https://registry.npmjs.org/', './testacular' ]
+verbose url resolved https://registry.npmjs.org/testacular
+verbose etag "2HY1WHZLGMJDMB9DDFRGWZ1I0"
+http GET https://registry.npmjs.org/testacular
+http 304 https://registry.npmjs.org/testacular
+silly get cb [ 304,
+silly get cb   { server: 'CouchDB/1.2.0 (Erlang OTP/R15B)',
+silly get cb     etag: '"2HY1WHZLGMJDMB9DDFRGWZ1I0"',
+silly get cb     date: 'Fri, 30 Nov 2012 21:49:19 GMT',
+silly get cb     'content-length': '0' } ]
+verbose etag testacular from cache
+silly name, range, hasData 2 [ 'testacular', '', true ]
+silly versions [ 'testacular',
+silly versions   [ '0.0.7',
+silly versions     '0.0.8',
+silly versions     '0.0.9',
+silly versions     '0.0.10',
+silly versions     '0.0.11',
+silly versions     '0.0.12',
+silly versions     '0.0.13',
+silly versions     '0.0.14',
+silly versions     '0.0.15',
+silly versions     '0.0.16',
+silly versions     '0.0.17' ] ]
+verbose bin dist [ '0.6-ares1.9.1-evundefined-openssl1.0.1c-v83.8.9.20-linux-ia32-3.6.0-030600-generic',
+verbose bin dist   { shasum: 'dc1e8abceb0ab3043d07172eee2eceead3facd51',
+verbose bin dist     tarball: 'http://registry.npmjs.org/testacular/-/testacular-0.0.17.tgz' } ]
+verbose caching /home/alex/.npm/testacular/0.0.17/package/package.json
+verbose loadDefaults testacular@0.0.17
+silly resolved [ { name: 'testacular',
+silly resolved     description: 'Remote execution of JS on multiple browsers / node.js',
+silly resolved     homepage: 'http://vojtajina.github.com/testacular/',
+silly resolved     bugs: { url: 'https://github.com/vojtajina/testacular/issues' },
+silly resolved     keywords: [ 'Testacular', 'nodejs', 'js', 'testing', 'remote', 'execution' ],
+silly resolved     author: { name: 'Vojta Jína', email: 'vojta.jina@gmail.com' },
+silly resolved     contributors: 
+silly resolved      [ { name: 'Igor Minár', email: 'igor.minar@gmail.com' },
+silly resolved        { name: 'Peter Bacon Darwin', email: 'pete@bacondarwin.com' },
+silly resolved        { name: 'Andy Joslin', email: 'andytjoslin@gmail.com' },
+silly resolved        { name: 'Marcello Nuccio', email: 'marcello.nuccio@gmail.com' } ],
+silly resolved     dependencies: 
+silly resolved      { 'socket.io': '>= 0.8.5',
+silly resolved        chokidar: '>=0.3.0',
+silly resolved        glob: '>=3.1.10',
+silly resolved        minimatch: '>=0.2.5',
+silly resolved        optimist: '>= 0.3.1' },
+silly resolved     devDependencies: 
+silly resolved      { 'jasmine-node': '>= 1.0.11',
+silly resolved        jake: '>= 0.2.15',
+silly resolved        mocks: '>= 0.0.2' },
+silly resolved     preferGlobal: true,
+silly resolved     repository: 
+silly resolved      { type: 'git',
+silly resolved        url: 'git://github.com/vojtajina/testacular.git' },
+silly resolved     main: './lib/index',
+silly resolved     bin: 
+silly resolved      { testacular: './bin/testacular',
+silly resolved        'testacular-run': './bin/testacular-run' },
+silly resolved     engines: { node: '>= 0.6.5' },
+silly resolved     version: '0.0.17',
+silly resolved     _id: 'testacular@0.0.17',
+silly resolved     optionalDependencies: {},
+silly resolved     _engineSupported: true,
+silly resolved     _npmVersion: '1.1.4',
+silly resolved     _nodeVersion: 'v0.6.19',
+silly resolved     _defaultsLoaded: true,
+silly resolved     _from: 'testacular' } ]
+info into /usr/local/lib testacular@0.0.17
+info installOne testacular@0.0.17
+verbose from cache /home/alex/.npm/testacular/0.0.17/package/package.json
+info unbuild /usr/local/lib/node_modules/testacular
+ERR! error installing testacular@0.0.17
+info unbuild /usr/local/lib/node_modules/testacular
+ERR! error rolling back testacular@0.0.17 Error: EPERM, chmod '/usr/local/lib/node_modules/testacular/node_modules/minimatch'
+verbose installOne cb testacular@0.0.17
+ERR! Error: EPERM, chmod '/usr/local/lib/node_modules/testacular/node_modules/minimatch'
+ERR! 
+ERR! Please try running this command again as root/Administrator.
+ERR! 
+ERR! System Linux 3.6.0-030600-generic
+ERR! command "/usr/bin/nodejs" "/usr/bin/npm" "-g" "install" "testacular"
+ERR! cwd /mnt/sda2/jde/projects/github/alexo/wro4j
+ERR! node -v v0.6.19
+ERR! npm -v 1.1.4
+ERR! path /usr/local/lib/node_modules/testacular/node_modules/minimatch
+ERR! code EPERM
+ERR! message EPERM, chmod '/usr/local/lib/node_modules/testacular/node_modules/minimatch'
+ERR! errno {}
+verbose exit [ 1, true ]
