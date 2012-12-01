@@ -49,8 +49,8 @@ public class Less4jProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      final String result = compiler.compile(IOUtils.toString(reader));
-      writer.write(result);
+      final LessCompiler.CompilationResult result =compiler.compile(IOUtils.toString(reader));
+      writer.write(result.getCss());
     } catch (final Exception e) {
       LOG.error("Failed to compile less", e);
       throw WroRuntimeException.wrap(e);
