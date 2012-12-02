@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.CharEncoding;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -459,12 +460,12 @@ public final class WroConfiguration
   }
 
   /**
-   * @return true if the processing failure should be ignored. 
+   * @return true if the processing failure should be ignored.
    */
   public boolean isIgnoreFailingProcessor() {
     return ignoreFailingProcessor;
   }
-  
+
   public void setIgnoreFailingProcessor(final boolean ignoreFailingProcessor) {
     this.ignoreFailingProcessor = ignoreFailingProcessor;
   }
@@ -472,9 +473,17 @@ public final class WroConfiguration
   public final long getResourceWatcherUpdatePeriod() {
     return resourceWatcherUpdatePeriod;
   }
-  
+
   public final void setResourceWatcherUpdatePeriod(final long resourceWatcherUpdatePeriod) {
     this.resourceWatcherUpdatePeriod = resourceWatcherUpdatePeriod;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    return EqualsBuilder.reflectionEquals(this, obj, true);
   }
 
   /**

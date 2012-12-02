@@ -4,6 +4,7 @@
 package ro.isdc.wro.runner;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -36,6 +38,7 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
+import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
@@ -61,6 +64,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class Wro4jCommandLineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(Wro4jCommandLineRunner.class);
+  private static String userDirectory = System.getProperty("user.dir");
   private final File defaultWroFile = newDefaultWroFile();
 
   @Option(name = "-m", aliases = {
@@ -88,17 +92,28 @@ public class Wro4jCommandLineRunner {
   @Option(name = "--postProcessors", metaVar = "POST_PROCESSOR", usage = "Comma separated list of post-processors")
   private String postProcessorsList;
 
+
+
   public static void main(final String[] args)
       throws Exception {
     new Wro4jCommandLineRunner().doMain(args);
   }
 
   /**
-   * @return the location where wro file is located by default. Default implementation uses current directory where user
-   *         is located.
+   * @return the location where wro file is located by default. Default implementation uses current user directory.
+   * @VisibleForTesting
    */
   protected File newDefaultWroFile() {
-    return new File(System.getProperty("user.dir"), "wro.xml");
+    return new File(userDirectory, "wro.xml");
+  }
+
+
+  /**
+   * @return the location where wro configuration file is located by default. Default implementation uses current user directory.
+   * @VisibleForTesting
+   */
+  protected File newWroConfigurationFile() throws IOException {
+    return new File(userDirectory, "wro.properties");
   }
 
   /**
@@ -174,28 +189,13 @@ public class Wro4jCommandLineRunner {
    */
   private void processGroup(final String group, final File parentFoder)
       throws IOException {
-    ByteArrayOutputStream resultOutputStream = null;
+    final ByteArrayOutputStream resultOutputStream = new ByteArrayOutputStream();
     InputStream resultInputStream = null;
     try {
       LOG.info("processing group: " + group);
+      initContext(group, resultOutputStream);
+      doProcess();
 
-      // mock request
-      final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-      Mockito.when(request.getRequestURI()).thenReturn(group);
-      // mock response
-      final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-      resultOutputStream = new ByteArrayOutputStream();
-      Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
-
-      // init context
-      final WroConfiguration config = new WroConfiguration();
-      //
-      config.setParallelPreprocessing(parallelPreprocessing);
-      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-
-      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
-      // perform processing
-      getManagerFactory().create().process();
       // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
@@ -223,6 +223,68 @@ public class Wro4jCommandLineRunner {
       if (resultInputStream != null) {
         resultInputStream.close();
       }
+    }
+  }
+
+  /**
+   * Initialize the context for standalone execution.
+   */
+  private void initContext(final String group, final ByteArrayOutputStream resultOutputStream)
+      throws IOException {
+    // mock request
+    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    Mockito.when(request.getRequestURI()).thenReturn(group);
+    // mock response
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(resultOutputStream));
+
+    // init context
+    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), initWroConfiguration());
+    Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
+  }
+
+  /**
+   * Perform actual processing by delegating the process call to {@link WroManager}.
+   * @throws IOException
+   * @VisibleForTesting
+   */
+  void doProcess()
+      throws IOException {
+    // perform processing
+    getManagerFactory().create().process();
+  }
+
+  private WroConfiguration initWroConfiguration()
+      throws IOException {
+    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(getWroConfigurationProperties());
+    final WroConfiguration config = factory.create();
+    //keep backward compatibility configuration of some config properties
+    config.setParallelPreprocessing(parallelPreprocessing);
+    return config;
+  }
+
+  /**
+   * @return {@link Properties} object loaded from wro.properties file located in current user directory. This location
+   *         is configurable. If the wro.properties file does not exist, the returned value will be an empty
+   *         {@link Properties} object, equivalent to no config properties.
+   * @throws IOException
+   *           if loaded file is corrupt.
+   */
+  private Properties getWroConfigurationProperties()
+      throws IOException {
+    try {
+      final Properties props = new Properties();
+      final File configFile = newWroConfigurationFile();
+      if (configFile.exists()) {
+        LOG.debug("Using {} to load WroConfiguration.", configFile.getPath());
+        props.load(new FileInputStream(configFile));
+      } else {
+        LOG.warn("{} does not exist. Using default configuration.", configFile.getPath());
+      }
+      return props;
+    } catch (final IOException e) {
+      LOG.error("Problem while loading WroConfiguration", e);
+      throw e;
     }
   }
 

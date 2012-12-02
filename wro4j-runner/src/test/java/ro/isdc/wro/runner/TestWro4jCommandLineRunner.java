@@ -3,8 +3,14 @@
  */
 package ro.isdc.wro.runner;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Date;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
@@ -17,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.ConfigConstants;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -27,6 +36,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -74,12 +84,16 @@ public class TestWro4jCommandLineRunner {
   @Test
   public void processCorrectArguments()
       throws Exception {
+    invokeRunner(createValidArguments());
+  }
+
+  protected String[] createValidArguments() {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
     final String wroFile = contextFolder + File.separator + "wro.xml";
     final String[] args = String.format("--wroFile %s --contextFolder %s -m ", new Object[] {
       wroFile, contextFolder
     }).split(" ");
-    invokeRunner(args);
+    return args;
   }
 
   private void invokeRunner(final String[] args)
@@ -222,5 +236,56 @@ public class TestWro4jCommandLineRunner {
         throw new RuntimeException(e);
       }
     }.doMain(args);
+  }
+
+  @Test
+  public void shouldUseDefaultConfigurationWhenConfigFileDoesNotExist() {
+    final WroConfiguration expected = new WroConfiguration();
+    new Wro4jCommandLineRunner() {
+      @Override
+      protected File newWroConfigurationFile()
+          throws IOException {
+        return new File("/path/to/invalid/file");
+      }
+
+      @Override
+      void doProcess()
+          throws IOException {
+        // do nothing
+        assertEquals(expected, Context.get().getConfig());
+      };
+    }.doMain(createValidArguments());
+  }
+
+  @Test
+  public void shouldUseProperConfigurationsWhenConfigFileExist() {
+    final File temp = WroUtil.createTempFile();
+    final WroConfiguration expected = new WroConfiguration();
+    expected.setConnectionTimeout(10000);
+    expected.setDisableCache(true);
+    expected.setEncoding("ISO-8859-1");
+    try {
+      new Wro4jCommandLineRunner() {
+        @Override
+        protected File newWroConfigurationFile()
+            throws IOException {
+          final Properties props = new Properties();
+          props.setProperty(ConfigConstants.connectionTimeout.name(), "10000");
+          props.setProperty(ConfigConstants.disableCache.name(), "true");
+          props.setProperty(ConfigConstants.encoding.name(), "ISO-8859-1");
+          props.list(new PrintStream(new FileOutputStream(temp)));
+          return temp;
+        }
+
+        @Override
+        void doProcess()
+            throws IOException {
+          // do nothing
+          assertEquals(expected, Context.get().getConfig());
+        };
+      }.doMain(createValidArguments());
+    } finally {
+      FileUtils.deleteQuietly(temp);
+    }
   }
 }
