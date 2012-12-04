@@ -1,2 +1,1 @@
-ro.isdc.wro.cache.spi.CacheStrategyProvider
 ro.isdc.wro.extras.hazelcast.spi.DefaultCacheStrategyProvider
