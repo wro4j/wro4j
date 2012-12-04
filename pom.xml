@@ -71,6 +71,8 @@
     <mockito.version>1.9.5</mockito.version>
     <junit.version>4.10</junit.version>    
     <rhino.version>1.7R3</rhino.version>
+    <hazelcast.version>2.4</hazelcast.version>
+    <less4j.version>0.0.5</less4j.version>
      
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  
@@ -207,7 +209,12 @@
       <dependency>
         <groupId>com.github.sommeri</groupId>
         <artifactId>less4j</artifactId>
-        <version>0.0.5</version>
+        <version>${less4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hazelcast</groupId>
+        <artifactId>hazelcast</artifactId>
+	<version>${hazelcast.version}</version>
       </dependency>
       <!-- Unit tests -->
       <dependency>
@@ -360,8 +367,9 @@
       <modules>   
         <module>wro4j-core</module>          
         <module>wro4j-extensions</module>
+	      <module>wro4j-extras</module>     
         <module>wro4j-maven-plugin</module>
-        <module>wro4j-runner</module>           
+        <module>wro4j-runner</module>      
       </modules>
     </profile>  
     <profile>
@@ -372,6 +380,7 @@
       <modules>   
         <module>wro4j-core</module>          
         <module>wro4j-extensions</module>
+	      <module>wro4j-extras</module>     
         <module>wro4j-maven-plugin</module>
         <module>wro4j-runner</module>           
         <module>wro4j-examples</module>        
@@ -385,6 +394,7 @@
       <modules>   
         <module>wro4j-core</module>          
         <module>wro4j-extensions</module>
+	      <module>wro4j-extras</module>     
         <module>wro4j-maven-plugin</module>
       </modules>
     </profile>    
@@ -401,6 +411,7 @@
       <modules>
         <module>wro4j-core</module>    
         <module>wro4j-extensions</module>
+	<module>wro4j-extras</module>     
         <module>wro4j-maven-plugin</module>
       </modules>
 
@@ -442,7 +453,7 @@
             </configuration>
           </plugin>
         </plugins>
-      </build>
+      </build>      
       <distributionManagement>
         <repository>
           <id>sonatype-nexus-staging</id>
