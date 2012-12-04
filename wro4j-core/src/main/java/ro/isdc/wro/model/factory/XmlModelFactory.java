@@ -272,7 +272,12 @@ public class XmlModelFactory
     };
     //inject manually created modelFactory 
     injector.inject(importedModelFactory);
-    return importedModelFactory.create();
+    try {
+      return importedModelFactory.create();
+    } catch (final WroRuntimeException e) {
+      LOG.error("Detected invalid model import from location {}", modelLocation);
+      throw e;
+    }
   }
   
   /**
