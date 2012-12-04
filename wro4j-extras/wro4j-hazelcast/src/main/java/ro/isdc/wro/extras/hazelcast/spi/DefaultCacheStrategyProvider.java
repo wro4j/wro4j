@@ -1,4 +1,4 @@
-package ro.isdc.wro.cache.spi;
+package ro.isdc.wro.extras.hazelcast.spi;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
-import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
-import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
+import ro.isdc.wro.cache.spi.CacheStrategyProvider;
+import ro.isdc.wro.extras.hazelcast.HazelcastCacheStrategy;
 
 
 /**
@@ -15,8 +15,8 @@ import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
  * core module.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
- * @since 1.4.7
+ * @created 4 Dec 2012
+ * @since 1.6.2
  */
 public class DefaultCacheStrategyProvider
     implements CacheStrategyProvider {
@@ -25,8 +25,7 @@ public class DefaultCacheStrategyProvider
    */
   public Map<String, CacheStrategy> provideCacheStrategies() {
     final Map<String, CacheStrategy> map = new HashMap<String, CacheStrategy>();
-    map.put(MemoryCacheStrategy.ALIAS, new MemoryCacheStrategy<CacheKey, CacheValue>());
-    map.put(LruMemoryCacheStrategy.ALIAS, new LruMemoryCacheStrategy<CacheKey, CacheValue>());
+    map.put(HazelcastCacheStrategy.ALIAS, new HazelcastCacheStrategy<CacheKey, CacheValue>());
     return map;
   }
 }
