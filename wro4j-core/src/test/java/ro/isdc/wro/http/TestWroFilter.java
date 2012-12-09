@@ -741,6 +741,7 @@ public class TestWroFilter {
 
     prepareValidRequest(config);
 
+
     final WroManager manager = ((AbstractDecorator<WroManagerFactory>) victim.getWroManagerFactory())
         .getOriginalDecoratedObject().create();
     final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());

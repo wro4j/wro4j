@@ -18,10 +18,12 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -111,13 +113,14 @@ public class BaseWroManagerFactory
       }
 
       managerBuilder.setGroupExtractor(groupExtractor);
-      managerBuilder.setCacheStrategy(cacheStrategy);
+      managerBuilder.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(cacheStrategy));
       managerBuilder.setHashStrategy(hashStrategy);
       managerBuilder.setLocatorFactory(uriLocatorFactory);
       managerBuilder.setProcessorsFactory(processorsFactory);
       managerBuilder.setNamingStrategy(namingStrategy);
-      managerBuilder.setModelFactory(modelFactory);
+
       managerBuilder.setModelTransformers(modelTransformers);
+      managerBuilder.setModelFactory(DefaultWroModelFactoryDecorator.decorate(modelFactory, modelTransformers));
       managerBuilder.setAuthorizationManager(authorizationManager);
       managerBuilder.setCacheKeyFactory(cacheKeyFactory);
       managerBuilder.setMetaDataFactory(metaDataFactory);

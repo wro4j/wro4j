@@ -53,29 +53,29 @@ import ro.isdc.wro.util.Transformer;
 public class WroManager
     implements WroConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
-  private WroModelFactory modelFactory;
-  private GroupExtractor groupExtractor;
+  private final WroModelFactory modelFactory;
+  private final GroupExtractor groupExtractor;
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
   @Inject
-  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
-  private ProcessorsFactory processorsFactory;
-  private UriLocatorFactory locatorFactory;
+  private final CacheStrategy<CacheKey, CacheValue> cacheStrategy;
+  private final ProcessorsFactory processorsFactory;
+  private final UriLocatorFactory locatorFactory;
   /**
    * Rename the file name based on its original name and content.
    */
   @Inject
-  private NamingStrategy namingStrategy;
+  private final NamingStrategy namingStrategy;
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
-  private GroupsProcessor groupsProcessor;
+  private final GroupsProcessor groupsProcessor;
   @Inject
   private ReadOnlyContext context;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
-  private HashStrategy hashStrategy;
+  private final HashStrategy hashStrategy;
   /**
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
@@ -102,9 +102,9 @@ public class WroManager
   }, ReloadCacheRunnable.class.getSimpleName());
   @Inject
   private ResourceBundleProcessor resourceBundleProcessor;
-  private ResourceAuthorizationManager authorizationManager;
-  private CacheKeyFactory cacheKeyFactory;
-  private MetaDataFactory metaDataFactory;
+  private final ResourceAuthorizationManager authorizationManager;
+  private final CacheKeyFactory cacheKeyFactory;
+  private final MetaDataFactory metaDataFactory;
 
   private WroManager(final Builder builder) {
     this.modelFactory = builder.modelFactory;
@@ -120,10 +120,6 @@ public class WroManager
     this.modelTransformers = builder.modelTransformers;
     this.namingStrategy = builder.namingStrategy;
     this.processorsFactory = builder.processorsFactory;
-  }
-
-  @Deprecated
-  public WroManager() {
   }
 
   /**
