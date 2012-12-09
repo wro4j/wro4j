@@ -83,32 +83,47 @@ public class WroManager
   /**
    * Schedules the model update.
    */
-  private final SchedulerHelper modelSchedulerHelper;
+  private final SchedulerHelper modelSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
+    @Override
+    protected Runnable initialize() {
+      //decorate with ContextPropagatingCallable to make context available in the new thread
+      return ContextPropagatingCallable.decorate(new ReloadModelRunnable(getModelFactory()));
+    }
+  }, ReloadModelRunnable.class.getSimpleName());
   /**
    * Schedules the cache update.
    */
-  private final SchedulerHelper cacheSchedulerHelper;
+  private final SchedulerHelper cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
+    @Override
+    protected Runnable initialize() {
+      //decorate with ContextPropagatingCallable to make context available in the new thread
+      return ContextPropagatingCallable.decorate(new ReloadCacheRunnable(getCacheStrategy()));
+    }
+  }, ReloadCacheRunnable.class.getSimpleName());
   @Inject
   private ResourceBundleProcessor resourceBundleProcessor;
   private ResourceAuthorizationManager authorizationManager;
   private CacheKeyFactory cacheKeyFactory;
   private MetaDataFactory metaDataFactory;
 
+  private WroManager(final Builder builder) {
+    this.modelFactory = builder.modelFactory;
+    this.authorizationManager = builder.authorizationManager;
+    this.cacheKeyFactory = builder.cacheKeyFactory;
+    this.cacheStrategy = builder.cacheStrategy;
+    this.callbackRegistry = builder.callbackRegistry;
+    this.groupExtractor = builder.groupExtractor;
+    this.groupsProcessor = builder.groupsProcessor;
+    this.hashStrategy = builder.hashStrategy;
+    this.locatorFactory = builder.locatorFactory;
+    this.metaDataFactory = builder.metaDataFactory;
+    this.modelTransformers = builder.modelTransformers;
+    this.namingStrategy = builder.namingStrategy;
+    this.processorsFactory = builder.processorsFactory;
+  }
+
+  @Deprecated
   public WroManager() {
-    cacheSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
-      @Override
-      protected Runnable initialize() {
-        //decorate with ContextPropagatingCallable to make context available in the new thread
-        return ContextPropagatingCallable.decorate(new ReloadCacheRunnable(getCacheStrategy()));
-      }
-    }, ReloadCacheRunnable.class.getSimpleName());
-    modelSchedulerHelper = SchedulerHelper.create(new LazyInitializer<Runnable>() {
-      @Override
-      protected Runnable initialize() {
-        //decorate with ContextPropagatingCallable to make context available in the new thread
-        return ContextPropagatingCallable.decorate(new ReloadModelRunnable(getModelFactory()));
-      }
-    }, ReloadModelRunnable.class.getSimpleName());
   }
 
   /**
@@ -119,7 +134,6 @@ public class WroManager
    */
   public final void process()
       throws IOException {
-    validate();
     // reschedule cache & model updates
     final WroConfiguration config = context.getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
@@ -193,59 +207,6 @@ public class WroManager
     }
   }
 
-  /**
-   * Check if all dependencies are set.
-   */
-  private void validate() {
-    notNull(cacheStrategy, "cacheStrategy was not set!");
-    notNull(groupsProcessor, "groupsProcessor was not set!");
-    notNull(locatorFactory, "uriLocatorFactory was not set!");
-    notNull(processorsFactory, "processorsFactory was not set!");
-    notNull(groupExtractor, "GroupExtractor was not set!");
-    notNull(modelFactory, "ModelFactory was not set!");
-    notNull(cacheStrategy, "cacheStrategy was not set!");
-    notNull(hashStrategy, "HashStrategy was not set!");
-    notNull(authorizationManager, "authorizationManager was not set!");
-    notNull(metaDataFactory, "metaDataFactory was not set!");
-    notNull(cacheKeyFactory, "CacheKeyFactory was not set!");
-  }
-
-  /**
-   * @param groupExtractor
-   *          the uriProcessor to set
-   */
-  public final WroManager setGroupExtractor(final GroupExtractor groupExtractor) {
-    notNull(groupExtractor);
-    this.groupExtractor = groupExtractor;
-    return this;
-  }
-
-  public final WroManager setModelFactory(final WroModelFactory modelFactory) {
-    notNull(modelFactory);
-    this.modelFactory = modelFactory;
-    return this;
-  }
-
-  /**
-   * @param cacheStrategy
-   *          the cache to set
-   */
-  public final WroManager setCacheStrategy(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
-    notNull(cacheStrategy);
-    this.cacheStrategy = cacheStrategy;
-    return this;
-  }
-
-  /**
-   * @param hashStrategy
-   *          the contentDigester to set
-   */
-  public final WroManager setHashStrategy(final HashStrategy hashStrategy) {
-    notNull(hashStrategy);
-    this.hashStrategy = hashStrategy;
-    return this;
-  }
-
   public final HashStrategy getHashStrategy() {
     return hashStrategy;
   }
@@ -262,28 +223,6 @@ public class WroManager
    */
   public final ProcessorsFactory getProcessorsFactory() {
     return processorsFactory;
-  }
-
-  /**
-   * @param processorsFactory
-   *          the processorsFactory to set
-   */
-  public final WroManager setProcessorsFactory(final ProcessorsFactory processorsFactory) {
-    this.processorsFactory = processorsFactory;
-    return this;
-  }
-
-  public final void setNamingStrategy(final NamingStrategy namingStrategy) {
-    this.namingStrategy = namingStrategy;
-  }
-
-  /**
-   * @param uriLocatorFactory
-   *          the uriLocatorFactory to set
-   */
-  public final WroManager setUriLocatorFactory(final UriLocatorFactory uriLocatorFactory) {
-    this.locatorFactory = uriLocatorFactory;
-    return this;
   }
 
   /**
@@ -320,16 +259,8 @@ public class WroManager
     return cacheKeyFactory;
   }
 
-  public void setCacheKeyFactory(final CacheKeyFactory cacheKeyFactory) {
-    this.cacheKeyFactory = cacheKeyFactory;
-  }
-
   public MetaDataFactory getMetaDataFactory() {
     return metaDataFactory;
-  }
-
-  public void setMetaDataFactory(final MetaDataFactory metaDataFactory) {
-    this.metaDataFactory = metaDataFactory;
   }
 
   /**
@@ -347,10 +278,6 @@ public class WroManager
     return modelTransformers;
   }
 
-  public final void setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
-    this.modelTransformers = modelTransformers;
-  }
-
   public LifecycleCallbackRegistry getCallbackRegistry() {
     // TODO check if initialization is required.
     if (callbackRegistry == null) {
@@ -363,8 +290,91 @@ public class WroManager
     return authorizationManager;
   }
 
-  public void setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
-    notNull(authorizationManager);
-    this.authorizationManager = authorizationManager;
+  public static class Builder {
+    private WroModelFactory modelFactory;
+    private GroupExtractor groupExtractor;
+    private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
+    private ProcessorsFactory processorsFactory;
+    private UriLocatorFactory locatorFactory;
+    private NamingStrategy namingStrategy;
+    private LifecycleCallbackRegistry callbackRegistry;
+    private GroupsProcessor groupsProcessor;
+    private HashStrategy hashStrategy;
+    private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
+    private ResourceAuthorizationManager authorizationManager;
+    private CacheKeyFactory cacheKeyFactory;
+    private MetaDataFactory metaDataFactory;
+    public Builder setModelFactory(final WroModelFactory modelFactory) {
+      this.modelFactory = modelFactory;
+      return this;
+    }
+    public Builder setGroupExtractor(final GroupExtractor groupExtractor) {
+      this.groupExtractor = groupExtractor;
+      return this;
+    }
+    public Builder setCacheStrategy(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
+      this.cacheStrategy = cacheStrategy;
+      return this;
+    }
+    public Builder setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+      this.processorsFactory = processorsFactory;
+      return this;
+    }
+    public Builder setLocatorFactory(final UriLocatorFactory locatorFactory) {
+      this.locatorFactory = locatorFactory;
+      return this;
+    }
+    public Builder setNamingStrategy(final NamingStrategy namingStrategy) {
+      this.namingStrategy = namingStrategy;
+      return this;
+    }
+    public Builder setCallbackRegistry(final LifecycleCallbackRegistry callbackRegistry) {
+      this.callbackRegistry = callbackRegistry;
+      return this;
+    }
+    public Builder setGroupsProcessor(final GroupsProcessor groupsProcessor) {
+      this.groupsProcessor = groupsProcessor;
+      return this;
+    }
+    public Builder setHashStrategy(final HashStrategy hashStrategy) {
+      this.hashStrategy = hashStrategy;
+      return this;
+    }
+    public Builder setModelTransformers(final List<Transformer<WroModel>> modelTransformers) {
+      this.modelTransformers = modelTransformers;
+      return this;
+    }
+    public Builder setAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {
+      this.authorizationManager = authorizationManager;
+      return this;
+    }
+    public Builder setCacheKeyFactory(final CacheKeyFactory cacheKeyFactory) {
+      this.cacheKeyFactory = cacheKeyFactory;
+      return this;
+    }
+    public Builder setMetaDataFactory(final MetaDataFactory metaDataFactory) {
+      this.metaDataFactory = metaDataFactory;
+      return this;
+    }
+    /**
+     * Check if all dependencies are set.
+     */
+    private void validate() {
+      notNull(cacheStrategy, "cacheStrategy was not set!");
+      notNull(groupsProcessor, "groupsProcessor was not set!");
+      notNull(locatorFactory, "uriLocatorFactory was not set!");
+      notNull(processorsFactory, "processorsFactory was not set!");
+      notNull(groupExtractor, "GroupExtractor was not set!");
+      notNull(modelFactory, "ModelFactory was not set!");
+      notNull(cacheStrategy, "cacheStrategy was not set!");
+      notNull(hashStrategy, "HashStrategy was not set!");
+      notNull(authorizationManager, "authorizationManager was not set!");
+      notNull(metaDataFactory, "metaDataFactory was not set!");
+      notNull(cacheKeyFactory, "CacheKeyFactory was not set!");
+    }
+    public WroManager build() {
+      validate();
+      return new WroManager(this);
+    }
   }
 }

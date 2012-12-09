@@ -26,6 +26,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
@@ -47,10 +48,6 @@ import ro.isdc.wro.util.Transformer;
  *
  * @author Alex Objelean
  * @created Created on Dec 30, 2009
- */
-/**
- * @author alex
- *
  */
 public class BaseWroManagerFactory
     implements WroManagerFactory {
@@ -77,7 +74,7 @@ public class BaseWroManagerFactory
   private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
     @Override
     protected WroManager initialize() {
-      final WroManager manager = new WroManager();
+      final WroManager.Builder managerBuilder = new WroManager.Builder();
       if (modelFactory == null) {
         modelFactory = newModelFactory();
       }
@@ -113,18 +110,18 @@ public class BaseWroManagerFactory
         metaDataFactory = newMetaDataFactory();
       }
 
-      manager.setGroupExtractor(groupExtractor);
-      manager.setCacheStrategy(cacheStrategy);
-      manager.setHashStrategy(hashStrategy);
-      manager.setUriLocatorFactory(uriLocatorFactory);
-      manager.setProcessorsFactory(processorsFactory);
-      manager.setNamingStrategy(namingStrategy);
-      manager.setModelFactory(modelFactory);
-      manager.setModelTransformers(modelTransformers);
-      manager.setResourceAuthorizationManager(authorizationManager);
-      manager.setCacheKeyFactory(cacheKeyFactory);
-      manager.setMetaDataFactory(metaDataFactory);
-
+      managerBuilder.setGroupExtractor(groupExtractor);
+      managerBuilder.setCacheStrategy(cacheStrategy);
+      managerBuilder.setHashStrategy(hashStrategy);
+      managerBuilder.setLocatorFactory(uriLocatorFactory);
+      managerBuilder.setProcessorsFactory(processorsFactory);
+      managerBuilder.setNamingStrategy(namingStrategy);
+      managerBuilder.setModelFactory(modelFactory);
+      managerBuilder.setModelTransformers(modelTransformers);
+      managerBuilder.setAuthorizationManager(authorizationManager);
+      managerBuilder.setCacheKeyFactory(cacheKeyFactory);
+      managerBuilder.setMetaDataFactory(metaDataFactory);
+      final WroManager manager = managerBuilder.build();
       onAfterInitializeManager(manager);
       return manager;
     }
