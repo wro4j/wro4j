@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.factory;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -149,16 +151,20 @@ public class XmlModelFactory
   /**
    * Allow aggregate processed imports during recursive model creation.
    */
-  private XmlModelFactory(final Set<String> processedImports) {
-    Validate.notNull(processedImports);
+  private XmlModelFactory(final Set<String> processedImports, final WroModel parentModel) {
+    notNull(processedImports);
+    notNull(parentModel);
     this.processedImports.addAll(processedImports);
+    this.model = parentModel;
   }
 
   /**
    * {@inheritDoc}
    */
   public synchronized WroModel create() {
-    model = new WroModel();
+    if (model == null) {
+      model = new WroModel();
+    }
     final StopWatch stopWatch = new StopWatch("Create Wro Model from XML");
     try {
       stopWatch.start("createDocument");
@@ -257,7 +263,7 @@ public class XmlModelFactory
    * @return the {@link WroModel} created from provided modelLocation.
    */
   private WroModel createImportedModel(final String modelLocation) {
-    final XmlModelFactory importedModelFactory = new XmlModelFactory(this.processedImports) {
+    final XmlModelFactory importedModelFactory = new XmlModelFactory(this.processedImports, model) {
       @Override
       protected InputStream getModelResourceAsStream()
           throws IOException {
