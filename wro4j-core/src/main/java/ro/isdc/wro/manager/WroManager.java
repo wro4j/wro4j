@@ -69,7 +69,7 @@ public class WroManager
   private final NamingStrategy namingStrategy;
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
-  private final GroupsProcessor groupsProcessor;
+  private GroupsProcessor groupsProcessor;
   @Inject
   private ReadOnlyContext context;
   /**
@@ -113,7 +113,6 @@ public class WroManager
     this.cacheStrategy = builder.cacheStrategy;
     this.callbackRegistry = builder.callbackRegistry;
     this.groupExtractor = builder.groupExtractor;
-    this.groupsProcessor = builder.groupsProcessor;
     this.hashStrategy = builder.hashStrategy;
     this.locatorFactory = builder.locatorFactory;
     this.metaDataFactory = builder.metaDataFactory;
@@ -294,12 +293,28 @@ public class WroManager
     private UriLocatorFactory locatorFactory;
     private NamingStrategy namingStrategy;
     private LifecycleCallbackRegistry callbackRegistry;
-    private GroupsProcessor groupsProcessor;
     private HashStrategy hashStrategy;
     private List<Transformer<WroModel>> modelTransformers = Collections.emptyList();
     private ResourceAuthorizationManager authorizationManager;
     private CacheKeyFactory cacheKeyFactory;
     private MetaDataFactory metaDataFactory;
+    public Builder() {
+    }
+    public Builder(final WroManager manager) {
+      notNull(manager);
+      this.modelFactory = manager.getModelFactory();
+      this.groupExtractor = manager.getGroupExtractor();
+      this.cacheStrategy = manager.getCacheStrategy();
+      this.processorsFactory = manager.getProcessorsFactory();
+      this.locatorFactory = manager.getUriLocatorFactory();
+      this.namingStrategy = manager.getNamingStrategy();
+      this.callbackRegistry = manager.getCallbackRegistry();
+      this.hashStrategy = manager.getHashStrategy();
+      this.modelTransformers = manager.getModelTransformers();
+      this.authorizationManager = manager.getResourceAuthorizationManager();
+      this.cacheKeyFactory = manager.getCacheKeyFactory();
+      this.metaDataFactory = manager.getMetaDataFactory();
+    }
     public Builder setModelFactory(final WroModelFactory modelFactory) {
       this.modelFactory = modelFactory;
       return this;
@@ -328,10 +343,6 @@ public class WroManager
       this.callbackRegistry = callbackRegistry;
       return this;
     }
-    public Builder setGroupsProcessor(final GroupsProcessor groupsProcessor) {
-      this.groupsProcessor = groupsProcessor;
-      return this;
-    }
     public Builder setHashStrategy(final HashStrategy hashStrategy) {
       this.hashStrategy = hashStrategy;
       return this;
@@ -357,7 +368,6 @@ public class WroManager
      */
     private void validate() {
       notNull(cacheStrategy, "cacheStrategy was not set!");
-      notNull(groupsProcessor, "groupsProcessor was not set!");
       notNull(locatorFactory, "uriLocatorFactory was not set!");
       notNull(processorsFactory, "processorsFactory was not set!");
       notNull(groupExtractor, "GroupExtractor was not set!");
