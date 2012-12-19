@@ -207,7 +207,7 @@
       <dependency>
         <groupId>com.github.sommeri</groupId>
         <artifactId>less4j</artifactId>
-        <version>0.0.4</version>
+        <version>0.0.7</version>
       </dependency>
       <!-- Unit tests -->
       <dependency>
