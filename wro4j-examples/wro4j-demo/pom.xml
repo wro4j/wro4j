@@ -16,7 +16,7 @@
 	<properties>
 		<wicket.version>1.5.2</wicket.version>
 		<gae.version>1.5.4</gae.version>
-		<jetty.version>8.0.0.M1</jetty.version>
+		<jetty.version>8.1.8.v20121106</jetty.version>
 		<dwr.version>3.0.M1</dwr.version>
 		<guice.version>3.0</guice.version>
 		<project_charset>UTF-8</project_charset>
@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>com.google.appengine.orm</groupId>
 			<artifactId>datanucleus-appengine</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
@@ -186,6 +186,11 @@
 					</webAppConfig>
 				</configuration>
 			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
 		</plugins>
 	</build>
 	<repositories>
