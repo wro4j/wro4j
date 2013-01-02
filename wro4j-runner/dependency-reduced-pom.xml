@@ -3,7 +3,7 @@
   <parent>
     <artifactId>wro4j-parent</artifactId>
     <groupId>ro.isdc.wro4j</groupId>
-    <version>1.6.0</version>
+    <version>1.6.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>wro4j-runner</artifactId>

@@ -1,0 +1,8 @@
+<div class="display row-fluid span5">Fluid
+  <input type="checkbox" class="check" {{#done}}checked="checked"{{/done}} />
+  <label class="todo-content span3">{{content}}</label>
+  <i class="icon-remove-sign remove" title="Remove"></i>
+</div>
+<div class="edit row-fluid">
+  <input type="text" class="todo-edit span4" value="{{content}}" />
+</div>
