@@ -9,7 +9,6 @@ import static org.junit.Assert.assertFalse;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -115,7 +114,6 @@ public class TestDefaultGroupExtractor {
   @Test
   public void shouldExtractGroupWhenUrlContainsEncodedSession() {
     final HttpServletRequest request = mockRequestForUri("/contextPath/wro/all.js;jsessionID=A327EBE59831FF690C26B0B895EA877E");
-    assertEquals("", FilenameUtils.getBaseName("all.js;jsessionID=A327EBE59831FF690C26B0B895EA877E"));
     assertEquals("all", groupExtractor.getGroupName(request));
     assertEquals(ResourceType.JS, groupExtractor.getResourceType(request));
   }
