@@ -19,7 +19,8 @@ import ro.isdc.wro.util.LazyInitializer;
 
 
 /**
- * Decorates a {@link LazyInitializer} which creates a processor.
+ * Decorates a {@link LazyInitializer} which creates a processor. Allows defer the initialization of the decorated
+ * processor, making it unnecessary dependency unless it is really used.
  *
  * @author Alex Objelean
  * @since 1.4.6
