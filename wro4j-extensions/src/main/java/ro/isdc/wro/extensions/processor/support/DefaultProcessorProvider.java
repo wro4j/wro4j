@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.DustJsProcessor;
+import ro.isdc.wro.extensions.processor.js.EmberJsProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
 import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
@@ -40,7 +41,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 
 /**
  * The implementation which contributes with processors from core module.
- *
+ * 
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
@@ -53,7 +54,7 @@ public class DefaultProcessorProvider
   public Map<String, ResourceProcessor> providePreProcessors() {
     return createMap();
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -70,7 +71,7 @@ public class DefaultProcessorProvider
     }
     return resultMap;
   }
-
+  
   /**
    * @return the map of pre processors.
    */
@@ -245,6 +246,12 @@ public class DefaultProcessorProvider
       @Override
       protected ResourceProcessor initialize() {
         return new TypeScriptProcessor();
+      }
+    }));
+    map.put(EmberJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new EmberJsProcessor();
       }
     }));
     return map;
