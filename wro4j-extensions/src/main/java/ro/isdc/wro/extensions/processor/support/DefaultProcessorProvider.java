@@ -41,7 +41,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 
 /**
  * The implementation which contributes with processors from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
@@ -54,7 +54,7 @@ public class DefaultProcessorProvider
   public Map<String, ResourceProcessor> providePreProcessors() {
     return createMap();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -71,7 +71,7 @@ public class DefaultProcessorProvider
     }
     return resultMap;
   }
-  
+
   /**
    * @return the map of pre processors.
    */
@@ -248,9 +248,9 @@ public class DefaultProcessorProvider
         return new TypeScriptProcessor();
       }
     }));
-    map.put(EmberJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+    map.put(EmberJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
       @Override
-      protected ResourcePreProcessor initialize() {
+      protected ResourceProcessor initialize() {
         return new EmberJsProcessor();
       }
     }));
