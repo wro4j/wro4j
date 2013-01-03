@@ -44,7 +44,7 @@ public class DefaultGroupExtractor
     // check if include or uri path are present and use one of these as request uri.
     final String includeUriPath = (String) request.getAttribute(ATTR_INCLUDE_PATH);
     uri = includeUriPath != null ? includeUriPath : uri;
-    final String groupName = FilenameUtils.getBaseName(uri);
+    final String groupName = FilenameUtils.getBaseName(stripSessionID(uri));
     return StringUtils.isEmpty(groupName) ? null : groupName;
   }
 
@@ -61,7 +61,7 @@ public class DefaultGroupExtractor
     Validate.notNull(uri);
     ResourceType type = null;
     try {
-      type = ResourceType.get(getExtensionFromUri(uri));
+      type = ResourceType.get(FilenameUtils.getExtension(stripSessionID(uri)));
     } catch (final IllegalArgumentException e) {
       LOG.debug("[FAIL] Cannot identify resourceType for uri: {}", uri);
     }
@@ -70,10 +70,10 @@ public class DefaultGroupExtractor
 
   /**
    * The uri is cleaned up (the ;jsessionID is removed).
-   * @return the extension of the resource. 
+   * @return the extension of the resource.
    */
-  private String getExtensionFromUri(final String uri) {
-    return FilenameUtils.getExtension(uri.replaceFirst("(.*)(;.*)", "$1"));
+  private String stripSessionID(final String uri) {
+    return uri.replaceFirst("(?i)(;jsessionid.*)", "");
   }
 
   /**
