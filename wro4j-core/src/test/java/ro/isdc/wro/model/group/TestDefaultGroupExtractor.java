@@ -119,6 +119,13 @@ public class TestDefaultGroupExtractor {
   }
 
   @Test
+  public void shouldStripJsessionIDFromUrl() {
+    final HttpServletRequest request = mockRequestForUri("https://www.servername.com:80/js/all.js;jsessionID=A327EBE59831FF690C26B0B895EA877E.EFKDD");
+    assertEquals("all", groupExtractor.getGroupName(request));
+    assertEquals(ResourceType.JS, groupExtractor.getResourceType(request));
+  }
+
+  @Test
   public void testWithInvalidUriType() {
     final HttpServletRequest request = mockRequestForUri("all.someInvalidType");
     assertEquals("all", groupExtractor.getGroupName(request));
