@@ -62,14 +62,14 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   /**
    * This parameter is not meant to be used. The only purpose is to hold project build directory
    *
-   * @parameter default-value="${project.build.directory}
+   * @parameter default-value="${project.build.directory}"
    * @optional
    */
   private File buildDirectory;
   /**
-   * This parameter is not meant to be used. The only purpose is to hold the final build name of the artifacty
+   * This parameter is not meant to be used. The only purpose is to hold the final build name of the artifact
    *
-   * @parameter default-value="${project.build.directory}/${project.build.finalName}
+   * @parameter default-value="${project.build.directory}/${project.build.finalName}"
    * @optional
    */
   private File buildFinalName;
@@ -123,7 +123,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   private void writeGroupNameMap()
       throws Exception {
     if (groupNameMappingFile != null) {
-      FileOutputStream outputStream = null; 
+      FileOutputStream outputStream = null;
       try {
         outputStream = new FileOutputStream(groupNameMappingFile);
         groupNames.store(outputStream, "Mapping of defined group name to renamed group name");

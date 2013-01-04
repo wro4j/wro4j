@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.support.csslint.CssLintError;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -43,6 +44,13 @@ public class CssLintMojo
    */
   private File reportFile;
   /**
+   * The preferred format of the report.
+   *
+   * @parameter expression="${reportFormat}"
+   * @optional
+   */
+  private String reportFormat = FormatterType.LINT.getFormat();
+  /**
    * Contains errors found during jshint processing which will be reported eventually.
    */
   private LintReport<CssLintError> lintReport;
@@ -59,7 +67,7 @@ public class CssLintMojo
         if (resource != null) {
           getLog().info("processing resource: " + resource.getUri());
         }
-        //use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
+        // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
         super.process(resource, reader, new StringWriter());
       }
 
@@ -102,8 +110,13 @@ public class CssLintMojo
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        ReportXmlFormatter.createForCssLintError(lintReport, ReportXmlFormatter.FormatterType.CSSLINT).write(
-            new FileOutputStream(reportFile));
+        getLog().debug("using report format: " + reportFormat);
+        final FormatterType type = FormatterType.getByFormat(reportFormat);
+        if (type == null) {
+          throw new WroRuntimeException("Usupported report format: " + reportFormat + ". Valid formats are: "
+              + FormatterType.getSupportedFormatsAsCSV());
+        }
+        ReportXmlFormatter.createForCssLintError(lintReport, type).write(new FileOutputStream(reportFile));
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
@@ -115,6 +128,14 @@ public class CssLintMojo
    */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
+  }
+
+  /**
+   * @param reportFormat
+   *          the preferred report format.
+   */
+  public void setReportFormat(final String reportFormat) {
+    this.reportFormat = reportFormat;
   }
 
   /**

@@ -52,7 +52,43 @@ public class ReportXmlFormatter
   private final FormatterType formatterType;
 
   public static enum FormatterType {
-    LINT, CHECKSTYLE, CSSLINT
+    LINT("lint-xml"), CHECKSTYLE("checkstyle-xml"), CSSLINT("csslint-xml");
+    private String format;
+    FormatterType(final String format) {
+      this.format = format;
+    }
+
+    /**
+     * @param format
+     *          of the {@link FormatterType} to return.
+     * @return the {@link FormatterType} of searched format type or null if such format does not exist.
+     */
+    public static FormatterType getByFormat(final String format) {
+      for (final FormatterType type : FormatterType.values()) {
+        if (type.format.equals(format)) {
+          return type;
+        }
+      }
+      return null;
+    }
+
+    /**
+     * @return supported formats as CSV.
+     */
+    public static String getSupportedFormatsAsCSV() {
+      final StringBuffer sb = new StringBuffer();
+      for (final FormatterType type : FormatterType.values()) {
+        sb.append(type.getFormat()).append(",");
+      }
+      return StringUtils.removeEnd(sb.toString(), ",");
+    }
+
+    /**
+     * @return string representation of the format.
+     */
+    public String getFormat() {
+      return format;
+    }
   }
 
   /**
