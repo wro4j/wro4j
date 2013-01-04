@@ -48,14 +48,12 @@ public class JSMinProcessor implements ResourcePreProcessor,
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("resource")
   public void process(final Resource resource, final Reader reader,
     final Writer writer) throws IOException {
       final InputStream is = new ProxyInputStream(new ReaderInputStream(reader, getEncoding())) {};
       final OutputStream os = new ProxyOutputStream(new WriterOutputStream(writer, getEncoding()));
     try {
       new JSMin(is, os).jsmin();
-
       is.close();
       os.close();
 		} catch (final Exception e) {
