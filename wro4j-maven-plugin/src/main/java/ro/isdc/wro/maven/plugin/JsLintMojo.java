@@ -25,7 +25,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 /**
  * Maven plugin used to validate js scripts defined in wro model using <a href="http://jslint.com/">jsLint</a>.
- * 
+ *
  * @goal jslint
  * @phase compile
  * @requiresDependencyResolution runtime
@@ -37,7 +37,7 @@ public class JsLintMojo
     extends AbstractSingleProcessorMojo {
   /**
    * File where the report will be written.
-   * 
+   *
    * @parameter default-value="${project.build.directory}/wro4j-reports/jslint.xml" expression="${reportFile}"
    * @optional
    */
@@ -46,7 +46,7 @@ public class JsLintMojo
    * Contains errors found during jshint processing which will be reported eventually.
    */
   private LintReport<LinterError> lintReport;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -63,12 +63,12 @@ public class JsLintMojo
         //use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
         super.process(resource, reader, new StringWriter());
       }
-      
+
       @Override
       protected void onException(final WroRuntimeException e) {
         JsLintMojo.this.onException(e);
       }
-      
+
       @Override
       protected void onLinterException(final LinterException e, final Resource resource) {
         final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s",
@@ -80,11 +80,11 @@ public class JsLintMojo
           throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
       };
-      
+
     }.setOptions(getOptions());
     return processor;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -93,7 +93,7 @@ public class JsLintMojo
     lintReport = new LintReport<LinterError>();
     FileUtils.deleteQuietly(reportFile);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -104,21 +104,21 @@ public class JsLintMojo
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.LINT).write(
+        ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.JSLINT).write(
             new FileOutputStream(reportFile));
-      } catch (IOException e) {
+      } catch (final IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
     }
   }
-  
+
   /**
    * @VisibleForTesting
    */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
   }
-  
+
   /**
    * Used by unit test to check if mojo doesn't fail.
    */

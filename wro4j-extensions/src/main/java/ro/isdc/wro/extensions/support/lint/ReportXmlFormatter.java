@@ -31,14 +31,12 @@ public class ReportXmlFormatter
   /**
    * Checkstyle related constants
    */
-  private static final String ELEMENT_CHECKSTYLE = "checkstyle";
   private static final String ELEMENT_ERROR = "error";
   private static final String ATTR_COLUMN = "column";
   private static final String ATTR_MESSAGE = "message";
   /**
    * Lint related constants
    */
-  private static final String ELEMENT_LINT = "jslint";
   private static final String ELEMENT_ISSUE = "issue";
   private static final String ELEMENT_FILE = "file";
   private static final String ATTR_NAME = "name";
@@ -47,15 +45,14 @@ public class ReportXmlFormatter
   private static final String ATTR_EVIDENCE = "evidence";
   private static final String ATTR_CHARACTER = "char";
   private static final String ATTR_SEVERITY = "severity";
-  private static final String ELEMENT_CSSLINT = "csslint";
 
   private final FormatterType formatterType;
 
   public static enum FormatterType {
-    LINT("lint-xml"), CHECKSTYLE("checkstyle-xml"), CSSLINT("csslint-xml");
-    private String format;
-    FormatterType(final String format) {
-      this.format = format;
+    LINT("lint") , CHECKSTYLE("checkstyle"), CSSLINT("csslint"), JSLINT("jslint");
+    private String rootElementName;
+    FormatterType(final String rootElementName) {
+      this.rootElementName = rootElementName;
     }
 
     /**
@@ -65,7 +62,7 @@ public class ReportXmlFormatter
      */
     public static FormatterType getByFormat(final String format) {
       for (final FormatterType type : FormatterType.values()) {
-        if (type.format.equals(format)) {
+        if (type.getFormat().equals(format)) {
           return type;
         }
       }
@@ -87,7 +84,7 @@ public class ReportXmlFormatter
      * @return string representation of the format.
      */
     public String getFormat() {
-      return format;
+      return String.format("%s-xml", this.rootElementName);
     }
   }
 
@@ -167,7 +164,7 @@ public class ReportXmlFormatter
    */
   @Override
   protected void buildDocument() {
-    final Element rootElement = getDocument().createElement(getRootElementName());
+    final Element rootElement = getDocument().createElement(formatterType.rootElementName);
     getDocument().appendChild(rootElement);
 
     for (final ResourceLintReport<LintItem> resourceErrors : getLintReport().getReports()) {
@@ -239,18 +236,5 @@ public class ReportXmlFormatter
    */
   protected String getIssueElementName() {
     return formatterType == FormatterType.CHECKSTYLE ? ELEMENT_ERROR : ELEMENT_ISSUE;
-  }
-
-  /**
-   * @return the name of root element.
-   */
-  protected String getRootElementName() {
-    String result = ELEMENT_CHECKSTYLE;
-    if (formatterType == FormatterType.LINT) {
-      result = ELEMENT_LINT;
-    } else if (formatterType == FormatterType.CSSLINT) {
-      result = ELEMENT_CSSLINT;
-    }
-    return result;
   }
 }
