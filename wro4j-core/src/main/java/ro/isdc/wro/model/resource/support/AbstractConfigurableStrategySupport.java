@@ -3,6 +3,7 @@ package ro.isdc.wro.model.resource.support;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.util.provider.ProviderFinder;
+import ro.isdc.wro.util.provider.ProviderPriority;
 
 
 /**
@@ -75,6 +77,9 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
     //use TreeMap to kep results sorted
     final Map<String, S> map = new TreeMap<String, S>();
     final List<P> providers = getProviderFinder().find();
+    
+    Collections.sort(providers, ProviderPriority.COMPARATOR);
+    
     for (final P provider : providers) {
       try {
         map.putAll(getStrategies(provider));
