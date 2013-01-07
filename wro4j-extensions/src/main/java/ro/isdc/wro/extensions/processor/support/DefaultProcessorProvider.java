@@ -42,7 +42,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 
 /**
  * The implementation which contributes with processors from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
@@ -55,7 +55,7 @@ public class DefaultProcessorProvider
   public Map<String, ResourcePreProcessor> providePreProcessors() {
     return createMap();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -72,7 +72,7 @@ public class DefaultProcessorProvider
     }
     return resultMap;
   }
-  
+
   /**
    * @return the map of pre processors.
    */
@@ -163,6 +163,13 @@ public class DefaultProcessorProvider
           @Override
           protected ResourcePreProcessor initialize() {
             return new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS);
+          }
+        }));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_WHITESPACE_ONLY, new LazyProcessorDecorator(
+        new LazyInitializer<ResourcePreProcessor>() {
+          @Override
+          protected ResourcePreProcessor initialize() {
+            return new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
           }
         }));
     map.put(RhinoCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
