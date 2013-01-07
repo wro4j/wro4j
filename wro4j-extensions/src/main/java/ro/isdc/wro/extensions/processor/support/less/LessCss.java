@@ -18,7 +18,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * This class is not thread-safe.<br/>
- * The underlying implementation use patched less.js from version <code>1.3.1</code> project: {@link https
+ * The underlying implementation use patched less.js from version <code>1.3.3</code> project: {@link https
  * ://github.com/cloudhead/less.js}.
  *
  * @author Alex Objelean
@@ -29,7 +29,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  public static final String DEFAULT_LESS_JS = "less-1.3.1.min.js";
+  public static final String DEFAULT_LESS_JS = "less-1.3.3.min.js";
   private static final String SCRIPT_RUN = "run.js";
   private static final String SCRIPT_INIT = "init.js";
   private ScriptableObject scope;

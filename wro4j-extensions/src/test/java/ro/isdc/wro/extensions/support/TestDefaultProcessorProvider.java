@@ -1,12 +1,14 @@
 package ro.isdc.wro.extensions.support;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.support.DefaultProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 
@@ -27,10 +29,14 @@ public class TestDefaultProcessorProvider {
     assertFalse(map.isEmpty());
   }
 
-
   @Test
   public void shouldLoadNonEmptyPreProcessors() throws Exception {
     final Map<String, ResourceProcessor> map = victim.providePreProcessors();
     assertFalse(map.isEmpty());
+  }
+
+  @Test
+  public void shouldProvideGoogleClosureWhitespace() throws Exception {
+    assertTrue(victim.providePreProcessors().keySet().contains(GoogleClosureCompressorProcessor.ALIAS_WHITESPACE_ONLY));
   }
 }

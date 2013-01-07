@@ -164,6 +164,13 @@ public class DefaultProcessorProvider
             return new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS);
           }
         }));
+    map.put(GoogleClosureCompressorProcessor.ALIAS_WHITESPACE_ONLY, new LazyProcessorDecorator(
+        new LazyInitializer<ResourceProcessor>() {
+          @Override
+          protected ResourceProcessor initialize() {
+            return new GoogleClosureCompressorProcessor(CompilationLevel.WHITESPACE_ONLY);
+          }
+        }));
     map.put(RhinoCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
       @Override
       protected ResourceProcessor initialize() {

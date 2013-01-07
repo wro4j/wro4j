@@ -47,6 +47,7 @@ public class GoogleClosureCompressorProcessor
   implements ResourceProcessor {
   public static final String ALIAS_SIMPLE = "googleClosureSimple";
   public static final String ALIAS_ADVANCED = "googleClosureAdvanced";
+  public static final String ALIAS_WHITESPACE_ONLY = "googleClosureWhitespace";
   /**
    * {@link CompilationLevel} to use for compression.
    */
