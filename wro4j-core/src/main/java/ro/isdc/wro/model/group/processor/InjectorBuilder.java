@@ -137,7 +137,6 @@ public class InjectorBuilder {
       public ResourceBundleProcessor create() {
         if (bundleProcessor == null) {
           bundleProcessor = new ResourceBundleProcessor();
-//          injector.inject(bundleProcessor);
         }
         return bundleProcessor;
       }
@@ -148,7 +147,6 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<MetaDataFactory>() {
       public MetaDataFactory create() {
         final MetaDataFactory factory = managerFactory.create().getMetaDataFactory();
-//        injector.inject(factory);
         return factory;
       }
     };
@@ -166,7 +164,6 @@ public class InjectorBuilder {
   private InjectorObjectFactory<PreProcessorExecutor> createPreProcessorExecutorProxy() {
     return new InjectorObjectFactory<PreProcessorExecutor>() {
       public PreProcessorExecutor create() {
-//        injector.inject(preProcessorExecutor);
         return preProcessorExecutor;
       }
     };
@@ -175,7 +172,6 @@ public class InjectorBuilder {
   private InjectorObjectFactory<GroupsProcessor> createGroupsProcessorProxy() {
     return new InjectorObjectFactory<GroupsProcessor>() {
       public GroupsProcessor create() {
-//        injector.inject(groupsProcessor);
         return groupsProcessor;
       }
     };
@@ -185,7 +181,6 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<LifecycleCallbackRegistry>() {
       public LifecycleCallbackRegistry create() {
         final LifecycleCallbackRegistry callbackRegistry = managerFactory.create().getCallbackRegistry();
-//        injector.inject(callbackRegistry);
         return callbackRegistry;
       }
     };
@@ -202,9 +197,7 @@ public class InjectorBuilder {
   private Object createGroupExtractorProxy() {
     return new InjectorObjectFactory<GroupExtractor>() {
       public GroupExtractor create() {
-        final GroupExtractor groupExtractor = managerFactory.create().getGroupExtractor();
-//        injector.inject(groupExtractor);
-        return groupExtractor;
+        return managerFactory.create().getGroupExtractor();
       }
     };
   }
@@ -237,7 +230,6 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
         final WroModelFactory modelFactory = modelFactoryInitializer.get();
-//        injector.inject(modelFactory);
         //final WroModelFactory proxy = ProxyFactory.proxy(modelFactory, WroModelFactory.class).create();
         return modelFactory;
       }
@@ -248,7 +240,6 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<NamingStrategy>() {
       public NamingStrategy create() {
         final NamingStrategy namingStrategy = managerFactory.create().getNamingStrategy();
-//        injector.inject(namingStrategy);
         //final NamingStrategy proxy = new ProxyFactory<NamingStrategy>(namingStrategy, NamingStrategy.class).create();
         return namingStrategy;
       }
@@ -258,9 +249,7 @@ public class InjectorBuilder {
   private Object createHashStrategyProxy() {
     return new InjectorObjectFactory<HashStrategy>() {
       public HashStrategy create() {
-        final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
-//        injector.inject(hashStrategy);
-        return hashStrategy;
+        return managerFactory.create().getHashStrategy();
       }
     };
   }
@@ -270,7 +259,6 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<CacheStrategy>() {
       public CacheStrategy create() {
         final CacheStrategy<CacheKey, CacheValue> decorated = cacheStrategyInitializer.get();
-//        injector.inject(decorated);
         return decorated;
       }
     };
@@ -292,7 +280,6 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<CacheKeyFactory>() {
       public CacheKeyFactory create() {
         final CacheKeyFactory factory = managerFactory.create().getCacheKeyFactory();
-//        injector.inject(factory);
         return factory;
       }
     };

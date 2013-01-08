@@ -58,7 +58,6 @@ public final class Injector {
    *          to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
-    LOG.info("injecting {}", object);
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
@@ -125,9 +124,6 @@ public final class Injector {
           accept = true;
           break;
         }
-      }
-      if (!accept) {
-        LOG.error("[BUG] Context Set but no entry found in map");
       }
 //      // accept injecting unsupported but initialized types
 //      if (!accept) {

@@ -51,7 +51,7 @@ public class ResourceBundleProcessor {
   /**
    * Write to stream the content of the processed resource bundle.
    */
-  public synchronized void serveProcessedBundle()
+  public void serveProcessedBundle()
       throws IOException {
     final WroConfiguration configuration = context.getConfig();
     final HttpServletRequest request = context.getRequest();
