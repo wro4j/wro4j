@@ -4,8 +4,8 @@
 package ro.isdc.wro.model.group.processor;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class InjectorBuilder {
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
    * something like spring ApplicationContext (lightweight IoC).
    */
-  private final Map<Class<?>, Object> map = new ConcurrentHashMap<Class<?>, Object>();
+  private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   private WroManagerFactory managerFactory;
   private final LazyInitializer<UriLocatorFactory> locatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
     @Override
