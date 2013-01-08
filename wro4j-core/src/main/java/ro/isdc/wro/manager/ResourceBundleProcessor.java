@@ -21,7 +21,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.HttpHeader;
-import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.WroUtil;
@@ -44,9 +43,8 @@ public class ResourceBundleProcessor {
   @Inject
   private ReadOnlyContext context;
   @Inject
-  private GroupExtractor groupExtractor;
-  @Inject
   private CacheKeyFactory cacheKeyFactory;
+
 
   /**
    * Write to stream the content of the processed resource bundle.
