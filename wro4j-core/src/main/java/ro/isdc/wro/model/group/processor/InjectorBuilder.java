@@ -4,8 +4,8 @@
 package ro.isdc.wro.model.group.processor;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -51,15 +51,12 @@ public class InjectorBuilder {
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
   private ResourceBundleProcessor bundleProcessor;
-  /**
-   * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
-   */
   private Injector injector;
   /**
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
    * something like spring ApplicationContext (lightweight IoC).
    */
-  private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+  private final Map<Class<?>, Object> map = new ConcurrentHashMap<Class<?>, Object>();
   private WroManagerFactory managerFactory;
   private final LazyInitializer<UriLocatorFactory> locatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
     @Override
@@ -140,7 +137,7 @@ public class InjectorBuilder {
       public ResourceBundleProcessor create() {
         if (bundleProcessor == null) {
           bundleProcessor = new ResourceBundleProcessor();
-          injector.inject(bundleProcessor);
+//          injector.inject(bundleProcessor);
         }
         return bundleProcessor;
       }
@@ -151,7 +148,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<MetaDataFactory>() {
       public MetaDataFactory create() {
         final MetaDataFactory factory = managerFactory.create().getMetaDataFactory();
-        injector.inject(factory);
+//        injector.inject(factory);
         return factory;
       }
     };
@@ -169,7 +166,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<PreProcessorExecutor> createPreProcessorExecutorProxy() {
     return new InjectorObjectFactory<PreProcessorExecutor>() {
       public PreProcessorExecutor create() {
-        injector.inject(preProcessorExecutor);
+//        injector.inject(preProcessorExecutor);
         return preProcessorExecutor;
       }
     };
@@ -178,7 +175,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<GroupsProcessor> createGroupsProcessorProxy() {
     return new InjectorObjectFactory<GroupsProcessor>() {
       public GroupsProcessor create() {
-        injector.inject(groupsProcessor);
+//        injector.inject(groupsProcessor);
         return groupsProcessor;
       }
     };
@@ -188,7 +185,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<LifecycleCallbackRegistry>() {
       public LifecycleCallbackRegistry create() {
         final LifecycleCallbackRegistry callbackRegistry = managerFactory.create().getCallbackRegistry();
-        injector.inject(callbackRegistry);
+//        injector.inject(callbackRegistry);
         return callbackRegistry;
       }
     };
@@ -206,7 +203,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<GroupExtractor>() {
       public GroupExtractor create() {
         final GroupExtractor groupExtractor = managerFactory.create().getGroupExtractor();
-        injector.inject(groupExtractor);
+//        injector.inject(groupExtractor);
         return groupExtractor;
       }
     };
@@ -240,7 +237,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
         final WroModelFactory modelFactory = modelFactoryInitializer.get();
-        injector.inject(modelFactory);
+//        injector.inject(modelFactory);
         //final WroModelFactory proxy = ProxyFactory.proxy(modelFactory, WroModelFactory.class).create();
         return modelFactory;
       }
@@ -251,7 +248,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<NamingStrategy>() {
       public NamingStrategy create() {
         final NamingStrategy namingStrategy = managerFactory.create().getNamingStrategy();
-        injector.inject(namingStrategy);
+//        injector.inject(namingStrategy);
         //final NamingStrategy proxy = new ProxyFactory<NamingStrategy>(namingStrategy, NamingStrategy.class).create();
         return namingStrategy;
       }
@@ -262,7 +259,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<HashStrategy>() {
       public HashStrategy create() {
         final HashStrategy hashStrategy = managerFactory.create().getHashStrategy();
-        injector.inject(hashStrategy);
+//        injector.inject(hashStrategy);
         return hashStrategy;
       }
     };
@@ -273,7 +270,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<CacheStrategy>() {
       public CacheStrategy create() {
         final CacheStrategy<CacheKey, CacheValue> decorated = cacheStrategyInitializer.get();
-        injector.inject(decorated);
+//        injector.inject(decorated);
         return decorated;
       }
     };
@@ -295,7 +292,7 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<CacheKeyFactory>() {
       public CacheKeyFactory create() {
         final CacheKeyFactory factory = managerFactory.create().getCacheKeyFactory();
-        injector.inject(factory);
+//        injector.inject(factory);
         return factory;
       }
     };

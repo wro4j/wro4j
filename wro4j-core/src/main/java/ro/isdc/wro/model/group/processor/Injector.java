@@ -58,12 +58,14 @@ public final class Injector {
    *          to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
+    LOG.info("injecting {}", object);
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(object, field)) {
-            final String message = "@Inject cannot be applied to field of type: " + field.getType();
+            final String message = String.format("@Inject cannot be applied on object: %s to field of type: %s using injector %s",
+                object, field.getType(), this);
             LOG.error(message + ". Supported types are: {}", map.keySet());
             throw new WroRuntimeException(message);
           }
@@ -75,7 +77,7 @@ public final class Injector {
       }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);
-      throw new WroRuntimeException("Exception while trying to process @Inject annotation", e);
+      throw new WroRuntimeException("Exception while trying to process @Inject annotation on object: " + object, e);
     }
   }
 
@@ -117,11 +119,15 @@ public final class Injector {
           // treat factories as a special case for lazy load of the objects.
           if (value instanceof InjectorObjectFactory) {
             value = ((InjectorObjectFactory<?>) value).create();
+            inject(value);
           }
           field.set(object, value);
           accept = true;
           break;
         }
+      }
+      if (!accept) {
+        LOG.error("[BUG] Context Set but no entry found in map");
       }
 //      // accept injecting unsupported but initialized types
 //      if (!accept) {
@@ -131,6 +137,8 @@ public final class Injector {
 //          processInjectAnnotation(field.get(object));
 //        }
 //      }
+    } else {
+      LOG.error("[BUG] No Context Set");
     }
     return accept;
   }
