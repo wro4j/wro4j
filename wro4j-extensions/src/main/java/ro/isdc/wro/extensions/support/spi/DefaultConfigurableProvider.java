@@ -9,6 +9,7 @@ import ro.isdc.wro.http.handler.spi.RequestHandlerProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
+import ro.isdc.wro.util.Ordered;
 import ro.isdc.wro.util.provider.ConfigurableProviderSupport;
 
 /**
@@ -19,7 +20,7 @@ import ro.isdc.wro.util.provider.ConfigurableProviderSupport;
  * @since 1.5.0
  */
 public class DefaultConfigurableProvider
-    extends ConfigurableProviderSupport {
+    extends ConfigurableProviderSupport implements Ordered {
   private ProcessorProvider processorProvider = new DefaultProcessorProvider();
   private RequestHandlerProvider requestHandlerProvider = new DefaultRequestHandlerProvider();
   
@@ -44,5 +45,10 @@ public class DefaultConfigurableProvider
   @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
     return requestHandlerProvider.provideRequestHandlers();
+  }
+
+  @Override
+  public int getOrder() {
+    return Ordered.LOWEST;
   }
 }
