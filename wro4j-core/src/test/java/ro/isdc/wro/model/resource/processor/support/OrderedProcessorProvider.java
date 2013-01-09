@@ -6,8 +6,6 @@ import java.util.Map;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
-import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.util.Ordered;
 
@@ -22,7 +20,6 @@ public class OrderedProcessorProvider
     implements ProcessorProvider, Ordered {
   public static final String ALIAS = "custom";
   public static ResourcePreProcessor CUSTOM = new ProcessorDecorator(new CssMinProcessor());
-  public static ResourcePreProcessor CONFORM_COLORS = new ProcessorDecorator(new ConformColorsCssProcessor());
 
   /**
    * {@inheritDoc}
@@ -30,7 +27,6 @@ public class OrderedProcessorProvider
   public Map<String, ResourcePreProcessor> providePreProcessors() {
     final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
     map.put(ALIAS, CUSTOM);
-    map.put(CssImportPreProcessor.ALIAS, CONFORM_COLORS);
     return map;
   }
 
