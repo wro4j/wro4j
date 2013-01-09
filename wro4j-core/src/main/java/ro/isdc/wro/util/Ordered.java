@@ -10,36 +10,36 @@ import java.util.Comparator;
  * @since 1.6.2
  */
 public interface Ordered {
+  /**
+   * The highest order, meaning that the value will be the last when ascending comparator is used.
+   */
   public static final int HIGHEST = Integer.MAX_VALUE;
   public static final int MEDIUM = 0;
+  /**
+   * The highest order, meaning that the value will be the first when ascending comparator is used.
+   */
   public static final int LOWEST = Integer.MIN_VALUE;
-  public static final Comparator<Object> DEFAULT_COMPARATOR = new Comparator<Object>() {
+  public static final Comparator<Object> ASCENDING_COMPARATOR = new Comparator<Object>() {
     /**
      * {@inheritDoc}
      */
     public int compare(final Object left, final Object right) {
-      int priority1 = MEDIUM;
-      int priority2 = MEDIUM;
+      int priorityLeft = MEDIUM;
+      int priorityRight = MEDIUM;
 
       if (left instanceof Ordered) {
         final Ordered loadOrderAwareProvider = (Ordered) left;
-        priority1 = loadOrderAwareProvider.getOrder();
+        priorityLeft = loadOrderAwareProvider.getOrder();
       }
 
       if (right instanceof Ordered) {
         final Ordered loadOrderAwareProvider = (Ordered) right;
-        priority2 = loadOrderAwareProvider.getOrder();
+        priorityRight = loadOrderAwareProvider.getOrder();
       }
-
-      if (priority1 > priority2) {
-        return 1;
+      if (priorityLeft == priorityRight) {
+        return 0;
       }
-
-      if (priority1 < priority2) {
-        return -1;
-      }
-
-      return 0;
+      return priorityLeft > priorityRight ? 1: -1;
     }
   };
   /**

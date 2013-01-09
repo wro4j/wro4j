@@ -63,7 +63,7 @@ public class ProviderFinder<T> {
       LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
       throw WroRuntimeException.wrap(e);
     }
-    Collections.sort(providers, Ordered.DEFAULT_COMPARATOR);
+    Collections.sort(providers, Ordered.ASCENDING_COMPARATOR);
     return providers;
   }
 
