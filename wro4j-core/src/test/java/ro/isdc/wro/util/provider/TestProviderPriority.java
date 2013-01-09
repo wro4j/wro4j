@@ -34,15 +34,15 @@ public class TestProviderPriority {
   public void shouldSortFromLowToHigh() {
     List<?> priorities = Arrays.asList(MEDIUM_HIGH, HIGH, LOW, MEDIUM, MEDIUM, HIGH, LOW, MEDIUM, HIGH);
     
-    Collections.sort(priorities, Ordered.COMPARATOR);
+    Collections.sort(priorities, Ordered.DEFAULT_COMPARATOR);
     
     assertEquals(Arrays.asList(LOW, LOW, MEDIUM, MEDIUM, MEDIUM, MEDIUM_HIGH, HIGH, HIGH, HIGH), priorities);
   }
   
   @Test
   public void shouldCompareSamePriorityEqually() {
-    assertEquals(0, Ordered.COMPARATOR.compare(LOW, LOW));
-    assertEquals(0, Ordered.COMPARATOR.compare(MEDIUM, MEDIUM));
-    assertEquals(0, Ordered.COMPARATOR.compare(HIGH, HIGH));
+    assertEquals(0, Ordered.DEFAULT_COMPARATOR.compare(LOW, LOW));
+    assertEquals(0, Ordered.DEFAULT_COMPARATOR.compare(MEDIUM, MEDIUM));
+    assertEquals(0, Ordered.DEFAULT_COMPARATOR.compare(HIGH, HIGH));
   }
 }

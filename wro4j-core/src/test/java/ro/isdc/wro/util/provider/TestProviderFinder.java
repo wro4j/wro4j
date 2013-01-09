@@ -65,32 +65,30 @@ public class TestProviderFinder {
   public void shouldFindProcessorProviders() {
     Assert.assertNotNull(ProviderFinder.of(ProcessorProvider.class).find());
   }
-  
+
   @Test
   public void shouldOrderProviders() {
-    final PrioritizableProvider lowest = new PrioritizableProvider(Ordered.LOWEST);
+    final OrderedProvider lowest = new OrderedProvider(Ordered.LOWEST);
     final Object defaultPriority = new Object();
-    final PrioritizableProvider highest = new PrioritizableProvider(Ordered.HIGHEST);
-    
+    final OrderedProvider highest = new OrderedProvider(Ordered.HIGHEST);
+
     victim = new ProviderFinder<Object>(Object.class) {
       @Override @SuppressWarnings("unchecked")
-      <P> Iterator<P> lookupProviders(Class<P> providerClass) {
+      <P> Iterator<P> lookupProviders(final Class<P> providerClass) {
         if (providerClass == Object.class) {
           return (Iterator<P>) Arrays.asList(defaultPriority, highest, lowest).iterator();
         }
-        
+
         return Collections.<P>emptyList().iterator();
       }
     };
-    
     Assert.assertEquals(Arrays.asList(lowest, defaultPriority, highest), victim.find());
   }
 
-  
-  private static class PrioritizableProvider implements Ordered {
+  private static class OrderedProvider implements Ordered {
     private final int providerPriority;
-    
-    public PrioritizableProvider(int providerPriority) {
+
+    public OrderedProvider(final int providerPriority) {
       this.providerPriority = providerPriority;
     }
 
