@@ -75,6 +75,7 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
     //use TreeMap to kep results sorted
     final Map<String, S> map = new TreeMap<String, S>();
     final List<P> providers = getProviderFinder().find();
+    
     for (final P provider : providers) {
       try {
         map.putAll(getStrategies(provider));

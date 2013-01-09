@@ -1,6 +1,7 @@
 package ro.isdc.wro.util.provider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.util.Ordered;
 
 
 /**
@@ -45,7 +47,7 @@ public class ProviderFinder<T> {
   }
 
   /**
-   * @return the list of all providers found in classpath.
+   * @return the list of all providers found in classpath. The list is sorted according to the {@link Ordered} interface.
    */
   public List<T> find() {
     final List<T> providers = new ArrayList<T>();
@@ -61,6 +63,9 @@ public class ProviderFinder<T> {
       LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
       throw WroRuntimeException.wrap(e);
     }
+    
+    Collections.sort(providers, Ordered.COMPARATOR);
+    
     return providers;
   }
 

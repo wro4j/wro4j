@@ -21,6 +21,7 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
+import ro.isdc.wro.util.Ordered;
 
 /**
  * Default implementation of {@link ConfigurableProviderSupport} which contributes with components from core module.
@@ -30,7 +31,7 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
  * @since 1.4.7
  */
 public class DefaultConfigurableProvider
-    extends ConfigurableProviderSupport {
+    extends ConfigurableProviderSupport implements Ordered {
   private ProcessorProvider processorProvider = new DefaultProcessorProvider();
   private NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
   private HashStrategyProvider hashStrategyProvider = new DefaultHashStrategyProvider();
@@ -91,5 +92,9 @@ public class DefaultConfigurableProvider
   @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
     return requestHandlerProvider.provideRequestHandlers();
+  }
+
+  public int getOrder() {
+    return Ordered.LOWEST;
   }
 }
