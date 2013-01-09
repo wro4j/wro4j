@@ -42,6 +42,7 @@ public interface Ordered {
       return priorityLeft > priorityRight ? 1: -1;
     }
   };
+
   /**
    * @return a number representing the order.
    */
