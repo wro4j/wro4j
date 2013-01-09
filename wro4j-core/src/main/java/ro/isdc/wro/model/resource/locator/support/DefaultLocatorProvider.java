@@ -8,8 +8,7 @@ import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator.LocatorStrategy;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
-import ro.isdc.wro.util.provider.ProviderPriorityAware;
-import ro.isdc.wro.util.provider.ProviderPriority;
+import ro.isdc.wro.util.Ordered;
 
 
 /**
@@ -20,7 +19,7 @@ import ro.isdc.wro.util.provider.ProviderPriority;
  * @since 1.4.7
  */
 public class DefaultLocatorProvider
-    implements LocatorProvider, ProviderPriorityAware {
+    implements LocatorProvider, Ordered {
   /**
    * {@inheritDoc}
    */
@@ -36,7 +35,7 @@ public class DefaultLocatorProvider
     return map;
   }
 
-  public ProviderPriority getPriority() {
-    return ProviderPriority.LOW;
+  public int getOrder() {
+    return Ordered.LOWEST;
   }
 }

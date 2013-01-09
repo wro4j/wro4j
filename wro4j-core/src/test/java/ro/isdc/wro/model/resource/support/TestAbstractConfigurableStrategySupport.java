@@ -14,9 +14,8 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
+import ro.isdc.wro.util.Ordered;
 import ro.isdc.wro.util.provider.ProviderFinder;
-import ro.isdc.wro.util.provider.ProviderPriority;
-import ro.isdc.wro.util.provider.ProviderPriorityAware;
 
 public class TestAbstractConfigurableStrategySupport {
 
@@ -27,8 +26,8 @@ public class TestAbstractConfigurableStrategySupport {
     AbstractConfigurableStrategySupport<UriLocator, LocatorProvider> strategySupport = new AbstractConfigurableStrategySupport<UriLocator, LocatorProvider>() {
       @Override
       protected ProviderFinder<LocatorProvider> getProviderFinder() {
-        LocatorProvider lowPriorityProvider = new PrioritizableLocatorProvider(new UrlUriLocator(), ProviderPriority.LOW);
-        LocatorProvider highPriorityProvider = new PrioritizableLocatorProvider(preferredUriLocator, ProviderPriority.HIGH);
+        LocatorProvider lowPriorityProvider = new PrioritizableLocatorProvider(new UrlUriLocator(), Ordered.LOWEST);
+        LocatorProvider highPriorityProvider = new PrioritizableLocatorProvider(preferredUriLocator, Ordered.HIGHEST);
 
         @SuppressWarnings("unchecked")
         ProviderFinder<LocatorProvider> providerFinder = mock(ProviderFinder.class);
@@ -53,16 +52,16 @@ public class TestAbstractConfigurableStrategySupport {
     assertSame(preferredUriLocator, selectedUriLocator);
   }
   
-  private static class PrioritizableLocatorProvider implements LocatorProvider, ProviderPriorityAware {
+  private static class PrioritizableLocatorProvider implements LocatorProvider, Ordered {
     private final UriLocator uriLocator;
-    private final ProviderPriority providerPriority;
+    private final int providerPriority;
     
-    public PrioritizableLocatorProvider(UriLocator uriLocator, ProviderPriority providerPriority) {
+    public PrioritizableLocatorProvider(UriLocator uriLocator, int providerPriority) {
       this.uriLocator = uriLocator;
       this.providerPriority = providerPriority;
     }
 
-    public ProviderPriority getPriority() {
+    public int getOrder() {
       return providerPriority;
     }
 
