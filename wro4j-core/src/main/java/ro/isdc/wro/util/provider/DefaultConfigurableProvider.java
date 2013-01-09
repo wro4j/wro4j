@@ -21,26 +21,28 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
+import ro.isdc.wro.util.Ordered;
 
 /**
  * Default implementation of {@link ConfigurableProviderSupport} which contributes with components from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class DefaultConfigurableProvider
-    extends ConfigurableProviderSupport {
-  private ProcessorProvider processorProvider = new DefaultProcessorProvider();
-  private NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
-  private HashStrategyProvider hashStrategyProvider = new DefaultHashStrategyProvider();
-  private LocatorProvider locatorProvider = new DefaultLocatorProvider();
-  private CacheStrategyProvider cacheStrategyProvider = new DefaultCacheStrategyProvider();
-  private RequestHandlerProvider requestHandlerProvider = new DefaultRequestHandlerProvider();
-  
+    extends ConfigurableProviderSupport implements Ordered {
+  private final ProcessorProvider processorProvider = new DefaultProcessorProvider();
+  private final NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
+  private final HashStrategyProvider hashStrategyProvider = new DefaultHashStrategyProvider();
+  private final LocatorProvider locatorProvider = new DefaultLocatorProvider();
+  private final CacheStrategyProvider cacheStrategyProvider = new DefaultCacheStrategyProvider();
+  private final RequestHandlerProvider requestHandlerProvider = new DefaultRequestHandlerProvider();
+
   /**
    * {@inheritDoc}
    */
+  @Override
   public java.util.Map<String,ResourcePreProcessor> providePreProcessors() {
     return processorProvider.providePreProcessors();
   }
@@ -52,7 +54,7 @@ public class DefaultConfigurableProvider
   public Map<String, ResourcePostProcessor> providePostProcessors() {
     return processorProvider.providePostProcessors();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -60,7 +62,7 @@ public class DefaultConfigurableProvider
   public Map<String, HashStrategy> provideHashStrategies() {
     return hashStrategyProvider.provideHashStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -68,7 +70,7 @@ public class DefaultConfigurableProvider
   public Map<String, NamingStrategy> provideNamingStrategies() {
     return namingStrategyProvider.provideNamingStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -76,7 +78,7 @@ public class DefaultConfigurableProvider
   public Map<String, CacheStrategy> provideCacheStrategies() {
     return cacheStrategyProvider.provideCacheStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -84,12 +86,20 @@ public class DefaultConfigurableProvider
   public Map<String, UriLocator> provideLocators() {
     return locatorProvider.provideLocators();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
     return requestHandlerProvider.provideRequestHandlers();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public int getOrder() {
+    //The lowest order is used to allow custom provider to override providers with the same name.
+    return Ordered.LOWEST;
   }
 }

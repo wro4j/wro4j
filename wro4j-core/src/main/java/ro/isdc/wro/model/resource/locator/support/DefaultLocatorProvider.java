@@ -8,6 +8,7 @@ import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator.LocatorStrategy;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.util.Ordered;
 
 
 /**
@@ -18,7 +19,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  * @since 1.4.7
  */
 public class DefaultLocatorProvider
-    implements LocatorProvider {
+    implements LocatorProvider, Ordered {
   /**
    * {@inheritDoc}
    */
@@ -32,5 +33,9 @@ public class DefaultLocatorProvider
         new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_FIRST));
     map.put(UrlUriLocator.ALIAS, new UrlUriLocator());
     return map;
+  }
+
+  public int getOrder() {
+    return Ordered.LOWEST;
   }
 }

@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.processor.factory;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.Collections;
@@ -20,6 +21,9 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.support.OrderedProcessorProvider;
+import ro.isdc.wro.model.resource.processor.support.UnorderedProcessorProvider;
 
 
 /**
@@ -27,19 +31,19 @@ import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDe
  */
 public class TestConfigurableProcessorsFactory {
   private ConfigurableProcessorsFactory victim;
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     victim = new ConfigurableProcessorsFactory();
   }
-  
+
   @Test
   public void shouldReturnEmptyListOfProcessors() {
     assertEquals(Collections.EMPTY_LIST, victim.getPreProcessors());
     assertEquals(Collections.EMPTY_LIST, victim.getPostProcessors());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void testInvalidPreProcessorSet() {
     final Properties props = new Properties();
@@ -47,7 +51,7 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     victim.getPreProcessors();
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void testInvalidPostProcessorSet() {
     final Properties props = new Properties();
@@ -55,7 +59,7 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     victim.getPostProcessors();
   }
-  
+
   @Test
   public void testGetValidPreProcessorSet() {
     final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
@@ -66,7 +70,7 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     assertEquals(1, victim.getPreProcessors().size());
   }
-  
+
   @Test
   public void testGetValidPostProcessorSet() {
     final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
@@ -77,7 +81,7 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     assertEquals(1, victim.getPostProcessors().size());
   }
-  
+
   @Test
   public void cannotAcceptExtensionAwareConfigurationForPostProcessors() {
     final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
@@ -91,17 +95,17 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     assertEquals(0, victim.getPreProcessors().size());
   }
-  
+
   @Test
   public void shouldDecorateWithExtensionAwareProcessorDecorator() {
     genericShouldDecorateWithExtension("valid", "js");
   }
-  
+
   @Test
   public void shouldDecorateWithExtensionAwareProcessorDecoratorWhenProcessorNameContainsDots() {
     genericShouldDecorateWithExtension("valid.processor.name", "js");
   }
-  
+
   private void genericShouldDecorateWithExtension(final String processorName, final String extension) {
     final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
     map.put(processorName, Mockito.mock(ResourcePreProcessor.class));
@@ -112,5 +116,21 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     assertEquals(1, victim.getPreProcessors().size());
     assertTrue(victim.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
+  }
+
+  @Test
+  public void unorderedShouldOverrideDefault() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, ConformColorsCssProcessor.ALIAS);
+    victim.setProperties(props);
+    assertSame(victim.getPreProcessors().iterator().next(), UnorderedProcessorProvider.CONFORM_COLORS);
+  }
+
+  @Test
+  public void orderedShouldOverrideUnordered() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, OrderedProcessorProvider.ALIAS);
+    victim.setProperties(props);
+    assertSame(victim.getPreProcessors().iterator().next(), OrderedProcessorProvider.CUSTOM);
   }
 }
