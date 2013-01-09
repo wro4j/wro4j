@@ -63,7 +63,9 @@ public final class Injector {
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {
           if (!acceptAnnotatedField(object, field)) {
-            final String message = "@Inject cannot be applied to field of type: " + field.getType();
+            final String message = String.format(
+                "@Inject cannot be applied on object: %s to field of type: %s using injector %s", object,
+                field.getType(), this);
             LOG.error(message + ". Supported types are: {}", map.keySet());
             throw new WroRuntimeException(message);
           }
@@ -75,7 +77,7 @@ public final class Injector {
       }
     } catch (final Exception e) {
       LOG.error("Error while scanning @Inject annotation", e);
-      throw new WroRuntimeException("Exception while trying to process @Inject annotation", e);
+      throw WroRuntimeException.wrap(e, "Exception while trying to process @Inject annotation on object: " + object);
     }
   }
 
@@ -87,10 +89,10 @@ public final class Injector {
     fields.addAll(Arrays.asList(object.getClass().getDeclaredFields()));
     // inspect super classes
     Class<?> superClass = object.getClass().getSuperclass();
-    do {
+    while (superClass != null) {
       fields.addAll(Arrays.asList(superClass.getDeclaredFields()));
       superClass = superClass.getSuperclass();
-    } while (superClass != null);
+    }
     return fields;
   }
 
@@ -110,27 +112,21 @@ public final class Injector {
     boolean accept = false;
     // accept private modifiers
     field.setAccessible(true);
-    if (Context.isContextSet()) {
-      for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
-        if (entry.getKey().isAssignableFrom(field.getType())) {
-          Object value = entry.getValue();
-          // treat factories as a special case for lazy load of the objects.
-          if (value instanceof InjectorObjectFactory) {
-            value = ((InjectorObjectFactory<?>) value).create();
-          }
-          field.set(object, value);
-          accept = true;
-          break;
+    if (!Context.isContextSet()) {
+      throw new WroRuntimeException("No Context Set");
+    }
+    for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
+      if (entry.getKey().isAssignableFrom(field.getType())) {
+        Object value = entry.getValue();
+        // treat factories as a special case for lazy load of the objects.
+        if (value instanceof InjectorObjectFactory) {
+          value = ((InjectorObjectFactory<?>) value).create();
+          inject(value);
         }
+        field.set(object, value);
+        accept = true;
+        break;
       }
-//      // accept injecting unsupported but initialized types
-//      if (!accept) {
-//        accept = field.get(object) != null;
-//        // if (accept |= field.get(object) != null) {
-//        if (accept) {
-//          processInjectAnnotation(field.get(object));
-//        }
-//      }
     }
     return accept;
   }
