@@ -18,7 +18,8 @@ public class TestProviderPriority {
       return Ordered.HIGHEST;
     }
   };
-  private static Ordered MEDIUM = new Ordered() {
+  private static Object MEDIUM = new Object();
+  private static Ordered MEDIUM_HIGH = new Ordered() {
     public int getOrder() {
       return 10;
     }
@@ -31,11 +32,11 @@ public class TestProviderPriority {
   
   @Test
   public void shouldSortFromLowToHigh() {
-    List<Ordered> priorities = Arrays.asList(HIGH, LOW, MEDIUM, MEDIUM, HIGH, LOW, MEDIUM, HIGH);
+    List<?> priorities = Arrays.asList(MEDIUM_HIGH, HIGH, LOW, MEDIUM, MEDIUM, HIGH, LOW, MEDIUM, HIGH);
     
     Collections.sort(priorities, Ordered.COMPARATOR);
     
-    assertEquals(Arrays.asList(LOW, LOW, MEDIUM, MEDIUM, MEDIUM, HIGH, HIGH, HIGH), priorities);
+    assertEquals(Arrays.asList(LOW, LOW, MEDIUM, MEDIUM, MEDIUM, MEDIUM_HIGH, HIGH, HIGH, HIGH), priorities);
   }
   
   @Test

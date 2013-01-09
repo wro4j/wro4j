@@ -2,16 +2,25 @@ package ro.isdc.wro.util;
 
 import java.util.Comparator;
 
+/**
+ * Classes implementing this interface signal to the classes that load them that order is significant.
+ *  
+ * @author Moandji Ezana
+ *
+ */
 public interface Ordered {
 
-  static final int HIGHEST = Integer.MAX_VALUE;
-  static final int LOWEST = Integer.MIN_VALUE;
   int getOrder();
+
+  static final int HIGHEST = Integer.MAX_VALUE;
+  static final int MEDIUM = 0;
+  static final int LOWEST = Integer.MIN_VALUE;
+  
   public static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
 
     public int compare(Object provider1, Object provider2) {
-      int priority1 = LOWEST;
-      int priority2 = LOWEST;
+      int priority1 = MEDIUM;
+      int priority2 = MEDIUM;
       
       if (provider1 instanceof Ordered) {
         Ordered loadOrderAwareProvider = (Ordered) provider1;
