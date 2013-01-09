@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.processor.factory;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.Collections;
@@ -19,6 +20,9 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.impl.css.ConformColorsCssProcessor;
+import ro.isdc.wro.model.resource.processor.support.OrderedProcessorProvider;
+import ro.isdc.wro.model.resource.processor.support.UnorderedProcessorProvider;
 
 
 /**
@@ -111,5 +115,21 @@ public class TestConfigurableProcessorsFactory {
     victim.setProperties(props);
     assertEquals(1, victim.getPreProcessors().size());
     assertTrue(victim.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
+  }
+
+  @Test
+  public void unorderedShouldOverrideDefault() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, ConformColorsCssProcessor.ALIAS);
+    victim.setProperties(props);
+    assertSame(victim.getPreProcessors().iterator().next(), UnorderedProcessorProvider.CONFORM_COLORS);
+  }
+
+  @Test
+  public void orderedShouldOverrideUnordered() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, OrderedProcessorProvider.ALIAS);
+    victim.setProperties(props);
+    assertSame(victim.getPreProcessors().iterator().next(), OrderedProcessorProvider.CUSTOM);
   }
 }

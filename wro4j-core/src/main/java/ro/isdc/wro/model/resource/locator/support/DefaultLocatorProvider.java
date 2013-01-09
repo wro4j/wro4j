@@ -10,6 +10,7 @@ import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ServletContextResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UrlResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.LocatorStrategy;
+import ro.isdc.wro.util.Ordered;
 
 
 /**
@@ -20,7 +21,7 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.
  * @since 1.4.7
  */
 public class DefaultLocatorProvider
-    implements LocatorProvider {
+    implements LocatorProvider, Ordered {
   /**
    * {@inheritDoc}
    */
@@ -42,5 +43,9 @@ public class DefaultLocatorProvider
     });
     map.put(UrlResourceLocator.ALIAS, new UrlResourceLocatorFactory());
     return map;
+  }
+
+  public int getOrder() {
+    return Ordered.LOWEST;
   }
 }

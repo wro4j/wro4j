@@ -20,16 +20,17 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
+import ro.isdc.wro.util.Ordered;
 
 /**
  * Default implementation of {@link ConfigurableProviderSupport} which contributes with components from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class DefaultConfigurableProvider
-    extends ConfigurableProviderSupport {
+    extends ConfigurableProviderSupport implements Ordered {
   private final ProcessorProvider processorProvider = new DefaultProcessorProvider();
   private final NamingStrategyProvider namingStrategyProvider = new DefaultNamingStrategyProvider();
   private final HashStrategyProvider hashStrategyProvider = new DefaultHashStrategyProvider();
@@ -52,7 +53,7 @@ public class DefaultConfigurableProvider
   public Map<String, ResourceProcessor> providePostProcessors() {
     return processorProvider.providePostProcessors();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -60,7 +61,7 @@ public class DefaultConfigurableProvider
   public Map<String, HashStrategy> provideHashStrategies() {
     return hashStrategyProvider.provideHashStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -68,7 +69,7 @@ public class DefaultConfigurableProvider
   public Map<String, NamingStrategy> provideNamingStrategies() {
     return namingStrategyProvider.provideNamingStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -76,7 +77,7 @@ public class DefaultConfigurableProvider
   public Map<String, CacheStrategy> provideCacheStrategies() {
     return cacheStrategyProvider.provideCacheStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -84,12 +85,20 @@ public class DefaultConfigurableProvider
   public Map<String, ResourceLocatorFactory> provideLocators() {
     return locatorProvider.provideLocators();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
     return requestHandlerProvider.provideRequestHandlers();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public int getOrder() {
+    //The lowest order is used to allow custom provider to override providers with the same name.
+    return Ordered.LOWEST;
   }
 }
