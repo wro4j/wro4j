@@ -344,8 +344,7 @@ public class WroFilter
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
-    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(
-        e.getMessage(), e);
+    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : WroRuntimeException.wrap(e);
     onRuntimeException(re, response, chain);
   }
 
