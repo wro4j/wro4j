@@ -7,6 +7,8 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.util.StopWatch;
 
@@ -21,6 +23,8 @@ import ro.isdc.wro.util.StopWatch;
  */
 public class BenchmarkProcessorDecorator
     extends ProcessorDecorator {
+  @Inject
+  private ReadOnlyContext context;
   private static final Logger LOG = LoggerFactory.getLogger(BenchmarkProcessorDecorator.class);
   public BenchmarkProcessorDecorator(final Object processor) {
     super(processor);
@@ -32,13 +36,32 @@ public class BenchmarkProcessorDecorator
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    final StopWatch stopWatch = new StopWatch();
-    stopWatch.start("Using " + this.toString());
+    StopWatch stopWatch = null;
+    if (context.getConfig().isDebug()) {
+      stopWatch = new StopWatch();
+      before(stopWatch);
+    }
     try {
       super.process(resource, reader, writer);
     } finally {
-      stopWatch.stop();
-      LOG.debug(stopWatch.prettyPrint());
+      if (context.getConfig().isDebug()) {
+        after(stopWatch);
+      }
     }
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  void before(final StopWatch stopWatch) {
+    stopWatch.start("Using " + this.toString());
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  void after(final StopWatch stopWatch) {
+    stopWatch.stop();
+    LOG.debug(stopWatch.prettyPrint());
   }
 }
