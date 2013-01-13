@@ -13,7 +13,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.util.StopWatch;
 
 
-
 /**
  * A decorator responsible for tracking the time spent with processing.
  *
@@ -37,17 +36,24 @@ public class BenchmarkProcessorDecorator
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     StopWatch stopWatch = null;
-    if (context.getConfig().isDebug()) {
+    if (isDebug()) {
       stopWatch = new StopWatch();
       before(stopWatch);
     }
     try {
       super.process(resource, reader, writer);
     } finally {
-      if (context.getConfig().isDebug()) {
+      if (isDebug()) {
         after(stopWatch);
       }
     }
+  }
+
+  /**
+   * required to allow processor work even outside of Context cycle.
+   */
+  private boolean isDebug() {
+    return context != null ? context.getConfig().isDebug() : true;
   }
 
   /**

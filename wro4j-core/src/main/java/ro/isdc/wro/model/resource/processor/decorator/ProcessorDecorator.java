@@ -99,13 +99,7 @@ public class ProcessorDecorator
    * @param searchedType
    *          - the type of the accepted processor. If the processor will have no type specified it will still be
    *          eligible.
-   * @return a list of found processors which satisfy the search criteria. There are 3 possibilities:
-   *         <ul>
-   *         <li>If you search by JS type - you'll get processors which can be applied on JS resources & any (null)
-   *         resources</li>
-   *         <li>If you search by CSS type - you'll get processors which can be applied on CSS resources & any (null)
-   *         resources</li>
-   *         </ul>
+   * @return true if this processor is of searchedType.
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {
     Validate.notNull(searchedType);
