@@ -28,9 +28,9 @@ public class DefaultProcessorDecorator
 
   private static ResourceProcessor decorate(final ResourceProcessor processor, final ProcessingCriteria criteria) {
     notNull(criteria);
-    return new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
+    return new BenchmarkProcessorDecorator(new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
         new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(processor, criteria
-            .getProcessingType()))));
+            .getProcessingType())))));
   }
 
   /**

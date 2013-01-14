@@ -28,7 +28,6 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -105,25 +104,20 @@ public class GroupsProcessor {
 
     Reader reader = new StringReader(content.toString());
     Writer writer = null;
-
-    final StopWatch stopWatch = new StopWatch();
     for (final ResourceProcessor processor : processors) {
       final ResourceProcessor decoratedProcessor = decorateProcessor(processor, cacheKey.isMinimize());
-      stopWatch.start("Using " + decoratedProcessor.toString());
       writer = new StringWriter();
       try {
         callbackRegistry.onBeforePostProcess();
         //the processor is invoked as a pre processor. This is important for correct computation of eligibility.
         decoratedProcessor.process(resource, reader, writer);
       } finally {
-        stopWatch.stop();
         callbackRegistry.onAfterPostProcess();
         IOUtils.closeQuietly(reader);
         IOUtils.closeQuietly(writer);
       }
       reader = new StringReader(writer.toString());
     }
-    LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
 

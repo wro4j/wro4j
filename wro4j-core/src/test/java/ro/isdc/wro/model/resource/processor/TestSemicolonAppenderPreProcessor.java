@@ -32,7 +32,7 @@ public class TestSemicolonAppenderPreProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
-  
+
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
