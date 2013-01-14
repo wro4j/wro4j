@@ -3,8 +3,13 @@
  */
 package ro.isdc.wro.manager.callback;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import ro.isdc.wro.config.Context;
+
 
 /**
  * @author Alex Objelean
@@ -12,8 +17,17 @@ import org.mockito.Mockito;
 public class TestLifecycleCallbackDecorator {
   private LifecycleCallbackDecorator decorator;
 
+  @Before
+  public void setUp() {
+    Context.set(Context.standaloneContext());
+  }
 
-  @Test(expected=NullPointerException.class)
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
+  @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullCallback() {
     decorator = new LifecycleCallbackDecorator(null);
   }
@@ -22,9 +36,8 @@ public class TestLifecycleCallbackDecorator {
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback callback = Mockito.spy(new PerformanceLoggerCallback());
     decorator = new LifecycleCallbackDecorator(callback);
-    
-    
-    LifecycleCallbackRegistry registry = new LifecycleCallbackRegistry();
+
+    final LifecycleCallbackRegistry registry = new LifecycleCallbackRegistry();
     registry.registerCallback(decorator);
 
     registry.onBeforeModelCreated();
