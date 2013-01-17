@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,10 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
+import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.LessCompiler.CompilationResult;
+import com.github.sommeri.less4j.LessCompiler.Problem;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 
@@ -33,6 +37,7 @@ public class Less4jProcessor
 
   public static final String ALIAS = "less4j";
   private final LessCompiler compiler = new DefaultLessCompiler();
+
   /**
    * {@inheritDoc}
    */
@@ -49,10 +54,16 @@ public class Less4jProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      final LessCompiler.CompilationResult result =compiler.compile(IOUtils.toString(reader));
+      final CompilationResult result = compiler.compile(IOUtils.toString(reader));
+      if (!result.getWarnings().isEmpty()) {
+        LOG.warn("Less warnings: {}", result.getWarnings());
+      }
       writer.write(result.getCss());
-    } catch (final Exception e) {
-      LOG.error("Failed to compile less", e);
+    } catch (final Less4jException e) {
+      LOG.error("Failed to compile less. Errors are: ");
+      for (final Problem problem : e.getErrors()) {
+        LOG.error(ToStringBuilder.reflectionToString(problem));
+      }
       throw WroRuntimeException.wrap(e);
     }
   }
