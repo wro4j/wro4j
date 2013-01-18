@@ -28,13 +28,13 @@ public interface Ordered {
       int priorityRight = MEDIUM;
 
       if (left instanceof Ordered) {
-        final Ordered loadOrderAwareProvider = (Ordered) left;
-        priorityLeft = loadOrderAwareProvider.getOrder();
+        final Ordered orderedLeft = (Ordered) left;
+        priorityLeft = orderedLeft.getOrder();
       }
 
       if (right instanceof Ordered) {
-        final Ordered loadOrderAwareProvider = (Ordered) right;
-        priorityRight = loadOrderAwareProvider.getOrder();
+        final Ordered orderedRight = (Ordered) right;
+        priorityRight = orderedRight.getOrder();
       }
       if (priorityLeft == priorityRight) {
         return 0;
