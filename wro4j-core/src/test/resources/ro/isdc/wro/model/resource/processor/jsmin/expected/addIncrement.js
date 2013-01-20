@@ -1,2 +1,1 @@
-var idCounter = 0;
-var id = '' + ++idCounter;
+var idCounter=0;var id=''+++idCounter;
