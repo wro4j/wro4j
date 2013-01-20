@@ -206,13 +206,5 @@ public class ResourceWatcher {
     }
     return changeDetector;
   }
-
-  /**
-   * Clear the change detector. Used to purge the data cached by change detector. This is required to handle correctly
-   * the cache & model reset.
-   */
-  public void clear() {
-    changeDetector.clear();
-  }
 }
 

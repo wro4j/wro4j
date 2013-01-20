@@ -53,13 +53,6 @@ public class ResourceChangeDetector {
   }
 
   /**
-   * Removes all entries from the map holding the change details.
-   */
-  public void clear() {
-    changeInfoMap.clear();
-  }
-
-  /**
    * Check if an uri from a particular group has changed.
    * @param uri the uri to check for change.
    * @param groupName the name of the group where the uri belongs to.

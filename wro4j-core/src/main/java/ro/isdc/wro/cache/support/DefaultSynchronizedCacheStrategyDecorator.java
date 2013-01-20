@@ -159,6 +159,9 @@ public class DefaultSynchronizedCacheStrategyDecorator
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void clear() {
     super.clear();
@@ -166,6 +169,5 @@ public class DefaultSynchronizedCacheStrategyDecorator
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
       ((MutableResourceAuthorizationManager) authorizationManager).clear();
     }
-    resourceWatcher.clear();
   }
 }
