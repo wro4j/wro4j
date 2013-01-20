@@ -159,6 +159,9 @@ public class DefaultSynchronizedCacheStrategyDecorator
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void clear() {
     super.clear();
