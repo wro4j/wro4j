@@ -166,5 +166,6 @@ public class DefaultSynchronizedCacheStrategyDecorator
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
       ((MutableResourceAuthorizationManager) authorizationManager).clear();
     }
+    resourceWatcher.clear();
   }
 }
