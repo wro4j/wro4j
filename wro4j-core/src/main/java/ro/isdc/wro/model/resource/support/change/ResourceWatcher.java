@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -60,7 +61,7 @@ public class ResourceWatcher {
     final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
-      final Group group = modelFactory.create().getGroupByName(cacheEntry.getGroupName());
+      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheEntry.getGroupName());
       if (isGroupChanged(group.collectResourcesOfType(cacheEntry.getType()))) {
         onGroupChanged(cacheEntry);
       }

@@ -20,6 +20,7 @@ import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -68,7 +69,7 @@ public class GroupsProcessor {
           cacheKey.getGroupName(), cacheKey.getType());
       // find processed result for a group
       final WroModel model = modelFactory.create();
-      final Group group = model.getGroupByName(cacheKey.getGroupName());
+      final Group group = new WroModelInspector(model).getGroupByName(cacheKey.getGroupName());
       final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
       if (filteredGroup.getResources().isEmpty()) {
         LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
