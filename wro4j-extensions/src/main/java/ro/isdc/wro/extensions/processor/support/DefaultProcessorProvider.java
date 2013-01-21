@@ -26,8 +26,10 @@ import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeCoffeeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.NodeTypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.RhinoCoffeeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.RhinoTypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.TypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -250,10 +252,22 @@ public class DefaultProcessorProvider
         return new HandlebarsJsProcessor();
       }
     }));
+    map.put(RhinoTypeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new RhinoTypeScriptProcessor();
+      }
+    }));
     map.put(TypeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
         return new TypeScriptProcessor();
+      }
+    }));
+    map.put(NodeTypeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+      @Override
+      protected ResourcePreProcessor initialize() {
+        return new NodeTypeScriptProcessor();
       }
     }));
     map.put(EmberJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
