@@ -3,7 +3,6 @@ package ro.isdc.wro.extensions.processor.support.emberjs;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 
-import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
 
@@ -15,8 +14,8 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
 public class EmberJs
     extends AbstractJsTemplateCompiler {
 
-  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.1.js";
-  private static final String DEFAULT_EMBER_JS = "ember-1.0.0.pre2.js";
+  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.2.js";
+  private static final String DEFAULT_EMBER_JS = "ember-1.0.0-pre.4.js";
   private static final String DEFAULT_HEADLESS_EMBER_JS = "headless-ember.js";
 
   /**
@@ -36,7 +35,7 @@ public class EmberJs
 
   @Override
   protected InputStream getCompilerAsStream() {
-    final InputStream handlebars = HandlebarsJs.class.getResourceAsStream(DEFAULT_HANDLEBARS_JS);
+    final InputStream handlebars = EmberJs.class.getResourceAsStream(DEFAULT_HANDLEBARS_JS);
     final InputStream headlessEmber = EmberJs.class.getResourceAsStream(DEFAULT_HEADLESS_EMBER_JS);
     final InputStream ember = EmberJs.class.getResourceAsStream(DEFAULT_EMBER_JS);
     return new SequenceInputStream(new SequenceInputStream(handlebars, headlessEmber), ember);
