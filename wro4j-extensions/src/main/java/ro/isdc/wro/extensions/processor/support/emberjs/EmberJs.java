@@ -15,8 +15,8 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
 public class EmberJs
     extends AbstractJsTemplateCompiler {
 
-  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.1.js";
-  private static final String DEFAULT_EMBER_JS = "ember-1.0.0.pre2.js";
+  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.2.js";
+  private static final String DEFAULT_EMBER_JS = "ember-1.0.0-pre.4.js";
   private static final String DEFAULT_HEADLESS_EMBER_JS = "headless-ember.js";
 
   /**
