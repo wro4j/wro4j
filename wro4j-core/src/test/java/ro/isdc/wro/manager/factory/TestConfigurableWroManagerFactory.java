@@ -355,7 +355,9 @@ public class TestConfigurableWroManagerFactory {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableCacheStrategy.KEY, MemoryCacheStrategy.ALIAS);
     victim.setConfigProperties(configProperties);
-    final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) victim.create().getCacheStrategy()).getConfiguredStrategy();
+
+    final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) AbstractDecorator.getOriginalDecoratedObject(victim
+        .create().getCacheStrategy())).getConfiguredStrategy();
     Assert.assertEquals(MemoryCacheStrategy.class, actual.getClass());
   }
 
@@ -370,15 +372,13 @@ public class TestConfigurableWroManagerFactory {
     victim.create().getCacheStrategy().clear();
   }
 
-  /**
-   * TODO Implement
-   */
   @Test
   public void shouldUseConfiguredRequestHandler() throws Exception {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableCacheStrategy.KEY, MemoryCacheStrategy.ALIAS);
     victim.setConfigProperties(configProperties);
-    final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) victim.create().getCacheStrategy()).getConfiguredStrategy();
+    final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) AbstractDecorator.getOriginalDecoratedObject(victim
+        .create().getCacheStrategy())).getConfiguredStrategy();
     Assert.assertEquals(MemoryCacheStrategy.class, actual.getClass());
   }
 
