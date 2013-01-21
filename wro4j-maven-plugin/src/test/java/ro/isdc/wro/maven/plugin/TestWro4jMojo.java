@@ -70,7 +70,6 @@ public class TestWro4jMojo {
   private BuildContext mockBuildContext;
   @Mock
   private HashStrategy mockHashStrategy;
-  @Mock
   private UriLocatorFactory mockLocatorFactory;
   @Mock
   private UriLocator mockLocator;
@@ -86,8 +85,16 @@ public class TestWro4jMojo {
   public void setUp()
     throws Exception {
     MockitoAnnotations.initMocks(this);
-    when(mockLocatorFactory.getInstance(Mockito.anyString())).thenReturn(mockLocator);
+    mockLocatorFactory = new UriLocatorFactory() {
+      public InputStream locate(final String uri)
+          throws IOException {
+        return mockLocator.locate(uri);
+      }
 
+      public UriLocator getInstance(final String uri) {
+        return mockLocator;
+      }
+    };
     Context.set(Context.standaloneContext());
     mojo = new Wro4jMojo();
     setUpMojo(mojo);
@@ -484,6 +491,7 @@ public class TestWro4jMojo {
     mojo.setBuildContext(mockBuildContext);
 
     //incremental build detects no change
+    System.out.println("targetGroupAsList: " + mojo.getTargetGroupsAsList());
     assertTrue(mojo.getTargetGroupsAsList().isEmpty());
 
     when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));

@@ -56,7 +56,7 @@ public class TypeScriptCompiler {
   private void throwCompilationError(final NativeArray errors) {
     final StringBuilder sb = new StringBuilder();
     for (final Object error : errors) {
-      sb.append(errors.get(error).toString()).append("\n");
+      sb.append(error.toString()).append("\n");
     }
     LOG.error("Compilation errors: {}", sb);
     throw new WroRuntimeException(sb.toString());
