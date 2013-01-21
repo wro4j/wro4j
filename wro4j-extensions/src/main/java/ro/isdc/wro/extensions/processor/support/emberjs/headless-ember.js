@@ -1,7 +1,9 @@
 // DOM
 var Element = {};
 Element.firstChild = function () { return Element; };
+Element.childNodes = [Element, Element, Element];
 Element.innerHTML = function () { return Element; };
+Element.nodeValue = '';
 
 var document = { createRange: false, createElement: function() { return Element; } };
 var window = this;
@@ -15,7 +17,7 @@ console.log = console.info = console.warn = console.error = function(){};
 var jQuery = window.jQuery = function() { return jQuery; };
 jQuery.ready = function() { return jQuery; };
 jQuery.inArray = function() { return jQuery; };
-jQuery.jquery = "1.7.2";
+jQuery.jquery = "1.9.0";
 jQuery.event = { fixHooks: {} };
 var $ = jQuery;
 

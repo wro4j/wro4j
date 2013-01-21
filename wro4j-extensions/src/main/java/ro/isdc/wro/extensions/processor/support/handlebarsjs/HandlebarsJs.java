@@ -19,7 +19,7 @@ public class HandlebarsJs extends AbstractJsTemplateCompiler {
   public static final String HANDLEBARS_JS_TEMPLATES_INIT = "(function() { var template = Handlebars.template, "
       + "templates = Handlebars.templates = Handlebars.templates || {};";
 
-  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.1.js";
+  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.2.js";
 
   @Override
   public String compile(final String content, final String name) {
