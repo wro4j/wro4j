@@ -14,7 +14,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.Less4jProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -75,7 +74,7 @@ public class TestLess4jProcessor {
         try {
           processor.process(null, new FileReader(input), new StringWriter());
           Assert.fail("Expected to fail, but didn't");
-        } catch (final WroRuntimeException e) {
+        } catch (final Exception e) {
           //expected to throw exception, continue
         }
         return null;

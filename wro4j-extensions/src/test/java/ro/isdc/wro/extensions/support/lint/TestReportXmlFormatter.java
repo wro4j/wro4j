@@ -1,6 +1,7 @@
 package ro.isdc.wro.extensions.support.lint;
 
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.processor.support.linter.LinterError;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -41,6 +43,13 @@ public class TestReportXmlFormatter {
       throws Exception {
     final URL url = getClass().getResource("formatter/xml/lint");
     checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.LINT);
+  }
+
+  @Test
+  public void shouldCreateJsLintFormatReportFromFolder()
+      throws Exception {
+    final URL url = getClass().getResource("formatter/xml/jslint");
+    checkFormattedReportsFromFolder(url, ReportXmlFormatter.FormatterType.JSLINT);
   }
 
   @Test
@@ -80,5 +89,13 @@ public class TestReportXmlFormatter {
             new WriterOutputStream(writer));
       }
     });
+  }
+
+  @Test
+  public void shouldReturnCorrectFormatterByName() {
+    assertEquals(FormatterType.LINT, FormatterType.getByFormat("lint-xml"));
+    assertEquals(FormatterType.CSSLINT, FormatterType.getByFormat("csslint-xml"));
+    assertEquals(FormatterType.CHECKSTYLE, FormatterType.getByFormat("checkstyle-xml"));
+    assertEquals(null, FormatterType.getByFormat("INVALID"));
   }
 }
