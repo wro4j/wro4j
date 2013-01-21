@@ -23,7 +23,7 @@ import ro.isdc.wro.util.WroTestUtils;
 /**
  * @author Alex Objelean
  */
-public class TestCoffeeScriptProcessor {
+public class TestTypeScriptProcessor {
   @Mock
   private Resource mockResource;
   @Mock
@@ -31,9 +31,9 @@ public class TestCoffeeScriptProcessor {
   @Mock
   private Writer mockWriter;
   @Mock
-  private NodeCoffeeScriptProcessor mockNodeProcessor;
+  private NodeTypeScriptProcessor mockNodeProcessor;
   @Mock
-  private ResourceProcessor mockFallbackProcessor;
+  private ResourceProcessor mockRhinoProcessor;
   private ResourceProcessor victim;
 
   @Before
@@ -48,7 +48,7 @@ public class TestCoffeeScriptProcessor {
 
           @Override
           protected ResourceProcessor createFallbackProcessor() {
-            return mockFallbackProcessor;
+            return mockRhinoProcessor;
           }
 
           @Override
@@ -66,7 +66,7 @@ public class TestCoffeeScriptProcessor {
     when(mockNodeProcessor.isSupported()).thenReturn(true);
     victim.process(mockResource, mockReader, mockWriter);
     verify(mockNodeProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
-    verify(mockFallbackProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
+    verify(mockRhinoProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
   }
 
   @Test
@@ -74,11 +74,11 @@ public class TestCoffeeScriptProcessor {
     when(mockNodeProcessor.isSupported()).thenReturn(false);
     victim.process(mockResource, mockReader, mockWriter);
     verify(mockNodeProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
-    verify(mockFallbackProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
+    verify(mockRhinoProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
   }
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
-    WroTestUtils.assertProcessorSupportResourceTypes(new CoffeeScriptProcessor(), ResourceType.JS);
+    WroTestUtils.assertProcessorSupportResourceTypes(new TypeScriptProcessor(), ResourceType.JS);
   }
 }

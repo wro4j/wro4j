@@ -62,12 +62,12 @@ public class TestLessCssProcessor {
       protected ResourceProcessor initialize() {
         return new LessCssProcessor() {
           @Override
-          ResourceProcessor createRhinoProcessor() {
+          protected ResourceProcessor createFallbackProcessor() {
             return mockRhinoProcessor;
           }
 
           @Override
-          NodeLessCssProcessor createNodeProcessor() {
+          protected ResourceProcessor createNodeProcessor() {
             return mockNodeProcessor;
           }
         };
