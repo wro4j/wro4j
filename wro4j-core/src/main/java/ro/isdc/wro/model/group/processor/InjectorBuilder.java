@@ -25,6 +25,7 @@ import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.resource.locator.factory.InjectorAwareResourceLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -63,9 +64,7 @@ public class InjectorBuilder {
     protected ResourceLocatorFactory initialize() {
       final WroManager manager = managerFactory.create();
       // update manager with new decorated factory
-//      manager.setResourceLocatorFactory(InjectorAwareResourceLocatorFactoryDecorator.decorate(
-//          manager.getResourceLocatorFactory(), injector));
-      return manager.getResourceLocatorFactory();
+      return InjectorAwareResourceLocatorFactoryDecorator.decorate(manager.getResourceLocatorFactory(), injector);
     }
   };
   private final LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
