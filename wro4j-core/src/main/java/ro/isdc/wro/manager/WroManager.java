@@ -36,7 +36,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -58,7 +57,10 @@ import ro.isdc.wro.util.Transformer;
 /**
  * Contains all the factories used by optimizer in order to perform the logic. This object should be created through
  * {@link WroManagerFactory}, in order to ensure that all dependencies are injected properly. In other words, avoid
- * setting the fields explicitly after creating a new instance of {@link WroManager}
+ * setting the fields explicitly after creating a new instance of {@link WroManager}.
+ * <p>
+ * Most of the fields of this class are annotated with @Inject, in order to ensure that each instance can benefit use
+ * <code>@Inject</code> annotation on its fields.
  *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
@@ -66,28 +68,38 @@ import ro.isdc.wro.util.Transformer;
 public class WroManager
     implements WroConfigurationChangeListener {
   private static final Logger LOG = LoggerFactory.getLogger(WroManager.class);
+  @Inject
   private final WroModelFactory modelFactory;
+  @Inject
   private final GroupExtractor groupExtractor;
   /**
    * A cacheStrategy used for caching processed results. <GroupName, processed result>.
    */
+  @Inject
   private final CacheStrategy<CacheKey, CacheValue> cacheStrategy;
+  @Inject
   private final ProcessorsFactory processorsFactory;
+  @Inject
   private final UriLocatorFactory locatorFactory;
   /**
    * Rename the file name based on its original name and content.
    */
+  @Inject
   private final NamingStrategy namingStrategy;
+  @Inject
   private LifecycleCallbackRegistry callbackRegistry;
-  private GroupsProcessor groupsProcessor;
   /**
    * HashBuilder for creating a hash based on the processed content.
    */
+  @Inject
   private final HashStrategy hashStrategy;
   @Inject
   private ResourceBundleProcessor resourceBundleProcessor;
+  @Inject
   private final ResourceAuthorizationManager authorizationManager;
+  @Inject
   private final CacheKeyFactory cacheKeyFactory;
+  @Inject
   private final MetaDataFactory metaDataFactory;
   /**
    * Schedules the model update.
@@ -248,10 +260,6 @@ public class WroManager
     return groupExtractor;
   }
 
-  public final GroupsProcessor getGroupsProcessor() {
-    return this.groupsProcessor;
-  }
-
   public CacheKeyFactory getCacheKeyFactory() {
     return cacheKeyFactory;
   }
@@ -299,10 +307,12 @@ public class WroManager
     return authorizationManager;
   }
 
-  private static class EmptyModelFactory implements WroModelFactory {
+  private static class EmptyModelFactory
+      implements WroModelFactory {
     public WroModel create() {
       return new WroModel();
     }
+
     public void destroy() {
     }
   }

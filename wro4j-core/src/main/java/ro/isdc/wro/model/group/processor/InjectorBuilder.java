@@ -65,7 +65,6 @@ public class InjectorBuilder {
    * Factory method which uses a managerFactory to initialize injected fields.
    */
   public static InjectorBuilder create(final WroManagerFactory managerFactory) {
-    Validate.notNull(managerFactory);
     return new InjectorBuilder(managerFactory);
   }
 
