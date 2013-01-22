@@ -425,8 +425,7 @@ public class TestWro4jMojo {
         final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
         final StandaloneContextAwareManagerFactory spiedFactory = Mockito.spy(factory);
 
-        final WroManager manager = factory.create();
-        manager.setHashStrategy(mockHashStrategy);
+        final WroManager manager = new WroManager.Builder(factory.create()).setHashStrategy(mockHashStrategy).build();
 
         Mockito.when(spiedFactory.create()).thenReturn(manager);
         return spiedFactory;

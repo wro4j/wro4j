@@ -15,7 +15,6 @@ import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
-import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -24,10 +23,8 @@ import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.resource.locator.factory.InjectorAwareResourceLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -66,19 +63,15 @@ public class InjectorBuilder {
     protected ResourceLocatorFactory initialize() {
       final WroManager manager = managerFactory.create();
       // update manager with new decorated factory
-      manager.setResourceLocatorFactory(InjectorAwareResourceLocatorFactoryDecorator.decorate(
-          manager.getResourceLocatorFactory(), injector));
+//      manager.setResourceLocatorFactory(InjectorAwareResourceLocatorFactoryDecorator.decorate(
+//          manager.getResourceLocatorFactory(), injector));
       return manager.getResourceLocatorFactory();
     }
   };
   private final LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
     @Override
     protected WroModelFactory initialize() {
-      final WroManager manager = managerFactory.create();
-      // update manager with new decorated factory
-      manager.setModelFactory(DefaultWroModelFactoryDecorator.decorate(manager.getModelFactory(),
-          manager.getModelTransformers()));
-      return manager.getModelFactory();
+      return managerFactory.create().getModelFactory();
     }
   };
   /**
@@ -87,10 +80,7 @@ public class InjectorBuilder {
   private final LazyInitializer<CacheStrategy<CacheKey, CacheValue>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheKey, CacheValue>>() {
     @Override
     protected CacheStrategy<CacheKey, CacheValue> initialize() {
-      final WroManager manager = managerFactory.create();
-      // update manager with new decorated strategy
-      manager.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(manager.getCacheStrategy()));
-      return manager.getCacheStrategy();
+      return managerFactory.create().getCacheStrategy();
     }
   };
 

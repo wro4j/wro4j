@@ -70,6 +70,9 @@ public class GroupsProcessor {
       // find processed result for a group
       final WroModel model = modelFactory.create();
       final Group group = new WroModelInspector(model).getGroupByName(cacheKey.getGroupName());
+      if (group == null) {
+        throw new WroRuntimeException("No such group available in the model: " + cacheKey.getGroupName());
+      }
       final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
       if (filteredGroup.getResources().isEmpty()) {
         LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());

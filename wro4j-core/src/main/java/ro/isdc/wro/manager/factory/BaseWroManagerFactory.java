@@ -18,14 +18,17 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
+import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
@@ -73,7 +76,7 @@ public class BaseWroManagerFactory
   private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
     @Override
     protected WroManager initialize() {
-      final WroManager manager = new WroManager();
+      final WroManager.Builder managerBuilder = new WroManager.Builder();
       if (modelFactory == null) {
         modelFactory = newModelFactory();
       }
@@ -109,18 +112,18 @@ public class BaseWroManagerFactory
         metaDataFactory = newMetaDataFactory();
       }
 
-      manager.setGroupExtractor(groupExtractor);
-      manager.setCacheStrategy(cacheStrategy);
-      manager.setHashStrategy(hashStrategy);
-      manager.setResourceLocatorFactory(locatorFactory);
-      manager.setProcessorsFactory(processorsFactory);
-      manager.setNamingStrategy(namingStrategy);
-      manager.setModelFactory(modelFactory);
-      manager.setModelTransformers(modelTransformers);
-      manager.setResourceAuthorizationManager(authorizationManager);
-      manager.setCacheKeyFactory(cacheKeyFactory);
-      manager.setMetaDataFactory(metaDataFactory);
-
+      managerBuilder.setGroupExtractor(groupExtractor);
+      managerBuilder.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(cacheStrategy));
+      managerBuilder.setHashStrategy(hashStrategy);
+      managerBuilder.setLocatorFactory(locatorFactory);
+      managerBuilder.setProcessorsFactory(processorsFactory);
+      managerBuilder.setNamingStrategy(namingStrategy);
+      managerBuilder.setModelTransformers(modelTransformers);
+      managerBuilder.setModelFactory(DefaultWroModelFactoryDecorator.decorate(modelFactory, modelTransformers));
+      managerBuilder.setAuthorizationManager(authorizationManager);
+      managerBuilder.setCacheKeyFactory(cacheKeyFactory);
+      managerBuilder.setMetaDataFactory(metaDataFactory);
+      final WroManager manager = managerBuilder.build();
       onAfterInitializeManager(manager);
 
       return manager;

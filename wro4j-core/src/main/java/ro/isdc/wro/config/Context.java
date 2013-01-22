@@ -227,7 +227,6 @@ public class Context
     this.aggregatedFolderPath = aggregatedFolderPath;
   }
 
-
   /**
    * Perform context clean-up.
    */
@@ -263,7 +262,6 @@ public class Context
     validateContext();
     return CORRELATION_ID.get();
   }
-
 
   /**
    * {@inheritDoc}
