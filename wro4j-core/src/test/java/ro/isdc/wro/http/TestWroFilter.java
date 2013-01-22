@@ -51,10 +51,9 @@ import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
-import ro.isdc.wro.manager.factory.SimpleWroManagerFactory;
+import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -549,7 +548,7 @@ public class TestWroFilter {
   @Test
   public void modelShouldBeReloadedWhenReloadIsTriggered()
       throws Exception {
-    final WroManagerFactory wroManagerFactory = new BaseWroManagerFactory().setModelFactory(new WroModelFactory() {
+    final WroManagerFactory wroManagerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(new WroModelFactory() {
       private boolean wasCreated = false;
 
       public WroModel create() {
@@ -564,7 +563,7 @@ public class TestWroFilter {
 
       public void destroy() {
       }
-    });
+    }));
     Context.set(Context.standaloneContext());
 
     final WroFilter filter = new WroFilter() {
@@ -714,17 +713,12 @@ public class TestWroFilter {
 
     prepareValidRequest(config);
 
-    final WroManager manager = ((AbstractDecorator<WroManagerFactory>) victim.getWroManagerFactory())
-        .getOriginalDecoratedObject().create();
-    final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
-    // configure spied proxy for mocking
-
-    final WroManager mockedManager = new WroManager.Builder(manager).setModelFactory(proxyModelFactory).build();
-    victim.setWroManagerFactory(new SimpleWroManagerFactory(mockedManager));
+    final WroModelFactory mockModelFactory = Mockito.spy(createValidModelFactory());
+    victim.setWroManagerFactory(new BaseWroManagerFactory().setModelFactory(mockModelFactory));
 
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
 
-    verify(proxyModelFactory).destroy();
+    verify(mockModelFactory).destroy();
   }
 
   private void prepareValidRequest(final WroConfiguration config)
@@ -744,16 +738,12 @@ public class TestWroFilter {
 
     prepareValidRequest(config);
 
-    final WroManager manager = ((AbstractDecorator<WroManagerFactory>) victim.getWroManagerFactory())
-        .getOriginalDecoratedObject().create();
-    final WroModelFactory proxyModelFactory = Mockito.spy(manager.getModelFactory());
-
-    final WroManager mockedManager = new WroManager.Builder(manager).setModelFactory(proxyModelFactory).build();
-    victim.setWroManagerFactory(new SimpleWroManagerFactory(mockedManager));
+    final WroModelFactory mockModelFactory = Mockito.spy(createValidModelFactory());
+    victim.setWroManagerFactory(new BaseWroManagerFactory().setModelFactory(mockModelFactory));
 
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
 
-    verify(proxyModelFactory, Mockito.never()).destroy();
+    verify(mockModelFactory, Mockito.never()).destroy();
   }
 
   @Test(expected = NullPointerException.class)
