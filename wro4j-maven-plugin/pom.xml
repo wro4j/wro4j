@@ -28,39 +28,38 @@
 			<artifactId>maven-plugin-api</artifactId>
 		</dependency>
 		<!-- By default it has 'test' scope, here it must be 'compile' -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.shared</groupId>
-			<artifactId>maven-plugin-testing-harness</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.plexus</groupId>
-			<artifactId>plexus-build-api</artifactId>
-			<version>0.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-embedder</artifactId>
-			<version>2.0.4</version>
-		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-plugin-testing-harness</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.plexus</groupId>
+            <artifactId>plexus-build-api</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-embedder</artifactId>
+            <version>2.0.4</version>
+        </dependency>
 		<!-- Add explicitly compile scope, because it is by default test -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-</project>  
-  
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>
