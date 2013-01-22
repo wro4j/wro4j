@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Apply <a href="https://github.com/douglascrockford/JSLint">JsLint</a> script checking utility.
  * <p/>
- * Using untagged version (committed: 2012-11-19 07:22:27)
+ * Using untagged version (committed: 2013-01-02 02:54:38)
  *
  * @author Alex Objelean
  * @since 1.4.2

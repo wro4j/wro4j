@@ -1,0 +1,26 @@
+#functions {
+  color: color("red");
+  width: increment(15);
+  height: undefined("self");
+  border-width: add(2, 3);
+  variable: increment(10);
+}
+#built-in {
+  escaped: -Some::weird(#thing, y);
+  lighten: lighten(#ff0000, 40%);
+  darken: darken(#ff0000, 40%);
+  saturate: saturate(#29332f, 20%);
+  desaturate: desaturate(#203c31, 20%);
+  greyscale: greyscale(#203c31);
+  spin-p: spin(hsl(340, 50%, 50%), 40);
+  spin-n: spin(hsl(30, 50%, 50%), -40);
+  format: "rgb(32, 128, 64)";
+  format-string: "hello world";
+  eformat: rgb(32, 128, 64);
+  hue: hue(hsl(98, 12%, 95%));
+  saturation: saturation(hsl(98, 12%, 95%));
+  lightness: lightness(hsl(98, 12%, 95%));
+}
+#alpha {
+  alpha: darken(hsla(25, 50%, 50%, 0.6), 10%);
+}

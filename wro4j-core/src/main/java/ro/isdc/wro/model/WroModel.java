@@ -42,7 +42,7 @@ public final class WroModel {
   public final Collection<Group> getGroups() {
     return Collections.unmodifiableSet(groups);
   }
-  
+
   /**
    * @return a set of group names.
    * @deprecated use {@link WroModelInspector#getGroupNames()}
@@ -98,13 +98,15 @@ public final class WroModel {
    * @return group with searched name.
    * @throws runtime
    *           exception if group is not found.
+   * @deprecated use {@link WroModelInspector#getGroupByName(String)}
    */
+  @Deprecated
   public Group getGroupByName(final String name) {
     final WroModelInspector modelInspector = new WroModelInspector(this);
     final Group group = modelInspector.getGroupByName(name);
     if (group == null) {
       throw new InvalidGroupNameException(String.format("There is no such group: '%s'. Available groups are: [%s]", name,
-          modelInspector.getGroupNamesAsString()));  
+          modelInspector.getGroupNamesAsString()));
     }
     return group;
   }
@@ -121,7 +123,8 @@ public final class WroModel {
       if (new WroModelInspector(this).getGroupNames().contains(groupName)) {
         throw new WroRuntimeException("Duplicate group name detected: " + groupName);
       }
-      addGroup(importedModel.getGroupByName(groupName));
+      final Group importedGroup = new WroModelInspector(importedModel).getGroupByName(groupName);
+      addGroup(importedGroup);
     }
   }
 
@@ -134,7 +137,7 @@ public final class WroModel {
     groups.add(group);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -142,7 +145,7 @@ public final class WroModel {
   public boolean equals(final Object obj) {
     return EqualsBuilder.reflectionEquals(this, obj, true);
   }
-  
+
   /**
    * {@inheritDoc}
    */

@@ -36,7 +36,6 @@ import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
-import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -202,10 +201,8 @@ public class PreProcessorExecutor {
       return resourceContent;
     }
     Writer writer = null;
-    final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
       final ResourcePreProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
-      stopWatch.start("Processor: " + decoratedProcessor.toString());
 
       callbackRegistry.onBeforePreProcess();
 
@@ -217,13 +214,11 @@ public class PreProcessorExecutor {
         // use the outcome for next input
         resourceContent = writer.toString();
       } finally {
-        stopWatch.stop();
         callbackRegistry.onAfterPreProcess();
         reader.close();
         writer.close();
       }
     }
-    LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
 

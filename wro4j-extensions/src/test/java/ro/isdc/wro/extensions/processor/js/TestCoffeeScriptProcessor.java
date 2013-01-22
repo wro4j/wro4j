@@ -33,7 +33,7 @@ public class TestCoffeeScriptProcessor {
   @Mock
   private NodeCoffeeScriptProcessor mockNodeProcessor;
   @Mock
-  private ResourcePreProcessor mockRhinoProcessor;
+  private ResourcePreProcessor mockFallbackProcessor;
   private ResourcePreProcessor victim;
 
   @Before
@@ -47,12 +47,12 @@ public class TestCoffeeScriptProcessor {
         return new CoffeeScriptProcessor() {
 
           @Override
-          ResourcePreProcessor createRhinoProcessor() {
-            return mockRhinoProcessor;
+          protected ResourcePreProcessor createFallbackProcessor() {
+            return mockFallbackProcessor;
           }
 
           @Override
-          NodeCoffeeScriptProcessor createNodeProcessor() {
+          protected NodeCoffeeScriptProcessor createNodeProcessor() {
             return mockNodeProcessor;
           }
         };
@@ -66,7 +66,7 @@ public class TestCoffeeScriptProcessor {
     when(mockNodeProcessor.isSupported()).thenReturn(true);
     victim.process(mockResource, mockReader, mockWriter);
     verify(mockNodeProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
-    verify(mockRhinoProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
+    verify(mockFallbackProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
   }
 
   @Test
@@ -74,7 +74,7 @@ public class TestCoffeeScriptProcessor {
     when(mockNodeProcessor.isSupported()).thenReturn(false);
     victim.process(mockResource, mockReader, mockWriter);
     verify(mockNodeProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
-    verify(mockRhinoProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
+    verify(mockFallbackProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
   }
 
   @Test

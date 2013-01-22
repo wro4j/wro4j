@@ -163,19 +163,20 @@ public class TestInjector {
   @Test
   public void shouldNotChangeAfterInjectionSupportedNotNullObject()
       throws Exception {
-    final Callable<?> outer = new Callable<Void>() {
+    new Callable<Void>() {
       @Inject
       private final ResourcePreProcessor inner = new ResourcePreProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
             throws IOException {
         }
       };
+
       public Void call()
           throws Exception {
         Assert.assertNotNull(inner);
         return null;
       }
-    };
+    }.call();
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -202,6 +203,12 @@ public class TestInjector {
     };
     victim.inject(outer);
     outer.call();
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void cannotInjectOutsideOfContext() {
+    Context.unset();
+    victim.inject(new TestProcessor());
   }
 
   @After

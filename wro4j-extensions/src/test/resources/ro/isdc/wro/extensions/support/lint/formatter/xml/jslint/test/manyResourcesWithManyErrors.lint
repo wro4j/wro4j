@@ -1,0 +1,91 @@
+{
+  "reports": [
+    {
+      "lints": [
+        {
+          "line": 1,
+          "character": 2,
+          "reason": "reason1",
+          "evidence": "evidence1"
+        },
+        {
+          "line": 20,
+          "character": 5,
+          "reason": "reason2",
+          "evidence": "evidence2"
+        },
+        {
+          "line": 30,
+          "character": 7,
+          "reason": "reason3",
+          "evidence": "evidence3"
+        },
+        {
+          "line": 50,
+          "character": 8,
+          "reason": "reason4",
+          "evidence": "evidence4"
+        }
+      ],
+      "resourcePath": "/path/resource/1.js"
+    },
+      {
+      "lints": [
+        {
+          "line": 1,
+          "character": 2,
+          "reason": "reason1",
+          "evidence": "evidence1"
+        },
+        {
+          "line": 20,
+          "character": 5,
+          "reason": "reason2",
+          "evidence": "evidence2"
+        },
+        {
+          "line": 30,
+          "character": 7,
+          "reason": "reason3",
+          "evidence": "evidence3"
+        },
+        {
+          "line": 50,
+          "character": 8,
+          "reason": "reason4",
+          "evidence": "evidence4"
+        }
+      ],
+      "resourcePath": "/path/resource/2.js"
+    },
+      {
+      "lints": [
+        {
+          "line": 1,
+          "character": 2,
+          "reason": "reason1",
+          "evidence": "evidence1"
+        },
+        {
+          "line": 20,
+          "character": 5,
+          "reason": "reason2",
+          "evidence": "evidence2"
+        },
+        {
+          "line": 30,
+          "character": 7,
+          "reason": "reason3",
+          "evidence": "evidence3"
+        },
+        {
+          "line": 50,
+          "character": 8,
+          "reason": "reason4",
+          "evidence": "evidence4"
+        }
+      ],
+      "resourcePath": "/path/resource/3.js"
+    }
+  ]
+}

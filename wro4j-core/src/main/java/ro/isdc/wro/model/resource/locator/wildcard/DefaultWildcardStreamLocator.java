@@ -181,7 +181,8 @@ public class DefaultWildcardStreamLocator
         // preserve exception type if the exception is already an IOException
         throw e;
       } catch (final Exception e) {
-        throw new IOException("Exception during expanding wildcard: ", e);
+        LOG.debug("wildcard expanding error. Reporting original exception", e);
+        throw new IOException("Exception during expanding wildcard: " + e.getMessage());
       }
     }
   }

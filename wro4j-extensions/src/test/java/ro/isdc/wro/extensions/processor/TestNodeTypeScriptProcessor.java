@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
-import ro.isdc.wro.extensions.processor.js.TypeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.NodeTypeScriptProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -32,12 +32,12 @@ import ro.isdc.wro.util.WroTestUtils;
  *
  * @author Alex Objelean
  */
-public class TestTypeScriptProcessor {
+public class TestNodeTypeScriptProcessor {
   private static boolean isSupported = false;
   @BeforeClass
   public static void beforeClass() {
     //initialize this field only once.
-    isSupported = new TypeScriptProcessor().isSupported();
+    isSupported = new NodeTypeScriptProcessor().isSupported();
   }
 
   /**
@@ -51,7 +51,7 @@ public class TestTypeScriptProcessor {
   @Test
   public void testFromFolder()
       throws Exception {
-    final ResourcePostProcessor processor = new TypeScriptProcessor();
+    final ResourcePostProcessor processor = new NodeTypeScriptProcessor();
     final URL url = getClass().getResource("typescript");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -62,7 +62,7 @@ public class TestTypeScriptProcessor {
 
   @Test
   public void shouldBeThreadSafe() throws Exception {
-    final ResourcePreProcessor processor = new TypeScriptProcessor() {
+    final ResourcePreProcessor processor = new NodeTypeScriptProcessor() {
       @Override
       protected void onException(final Exception e, final String content) {
         throw WroRuntimeException.wrap(e);
@@ -88,7 +88,7 @@ public class TestTypeScriptProcessor {
   @Test
   public void shouldFailWhenInvalidTypeScriptIsProcessed()
       throws Exception {
-    final ResourcePreProcessor processor = new TypeScriptProcessor();
+    final ResourcePreProcessor processor = new NodeTypeScriptProcessor();
     final URL url = getClass().getResource("typescript");
 
     final File testFolder = new File(url.getFile(), "invalid");
@@ -109,6 +109,6 @@ public class TestTypeScriptProcessor {
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
-    WroTestUtils.assertProcessorSupportResourceTypes(new TypeScriptProcessor(), ResourceType.JS);
+    WroTestUtils.assertProcessorSupportResourceTypes(new NodeTypeScriptProcessor(), ResourceType.JS);
   }
 }

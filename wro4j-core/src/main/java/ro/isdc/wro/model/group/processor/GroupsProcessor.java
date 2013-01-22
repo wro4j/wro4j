@@ -20,6 +20,7 @@ import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
@@ -29,7 +30,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -70,7 +70,7 @@ public class GroupsProcessor {
           cacheKey.getGroupName(), cacheKey.getType());
       // find processed result for a group
       final WroModel model = modelFactory.create();
-      final Group group = model.getGroupByName(cacheKey.getGroupName());
+      final Group group = new WroModelInspector(model).getGroupByName(cacheKey.getGroupName());
       final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
       if (filteredGroup.getResources().isEmpty()) {
         LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
@@ -106,24 +106,20 @@ public class GroupsProcessor {
 
     Reader reader = new StringReader(content.toString());
     Writer writer = null;
-    final StopWatch stopWatch = new StopWatch();
     for (final ResourcePostProcessor processor : processors) {
       final ResourcePreProcessor decoratedProcessor = decorateProcessor(processor, cacheKey.isMinimize());
-      stopWatch.start("Using " + decoratedProcessor.toString());
       writer = new StringWriter();
       try {
         callbackRegistry.onBeforePostProcess();
         //the processor is invoked as a pre processor. This is important for correct computation of eligibility.
         decoratedProcessor.process(resource, reader, writer);
       } finally {
-        stopWatch.stop();
         callbackRegistry.onAfterPostProcess();
         IOUtils.closeQuietly(reader);
         IOUtils.closeQuietly(writer);
       }
       reader = new StringReader(writer.toString());
     }
-    LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
 
