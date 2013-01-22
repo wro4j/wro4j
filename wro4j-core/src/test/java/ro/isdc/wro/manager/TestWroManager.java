@@ -221,7 +221,7 @@ public class TestWroManager {
 
   @Test(expected = NullPointerException.class)
   public void cannotRegisterNullCallback() {
-    final WroManager manager = new WroManager();
+    final WroManager manager = new BaseWroManagerFactory().create();
     manager.registerCallback(null);
   }
 
@@ -515,7 +515,7 @@ public class TestWroManager {
 
   @Test
   public void shouldRegisterCallback() {
-    final WroManager manager = new WroManager();
+    final WroManager manager = new BaseWroManagerFactory().create();
     final LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
     manager.registerCallback(mockCallback);
     manager.getCallbackRegistry().onProcessingComplete();
