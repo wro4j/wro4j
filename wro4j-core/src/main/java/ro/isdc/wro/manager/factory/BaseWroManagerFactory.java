@@ -18,12 +18,10 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
-import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
 import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
@@ -39,7 +37,6 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
-import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.Transformer;
 
@@ -111,20 +108,41 @@ public class BaseWroManagerFactory
       if (metaDataFactory == null) {
         metaDataFactory = newMetaDataFactory();
       }
-
-      managerBuilder.setGroupExtractor(groupExtractor);
-      managerBuilder.setCacheStrategy(DefaultSynchronizedCacheStrategyDecorator.decorate(cacheStrategy));
-      managerBuilder.setHashStrategy(hashStrategy);
-      managerBuilder.setLocatorFactory(uriLocatorFactory);
-      managerBuilder.setProcessorsFactory(processorsFactory);
-      managerBuilder.setNamingStrategy(namingStrategy);
-
-      managerBuilder.setModelTransformers(modelTransformers);
-      managerBuilder.setModelFactory(DefaultWroModelFactoryDecorator.decorate(modelFactory, modelTransformers));
-      managerBuilder.setAuthorizationManager(authorizationManager);
-      managerBuilder.setCacheKeyFactory(cacheKeyFactory);
-      managerBuilder.setMetaDataFactory(metaDataFactory);
+      if (groupExtractor != null) {
+        managerBuilder.setGroupExtractor(groupExtractor);
+      }
+      if (cacheStrategy != null) {
+        managerBuilder.setCacheStrategy(cacheStrategy);
+      }
+      if (hashStrategy != null) {
+        managerBuilder.setHashStrategy(hashStrategy);
+      }
+      if (uriLocatorFactory != null) {
+        managerBuilder.setLocatorFactory(uriLocatorFactory);
+      }
+      if (processorsFactory != null) {
+        managerBuilder.setProcessorsFactory(processorsFactory);
+      }
+      if (namingStrategy != null) {
+        managerBuilder.setNamingStrategy(namingStrategy);
+      }
+      if (modelTransformers != null) {
+        managerBuilder.setModelTransformers(modelTransformers);
+      }
+      if (modelFactory != null) {
+        managerBuilder.setModelFactory(modelFactory);
+      }
+      if (authorizationManager != null) {
+        managerBuilder.setAuthorizationManager(authorizationManager);
+      }
+      if (cacheKeyFactory != null) {
+        managerBuilder.setCacheKeyFactory(cacheKeyFactory);
+      }
+      if (metaDataFactory != null) {
+        managerBuilder.setMetaDataFactory(metaDataFactory);
+      }
       final WroManager manager = managerBuilder.build();
+
       onAfterInitializeManager(manager);
       return manager;
     }
@@ -169,7 +187,6 @@ public class BaseWroManagerFactory
    * @return default implementation of modelTransformers.
    */
   protected List<Transformer<WroModel>> newModelTransformers() {
-    addModelTransformer(new WildcardExpanderModelTransformer());
     return this.modelTransformers;
   }
 
@@ -302,7 +319,6 @@ public class BaseWroManagerFactory
     return this;
   }
 
-
   /**
    * @param hashBuilder
    *          the hashBuilder to set
@@ -311,7 +327,6 @@ public class BaseWroManagerFactory
     this.hashStrategy = hashStrategy;
     return this;
   }
-
 
   public void setCacheKeyFactory(final CacheKeyFactory cacheKeyFactory) {
     this.cacheKeyFactory = cacheKeyFactory;

@@ -188,7 +188,7 @@ public class TestPreProcessorExecutor {
   @Test(expected = IOException.class)
   public void shouldFailWhenProcessingInvalidResource()
     throws Exception {
-    when(mockLocator.locate(Mockito.anyString())).thenThrow(IOException.class);
+    when(mockLocatorFactory.locate(Mockito.anyString())).thenThrow(IOException.class);
     Context.get().getConfig().setIgnoreMissingResources(false);
     shouldNotFailWhenProcessingInvalidResource();
   }

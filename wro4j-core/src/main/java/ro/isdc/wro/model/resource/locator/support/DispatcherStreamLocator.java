@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -35,8 +33,6 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class DispatcherStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
-  @Inject
-  private Injector injector;
   /**
    * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent
    * {@link StackOverflowError}.
@@ -122,7 +118,6 @@ public class DispatcherStreamLocator {
         return false;
       };
     };
-    injector.inject(locator);
     return locator;
   }
 
