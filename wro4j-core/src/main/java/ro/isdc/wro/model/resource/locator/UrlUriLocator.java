@@ -15,9 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
@@ -34,8 +32,6 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "uri";
-  @Inject
-  private ReadOnlyContext context;
   /**
    * {@inheritDoc}
    */
@@ -90,7 +86,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    * @return connection timeout in milliseconds. By default uses connection timeout from {@link WroConfiguration}.
    */
   private int getConnectionTimeout() {
-    return Context.isContextSet() ? context.getConfig().getConnectionTimeout()
+    return Context.isContextSet() ? Context.get().getConfig().getConnectionTimeout()
         : WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
   }
 }

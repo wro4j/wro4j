@@ -11,9 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
@@ -25,13 +23,11 @@ import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.resource.locator.factory.InjectorAwareUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
-import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.ProxyFactory;
 
@@ -56,31 +52,6 @@ public class InjectorBuilder {
    */
   private final Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
   private WroManagerFactory managerFactory;
-  private final LazyInitializer<UriLocatorFactory> locatorFactoryInitializer = new LazyInitializer<UriLocatorFactory>() {
-    @Override
-    protected UriLocatorFactory initialize() {
-      final WroManager manager = managerFactory.create();
-      // update manager with new decorated factory
-      final UriLocatorFactory locatorFactory = InjectorAwareUriLocatorFactoryDecorator.decorate(manager
-          .getUriLocatorFactory(), injector);
-      return locatorFactory;
-    }
-  };
-  private final LazyInitializer<WroModelFactory> modelFactoryInitializer = new LazyInitializer<WroModelFactory>() {
-    @Override
-    protected WroModelFactory initialize() {
-      return managerFactory.create().getModelFactory();
-    }
-  };
-  /**
-   * Ensure the strategy is decorated only once.
-   */
-  private final LazyInitializer<CacheStrategy<CacheKey, CacheValue>> cacheStrategyInitializer = new LazyInitializer<CacheStrategy<CacheKey, CacheValue>>() {
-    @Override
-    protected CacheStrategy<CacheKey, CacheValue> initialize() {
-      return managerFactory.create().getCacheStrategy();
-    }
-  };
 
   /**
    * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
@@ -137,8 +108,7 @@ public class InjectorBuilder {
   private Object createMetaDataFactoryProxy() {
     return new InjectorObjectFactory<MetaDataFactory>() {
       public MetaDataFactory create() {
-        final MetaDataFactory factory = managerFactory.create().getMetaDataFactory();
-        return factory;
+        return managerFactory.create().getMetaDataFactory();
       }
     };
   }
@@ -171,8 +141,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<LifecycleCallbackRegistry> createCallbackRegistryProxy() {
     return new InjectorObjectFactory<LifecycleCallbackRegistry>() {
       public LifecycleCallbackRegistry create() {
-        final LifecycleCallbackRegistry callbackRegistry = managerFactory.create().getCallbackRegistry();
-        return callbackRegistry;
+        return managerFactory.create().getCallbackRegistry();
       }
     };
   }
@@ -204,7 +173,7 @@ public class InjectorBuilder {
   private Object createLocatorFactoryProxy() {
     return new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        return locatorFactoryInitializer.get();
+        return managerFactory.create().getUriLocatorFactory();
       }
     };
   }
@@ -220,9 +189,7 @@ public class InjectorBuilder {
   private Object createModelFactoryProxy() {
     return new InjectorObjectFactory<WroModelFactory>() {
       public WroModelFactory create() {
-        final WroModelFactory modelFactory = modelFactoryInitializer.get();
-        //final WroModelFactory proxy = ProxyFactory.proxy(modelFactory, WroModelFactory.class).create();
-        return modelFactory;
+        return managerFactory.create().getModelFactory();
       }
     };
   }
@@ -230,9 +197,7 @@ public class InjectorBuilder {
   private Object createNamingStrategyProxy() {
     return new InjectorObjectFactory<NamingStrategy>() {
       public NamingStrategy create() {
-        final NamingStrategy namingStrategy = managerFactory.create().getNamingStrategy();
-        //final NamingStrategy proxy = new ProxyFactory<NamingStrategy>(namingStrategy, NamingStrategy.class).create();
-        return namingStrategy;
+        return managerFactory.create().getNamingStrategy();
       }
     };
   }
@@ -249,8 +214,7 @@ public class InjectorBuilder {
   private Object createCacheStrategyProxy() {
     return new InjectorObjectFactory<CacheStrategy>() {
       public CacheStrategy create() {
-        final CacheStrategy<CacheKey, CacheValue> decorated = cacheStrategyInitializer.get();
-        return decorated;
+        return managerFactory.create().getCacheStrategy();
       }
     };
   }
@@ -270,8 +234,7 @@ public class InjectorBuilder {
   private Object createCacheKeyFactoryProxy() {
     return new InjectorObjectFactory<CacheKeyFactory>() {
       public CacheKeyFactory create() {
-        final CacheKeyFactory factory = managerFactory.create().getCacheKeyFactory();
-        return factory;
+        return managerFactory.create().getCacheKeyFactory();
       }
     };
   }

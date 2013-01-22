@@ -491,7 +491,6 @@ public class TestWro4jMojo {
     mojo.setBuildContext(mockBuildContext);
 
     //incremental build detects no change
-    System.out.println("targetGroupAsList: " + mojo.getTargetGroupsAsList());
     assertTrue(mojo.getTargetGroupsAsList().isEmpty());
 
     when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
