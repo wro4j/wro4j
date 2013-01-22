@@ -67,7 +67,6 @@
     <commons-pool.version>1.6</commons-pool.version>
     <closure.version>r2388</closure.version>
     <slf4j.version>1.7.2</slf4j.version>    
-    <logback.version>1.0.9</logback.version>
     <maven.version>3.0.4</maven.version>    
     <mockito.version>1.9.5</mockito.version>
     <junit.version>4.10</junit.version>    
@@ -125,9 +124,10 @@
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
-	<groupId>ch.qos.logback</groupId>
-	<artifactId>logback-core</artifactId>
-	<version>${logback.version}</version>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -224,8 +224,8 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>        
     </dependency>
     <!-- For test -->
     <dependency>
