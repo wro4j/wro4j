@@ -60,7 +60,7 @@ public class BaseWroManagerFactory
    * A list of model transformers. Allows manager to mutate the model before it is being parsed and processed.
    */
   private List<Transformer<WroModel>> modelTransformers;
-  private UriLocatorFactory uriLocatorFactory;
+  private ResourceLocatorFactory locatorFactory;
   private ProcessorsFactory processorsFactory;
   private NamingStrategy namingStrategy;
   private ResourceAuthorizationManager authorizationManager;
@@ -117,8 +117,8 @@ public class BaseWroManagerFactory
       if (hashStrategy != null) {
         managerBuilder.setHashStrategy(hashStrategy);
       }
-      if (uriLocatorFactory != null) {
-        managerBuilder.setLocatorFactory(uriLocatorFactory);
+      if (locatorFactory != null) {
+        managerBuilder.setLocatorFactory(locatorFactory);
       }
       if (processorsFactory != null) {
         managerBuilder.setProcessorsFactory(processorsFactory);

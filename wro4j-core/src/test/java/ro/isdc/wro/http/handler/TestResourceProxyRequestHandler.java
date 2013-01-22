@@ -31,9 +31,9 @@ import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.WroUtil;
 
@@ -55,35 +55,35 @@ public class TestResourceProxyRequestHandler {
   @Mock
   private ResourceAuthorizationManager mockAuthorizationManager;
   @Mock
-  private UriLocatorFactory mockUriLocatorFactory;
+  private ResourceLocatorFactory mockLocatorFactory;
   @Mock
-  private UriLocator mockUriLocator;
-  
+  private ResourceLocator mockUriLocator;
+
   private OutputStream outputStream;
-  
+
   private ServletOutputStream servletOutputStream;
-  
+
   private String packagePath;
-  
+
   @Before
   public void setup()
       throws IOException {
     MockitoAnnotations.initMocks(this);
     victim = new ResourceProxyRequestHandler();
-    
+
     Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
     Context.set(Context.webContext(request, response, filterConfig));
     // a more elaborate way to build injector, used to instruct it use a different instance of authorizationManager
     final Injector injector = new InjectorBuilder(
-        new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).setResourceAuthorizationManager(
+        new BaseWroManagerFactory().setLocatorFactory(mockLocatorFactory).setResourceAuthorizationManager(
         mockAuthorizationManager)).build();
     injector.inject(victim);
-    
+
     when(mockLocatorFactory.getLocator(anyString())).thenReturn(mockUriLocator);
     when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
-    
+
     packagePath = WroUtil.toPackageAsFolder(this.getClass());
-    
+
     // Setup response writer
     outputStream = new ByteArrayOutputStream();
     servletOutputStream = new ServletOutputStream() {
@@ -94,122 +94,122 @@ public class TestResourceProxyRequestHandler {
       }
     };
     when(response.getOutputStream()).thenReturn(servletOutputStream);
-    
+
   }
-  
+
   @Test
   public void shouldAlwaysBeEnabled() {
     assertThat(victim.isEnabled(), is(true));
   }
-  
+
   @Test
   public void shouldAcceptCallsTo_wroResources() {
     when(request.getRequestURI()).thenReturn("/wro/wroResources?id=test.css");
     assertThat(victim.accept(request), is(true));
   }
-  
+
   @Test
   public void shouldNotAcceptCallsTo_OtherUris() {
     when(request.getRequestURI()).thenReturn("/wro/someOtherUri");
     assertThat(victim.accept(request), is(false));
   }
-  
+
   @Test
   public void shouldReturnClasspathResource()
       throws IOException {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    when(mockUriLocator.locate(anyString())).thenReturn(new ClasspathUriLocator().locate(resourceUri));
-    
+    when(mockUriLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
+
     victim.handle(request, response);
-    
-    String body = outputStream.toString();
-    String expectedBody = IOUtils.toString(getInputStream("test.css"));
-    
+
+    final String body = outputStream.toString();
+    final String expectedBody = IOUtils.toString(getInputStream("test.css"));
+
     assertThat(body, is(expectedBody));
   }
-  
+
   @Test(expected = UnauthorizedRequestException.class)
   public void cannotProxyUnauthorizedResources()
       throws IOException {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(false);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    when(mockUriLocator.locate(anyString())).thenReturn(new ClasspathUriLocator().locate(resourceUri));
-    
+    when(mockUriLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
+
     victim.handle(request, response);
   }
-  
+
   @Test
   public void shouldReturnRelativeResource()
       throws IOException {
     final String resourceUri = "/" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
-    
+
     // Set up victim
-    when(mockUriLocator.locate(resourceUri)).thenReturn(getInputStream("test.css"));
+    when(mockUriLocator.getInputStream()).thenReturn(getInputStream("test.css"));
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    
+
     // Perform Action
     victim.handle(request, response);
     final String body = outputStream.toString();
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
-    
-    verify(mockUriLocator, times(1)).locate(resourceUri);
+
+    verify(mockUriLocator, times(1)).getInputStream();
     assertThat(body, is(expectedBody));
   }
-  
+
   @Test
   public void shouldSetResponseLength()
       throws IOException {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    when(mockUriLocator.locate(anyString())).thenReturn(new ClasspathUriLocator().locate(resourceUri));
-    
+    when(mockUriLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
+
     victim.handle(request, response);
     final int expectedLength = IOUtils.toString(getInputStream("test.css")).length();
-    
+
     verify(response, times(1)).setContentLength(expectedLength);
   }
-  
+
   @Test
   public void shouldSetCSSContentType()
       throws IOException {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    
+
     victim.handle(request, response);
-    
+
     verify(response, times(1)).setContentType("text/css; charset=UTF-8");
   }
-  
+
   @Test
   public void shouldSetJSContentType()
       throws IOException {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.js";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    
+
     victim.handle(request, response);
-    
+
     verify(response, times(1)).setContentType("application/javascript; charset=UTF-8");
   }
-  
+
   @Test
   public void shouldSetPNGContentType()
       throws IOException {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.png";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    
+
     victim.handle(request, response);
-    
+
     verify(response, times(1)).setContentType("image/png");
   }
-  
+
   private InputStream getInputStream(final String filename)
       throws IOException {
     return this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);

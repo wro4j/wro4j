@@ -37,7 +37,7 @@ import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -322,7 +322,7 @@ public class WroManager
     private GroupExtractor groupExtractor = new DefaultGroupExtractor();
     private CacheStrategy<CacheKey, CacheValue> cacheStrategy = new LruMemoryCacheStrategy<CacheKey, CacheValue>();
     private ProcessorsFactory processorsFactory = new SimpleProcessorsFactory();
-    private ResourceLocatorFactory locatorFactory = new DefaultUriLocatorFactory();
+    private ResourceLocatorFactory locatorFactory = new DefaultResourceLocatorFactory();
     private NamingStrategy namingStrategy = new NoOpNamingStrategy();
     private LifecycleCallbackRegistry callbackRegistry = new LifecycleCallbackRegistry();
     private HashStrategy hashStrategy = new SHA1HashStrategy();

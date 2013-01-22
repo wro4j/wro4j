@@ -11,9 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
@@ -30,7 +28,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
-import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.ProxyFactory;
 
@@ -83,7 +80,7 @@ public class InjectorBuilder {
     map.put(LifecycleCallbackRegistry.class, createCallbackRegistryProxy());
     map.put(GroupExtractor.class, createGroupExtractorProxy());
     map.put(Injector.class, createInjectorProxy());
-    map.put(UriLocatorFactory.class, createLocatorFactoryProxy());
+    map.put(ResourceLocatorFactory.class, createLocatorFactoryProxy());
     map.put(ProcessorsFactory.class, createProcessorFactoryProxy());
     map.put(WroModelFactory.class, createModelFactoryProxy());
     map.put(NamingStrategy.class, createNamingStrategyProxy());
@@ -176,9 +173,9 @@ public class InjectorBuilder {
   }
 
   private Object createLocatorFactoryProxy() {
-    return new InjectorObjectFactory<UriLocatorFactory>() {
-      public UriLocatorFactory create() {
-        return locatorFactoryInitializer.get();
+    return new InjectorObjectFactory<ResourceLocatorFactory>() {
+      public ResourceLocatorFactory create() {
+        return managerFactory.create().getResourceLocatorFactory();
       }
     };
   }
