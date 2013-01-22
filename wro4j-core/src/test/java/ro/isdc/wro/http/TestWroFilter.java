@@ -97,16 +97,17 @@ public class TestWroFilter {
   private ResourceLocatorFactory mockLocatorFactory;
   @Mock
   private ResourceLocator mockLocator;
-  
+
   @Before
   public void setUp()
       throws Exception {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
-    
+
     when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
+    when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
     when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
-    
+
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);
     when(mockManagerFactory.create()).thenReturn(new BaseWroManagerFactory().create());
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
@@ -220,7 +221,8 @@ public class TestWroFilter {
         managerClass.getName());
 
     victim.init(mockFilterConfig);
-    final Class<?> actualClass = ((DefaultWroManagerFactory) AbstractDecorator.getOriginalDecoratedObject(victim.getWroManagerFactory())).getFactory().getClass();
+    final Class<?> actualClass = ((DefaultWroManagerFactory) AbstractDecorator.getOriginalDecoratedObject(victim
+        .getWroManagerFactory())).getFactory().getClass();
     Assert.assertSame(managerClass, actualClass);
   }
 
@@ -393,9 +395,8 @@ public class TestWroFilter {
 
       @Override
       Injector getInjector() {
-        return new InjectorBuilder(
-            new BaseWroManagerFactory().setLocatorFactory(mockLocatorFactory).setResourceAuthorizationManager(
-                mockAuthorizationManager)).build();
+        return new InjectorBuilder(new BaseWroManagerFactory().setLocatorFactory(mockLocatorFactory)
+            .setResourceAuthorizationManager(mockAuthorizationManager)).build();
       }
     };
   }
@@ -547,22 +548,23 @@ public class TestWroFilter {
   @Test
   public void modelShouldBeReloadedWhenReloadIsTriggered()
       throws Exception {
-    final WroManagerFactory wroManagerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(new WroModelFactory() {
-      private boolean wasCreated = false;
+    final WroManagerFactory wroManagerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory()
+        .setModelFactory(new WroModelFactory() {
+          private boolean wasCreated = false;
 
-      public WroModel create() {
-        if (!wasCreated) {
-          wasCreated = true;
-          // return model with no groups defined
-          return new WroModel();
-        }
-        // second time when created add one group
-        return new WroModel().addGroup(new Group("g1"));
-      }
+          public WroModel create() {
+            if (!wasCreated) {
+              wasCreated = true;
+              // return model with no groups defined
+              return new WroModel();
+            }
+            // second time when created add one group
+            return new WroModel().addGroup(new Group("g1"));
+          }
 
-      public void destroy() {
-      }
-    }));
+          public void destroy() {
+          }
+        }));
     Context.set(Context.standaloneContext());
 
     final WroFilter filter = new WroFilter() {
@@ -763,7 +765,8 @@ public class TestWroFilter {
   }
 
   @Test
-  public void shouldChainTheIncludedRequestByDispatcher() throws Exception {
+  public void shouldChainTheIncludedRequestByDispatcher()
+      throws Exception {
     when(mockRequest.getAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER)).thenReturn(Boolean.TRUE);
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verify(mockManagerFactory, Mockito.never()).create();
@@ -771,14 +774,16 @@ public class TestWroFilter {
   }
 
   @Test
-  public void shouldChainWhenFilterIsNotEnabled() throws Exception {
+  public void shouldChainWhenFilterIsNotEnabled()
+      throws Exception {
     victim.setEnable(false);
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verifyChainIsCalled(mockFilterChain);
   }
 
   @Test
-  public void shouldNotChainWhenFilterIsEnabled() throws Exception {
+  public void shouldNotChainWhenFilterIsEnabled()
+      throws Exception {
     prepareValidRequest(new WroConfiguration());
     victim.setEnable(true);
 
