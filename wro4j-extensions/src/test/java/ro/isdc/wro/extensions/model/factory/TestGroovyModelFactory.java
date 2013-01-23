@@ -7,6 +7,9 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +29,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.DefaultWroModelFactoryDecorator;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.RecursiveGroupDefinitionException;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -110,6 +114,22 @@ public class TestGroovyModelFactory {
     Assert.assertNotNull(factory.create());
   }
 
+  @Test
+  public void shouldSupportAbstractGroup() {
+    factory = new GroovyModelFactory() {
+      @Override
+      protected ResourceLocator getModelResourceLocator() {
+        return new UrlResourceLocator(TestGroovyModelFactory.class.getResource("abstractGroup.groovy"));
+      }
+    };
+    final WroModel model = factory.create();
+    assertNotNull(model);
+    assertEquals(1, model.getGroups().size());
+    final Group group = model.getGroups().iterator().next();
+    assertEquals("nonAbstractGroup", group.getName());
+    assertEquals(1, group.getResources().size());
+  }
+
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testRecursiveGroupReference() {
     factory = new GroovyModelFactory() {
@@ -168,7 +188,7 @@ public class TestGroovyModelFactory {
   }
 
   @Test
-  public void decoratedModelshouldBeThreadSafe()
+  public void decoratedModelShouldBeThreadSafe()
       throws Exception {
     final List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
     modelTransformers.add(new WildcardExpanderModelTransformer());
