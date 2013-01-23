@@ -39,9 +39,9 @@ import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
-import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -70,10 +70,9 @@ public class WroFilter
    */
   private WroConfiguration wroConfiguration;
   /**
-   * WroManagerFactory. The core of the optimizer. The {@link InjectableWroManagerFactoryDecorator} is used to force the
-   * injection during {@link WroManager} creation.
+   * WroManagerFactory. The core of the optimizer.
    */
-  private InjectableWroManagerFactoryDecorator wroManagerFactory;
+  private WroManagerFactory wroManagerFactory;
   /**
    * Used to create the collection of requestHandlers to apply
    */
@@ -85,6 +84,7 @@ public class WroFilter
    * true by default.
    */
   private boolean enable = true;
+  private Injector injector;
 
   /**
    * {@inheritDoc}
@@ -94,7 +94,7 @@ public class WroFilter
     this.filterConfig = config;
     // invoke createConfiguration method only if the configuration was not set.
     this.wroConfiguration = wroConfiguration == null ? createConfiguration() : wroConfiguration;
-    this.wroManagerFactory = new InjectableWroManagerFactoryDecorator(createWroManagerFactory());
+    this.wroManagerFactory = createWroManagerFactory();
     headersConfigurer = newResponseHeadersConfigurer();
     registerChangeListeners();
     initJMX();
@@ -120,7 +120,8 @@ public class WroFilter
   private WroManagerFactory createWroManagerFactory() {
     if (this.wroManagerFactory == null) {
       // TODO use a named helper
-      final WroManagerFactory managerFactoryAttribute = ServletContextAttributeHelper.create(filterConfig).getManagerFactory();
+      final WroManagerFactory managerFactoryAttribute = ServletContextAttributeHelper.create(filterConfig)
+          .getManagerFactory();
       LOG.debug("managerFactory attribute: {}", managerFactoryAttribute);
       return managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
     }
@@ -238,7 +239,8 @@ public class WroFilter
    *
    * @param map
    *          the {@link Map} where key represents the header name, and value - header value.
-   * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and {@link ResponseHeadersConfigurer#configureDefaultHeaders(Map)}
+   * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and
+   *             {@link ResponseHeadersConfigurer#configureDefaultHeaders(Map)}
    */
   @Deprecated
   protected void configureDefaultHeaders(final Map<String, String> map) {
@@ -315,7 +317,10 @@ public class WroFilter
    * @VisibleForTesting
    */
   Injector getInjector() {
-    return wroManagerFactory.getInjector();
+    if (injector == null) {
+      injector = InjectorBuilder.create(wroManagerFactory).build();
+    }
+    return injector;
   }
 
   /**
@@ -332,7 +337,7 @@ public class WroFilter
    * @return true if the filter should be applied or proceed with chain otherwise.
    */
   private boolean isFilterActive(final HttpServletRequest request) {
-    //prevent StackOverflowError by skipping the already included wro request
+    // prevent StackOverflowError by skipping the already included wro request
     return enable && !DispatcherStreamLocator.isIncludedRequest(request);
   }
 
@@ -344,8 +349,8 @@ public class WroFilter
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
-    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(
-        e.getMessage(), e);
+    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(e
+        .getMessage(), e);
     onRuntimeException(re, response, chain);
   }
 
@@ -391,11 +396,7 @@ public class WroFilter
    *          the wroManagerFactory to set
    */
   public void setWroManagerFactory(final WroManagerFactory wroManagerFactory) {
-    if (wroManagerFactory != null && !(wroManagerFactory instanceof InjectableWroManagerFactoryDecorator)) {
-      this.wroManagerFactory = new InjectableWroManagerFactoryDecorator(wroManagerFactory);
-    } else {
-      this.wroManagerFactory = (InjectableWroManagerFactoryDecorator) wroManagerFactory;
-    }
+    this.wroManagerFactory = wroManagerFactory;
   }
 
   /**
@@ -457,12 +458,12 @@ public class WroFilter
     this.wroConfiguration = config;
   }
 
-
   /**
    * Sets the enable flag used to toggle filter. This might be useful when the filter has to be enabled/disabled based
    * on environment configuration.
    *
-   * @param enable flag for enabling the {@link WroFilter}.
+   * @param enable
+   *          flag for enabling the {@link WroFilter}.
    */
   public void setEnable(final boolean enable) {
     this.enable = enable;

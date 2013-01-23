@@ -47,7 +47,6 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.runnable.ReloadModelRunnable;
@@ -93,13 +92,13 @@ public class TestWroManager {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
-        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class), Mockito.mock(
+        HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
 
     Context.set(context, newConfigWithUpdatePeriodValue(0));
 
-    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setResourceAuthorizationManager(
-        mockAuthorizationManager);
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory())
+        .setResourceAuthorizationManager(mockAuthorizationManager);
 
     final Injector injector = new InjectorBuilder(managerFactory).build();
     victim = managerFactory.create();
@@ -158,8 +157,7 @@ public class TestWroManager {
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
-      WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
-      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+      final WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
       managerFactory.create().process();
     }
   }
@@ -191,8 +189,8 @@ public class TestWroManager {
       managerFactory.create().process();
 
       // compare written bytes to output stream with the content from specified css.
-      final InputStream expectedInputStream = new UnclosableBufferedInputStream(
-          WroTestUtils.getInputStream(expectedResourceUri));
+      final InputStream expectedInputStream = new UnclosableBufferedInputStream(WroTestUtils
+          .getInputStream(expectedResourceUri));
       final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
       expectedInputStream.reset();
       WroTestUtils.compare(expectedInputStream, actualInputStream);
@@ -266,8 +264,7 @@ public class TestWroManager {
   @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
-    WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
-    factory = new InjectableWroManagerFactoryDecorator(factory);
+    final WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
 
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
@@ -288,7 +285,8 @@ public class TestWroManager {
   @Test
   public void testDuplicatedResourcesShouldBeSkipped()
       throws Exception {
-    new GenericTestBuilder().processAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
+    new GenericTestBuilder()
+        .processAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
 
   @Test
@@ -314,7 +312,8 @@ public class TestWroManager {
   @Test
   public void testWildcardGroupResources()
       throws Exception {
-    new GenericTestBuilder().processAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
+    new GenericTestBuilder()
+        .processAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
   }
 
   /**
@@ -382,8 +381,8 @@ public class TestWroManager {
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    final Context context = Context.webContext(request,
-        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    final Context context = Context.webContext(request, Mockito.mock(HttpServletResponse.class,
+        Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     final WroConfiguration config = new WroConfiguration();
     // make it run each 1 second
     config.setModelUpdatePeriod(1);
@@ -457,15 +456,15 @@ public class TestWroManager {
     final WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
     WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
-    managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+    managerFactory = managerFactory;
     managerFactory.create().process();
   }
 
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    final WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
-        new CRC32HashStrategy()));
+    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory())
+        .setHashStrategy(new CRC32HashStrategy());
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     assertEquals("daa1bb3c/g3.css?minimize=true", path);
@@ -474,8 +473,8 @@ public class TestWroManager {
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    final WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
-        new MD5HashStrategy()));
+    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory())
+        .setHashStrategy(new MD5HashStrategy());
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
@@ -506,7 +505,8 @@ public class TestWroManager {
     wroManager.process();
 
     // use original decorated object because the decorated one trigger the processing for each cache lookup.
-    final CacheStrategy<CacheKey, CacheValue> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager.getCacheStrategy());
+    final CacheStrategy<CacheKey, CacheValue> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager
+        .getCacheStrategy());
     Assert.assertNotNull(cacheStrategy.get(new CacheKey("g3", ResourceType.CSS, true)));
 
     final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager.getModelFactory());
