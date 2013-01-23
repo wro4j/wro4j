@@ -70,7 +70,7 @@ class GroupDelegate {
   def methodMissing(String name, args) {
     if (closures.containsKey(name)) throw new WroRuntimeException("This group is already defined : $name")
     int clIndex = 0
-      if (args.length == 2 && args[0] instanceof HashMap) {
+      if (args.length == 2 && args[0] instanceof Map) {
           clIndex++
           params.put(name,args[0])
       }
