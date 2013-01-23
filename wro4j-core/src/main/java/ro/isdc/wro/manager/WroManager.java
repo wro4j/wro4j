@@ -36,6 +36,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
@@ -428,7 +429,9 @@ public class WroManager
     }
 
     public WroManager build() {
-      return new WroManager(this);
+      final WroManager manager = new WroManager(this);
+      InjectorBuilder.create(manager).build().inject(manager);
+      return manager;
     }
   }
 }

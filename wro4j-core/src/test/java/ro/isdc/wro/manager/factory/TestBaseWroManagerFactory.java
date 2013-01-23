@@ -143,19 +143,21 @@ public class TestBaseWroManagerFactory {
 
   /**
    * TODO find a way to test manager thread safety
+   *
    * @throws Exception
    */
   @Ignore
   @Test
-  public void shouldBeThreadSafe() throws Exception {
-    //Mockito.when(mockRequest.getRequestURI()).thenReturn("/a/resource.js");
-    final WroManagerFactory managerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory());
+  public void shouldBeThreadSafe()
+      throws Exception {
+    // Mockito.when(mockRequest.getRequestURI()).thenReturn("/a/resource.js");
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory();
     WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        //Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+        // Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
         managerFactory.create().process();
-        //Context.unset();
+        // Context.unset();
         return null;
       }
     }));

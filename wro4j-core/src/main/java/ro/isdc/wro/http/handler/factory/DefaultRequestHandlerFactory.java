@@ -31,7 +31,6 @@ public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
     try {
       requestHandlerProviders = ProviderFinder.of(RequestHandlerProvider.class).find();
     } catch (final NoClassDefFoundError e) {
-
     }
     final List<RequestHandler> requestHandlers = new ArrayList<RequestHandler>();
     for (final RequestHandlerProvider provider : requestHandlerProviders) {

@@ -20,6 +20,7 @@ import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.factory.SimpleWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
@@ -67,6 +68,10 @@ public class InjectorBuilder {
   public static InjectorBuilder create(final WroManagerFactory managerFactory) {
     Validate.notNull(managerFactory);
     return new InjectorBuilder(managerFactory);
+  }
+
+  public static InjectorBuilder create(final WroManager manager) {
+    return new InjectorBuilder(new SimpleWroManagerFactory(manager));
   }
 
   public InjectorBuilder(final WroManagerFactory managerFactory) {

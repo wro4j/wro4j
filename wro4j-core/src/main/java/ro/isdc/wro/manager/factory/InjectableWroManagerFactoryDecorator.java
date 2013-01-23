@@ -11,7 +11,10 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
  * @author Alex Objelean
  * @created 23 Jun 2012
  * @since 1.4.7
+ * @deprecated Not required anymore. The {@link WroManager} objects are injected in {@link WroManager.Builder} during
+ *             initialization.
  */
+@Deprecated
 public class InjectableWroManagerFactoryDecorator
     extends WroManagerFactoryDecorator {
   private Injector injector;

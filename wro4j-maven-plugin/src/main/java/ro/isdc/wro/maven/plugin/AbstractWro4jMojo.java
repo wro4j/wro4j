@@ -27,7 +27,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.InjectableContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
@@ -178,7 +177,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   protected StandaloneContextAwareManagerFactory getManagerFactory() {
     if (managerFactory == null) {
       try {
-        managerFactory = new InjectableContextAwareManagerFactory(newWroManagerFactory());
+        managerFactory = newWroManagerFactory();
       } catch (final MojoExecutionException e) {
         throw WroRuntimeException.wrap(e);
       }
