@@ -53,7 +53,6 @@ import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
-import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -548,7 +547,7 @@ public class TestWroFilter {
   @Test
   public void modelShouldBeReloadedWhenReloadIsTriggered()
       throws Exception {
-    final WroManagerFactory wroManagerFactory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(new WroModelFactory() {
+    final WroManagerFactory wroManagerFactory = new BaseWroManagerFactory().setModelFactory(new WroModelFactory() {
       private boolean wasCreated = false;
 
       public WroModel create() {
@@ -563,7 +562,7 @@ public class TestWroFilter {
 
       public void destroy() {
       }
-    }));
+    });
     Context.set(Context.standaloneContext());
 
     final WroFilter filter = new WroFilter() {

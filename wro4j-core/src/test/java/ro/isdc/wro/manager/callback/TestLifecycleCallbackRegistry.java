@@ -21,7 +21,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -155,8 +154,8 @@ public class TestLifecycleCallbackRegistry {
     group.addResource(Resource.create("classpath:1.js"));
     final WroModelFactory modelFactory = WroUtil.factoryFor(new WroModel().addGroup(group));
 
-    final WroManagerFactory managerFactory = new InjectableWroManagerFactoryDecorator(
-        new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(modelFactory));
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setGroupExtractor(groupExtractor)
+        .setModelFactory(modelFactory);
     final WroManager manager = managerFactory.create();
     manager.registerCallback(callback);
     manager.process();
