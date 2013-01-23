@@ -25,6 +25,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
@@ -57,7 +59,7 @@ public class TestResourceProxyRequestHandler {
   @Mock
   private ResourceLocatorFactory mockLocatorFactory;
   @Mock
-  private ResourceLocator mockUriLocator;
+  private ResourceLocator mockLocator;
 
   private OutputStream outputStream;
 
@@ -79,8 +81,14 @@ public class TestResourceProxyRequestHandler {
         mockAuthorizationManager)).build();
     injector.inject(victim);
 
-    when(mockLocatorFactory.getLocator(anyString())).thenReturn(mockUriLocator);
-    when(mockUriLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
+    when(mockLocatorFactory.getLocator(anyString())).thenReturn(mockLocator);
+    when(mockLocatorFactory.locate(anyString())).thenAnswer(new Answer<InputStream>() {
+      public InputStream answer(final InvocationOnMock invocation)
+          throws Throwable {
+        return mockLocator.getInputStream();
+      }
+    });
+    when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
 
     packagePath = WroUtil.toPackageAsFolder(this.getClass());
 
@@ -120,7 +128,7 @@ public class TestResourceProxyRequestHandler {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    when(mockUriLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
+    when(mockLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
 
     victim.handle(request, response);
 
@@ -136,7 +144,7 @@ public class TestResourceProxyRequestHandler {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(false);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    when(mockUriLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
+    when(mockLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
 
     victim.handle(request, response);
   }
@@ -148,7 +156,7 @@ public class TestResourceProxyRequestHandler {
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
 
     // Set up victim
-    when(mockUriLocator.getInputStream()).thenReturn(getInputStream("test.css"));
+    when(mockLocator.getInputStream()).thenReturn(getInputStream("test.css"));
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
 
     // Perform Action
@@ -156,7 +164,7 @@ public class TestResourceProxyRequestHandler {
     final String body = outputStream.toString();
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
-    verify(mockUriLocator, times(1)).getInputStream();
+    verify(mockLocator, times(1)).getInputStream();
     assertThat(body, is(expectedBody));
   }
 
@@ -166,7 +174,7 @@ public class TestResourceProxyRequestHandler {
     final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
     when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
     when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
-    when(mockUriLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
+    when(mockLocator.getInputStream()).thenReturn(new ClasspathResourceLocator(resourceUri).getInputStream());
 
     victim.handle(request, response);
     final int expectedLength = IOUtils.toString(getInputStream("test.css")).length();

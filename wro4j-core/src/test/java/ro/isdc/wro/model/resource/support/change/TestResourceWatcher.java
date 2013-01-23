@@ -59,6 +59,7 @@ public class TestResourceWatcher {
     Context.set(Context.standaloneContext());
     victim = new ResourceWatcher();
     when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
+    when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
     when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
 
     createInjector().inject(victim);
@@ -104,7 +105,7 @@ public class TestResourceWatcher {
     victim.check(cacheEntry);
     assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
 
-    Mockito.when(mockLocator.getInputStream()).then(answerWithContent("different"));
+    Mockito.when(mockLocatorFactory.locate(Mockito.anyString())).then(answerWithContent("different"));
 
     victim.check(cacheEntry);
     assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
@@ -124,7 +125,7 @@ public class TestResourceWatcher {
     createInjector().inject(victim);
     final ResourceChangeDetector mockChangeDetector = Mockito.spy(victim.getResourceChangeDetector());
 
-    Mockito.when(mockLocator.getInputStream()).thenThrow(new IOException("Resource is unavailable"));
+    Mockito.when(mockLocatorFactory.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
 
     victim.check(cacheEntry);
     verify(mockChangeDetector, never()).checkChangeForGroup(Mockito.anyString(), Mockito.anyString());
