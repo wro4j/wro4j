@@ -49,8 +49,9 @@ public class ReportXmlFormatter
   private final FormatterType formatterType;
 
   public static enum FormatterType {
-    LINT("lint") , CHECKSTYLE("checkstyle"), CSSLINT("csslint"), JSLINT("jslint");
+    LINT("lint"), CHECKSTYLE("checkstyle"), CSSLINT("csslint"), JSLINT("jslint");
     private String rootElementName;
+
     FormatterType(final String rootElementName) {
       this.rootElementName = rootElementName;
     }
@@ -98,7 +99,8 @@ public class ReportXmlFormatter
     return new ReportXmlFormatter(lintReport, formatterType);
   }
 
-  public static ReportXmlFormatter createForLinterError(final LintReport<LinterError> lintReport, final FormatterType formatterType) {
+  public static ReportXmlFormatter createForLinterError(final LintReport<LinterError> lintReport,
+      final FormatterType formatterType) {
     return createInternal(lintReport, formatterType, new Function<LinterError, LintItem>() {
       @Override
       public LintItem apply(final LinterError input)
@@ -109,7 +111,8 @@ public class ReportXmlFormatter
     });
   }
 
-  public static ReportXmlFormatter createForCssLintError(final LintReport<CssLintError> lintReport, final FormatterType formatterType) {
+  public static ReportXmlFormatter createForCssLintError(final LintReport<CssLintError> lintReport,
+      final FormatterType formatterType) {
     return createInternal(lintReport, formatterType, new Function<CssLintError, LintItem>() {
       @Override
       public LintItem apply(final CssLintError input)
@@ -130,8 +133,8 @@ public class ReportXmlFormatter
    * @param adapter
    *          a {@link Function} responsible for adapting a type <F> into {@link LintItem}
    */
-  private static <F> ReportXmlFormatter createInternal(final LintReport<F> lintReport, final FormatterType formatterType,
-      final Function<F, LintItem> adapter) {
+  private static <F> ReportXmlFormatter createInternal(final LintReport<F> lintReport,
+      final FormatterType formatterType, final Function<F, LintItem> adapter) {
     Validate.notNull(lintReport);
     final LintReport<LintItem> report = new LintReport<LintItem>();
     for (final ResourceLintReport<F> reportItem : lintReport.getReports()) {
