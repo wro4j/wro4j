@@ -157,13 +157,13 @@ public class WroTestUtils {
   }
 
   /**
-   * Compare if content of expected stream is the same as content of the actual stream.
+   * Compare if content of expected stream is the same as content of the actual stream. When compared content is not
+   * equal, the assertion error will be thrown.
    *
    * @param expected
    *          {@link InputStream} of the expected content.
    * @param actual
    *          {@link InputStream} of the actual content.
-   * @return true if content of the expected and actual streams are equal.
    */
   public static void compare(final InputStream expected, final InputStream actual)
       throws IOException {

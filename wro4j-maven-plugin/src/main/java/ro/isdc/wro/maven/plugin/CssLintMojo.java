@@ -4,13 +4,10 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-
-import org.apache.commons.io.FileUtils;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -35,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created 20 Jun 2011
  */
 public class CssLintMojo
-    extends AbstractSingleProcessorMojo {
+    extends AbstractLinterMojo<CssLintError> {
   /**
    * File where the report will be written.
    *
@@ -50,10 +47,6 @@ public class CssLintMojo
    * @optional
    */
   private String reportFormat = FormatterType.LINT.getFormat();
-  /**
-   * Contains errors found during jshint processing which will be reported eventually.
-   */
-  private LintReport<CssLintError> lintReport;
 
   /**
    * {@inheritDoc}
@@ -82,7 +75,7 @@ public class CssLintMojo
             e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
                 + e.getErrors());
         // collect found errors
-        lintReport.addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
+        addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
         if (!isFailNever()) {
           throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
@@ -91,36 +84,30 @@ public class CssLintMojo
     return processor;
   }
 
+
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void onBeforeExecute() {
-    lintReport = new LintReport<CssLintError>();
-    FileUtils.deleteQuietly(reportFile);
+  protected ReportXmlFormatter createXmlFormatter(final LintReport<CssLintError> lintReport, final FormatterType type) {
+    return ReportXmlFormatter.createForCssLintError(lintReport, type);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected File getReportFile() {
+    return reportFile;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void onAfterExecute() {
-    if (reportFile != null) {
-      try {
-        reportFile.getParentFile().mkdirs();
-        reportFile.createNewFile();
-        getLog().debug("creating report at location: " + reportFile);
-        getLog().debug("using report format: " + reportFormat);
-        final FormatterType type = FormatterType.getByFormat(reportFormat);
-        if (type == null) {
-          throw new WroRuntimeException("Usupported report format: " + reportFormat + ". Valid formats are: "
-              + FormatterType.getSupportedFormatsAsCSV());
-        }
-        ReportXmlFormatter.createForCssLintError(lintReport, type).write(new FileOutputStream(reportFile));
-      } catch (final IOException e) {
-        getLog().error("Could not create report file: " + reportFile, e);
-      }
-    }
+  protected String getReportFormat() {
+    return reportFormat;
   }
 
   /**
@@ -133,14 +120,16 @@ public class CssLintMojo
   /**
    * @param reportFormat
    *          the preferred report format.
+   * @VisibleForTesting
    */
-  public void setReportFormat(final String reportFormat) {
+  void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;
   }
 
   /**
    * Used by unit test to check if mojo doesn't fail.
    */
+  @Override
   void onException(final Exception e) {
   }
 }
