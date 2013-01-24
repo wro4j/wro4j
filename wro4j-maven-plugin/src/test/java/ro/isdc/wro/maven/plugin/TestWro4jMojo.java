@@ -38,9 +38,10 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
@@ -400,14 +401,13 @@ public class TestWro4jMojo {
       throws Exception {
     mojo = new Wro4jMojo() {
       @Override
-      protected StandaloneContextAwareManagerFactory getManagerFactory() {
-        final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
-        final StandaloneContextAwareManagerFactory spiedFactory = Mockito.spy(factory);
-
-        final WroManager manager = new WroManager.Builder(factory.create()).setHashStrategy(mockHashStrategy).build();
-
-        Mockito.when(spiedFactory.create()).thenReturn(manager);
-        return spiedFactory;
+      protected WroManagerFactory getManagerFactory() {
+        return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+          @Override
+          protected void onBeforeBuild(final Builder builder) {
+            builder.setHashStrategy(mockHashStrategy);
+          }
+        };
       }
     };
     setUpMojo(mojo);
@@ -442,7 +442,7 @@ public class TestWro4jMojo {
 
     mojo = new Wro4jMojo() {
       @Override
-      protected StandaloneContextAwareManagerFactory newWroManagerFactory()
+      protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
         final DefaultStandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory();
         managerFactory.setLocatorFactory(mockLocatorFactory);

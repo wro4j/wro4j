@@ -39,9 +39,10 @@ import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -322,9 +323,9 @@ public class Wro4jCommandLineRunner {
 
   /**
    * This method will ensure that you have a right and initialized instance of
-   * {@link StandaloneContextAwareManagerFactory}.
+   * {@link StandaloneContextAware}.
    */
-  private StandaloneContextAwareManagerFactory getManagerFactory() {
+  private WroManagerFactory getManagerFactory() {
     final DefaultStandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory();
     managerFactory.setProcessorsFactory(createProcessorsFactory());
     managerFactory.setModelFactory(createWroModelFactory());

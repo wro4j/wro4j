@@ -15,7 +15,9 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -89,10 +91,13 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    * {@inheritDoc}
    */
   @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory() {
-    final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
-    factory.setProcessorsFactory(createSingleProcessorsFactory());
-    return factory;
+  protected WroManagerFactory getManagerFactory() {
+    return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+      @Override
+      protected void onBeforeBuild(final Builder builder) {
+        builder.setProcessorsFactory(createSingleProcessorsFactory());
+      }
+    };
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {
