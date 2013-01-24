@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.util.WroTestUtils;
@@ -135,7 +134,7 @@ public class TestCssLintMojo {
     runPluginWithReportFormat(ReportXmlFormatter.FormatterType.CHECKSTYLE.getFormat());
   }
 
-  @Test(expected = WroRuntimeException.class)
+  @Test(expected = MojoExecutionException.class)
   public void shouldNotAcceptInvalidReportFormat()
       throws Exception {
     runPluginWithReportFormat("INVALID");

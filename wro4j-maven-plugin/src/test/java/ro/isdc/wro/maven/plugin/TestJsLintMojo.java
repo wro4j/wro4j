@@ -89,7 +89,7 @@ public class TestJsLintMojo
     generateAndCompareReportFile(FormatterType.CHECKSTYLE.getFormat(), "jslint-checkstyle.xml");
   }
 
-  @Test
+  @Test(expected = MojoExecutionException.class)
   public void cannotGenerateReportWithInvalidFormat()
       throws Exception {
     final File reportFile = WroUtil.createTempFile();
