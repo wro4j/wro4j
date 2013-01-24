@@ -21,7 +21,8 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  */
-public class TestJsLintMojo extends AbstractTestLinterMojo {
+public class TestJsLintMojo
+    extends AbstractTestLinterMojo {
   /**
    * {@inheritDoc}
    */
@@ -36,46 +37,45 @@ public class TestJsLintMojo extends AbstractTestLinterMojo {
   }
 
   @Test
-  public void usePredefOptions() throws Exception {
+  public void usePredefOptions()
+      throws Exception {
     getMojo().setOptions("predef=['YUI','window','document','OnlineOpinion','xui']");
-    //ignore found linter errors
+    // ignore found linter errors
     getMojo().setFailNever(true);
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
 
-
-  @Test(expected=MojoExecutionException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testMojoWithPropertiesSet()
-    throws Exception {
+      throws Exception {
     getMojo().setIgnoreMissingResources(true);
     getMojo().execute();
   }
 
-
-  @Test(expected=MojoExecutionException.class)
-  public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue() throws Exception {
+  @Test(expected = MojoExecutionException.class)
+  public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue()
+      throws Exception {
     setWroWithInvalidResources();
     getMojo().setIgnoreMissingResources(true);
     getMojo().execute();
   }
 
-  @Test(expected=MojoExecutionException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testResourceWithUndefVariables()
-    throws Exception {
+      throws Exception {
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
 
-
-  @Test(expected=MojoExecutionException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testEmptyOptions()
-    throws Exception {
+      throws Exception {
     getMojo().setOptions("");
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
-  
+
   @Test
   public void shouldGenerateXmlReportFile()
       throws Exception {
@@ -88,7 +88,7 @@ public class TestJsLintMojo extends AbstractTestLinterMojo {
       getMojo().setIgnoreMissingResources(true);
       getMojo().execute();
     } finally {
-      //Assert that file is big enough to prove that it contains serialized errors.
+      // Assert that file is big enough to prove that it contains serialized errors.
       assertTrue(reportFile.length() > 1000);
       FileUtils.deleteQuietly(reportFile);
     }

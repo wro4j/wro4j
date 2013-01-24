@@ -28,7 +28,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * @author Alex Objelean
  */
 public class DefaultStandaloneContextAwareManagerFactory
-  extends StandaloneWroManagerFactory implements StandaloneContextAwareManagerFactory {
+  extends StandaloneWroManagerFactory implements StandaloneContextAware {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultStandaloneContextAwareManagerFactory.class);
   /**
    * Context used by stand-alone process.

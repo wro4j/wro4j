@@ -5,7 +5,6 @@
 package ro.isdc.wro.manager.factory.standalone;
 
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 
 /**
@@ -14,19 +13,8 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * instance of {@link WroManagerFactory}.
  *
  * @author Alex Objelean
+ * @deprecated use {@link StandaloneContextAware}
  */
-public interface StandaloneContextAwareManagerFactory
-  extends WroManagerFactory {
-  /**
-   * Called by standalone process for initialization. It is responsibility of the implementor to take care of
-   * {@link StandaloneContext} in order to initialize the internals.
-   *
-   * @param standaloneContext {@link StandaloneContext} holding properties associated with current context.
-   */
-  void initialize(StandaloneContext standaloneContext);
-  /**
-   * set the processor factory to be used by the {@link WroManagerFactory} created by this factory.
-   * @param processorsFactory
-   */
-  void setProcessorsFactory(ProcessorsFactory processorsFactory);
+@Deprecated
+public interface StandaloneContextAwareManagerFactory extends StandaloneContextAware {
 }
