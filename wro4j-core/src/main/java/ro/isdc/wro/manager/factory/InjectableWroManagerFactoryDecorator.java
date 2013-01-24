@@ -12,7 +12,7 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
  * @created 23 Jun 2012
  * @since 1.4.7
  * @deprecated Not required anymore. The {@link WroManager} objects are injected in {@link WroManager.Builder} during
- *             initialization.
+ *             initialization. This class with be removed in 1.7.0.
  */
 @Deprecated
 public class InjectableWroManagerFactoryDecorator
@@ -28,14 +28,13 @@ public class InjectableWroManagerFactoryDecorator
    */
   @Override
   public WroManager create() {
-    final WroManager manager = getDecoratedObject().create();
-    getInjector().inject(manager);
-    return manager;
+    return getDecoratedObject().create();
   }
 
   /**
    * @return {@link Injector} used to inject the created manager.
    */
+  @Deprecated
   public Injector getInjector() {
     if (injector == null) {
       injector = InjectorBuilder.create(getDecoratedObject()).build();
