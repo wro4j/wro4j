@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
@@ -19,6 +18,8 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -154,18 +155,34 @@ public class TestCssLintMojo {
   }
 
   @Test
-  public void shouldGenerateXmlReportFile()
+  public void shouldGenerateXmlReportFileWithDefaultFormat()
+      throws Exception {
+    generateAndCompareReportUsingFormat(null, "csslint-default.xml");
+  }
+
+  @Test
+  public void shouldGenerateXmlReportFileWithCheckstyleFormat()
+      throws Exception {
+    generateAndCompareReportUsingFormat(FormatterType.CHECKSTYLE.getFormat(), "csslint-checkstyle.xml");
+  }
+
+  private void generateAndCompareReportUsingFormat(final String reportFormat, final String expectedReportFileName)
       throws Exception {
     final File reportFile = WroUtil.createTempFile();
     try {
       mojo.setReportFile(reportFile);
+      if (reportFormat != null) {
+        mojo.setReportFormat(reportFormat);
+      }
       // mojo.setOptions("undef, browser");
       mojo.setTargetGroups(null);
       mojo.setFailNever(true);
       mojo.setIgnoreMissingResources(true);
       mojo.execute();
     } finally {
-      IOUtils.copy(new FileInputStream(reportFile), System.out);
+      WroTestUtils.compare(getClass().getResourceAsStream("report/" + expectedReportFileName), new FileInputStream(
+          reportFile));
+
       // Assert that file is big enough to prove that it contains serialized errors.
       assertTrue(reportFile.length() > 1000);
       FileUtils.deleteQuietly(reportFile);

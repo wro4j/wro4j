@@ -96,6 +96,8 @@ public class CssLintMojo
    */
   @Override
   protected void onBeforeExecute() {
+    // validate report format before actual plugin execution (fail fast).
+    validateReportFormat();
     lintReport = new LintReport<CssLintError>();
     FileUtils.deleteQuietly(reportFile);
   }
@@ -105,22 +107,29 @@ public class CssLintMojo
    */
   @Override
   protected void onAfterExecute() {
-    if (reportFile != null) {
+    if (shouldGenerateReport()) {
       try {
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
         getLog().debug("using report format: " + reportFormat);
         final FormatterType type = FormatterType.getByFormat(reportFormat);
-        if (type == null) {
-          throw new WroRuntimeException("Usupported report format: " + reportFormat + ". Valid formats are: "
-              + FormatterType.getSupportedFormatsAsCSV());
-        }
         ReportXmlFormatter.createForCssLintError(lintReport, type).write(new FileOutputStream(reportFile));
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
     }
+  }
+
+  private void validateReportFormat() {
+    if (FormatterType.getByFormat(reportFormat) == null) {
+      throw new WroRuntimeException("Usupported report format: " + reportFormat + ". Valid formats are: "
+          + FormatterType.getSupportedFormatsAsCSV());
+    }
+  }
+
+  private boolean shouldGenerateReport() {
+    return reportFile != null;
   }
 
   /**
@@ -133,8 +142,9 @@ public class CssLintMojo
   /**
    * @param reportFormat
    *          the preferred report format.
+   * @VisibleForTesting
    */
-  public void setReportFormat(final String reportFormat) {
+  void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;
   }
 

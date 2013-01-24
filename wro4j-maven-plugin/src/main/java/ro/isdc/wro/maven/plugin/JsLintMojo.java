@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -43,7 +44,15 @@ public class JsLintMojo
    */
   private File reportFile;
   /**
-   * Contains errors found during jshint processing which will be reported eventually.
+   * The preferred format of the report.
+   *
+   * @parameter expression="${reportFormat}"
+   * @optional
+   */
+  private String reportFormat = FormatterType.JSLINT.getFormat();
+
+  /**
+   * Contains errors found during jslint processing which will be reported eventually.
    */
   private LintReport<LinterError> lintReport;
 
@@ -60,7 +69,7 @@ public class JsLintMojo
         if (resource != null) {
           getLog().info("processing resource: " + resource.getUri());
         }
-        //use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
+        // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
         super.process(resource, reader, new StringWriter());
       }
 
@@ -71,8 +80,8 @@ public class JsLintMojo
 
       @Override
       protected void onLinterException(final LinterException e, final Resource resource) {
-        final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s",
-            e.getErrors().size(), resource, e.getErrors());
+        final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s", e
+            .getErrors().size(), resource, e.getErrors());
         getLog().error(errorMessage);
         // collect found errors
         lintReport.addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
@@ -90,6 +99,8 @@ public class JsLintMojo
    */
   @Override
   protected void onBeforeExecute() {
+    // validate report format before actual plugin execution (fail fast).
+    validateReportFormat();
     lintReport = new LintReport<LinterError>();
     FileUtils.deleteQuietly(reportFile);
   }
@@ -99,17 +110,28 @@ public class JsLintMojo
    */
   @Override
   protected void onAfterExecute() {
-    if (reportFile != null) {
+    if (shouldGenerateReport()) {
       try {
         reportFile.getParentFile().mkdirs();
         reportFile.createNewFile();
         getLog().debug("creating report at location: " + reportFile);
-        ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.JSLINT).write(
-            new FileOutputStream(reportFile));
+        final FormatterType type = FormatterType.getByFormat(reportFormat);
+        ReportXmlFormatter.createForLinterError(lintReport, type).write(new FileOutputStream(reportFile));
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + reportFile, e);
       }
     }
+  }
+
+  private void validateReportFormat() {
+    if (FormatterType.getByFormat(reportFormat) == null) {
+      throw new WroRuntimeException("Usupported report format: " + reportFormat + ". Valid formats are: "
+          + FormatterType.getSupportedFormatsAsCSV());
+    }
+  }
+
+  private boolean shouldGenerateReport() {
+    return reportFile != null;
   }
 
   /**
@@ -117,6 +139,15 @@ public class JsLintMojo
    */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
+  }
+
+  /**
+   * @param reportFormat
+   *          the preferred report format.
+   * @VisibleForTesting
+   */
+  void setReportFormat(final String reportFormat) {
+    this.reportFormat = reportFormat;
   }
 
   /**
