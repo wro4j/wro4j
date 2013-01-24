@@ -77,7 +77,6 @@ public class TestJsLintMojo
     getMojo().execute();
   }
 
-
   @Test
   public void shouldGenerateReportWithDefaultFormat() throws Exception {
     generateAndCompareReportFile(null, "jslint-default.xml");

@@ -42,7 +42,7 @@ public class JsHintMojo
    * @parameter expression="${reportFormat}"
    * @optional
    */
-  private final String reportFormat = FormatterType.JSLINT.getFormat();
+  private String reportFormat = FormatterType.JSLINT.getFormat();
 
   /**
    * {@inheritDoc}
@@ -95,18 +95,27 @@ public class JsHintMojo
   }
 
   /**
+   * @VisibleForTesting
+   */
+  void setReportFile(final File reportFile) {
+    this.reportFile = reportFile;
+  }
+
+  /**
+   * @param reportFormat
+   *          the preferred report format.
+   * @VisibleForTesting
+   */
+  void setReportFormat(final String reportFormat) {
+    this.reportFormat = reportFormat;
+  }
+
+  /**
    * Used by unit test to check if mojo doesn't fail.
    *
    * @VisibleForTesting
    */
   @Override
   void onException(final Exception e) {
-  }
-
-  /**
-   * @VisibleForTesting
-   */
-  void setReportFile(final File reportFile) {
-    this.reportFile = reportFile;
   }
 }
