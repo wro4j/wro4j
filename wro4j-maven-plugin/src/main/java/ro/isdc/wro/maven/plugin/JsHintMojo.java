@@ -11,7 +11,10 @@ import java.io.Writer;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
+import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
+import ro.isdc.wro.extensions.support.lint.LintReport;
+import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
@@ -28,7 +31,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.3.5
  */
 public class JsHintMojo
-    extends AbstractLinterMojo {
+    extends AbstractLinterMojo<LinterError> {
   /**
    * File where the report will be written.
    *
@@ -76,6 +79,14 @@ public class JsHintMojo
       };
     }.setOptionsAsString(getOptions());
     return processor;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected ReportXmlFormatter createXmlFormatter(final LintReport<LinterError> lintReport, final FormatterType type) {
+    return ReportXmlFormatter.createForLinterError(lintReport, type);
   }
 
   /**

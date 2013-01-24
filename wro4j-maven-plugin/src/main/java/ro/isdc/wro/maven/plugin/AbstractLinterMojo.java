@@ -10,7 +10,6 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
@@ -24,12 +23,12 @@ import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
  * @created 25 Jan 2013
  * @since 1.6.3
  */
-public abstract class AbstractLinterMojo
+public abstract class AbstractLinterMojo<T>
     extends AbstractSingleProcessorMojo {
   /**
    * Contains errors found during jslint processing which will be reported eventually.
    */
-  private LintReport<LinterError> lintReport;
+  private LintReport<T> lintReport;
 
   /**
    * Add a single report to the registry of found errors.
@@ -48,7 +47,7 @@ public abstract class AbstractLinterMojo
   protected void onBeforeExecute() {
     // validate report format before actual plugin execution (fail fast).
     validateReportFormat();
-    lintReport = new LintReport<LinterError>();
+    lintReport = new LintReport<T>();
     FileUtils.deleteQuietly(getReportFile());
   }
 
@@ -63,12 +62,14 @@ public abstract class AbstractLinterMojo
         getReportFile().createNewFile();
         getLog().debug("creating report at location: " + getReportFile());
         final FormatterType type = FormatterType.getByFormat(getReportFormat());
-        ReportXmlFormatter.createForLinterError(lintReport, type).write(new FileOutputStream(getReportFile()));
+        createXmlFormatter(lintReport, type).write(new FileOutputStream(getReportFile()));
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + getReportFile(), e);
       }
     }
   }
+
+  protected abstract ReportXmlFormatter createXmlFormatter(LintReport<T> lintReport, FormatterType type);
 
   private void validateReportFormat() {
     if (FormatterType.getByFormat(getReportFormat()) == null) {
