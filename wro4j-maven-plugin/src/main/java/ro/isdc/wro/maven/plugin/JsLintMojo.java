@@ -4,20 +4,14 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.apache.commons.io.FileUtils;
-
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
-import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
-import ro.isdc.wro.extensions.support.lint.LintReport;
-import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
@@ -35,7 +29,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @since 1.4.2
  */
 public class JsLintMojo
-    extends AbstractSingleProcessorMojo {
+    extends AbstractLinterMojo {
   /**
    * File where the report will be written.
    *
@@ -50,11 +44,6 @@ public class JsLintMojo
    * @optional
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();
-
-  /**
-   * Contains errors found during jslint processing which will be reported eventually.
-   */
-  private LintReport<LinterError> lintReport;
 
   /**
    * {@inheritDoc}
@@ -84,7 +73,7 @@ public class JsLintMojo
             .getErrors().size(), resource, e.getErrors());
         getLog().error(errorMessage);
         // collect found errors
-        lintReport.addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
+        addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
         if (!isFailNever()) {
           throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
@@ -98,40 +87,16 @@ public class JsLintMojo
    * {@inheritDoc}
    */
   @Override
-  protected void onBeforeExecute() {
-    // validate report format before actual plugin execution (fail fast).
-    validateReportFormat();
-    lintReport = new LintReport<LinterError>();
-    FileUtils.deleteQuietly(reportFile);
+  protected File getReportFile() {
+    return reportFile;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void onAfterExecute() {
-    if (shouldGenerateReport()) {
-      try {
-        reportFile.getParentFile().mkdirs();
-        reportFile.createNewFile();
-        getLog().debug("creating report at location: " + reportFile);
-        final FormatterType type = FormatterType.getByFormat(reportFormat);
-        ReportXmlFormatter.createForLinterError(lintReport, type).write(new FileOutputStream(reportFile));
-      } catch (final IOException e) {
-        getLog().error("Could not create report file: " + reportFile, e);
-      }
-    }
-  }
-
-  private void validateReportFormat() {
-    if (FormatterType.getByFormat(reportFormat) == null) {
-      throw new WroRuntimeException("Usupported report format: " + reportFormat + ". Valid formats are: "
-          + FormatterType.getSupportedFormatsAsCSV());
-    }
-  }
-
-  private boolean shouldGenerateReport() {
-    return reportFile != null;
+  protected String getReportFormat() {
+    return reportFormat;
   }
 
   /**
@@ -153,6 +118,7 @@ public class JsLintMojo
   /**
    * Used by unit test to check if mojo doesn't fail.
    */
+  @Override
   void onException(final Exception e) {
   }
 }
