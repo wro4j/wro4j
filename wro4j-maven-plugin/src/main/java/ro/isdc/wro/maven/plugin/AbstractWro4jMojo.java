@@ -131,9 +131,10 @@ public abstract class AbstractWro4jMojo
     try {
       onBeforeExecute();
       doExecute();
-      onAfterExecute();
     } catch (final Exception e) {
       throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
+    } finally {
+      onAfterExecute();
     }
   }
 
@@ -144,7 +145,7 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
-   * Invoked right after successful execution completion.
+   * Invoked right after execution completion. This method is invoked also if the execution failed with an exception.
    */
   protected void onAfterExecute() {
   }

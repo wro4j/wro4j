@@ -62,7 +62,9 @@ public abstract class AbstractLinterMojo<T>
         getReportFile().createNewFile();
         getLog().debug("creating report at location: " + getReportFile());
         final FormatterType type = FormatterType.getByFormat(getReportFormat());
-        createXmlFormatter(lintReport, type).write(new FileOutputStream(getReportFile()));
+        if (type != null) {
+          createXmlFormatter(lintReport, type).write(new FileOutputStream(getReportFile()));
+        }
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + getReportFile(), e);
       }
