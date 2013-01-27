@@ -1,91 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <parent>
-    <groupId>ro.isdc.wro4j</groupId>
-    <artifactId>wro4j-examples</artifactId>
-    <version>1.6.3-SNAPSHOT</version>
-  </parent>
-
-  <artifactId>wro4j-standalone</artifactId>
-  <packaging>war</packaging>
-  <name>wro4j standalone example</name>
-
-  <properties>
-    <project_charset>UTF-8</project_charset>
-  </properties>
-  
-  <dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-examples</artifactId>
+        <version>1.6.3-SNAPSHOT</version>
+    </parent>
+    <artifactId>wro4j-standalone</artifactId>
+    <packaging>war</packaging>
+    <name>wro4j standalone example</name>
+    <properties>
+        <project_charset>UTF-8</project_charset>
+    </properties>
+    <dependencies>
     <!-- Project Dependencies -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>wro4j-extensions</artifactId>   
-    </dependency>        
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-  </dependencies>
-    
-  <build>
-    <resources>      
-      <resource>
-        <filtering>false</filtering>
-        <directory>src/main/webapp</directory>        
-      </resource>          
-    </resources>  
-    <plugins>     
-        <plugin>
-        <groupId>ro.isdc.wro4j</groupId>
-        <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.6.3-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-           <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>              
-        </configuration>
-        
-      </plugin>
-      <plugin>
-        <groupId>ro.isdc.wro4j</groupId>
-        <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.6.3-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>csslint</goal>
-              <!--
-              <goal>jshint</goal>
-                            
-              <goal>csslint</goal>
-              -->
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <options>ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes,vendor-prefix,zero-units</options>
-          <ignoreMissingResources>true</ignoreMissingResources>          
-          <failNever>true</failNever>
-          <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/bundle/</cssDestinationFolder>
-          <!--
-
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-          <extraConfigFile>c:/path/wro.proprties</extraConfigFile>
-          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>          
-          <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.FingerprintAwareStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.YUIStandaloneManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.examples.manager.CustomStandaloneWroManagerFactory</wroManagerFactory>
-          <wroManagerFactory>ro.isdc.wro.extensions.manager.standalone.GoogleStandaloneManagerFactory</wroManagerFactory>
-          -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wro4j-extensions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/webapp</directory>
+            </resource>
+        </resources>
+        <plugins>
+        <!-- 
+            <plugin>
+                <groupId>ro.isdc.wro4j</groupId>
+                <artifactId>wro4j-maven-plugin</artifactId>
+                <version>1.6.3-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+                </configuration>
+            </plugin>
+             -->
+            <plugin>
+                <groupId>ro.isdc.wro4j</groupId>
+                <artifactId>wro4j-maven-plugin</artifactId>
+                <version>1.6.2</version>
+                <executions>
+                <!----> 
+                    <execution>
+                        <id>csslint</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>csslint</goal>
+                        </goals>
+                        <configuration>
+                            <options>box-model, import</options>
+                            <targetGroups>cssGroup</targetGroups>
+                        </configuration>
+                    </execution>
+                     
+                    <execution>
+                        <id>jshint</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>jshint</goal>
+                        </goals>
+                        <configuration>
+                            <options>undef</options>
+                            <targetGroups>jshint</targetGroups>
+                        </configuration>
+                    </execution>
+                </executions>
+                <!--  
+                <configuration>
+                    <options>undef</options>
+                </configuration>
+                -->
+            </plugin>
+        </plugins>
+    </build>
 </project>

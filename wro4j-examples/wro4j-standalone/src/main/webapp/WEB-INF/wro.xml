@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <groups xmlns="http://www.isdc.ro/wro">
-	<group name="jshint">
-		<js>/static/jshint/*.js</js>
-	</group>
+
+    <group name="jshint">
+        <js>/static/jshint/*.js</js>
+    </group>
+    <group name="cssGroup">
+        <css>/static/csslint/**css</css>
+    </group>
+    
 </groups>
