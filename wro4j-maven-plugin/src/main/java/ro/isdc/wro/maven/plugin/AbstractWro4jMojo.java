@@ -431,60 +431,68 @@ public abstract class AbstractWro4jMojo
   /**
    * @param contextFolder
    *          the servletContextFolder to set
+   * @VisibleForTesting
    */
-  public void setContextFolder(final File contextFolder) {
+  void setContextFolder(final File contextFolder) {
     this.contextFolder = contextFolder;
   }
 
   /**
    * @param wroFile
    *          the wroFile to set
+   * @VisibleForTesting
    */
-  public void setWroFile(final File wroFile) {
+  void setWroFile(final File wroFile) {
     this.wroFile = wroFile;
   }
 
   /**
    * @return the wroFile
+   * @VisibleForTesting
    */
-  public File getWroFile() {
+  File getWroFile() {
     return this.wroFile;
   }
 
   /**
    * @return the contextFolder
+   * @VisibleForTesting
    */
-  public File getContextFolder() {
+  File getContextFolder() {
     return this.contextFolder;
   }
 
   /**
    * @param minimize
    *          flag for minimization.
+   * @VisibleForTesting
    */
-  public void setMinimize(final boolean minimize) {
+  void setMinimize(final boolean minimize) {
     this.minimize = minimize;
   }
 
   /**
    * @param ignoreMissingResources
    *          the ignoreMissingResources to set
+   * @VisibleForTesting
    */
-  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
+  void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
   }
 
   /**
    * @return the minimize
+   * @VisibleForTesting
    */
-  public boolean isMinimize() {
+  boolean isMinimize() {
     return this.minimize;
   }
 
   /**
    * @return the ignoreMissingResources
+   * @VisibleForTesting
    */
-  public boolean isIgnoreMissingResources() {
+  boolean isIgnoreMissingResources() {
     return this.ignoreMissingResources;
   }
 
@@ -500,32 +508,36 @@ public abstract class AbstractWro4jMojo
 
   /**
    * @return the targetGroups
+   * @VisibleForTesting
    */
-  public String getTargetGroups() {
+  String getTargetGroups() {
     return this.targetGroups;
   }
 
   /**
    * @param versionEncoder
    *          (targetGroups) comma separated group names.
+   * @VisibleForTesting
    */
-  public void setTargetGroups(final String targetGroups) {
+  void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
   }
 
   /**
    * @param wroManagerFactory
    *          fully qualified name of the {@link WroManagerFactory} class.
+   * @VisibleForTesting
    */
-  public void setWroManagerFactory(final String wroManagerFactory) {
+  void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
   }
 
   /**
    * @param extraConfigFile
    *          the extraConfigFile to set
+   * @VisibleForTesting
    */
-  public void setExtraConfigFile(final File extraConfigFile) {
+  void setExtraConfigFile(final File extraConfigFile) {
     this.extraConfigFile = extraConfigFile;
   }
 

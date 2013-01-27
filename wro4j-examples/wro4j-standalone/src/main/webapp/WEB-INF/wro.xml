@@ -5,7 +5,7 @@
         <js>/static/jshint/*.js</js>
     </group>
     <group name="cssGroup">
-        <js>/static/csslint/**css</js>
+        <css>/static/csslint/**css</css>
     </group>
     
 </groups>

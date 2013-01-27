@@ -42,7 +42,7 @@ public class TestJsLintProcessor
       protected void onLinterException(final LinterException e, final Resource resource) {
         throw e;
       };
-    }.setOptions("maxerr=1");
+    }.setOptionsAsString("maxerr=1");
 
     processor.process(new StringReader("alert(;"), new StringWriter());
   }

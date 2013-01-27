@@ -54,9 +54,7 @@ public class TestJsHintProcessor
       protected void onLinterException(final LinterException e, final Resource resource) {
         cause.set(e);
       };
-    }.setOptions(new String[] {
-      "maxerr=1"
-    });
+    }.setOptionsAsString("maxerr=1");
 
     processor.process(new StringReader("alert(;"), new StringWriter());
     Assert.assertNotNull(cause.get());
@@ -92,8 +90,7 @@ public class TestJsHintProcessor
   @Test
   public void canSetNullOptions()
       throws Exception {
-    final String[] options = null;
-    victim.setOptions(options);
+    victim.setOptionsAsString("");
     victim.process(null, new StringReader("alert(1);"), new StringWriter());
   }
 

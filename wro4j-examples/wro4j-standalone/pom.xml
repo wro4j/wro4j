@@ -52,32 +52,38 @@
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>
-                <version>1.6.3-SNAPSHOT</version>
+                <version>1.6.2</version>
                 <executions>
-                <!-- 
+                <!----> 
                     <execution>
                         <id>csslint</id>
+                        <phase>test</phase>
                         <goals>
                             <goal>csslint</goal>
                         </goals>
                         <configuration>
                             <options>box-model, import</options>
+                            <targetGroups>cssGroup</targetGroups>
                         </configuration>
                     </execution>
-                     -->
+                     
                     <execution>
                         <id>jshint</id>
+                        <phase>test</phase>
                         <goals>
                             <goal>jshint</goal>
                         </goals>
                         <configuration>
                             <options>undef</options>
+                            <targetGroups>jshint</targetGroups>
                         </configuration>
                     </execution>
                 </executions>
+                <!--  
                 <configuration>
                     <options>undef</options>
                 </configuration>
+                -->
             </plugin>
         </plugins>
     </build>
