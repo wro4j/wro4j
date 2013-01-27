@@ -112,7 +112,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   /**
    * @return raw representation of the option value.
    */
-  public String getOptions() {
+  protected String getOptions() {
     return options;
   }
 
@@ -126,15 +126,17 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
 
   /**
    * @param failNever the failFast to set
+   * @VisibleForTesting
    */
-  public void setFailNever(final boolean failNever) {
+  void setFailNever(final boolean failNever) {
     this.failNever = failNever;
   }
 
   /**
    * @return the failNever
+   * @VisibleForTesting
    */
-  public boolean isFailNever() {
+  boolean isFailNever() {
     return failNever;
   }
 }

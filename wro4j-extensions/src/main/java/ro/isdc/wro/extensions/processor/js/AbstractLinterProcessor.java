@@ -113,6 +113,9 @@ public abstract class AbstractLinterProcessor
     return "";
   }
 
+  /**
+   * @param options comma separated list of options.
+   */
   public AbstractLinterProcessor setOptionsAsString(final String options) {
     this.options = options;
     return this;

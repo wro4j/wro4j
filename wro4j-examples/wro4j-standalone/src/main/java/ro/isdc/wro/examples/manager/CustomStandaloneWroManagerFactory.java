@@ -65,12 +65,8 @@ public class CustomStandaloneWroManagerFactory
         LOG.error(
           e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
             + e.getErrors());
-//        if (!isFailNever()) {
-//          throw new MojoExecutionException("Errors found when validating resource: " + resource);
-//        }
       };
-    }.setOptions(new String[] {});
-//    factory.addPreProcessor(processor);
+    }.setOptionsAsString("");
     return factory;
   }
 
