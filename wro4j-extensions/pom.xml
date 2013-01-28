@@ -73,6 +73,12 @@
         <dependency>
             <groupId>com.github.sommeri</groupId>
             <artifactId>less4j</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.beust</groupId>
+                    <artifactId>jcommander</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.gmaven.runtime</groupId>
