@@ -11,7 +11,7 @@
 	<tx:annotation-driven />
 
 	<!-- Scans within the base package of the application for @Components to configure as beans -->
-	<context:component-scan base-package="package" />
+	<context:component-scan base-package="ro.isdc.wro.spring" />
 
 	<!-- Drives transactions using local JPA APIs -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

@@ -1,7 +1,6 @@
 package ro.isdc.wro.spring.service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +15,14 @@ public class EntityService {
 
   private static final Logger logger = LoggerFactory.getLogger(EntityService.class);
 
-  @PersistenceContext
+  //@PersistenceContext
   EntityManager em;
 
   public void setEntityManager(final EntityManager em) {
     this.em = em;
   }
 
-  @Transactional(readOnly = true)
+  //@Transactional(readOnly = true)
   public MyEntity findEntity(final String id) {
 
     // Uncomment when you have defined your entity
@@ -43,7 +42,7 @@ public class EntityService {
 
   }
 
-  @Transactional
+  //@Transactional
   public MyEntity save(MyEntity entity) {
 
     // Once you have defined your entity in the MyEntity model object, you can
