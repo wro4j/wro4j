@@ -16,5 +16,6 @@
   <modules>
     <module>wro4j-demo</module>
     <module>wro4j-standalone</module>
+    <module>wro4j-spring</module>
   </modules>
 </project>
