@@ -5,11 +5,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<title>Database.com App: artifactId</title>
+	<title>Spring MVC Web App</title>
 	<link href="${pageContext.request.contextPath}/resources/layout.css" rel="stylesheet" type="text/css" />
+	<script type="javascript" src="/wro/jquery.js"/>
 </head>
 <body>
-	<div id="header"><div id="app_title">artifactId</div></div>
+	<div id="header"><div id="app_title">TestApp</div></div>
 	<div id="navigation">${breadcrumb}</div>
 	<div id="content">
 	
