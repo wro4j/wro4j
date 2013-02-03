@@ -4,6 +4,7 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @parameter expression="${groupNameMappingFile}"
    * @optional
    */
-  private String groupNameMappingFile;
+  private File groupNameMappingFile;
   /**
    * Holds a mapping between original group name file & renamed one.
    */
@@ -96,6 +97,21 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void onBeforeExecute() {
+    if (groupNameMappingFile != null && isIncrementalBuild()) {
+      groupNames.clear();
+      try {
+        //reuse stored properties for incremental build
+        groupNames.load(new FileInputStream(groupNameMappingFile));
+      } catch(final IOException e) {
+        getLog().debug("Cannot load " + groupNameMappingFile.getPath());
+      }
+    }
+  }
 
   /**
    * {@inheritDoc}
@@ -324,7 +340,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @param groupNameMappingFile the groupNameMappingFile to set
    * @VisibleForTesting
    */
-  void setGroupNameMappingFile(final String groupNameMappingFile) {
+  void setGroupNameMappingFile(final File groupNameMappingFile) {
     this.groupNameMappingFile = groupNameMappingFile;
   }
 }
