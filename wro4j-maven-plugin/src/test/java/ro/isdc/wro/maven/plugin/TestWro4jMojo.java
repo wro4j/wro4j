@@ -3,8 +3,10 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -55,9 +57,11 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.DefaultHashEncoderNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.FolderHashEncoderNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.WroTestUtils;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -297,7 +301,7 @@ public class TestWro4jMojo {
 
     final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
 
-    mojo.setGroupNameMappingFile(groupNameMappingFile.getPath());
+    mojo.setGroupNameMappingFile(groupNameMappingFile);
     mojo.setIgnoreMissingResources(true);
     mojo.execute();
 
@@ -318,7 +322,7 @@ public class TestWro4jMojo {
     final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
 
     mojo.setWroManagerFactory(CustomNamingStrategyWroManagerFactory.class.getName());
-    mojo.setGroupNameMappingFile(groupNameMappingFile.getPath());
+    mojo.setGroupNameMappingFile(groupNameMappingFile);
     mojo.setIgnoreMissingResources(true);
     mojo.execute();
 
@@ -334,7 +338,6 @@ public class TestWro4jMojo {
   @Test
   public void shouldUseConfiguredNamingStrategy()
       throws Exception {
-    Context.unset();
     setWroWithValidResources();
 
     final File extraConfigFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
@@ -471,6 +474,62 @@ public class TestWro4jMojo {
     when(mockLocatorFactory.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
 
     assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+  }
+
+  @Test
+  public void shouldReuseGroupNameMappingFileWithIncrementalBuild()
+      throws Exception {
+    final File groupNameMappingFile = WroUtil.createTempFile();
+
+    final Resource g1Resource = spy(Resource.create("1.js"));
+    try {
+      final WroModel model = new WroModel();
+      model.addGroup(new Group("g1").addResource(g1Resource));
+      model.addGroup(new Group("g2").addResource(Resource.create("2.js")));
+      mojo = new Wro4jMojo() {
+        @Override
+        protected WroManagerFactory newWroManagerFactory()
+            throws MojoExecutionException {
+          final DefaultStandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory();
+          managerFactory.setUriLocatorFactory(WroTestUtils.createResourceMockingLocatorFactory());
+          managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(model));
+          managerFactory.setNamingStrategy(new DefaultHashEncoderNamingStrategy());
+          return managerFactory;
+        }
+      };
+      setUpMojo(mojo);
+      mojo.setBuildContext(mockBuildContext);
+
+      mojo.setGroupNameMappingFile(groupNameMappingFile);
+      when(mockBuildContext.isIncremental()).thenReturn(true);
+
+      assertEquals(2, mojo.getTargetGroupsAsList().size());
+      mojo.execute();
+      final Properties groupNames = new Properties();
+      groupNames.load(new FileInputStream(groupNameMappingFile));
+      assertEquals(4, groupNames.entrySet().size());
+
+      //change the uri of the resource from group a (equivalent to changing its content.
+      when(g1Resource.getUri()).thenReturn("1a.js");
+      when(mockBuildContext.getValue(Mockito.eq("1a.js"))).thenAnswer(new Answer<Object>() {
+        public Object answer(final InvocationOnMock invocation)
+            throws Throwable {
+          final String key = (String) invocation.getArguments()[0];
+          return mojo.getManagerFactory().create().getHashStrategy().getHash(new ByteArrayInputStream(key.getBytes()));
+        }
+      });
+
+
+      assertEquals(1, mojo.getTargetGroupsAsList().size());
+      mojo.execute();
+
+      groupNames.load(new FileInputStream(groupNameMappingFile));
+      // The number of persisted groupNames should still be unchanged, even though only a single group has been changed
+      // after incremental build.
+      assertEquals(4, groupNames.entrySet().size());
+    } finally {
+      FileUtils.deleteQuietly(groupNameMappingFile);
+    }
   }
 
   private Answer<InputStream> answerWithContent(final String content) {

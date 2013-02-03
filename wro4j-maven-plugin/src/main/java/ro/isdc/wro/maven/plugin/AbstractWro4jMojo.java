@@ -360,7 +360,7 @@ public abstract class AbstractWro4jMojo
     return false;
   }
 
-  private boolean isIncrementalBuild() {
+  protected final boolean isIncrementalBuild() {
     return buildContext != null && buildContext.isIncremental();
   }
 
