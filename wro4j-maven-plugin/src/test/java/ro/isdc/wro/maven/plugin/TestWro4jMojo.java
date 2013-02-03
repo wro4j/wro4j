@@ -3,8 +3,10 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -23,7 +25,6 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
@@ -482,9 +483,11 @@ public class TestWro4jMojo {
   public void shouldReuseGroupNameMappingFileWithIncrementalBuild()
       throws Exception {
     final File groupNameMappingFile = WroUtil.createTempFile();
+
+    final Resource g1Resource = spy(Resource.create("1.js"));
     try {
       final WroModel model = new WroModel();
-      model.addGroup(new Group("g1").addResource(Resource.create("1.js")));
+      model.addGroup(new Group("g1").addResource(g1Resource));
       model.addGroup(new Group("g2").addResource(Resource.create("2.js")));
       mojo = new Wro4jMojo() {
         @Override
@@ -498,17 +501,35 @@ public class TestWro4jMojo {
         }
       };
       setUpMojo(mojo);
+      mojo.setBuildContext(mockBuildContext);
 
       mojo.setGroupNameMappingFile(groupNameMappingFile);
       when(mockBuildContext.isIncremental()).thenReturn(true);
 
+      assertEquals(2, mojo.getTargetGroupsAsList().size());
+      mojo.execute();
+      final Properties groupNames = new Properties();
+      groupNames.load(new FileInputStream(groupNameMappingFile));
+      assertEquals(4, groupNames.entrySet().size());
+
+      //change the uri of the resource from group a (equivalent to changing its content.
+      when(g1Resource.getUri()).thenReturn("1a.js");
+      when(mockBuildContext.getValue(Mockito.eq("1a.js"))).thenAnswer(new Answer<Object>() {
+        public Object answer(final InvocationOnMock invocation)
+            throws Throwable {
+          final String key = (String) invocation.getArguments()[0];
+          return mojo.getManagerFactory().create().getHashStrategy().getHash(new ByteArrayInputStream(key.getBytes()));
+        }
+      });
+
+
+      assertEquals(1, mojo.getTargetGroupsAsList().size());
       mojo.execute();
 
-      System.out.println(IOUtils.toString(new FileInputStream(groupNameMappingFile)));
-
-      mojo.execute();
-
-      System.out.println(IOUtils.toString(new FileInputStream(groupNameMappingFile)));
+      groupNames.load(new FileInputStream(groupNameMappingFile));
+      // The number of persisted groupNames should still be unchanged, even though only a single group has been changed
+      // after incremental build.
+      assertEquals(4, groupNames.entrySet().size());
     } finally {
       FileUtils.deleteQuietly(groupNameMappingFile);
     }

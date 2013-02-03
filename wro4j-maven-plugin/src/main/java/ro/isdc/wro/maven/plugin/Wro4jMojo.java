@@ -102,8 +102,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   @Override
   protected void onBeforeExecute() {
+    groupNames.clear();
     if (groupNameMappingFile != null && isIncrementalBuild()) {
-      groupNames.clear();
       try {
         //reuse stored properties for incremental build
         groupNames.load(new FileInputStream(groupNameMappingFile));
