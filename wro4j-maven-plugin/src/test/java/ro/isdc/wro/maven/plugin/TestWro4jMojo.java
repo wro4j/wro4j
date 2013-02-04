@@ -491,7 +491,7 @@ public class TestWro4jMojo {
         protected WroManagerFactory newWroManagerFactory()
             throws MojoExecutionException {
           final DefaultStandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory();
-          managerFactory.setUriLocatorFactory(WroTestUtils.createResourceMockingLocatorFactory());
+          managerFactory.setLocatorFactory(WroTestUtils.createResourceMockingLocatorFactory());
           managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(model));
           managerFactory.setNamingStrategy(new DefaultHashEncoderNamingStrategy());
           return managerFactory;
