@@ -39,6 +39,10 @@ public class SmartWroModelFactory extends AbstractWroModelFactory {
    * The default location of the wro model file.
    */
   private static final String DEFAULT_WRO_FILE = "/src/main/webapp/WEB-INF/wro.xml";
+  /**
+   * Alias for this model factory used by provider.
+   */
+  public static final String ALIAS = "smart";
   @Inject
   private Injector injector;
   private List<WroModelFactory> factoryList;

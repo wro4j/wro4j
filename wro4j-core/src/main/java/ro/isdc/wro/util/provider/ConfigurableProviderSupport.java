@@ -5,6 +5,7 @@ import java.util.Map;
 
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -14,7 +15,7 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 /**
  * Default implementation of {@link ConfigurableProvider} which provides nothing by default.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
@@ -27,7 +28,7 @@ public class ConfigurableProviderSupport
   public Map<String, ResourcePreProcessor> providePreProcessors() {
     return new HashMap<String, ResourcePreProcessor>();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -55,18 +56,25 @@ public class ConfigurableProviderSupport
   public Map<String, UriLocator> provideLocators() {
     return new HashMap<String, UriLocator>();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public Map<String, CacheStrategy> provideCacheStrategies() {
     return new HashMap<String, CacheStrategy>();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public Map<String, RequestHandler> provideRequestHandlers() {
     return new HashMap<String, RequestHandler>();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Map<String, WroModelFactory> provideModelFactories() {
+    return new HashMap<String, WroModelFactory>();
   }
 }
