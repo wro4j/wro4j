@@ -2,8 +2,11 @@ package ro.isdc.wro.model.spi;
 
 import java.util.Map;
 
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
@@ -14,18 +17,13 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
  */
 public class ConfigurableModelFactory
     extends AbstractConfigurableSingleStrategy<WroModelFactory, ModelFactoryProvider>
-    implements ModelFactoryProvider {
+    implements WroModelFactory {
   /**
    * Property name to specify alias.
    */
   public static final String KEY = "modelFactory";
-  /**
-   * {@inheritDoc}
-   */
-  public Map<String, WroModelFactory> provideModelFactories() {
-    return null;
-  }
-
+  @Inject
+  private Injector injector;
   /**
    * {@inheritDoc}
    */
@@ -48,5 +46,20 @@ public class ConfigurableModelFactory
   @Override
   protected String getStrategyKey() {
     return KEY;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public WroModel create() {
+    final WroModelFactory modelFactory = getConfiguredStrategy();
+    injector.inject(modelFactory);
+    return modelFactory.create();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void destroy() {
   }
 }
