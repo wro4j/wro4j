@@ -14,11 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ConfigurableCacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.ConfigurableCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
+import ro.isdc.wro.model.factory.ConfigurableModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
@@ -165,6 +167,21 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       protected Properties newProperties() {
         final Properties props = new Properties();
         updatePropertiesWithConfiguration(props, ConfigurableCacheStrategy.KEY);
+        return props;
+      }
+    };
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroModelFactory newModelFactory() {
+    return new ConfigurableModelFactory() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableModelFactory.KEY);
         return props;
       }
     };

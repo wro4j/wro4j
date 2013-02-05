@@ -21,7 +21,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -52,7 +51,7 @@ import ro.isdc.wro.util.StopWatch;
  * groups.
  * <p/>
  * This class is thread-safe (the create method is synchronized).
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -62,17 +61,20 @@ public class XmlModelFactory
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(XmlModelFactory.class);
-  
+  /**
+   * The alias for this model factory used by spi provider.
+   */
+  public static final String ALIAS = "xml";
   /**
    * Default xml filename.
    */
   private static final String DEFAULT_FILE_NAME = "wro.xml";
-  
+
   /**
    * Default xml to parse.
    */
   private static final String XML_SCHEMA_FILE = "wro.xsd";
-  
+
   /**
    * Group tag used in xml.
    */
@@ -85,17 +87,17 @@ public class XmlModelFactory
    * CSS tag used in xml.
    */
   private static final String TAG_CSS = "css";
-  
+
   /**
    * JS tag used in xml.
    */
   private static final String TAG_JS = "js";
-  
+
   /**
    * GroupRef tag used in xml.
    */
   private static final String TAG_GROUP_REF = "group-ref";
-  
+
   /**
    * Group name attribute.
    */
@@ -110,19 +112,19 @@ public class XmlModelFactory
    * pre processing.
    */
   private static final String ATTR_MINIMIZE = "minimize";
-  
+
   /**
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
    * any element.
    */
   final Map<String, Element> allGroupElements = new HashMap<String, Element>();
-  
+
   /**
    * List of groups which are currently being processing and are partially parsed. This list is useful in order to catch
    * infinite recurse group reference.
    */
   final Collection<String> groupsInProcess = new HashSet<String>();
-  
+
   /**
    * Used to locate imports;
    */
@@ -148,7 +150,7 @@ public class XmlModelFactory
    */
   public XmlModelFactory() {
   }
-  
+
   /**
    * Allow aggregate processed imports during recursive model creation.
    */
@@ -156,7 +158,7 @@ public class XmlModelFactory
     Validate.notNull(processedImports);
     this.processedImports.addAll(processedImports);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -175,7 +177,7 @@ public class XmlModelFactory
       stopWatch.start("processImports");
       processImports(document);
       stopWatch.stop();
-      
+
       stopWatch.start("createModel");
       parseGroups();
       stopWatch.stop();
@@ -186,7 +188,7 @@ public class XmlModelFactory
       LOG.debug(stopWatch.prettyPrint());
     }
   }
-  
+
   /**
    * @return valid {@link Document} of the xml containing model representation.
    */
@@ -208,7 +210,7 @@ public class XmlModelFactory
       IOUtils.closeQuietly(is);
     }
   }
-  
+
   /**
    * @param document
    *          xml document to validate.
@@ -219,13 +221,13 @@ public class XmlModelFactory
     final Schema schema = factory.newSchema(new StreamSource(getSchemaStream()));
     schema.newValidator().validate(new DOMSource(document));
   }
-  
+
   private InputStream getSchemaStream()
       throws IOException {
     // use the class located in same package where xsd is located
     return WroRuntimeException.class.getResourceAsStream(XML_SCHEMA_FILE);
   }
-  
+
   /**
    * Initialize the map
    */
@@ -238,7 +240,7 @@ public class XmlModelFactory
       allGroupElements.put(name, groupElement);
     }
   }
-  
+
   private void processImports(final Document document) {
     final NodeList importsList = document.getElementsByTagName(TAG_IMPORT);
     LOG.debug("number of imports: {}", importsList.getLength());
@@ -252,7 +254,7 @@ public class XmlModelFactory
         LOG.error(message);
         throw new RecursiveGroupDefinitionException(message);
       }
-      
+
       processedImports.add(name);
       model.merge(createImportedModel(name));
     }
@@ -270,7 +272,7 @@ public class XmlModelFactory
         return locatorFactory.getLocator(modelLocation);
       }
     };
-    //inject manually created modelFactory 
+    //inject manually created modelFactory
     injector.inject(importedModelFactory);
     try {
       return importedModelFactory.create();
@@ -279,10 +281,10 @@ public class XmlModelFactory
       throw e;
     }
   }
-  
+
   /**
    * Parse the document and creates groups which are added to the provided model.
-   * 
+   *
    * @param document
    *          to parse.
    */
@@ -292,11 +294,11 @@ public class XmlModelFactory
       parseGroup(element);
     }
   }
-  
+
   /**
    * Recursive method. Add the parsed element group to the group collection. If the group contains group-ref element,
    * parse recursively this group.
-   * 
+   *
    * @param element
    *          Group Element to parse.
    * @param groups
@@ -306,7 +308,7 @@ public class XmlModelFactory
   private Collection<Resource> parseGroup(final Element element) {
     final String name = element.getAttribute(ATTR_GROUP_NAME);
     final String isAbstractAsString = element.getAttribute(ATTR_GROUP_ABSTRACT);
-    boolean isAbstractGroup = StringUtils.isNotEmpty(isAbstractAsString) && Boolean.valueOf(isAbstractAsString);
+    final boolean isAbstractGroup = StringUtils.isNotEmpty(isAbstractAsString) && Boolean.valueOf(isAbstractAsString);
     if (groupsInProcess.contains(name)) {
       throw new RecursiveGroupDefinitionException("Infinite Recursion detected for the group: " + name
           + ". Recursion path: " + groupsInProcess);
@@ -340,11 +342,11 @@ public class XmlModelFactory
     }
     return resources;
   }
-  
+
   /**
    * Creates a resource from a given resourceElement. It can be css, js. If resource tag name is group-ref, the method
    * will start a recursive computation.
-   * 
+   *
    * @param resourceElement
    * @param resources
    *          list of parsed resources where the parsed resource is added.
@@ -385,11 +387,11 @@ public class XmlModelFactory
         throw new WroRuntimeException("Invalid group-ref: " + groupName);
       }
       groupResources = parseGroup(groupElement);
-      return groupResources;      
+      return groupResources;
     }
     return foundGroup.getResources();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -397,14 +399,14 @@ public class XmlModelFactory
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
   }
-  
+
   /**
    * @return true if xml validation should be performed.
    */
   private boolean isValidateXml() {
     return this.validateXml;
   }
-  
+
   /**
    * Allows disable the xml validation (which is true by default. Be aware that this is not a good idea to disable
    * validation, because you cannot be sure that the model is built correctly. Disabling makes sense only when for some
@@ -416,7 +418,7 @@ public class XmlModelFactory
     this.validateXml = validateXml;
     return this;
   }
-  
+
   /**
    * @return the resourceLocatorFactory
    */

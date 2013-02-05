@@ -37,6 +37,10 @@ public class JsonModelFactory
    * Default name of the file used to retrieve the model.
    */
   private static final String DEFAULT_FILE_NAME = "wro.json";
+  /**
+   * Alias for this model factory used by provider.
+   */
+  public static final String ALIAS = "json";
 
   /**
    * {@inheritDoc}
