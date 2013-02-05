@@ -2,11 +2,12 @@ package ro.isdc.wro.model.spi;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
@@ -18,17 +19,25 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 public class ConfigurableModelFactory
     extends AbstractConfigurableSingleStrategy<WroModelFactory, ModelFactoryProvider>
     implements WroModelFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigurableModelFactory.class);
   /**
    * Property name to specify alias.
    */
   public static final String KEY = "modelFactory";
-  @Inject
-  private Injector injector;
   /**
    * {@inheritDoc}
    */
   @Override
   protected WroModelFactory getDefaultStrategy() {
+    try {
+      LOG.debug("Trying to use SmartWroModelFactory as default model factory");
+      final Class<? extends WroModelFactory> smartFactoryClass = Class.forName(
+          "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
+      return smartFactoryClass.newInstance();
+    } catch (final Exception e) {
+      LOG.debug("SmartWroModelFactory is not available. Using default model factory.");
+      LOG.debug("Reason: {}", e.getMessage());
+    }
     return new XmlModelFactory();
   }
 
@@ -52,14 +61,13 @@ public class ConfigurableModelFactory
    * {@inheritDoc}
    */
   public WroModel create() {
-    final WroModelFactory modelFactory = getConfiguredStrategy();
-    injector.inject(modelFactory);
-    return modelFactory.create();
+    return getConfiguredStrategy().create();
   }
 
   /**
    * {@inheritDoc}
    */
   public void destroy() {
+    getConfiguredStrategy().destroy();
   }
 }

@@ -2,7 +2,9 @@ package ro.isdc.wro.util.provider;
 
 import java.util.Map;
 
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.spi.CacheStrategyProvider;
 import ro.isdc.wro.cache.spi.DefaultCacheStrategyProvider;
 import ro.isdc.wro.http.handler.RequestHandler;
@@ -75,7 +77,7 @@ public class DefaultConfigurableProvider
    * {@inheritDoc}
    */
   @Override
-  public Map<String, CacheStrategy> provideCacheStrategies() {
+  public Map<String, CacheStrategy<CacheKey, CacheValue>> provideCacheStrategies() {
     return cacheStrategyProvider.provideCacheStrategies();
   }
 
