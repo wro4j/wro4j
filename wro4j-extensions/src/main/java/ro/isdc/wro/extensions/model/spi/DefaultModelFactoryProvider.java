@@ -5,6 +5,7 @@ import java.util.Map;
 
 import ro.isdc.wro.extensions.model.factory.GroovyModelFactory;
 import ro.isdc.wro.extensions.model.factory.JsonModelFactory;
+import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.spi.ModelFactoryProvider;
 
@@ -27,6 +28,7 @@ public class DefaultModelFactoryProvider
     final Map<String, WroModelFactory> map = new HashMap<String, WroModelFactory>();
     map.put(GroovyModelFactory.ALIAS, new GroovyModelFactory());
     map.put(JsonModelFactory.ALIAS, new JsonModelFactory());
+    map.put(SmartWroModelFactory.ALIAS, new SmartWroModelFactory());
     return map;
   }
 }

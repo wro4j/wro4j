@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.manager.factory;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +31,9 @@ import ro.isdc.wro.cache.ConfigurableCacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.model.factory.ConfigurableModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -379,7 +384,26 @@ public class TestConfigurableWroManagerFactory {
     victim.setConfigProperties(configProperties);
     final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) AbstractDecorator.getOriginalDecoratedObject(victim
         .create().getCacheStrategy())).getConfiguredStrategy();
-    Assert.assertEquals(MemoryCacheStrategy.class, actual.getClass());
+    assertEquals(MemoryCacheStrategy.class, actual.getClass());
+  }
+
+  @Test
+  public void shouldUseConfiguredModelFactory() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableModelFactory.KEY, XmlModelFactory.ALIAS);
+    victim.setConfigProperties(configProperties);
+    final WroModelFactory actual = ((ConfigurableModelFactory) AbstractDecorator.getOriginalDecoratedObject(victim
+        .create().getModelFactory())).getConfiguredStrategy();
+    assertEquals(XmlModelFactory.class, actual.getClass());
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void cannotUseInvalidConfiguredModelFactory() throws Exception {
+    final Properties configProperties = new Properties();
+    configProperties.setProperty(ConfigurableModelFactory.KEY, "invalid");
+    victim.setConfigProperties(configProperties);
+    ((ConfigurableModelFactory) AbstractDecorator.getOriginalDecoratedObject(victim
+        .create().getModelFactory())).getConfiguredStrategy();
   }
 
 

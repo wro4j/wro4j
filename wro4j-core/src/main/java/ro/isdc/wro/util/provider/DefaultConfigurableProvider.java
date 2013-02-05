@@ -10,6 +10,7 @@ import ro.isdc.wro.cache.spi.DefaultCacheStrategyProvider;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.spi.DefaultRequestHandlerProvider;
 import ro.isdc.wro.http.handler.spi.RequestHandlerProvider;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.DefaultLocatorProvider;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
@@ -23,6 +24,8 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.DefaultNamingStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
+import ro.isdc.wro.model.spi.DefaultModelFactoryProvider;
+import ro.isdc.wro.model.spi.ModelFactoryProvider;
 import ro.isdc.wro.util.Ordered;
 
 /**
@@ -40,7 +43,7 @@ public class DefaultConfigurableProvider
   private final LocatorProvider locatorProvider = new DefaultLocatorProvider();
   private final CacheStrategyProvider cacheStrategyProvider = new DefaultCacheStrategyProvider();
   private final RequestHandlerProvider requestHandlerProvider = new DefaultRequestHandlerProvider();
-
+  private final ModelFactoryProvider modelFactoryProvider = new DefaultModelFactoryProvider();
   /**
    * {@inheritDoc}
    */
@@ -95,6 +98,14 @@ public class DefaultConfigurableProvider
   @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
     return requestHandlerProvider.provideRequestHandlers();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Map<String, WroModelFactory> provideModelFactories() {
+    return modelFactoryProvider.provideModelFactories();
   }
 
   /**

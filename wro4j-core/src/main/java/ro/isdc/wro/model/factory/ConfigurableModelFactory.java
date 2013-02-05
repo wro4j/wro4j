@@ -1,4 +1,4 @@
-package ro.isdc.wro.model.spi;
+package ro.isdc.wro.model.factory;
 
 import java.util.Map;
 
@@ -6,9 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.WroModel;
-import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
+import ro.isdc.wro.model.spi.ModelFactoryProvider;
 
 
 /**
@@ -47,6 +46,11 @@ public class ConfigurableModelFactory
   @Override
   protected Map<String, WroModelFactory> getStrategies(final ModelFactoryProvider provider) {
     return provider.provideModelFactories();
+  }
+
+  @Override
+  protected Class<ModelFactoryProvider> getProviderClass() {
+    return ModelFactoryProvider.class;
   }
 
   /**
