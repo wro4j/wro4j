@@ -35,7 +35,7 @@ public class ConfigurableLocatorFactory
    */
   public static final String PARAM_URI_LOCATORS = "uriLocators";
   
-  private final UriLocatorFactory locatorFactory = newUriLocatorFactory();
+  private final UriLocatorFactory locatorFactory = newLocatorFactory();
 
   /**
    * {@inheritDoc}
@@ -64,7 +64,7 @@ public class ConfigurableLocatorFactory
   /**
    * {@inheritDoc}
    */
-  private UriLocatorFactory newUriLocatorFactory() {
+  private UriLocatorFactory newLocatorFactory() {
     final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
     final List<UriLocator> locators = getConfiguredStrategies();
     for (final UriLocator locator : locators) {

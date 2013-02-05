@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
 /**
  * Uses the {@link NamingStrategy} implementation associated with an alias read from properties file.
- * 
+ *
  * @author Alex Objelean
  * @created 17 Jun 2012
  * @since 1.4.7
@@ -23,16 +21,12 @@ public class ConfigurableNamingStrategy
    * Property name to specify namingStrategy alias.
    */
   public static final String KEY = "namingStrategy";
-  @Inject
-  private Injector injector;
   /**
    * {@inheritDoc}
    */
-  public String rename(String originalName, InputStream inputStream)
+  public String rename(final String originalName, final InputStream inputStream)
       throws IOException {
-    final NamingStrategy namingStrategy = getConfiguredStrategy();
-    injector.inject(namingStrategy);
-    return namingStrategy.rename(originalName, inputStream);
+    return getConfiguredStrategy().rename(originalName, inputStream);
   }
 
   /**
@@ -50,7 +44,7 @@ public class ConfigurableNamingStrategy
   protected Map<String, NamingStrategy> getStrategies(final NamingStrategyProvider provider) {
     return provider.provideNamingStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */

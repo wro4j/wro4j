@@ -14,11 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ConfigurableCacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.ConfigurableCacheStrategy;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
+import ro.isdc.wro.model.factory.ConfigurableModelFactory;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.ConfigurableLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -109,13 +111,13 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         return props;
       }
       @Override
-      protected Map<String, ResourcePostProcessor> getPostProcessorStrategies(ProcessorProvider provider) {
+      protected Map<String, ResourcePostProcessor> getPostProcessorStrategies(final ProcessorProvider provider) {
         final Map<String, ResourcePostProcessor> map = super.getPostProcessorStrategies(provider);
         contributePostProcessors(map);
         return map;
       }
       @Override
-      protected Map<String, ResourcePreProcessor> getPreProcessorStrategies(ProcessorProvider provider) {
+      protected Map<String, ResourcePreProcessor> getPreProcessorStrategies(final ProcessorProvider provider) {
         final Map<String, ResourcePreProcessor> map = super.getPreProcessorStrategies(provider);
         contributePreProcessors(map);
         return map;
@@ -153,7 +155,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       }
     };
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -168,11 +170,26 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
       }
     };
   }
-  
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected WroModelFactory newModelFactory() {
+    return new ConfigurableModelFactory() {
+      @Override
+      protected Properties newProperties() {
+        final Properties props = new Properties();
+        updatePropertiesWithConfiguration(props, ConfigurableModelFactory.KEY);
+        return props;
+      }
+    };
+  }
+
   /**
    * Add to properties a new key with value extracted either from filterConfig or from configurable properties file.
    * This method helps to ensure backward compatibility of the filterConfig vs configProperties configuration.
-   * 
+   *
    * @param props
    *          the {@link Properties} which will be populated with the value extracted from filterConfig or
    *          configProperties for the provided key.

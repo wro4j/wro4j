@@ -59,7 +59,10 @@ public class XmlModelFactory
    * Logger for this class.
    */
   private static final Logger LOG = LoggerFactory.getLogger(XmlModelFactory.class);
-
+  /**
+   * The alias for this model factory used by spi provider.
+   */
+  public static final String ALIAS = "xml";
   /**
    * Default xml filename.
    */
@@ -107,7 +110,6 @@ public class XmlModelFactory
    * pre processing.
    */
   private static final String ATTR_MINIMIZE = "minimize";
-
   /**
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
    * any element.
