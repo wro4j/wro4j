@@ -30,9 +30,7 @@ import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
-import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.ConfigurableModelFactory;
-import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
@@ -43,7 +41,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.AbstractDecorator;
-import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * @author Alex Objelean
@@ -72,10 +69,6 @@ public class TestConfigurableWroManagerFactory {
       @Override
       protected Properties createProperties() {
         return properties;
-      }
-      @Override
-      protected WroModelFactory newModelFactory() {
-        return WroTestUtils.simpleModelFactory(new WroModel());
       }
     };
     final StandaloneContext context = new StandaloneContext();
