@@ -19,9 +19,9 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * @created 15 May 2011
  * @since 1.3.7
  */
-public final class DefaultProcesorsFactory
+public final class DefaultProcessorsFactory
   extends SimpleProcessorsFactory {
-  public DefaultProcesorsFactory() {
+  public DefaultProcessorsFactory() {
     addPreProcessor(new CssUrlRewritingProcessor());
     addPreProcessor(new CssImportPreProcessor());
     addPreProcessor(new SemicolonAppenderPreProcessor());
