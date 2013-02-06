@@ -114,7 +114,7 @@ public class SmartWroModelFactory
     return new LazyWroModelFactoryDecorator(new LazyInitializer<WroModelFactory>() {
       @Override
       protected WroModelFactory initialize() {
-        return new GroovyModelFactory() {
+        final WroModelFactory modelFactory = new GroovyModelFactory() {
           @Override
           protected InputStream getModelResourceAsStream()
               throws IOException {
@@ -124,6 +124,8 @@ public class SmartWroModelFactory
             return createAutoDetectedStream(getDefaultModelFilename());
           }
         };
+        injector.inject(modelFactory);
+        return modelFactory;
       }
     });
   }
@@ -132,7 +134,7 @@ public class SmartWroModelFactory
     return new LazyWroModelFactoryDecorator(new LazyInitializer<WroModelFactory>() {
       @Override
       protected WroModelFactory initialize() {
-        return new JsonModelFactory() {
+        final WroModelFactory modelFactory = new JsonModelFactory() {
           @Override
           protected InputStream getModelResourceAsStream()
               throws IOException {
@@ -142,6 +144,8 @@ public class SmartWroModelFactory
             return createAutoDetectedStream(getDefaultModelFilename());
           }
         };
+        injector.inject(modelFactory);
+        return modelFactory;
       }
     });
   }

@@ -79,7 +79,7 @@ public class ResourceWatcher {
    */
   protected void onException(final Exception e) {
     // not using ERROR log intentionally, since this error is not that important
-    LOG.info("Could not check for resource changes because: {}", e);
+    LOG.info("Could not check for resource changes because: {}", e.getMessage());
     LOG.debug("[FAIL] detecting resource change ", e);
   }
 

@@ -44,10 +44,10 @@ public abstract class AbstractConfigurableSingleStrategy<S, P>
           throw new WroRuntimeException("Invalid strategy alias provided: <" + alias + ">. Available aliases are: "
               + getAvailableAliases());
         }
-        // inject only when injector is available.
-        if (injector != null) {
-          injector.inject(configuredStrategy);
-        }
+      }
+      // inject only when injector is available.
+      if (injector != null) {
+        injector.inject(configuredStrategy);
       }
       LOG.debug("using strategy: {}", configuredStrategy);
     }
