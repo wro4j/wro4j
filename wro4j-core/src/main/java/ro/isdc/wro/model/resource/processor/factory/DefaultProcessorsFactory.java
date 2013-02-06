@@ -1,5 +1,5 @@
 /**
- * Copyright Alex Objelean
+ * Copyright wro4j@2011
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
@@ -11,21 +11,22 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
 
 
+
 /**
- * A factory which contains most used processors.
+ * Default {@link ProcessorsFactory} which provides most commons processors.
  *
  * @author Alex Objelean
- * @created 2 apr 2011
- * @since 1.4.0
+ * @created 15 May 2011
+ * @since 1.3.7
  */
-public final class DefaultProcessorsFactory extends SimpleProcessorsFactory {
+public final class DefaultProcessorsFactory
+  extends SimpleProcessorsFactory {
   public DefaultProcessorsFactory() {
-    addPreProcessor(new CssImportPreProcessor());
     addPreProcessor(new CssUrlRewritingProcessor());
+    addPreProcessor(new CssImportPreProcessor());
     addPreProcessor(new SemicolonAppenderPreProcessor());
     addPreProcessor(new JSMinProcessor());
     addPreProcessor(new JawrCssMinifierProcessor());
-
     addPostProcessor(new CssVariablesProcessor());
   }
 }

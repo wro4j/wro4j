@@ -63,6 +63,10 @@ public class DefaultStandaloneContextAwareManagerFactory
     };
   }
 
+  @Override
+  protected ProcessorsFactory newProcessorsFactory() {
+    return new DefaultProcessorsFactory();
+  }
 
   /**
    * {@inheritDoc}
