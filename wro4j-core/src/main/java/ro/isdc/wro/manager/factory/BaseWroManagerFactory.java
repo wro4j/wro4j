@@ -29,6 +29,7 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -196,7 +197,7 @@ public class BaseWroManagerFactory
    * @return {@link ProcessorsFactory} object.
    */
   protected ProcessorsFactory newProcessorsFactory() {
-    return new DefaultProcesorsFactory();
+    return new DefaultProcessorsFactory();
   }
 
   /**

@@ -16,6 +16,8 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.FileSystemResourceLocator;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 /**
  * {@link WroManagerFactory} instance used by the maven plugin.

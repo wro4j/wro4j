@@ -111,7 +111,7 @@ public class SmartWroModelFactory
     };
   }
 
-  private GroovyModelFactory newGroovyModelFactory() {
+  private WroModelFactory newGroovyModelFactory() {
     return new LazyWroModelFactoryDecorator(new LazyInitializer<WroModelFactory>() {
       @Override
       protected WroModelFactory initialize() {
@@ -130,18 +130,19 @@ public class SmartWroModelFactory
     });
   }
 
-  private JsonModelFactory newJsonModelFactory() {
+  private WroModelFactory newJsonModelFactory() {
     return new LazyWroModelFactoryDecorator(new LazyInitializer<WroModelFactory>() {
       @Override
       protected WroModelFactory initialize() {
         final WroModelFactory modelFactory = new JsonModelFactory() {
-      @Override
-      protected ResourceLocator getModelResourceLocator() {
-        if (wroFile == null) {
-          return super.getModelResourceLocator();
-        }
-        return createAutoDetectedResourceLocator(getDefaultModelFilename());
-      };
+          @Override
+          protected ResourceLocator getModelResourceLocator() {
+            if (wroFile == null) {
+              return super.getModelResourceLocator();
+            }
+            return createAutoDetectedResourceLocator(getDefaultModelFilename());
+          };
+        };
         injector.inject(modelFactory);
         return modelFactory;
       }
