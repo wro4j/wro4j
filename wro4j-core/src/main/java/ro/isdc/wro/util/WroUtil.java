@@ -47,10 +47,11 @@ public final class WroUtil {
   public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile(loadRegexpWithKey("emptyLine"),
       Pattern.MULTILINE);
   /**
-   * Thread safe date format used to transform milliseconds into date as string to put in response header.
+   * Thread safe date format used to transform milliseconds into date as string to put in response header. The localy is
+   * set explicitly to US to conform to specification.
    */
   private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("E, dd MMM yyyy HH:mm:ss z",
-      TimeZone.getTimeZone("GMT"));
+      TimeZone.getTimeZone("GMT"), Locale.US);
   /**
    * Patterns used to search for mangled Accept-Encoding header.
    */

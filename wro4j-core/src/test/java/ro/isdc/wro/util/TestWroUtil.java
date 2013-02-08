@@ -10,9 +10,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -23,6 +26,17 @@ import org.mockito.Mockito;
  * @author Alex Objelean
  */
 public class TestWroUtil {
+  private Locale defaultLocale;
+  @Before
+  public void setUp() {
+    defaultLocale = Locale.getDefault();
+  }
+
+  @After
+  public void tearDown() {
+    Locale.setDefault(defaultLocale);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void cannotComputeEmptyLocation() {
     WroUtil.getPathInfoFromLocation(mockContextPathRequest(null), "");
@@ -145,4 +159,12 @@ public class TestWroUtil {
   public void shouldCreateMultiLineFromNullString() {
     assertEquals("[].join(\"\\n\")", WroUtil.toJSMultiLineString(null));
   }
+
+  @Test
+  public void shouldGenerateDateAsStringWithUSLocale() {
+    Locale.setDefault(Locale.ITALY);
+    final long milliseconds = 1360278459808l;
+    assertEquals("Thu, 07 Feb 2013 23:07:39 GMT", WroUtil.toDateAsString(milliseconds));
+  }
+
 }
