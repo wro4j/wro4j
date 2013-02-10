@@ -1,0 +1,398 @@
+body{font-family:"Myriad Pro","Segoe UI",Helvetica, Arial, sans-serif;}
+/* **************** CONTENT OBJECTS ***************** */
+/* ====== Default spacing ====== */
+h1, h2, h3, h4, h5, h6, ul, ol,dl, p,blockquote {padding:10px;}
+h1, h2, h3, h4, h5, h6,img{padding-bottom:0px;}
+pre{margin: 10px;}
+table h1,table h2,table h3, table h4, table h5, table h6, table p, table ul, table ol, table dl{padding:0;}
+/* ====== Elements ====== */
+img{display:block;}
+em{font-style: italic;}
+strong{font-weight:bold;}
+hr{border: 5px solid #e2e2e2; border-width: 0 0 5px 0; margin: 20px 10px 10px 10px;}
+code{color:#0B8C8F;}
+/* ====== Headings ====== */
+/* .h1-.h6 classes should be used to maintain the semantically appropriate heading levels - NOT for use on non-headings */
+h1, .h1{font-size:196%; font-weight:normal; font-style: normal; color:#AE0345;}
+h2, .h2{font-size:167%; font-weight:normal; font-style: normal; color:#AE0345;}
+h3, .h3{font-size:146.5%; font-weight:normal; font-style: normal; color:#DF2B72;}
+h4, .h4{font-size:123.1%; font-weight:normal; font-style: normal; color: #333;}
+h5, .h5{font-size:108%; font-weight:bold; font-style: normal; color:#AE0345;}
+h6, .h6{font-size:108%; font-weight:normal; font-style: italic; color:#333;}
+/* if additional headings are needed they should be created via additional classes, never via location dependant styling */
+.category{font-size:108%; font-weight:normal; font-style: normal; text-transform:uppercase; color: #333;}
+.category a{color: #333;}
+.important a{font-weight:bold;}
+/* links */
+a {color: #2c4460; text-decoration: none;}
+a:focus, a:hover {text-decoration: underline;}
+a:focus{background-color:#FFFFCC;}
+a:visited { color:#005a9c; }
+/* ====== Lists ======*/
+/* numbered list */
+ol.simpleList li{list-style-type: decimal; margin-left:40px;}
+/* standard list */
+ul.simpleList li{list-style-type:disc; margin-left:40px;}
+/* ====== Tables ====== */
+.data{padding: 20px; position:relative; zoom:1;vertical-align: top;border-right:solid 1px transparent;/* border fixes a FF2 bug which causes the data table to overlay its borders*/}
+.data table {width:100%;border:1px solid #AE0345;}
+th, td{vertical-align:top;border:1px solid #AE0345;}
+.txtC, .data .txtC td, .data .txtC th{text-align:center;}
+.txtL, .data .txtL td, .data .txtL th{text-align:left;}
+.txtR, .data .txtR td, .data .txtR th{text-align:right;}
+.txtT, .data .txtT td, .data .txtT th{vertical-align:top;}
+.txtB, .data .txtB td, .data .txtB th{vertical-align:bottom;}
+.txtM, .data .txtM td, .data .txtM th{vertical-align:middle;}
+.data th,.data td{padding:3px 20px}
+.data thead tr{background-color: #fff0f8;}
+.data th{color: #000; font-weight:bold}
+/* specification table - extends data table */
+.spec{padding:10px;}
+.spec table{border-top: 1px solid #e2e2e2; border-bottom-color:#fff; border-left:none; border-right:none;}
+.spec th, .spec td{border:1px solid #e2e2e2; border-width: 1px 0; padding-left:0;}
+.spec .odd, .spec .even{background-color: #fff;}
+/* ====== blockquote ====== */
+cite{display:block; text-align:right; padding-top: 10px;}
+/* ====== callout ====== */
+.callout{font-size:189%;color:#999999; font-style:italic;}
+.callout cite{display:block; text-align:right;padding-top: 30px; font-size:69.25%;}
+.callout span.quot{font-size: 500%; vertical-align: sub; color:#e2e2e2; line-height:25px; font-weight:bold;}
+.callout span.quotLast{vertical-align:middle;}
+/* ====== image treatments (get more from jason santa maria) ====== */
+.caption{font-size:13px; color:#666666; font-style:italic;padding-top:0;}
+/* will need to either
+1. find a way to capture the width of the caption in the width of the image or flash
+2. Set some default widths, mby use flickr widths?
+*/
+/* ====== media ====== */
+.media{overflow:hidden; overflow:visible; zoom:1;margin:10px;}
+.media .img{float:left;margin-right: 10px;}
+.media .img img{display:block;}
+.media .imgExt{float:right; margin-left: 10px;}
+/* ====== special formatting classes ====== */
+.detail{color: #777; font-size:11px;display:block;}
+@media screen and (max-width: 319px) {.unit{float: none !important; width: auto !important;}}
+.line:after,.lastUnit:after{clear:both;display:block;visibility:hidden;overflow:hidden;height:0 !important;line-height:0;font-size:xx-large;content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";}
+.line{*zoom:1;}
+.unit{float:left;}
+.size1of1{float:none;}
+.size1of2{width:50%;}
+.size1of3{width:33.33333%;}
+.size2of3{width:66.66666%;}
+.size1of4{width:25%;}
+.size3of4{width:75%;}
+.size1of5{width:20%;}
+.size2of5{width:40%;}
+.size3of5{width:60%;}
+.size4of5{width:80%;}
+.lastUnit{display:table-cell;float:none;width:auto;*display:block;*zoom:1;_position:relative;_left:-3px;_margin-right:-3px;}
+/* grids debug */
+.line{background-color:#e2e2e2;}
+.size1of1{background-color:pink;}
+.size1of2{background-color:red;}
+.size1of3{background-color:orange;}
+.size2of3{background-color: yellow;}
+.size1of4{background-color:lime;}
+.size3of4{background-color:green;}
+.size1of5{background-color:aqua;}
+.size2of5{background-color:blue;}
+.size3of5{background-color:purple;}
+.size4of5{background-color:magenta;}/*
+Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 3.0.0pr2
+*/
+/* reset */
+html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
+/* fonts */
+body{font:13px/1.231 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small;}select,input,button,textarea{font:99% arial,helvetica,clean,sans-serif;}table{font-size:inherit;font:100%;}pre,code,kbd,samp,tt{font-family:monospace;*font-size:108%;line-height:100%;}/*
+Copyright (c) 2009, Nicole Sullivan. All rights reserved.
+Code licensed under the BSD License:
+version: 0.2
+*/
+/* **************** BLOCK STRUCTURES ***************** */
+/* mod */
+.mod{margin:10px;}
+.mod .inner{/*background: url(skin/transparent.png) repeat left top;*/}
+.inner,.bd,.ft{*zoom:1;}
+.inner:after,.hd:after,.bd:after,.ft:after{clear:both;display:block;visibility:hidden;overflow:hidden;height:0 !important;line-height:0;font-size:xx-large;content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";}
+.inner{position:relative;}
+b{display:block;background-repeat:no-repeat;font-size:1%;position:relative;z-index:10;}
+.tl, .tr, .bl, .br{height:10px; width:10px;float:left;}
+.tl{background-position: left top;}
+.tr{background-position: right top;}
+.bl{background-position: left bottom;}
+.br{background-position: right bottom;}
+.br,.tr{float:right;}
+.tr, .tl{overflow:hidden;margin-bottom:-32000px;}/* margin bottom needs to be < -9px */
+.bl,.br{margin-top:-10px;}
+.top{background-position:center top;}
+.bottom{background-position:center bottom;_zoom:1;}/* this zoom required for IE5.5 only*/
+/* complex */
+.complex{overflow:hidden;*position:relative;*zoom:1;}/* position/zoom required for IE7, 6, 5.5 */
+.complex .tl, .complex .tr{height:32000px; margin-bottom:-32000px;width:10px;}
+.complex .bl, .complex .br{/*margin-top:0;*/}
+.complex .top{height:5px;}
+.complex .bottom{height:5px;/*margin-top:-10px;*/}
+/* pop */
+.pop{overflow:visible;margin: 10px 20px 20px 10px; background-position:left top;}
+.pop .inner{right:-10px; bottom:-10px; background-position:right bottom;padding:0 10px 10px 0;}
+.pop .tl, .pop .br{display:none;}
+.pop .bl{bottom:-10px;}
+.pop .tr{right:-10px;}/* debug modules */
+.top, .bottom{background-color:#e2e2e2;}
+.tl{background-color:red;}
+.tr{background-color:orange;}
+.bl{background-color:yellow;}
+.br{background-color:lime;}
+/*.hd{background-color: green;}
+.bd{background-color: teal;}
+.ft{background-color: blue;}*/
+.mod{background-color:purple;}
+.inner{background-color:#E20074;}
+/* **************** BLOCK SKINS ***************** */
+/* ====== Contour blocks ====== */
+/* remove background-image:" to default to square corners for IE */
+/* ----- simple (extends mod) ----- */
+.simple .inner {border:1px solid #D7D7D7;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;}
+.simple b{*background-image:url(skin/simple_corners.png);}
+/* ----- basic (extends mod) ----- */
+.basic .inner {-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;}
+.basic b{*background-image:url(skin/round.png);}
+/* ----- simpleExt (extends mod) ----- */
+.simpleExt,.simpleExt .inner{border:1px solid #c7c7c7;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px; }
+.simpleExt .inner{border-color:#fff; border-width:4px; background-color:#e2e2e2;}
+.simpleExt b{*background-image:url(skin/simple_extended.png);}
+.simpleExt .tl{left:-1px;top:-1px;height:12px; width:12px;}
+.simpleExt .tr{right:-1px;top:-1px;height:12px; width:12px;}
+.simpleExt .bl{left:-1px;bottom:-1px;height:12px; width:12px;margin-top:-12px;}
+.simpleExt .br{right:-1px;bottom:-1px;height:12px; width:12px;margin-top:-12px;}
+/* ----- me (extends mod) use for my comments ----- */
+.me,.me .inner{border:1px solid #909090;-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;}
+.me .inner{border-color:#d76a84;}
+.me b{*background-image:url(skin/me.png);}
+.me .tl{left:-1px;top:-1px;}
+.me .tr{right:-1px;top:-1px;}
+.me .bl{left:-1px;bottom:-1px;}
+.me .br{right:-1px;bottom:-1px;}
+/* ----- noted (extends mod) ----- */
+.noted,.noted .inner{border:1px solid #c2c2c2;-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;}
+.noted .inner{border-color:#eded68;}
+.noted b{*background-image:url(skin/noted.png);}
+.noted .tl{left:-1px;top:-1px;}
+.noted .tr{right:-1px;top:-1px;}
+.noted .bl{left:-1px;bottom:-1px;}
+.noted .br{right:-1px;bottom:-1px;}
+/* ----- grab (extends mod) ----- */
+.grab .inner{border: 3px solid #00477a; border-bottom-width:10px;}/* can't be done w border radius */
+.grab b{background-image:url(skin/grab.png);}
+/*.grab .tl, .grab .tr{height:10px; width:10px;}*/
+.grab .bl, .grab .br{height:16px;/*if height is set, margin set*/margin-top:-16px;}
+/* ----- faq (extends mod) ----- */
+.faq .inner{border: 3px solid #b20029; border-bottom-width:10px;}/* can't be done w border radius */
+.faq b{background-image:url(skin/faq.png);}
+.faq .bl, .faq .br{height:16px;/*if height is set, margin set*/margin-top:-16px;}
+/* ----- onlinestore (extends mod) ----- */
+.onlinestore .inner{border: 3px solid #9a9800; border-bottom-width:10px;}/* can't be done w border radius */
+.onlinestore b{background-image:url(skin/store.png);}
+.onlinestore .bl, .onlinestore .br{height:16px;/*if height is set, margin set*/margin-top:-16px;}
+/* ----- about (extends mod) ----- */
+.about .inner{border: 3px solid #494949; border-bottom-width:10px;}/* can't be done w border radius */
+.about b{background-image:url(skin/about.png);}
+.about .bl, .about .br{height:16px;/*if height is set, margin set*/margin-top:-16px;}
+/* ----- talk (extends mod) ----- */
+.talk,.talk .inner{border:1px solid #c7c7c7;-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;}
+.talk .inner{border-color:#ededed;}
+.talk b{*background-image:url(skin/talk.png);}
+.talk .tl{left:-1px;top:-1px;}
+.talk .tr{right:-1px;top:-1px;}
+.talk .bl{left:-1px;bottom:-1px;}
+.talk .br{right:-1px;bottom:-1px;}
+/* ----- photo (extends complex) ----- */
+.photo .inner{border:solid 10px #fff;margin:0 4px;}/* muck with margins to change how the block will align with other blocks, any value between 0-10px */
+.photo b{background-image:url(skin/photo.png);}
+.photo .tr, .photo .tl{width:20px;}
+.photo .top, .photo .bottom{height:4px;margin-top:0px;}
+.photo .bl, .photo .br{height:16px;margin-top: -12px;}
+/* ----- flow (extends complex) ----- */
+.flow{margin:6px;}
+.flow b{background-image:url(skin/even.png);}
+.flow .inner{padding:0 4px;}
+.flow .top{height:4px;}
+.flow .bottom{height:4px;margin-top:-4px;}
+.flow .br,.flow .bl{margin-top:-6px;}/* margin top = bottom height - corner height */
+/* ----- shadow test (experimental attempt to match "flow" cross browser w no img)----- */
+.boo{-webkit-box-shadow: 0px 0px 1px rgba(0,0,0,33);-moz-box-shadow: black 2px 2px 2px 2px;/*-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;*/border:solid 1px #949494;background:#fff;}
+/* ----- .excerpt (extends complex) ----- */
+.excerpt b{background-image:url(skin/excerpt.png);}
+.excerpt .top{height:1px;}
+.excerpt .bottom{height:6px;margin-top:-6px;}/* margin top equal to - height of bottom */
+.excerpt .br,.excerpt .bl{height:12px;margin-top:-6px;}/* margin top = bottom height - corner height */
+/* ----- sommers (extends pop) ----- */
+.sommers .inner{_border:3px solid #D7D7D7;}/*IE6 backup no alpha transparency */
+.sommers,.sommers .inner,.sommers b{background-image:url(skin/glow_7px.png);_background-image:none;}
+.sommers{margin:3px 20px 20px 3px;}
+/* ----- gonzalo ----- */
+.gonzalo, .gonzalo .inner, .gonzalo b{background-image:url(skin/gc.png);}
+/* ====== Background blocks ====== */
+.sale .inner{background:red none;}
+.nicole .inner{background:#c01c41 none; color:#fff;}
+.nicole *, .login *{ color:#fff;}
+.highlight .inner{background:#e3e36f none;}
+.universe .inner{background:url(skin/universe.png) repeat left top;}
+.foo .inner{background: url(skin/universe_gray.png) repeat left top;}
+.login .inner{background: url(skin/universe_login.png) repeat left top;}
+.comment .inner{background:#e2e2e2 none;}
+/* ====== Block headers and footers ====== */
+.hd h1, .hd h2, .hd h3, .hd h4, .hd h5, .hd h6{padding: 5px 10px;}
+.section{background: #e9e9e9 url(skin/header.png) repeat-x left bottom; color:#de2c72;font-size:120%;padding:5px 10px;}
+.section h1,.section h2,.section h3,.section h4,.section h5,.section h6{font-size:100%;color:#de2c72;padding:0;}
+.act{background-color:#e9e9e9;}
+.topper{background: #fff url(skin/header_gradient_light.png) repeat-x left bottom;color: #4D4D4D;font-size:120%;padding:5px 10px;}
+.topper h1,.topper h2,.topper h3,.topper h4,.topper h5,.topper h6{font-size:100%;color:#4D4D4D;padding:0;}
+.tabPosLeft .topper li,.tabPosRight .topper li{background: #fff url(skin/header_gradient_light.png) repeat-x left bottom;/* belongs in topper */}
+.tabPosBottom .topper{
+  background-image:-webkit-gradient(linear, 0% 0%, 0% 40%, from(#E2E2E2), to(#FFFFFF));
+  background-image:-moz-linear-gradient(0% 8% 270deg, #E2E2E2, #FFFFFF, #FFFFFF 77%);}
+.bam{background: #00477a url(skin/header_glossy.png) repeat-x left top;color: #fff;font-size:120%;padding:5px 10px;}
+.bam h1,.bam h2,.bam h3,.bam h4,.bam h5,.bam h6{font-size:100%;color:#fff;padding:0;}
+.gonz{background:url(skin/gc_header.png) no-repeat left top;}/* messed up */
+.online{background: #9a9400 url(skin/online.png) repeat-x left top;color: #000;font-size:120%;padding:5px 10px;}
+.online h1,.online h2,.online h3,.online h4,.online h5,.online h6{font-size:100%;color:#000;padding:0;}
+.help{background: #b20029 url(skin/help.png) repeat-x left top;color: #fff;font-size:120%;padding:5px 10px;}
+.help h1,.help h2,.help h3,.help h4,.help h5,.help h6{font-size:100%;color:#fff;padding:0;}
+.info{background: #636363 url(skin/info.png) repeat-x left top;color: #fff;font-size:120%;padding:5px 10px;}
+.info h1,.info h2,.info h3,.info h4,.info h5,.info h6{font-size:100%;color:#fff;padding:0;}
+/* **************** TEMPLATE ***************** */
+/* ====== Page Head, Body, and Foot ====== */
+body{_text-align:center;}/* IE5.5 */
+.main{display:table-cell;*display:block;width:auto;}
+.body,.main{*zoom:1;}
+.body:after,.main:after{clear:both;display:block;visibility:hidden;overflow:hidden;height:0 !important;line-height:0;font-size:xx-large;content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";}
+.page{margin:0 auto;width:950px;_text-align:left;} /* wraps other template elems to set width */ /* text-align IE5.5 */
+/* "old school" and "liquid" extend page to allow for different page widths */
+.oldSchool{width:750px;}
+.gs960{width:960px;}
+.liquid{width:auto;margin:0;}
+/* ====== Columns ====== */
+.leftCol{float:left;width:250px;_margin-right:-3px;}
+.rightCol{float:right;width:300px;_margin-left:-3px;}
+/* extend columns to allow for common column widths */
+.gMail{width:160px;}
+.gCal{width:180px;}
+.yahoo{width:240px;}
+.myYahoo{width:300px;}
+/* **************** TEMPLATE DEBUG ***************** */
+.body{background-color:red;}
+.page{background-color:orange;}
+.main{background-color:yellow;}
+.leftCol{background-color:lime;}
+.rightCol{background-color:aqua;}.breadcrumb li{ display: inline;}
+.breadcrumb li:after{ content: "\25B8"; display: inline-block; padding: 0 6px 0 10px;}
+.breadcrumb li:last-child:after{content: "";}
+.breadcrumb a {color: #2c4460 !important;}/*
+TODO: Allow % widths of tabs
+TODO: Abstract skin from tabs
+TODO: clean up selector structure - too much variation in rule strength
+
+*/
+
+.tabs{}
+.tabs .bd{}
+.tabs .hd ul{padding:0; display:table-row;_zoom:1;}
+.tabs .hd li{display:table-cell;*display:inline;vertical-align:middle;}
+.tabs .tabControl a{display:inline-block;text-decoration: none;}
+.tabs .tabControl span{display:inline-block; text-align:center; padding: 5px 20px;}
+.tabs .bd li{display:none;}
+.tabs .bd li li{display:block;}
+.tabs .bd li.current{display:block;}
+
+.tabs .topper{padding:0;}
+
+.tabControl li{border-right:solid 1px #ccc; border-left:solid 1px #fff;}
+.tabControl li:last-child{border-right:none;}
+.tabControl li:first-child{border-left:none;}
+.tabs a{font-weight:normal; color: #333;}
+.tabs .hd .tabControl .current{background-color: #fff;}
+.tabs li a:hover{color:#000;background-color: #fff;}
+.tabs .hd li.current a,.tabs .hd li.current span{cursor: default;}
+.tabs li.current a:hover{color:#333;}
+.tabs .hd li span{cursor:pointer;}
+
+.controls{position:absolute; top:0; right: 0; display: none !important; /* this should move to its' own plugin */}
+.controls a{padding: 10px;}
+
+
+.tabPosLeft .hd .tabControl .current {background-image:none; border-bottom:solid 1px #e2e2e2;border-right:none; margin-right:-1px;}
+.tabPosLeft .tabControl li{border-right:none;}
+.tabPosLeft .hd{border-right: 1px solid #e2e2e2;margin-right:-1px;}
+.tabPosLeft .bd {border-left: 1px solid #e2e2e2; display: table-cell;}
+.tabPosLeft .tabControl a{border-right:1px solid #fff;}
+.tabPosLeft .hd {float:left; width: 33%;}
+.tabPosLeft .tabControl a, .tabPosLeft .tabControl span, .tabPosLeft .tabControl li, .tabPosLeft .hd ul{display:block;text-align: left;}
+.tabPosLeft .tabControl span,.tabPosRight .tabControl span{padding: 5px 10px;}
+
+/* right side tabs */
+
+.tabPosRight .hd .tabControl li{border-left:none; border-right:solid 1px #fff;}
+.tabPosRight .hd .tabControl .current {background-image:none; border-bottom:solid 1px #e2e2e2;border-left:none; margin-left: -1px;}
+.tabPosRight .tabControl a{border-left:1px solid #fff;}
+.tabPosRight .hd {float:right; width: 33%;}
+.tabPosRight .tabControl a, .tabPosRight .tabControl span, .tabPosRight .tabControl li, .tabPosRight .hd ul{display:block;text-align: left;}
+.tabPosRight .hd{border-left: 1px solid #e2e2e2;margin-left:-1px;}
+.tabPosRight .bd {border-right: 1px solid #e2e2e2; display: table-cell;}
+/* bottom side tabs */
+
+
+
+/*.inner:after,.bd:after{clear:both;display:block;visibility:hidden;overflow:hidden;height:0 !important;line-height:0;font-size:xx-large;content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";}
+.inner, .bd{*zoom:1;}*/
+
+
+
+/* debug */
+/*
+.tabs{background-color: brown;}
+.tabs .hd{background-color: black;}
+.tabs .hd ul{background-color: blue;}
+.tabs .hd ul li{background-color: yellow;}
+.tabs .hd ul li a{background-color: orange;}
+*/
+/* **************** TALK BUBBLE ***************** */
+.bubble{overflow:hidden;_overflow:visible;_zoom:1;margin:10px;}
+.bubble b b{position:absolute;height:0;width:0;border: solid 7px transparent;_border: 7px solid #fff /* set color to match background color for IE6 */;}
+.bubble .bottom{visibility:hidden;}
+/* top bubbles */
+.bubbleTop .inner{margin-top:7px;}
+.bubbleTop b b{top:0;left:10px;border-top-style:none;}
+/* left bubbles */
+.bubbleLeft .inner{margin-left:7px;}
+.bubbleLeft b b{top:10px;left:0;border-left-style:none;}
+/* right bubbles */
+.bubbleRight .inner{margin-right:7px;}
+.bubbleRight b b{top:10px;right:0;border-right-style:none;}
+/* bottom bubbles */
+.bubbleBottom .inner{margin-bottom:7px;}
+.bubbleBottom b b{bottom:0;left:10px;border-bottom-style:none;}
+.bubbleBottom .bottom{visibility:visible;}
+/* extensions (swaps alignment of talk bubble) */
+.bubbleHorizontalExt b b{top:auto; bottom:10px;visibility:visible;} /* apply to bubbleLeft or bubbleRight */
+.bubbleVerticalExt b b{right:10px;left:auto;} /* apply to bubbleTop or bubbleBottom *//* yowza (extends bubbleTop) */
+.yowza .inner{background-color:#d4494f;}
+.yowza b b{border-bottom-color:#d4494f;}
+/* discuss (extends bubbleBottom) */
+.discuss .inner{background-color:#CCC;}
+.discuss b b{border-top-color:#CCC;}
+/* lol (extends bubbleLeft) */
+.lol .inner{background-color:#845B4E; color:#fff;}
+.lol b b{border-right-color:#845B4E;}
+/* meep (extends bubbleRight) */
+.meep .inner{background-color:#6cc6c6;}
+.meep b b{border-left-color:#6cc6c6;}
+/* yoyo (extends bubbleBottom) */
+.yoyo .inner{background-color:#52a583;}
+.yoyo b b{border-top-color:#52a583;}
+/* header */
+.fire, .fire *{color: #000; font-size:18px; border-bottom: 1px dashed #fff;}
+.attribution{margin-left:27px;}

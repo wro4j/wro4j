@@ -10,7 +10,7 @@
         <js>/libraries/uglifyJs/**</js>
     </group>
     <group name="styles">
-        <css>/libraries/oocss/**</css>
-        <js>/libraries/uglify/**</js>
+        <css>/assets/oocss/**.css</css>
+        <js>/assets/uglify/**.js</js>
      </group>   
 </groups>

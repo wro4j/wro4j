@@ -1,0 +1,724 @@
+#yelow #short {
+  color: #fea;
+}
+#yelow #long {
+  color: #ffeeaa;
+}
+#yelow #rgba {
+  color: rgba(255, 238, 170, 0.1);
+}
+#blue #short {
+  color: #00f;
+}
+#blue #long {
+  color: #0000ff;
+}
+#blue #rgba {
+  color: rgba(0, 0, 255, 0.1);
+}
+#alpha #hsla {
+  color: rgba(61, 45, 41, 0.6);
+}
+#overflow .a {
+  color: #000000;
+}
+#overflow .b {
+  color: #ffffff;
+}
+#overflow .c {
+  color: #ffffff;
+}
+#overflow .d {
+  color: #00ff00;
+}
+#grey {
+  color: #c8c8c8;
+}
+#808080 {
+  color: #808080;
+}
+#00ff00 {
+  color: #00ff00;
+}
+/******************\
+*                  *
+*  Comment Header  *
+*                  *
+\******************/
+/*
+
+    Comment
+
+*/
+/*  
+ * Comment Test
+ * 
+ * - cloudhead (http://cloudhead.net)
+ *
+ */
+/* Colors
+ * ------
+ *   #EDF8FC (background blue)
+ *   #166C89 (darkest blue)
+ *
+ * Text:
+ *   #333 (standard text) // A comment within a comment!
+ *   #1F9EC9 (standard link)
+ *
+ */
+/* @group Variables
+------------------- */
+#comments {
+  /**/
+  color: red;
+  /* A C-style comment */
+
+  background-color: orange;
+  font-size: 12px;
+  /* lost comment */
+  content: 42;
+  border: 1px solid black;
+  padding: 0;
+  margin: 2em;
+}
+/* commented out
+  #more-comments {
+    color: grey;
+  }
+*/
+#last {
+  color: #0000ff;
+}
+.comma-delimited {
+  background: url(bg.jpg) no-repeat, url(bg.png) repeat-x top left, url(bg);
+  text-shadow: -1px -1px 1px #ff0000, 6px 5px 5px #ffff00;
+  -moz-box-shadow: 0pt 0pt 2px rgba(255, 255, 255, 0.4) inset, 0pt 4px 6px rgba(255, 255, 255, 0.4) inset;
+}
+@font-face {
+  font-family: Headline;
+  src: local(Futura-Medium), url(fonts.svg#MyGeometricModern) format("svg");
+}
+.other {
+  -moz-transform: translate(0, 11em) rotate(-90deg);
+}
+p:not([class*="lead"]) {
+  color: black;
+}
+input[type="text"].class#id[attr=32]:not(1) {
+  color: white;
+}
+div#id.class[a=1][b=2].class:not(1) {
+  color: white;
+}
+ul.comma > li:not(:only-child)::after {
+  color: white;
+}
+ol.comma > li:nth-last-child(2)::after {
+  color: white;
+}
+li:nth-child(4n+1),
+li:nth-child(-5n),
+li:nth-child(-n+2) {
+  color: white;
+}
+a[href^="http://"] {
+  color: black;
+}
+a[href$="http://"] {
+  color: black;
+}
+form[data-disabled] {
+  color: black;
+}
+p::before {
+  color: black;
+}
+.escape\|random\|char {
+  color: red;
+}
+.mixin\!tUp {
+  font-weight: bold;
+}
+.\34 04 {
+  background: red;
+}
+.\34 04 strong {
+  color: #ff00ff;
+  font-weight: bold;
+}
+.trailingTest\+ {
+  color: red;
+}
+/* This hideous test of hideousness checks for the selector "blockquote" with various permutations of hex escapes */
+\62\6c\6f \63 \6B \0071 \000075o\74 e {
+  color: silver;
+}
+@charset "utf-8";
+div {
+  color: black;
+}
+div {
+  width: 99%;
+}
+* {
+  min-width: 45em;
+}
+h1,
+h2 > a > p,
+h3 {
+  color: none;
+}
+div.class {
+  color: blue;
+}
+div#id {
+  color: green;
+}
+.class#id {
+  color: purple;
+}
+.one.two.three {
+  color: grey;
+}
+@media print {
+  font-size: 3em;
+}
+@media screen {
+  font-size: 10px;
+}
+@font-face {
+  font-family: 'Garamond Pro';
+  src: url("/fonts/garamond-pro.ttf");
+}
+a:hover,
+a:link {
+  color: #999;
+}
+p,
+p:first-child {
+  text-transform: none;
+}
+q:lang(no) {
+  quotes: none;
+}
+p + h1 {
+  font-size: 2.2em;
+}
+#shorthands {
+  border: 1px solid #000;
+  font: 12px/16px Arial;
+  font: 100%/16px Arial;
+  margin: 1px 0;
+  padding: 0 auto;
+  background: url("http://www.lesscss.org/spec.html") no-repeat 0 4px;
+}
+#more-shorthands {
+  margin: 0;
+  padding: 1px 0 2px 0;
+  font: normal small/20px 'Trebuchet MS', Verdana, sans-serif;
+}
+.misc {
+  -moz-border-radius: 2px;
+  display: -moz-inline-stack;
+  width: .1em;
+  background-color: #009998;
+  background-image: url(images/image.jpg);
+  background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), to(#0000ff));
+  margin: ;
+}
+#important {
+  color: red !important;
+  width: 100%!important;
+  height: 20px ! important;
+}
+#data-uri {
+  background: url(data:image/png;charset=utf-8;base64,
+    kiVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD/
+    k//+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4U
+    kg9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC);
+  background-image: url(data:image/x-png,f9difSSFIIGFIFJD1f982FSDKAA9==);
+}
+#functions {
+  color: #NaNNaNNaNNaNNaNeedd;
+  width: increment(15);
+  height: undefined("self");
+  border-width: add(2, 3);
+  variable: increment(10);
+}
+#built-in {
+  escaped: -Some::weird(#thing, y);
+  lighten: #ffcccc;
+  darken: #330000;
+  saturate: #203c31;
+  desaturate: #29332f;
+  greyscale: #2e2e2e;
+  spin-p: #bf6a40;
+  spin-n: #bf4055;
+  format: "rgb(32, 128, 64)";
+  format-string: "hello world";
+  eformat: rgb(32, 128, 64);
+  hue: 98;
+  saturation: 12%;
+  lightness: 95%;
+}
+#alpha {
+  alpha: rgba(153, 94, 51, 0.6);
+}
+.lazy-eval {
+  width: 42;
+}
+@media print {
+  .class {
+    color: blue;
+  }
+  .class .sub {
+    width: 42;
+  }
+  .top,
+  header > h1 {
+    color: #444444;
+  }
+}
+@media screen {
+  body {
+    max-width: 480;
+  }
+}
+@media all and (orientation: portrait) {
+  aside {
+    float: none;
+  }
+}
+#hidden {
+  color: transparent;
+  color: transparent;
+}
+.two-args {
+  color: blue;
+  width: 10px;
+  height: 99%;
+  two: 2;
+  three: 3;
+  border: 2px dotted #000000;
+}
+.one-arg {
+  width: 15px;
+  height: 49%;
+  one: 1;
+  one-req: 1;
+  two: 2;
+  three: 3;
+}
+.no-parens {
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+}
+.no-args {
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+}
+.var-args {
+  width: 45;
+  height: 17%;
+  two: 2;
+  three: 3;
+}
+.multi-mix {
+  width: 10px;
+  height: 29%;
+  two: 2;
+  three: 3;
+  margin: 4;
+  padding: 5;
+}
+body {
+  padding: 30px;
+  color: #ff0000;
+}
+.scope-mix {
+  width: 8;
+}
+.content {
+  width: 600px;
+}
+.content .column {
+  margin: 600px;
+}
+#same-var-name {
+  radius: 5px;
+}
+#var-inside {
+  width: 10px;
+}
+.id-class {
+  color: red;
+  color: red;
+}
+.class {
+  width: 99px;
+}
+.overwrite {
+  width: 99px;
+}
+.nested .class {
+  width: 5px;
+}
+.class .inner {
+  height: 300;
+}
+.class .inner .innest {
+  width: 30;
+  border-width: 60;
+}
+.class2 .inner {
+  height: 600;
+}
+.class2 .inner .innest {
+  width: 60;
+  border-width: 120;
+}
+.zero {
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+}
+.one {
+  width: 5;
+  height: 49%;
+  one: 1;
+  one-req: 1;
+  two: 2;
+  three: 3;
+}
+.two {
+  width: 5;
+  height: 1%;
+  two: 2;
+  three: 3;
+}
+.three {
+  three-req: 3;
+  three: 3;
+}
+.left {
+  left: 1;
+}
+.right {
+  right: 1;
+}
+.border-right {
+  color: black;
+  border-right: 4px;
+}
+.border-left {
+  color: black;
+  border-left: 4px;
+}
+.only-right {
+  right: 33;
+}
+.only-left {
+  left: 33;
+}
+.left-right {
+  both: 330;
+}
+.mixin {
+  border: 1px solid black;
+}
+.mixout {
+  border-color: orange;
+}
+.borders {
+  border-style: dashed;
+}
+#namespace .borders {
+  border-style: dotted;
+}
+#namespace .biohazard {
+  content: "death";
+}
+#namespace .biohazard .man {
+  color: transparent;
+}
+#theme > .mixin {
+  background-color: grey;
+}
+#container {
+  color: black;
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+  border-color: orange;
+  background-color: grey;
+}
+#header .milk {
+  color: white;
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+  background-color: grey;
+}
+#header #cookie {
+  border-style: dashed;
+}
+#header #cookie .chips {
+  border-style: dotted;
+}
+#header #cookie .chips .calories {
+  color: black;
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+  border-color: orange;
+  background-color: grey;
+}
+.secure-zone {
+  color: transparent;
+}
+.direct {
+  border-style: dotted;
+}
+#operations {
+  color: #111111;
+  height: 9px;
+  width: 3em;
+  substraction: 0;
+  division: 1;
+}
+#operations .spacing {
+  height: 9px;
+  width: 3em;
+}
+.with-variables {
+  height: 9;
+  width: 17;
+  size: 1cm;
+}
+.with-functions {
+  color: #646464;
+  color: #ff8080;
+  color: #c94a4a;
+}
+.negative {
+  height: 15px;
+  width: -11px;
+}
+.shorthands {
+  padding: -1px 2px 0 -4px;
+}
+.colors {
+  color: #123;
+  border-color: #334455;
+  background-color: #000000;
+}
+.colors .other {
+  color: #222222;
+  border-color: #222222;
+}
+.parens {
+  border: 2px solid #000000;
+  margin: 1px 3px 16 3;
+  width: 36;
+  padding: 2px 36px;
+}
+.more-parens {
+  padding: 8 4 4 4px;
+  width: 96;
+  height: 113;
+  margin: 12;
+}
+.nested-parens {
+  width: 71;
+  height: 6;
+}
+.mixed-units {
+  margin: 2px 4em 1 5pc;
+  padding: 6px 1em 2px 2;
+}
+#first > .one {
+  font-size: 2em;
+}
+#first > .one > #second .two > #deux {
+  width: 50%;
+}
+#first > .one > #second .two > #deux #third {
+  height: 100%;
+}
+#first > .one > #second .two > #deux #third:focus {
+  color: black;
+}
+#first > .one > #second .two > #deux #third:focus #fifth > #sixth .seventh #eighth + #ninth {
+  color: purple;
+}
+#first > .one > #second .two > #deux #fourth,
+#first > .one > #second .two > #deux #five,
+#first > .one > #second .two > #deux #six {
+  color: #110000;
+}
+#first > .one > #second .two > #deux #fourth .seven,
+#first > .one > #second .two > #deux #five .seven,
+#first > .one > #second .two > #deux #six .seven,
+#first > .one > #second .two > #deux #fourth .eight > #nine,
+#first > .one > #second .two > #deux #five .eight > #nine,
+#first > .one > #second .two > #deux #six .eight > #nine {
+  border: 1px solid black;
+}
+#first > .one > #second .two > #deux #fourth #ten,
+#first > .one > #second .two > #deux #five #ten,
+#first > .one > #second .two > #deux #six #ten {
+  color: red;
+}
+.tiny-scope {
+  color: #998899;
+  width: 5px;
+  height: 49%;
+  zero: 0;
+  one: 1;
+  two: 2;
+  three: 3;
+  border: 1px solid black;
+}
+.scope1 {
+  color: 4;
+  border-color: #000000;
+}
+.scope1 .scope2 {
+  color: 4;
+}
+.scope1 .scope2 .scope3 {
+  color: #ff0000;
+  border-color: #000000;
+  background-color: #ffffff;
+}
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h1 p:hover,
+h2 p:hover,
+h3 p:hover {
+  color: red;
+}
+#all {
+  color: blue;
+}
+#the {
+  color: blue;
+}
+#same {
+  color: blue;
+}
+ul,
+li,
+div,
+q,
+blockquote,
+textarea {
+  margin: 0;
+}
+td {
+  margin: 0;
+  padding: 0;
+}
+td,
+input {
+  line-height: 1em;
+}
+#strings {
+  background-image: url("http://son-of-a-banana.com");
+  quotes: "~" "~";
+  content: "#*%:&^,)!.(~*})";
+  empty: "";
+  brackets: "{" "}";
+}
+#comments {
+  content: "/* hello */ // not-so-secret";
+}
+#single-quote {
+  quotes: "'" "'";
+  content: '""#!&""';
+  empty: '';
+  semi-colon: ';';
+}
+.variables {
+  width: 14cm;
+}
+.variables {
+  height: 24px;
+  color: #888888;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  quotes: "~" "~";
+}
+.redefinition {
+  three: 3;
+}
+.values {
+  font-family: 'Trebuchet', 'Trebuchet', 'Trebuchet';
+  color: #888888 !important;
+  url: url('Trebuchet');
+  multi: something 'A', B, C, 'Trebuchet';
+}
+.whitespace {
+  color: white;
+}
+.whitespace {
+  color: white;
+}
+.whitespace {
+  color: white;
+}
+.whitespace {
+  color: white;
+}
+.whitespace {
+  color: white ;
+}
+.white,
+.space,
+.mania {
+  color: white;
+}
+.no-semi-column {
+  color: #ffffff;
+}
+.no-semi-column {
+  color: white;
+  white-space: pre;
+}
+.no-semi-column {
+  border: 2px solid #ffffff;
+}
+.newlines {
+  background: the,
+              great,
+              wall;
+  border: 2px
+          solid
+          black;
+}
