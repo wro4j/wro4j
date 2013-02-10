@@ -35,7 +35,7 @@ public class TestDefaultGroupExtractor {
     groupExtractor = new DefaultGroupExtractor();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotExtractGroupNameWithNullUri() {
     groupExtractor.getGroupName(null);
   }
@@ -45,7 +45,7 @@ public class TestDefaultGroupExtractor {
     groupExtractor.getResourceType(null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotExtractMinimizedWithNullRequest() {
     groupExtractor.isMinimized(null);
   }
