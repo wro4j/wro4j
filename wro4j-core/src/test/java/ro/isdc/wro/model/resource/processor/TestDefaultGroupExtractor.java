@@ -17,53 +17,53 @@ import ro.isdc.wro.model.resource.ResourceType;
 
 /**
  * TestGroupsExtractor.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class TestSingleGroupRequestUriParser {
-  private DefaultGroupExtractor requestUriParser;
-  
+public class TestDefaultGroupExtractor {
+  private DefaultGroupExtractor victim;
+
   @Before
   public void init() {
-    requestUriParser = new DefaultGroupExtractor();
+    victim = new DefaultGroupExtractor();
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotExtractResourceTypeUsingNullUri() {
-    requestUriParser.getResourceType(null);
+    victim.getResourceType(null);
   }
-  
-  @Test(expected = IllegalArgumentException.class)
+
+  @Test(expected = NullPointerException.class)
   public void cannotExtractGroupNamesUsingNullUri() {
-    requestUriParser.getGroupName(null);
+    victim.getGroupName(null);
   }
-  
+
   @Test
   public void testExtractInvalidResourceType() {
     String uri = "/test.js";
-    ResourceType type = requestUriParser.getResourceType(mockRequestForUri(uri));
+    ResourceType type = victim.getResourceType(mockRequestForUri(uri));
     Assert.assertEquals(ResourceType.JS, type);
-    
+
     uri = "/test.css";
-    type = requestUriParser.getResourceType(mockRequestForUri(uri));
+    type = victim.getResourceType(mockRequestForUri(uri));
     Assert.assertEquals(ResourceType.CSS, type);
-    
+
     uri = "/test.txt";
-    Assert.assertNull(requestUriParser.getResourceType(mockRequestForUri(uri)));
+    Assert.assertNull(victim.getResourceType(mockRequestForUri(uri)));
   }
-  
+
   @Test
   public void testExtractNoGroupName() {
-    String groupName = requestUriParser.getGroupName(mockRequestForUri("/app/test.js"));
+    String groupName = victim.getGroupName(mockRequestForUri("/app/test.js"));
     Assert.assertEquals("test", groupName);
-    
-    groupName = requestUriParser.getGroupName(mockRequestForUri("/app/test.group.js"));
+
+    groupName = victim.getGroupName(mockRequestForUri("/app/test.group.js"));
     Assert.assertEquals("test.group", groupName);
-    
-    Assert.assertEquals(null, requestUriParser.getGroupName(mockRequestForUri("/123/")));
+
+    Assert.assertEquals(null, victim.getGroupName(mockRequestForUri("/123/")));
   }
-  
+
   private HttpServletRequest mockRequestForUri(final String uri) {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(uri);
