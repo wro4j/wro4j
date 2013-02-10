@@ -1,38 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>ro.isdc.wro4j</groupId>
-		<artifactId>wro4j-parent</artifactId>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ro.isdc.wro4j</groupId>
+        <artifactId>wro4j-parent</artifactId>
         <version>2.0.0-SNAPSHOT</version>
-	</parent>
-	<artifactId>wro4j-runner</artifactId>
-	<packaging>jar</packaging>
-	<name>wro4j runner</name>
-	<properties>
-		<wro4j.runner.mainClass>ro.isdc.wro.runner.Wro4jCommandLineRunner</wro4j.runner.mainClass>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>wro4j-extensions</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.ant</groupId>
-					<artifactId>ant</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.hamcrest</groupId>
-					<artifactId>hamcrest-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>compile</scope>
-		</dependency>
+    </parent>
+    <artifactId>wro4j-runner</artifactId>
+    <packaging>jar</packaging>
+    <name>wro4j runner</name>
+    <properties>
+        <wro4j.runner.mainClass>ro.isdc.wro.runner.Wro4jCommandLineRunner</wro4j.runner.mainClass>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wro4j-extensions</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jruby</groupId>
+                    <artifactId>jruby-complete</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>me.n4u.sass</groupId>
+                    <artifactId>sass-gems</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>nz.co.edmi</groupId>
+                    <artifactId>bourbon-gem-jar</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.gmaven.runtime</groupId>
+                    <artifactId>gmaven-runtime-1.7</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
 		<!-- Other Dependencies -->
         <dependency>
             <groupId>org.mockito</groupId>
