@@ -20,9 +20,10 @@ import ro.isdc.wro.util.provider.ProviderFinder;
  * @created 19 May 2012
  * @since 1.4.7
  */
-public class DefaultRequestHandlerFactory extends SimpleRequestHandlerFactory {
-
+public class DefaultRequestHandlerFactory
+    extends SimpleRequestHandlerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRequestHandlerFactory.class);
+
   /**
    * Creates a factory with a list of default handlers.
    */

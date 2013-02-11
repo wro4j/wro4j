@@ -44,10 +44,12 @@ public final class Injector {
    *
    * @param object
    *          {@link Object} which will be scanned for @Inject annotation presence.
+   * @return the injected object instance. Useful for fluent interface.
    */
-  public void inject(final Object object) {
+  public <T>T inject(final T object) {
     Validate.notNull(object);
     processInjectAnnotation(object);
+    return object;
   }
 
   /**
