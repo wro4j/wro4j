@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
@@ -19,7 +21,9 @@ import ro.isdc.wro.util.LazyInitializer;
 public class LazyRequestHandlerDecorator
     extends AbstractDecorator<LazyInitializer<RequestHandler>>
     implements RequestHandler {
-
+  @Inject
+  private Injector injector;
+  private RequestHandler requestHandler;
   public LazyRequestHandlerDecorator(final LazyInitializer<RequestHandler> initializer) {
     super(initializer);
   }
@@ -29,20 +33,32 @@ public class LazyRequestHandlerDecorator
    */
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-    getDecoratedObject().get().handle(request, response);
+    getRequestHandler().handle(request, response);
   }
 
   /**
    * {@inheritDoc}
    */
   public boolean accept(final HttpServletRequest request) {
-    return getDecoratedObject().get().accept(request);
+    return getRequestHandler().accept(request);
   }
 
   /**
    * {@inheritDoc}
    */
   public boolean isEnabled() {
-    return getDecoratedObject().get().isEnabled();
+    return getRequestHandler().isEnabled();
   }
+
+  /**
+   * This method is used to ensure that lazy initialized object is injected as well.
+   */
+  private RequestHandler getRequestHandler() {
+    if (requestHandler == null) {
+      requestHandler = getDecoratedObject().get();
+      injector.inject(requestHandler);
+    }
+    return requestHandler;
+  }
+
 }
