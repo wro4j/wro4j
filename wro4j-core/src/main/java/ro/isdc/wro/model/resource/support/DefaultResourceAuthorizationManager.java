@@ -15,7 +15,7 @@ import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 /**
  * Controls the resources which should be accessible through {@link ResourceProxyRequestHandler}. Prevent the security
  * issue which may occur when everything can be accessed using the proxy.
- * 
+ *
  * @author Alex Objelean
  */
 public class DefaultResourceAuthorizationManager implements MutableResourceAuthorizationManager {
@@ -29,28 +29,28 @@ public class DefaultResourceAuthorizationManager implements MutableResourceAutho
   public boolean isAuthorized(final String uri) {
     return authorizedResources.contains(uri);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public void add(final String uri) {
     Validate.notNull(uri);
-    LOG.debug("authorize resource: {}", uri);
+    LOG.debug("authorize: {}", uri);
     authorizedResources.add(uri);
   }
-  
+
   /**
    * @return a read-only copy of authorized resources.
    */
   public Collection<String> list() {
     return Collections.unmodifiableCollection(authorizedResources);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public void clear() {
-    LOG.debug("clear authorized resources.");
+    LOG.debug("clear.");
     authorizedResources.clear();
   }
 }

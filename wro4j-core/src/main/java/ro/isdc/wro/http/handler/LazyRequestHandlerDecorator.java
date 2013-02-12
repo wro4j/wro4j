@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
@@ -19,7 +21,8 @@ import ro.isdc.wro.util.LazyInitializer;
 public class LazyRequestHandlerDecorator
     extends AbstractDecorator<LazyInitializer<RequestHandler>>
     implements RequestHandler {
-
+  @Inject
+  private Injector injector;
   public LazyRequestHandlerDecorator(final LazyInitializer<RequestHandler> initializer) {
     super(initializer);
   }
