@@ -13,6 +13,7 @@ import org.mockito.Mock;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -22,12 +23,14 @@ public class TestDefaultRequestHandlerProvider {
   @Mock
   private HttpServletRequest mockRequest;
   private DefaultRequestHandlerProvider victim;
+  private Injector injector;
   @Before
   public void setUp() {
     initMocks(this);
     Context.set(Context.standaloneContext());
+    injector = WroTestUtils.createInjector();
     victim = new DefaultRequestHandlerProvider();
-    WroTestUtils.createInjector().inject(victim);
+    injector.inject(victim);
   }
 
   @Test
@@ -40,6 +43,7 @@ public class TestDefaultRequestHandlerProvider {
   public void shouldNotFailWhenEachHandlerIsInvoked() {
     final Map<String, RequestHandler> map = victim.provideRequestHandlers();
     for(final RequestHandler handler : map.values()) {
+      injector.inject(handler);
       handler.accept(mockRequest);
       handler.isEnabled();
     }
