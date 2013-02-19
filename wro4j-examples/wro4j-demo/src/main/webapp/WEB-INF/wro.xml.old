@@ -17,13 +17,10 @@
     <group name="less">
         <css>/static/less/**.less</css>
     </group>
-    <group name="module-import">
+    <group name="module-import"> 
         <css>/module/import/parent.css</css>
     </group>
     <group name="testPage">
         <group-ref>module-import</group-ref>
-        <!-- 
-        <css>/module/import/child/style.css</css>
-         -->
     </group>
 </groups>

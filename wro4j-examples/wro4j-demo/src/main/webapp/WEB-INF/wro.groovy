@@ -15,9 +15,14 @@ groups {
     dynamicRandom()  
     font()
     wildcard()
+    moduleImport()
     /*
     jar()
     */
+  }
+  
+  moduleImport {
+      css("/module/import/parent.css")
   }
   
   wildcard {
