@@ -197,7 +197,7 @@ public class SmartWroModelFactory
           logMessageBuffer.append(" Using " + getClassName(factoryClass) + " for model creation..\n");
           return factory.create();
         } catch (final WroRuntimeException e) {
-          LOG.debug("[FAIL] creating model... will try another factory");
+          LOG.debug("[FAIL] creating model... will try another factory: {}", e.getCause());
           logMessageBuffer.append("[FAIL] Model creation using " + getClassName(factory.getClass())
               + " failed. Trying another ...\n");
           logMessageBuffer.append("[FAIL] Exception occured while building the model using: "
