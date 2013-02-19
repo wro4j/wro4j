@@ -199,7 +199,11 @@ public class ServletContextUriLocator
 
   private InputStream servletContextBasedStreamLocator(final String uri)
       throws IOException {
-    return Context.get().getServletContext().getResourceAsStream(uri);
+    try {
+      return Context.get().getServletContext().getResourceAsStream(uri);
+    } catch (final Exception e) {
+      throw new IOException("Could not locate uri: " + uri, e);
+    }
   }
 
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)

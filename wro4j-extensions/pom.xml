@@ -41,7 +41,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
@@ -54,12 +53,10 @@
         <dependency>
             <groupId>com.github.lltyk</groupId>
             <artifactId>dojo-shrinksafe</artifactId>
-            <version>1.7.2</version>
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-complete</artifactId>
-            <version>1.6.8</version>
         </dependency>
         <dependency>
             <groupId>me.n4u.sass</groupId>
@@ -68,28 +65,14 @@
         <dependency>
             <groupId>nz.co.edmi</groupId>
             <artifactId>bourbon-gem-jar</artifactId>
-            <version>2.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.sommeri</groupId>
             <artifactId>less4j</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.beust</groupId>
-                    <artifactId>jcommander</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.gmaven.runtime</groupId>
             <artifactId>gmaven-runtime-1.7</artifactId>
-            <version>1.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.sonatype.gossip</groupId>
-                    <artifactId>gossip</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
     <build>

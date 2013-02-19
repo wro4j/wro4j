@@ -3,8 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Matcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
@@ -13,10 +18,6 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Matcher;
 
 
 /**
