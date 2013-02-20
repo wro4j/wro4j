@@ -7,8 +7,10 @@ import java.util.regex.Pattern;
 
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
- * Encapsulates the matcher creation for css import statements detection. Useful to isolate unit tests.
+ * Encapsulates the matcher creation for css import statements detection. Useful to isolate unit tests. TODO prefer a
+ * fluent interface implementation for this class.
  *
  * @author Alex Objelean
  * @created 19 Feb 2013
