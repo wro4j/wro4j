@@ -78,6 +78,12 @@ public abstract class AbstractCssUrlRewritingProcessor
       final int urlIndexA = getUrlIndexA();
       final int urlIndexB = getUrlIndexB();
 
+      //Do not process @import statements
+      LOG.debug("Matched group: {}", matcher.group());
+      if (matcher.group().matches("@import\\b.*")) {
+        continue;
+      }
+      LOG.debug("No @import detected");
       final String originalDeclaration = matcher.group(getDeclarationGroupIndex());
       final String groupA = matcher.group(urlIndexA);
       final String originalUrl = groupA != null ? groupA : matcher.group(urlIndexB);

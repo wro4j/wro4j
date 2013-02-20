@@ -35,6 +35,11 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
+  
+   <filter-mapping>
+    <filter-name>WebResourceOptimizer</filter-name>
+    <url-pattern>/v/*</url-pattern>
+  </filter-mapping>
 
   
   <filter>
