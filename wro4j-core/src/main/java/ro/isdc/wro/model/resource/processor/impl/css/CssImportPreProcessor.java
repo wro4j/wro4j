@@ -65,7 +65,7 @@ public class CssImportPreProcessor
     final Matcher m = PATTERN.matcher(content);
     final StringBuffer sb = new StringBuffer();
     while (m.find()) {
-      // add and check if already exist
+      // replace @import with empty string
       m.appendReplacement(sb, "");
     }
     m.appendTail(sb);
