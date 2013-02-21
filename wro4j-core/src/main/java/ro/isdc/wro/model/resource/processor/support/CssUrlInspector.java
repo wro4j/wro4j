@@ -21,7 +21,7 @@ public class CssUrlInspector {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlInspector.class);
   private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
 
-  public String findAndReplace(final String content, final ItemHandler handler) {
+  public final String findAndReplace(final String content, final ItemHandler handler) {
     final Matcher matcher = getMatcher(content);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
@@ -34,6 +34,7 @@ public class CssUrlInspector {
       LOG.debug("No @import detected");
       final String originalDeclaration = getOriginalDeclaration(matcher);
       final String originalUrl = getOriginalUrl(matcher);
+      LOG.debug("originalDeclaration: {}", originalDeclaration);
       LOG.debug("originalUrl: {}", originalUrl);
 
       Validate.notNull(originalUrl);
@@ -50,10 +51,20 @@ public class CssUrlInspector {
     return PATTERN.matcher(content);
   }
 
+  /**
+   * @param matcher
+   *          the {@link Matcher} used to find url occurances.
+   * @return the string representing entire css declaration containing the url.
+   */
   protected String getOriginalDeclaration(final Matcher matcher) {
     return matcher.group(0);
   }
 
+  /**
+   * @param matcher
+   *          the {@link Matcher} used to find url occurances.
+   * @return the url found in css declaration.
+   */
   protected String getOriginalUrl(final Matcher matcher) {
     /**
      * index of the group containing an url inside a declaration of this form:
@@ -88,6 +99,9 @@ public class CssUrlInspector {
     return originalUrl;
   }
 
+  /**
+   * The handler invoked for each found occurrence of url in parsed css.
+   */
   public static interface ItemHandler {
     String replace(String originalDeclaration, String originalUrl);
   }

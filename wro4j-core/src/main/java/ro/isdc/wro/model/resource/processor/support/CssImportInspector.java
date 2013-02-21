@@ -19,6 +19,10 @@ import ro.isdc.wro.util.WroUtil;
 public class CssImportInspector {
   private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
   private static final String REGEX_IMPORT_FROM_COMMENTS = WroUtil.loadRegexpWithKey("cssImportFromComments");
+  /**
+   * The index of the url group in regex.
+   */
+  private static final int INDEX_URL = 1;
 
   /**
    * Removes all @import statements from css.
@@ -41,7 +45,7 @@ public class CssImportInspector {
     final List<String> list = new ArrayList<String>();
     final Matcher m = PATTERN.matcher(removeImportsFromComments(content));
     while (m.find()) {
-      list.add(m.group(1));
+      list.add(m.group(INDEX_URL));
     }
     return list;
   }
