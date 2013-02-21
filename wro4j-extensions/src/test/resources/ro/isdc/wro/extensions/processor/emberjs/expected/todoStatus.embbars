@@ -1,5 +1,6 @@
 (function() {Ember.TEMPLATES['todoStatus'] = Ember.Handlebars.template(
 function anonymous(Handlebars, depth0, helpers, partials, data) {
+    this.compilerInfo = [2, ">= 1.0.0-rc.3"];
     helpers = helpers || Ember.Handlebars.helpers;
     data = data || {};
     var buffer = "", stack1, hashTypes, escapeExpression = this.escapeExpression, self = this;
@@ -7,17 +8,14 @@ function anonymous(Handlebars, depth0, helpers, partials, data) {
         data.buffer.push("s");
     }
     data.buffer.push("<div class=\"row-fluid span5\">\n  <strong>");
-    stack1 = {};
     hashTypes = {};
-    stack1 = helpers._triageMustache.call(depth0, "remaining", {hash:stack1, contexts:[depth0], types:["ID"], hashTypes:hashTypes, data:data});
-    data.buffer.push(escapeExpression(stack1) + "</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>");
-    stack1 = {};
+    data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "remaining", {hash:{}, contexts:[depth0], types:["ID"], hashTypes:hashTypes, data:data})));
+    data.buffer.push("</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>");
     hashTypes = {};
-    stack1 = helpers._triageMustache.call(depth0, "finished", {hash:stack1, contexts:[depth0], types:["ID"], hashTypes:hashTypes, data:data});
-    data.buffer.push(escapeExpression(stack1) + "</strong> completed item");
-    stack1 = {};
+    data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "finished", {hash:{}, contexts:[depth0], types:["ID"], hashTypes:hashTypes, data:data})));
+    data.buffer.push("</strong> completed item");
     hashTypes = {};
-    stack1 = helpers.unless.call(depth0, "oneFinished", {hash:stack1, inverse:self.noop, fn:self.program(1, program1, data), contexts:[depth0], types:["ID"], hashTypes:hashTypes, data:data});
+    stack1 = helpers.unless.call(depth0, "oneFinished", {hash:{}, inverse:self.noop, fn:self.program(1, program1, data), contexts:[depth0], types:["ID"], hashTypes:hashTypes, data:data});
     if (stack1 || stack1 === 0) {
         data.buffer.push(stack1);
     }
