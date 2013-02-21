@@ -43,11 +43,11 @@ public class TestHandlebarsJsProcessor {
   @Test
   public void testSimpleString()
       throws Exception {
-    StringWriter writer = new StringWriter();
+    final StringWriter writer = new StringWriter();
     processor.process(null, new StringReader("Hello {name}!"), writer);
-    String result = writer.toString();
+    final String result = writer.toString();
     assertTrue(result.startsWith(HandlebarsJs.HANDLEBARS_JS_TEMPLATES_INIT));
-    assertTrue(result.contains("return \"Hello {name}!\\n\";} );"));
+    assertTrue(result.contains("return \"Hello {name}!\\n\";"));
   }
 
   @Test
@@ -77,7 +77,7 @@ public class TestHandlebarsJsProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
 
   @Test
   public void shouldSupportCorrectResourceTypes() {
