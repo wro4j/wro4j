@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -28,8 +27,9 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector.ItemHandler;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -42,14 +42,6 @@ import ro.isdc.wro.util.WroUtil;
 public abstract class AbstractCssUrlRewritingProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, ImportAware {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
-  /**
-   * Compiled pattern.
-   */
-  private final Pattern PATTERN;
-
-  public AbstractCssUrlRewritingProcessor() {
-    PATTERN = Pattern.compile(getPattern());
-  }
 
   @Inject
   private ReadOnlyContext context;
@@ -60,46 +52,6 @@ public abstract class AbstractCssUrlRewritingProcessor
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
-  }
-
-  /**
-   * Parse the css content and transform found url's.
-   *
-   * @param cssContent
-   *          to parse.
-   * @param cssUri
-   *          Uri of the css to parse.
-   * @return parsed css.
-   */
-  private String parseCss(final String cssContent, final String cssUri) {
-    final Matcher matcher = PATTERN.matcher(cssContent);
-    final StringBuffer sb = new StringBuffer();
-    while (matcher.find()) {
-      final int urlIndexA = getUrlIndexA();
-      final int urlIndexB = getUrlIndexB();
-
-      final String originalDeclaration = matcher.group(getDeclarationGroupIndex());
-      final String groupA = matcher.group(urlIndexA);
-      final String originalUrl = groupA != null ? groupA : matcher.group(urlIndexB);
-      LOG.debug("urlGroup: {}", originalUrl);
-
-      Validate.notNull(originalUrl);
-      if (isReplaceNeeded(originalUrl)) {
-        final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
-        LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
-        /**
-         * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
-         * from stackoverflow: @see
-         * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
-         */
-        final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
-            modifiedUrl));
-        onUrlReplaced(modifiedUrl);
-        matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration));
-      }
-    }
-    matcher.appendTail(sb);
-    return sb.toString();
   }
 
   /**
@@ -119,6 +71,33 @@ public abstract class AbstractCssUrlRewritingProcessor
       reader.close();
       writer.close();
     }
+  }
+
+  private String parseCss(final String cssContent, final String cssUri) {
+    return newCssUrlInspector().findAndReplace(cssContent, new ItemHandler() {
+      public String replace(final String originalDeclaration, final String originalUrl) {
+        Validate.notNull(originalUrl);
+        String replacement = originalDeclaration;
+        if (isReplaceNeeded(originalUrl)) {
+          final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
+          LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
+          /**
+           * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
+           * from stackoverflow: @see
+           * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
+           */
+          final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
+              modifiedUrl));
+          onUrlReplaced(modifiedUrl);
+          replacement = replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration);
+        }
+        return replacement;
+      }
+    });
+  }
+
+  protected CssUrlInspector newCssUrlInspector() {
+    return new CssUrlInspector();
   }
 
   /**
@@ -225,54 +204,5 @@ public abstract class AbstractCssUrlRewritingProcessor
   public boolean isImportAware() {
     // We want this processor to be applied when processing resources referred with @import directive
     return true;
-  }
-
-  /**
-   * @return the string representation of the pattern used to match url's inside the css.
-   */
-  protected String getPattern() {
-    return WroUtil.loadRegexpWithKey("cssUrlRewrite");
-  }
-
-  /**
-   * @return index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
-   */
-  protected int getDeclarationGroupIndex() {
-    return 0;
-  }
-
-  /**
-   * index of the group containing an url inside a declaration of this form:
-   *
-   * <pre>
-   * body {
-   *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
-   * }
-   * </pre>
-   *
-   * or
-   *
-   * <pre>
-   * @font-face {
-   *   src: url(btn_icons.png);
-   * }
-   * </pre>
-   */
-  protected int getUrlIndexA() {
-    return 1;
-  }
-
-  /**
-   * index of the group containing an url inside a declaration of this form:
-   *
-   * <pre>
-   * body {
-   *     background: #B3B3B3 url(img.gif);
-   *     color:red;
-   * }
-   * </pre>
-   */
-  protected int getUrlIndexB() {
-    return 2;
   }
 }

@@ -188,12 +188,7 @@
 				<groupId>com.google.javascript</groupId>
 				<artifactId>closure-compiler</artifactId>
 				<version>${closure.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.github.lltyk</groupId>
-				<artifactId>dojo-shrinksafe</artifactId>
-				<version>1.7.2</version>
-			</dependency>
+			</dependency>			
 			<dependency>
 				<groupId>me.n4u.sass</groupId>
 				<artifactId>sass-gems</artifactId>
