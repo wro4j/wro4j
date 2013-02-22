@@ -71,7 +71,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    *          Uri of the css to parse.
    * @return parsed css.
    */
-  private String parseCss(final String cssContent, final String cssUri) {
+  protected String parseCss(final String cssContent, final String cssUri) {
     final Matcher matcher = PATTERN.matcher(cssContent);
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {

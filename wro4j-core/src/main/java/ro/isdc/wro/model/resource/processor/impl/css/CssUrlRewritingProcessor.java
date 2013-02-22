@@ -8,8 +8,10 @@ import static ro.isdc.wro.util.StringUtils.cleanPath;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,8 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector.ItemHandler;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -117,6 +121,30 @@ public class CssUrlRewritingProcessor
   private ResourceAuthorizationManager authorizationManager;
   @Inject
   private ReadOnlyContext context;
+
+  @Override
+  protected String parseCss(final String cssContent, final String cssUri) {
+    return new CssUrlInspector().findAndReplace(cssContent, new ItemHandler() {
+      public String replace(final String originalDeclaration, final String originalUrl) {
+        Validate.notNull(originalUrl);
+        String replacement = originalDeclaration;
+        if (isReplaceNeeded(originalUrl)) {
+          final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
+          LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
+          /**
+           * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
+           * from stackoverflow: @see
+           * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
+           */
+          final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
+              modifiedUrl));
+          onUrlReplaced(modifiedUrl);
+          replacement = replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration);
+        }
+        return replacement;
+      }
+    });
+  }
 
   /**
    * {@inheritDoc}

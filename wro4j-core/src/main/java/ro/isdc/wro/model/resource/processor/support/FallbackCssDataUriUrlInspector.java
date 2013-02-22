@@ -7,7 +7,8 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Encapsulates the matcher creation for css backround url's detection. Useful to isolate unit tests.
+ * Similar to {@link CssUrlInspector} but responsible for Preserving the original css uri along with the new one. This
+ * should work also with browsers which do not support dataURI's.
  *
  * @author Alex Objelean
  * @created 20 Feb 2013
