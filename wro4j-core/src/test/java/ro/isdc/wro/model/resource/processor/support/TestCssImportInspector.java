@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -41,7 +41,7 @@ public class TestCssImportInspector {
     compareResultsFromFolderUsingProcessor("expectedFindImports", createFindImportsProcessor());
   }
 
-  private void compareResultsFromFolderUsingProcessor(final String expectedFolderName, final ResourcePreProcessor processor) throws Exception {
+  private void compareResultsFromFolderUsingProcessor(final String expectedFolderName, final ResourceProcessor processor) throws Exception {
     final URL url = getClass().getResource("cssimport");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -50,8 +50,8 @@ public class TestCssImportInspector {
   }
 
 
-  private ResourcePreProcessor createFindImportsProcessor() {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createFindImportsProcessor() {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         final List<String> results = victim.findImports(IOUtils.toString(reader));
@@ -62,8 +62,8 @@ public class TestCssImportInspector {
     };
   }
 
-  private ResourcePreProcessor createImportsRemovalProcessor() {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createImportsRemovalProcessor() {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         writer.write(victim.removeImportsFromComments(IOUtils.toString(reader)));
@@ -71,8 +71,8 @@ public class TestCssImportInspector {
     };
   }
 
-  private ResourcePreProcessor createRemoveImportsProcessor() {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createRemoveImportsProcessor() {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         writer.write(victim.removeImportStatements(IOUtils.toString(reader)));

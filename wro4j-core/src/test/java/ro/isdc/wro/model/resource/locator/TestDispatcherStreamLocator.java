@@ -46,7 +46,7 @@ public class TestDispatcherStreamLocator {
     WroTestUtils.createInjector().inject(locator);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IOException.class)
   public void shouldNotAcceptNullRequestOrResponse()
       throws Exception {
     locator.getInputStream(null, null, null);

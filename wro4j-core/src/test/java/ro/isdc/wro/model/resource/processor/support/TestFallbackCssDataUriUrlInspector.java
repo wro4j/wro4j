@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.CssUrlInspector.ItemHandler;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -38,7 +38,7 @@ public class TestFallbackCssDataUriUrlInspector {
   }
 
   private void compareResultsFromFolderUsingProcessor(final String expectedFolderName,
-      final ResourcePreProcessor processor)
+      final ResourceProcessor processor)
       throws Exception {
     final URL url = getClass().getResource("cssurlinspector");
 
@@ -47,8 +47,8 @@ public class TestFallbackCssDataUriUrlInspector {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
-  private ResourcePreProcessor createProcessorWithHandler(final ItemHandler handler) {
-    return new ResourcePreProcessor() {
+  private ResourceProcessor createProcessorWithHandler(final ItemHandler handler) {
+    return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         writer.write(victim.findAndReplace(IOUtils.toString(reader), handler));
