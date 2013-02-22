@@ -1,0 +1,106 @@
+@import url("/path/to1.css");
+@import  url("/path/to2.css");
+@import   url("/path/to3.css");
+@import url('/path/to1.css');
+@import  url('/path/to2.css');
+@import   url('/path/to3.css');
+@import "/path/to4.css";
+@import  "/path/to5.css";
+@import   "/path/to6.css";
+@import '/path/to4.css';
+@import  '/path/to5.css';
+@import   '/path/to6.css';
+
+.imageWithSrcAttribute {
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='', sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='',   sizingMethod='scale' )
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '',   sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '',  
+       sizingMethod='scale' );
+    filter : progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '',  sizingMethod='scale' );
+    filter : 
+        progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '',   sizingMethod='scale' );
+    color:red;
+    background: url()
+}
+#outer {
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(
+      src='',
+      sizingMethod='scale');
+}
+@font-face {
+    src: url();
+}
+.relativeImageBackgrounds {
+    background: #B3B3B3 url();color:red;
+    background: url();
+    background: url();
+    background: url('');
+    background: url("");
+    background: url() top left;
+    background: url() repeat-x;
+    background: url() no-repeat right;
+    BACKGROUND-IMAGE: url();
+    background-image: url();
+    background-image: 
+     #555 url();
+    background-image: 
+     url();
+    background:
+        url()
+        0 1.1em no-repeat !important;color:red;
+}
+.inline {background:#ffffff url('') no-repeat right top;}
+.inlineMinimized {background:#ffffff url('') no-repeat right top;color:red;font-size:large;}.anotherClass{color:blue;background:#ffffff url('') no-repeat right top;}
+.noQuotes {
+    background-IMAGE: URL();
+    background: url() red;
+    background: url() no-repeat right;
+    background: url();
+}
+
+.differentTypeOfQuotes {
+    background: #B3B3B3 url("") repeat-x 
+        scroll 0 -1px;
+    background: #B3B3B3 url('') repeat-x
+        scroll 0 -1px;
+    background: #B3B3B3 url() repeat-x
+        scroll 0 -1px
+}
+
+.contextPathWithWhitespaces {
+    background-image: url( "" );
+    background-image: url( '' );
+    background-image: url(  );
+    background-image: url( "");
+    background-image: url( '');
+    background-image: url( );
+    background-image: url( "" );
+    background-image: url( '' );
+    background-image: url(  );
+    background-image: url("");
+    background-image: url('');
+    background-image: url("" );
+    background-image: url('' );
+    background-image: url();
+}
+
+.relativePathWithWhitespaces {
+    background-image: url( "" );
+    background-image: url( '' );
+    background-image: url(  );
+}
+
+.specialCharacters {
+    background-image: url( );
+}
+@font-face {
+    font-family: 'Trade Gothic Condensed Bold';
+    src: url('');
+    src: url('') format('embedded-opentype'),
+    url('fonts/tradegothic-boldcondtwenty-webfont.woff') format('woff'),
+    url('fonts/tradegothic-boldcondtwenty-webfont.ttf') format('truetype'),
+    url('fonts/tradegothic-boldcondtwenty-webfont.svg#tradegothic-boldcondtwenty-webfont') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

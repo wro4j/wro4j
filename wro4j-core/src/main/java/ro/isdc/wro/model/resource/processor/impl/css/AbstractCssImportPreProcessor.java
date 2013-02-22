@@ -9,8 +9,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -26,8 +24,8 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.support.CssImportInspector;
 import ro.isdc.wro.util.StringUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -53,14 +51,13 @@ public abstract class AbstractCssImportPreProcessor
    * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
    * processor is thread-safe and doesn't erroneously detect recursion when running in concurrent environment.
    */
+  //TODO prefer using method argument rather than ThreadLocal
   private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
     @Override
     protected List<String> initialValue() {
       return new ArrayList<String>();
     };
   };
-  protected static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
-  private static final String REGEX_IMPORT_FROM_COMMENTS = WroUtil.loadRegexpWithKey("cssImportFromComments");
 
   /**
    * {@inheritDoc}
@@ -114,12 +111,10 @@ public abstract class AbstractCssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    String css = cssContent;
-    //remove imports from comments before parse the file
-    css = css.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
-    final Matcher m = PATTERN.matcher(css);
-    while (m.find()) {
-      final Resource importedResource = createImportedResource(resourceUri, m.group(1));
+    final String css = cssContent;
+    final List<String> foundImports = new CssImportInspector().findImports(css);
+    for (final String importUrl : foundImports) {
+      final Resource importedResource = createImportedResource(resourceUri, importUrl);
       // check if already exist
       if (imports.contains(importedResource)) {
         LOG.debug("[WARN] Duplicate imported resource: {}", importedResource);

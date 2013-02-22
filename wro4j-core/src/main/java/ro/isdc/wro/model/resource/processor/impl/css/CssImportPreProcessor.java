@@ -5,7 +5,6 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,7 @@ import ro.isdc.wro.model.group.processor.PreProcessorExecutor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.support.CssImportInspector;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 
@@ -58,20 +58,6 @@ public class CssImportPreProcessor
     }
     sb.append(cssContent);
     LOG.debug("importsCollector: {}", foundImports);
-    return removeImportStatements(sb.toString());
-  }
-
-  /**
-   * Removes all @import statements for css.
-   */
-  private String removeImportStatements(final String content) {
-    final Matcher m = PATTERN.matcher(content);
-    final StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      // add and check if already exist
-      m.appendReplacement(sb, "");
-    }
-    m.appendTail(sb);
-    return sb.toString();
+    return new CssImportInspector().removeImportStatements(sb.toString());
   }
 }
