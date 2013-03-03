@@ -16,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.Resource;
@@ -28,6 +29,7 @@ import ro.isdc.wro.util.WroTestUtils;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSSourceFile;
+import com.google.javascript.jscomp.SourceFile;
 
 
 /**
@@ -111,14 +113,14 @@ public class TestGoogleClosureCompressorProcessor {
     Assert.assertEquals("", sw.toString());
   }
 
-  @Test
-  public void invalidExtern()
+  @Test(expected=WroRuntimeException.class)
+  public void shouldFailWhenInvalidExternProvided()
       throws IOException {
     victim = new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS) {
       @Override
-      protected JSSourceFile[] getExterns(final Resource resource) {
-        return new JSSourceFile[] {
-          JSSourceFile.fromFile(new File("INVALID"))
+      protected SourceFile[] getExterns(final Resource resource) {
+        return new SourceFile[] {
+          SourceFile.fromFile(new File("INVALID"))
         };
       }
     };
