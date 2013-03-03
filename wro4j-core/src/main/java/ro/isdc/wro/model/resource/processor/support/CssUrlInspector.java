@@ -26,19 +26,22 @@ public class CssUrlInspector {
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
       // Do not process @import statements
-      LOG.debug("Matched group: {}", matcher.group());
-      //TODO use CssImportInspector
-      if (matcher.group().matches("@import\\b.*")) {
-        continue;
-      }
-      LOG.debug("No @import detected");
-      final String originalDeclaration = getOriginalDeclaration(matcher);
-      final String originalUrl = getOriginalUrl(matcher);
-      LOG.debug("originalDeclaration: {}", originalDeclaration);
-      LOG.debug("originalUrl: {}", originalUrl);
+      /**
+       * The url found inside @import statement should not be matched. This cannot be solved using regexp only because
+       * of some limitations with negative look-around.
+       */
+      final String cssStatement = matcher.group();
+      LOG.debug("Matched group: {}", cssStatement);
+      if (!new CssImportInspector().containsImport(cssStatement)) {
+        LOG.debug("No @import detected");
+        final String originalDeclaration = getOriginalDeclaration(matcher);
+        final String originalUrl = getOriginalUrl(matcher);
+        LOG.debug("originalDeclaration: {}", originalDeclaration);
+        LOG.debug("originalUrl: {}", originalUrl);
 
-      Validate.notNull(originalUrl);
-      matcher.appendReplacement(sb, handler.replace(originalDeclaration, originalUrl));
+        Validate.notNull(originalUrl);
+        matcher.appendReplacement(sb, handler.replace(originalDeclaration, originalUrl));
+      }
     }
     matcher.appendTail(sb);
     return sb.toString();

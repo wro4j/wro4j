@@ -1,5 +1,8 @@
 package ro.isdc.wro.model.resource.processor.support;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -47,6 +50,18 @@ public class TestCssImportInspector {
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), expectedFolderName);
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+
+  @Test
+  public void shouldDetectImportStatement() {
+    assertTrue(victim.containsImport("@import 'style.css'"));
+    assertTrue(victim.containsImport("@import url(style.css)"));
+  }
+
+  @Test
+  public void shouldDetectMissingImportStatement() {
+    assertFalse(victim.containsImport("#someId {color: red}"));
+    assertFalse(victim.containsImport("#import {display: block}"));
   }
 
 

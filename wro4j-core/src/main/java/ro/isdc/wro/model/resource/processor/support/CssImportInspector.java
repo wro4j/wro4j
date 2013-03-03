@@ -39,6 +39,13 @@ public class CssImportInspector {
   }
 
   /**
+   * @return true if checked css content contains an @import statement.
+   */
+  public boolean containsImport(final String content) {
+    return PATTERN.matcher(content).find();
+  }
+
+  /**
    * @return a list of all resources imported using @import statement.
    */
   public List<String> findImports(final String content) {
