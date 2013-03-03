@@ -7,11 +7,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -28,8 +30,8 @@ import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
-import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
 
 
 /**
@@ -90,13 +92,13 @@ public class GoogleClosureCompressorProcessor
       }
 
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
-      final JSSourceFile[] input = new JSSourceFile[] {
-        JSSourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
+      final SourceFile[] input = new SourceFile[] {
+          SourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
       };
-      JSSourceFile[] externs = getExterns(resource);
+      SourceFile[] externs = getExterns(resource);
       if (externs == null) {
         // fallback to empty array when null is provided.
-        externs = new JSSourceFile[] {};
+        externs = new SourceFile[] {};
       }
       Result result = null;
       /**
@@ -109,12 +111,12 @@ public class GoogleClosureCompressorProcessor
         // make it play nice with GAE
         compiler.disableThreads();
         compiler.initOptions(compilerOptions);
-        result = compiler.compile(externs, input, compilerOptions);
+        result = compiler.compile(Arrays.asList(externs), Arrays.asList(input), compilerOptions);
       }
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
-        writer.write(content);
+        throw new WroRuntimeException("Compilation has errors: " + Arrays.asList(result.errors));
       }
     } finally {
       reader.close();
@@ -145,8 +147,8 @@ public class GoogleClosureCompressorProcessor
    *          processor.
    * @return An Array of externs files for the resource to process.
    */
-  protected JSSourceFile[] getExterns(final Resource resource) {
-    return new JSSourceFile[] {};
+  protected SourceFile[] getExterns(final Resource resource) {
+    return new SourceFile[] {};
   }
 
   /**
