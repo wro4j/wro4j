@@ -196,7 +196,7 @@
 			<dependency>
 				<groupId>com.github.sommeri</groupId>
 				<artifactId>less4j</artifactId>
-				<version>0.0.13</version>
+				<version>0.0.14</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.beust</groupId>

@@ -58,8 +58,8 @@ public class ExceptionHandlingProcessorDecorator
       writer.write(innerWriter.toString());
     } catch (final Exception e) {
       final String processorName = toString();
-      LOG.debug("Original Exception", e);
       if (isIgnoreFailingProcessor()) {
+        LOG.debug("Original Exception", e);
         writer.write(resourceContent);
         // don't wrap exception unless required
       } else {
