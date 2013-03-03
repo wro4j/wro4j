@@ -49,18 +49,6 @@ public abstract class AbstractCssImportPreProcessor
   private UriLocatorFactory uriLocatorFactory;
 
   /**
-   * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
-   * processor is thread-safe and doesn't erroneously detect recursion when running in concurrent environment.
-   */
-  //TODO prefer using method argument rather than ThreadLocal
-  private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
-    @Override
-    protected List<String> initialValue() {
-      return new ArrayList<String>();
-    };
-  };
-
-  /**
    * {@inheritDoc}
    */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
@@ -68,17 +56,12 @@ public abstract class AbstractCssImportPreProcessor
     LOG.debug("Applying {} processor", toString());
     validate();
     try {
-      final String result = parseCss(resource, IOUtils.toString(reader));
+      final String result = parseCss(resource, IOUtils.toString(reader), new ArrayList<String>());
       writer.write(result);
-      getProcessedList().clear();
     } finally {
       reader.close();
       writer.close();
     }
-  }
-
-  private List<String> getProcessedList() {
-    return processedImports.get();
   }
 
   /**
@@ -93,15 +76,15 @@ public abstract class AbstractCssImportPreProcessor
    * @param cssContent Reader for processed resource.
    * @return css content with all imports processed.
    */
-  private String parseCss(final Resource resource, final String cssContent)
+  private String parseCss(final Resource resource, final String cssContent, final List<String> processedImports)
     throws IOException {
-    if (getProcessedList().contains(resource.getUri())) {
+    if (processedImports.contains(resource.getUri())) {
       LOG.debug("[WARN] Recursive import detected: {}", resource);
       onRecursiveImportDetected();
       return "";
     }
     final String importedUri = resource.getUri().replace(File.separatorChar,'/');
-    getProcessedList().add(importedUri);
+    processedImports.add(importedUri);
     final List<Resource> importedResources = findImportedResources(resource.getUri(), cssContent);
     return doTransform(cssContent, importedResources);
   }
