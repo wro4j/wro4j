@@ -118,10 +118,23 @@ public class GoogleClosureCompressorProcessor
       } else {
         throw new WroRuntimeException("Compilation has errors: " + Arrays.asList(result.errors));
       }
+    } catch(final Exception e) {
+      onException(e);
     } finally {
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * Invoked when an exception occurs during processing. Default implementation wraps the exception into
+   * {@link WroRuntimeException} and throws it further.
+   *
+   * @param e
+   *          {@link Exception} thrown during processing.
+   */
+  protected void onException(final Exception e) {
+    throw WroRuntimeException.wrap(e);
   }
 
   private String getEncoding() {
