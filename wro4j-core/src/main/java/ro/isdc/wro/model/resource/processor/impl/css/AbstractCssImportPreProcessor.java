@@ -130,7 +130,7 @@ public abstract class AbstractCssImportPreProcessor
    * @return a list of found imports.
    */
   protected List<String> findImports(final String css) {
-    return new CssImportInspector().findImports(css);
+    return new CssImportInspector(css).findImports();
   }
 
   /**

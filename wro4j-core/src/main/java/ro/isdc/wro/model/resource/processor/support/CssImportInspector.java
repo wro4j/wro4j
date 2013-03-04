@@ -23,41 +23,54 @@ public class CssImportInspector {
    * The index of the url group in regex.
    */
   private static final int INDEX_URL = 1;
+  private final Matcher matcher;
+
+  public CssImportInspector(final String cssContent) {
+    matcher = getMatcher(removeImportsFromComments(cssContent));
+  }
+
+  protected Matcher getMatcher(final String cssContent) {
+    return PATTERN.matcher(cssContent);
+  }
 
   /**
    * Removes all @import statements from css.
    */
-  public String removeImportStatements(final String content) {
-    final Matcher m = PATTERN.matcher(content);
+  public String removeImportStatements() {
     final StringBuffer sb = new StringBuffer();
-    while (m.find()) {
+    while (matcher.find()) {
       // replace @import with empty string
-      m.appendReplacement(sb, "");
+      matcher.appendReplacement(sb, "");
     }
-    m.appendTail(sb);
+    matcher.appendTail(sb);
     return sb.toString();
   }
 
   /**
    * @return true if checked css content contains an @import statement.
    */
-  public boolean containsImport(final String content) {
-    return PATTERN.matcher(content).find();
+  public boolean containsImport() {
+    return matcher.find();
   }
 
   /**
    * @return a list of all resources imported using @import statement.
    */
-  public List<String> findImports(final String content) {
+  public List<String> findImports() {
     final List<String> list = new ArrayList<String>();
-    final Matcher m = PATTERN.matcher(removeImportsFromComments(content));
-    while (m.find()) {
-      list.add(m.group(INDEX_URL));
+    while (matcher.find()) {
+      list.add(matcher.group(INDEX_URL));
     }
     return list;
   }
 
-  public String removeImportsFromComments(final String content) {
+  /**
+   * Removes all import statements from provided css content.
+   *
+   * @return the css content with import statement removed.
+   * @VisibleForTesting
+   */
+  String removeImportsFromComments(final String content) {
     return content.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
   }
 }

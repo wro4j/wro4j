@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
@@ -22,12 +21,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssImportInspector {
-  private CssImportInspector victim;
-
-  @Before
-  public void setUp() {
-    victim = new CssImportInspector();
-  }
 
   @Test
   public void shouldRemoveImportsFromComments() throws Exception {
@@ -54,14 +47,14 @@ public class TestCssImportInspector {
 
   @Test
   public void shouldDetectImportStatement() {
-    assertTrue(victim.containsImport("@import 'style.css'"));
-    assertTrue(victim.containsImport("@import url(style.css)"));
+    assertTrue(new CssImportInspector("@import 'style.css'").containsImport());
+    assertTrue(new CssImportInspector("@import url(style.css)").containsImport());
   }
 
   @Test
   public void shouldDetectMissingImportStatement() {
-    assertFalse(victim.containsImport("#someId {color: red}"));
-    assertFalse(victim.containsImport("#import {display: block}"));
+    assertFalse(new CssImportInspector("#someId {color: red}").containsImport());
+    assertFalse(new CssImportInspector("#import {display: block}").containsImport());
   }
 
 
@@ -69,7 +62,7 @@ public class TestCssImportInspector {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        final List<String> results = victim.findImports(IOUtils.toString(reader));
+        final List<String> results = new CssImportInspector(IOUtils.toString(reader)).findImports();
         for (final String string : results) {
           writer.write(string + "\n");
         }
@@ -81,7 +74,8 @@ public class TestCssImportInspector {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        writer.write(victim.removeImportsFromComments(IOUtils.toString(reader)));
+
+        writer.write(new CssImportInspector("").removeImportsFromComments(IOUtils.toString(reader)));
       }
     };
   }
@@ -90,7 +84,7 @@ public class TestCssImportInspector {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        writer.write(victim.removeImportStatements(IOUtils.toString(reader)));
+        writer.write(new CssImportInspector(IOUtils.toString(reader)).removeImportStatements());
       }
     };
   }

@@ -55,6 +55,6 @@ public class CssImportPreProcessor
     }
     sb.append(cssContent);
     LOG.debug("importsCollector: {}", foundImports);
-    return new CssImportInspector().removeImportStatements(sb.toString());
+    return new CssImportInspector(sb.toString()).removeImportStatements();
   }
 }
