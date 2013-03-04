@@ -47,6 +47,18 @@ public abstract class AbstractCssImportPreProcessor
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
+  /**
+   * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
+   * processor is thread-safe and doesn't erroneously detect recursion when running in concurrent environment. A
+   * thread-local is used in order to avoid infinite recursion when processor is invoked from within the processor for
+   * child resources.
+   */
+  private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
+    @Override
+    protected List<String> initialValue() {
+      return new ArrayList<String>();
+    };
+  };
 
   /**
    * {@inheritDoc}
@@ -56,9 +68,10 @@ public abstract class AbstractCssImportPreProcessor
     LOG.debug("Applying {} processor", toString());
     validate();
     try {
-      final String result = parseCss(resource, IOUtils.toString(reader), new ArrayList<String>());
+      final String result = parseCss(resource, IOUtils.toString(reader), processedImports.get());
       writer.write(result);
     } finally {
+      processedImports.get().clear();
       reader.close();
       writer.close();
     }

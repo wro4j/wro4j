@@ -7,7 +7,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -30,7 +32,7 @@ import ro.isdc.wro.util.ObjectDecorator;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final Map<Class<?>, Object> map;
-
+  private final Set<Object> injectedObjects = new HashSet<Object>();
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
    */
@@ -48,7 +50,10 @@ public final class Injector {
    */
   public <T>T inject(final T object) {
     Validate.notNull(object);
-    processInjectAnnotation(object);
+    if (!injectedObjects.contains(object)) {
+      processInjectAnnotation(object);
+      injectedObjects.add(object);
+    }
     return object;
   }
 
@@ -60,6 +65,7 @@ public final class Injector {
    *          to check for annotation presence.
    */
   private void processInjectAnnotation(final Object object) {
+    LOG.info("inject: {}", object.getClass());
     try {
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
