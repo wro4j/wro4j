@@ -59,9 +59,20 @@ public class CssImportInspector {
   public List<String> findImports() {
     final List<String> list = new ArrayList<String>();
     while (matcher.find()) {
-      list.add(matcher.group(INDEX_URL));
+      list.add(extractImportUrl(matcher));
     }
     return list;
+  }
+
+  /**
+   * Override this method to provide a custom way of extracting the imported resource url.
+   *
+   * @param matcher
+   *          the {@link Matcher} inspecting the parsed css content.
+   * @return the url of the imported resources.
+   */
+  protected String extractImportUrl(final Matcher matcher) {
+    return matcher.group(INDEX_URL);
   }
 
   /**
