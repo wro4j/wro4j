@@ -29,6 +29,10 @@ public class CssImportInspector {
     matcher = getMatcher(removeImportsFromComments(cssContent));
   }
 
+  /**
+   * @return a {@link Matcher} for the processed content using the regexp responsible for identifying css import
+   * statements.
+   */
   protected Matcher getMatcher(final String cssContent) {
     return PATTERN.matcher(cssContent);
   }
@@ -36,7 +40,7 @@ public class CssImportInspector {
   /**
    * Removes all @import statements from css.
    */
-  public String removeImportStatements() {
+  public final String removeImportStatements() {
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
       // replace @import with empty string
@@ -49,14 +53,14 @@ public class CssImportInspector {
   /**
    * @return true if checked css content contains an @import statement.
    */
-  public boolean containsImport() {
+  public final boolean containsImport() {
     return matcher.find();
   }
 
   /**
    * @return a list of all resources imported using @import statement.
    */
-  public List<String> findImports() {
+  public final List<String> findImports() {
     final List<String> list = new ArrayList<String>();
     while (matcher.find()) {
       list.add(extractImportUrl(matcher));
@@ -81,7 +85,7 @@ public class CssImportInspector {
    * @return the css content with import statement removed.
    * @VisibleForTesting
    */
-  String removeImportsFromComments(final String content) {
+  final String removeImportsFromComments(final String content) {
     return content.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
   }
 }
