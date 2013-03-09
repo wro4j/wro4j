@@ -109,7 +109,7 @@ public abstract class AbstractCssImportPreProcessor
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
     final String css = cssContent;
-    final List<String> foundImports = new CssImportInspector().findImports(css);
+    final List<String> foundImports = findImports(css);
     for (final String importUrl : foundImports) {
       final Resource importedResource = createImportedResource(resourceUri, importUrl);
       // check if already exist
@@ -121,6 +121,15 @@ public abstract class AbstractCssImportPreProcessor
       }
     }
     return imports;
+  }
+
+  /**
+   * Extracts a list of imports from css content.
+   *
+   * @return a list of found imports.
+   */
+  protected List<String> findImports(final String css) {
+    return new CssImportInspector(css).findImports();
   }
 
   /**

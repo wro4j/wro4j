@@ -15,6 +15,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.FallbackCssDataUriProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.LessCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -48,6 +49,7 @@ public class DefaultProcessorProvider
   private void populateProcessorsMap(final Map<String, ResourceProcessor> map) {
     map.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
     map.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    map.put(LessCssImportPreProcessor.ALIAS, new CssImportPreProcessor());
     map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     map.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());

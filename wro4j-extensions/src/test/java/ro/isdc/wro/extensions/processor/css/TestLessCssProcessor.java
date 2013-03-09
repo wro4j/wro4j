@@ -123,7 +123,6 @@ public class TestLessCssProcessor {
     assertEquals(expected, actual.toString());
   }
 
-
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(new LessCssProcessor(), ResourceType.CSS);

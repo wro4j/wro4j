@@ -32,7 +32,7 @@ public class CssUrlInspector {
        */
       final String cssStatement = matcher.group();
       LOG.debug("Matched group: {}", cssStatement);
-      if (!new CssImportInspector().containsImport(cssStatement)) {
+      if (!new CssImportInspector(cssStatement).containsImport()) {
         LOG.debug("No @import detected");
         final String originalDeclaration = getOriginalDeclaration(matcher);
         final String originalUrl = getOriginalUrl(matcher);
