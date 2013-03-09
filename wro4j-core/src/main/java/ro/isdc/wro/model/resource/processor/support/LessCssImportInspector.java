@@ -11,7 +11,7 @@ import ro.isdc.wro.util.WroUtil;
  * href="https://github.com/SomMeri/less4j/wiki/Less-Language-Import">LESS language</a>.
  *
  * @author Alex Objelean
- * @created 19 Feb 2013
+ * @created 10 Mar 2013
  * @since 1.6.3
  */
 public class LessCssImportInspector

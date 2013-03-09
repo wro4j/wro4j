@@ -14,9 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
 /**
@@ -99,10 +97,5 @@ public class TestCssImportInspector {
 
   protected final void assertHasImport(final String cssContent) {
     assertTrue(createCssImportInspector(cssContent).containsImport());
-  }
-
-  @Test
-  public void shouldSupportCorrectResourceTypes() {
-    WroTestUtils.assertProcessorSupportResourceTypes(new CssImportPreProcessor(), ResourceType.CSS);
   }
 }
