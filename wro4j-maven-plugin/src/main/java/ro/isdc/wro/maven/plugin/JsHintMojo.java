@@ -47,8 +47,8 @@ public class JsHintMojo
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();
 
-  private int processedResources = 0;
-  private int foundErrors = 0;
+  private int totalResources = 0;
+  private int totalFoundErrors = 0;
 
   /**
    * {@inheritDoc}
@@ -59,7 +59,7 @@ public class JsHintMojo
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        processedResources++;
+        totalResources++;
         getLog().info("processing resource: " + resource);
         // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
         super.process(resource, reader, new StringWriter());
@@ -74,7 +74,7 @@ public class JsHintMojo
       protected void onLinterException(final LinterException e, final Resource resource) {
         final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s", e
             .getErrors().size(), resource, e.getErrors());
-        foundErrors += e.getErrors().size();
+        totalFoundErrors += e.getErrors().size();
         getLog().error(errorMessage);
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
@@ -86,10 +86,24 @@ public class JsHintMojo
     return processor;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void onBeforeExecute() {
+    totalFoundErrors = 0;
+    totalResources = 0;
+    super.onBeforeExecute();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected void onAfterExecute() {
-    getLog().info("ONAFTEREXECUTE");
-    getLog().info(String.format("JSHINT found %s errors in %s files", foundErrors, processedResources));
+    getLog().info("\n----------------------------------------");
+    getLog().info(String.format("JSHINT found %s errors in %s files", totalFoundErrors, totalResources));
+    getLog().info("----------------------------------------\n");
     super.onAfterExecute();
   }
 
