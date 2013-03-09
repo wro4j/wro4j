@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -23,7 +24,7 @@ import ro.isdc.wro.util.StringUtils;
 
 /**
  * Implementation of the {@link UriLocator} that is able to read a resource from a classpath.
- * 
+ *
  * @author Alex Objelean
  * @created 28 Mar 2011
  * @since 1.4.0
@@ -31,7 +32,7 @@ import ro.isdc.wro.util.StringUtils;
 public class ClasspathResourceLocator extends AbstractResourceLocator {
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathResourceLocator.class);
   /**
-   * Alias used to register this locator with {@link LocatorProvider}. 
+   * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "classpath";
   /**
@@ -107,7 +108,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
       return locateWildcardStream(uri, url);
     }
   }
-  
+
   private InputStream locateWildcardStream(final String uri, final URL url)
       throws IOException {
     if (url == null) {
@@ -116,7 +117,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     }
     return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
   }
-  
+
   /**
    * Builds a {@link JarWildcardStreamLocator} in order to get resources from the full classpath.
    */
