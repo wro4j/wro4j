@@ -96,7 +96,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     LOG.debug("Attempting to find resource {} at the following location: {}", uri, fullPath);
     try {
       return locateWildcardStream(uri, url);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       //do not attempt unless exception is of this type
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
@@ -114,7 +114,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
       LOG.debug("Failed to locate stream for {} because URL is null", uri);
       throw new IOException("Cannot locate stream for null URL");
     }
-    return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+    return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
   }
   
   /**
