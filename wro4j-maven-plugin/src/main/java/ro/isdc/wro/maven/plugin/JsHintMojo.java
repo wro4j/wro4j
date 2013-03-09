@@ -101,7 +101,7 @@ public class JsHintMojo
    */
   @Override
   protected void onAfterExecute() {
-    getLog().info("\n----------------------------------------");
+    getLog().info("----------------------------------------");
     getLog().info(String.format("JSHINT found %s errors in %s files", totalFoundErrors, totalResources));
     getLog().info("----------------------------------------\n");
     super.onAfterExecute();
