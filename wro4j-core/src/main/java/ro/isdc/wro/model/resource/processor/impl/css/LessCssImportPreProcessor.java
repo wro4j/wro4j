@@ -1,9 +1,8 @@
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import java.io.IOException;
 import java.util.List;
 
-import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.support.LessCssImportInspector;
 
 
 /**
@@ -14,21 +13,22 @@ import ro.isdc.wro.model.resource.Resource;
  * @since 1.6.3
  */
 public class LessCssImportPreProcessor
-    extends AbstractCssImportPreProcessor {
+    extends CssImportPreProcessor {
+
+  public static final String ALIAS = "lessCssImport";
   /**
    * {@inheritDoc}
    */
   @Override
-  protected String doTransform(final String cssContent, final List<Resource> importedResources)
-      throws IOException {
-    return null;
+  protected List<String> findImports(final String css) {
+    return new LessCssImportInspector(css).findImports();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected List<String> findImports(final String css) {
-    return super.findImports(css);
+  protected String removeImportStatements(final String cssContent) {
+    return new LessCssImportInspector(cssContent).removeImportStatements();
   }
 }

@@ -18,6 +18,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.FallbackCssDataUriProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.LessCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.VariablizeColorsCssProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.ConsoleStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
@@ -26,7 +27,7 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
 
 /**
  * The implementation which contributes with processors from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 1 Jun 2012
  */
@@ -40,7 +41,7 @@ public class DefaultProcessorProvider
     populateProcessorsMap(map);
     return map;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -55,15 +56,16 @@ public class DefaultProcessorProvider
   private Map<String, ResourcePostProcessor> toPostProcessors(
       final Map<String, ResourcePreProcessor> preProcessorsMap) {
     final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
-    for (Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
+    for (final Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
       map.put(entry.getKey(), new ProcessorDecorator(entry.getValue()));
     }
     return map;
   }
-  
+
   private void populateProcessorsMap(final Map<String, ResourcePreProcessor> map) {
     map.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
     map.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    map.put(LessCssImportPreProcessor.ALIAS, new CssImportPreProcessor());
     map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     map.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());
