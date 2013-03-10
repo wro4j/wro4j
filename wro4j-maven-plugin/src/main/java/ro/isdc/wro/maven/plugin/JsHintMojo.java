@@ -46,9 +46,24 @@ public class JsHintMojo
    * @optional
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();
-
+  /**
+   * Counts maximum acceptable number of jshint errors, useful for progressive code quality enhancement strategy.
+   *
+   * @parameter expression="${failThreshold}"
+   * @optional
+   */
+  private int failThreshold = 0;
+  /**
+   * Counts total number of processed resources.
+   */
   private int totalResources = 0;
+  /**
+   * Counts total number of resources with errors.
+   */
   private int totalResourcesWithErrors = 0;
+  /**
+   * Counts total number of jshint errors.
+   */
   private int totalFoundErrors = 0;
 
   /**
@@ -81,7 +96,9 @@ public class JsHintMojo
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
         if (!isFailNever()) {
-          throw new WroRuntimeException("Errors found when validating resource: " + resource);
+          if (totalFoundErrors >= failThreshold) {
+            throw new WroRuntimeException("Errors found when validating resource: " + resource);
+          }
         }
       };
     }.setOptionsAsString(getOptions());
@@ -155,6 +172,13 @@ public class JsHintMojo
    */
   void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  void setFailThreshold(final int failThreshold) {
+    this.failThreshold = failThreshold;
   }
 
   /**
