@@ -6,6 +6,7 @@ package ro.isdc.wro.model.resource.locator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -132,7 +133,7 @@ public class ServletContextUriLocator
           LOG.debug(message);
           throw new IOException(message);
         }
-        return getWildcardStreamLocator().locateStream(uri, new File(realPath));
+        return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(realPath, "UTF-8")));
       }
     } catch (final IOException e) {
       /**
