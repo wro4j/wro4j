@@ -48,6 +48,7 @@ public class JsHintMojo
   private String reportFormat = FormatterType.JSLINT.getFormat();
 
   private int totalResources = 0;
+  private int totalResourcesWithErrors = 0;
   private int totalFoundErrors = 0;
 
   /**
@@ -74,6 +75,7 @@ public class JsHintMojo
       protected void onLinterException(final LinterException e, final Resource resource) {
         final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s", e
             .getErrors().size(), resource, e.getErrors());
+        totalResourcesWithErrors++;
         totalFoundErrors += e.getErrors().size();
         getLog().error(errorMessage);
         // collect found errors
@@ -93,6 +95,7 @@ public class JsHintMojo
   protected void onBeforeExecute() {
     totalFoundErrors = 0;
     totalResources = 0;
+    totalResourcesWithErrors = 0;
     super.onBeforeExecute();
   }
 
@@ -101,10 +104,17 @@ public class JsHintMojo
    */
   @Override
   protected void onAfterExecute() {
-    getLog().info("----------------------------------------");
-    getLog().info(String.format("JSHINT found %s errors in %s files", totalFoundErrors, totalResources));
-    getLog().info("----------------------------------------\n");
+    logSummary();
     super.onAfterExecute();
+  }
+
+  private void logSummary() {
+    final String message = totalFoundErrors == 0 ? "JSHINT found no errors." : String.format(
+        "JSHINT found %s errors in %s files.", totalFoundErrors, totalResourcesWithErrors);
+    getLog().info("----------------------------------------");
+    getLog().info(String.format("Total number of processed resources: %s", totalResources));
+    getLog().info(message);
+    getLog().info("----------------------------------------\n");
   }
 
   /**
