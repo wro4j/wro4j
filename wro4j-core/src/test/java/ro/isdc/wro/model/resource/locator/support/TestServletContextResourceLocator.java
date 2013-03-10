@@ -117,7 +117,7 @@ public class TestServletContextResourceLocator {
 
   private String createUri(final String uri)
       throws IOException {
-    return createUri("ro/isdc/wro/model/resource/locator/");
+    return createUri(uri, "ro/isdc/wro/model/resource/locator/");
   }
 
   private String createUri(final String uri, final String path)
