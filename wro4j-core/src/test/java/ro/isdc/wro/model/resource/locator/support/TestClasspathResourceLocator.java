@@ -122,6 +122,13 @@ public class TestClasspathResourceLocator {
     uriLocator.getInputStream();
   }
 
+  @Test
+  public void shouldFindWildcardResourcesForFolderContainingSpaces()
+      throws IOException {
+    uriLocator = new ClasspathResourceLocator(createUri("test/folder with spaces/**.css"));
+    uriLocator.getInputStream();
+  }
+
   @Test(expected = IOException.class)
   public void resourceUnavailable()
       throws Exception {

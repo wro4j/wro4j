@@ -49,18 +49,18 @@ public class TestServletContextResourceLocator {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    
+
     Mockito.when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     Mockito.when(mockRequest.getServletPath()).thenReturn("");
     Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    
+
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
-    
+
     final WroConfiguration config = new WroConfiguration();
     config.setConnectionTimeout(100);
     Context.set(context, config);
   }
-  
+
   private void useLocator(final ServletContextResourceLocator locator) {
     Validate.notNull(locator);
     this.locator = locator;
@@ -117,7 +117,12 @@ public class TestServletContextResourceLocator {
 
   private String createUri(final String uri)
       throws IOException {
-    final URL url = Thread.currentThread().getContextClassLoader().getResource("ro/isdc/wro/model/resource/locator/");
+    return createUri("ro/isdc/wro/model/resource/locator/");
+  }
+
+  private String createUri(final String uri, final String path)
+      throws IOException {
+    final URL url = Thread.currentThread().getContextClassLoader().getResource(path);
     Mockito.when(mockServletContext.getRealPath(Mockito.anyString())).thenReturn(url.getPath());
     // Mockito.when(Context.get().getServletContext().getRequestDispatcher(Mockito.anyString())).thenReturn(null);
     return uri;
@@ -164,6 +169,14 @@ public class TestServletContextResourceLocator {
   public void cannotSetNullLocatorStrategy() {
     locator = new ServletContextResourceLocator(mockServletContext, "/doesntMatter");
     locator.setLocatorStrategy(null);
+  }
+
+
+  @Test
+  public void shouldFindWildcardResourcesForFolderContainingSpaces()
+      throws IOException {
+    useLocator(new ServletContextResourceLocator(mockServletContext, createUri("/folder with spaces/**.css", "test")));
+    locator.getInputStream();
   }
 
   @After
