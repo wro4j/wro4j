@@ -36,7 +36,7 @@ public abstract class AbstractLinterMojo<T>
    * @param report
    *          to add.
    */
-  protected final void addReport(final ResourceLintReport report) {
+  protected final void addReport(final ResourceLintReport<T> report) {
     lintReport.addReport(report);
   }
 
