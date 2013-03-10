@@ -89,14 +89,15 @@ public class TestJsHintMojo
       getMojo().setIgnoreMissingResources(true);
       getMojo().execute();
     } finally {
-      //Assert that file is big enough to prove that it contains serialized errors.
+      // Assert that file is big enough to prove that it contains serialized errors.
       assertTrue(reportFile.length() > 1000);
       FileUtils.deleteQuietly(reportFile);
     }
   }
 
   @Test
-  public void shouldGenerateReportWithDefaultFormat() throws Exception {
+  public void shouldGenerateReportWithDefaultFormat()
+      throws Exception {
     generateAndCompareReportFile(null, "jshint-default.xml");
   }
 
@@ -124,8 +125,27 @@ public class TestJsHintMojo
     }
   }
 
+  @Test
+  public void shouldNotFailWhenThresholdIsGreaterThanNumberOfErrors()
+      throws Exception {
+    ((JsHintMojo) getMojo()).setFailThreshold(3);
+    executeResourcesWithErrors();
+  }
 
-  public void generateAndCompareReportFile(final String reportFormat, final String expectedFileName)
+  @Test(expected = MojoExecutionException.class)
+  public void shouldFailWhenThresholdEqualsWithNumberOfErrors()
+      throws Exception {
+    ((JsHintMojo) getMojo()).setFailThreshold(2);
+    executeResourcesWithErrors();
+  }
+
+  private void executeResourcesWithErrors()
+      throws MojoExecutionException {
+    getMojo().setTargetGroups("invalidResources");
+    getMojo().execute();
+  }
+
+  private void generateAndCompareReportFile(final String reportFormat, final String expectedFileName)
       throws Exception {
     final File reportFile = WroUtil.createTempFile();
     final JsHintMojo mojo = (JsHintMojo) getMojo();

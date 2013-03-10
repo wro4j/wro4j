@@ -117,7 +117,6 @@ public abstract class AbstractWro4jMojo
   public final void execute()
       throws MojoExecutionException {
     validate();
-
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
