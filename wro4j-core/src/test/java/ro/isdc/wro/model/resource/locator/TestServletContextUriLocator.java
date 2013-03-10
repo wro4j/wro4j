@@ -49,7 +49,6 @@ public class TestServletContextUriLocator {
   private ServletContext mockServletContext;
   private ServletContextUriLocator locator;
 
-
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -57,14 +56,14 @@ public class TestServletContextUriLocator {
     when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     when(mockRequest.getServletPath()).thenReturn("");
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    
+
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
     final WroConfiguration config = new WroConfiguration();
     config.setConnectionTimeout(100);
     Context.set(context, config);
-    
+
     locator = new ServletContextUriLocator();
-    
+
     initLocator(locator);
   }
 
@@ -72,54 +71,60 @@ public class TestServletContextUriLocator {
    * Initialize the locator by injecting all required fields.
    */
   private void initLocator(final ServletContextUriLocator locator) {
-    Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     injector.inject(locator);
   }
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullUri()
-    throws Exception {
+      throws Exception {
     locator.locate(null);
   }
 
-
   @Test
   public void testWildcard1Resources()
-    throws IOException {
+      throws IOException {
     locator.locate(createUri("/css/*.css"));
   }
 
-
   @Test
   public void testWildcard2Resources()
-    throws IOException {
+      throws IOException {
     locator.locate(createUri("/css/*.cs?"));
   }
 
-
   @Test
   public void testWildcard3Resources()
-    throws IOException {
+      throws IOException {
     locator.locate(createUri("/css/*.???"));
   }
 
-
   @Test
   public void testRecursiveWildcardResources()
-    throws IOException {
+      throws IOException {
     locator.locate(createUri("/css/**.css"));
+  }
+
+  @Test
+  public void shouldFindWildcardResourcesForFolderContainingSpaces()
+      throws IOException {
+    locator.locate(createUri("/folder with spaces/**.css", "test"));
   }
 
   @Test(expected = IOException.class)
   public void testWildcardInexistentResources()
-    throws IOException {
+      throws IOException {
     locator.locate(createUri("/css/**.NOTEXIST"));
   }
 
-
   private String createUri(final String uri)
-    throws IOException {
-    final URL url = Thread.currentThread().getContextClassLoader().getResource("ro/isdc/wro/model/resource/locator/");
+      throws IOException {
+    return createUri(uri, "ro/isdc/wro/model/resource/locator/");
+  }
+
+  private String createUri(final String uri, final String path)
+      throws IOException {
+    final URL url = Thread.currentThread().getContextClassLoader().getResource(path);
     when(mockServletContext.getRealPath(Mockito.anyString())).thenReturn(url.getPath());
     return uri;
   }
@@ -129,13 +134,13 @@ public class TestServletContextUriLocator {
    */
   @Test(expected = IOException.class)
   public void testInvalidUrl()
-    throws Exception {
+      throws Exception {
     locator.locate("/invalid/resource.css");
   }
 
   @Test
   public void shouldPreferServletContextBasedResolving()
-    throws IOException {
+      throws IOException {
     final InputStream is = new ByteArrayInputStream("a {}".getBytes());
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
@@ -153,7 +158,6 @@ public class TestServletContextUriLocator {
   public void cannotSetNullLocatorStrategy() {
     locator.setLocatorStrategy(null);
   }
-
 
   @After
   public void resetContext() {

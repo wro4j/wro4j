@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
@@ -66,7 +67,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
-      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+      return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
     }
     final URL url = new URL(uri);
     final URLConnection connection = url.openConnection();

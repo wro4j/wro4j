@@ -79,11 +79,10 @@ public class TestClasspathUriLocator {
     uriLocator.locate(createUri("ro/isdc/wro/http/**.css"));
   }
 
-
   @Test
-  public void shouldFindWildcardResourcesForFilesContainingSpaces()
+  public void shouldFindWildcardResourcesForFolderContainingSpaces()
       throws IOException {
-    uriLocator.locate(createUri("ro/isdc/wro/model/resource/locator/nameWithSpaces/**.css"));
+    uriLocator.locate(createUri("test/folder with spaces/**.css"));
   }
 
   @Test(expected = IOException.class)
