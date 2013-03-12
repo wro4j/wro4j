@@ -5,7 +5,7 @@
 
 	<groupId>ro.isdc.wro4j</groupId>
 	<artifactId>wro4j-parent</artifactId>
-	<version>1.6.3-SNAPSHOT</version>
+	<version>1.6.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>wro4j parent</name>
