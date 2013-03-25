@@ -5,9 +5,15 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
@@ -19,9 +25,11 @@ import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -46,7 +54,7 @@ public class TestNodeLessCssProcessor {
   public void beforeMethod() {
     Assume.assumeTrue(isSupported);
   }
-  
+
   @Test
   public void testFromFolder()
       throws Exception {
@@ -58,6 +66,42 @@ public class TestNodeLessCssProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
+  @Test
+  public void shouldWorkProperlyWithUrlRewritingPreProcessor()
+      throws Exception {
+    final ResourcePreProcessor processor = ChainedProcessor.create(new CssUrlRewritingProcessor(), new NodeLessCssProcessor());
+    final URL url = getClass().getResource("lesscss");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedUrlRewriting");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
+
+  private static class ChainedProcessor implements ResourcePreProcessor {
+    private List<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
+    private ChainedProcessor(final List<ResourcePreProcessor> processors) {
+      this.processors = processors;
+    }
+    public static ChainedProcessor create(final ResourcePreProcessor ... processors) {
+      final List<ResourcePreProcessor> processorsAsList = new ArrayList<ResourcePreProcessor>();
+      if (processors != null) {
+        processorsAsList.addAll(Arrays.asList(processors));
+      }
+      return new ChainedProcessor(processorsAsList);
+    }
+    @Override
+    public void process(final Resource resource, final Reader reader, final Writer writer)
+        throws IOException {
+      Reader tempReader = reader;
+      Writer tempWriter = null;
+      for (final ResourcePreProcessor processor : processors) {
+        tempWriter = new StringWriter();
+        processor.process(resource, tempReader, tempWriter);
+        tempReader = new StringReader(tempWriter.toString());
+      }
+      writer.write(tempWriter.toString());
+    }
+  }
 
   @Test
   public void shouldBeThreadSafe() throws Exception {

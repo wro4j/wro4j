@@ -204,20 +204,12 @@ public class PreProcessorExecutor {
     for (final ResourcePreProcessor processor : processors) {
       final ResourcePreProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
 
-      callbackRegistry.onBeforePreProcess();
-
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
-      try {
-        // decorate and process
-        decoratedProcessor.process(resource, reader, writer);
-        // use the outcome for next input
-        resourceContent = writer.toString();
-      } finally {
-        callbackRegistry.onAfterPreProcess();
-        reader.close();
-        writer.close();
-      }
+      // decorate and process
+      decoratedProcessor.process(resource, reader, writer);
+      // use the outcome for next input
+      resourceContent = writer.toString();
     }
     return writer.toString();
   }
@@ -227,7 +219,18 @@ public class PreProcessorExecutor {
    */
   private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
       final ProcessingCriteria criteria) {
-    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria);
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria) {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        try {
+          callbackRegistry.onBeforePreProcess();
+          super.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPreProcess();
+        }
+      }
+    };
     injector.inject(decorated);
     return decorated;
   }
