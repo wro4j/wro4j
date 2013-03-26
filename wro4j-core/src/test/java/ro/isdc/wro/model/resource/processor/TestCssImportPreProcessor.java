@@ -153,6 +153,7 @@ public class TestCssImportPreProcessor {
     WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
+        Context.set(Context.standaloneContext());
         final Reader reader = new StringReader("@import('/path/to/imported');");
         final Resource resource1 = Resource.create("resource1.css");
         final Resource resource2 = Resource.create("resource2.css");
@@ -161,6 +162,7 @@ public class TestCssImportPreProcessor {
         } else {
           victim.process(resource2, reader, new StringWriter());
         }
+        Context.unset();
         return null;
       }
     }));
