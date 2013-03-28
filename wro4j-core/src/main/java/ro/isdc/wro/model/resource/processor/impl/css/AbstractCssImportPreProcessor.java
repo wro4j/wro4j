@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,28 +54,23 @@ public abstract class AbstractCssImportPreProcessor
   @Inject
   private UriLocatorFactory uriLocatorFactory;
   /**
-   * Holds a list of processed resources, useful for detecting deep recursion. A map (maps current thread correlationId)
-   * is used to ensure that the processor is thread-safe and doesn't erroneously detect recursion when running in
-   * concurrent environment. A thread-local is used in order to avoid infinite recursion when processor is invoked from
-   * within the processor for child resources.
+   * A map useful for detecting deep recursion. The key (correlationId) - identifies a processing unit, while the value
+   * contains a pair between the list o processed resources and a stack holding recursive calls (value contained on this
+   * stack is not important). This map is used to ensure that the processor is thread-safe and doesn't erroneously
+   * detect recursion when running in concurrent environment. A thread-local is used in order to avoid infinite
+   * recursion when processor is invoked from within the processor for child resources.
    */
-  private final Map<String, List<String>> map = new ConcurrentHashMap<String, List<String>>() {
+  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new HashMap<String, Pair<List<String>, Stack<String>>>() {
+    /**
+     * Make sure that the get call will always return a not null object. To avoid growth of this map, it is important to
+     * call remove for each invoked get.
+     */
     @Override
-    public List<String> get(final Object key) {
-      List<String> result = super.get(key);
+    public Pair<List<String>, Stack<String>> get(final Object key) {
+      Pair<List<String>, Stack<String>> result = super.get(key);
       if (result == null) {
-        result = new ArrayList<String>();
-        put(key.toString(), result);
-      }
-      return result;
-    };
-  };
-  private final Map<String, Stack<String>> contextStackMap = new ConcurrentHashMap<String, Stack<String>>() {
-    @Override
-    public Stack<String> get(final Object key) {
-      Stack<String> result = super.get(key);
-      if (result == null) {
-        result = new Stack<String>();
+        final List<String> list = new ArrayList<String>();
+        result = ImmutablePair.of(list, new Stack<String>());
         put(key.toString(), result);
       }
       return result;
@@ -128,23 +125,22 @@ public abstract class AbstractCssImportPreProcessor
 
   private void addProcessedImport(final String importedUri) {
     final String correlationId = Context.getCorrelationId();
-    contextStackMap.get(correlationId).push(correlationId);
+    contextMap.get(correlationId).getValue().push(correlationId);
     getProcessedImports().add(importedUri);
   }
 
   private List<String> getProcessedImports() {
-    return map.get(Context.getCorrelationId());
+    return contextMap.get(Context.getCorrelationId()).getKey();
   }
 
   private void clearProcessedImports() {
     final String correlationId = Context.getCorrelationId();
-    final Stack<String> stack = contextStackMap.get(correlationId);
+    final Stack<String> stack = contextMap.get(correlationId).getValue();
     if (!stack.isEmpty()) {
       stack.pop();
     }
     if (stack.isEmpty()) {
-      map.remove(correlationId);
-      contextStackMap.remove(correlationId);
+      contextMap.remove(correlationId);
     }
   }
 
