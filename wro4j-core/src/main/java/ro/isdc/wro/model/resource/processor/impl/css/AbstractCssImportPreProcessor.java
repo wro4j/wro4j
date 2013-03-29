@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -60,7 +60,7 @@ public abstract class AbstractCssImportPreProcessor
    * detect recursion when running in concurrent environment. A thread-local is used in order to avoid infinite
    * recursion when processor is invoked from within the processor for child resources.
    */
-  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new HashMap<String, Pair<List<String>, Stack<String>>>() {
+  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new ConcurrentHashMap<String, Pair<List<String>, Stack<String>>>() {
     /**
      * Make sure that the get call will always return a not null object. To avoid growth of this map, it is important to
      * call remove for each invoked get.
@@ -77,6 +77,15 @@ public abstract class AbstractCssImportPreProcessor
     };
   };
 
+
+  /**
+   * Useful to check that there is no memory leak after processing completion.
+   * @VisibleForTesting
+   */
+  protected final Map<String, Pair<List<String>, Stack<String>>> getContextMap() {
+    return contextMap;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -88,6 +97,7 @@ public abstract class AbstractCssImportPreProcessor
       final String result = parseCss(resource, IOUtils.toString(reader));
       writer.write(result);
     } finally {
+      //imkportant to avoid memory leak
       clearProcessedImports();
       reader.close();
       writer.close();
@@ -125,7 +135,7 @@ public abstract class AbstractCssImportPreProcessor
 
   private void addProcessedImport(final String importedUri) {
     final String correlationId = Context.getCorrelationId();
-    contextMap.get(correlationId).getValue().push(correlationId);
+    contextMap.get(correlationId).getValue().push(importedUri);
     getProcessedImports().add(importedUri);
   }
 
