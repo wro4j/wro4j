@@ -13,10 +13,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -143,7 +145,11 @@ public class TestCssImportPreProcessor {
    */
   @Test
   public void shouldNotComplainAboutRecursiveImportWhenRunningConcurrently() throws Exception {
+    final AtomicReference<Map<?, ?>> contextMapRef = new AtomicReference<Map<?,?>>();
     victim = new CssImportPreProcessor() {
+      {{
+        contextMapRef.set(getContextMap());
+      }}
       @Override
       protected void onRecursiveImportDetected() {
         throw new WroRuntimeException("Recursion detected");
@@ -166,5 +172,6 @@ public class TestCssImportPreProcessor {
         return null;
       }
     }));
+    assertTrue(contextMapRef.get().isEmpty());
   }
 }
