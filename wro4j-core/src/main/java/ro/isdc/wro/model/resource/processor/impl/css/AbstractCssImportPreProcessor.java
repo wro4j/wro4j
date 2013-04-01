@@ -57,8 +57,8 @@ public abstract class AbstractCssImportPreProcessor
    * A map useful for detecting deep recursion. The key (correlationId) - identifies a processing unit, while the value
    * contains a pair between the list o processed resources and a stack holding recursive calls (value contained on this
    * stack is not important). This map is used to ensure that the processor is thread-safe and doesn't erroneously
-   * detect recursion when running in concurrent environment. A thread-local is used in order to avoid infinite
-   * recursion when processor is invoked from within the processor for child resources.
+   * detect recursion when running in concurrent environment (when processor is invoked from within the processor for
+   * child resources).
    */
   private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new HashMap<String, Pair<List<String>, Stack<String>>>() {
     /**
