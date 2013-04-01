@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -95,6 +97,8 @@ public class TestWroFilter {
   @Mock
   private UriLocatorFactory mockUriLocatorFactory;
   @Mock
+  private MBeanServer mockMBeanServer;
+  @Mock
   private UriLocator mockUriLocator;
 
   @Before
@@ -117,9 +121,13 @@ public class TestWroFilter {
       protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
         throw WroRuntimeException.wrap(e);
       }
+
+      @Override
+      protected MBeanServer getMBeanServer() {
+        return mockMBeanServer;
+      }
     };
     victim.setWroManagerFactory(mockManagerFactory);
-    // victim.init(mockFilterConfig);
   }
 
   private WroManagerFactory createValidManagerFactory() {
@@ -784,6 +792,14 @@ public class TestWroFilter {
 
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verifyChainIsNotCalled(mockFilterChain);
+  }
+
+  @Test
+  public void shouldUnregisterMBeanOnDestroy() throws Exception {
+    when(mockMBeanServer.isRegistered(Mockito.any(ObjectName.class))).thenReturn(true);
+    victim.init(mockFilterConfig);
+    victim.destroy();
+    verify(mockMBeanServer).unregisterMBean(Mockito.any(ObjectName.class));
   }
 
   @After

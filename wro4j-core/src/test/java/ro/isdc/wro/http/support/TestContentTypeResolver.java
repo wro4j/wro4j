@@ -1,70 +1,69 @@
 package ro.isdc.wro.http.support;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static junit.framework.Assert.assertEquals;
 
 import org.junit.Test;
 
 
 public class TestContentTypeResolver {
-  
+
   @Test
   public void shouldResolveCSSExtenstion() {
-    assertThat(ContentTypeResolver.get("somefile.css"), is("text/css"));
+    assertEquals("text/css", ContentTypeResolver.get("somefile.css"));
   }
-  
+
   @Test
   public void shouldResolveJPGExtenstion() {
-    assertThat(ContentTypeResolver.get("s/bvews/omefile.jpg"), is("image/jpeg"));
+    assertEquals("image/jpeg", ContentTypeResolver.get("s/bvews/omefile.jpg"));
   }
 
   @Test
    public void shouldResolveJPGExtenstionWithoutCharset() {
-     assertThat(ContentTypeResolver.get("s/bvews/omefile.jpg", "UTF-8"), is("image/jpeg"));
+    assertEquals("image/jpeg", ContentTypeResolver.get("s/bvews/omefile.jpg", "UTF-8"));
    }
-  
+
   @Test
   public void shouldResolveHTMLExtenstion() {
-    assertThat(ContentTypeResolver.get("mefile.html"), is("text/html"));
+    assertEquals("text/html", ContentTypeResolver.get("mefile.html"));
   }
 
   @Test
   public void shouldResolveHTMLExtenstionWitCharset() {
-    assertThat(ContentTypeResolver.get("mefile.html", "UTF-8"), is("text/html; charset=UTF-8"));
+    assertEquals("text/html; charset=UTF-8", ContentTypeResolver.get("mefile.html", "UTF-8"));
   }
-  
+
   @Test
   public void shouldResolveJSExtenstion() {
-    assertThat(ContentTypeResolver.get("/ad/df/mefile.js"), is("application/javascript"));
+    assertEquals("application/javascript", ContentTypeResolver.get("/ad/df/mefile.js"));
   }
-  
+
   @Test
   public void shouldResolveUnknownExtenstion() {
-    assertThat(ContentTypeResolver.get("/ad/df/mefile.unknown"), is("application/octet-stream"));
+    assertEquals("application/octet-stream", ContentTypeResolver.get("/ad/df/mefile.unknown"));
   }
 
   @Test
   public void shouldOnlyUseLastDot() {
-    assertThat(ContentTypeResolver.get("somefile.js.png"), is("image/png"));
+    assertEquals("image/png", ContentTypeResolver.get("somefile.js.png"));
   }
 
   @Test
    public void shouldResolveHTMLUpperCaseExtenstion() {
-     assertThat(ContentTypeResolver.get("mefile.CSS"), is("text/css"));
+    assertEquals("text/css", ContentTypeResolver.get("mefile.CSS"));
    }
-  
+
   @Test
   public void shouldResolveFontExtensionEot() {
-    assertThat(ContentTypeResolver.get("font.eot"), is("application/vnd.ms-fontobject"));
+    assertEquals("application/vnd.ms-fontobject", ContentTypeResolver.get("font.eot"));
   }
-  
+
   @Test
   public void shouldResolveFontExtensionOtf() {
-    assertThat(ContentTypeResolver.get("font.otf"), is("application/x-font-opentype"));
+    assertEquals("application/x-font-opentype", ContentTypeResolver.get("font.otf"));
   }
-  
+
   @Test
   public void shouldResolveFontExtensionTtf() {
-    assertThat(ContentTypeResolver.get("font.ttf"), is("application/octet-stream"));
+    assertEquals("application/octet-stream", ContentTypeResolver.get("font.ttf"));
   }
 }
