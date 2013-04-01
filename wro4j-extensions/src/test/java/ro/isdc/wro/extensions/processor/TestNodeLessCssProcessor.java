@@ -78,7 +78,7 @@ public class TestNodeLessCssProcessor {
   @Test
   public void shouldWorkProperlyWithUrlRewritingPreProcessor()
       throws Exception {
-    final ResourcePreProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(), new NodeLessCssProcessor());
+    final ResourceProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(), new NodeLessCssProcessor());
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -86,13 +86,13 @@ public class TestNodeLessCssProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
-  private static class ChainedProcessor implements ResourcePreProcessor {
-    private List<ResourcePreProcessor> processors = new ArrayList<ResourcePreProcessor>();
-    private ChainedProcessor(final List<ResourcePreProcessor> processors) {
+  private static class ChainedProcessor implements ResourceProcessor {
+    private List<ResourceProcessor> processors = new ArrayList<ResourceProcessor>();
+    private ChainedProcessor(final List<ResourceProcessor> processors) {
       this.processors = processors;
     }
-    public static ChainedProcessor create(final ResourcePreProcessor ... processors) {
-      final List<ResourcePreProcessor> processorsAsList = new ArrayList<ResourcePreProcessor>();
+    public static ChainedProcessor create(final ResourceProcessor ... processors) {
+      final List<ResourceProcessor> processorsAsList = new ArrayList<ResourceProcessor>();
       if (processors != null) {
         processorsAsList.addAll(Arrays.asList(processors));
       }
@@ -103,7 +103,7 @@ public class TestNodeLessCssProcessor {
         throws IOException {
       Reader tempReader = reader;
       Writer tempWriter = null;
-      for (final ResourcePreProcessor processor : processors) {
+      for (final ResourceProcessor processor : processors) {
         tempWriter = new StringWriter();
         initProcessor(processor);
         processor.process(resource, tempReader, tempWriter);
