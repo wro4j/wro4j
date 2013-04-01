@@ -1,6 +1,13 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
 import static org.apache.commons.lang3.Validate.notNull;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
+import org.apache.commons.io.IOUtils;
+
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 
@@ -25,11 +32,25 @@ public class DefaultProcessorDecorator
     this.criteria = criteria;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void process(final Resource resource, final Reader reader, final Writer writer)
+      throws IOException {
+    try {
+      super.process(resource, reader, writer);
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(writer);
+    }
+  }
+
   private static ProcessorDecorator decorate(final Object processor, final ProcessingCriteria criteria) {
     notNull(criteria);
-    return new BenchmarkProcessorDecorator(new ExceptionHandlingProcessorDecorator(new SupportAwareProcessorDecorator(
-        new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(processor, criteria
-            .getProcessingType())))));
+    return new BenchmarkProcessorDecorator(new ExceptionHandlingProcessorDecorator(
+        new SupportAwareProcessorDecorator(new MinimizeAwareProcessorDecorator(new ImportAwareProcessorDecorator(
+            processor, criteria.getProcessingType())))));
   }
 
   /**
