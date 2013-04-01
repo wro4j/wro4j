@@ -107,19 +107,19 @@ public class TestResourceProxyRequestHandler {
 
   @Test
   public void shouldAlwaysBeEnabled() {
-    assertThat(victim.isEnabled(), is(true));
+    assertTrue(victim.isEnabled());
   }
 
   @Test
   public void shouldAcceptCallsTo_wroResources() {
     when(request.getRequestURI()).thenReturn("/wro/wroResources?id=test.css");
-    assertThat(victim.accept(request), is(true));
+    assertTrue(victim.accept(request));
   }
 
   @Test
   public void shouldNotAcceptCallsTo_OtherUris() {
     when(request.getRequestURI()).thenReturn("/wro/someOtherUri");
-    assertThat(victim.accept(request), is(false));
+    assertFalse(victim.accept(request));
   }
 
   @Test
@@ -135,7 +135,7 @@ public class TestResourceProxyRequestHandler {
     final String body = outputStream.toString();
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
-    assertThat(body, is(expectedBody));
+    assertEquals(expectedBody, body);
   }
 
   @Test(expected = UnauthorizedRequestException.class)
@@ -165,7 +165,7 @@ public class TestResourceProxyRequestHandler {
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
     verify(mockLocator, times(1)).getInputStream();
-    assertThat(body, is(expectedBody));
+    assertEquals(expectedBody, body);
   }
 
   @Test
