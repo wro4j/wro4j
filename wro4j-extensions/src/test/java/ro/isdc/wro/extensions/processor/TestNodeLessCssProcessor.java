@@ -76,7 +76,7 @@ public class TestNodeLessCssProcessor {
   }
 
   @Test
-  public void shouldWorkProperlyWithUrlRewritingPreProcessor()
+  public void shouldWorkProperlyWithCssImportPreProcessor()
       throws Exception {
     final ResourceProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(), new NodeLessCssProcessor());
     final URL url = getClass().getResource("lesscss");
