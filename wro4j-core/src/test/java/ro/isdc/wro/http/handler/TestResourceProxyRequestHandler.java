@@ -1,7 +1,8 @@
 package ro.isdc.wro.http.handler;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -108,19 +109,19 @@ public class TestResourceProxyRequestHandler {
 
   @Test
   public void shouldAlwaysBeEnabled() {
-    assertThat(victim.isEnabled(), is(true));
+    assertTrue(victim.isEnabled());
   }
 
   @Test
   public void shouldAcceptCallsTo_wroResources() {
     when(request.getRequestURI()).thenReturn("/wro/wroResources?id=test.css");
-    assertThat(victim.accept(request), is(true));
+    assertTrue(victim.accept(request));
   }
 
   @Test
   public void shouldNotAcceptCallsTo_OtherUris() {
     when(request.getRequestURI()).thenReturn("/wro/someOtherUri");
-    assertThat(victim.accept(request), is(false));
+    assertFalse(victim.accept(request));
   }
 
   @Test
@@ -136,7 +137,7 @@ public class TestResourceProxyRequestHandler {
     final String body = outputStream.toString();
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
-    assertThat(body, is(expectedBody));
+    assertEquals(expectedBody, body);
   }
 
   @Test(expected = UnauthorizedRequestException.class)
@@ -166,7 +167,7 @@ public class TestResourceProxyRequestHandler {
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
     verify(mockUriLocator, times(1)).locate(resourceUri);
-    assertThat(body, is(expectedBody));
+    assertEquals(expectedBody, body);
   }
 
   @Test
