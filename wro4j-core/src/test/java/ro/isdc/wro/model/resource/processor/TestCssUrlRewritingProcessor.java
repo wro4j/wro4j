@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -10,8 +13,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.Callable;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -167,8 +168,8 @@ public class TestCssUrlRewritingProcessor {
   @Test
   public void checkUrlIsAllowed() throws Exception {
     processClasspathResourceType();
-    Assert.assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
-    Assert.assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
+    assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
+    assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
   }
 
   @Test
