@@ -254,21 +254,32 @@ public abstract class AbstractWro4jMojo
     if (buildContext != null) {
       final WroModelInspector modelInspector = new WroModelInspector(getModel());
       final WroManager manager = getWroManager();
-      final HashStrategy hashStrategy = manager.getHashStrategy();
-      final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
       for (final String groupName : groupNames) {
         final Group group = modelInspector.getGroupByName(groupName);
         if (group != null) {
           for (final Resource resource : group.getResources()) {
-            try {
-              final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-              buildContext.setValue(resource.getUri(), fingerprint);
-            } catch (final IOException e) {
-              getLog().debug("could not check fingerprint of resource: " + resource);
-            }
+            persistResourceFingerprints(resource, modelInspector, manager);
           }
         }
       }
+    }
+  }
+
+  private void persistResourceFingerprints(Resource resource, WroModelInspector modelInspector, WroManager manager) {
+    final HashStrategy hashStrategy = manager.getHashStrategy();
+    final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
+    try {
+      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+      buildContext.setValue(resource.getUri(), fingerprint);
+      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
+      if (resource.getType() == ResourceType.CSS) {
+        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+        getLog().debug("Check @import directive from " + resource);
+        // persist fingerprints in imported resources.
+        createCssImportProcessorPersistFingerprints(modelInspector, manager).process(resource, reader, new StringWriter());
+      }
+    } catch (final IOException e) {
+      getLog().debug("could not check fingerprint of resource: " + resource);
     }
   }
 
@@ -289,6 +300,41 @@ public abstract class AbstractWro4jMojo
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
           throws IOException {
+        // no need to build the content, since we are interested in finding imported resources only
+        return "";
+      }
+
+      @Override
+      public String toString() {
+        return CssImportPreProcessor.class.getSimpleName();
+      }
+    };
+    /**
+     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
+     * change.
+     */
+    final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
+      @Override
+      protected boolean isIgnoreFailingProcessor() {
+        return true;
+      }
+    };
+    InjectorBuilder.create(getManagerFactory()).build().inject(processor);
+    return processor;
+  }
+
+  private ResourcePreProcessor createCssImportProcessorPersistFingerprints(final WroModelInspector modelInspector,
+                                                                           final WroManager manager) {
+    final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
+      @Override
+      protected void onImportDetected(final String importedUri) {
+        getLog().debug("Found @import " + importedUri);
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS), modelInspector, manager);
+      }
+
+      @Override
+      protected String doTransform(final String cssContent, final List<Resource> foundImports)
+              throws IOException {
         // no need to build the content, since we are interested in finding imported resources only
         return "";
       }
