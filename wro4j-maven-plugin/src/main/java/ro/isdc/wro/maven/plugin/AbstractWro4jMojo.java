@@ -253,19 +253,19 @@ public abstract class AbstractWro4jMojo
   private void persistResourceFingerprints(final List<String> groupNames) {
     if (buildContext != null) {
       final WroModelInspector modelInspector = new WroModelInspector(getModel());
-      final WroManager manager = getWroManager();
       for (final String groupName : groupNames) {
         final Group group = modelInspector.getGroupByName(groupName);
         if (group != null) {
           for (final Resource resource : group.getResources()) {
-            persistResourceFingerprints(resource, modelInspector, manager);
+            persistResourceFingerprints(resource);
           }
         }
       }
     }
   }
 
-  private void persistResourceFingerprints(Resource resource, WroModelInspector modelInspector, WroManager manager) {
+  private void persistResourceFingerprints(final Resource resource) {
+    final WroManager manager = getWroManager();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
     try {
@@ -276,30 +276,24 @@ public abstract class AbstractWro4jMojo
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
         getLog().debug("Check @import directive from " + resource);
         // persist fingerprints in imported resources.
-        createCssImportProcessorPersistFingerprints(modelInspector, manager).process(resource, reader, new StringWriter());
+        persistFingerprintsForCssImports(resource, reader);
       }
     } catch (final IOException e) {
       getLog().debug("could not check fingerprint of resource: " + resource);
     }
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
+  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader) throws IOException {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
-        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
-        getLog().debug("\tisImportChanged: " + isImportChanged);
-        if (isImportChanged) {
-          changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
-        }
-      };
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
+      }
 
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
-          throws IOException {
+              throws IOException {
         // no need to build the content, since we are interested in finding imported resources only
         return "";
       }
@@ -320,21 +314,26 @@ public abstract class AbstractWro4jMojo
       }
     };
     InjectorBuilder.create(getManagerFactory()).build().inject(processor);
-    return processor;
+    processor.process(resource, reader, new StringWriter());
   }
 
-  private ResourcePreProcessor createCssImportProcessorPersistFingerprints(final WroModelInspector modelInspector,
-                                                                           final WroManager manager) {
+  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
-        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS), modelInspector, manager);
-      }
+        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
+        getLog().debug("\tisImportChanged: " + isImportChanged);
+        if (isImportChanged) {
+          changeDetected.set(true);
+          // no need to continue
+          throw new WroRuntimeException("Change detected. No need to continue processing");
+        }
+      };
 
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
-              throws IOException {
+          throws IOException {
         // no need to build the content, since we are interested in finding imported resources only
         return "";
       }
