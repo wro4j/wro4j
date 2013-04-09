@@ -42,6 +42,7 @@ import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessor
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.util.Function;
 
 
 /**
@@ -283,14 +284,22 @@ public abstract class AbstractWro4jMojo
     }
   }
 
-  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader) throws IOException {
+  /**
+   * Invokes the provided function for each detected css import.
+   */
+  private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
+      throws IOException {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
+        try {
+          func.apply(importedUri);
+        } catch (final Exception e) {
+          getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
+        }
         persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
       }
-
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
               throws IOException {
@@ -303,10 +312,6 @@ public abstract class AbstractWro4jMojo
         return CssImportPreProcessor.class.getSimpleName();
       }
     };
-    /**
-     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
-     * change.
-     */
     final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
       @Override
       protected boolean isIgnoreFailingProcessor() {
@@ -317,11 +322,22 @@ public abstract class AbstractWro4jMojo
     processor.process(resource, reader, new StringWriter());
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
-    final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
-      @Override
-      protected void onImportDetected(final String importedUri) {
-        getLog().debug("Found @import " + importedUri);
+  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader) throws IOException {
+    forEachCssImportApply(new Function<String, Void>() {
+      public Void apply(final String importedUri)
+          throws Exception {
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
+        return null;
+      }
+    }, resource, reader);
+  }
+
+  private void createCssImportProcessor(final Resource resource, final Reader reader,
+      final AtomicBoolean changeDetected)
+      throws IOException {
+    forEachCssImportApply(new Function<String, Void>() {
+      public Void apply(final String importedUri)
+          throws Exception {
         final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
         getLog().debug("\tisImportChanged: " + isImportChanged);
         if (isImportChanged) {
@@ -329,32 +345,9 @@ public abstract class AbstractWro4jMojo
           // no need to continue
           throw new WroRuntimeException("Change detected. No need to continue processing");
         }
-      };
-
-      @Override
-      protected String doTransform(final String cssContent, final List<Resource> foundImports)
-          throws IOException {
-        // no need to build the content, since we are interested in finding imported resources only
-        return "";
+        return null;
       }
-
-      @Override
-      public String toString() {
-        return CssImportPreProcessor.class.getSimpleName();
-      }
-    };
-    /**
-     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
-     * change.
-     */
-    final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
-      @Override
-      protected boolean isIgnoreFailingProcessor() {
-        return true;
-      }
-    };
-    InjectorBuilder.create(getManagerFactory()).build().inject(processor);
-    return processor;
+    }, resource, reader);
   }
 
   /**
@@ -395,7 +388,7 @@ public abstract class AbstractWro4jMojo
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
         getLog().debug("Check @import directive from " + resource);
         // detect changes in imported resources.
-        createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
+        createCssImportProcessor(resource, reader, changeDetected);
       }
       return changeDetected.get();
     } catch (final IOException e) {
@@ -404,6 +397,9 @@ public abstract class AbstractWro4jMojo
     return false;
   }
 
+  /**
+   * @return true if the build was triggered by an incremental change.
+   */
   protected final boolean isIncrementalBuild() {
     return buildContext != null && buildContext.isIncremental();
   }
