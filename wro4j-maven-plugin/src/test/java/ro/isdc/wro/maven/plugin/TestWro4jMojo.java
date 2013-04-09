@@ -3,9 +3,9 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -22,12 +22,11 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -408,7 +407,7 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void testIncrementalChange()
+  public void shouldDetectIncrementalChange()
       throws Exception {
     mojo = new Wro4jMojo() {
       @Override
