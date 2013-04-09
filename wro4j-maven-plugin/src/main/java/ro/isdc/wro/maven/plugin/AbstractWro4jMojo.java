@@ -286,6 +286,10 @@ public abstract class AbstractWro4jMojo
 
   /**
    * Invokes the provided function for each detected css import.
+   *
+   * @param func
+   *          a function (closure) invoked for each found import. It will be provided as argument the uri of imported
+   *          css.
    */
   private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
       throws IOException {
@@ -300,9 +304,10 @@ public abstract class AbstractWro4jMojo
         }
         persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
       }
+
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
-              throws IOException {
+          throws IOException {
         // no need to build the content, since we are interested in finding imported resources only
         return "";
       }
@@ -322,7 +327,8 @@ public abstract class AbstractWro4jMojo
     processor.process(resource, reader, new StringWriter());
   }
 
-  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader) throws IOException {
+  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader)
+      throws IOException {
     forEachCssImportApply(new Function<String, Void>() {
       public Void apply(final String importedUri)
           throws Exception {
@@ -332,7 +338,7 @@ public abstract class AbstractWro4jMojo
     }, resource, reader);
   }
 
-  private void createCssImportProcessor(final Resource resource, final Reader reader,
+  private void detectChangeForCssImports(final Resource resource, final Reader reader,
       final AtomicBoolean changeDetected)
       throws IOException {
     forEachCssImportApply(new Function<String, Void>() {
@@ -388,7 +394,7 @@ public abstract class AbstractWro4jMojo
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
         getLog().debug("Check @import directive from " + resource);
         // detect changes in imported resources.
-        createCssImportProcessor(resource, reader, changeDetected);
+        detectChangeForCssImports(resource, reader, changeDetected);
       }
       return changeDetected.get();
     } catch (final IOException e) {
