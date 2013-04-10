@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -365,9 +367,8 @@ public abstract class AbstractWro4jMojo
   private List<String> getIncrementalGroupNames()
       throws Exception {
     final List<String> changedGroupNames = new ArrayList<String>();
-    final String targetGroups = getTargetGroups();
     for (final Group group : getModel().getGroups()) {
-      if (!targetGroups.isEmpty() && !targetGroups.contains(group.getName())) {
+      if (!isTargetGroup(group)) {
         //skip this group processing
         continue;
       }
@@ -382,6 +383,16 @@ public abstract class AbstractWro4jMojo
       }
     }
     return changedGroupNames;
+  }
+
+  /**
+   * Check if the provided group is a target group.
+   */
+  private boolean isTargetGroup(final Group group) {
+    notNull(group);
+    final String targetGroups = getTargetGroups();
+    //null, means all groups are target groups
+    return targetGroups == null || targetGroups.contains(group.getName());
   }
 
   private boolean isResourceChanged(final Resource resource) {
