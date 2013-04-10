@@ -132,7 +132,10 @@ public abstract class AbstractWro4jMojo
       onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
-      throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
+      final String message = "Exception occured while processing: " + e.toString() + ", class: " + e.getClass().getName()
+          + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
+      getLog().error(message, e);
+      throw new MojoExecutionException(message, e);
     } finally {
       onAfterExecute();
     }
