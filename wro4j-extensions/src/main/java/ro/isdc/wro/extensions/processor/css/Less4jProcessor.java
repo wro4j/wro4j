@@ -55,9 +55,7 @@ public class Less4jProcessor
       throws IOException {
     try {
       final CompilationResult result = compiler.compile(IOUtils.toString(reader));
-      if (!result.getWarnings().isEmpty()) {
-        LOG.warn("Less warnings: {}", result.getWarnings());
-      }
+      logWarnings(result);
       writer.write(result.getCss());
     } catch (final Less4jException e) {
       LOG.error("Failed to compile less. Errors are: ");
@@ -65,6 +63,15 @@ public class Less4jProcessor
         LOG.error(ToStringBuilder.reflectionToString(problem));
       }
       throw WroRuntimeException.wrap(e);
+    }
+  }
+
+  private void logWarnings(final CompilationResult result) {
+    if (!result.getWarnings().isEmpty()) {
+      LOG.warn("Less warnings are:");
+      for (final Problem problem : result.getWarnings()) {
+        LOG.warn(ToStringBuilder.reflectionToString(problem));
+      }
     }
   }
 }
