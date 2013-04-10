@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -318,7 +319,16 @@ public abstract class AbstractWro4jMojo
   private List<String> getIncrementalGroupNames()
       throws Exception {
     final List<String> changedGroupNames = new ArrayList<String>();
+    String targetGroups = getTargetGroups();
+    List<String> targetGroupsList = Collections.emptyList();
+    if (getTargetGroups() != null) {
+      targetGroupsList = Arrays.asList(getTargetGroups().split(","));
+    }
     for (final Group group : getModel().getGroups()) {
+      if (! targetGroups.isEmpty() && !targetGroups.contains(group.getName())) {
+        //skip this group processing
+        continue;
+      }
       for (final Resource resource : group.getResources()) {
         getLog().debug("checking delta for resource: " + resource);
         if (isResourceChanged(resource)) {
