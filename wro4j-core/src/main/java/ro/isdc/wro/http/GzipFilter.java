@@ -14,6 +14,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class GzipFilter
   /**
    * {@inheritDoc}
    */
-  public void init(final FilterConfig arg0)
+  public void init(final FilterConfig filterConfig)
       throws ServletException {
   }
 
@@ -48,17 +49,22 @@ public class GzipFilter
    */
   public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
       throws IOException, ServletException {
-    final ServletResponseWrapper response = decorateResponse((HttpServletRequest) req, (HttpServletResponse) res);
-    chain.doFilter(req, response);
+    final HttpServletRequest request = (HttpServletRequest) req;
+    final HttpServletResponse response = (HttpServletResponse) res;
+
+    final ServletResponseWrapper responseWrapper = decorateResponse(request, response);
+    chain.doFilter(req, responseWrapper);
+    responseWrapper.flushBuffer();
     IOUtils.closeQuietly(response.getOutputStream());
+    //chain.doFilter(request, response);
   }
 
   /**
    * Decorates the provided {@link HttpServletResponse} which handles gzip if it is allowed.
    */
-  private ServletResponseWrapper decorateResponse(final HttpServletRequest request, final HttpServletResponse response)
+  private HttpServletResponseWrapper decorateResponse(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-    ServletResponseWrapper wrappedResponse = new ServletResponseWrapper(response);
+    HttpServletResponseWrapper wrappedResponse = new HttpServletResponseWrapper(response);
     if (isGzipAllowed(request)) {
       LOG.debug("setting gzip header");
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
@@ -66,7 +72,7 @@ public class GzipFilter
       final GZIPOutputStream gzout = new GZIPOutputStream(new ByteArrayOutputStream());
       // Handle the request
 
-      wrappedResponse = new ServletResponseWrapper(wrappedResponse) {
+      wrappedResponse = new HttpServletResponseWrapper(wrappedResponse) {
         @Override
         public ServletOutputStream getOutputStream()
             throws IOException {
@@ -80,7 +86,7 @@ public class GzipFilter
   /**
    * Checks if the request supports gzip and is not a include request (these cannot be gzipped)
    */
-  protected boolean isGzipAllowed(final HttpServletRequest request) {
+  private boolean isGzipAllowed(final HttpServletRequest request) {
     return !DispatcherStreamLocator.isIncludedRequest(request) && WroUtil.isGzipSupported(request);
   }
 
