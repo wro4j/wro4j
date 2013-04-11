@@ -109,14 +109,7 @@ public class ResourceBundleProcessor {
   }
 
   private boolean isGzipAllowed() {
-    return context.getConfig().isGzipEnabled() && isGzipSupported();
-  }
-
-  /**
-   * @return true if Gzip is Supported
-   */
-  private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(context.getRequest());
+    return context.getConfig().isGzipEnabled() && WroUtil.isGzipSupported(context.getRequest());
   }
 
   /**
