@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -47,16 +48,19 @@ public class GzipFilter
    */
   public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
       throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest) req;
-    final ServletResponseWrapper response = decorateResponse((HttpServletResponse) res, request);
-    chain.doFilter(request, response);
+    final ServletResponseWrapper response = decorateResponse((HttpServletRequest) req, (HttpServletResponse) res);
+    chain.doFilter(req, response);
     IOUtils.closeQuietly(response.getOutputStream());
   }
 
-  private ServletResponseWrapper decorateResponse(final HttpServletResponse response, final HttpServletRequest request)
+  /**
+   * Decorates the provided {@link HttpServletResponse} which handles gzip if it is allowed.
+   */
+  private ServletResponseWrapper decorateResponse(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     ServletResponseWrapper wrappedResponse = new ServletResponseWrapper(response);
     if (isGzipAllowed(request)) {
+      LOG.debug("setting gzip header");
       response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
       // Create a gzip stream
       final GZIPOutputStream gzout = new GZIPOutputStream(new ByteArrayOutputStream());
@@ -66,10 +70,9 @@ public class GzipFilter
         @Override
         public ServletOutputStream getOutputStream()
             throws IOException {
-          return super.getOutputStream();
+          return new DelegatingServletOutputStream(gzout);
         }
       };
-      gzout.close();
     }
     return wrappedResponse;
   }
