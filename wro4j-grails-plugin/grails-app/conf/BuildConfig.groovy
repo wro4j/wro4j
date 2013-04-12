@@ -12,7 +12,7 @@ grails.project.dependency.resolution = {
     checksums true
 
     def gebVersion = "0.7.2"
-    def seleniumVersion = "2.25.0"
+    def seleniumVersion = "2.31.0"
 
     repositories {
         grailsPlugins()
