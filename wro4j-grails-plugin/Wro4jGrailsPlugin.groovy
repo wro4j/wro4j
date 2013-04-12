@@ -32,6 +32,9 @@ Web Resource Optimizer for Grails
 
   // URL to the plugin's documentation
   def documentation = "http://code.google.com/p/wro4j/wiki/GrailsPlugin"
+  def license = "APACHE"
+  def scm = [ url: "https://github.com/alexo/wro4j" ]
+  def issueManagement = [ system: "googleCode", url: "https://code.google.com/p/wro4j/issues/list" ]
 
   def doWithWebDescriptor = { xml ->
     def contextParam = xml.'context-param'
