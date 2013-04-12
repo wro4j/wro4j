@@ -54,9 +54,8 @@ grails.project.dependency.resolution = {
     }
     plugins {
       build(":tomcat:$grailsVersion",
-            ":release:2.0.4",
-            ":rest-client-builder:1.0.2") {
-        excludes 'nekohtml', "httpclient"
+            ":release:2.2.1",
+            ":rest-client-builder:1.0.3") {
         export = false
       }
       test(":spock:0.6", ":geb:$gebVersion") {
