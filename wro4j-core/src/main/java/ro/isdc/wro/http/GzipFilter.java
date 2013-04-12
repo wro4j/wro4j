@@ -1,5 +1,6 @@
 package ro.isdc.wro.http;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
@@ -8,10 +9,8 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -20,8 +19,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.HttpHeader;
+import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.WroUtil;
 
@@ -52,35 +51,29 @@ public class GzipFilter
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
 
-    final ServletResponseWrapper responseWrapper = decorateResponse(request, response);
-    chain.doFilter(req, responseWrapper);
-    responseWrapper.flushBuffer();
-    IOUtils.closeQuietly(response.getOutputStream());
-    //chain.doFilter(request, response);
+    if (isGzipAllowed(request)) {
+      doGzipResponse(request, response, chain);
+    } else {
+      chain.doFilter(request, response);
+    }
   }
 
   /**
-   * Decorates the provided {@link HttpServletResponse} which handles gzip if it is allowed.
+   * Performs actual gzip of the filtered content.
    */
-  private HttpServletResponseWrapper decorateResponse(final HttpServletRequest request, final HttpServletResponse response)
-      throws IOException {
-    HttpServletResponseWrapper wrappedResponse = new HttpServletResponseWrapper(response);
-    if (isGzipAllowed(request)) {
-      LOG.debug("setting gzip header");
-      response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
-      // Create a gzip stream
-      final GZIPOutputStream gzout = new GZIPOutputStream(new ByteArrayOutputStream());
-      // Handle the request
-
-      wrappedResponse = new HttpServletResponseWrapper(wrappedResponse) {
-        @Override
-        public ServletOutputStream getOutputStream()
-            throws IOException {
-          return new DelegatingServletOutputStream(gzout);
-        }
-      };
-    }
-    return wrappedResponse;
+  private void doGzipResponse(final HttpServletRequest req, final HttpServletResponse response, final FilterChain chain)
+      throws IOException, ServletException {
+    LOG.debug("Applying gzip on resource: " + req.getRequestURI());
+    response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final GZIPOutputStream gzout = new GZIPOutputStream(new BufferedOutputStream(baos));
+    //Perform gzip operation in-memory before sending response
+    final HttpServletResponseWrapper wrappedResponse = new RedirectedStreamServletResponseWrapper(gzout, response);
+    chain.doFilter(req, wrappedResponse);
+    //close underlying stream
+    gzout.close();
+    response.setContentLength(baos.size());
+    IOUtils.write(baos.toByteArray(), response.getOutputStream());
   }
 
   /**
