@@ -54,6 +54,7 @@ public class GzipFilter
     if (isGzipAllowed(request)) {
       doGzipResponse(request, response, chain);
     } else {
+      LOG.debug("Gzip not allowed. Proceeding with chain.");
       chain.doFilter(request, response);
     }
   }
