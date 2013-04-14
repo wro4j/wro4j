@@ -7,7 +7,7 @@ import wro4j.grails.plugin.WroDSLHandler
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
-  def version = "1.4.0"
+  def version = "1.6.3"
   // the version or versions of Grails the plugin is designed for
   def grailsVersion = "1.3.7 > *"
   // the other plugins this plugin depends on
@@ -32,6 +32,9 @@ Web Resource Optimizer for Grails
 
   // URL to the plugin's documentation
   def documentation = "http://code.google.com/p/wro4j/wiki/GrailsPlugin"
+  def license = "APACHE"
+  def scm = [ url: "https://github.com/alexo/wro4j" ]
+  def issueManagement = [ system: "googleCode", url: "https://code.google.com/p/wro4j/issues/list" ]
 
   def doWithWebDescriptor = { xml ->
     def contextParam = xml.'context-param'

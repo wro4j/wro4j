@@ -12,7 +12,7 @@ grails.project.dependency.resolution = {
     checksums true
 
     def gebVersion = "0.7.2"
-    def seleniumVersion = "2.25.0"
+    def seleniumVersion = "2.31.0"
 
     repositories {
         grailsPlugins()
@@ -32,7 +32,7 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
-      runtime('ro.isdc.wro4j:wro4j-extensions:1.5.0') {
+      runtime("ro.isdc.wro4j:wro4j-extensions:1.6.3") {
         excludes('slf4j-log4j12', 'spring-web', 'gmaven-runtime-1.6', 'servlet-api', 'ant', 'groovy-all')
       }
 
@@ -54,9 +54,8 @@ grails.project.dependency.resolution = {
     }
     plugins {
       build(":tomcat:$grailsVersion",
-            ":release:2.0.4",
-            ":rest-client-builder:1.0.2") {
-        excludes 'nekohtml', "httpclient"
+            ":release:2.2.1",
+            ":rest-client-builder:1.0.3") {
         export = false
       }
       test(":spock:0.6", ":geb:$gebVersion") {
