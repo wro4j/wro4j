@@ -15,7 +15,6 @@
 */
 package wro4j.grails.plugin
 
-import groovy.util.ConfigObject
 import ro.isdc.wro.extensions.model.factory.GroovyModelFactory
 import ro.isdc.wro.extensions.model.factory.GroovyModelParser
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory
@@ -23,7 +22,6 @@ import ro.isdc.wro.model.WroModel
 import ro.isdc.wro.model.factory.WroModelFactory
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory
-
 
 /**
  * The Grails WroManagerFactory.
@@ -35,20 +33,19 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory
  * @author Filirom1
  */
 class GrailsWroManagerFactory extends BaseWroManagerFactory {
-  def classLoader = new GroovyClassLoader()
+  private classLoader = new GroovyClassLoader()
 
   @Override
   protected WroModelFactory newModelFactory() {
     return new GroovyModelFactory() {
-
       WroModel create() {
-        return GroovyModelParser.parse(WroDSLHandler.dsl);
+        return GroovyModelParser.parse(WroDSLHandler.dsl)
       }
-    };
+    }
   }
 
   protected ProcessorsFactory newProcessorsFactory() {
-    return new GrailsProcessorsFactory(config);
+    return new GrailsProcessorsFactory(config)
   }
 
   /** WroConfigHandler initialized in the doWithSpring closure (in Wro4JGrailsPluguin)             */
@@ -58,9 +55,8 @@ class GrailsWroManagerFactory extends BaseWroManagerFactory {
 /** Load preProcessors and postProcessors from the config file.             */
 final class GrailsProcessorsFactory extends SimpleProcessorsFactory {
 
-  public GrailsProcessorsFactory(ConfigObject config) {
+  GrailsProcessorsFactory(ConfigObject config) {
     config.preProcessors.each { addPreProcessor(it) }
     config.postProcessors.each { addPostProcessor(it) }
   }
 }
-
