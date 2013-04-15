@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -42,6 +44,7 @@ import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessor
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.util.Function;
 
 
 /**
@@ -131,7 +134,10 @@ public abstract class AbstractWro4jMojo
       onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
-      throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
+      final String message = "Exception occured while processing: " + e.toString() + ", class: " + e.getClass().getName()
+          + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
+      getLog().error(message, e);
+      throw new MojoExecutionException(message, e);
     } finally {
       onAfterExecute();
     }
@@ -253,38 +259,56 @@ public abstract class AbstractWro4jMojo
   private void persistResourceFingerprints(final List<String> groupNames) {
     if (buildContext != null) {
       final WroModelInspector modelInspector = new WroModelInspector(getModel());
-      final WroManager manager = getWroManager();
-      final HashStrategy hashStrategy = manager.getHashStrategy();
-      final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
       for (final String groupName : groupNames) {
         final Group group = modelInspector.getGroupByName(groupName);
         if (group != null) {
           for (final Resource resource : group.getResources()) {
-            try {
-              final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-              buildContext.setValue(resource.getUri(), fingerprint);
-            } catch (final IOException e) {
-              getLog().debug("could not check fingerprint of resource: " + resource);
-            }
+            persistResourceFingerprints(resource);
           }
         }
       }
     }
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
+  private void persistResourceFingerprints(final Resource resource) {
+    final WroManager manager = getWroManager();
+    final HashStrategy hashStrategy = manager.getHashStrategy();
+    final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
+    try {
+      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+      buildContext.setValue(resource.getUri(), fingerprint);
+      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
+      if (resource.getType() == ResourceType.CSS) {
+        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+        getLog().debug("Check @import directive from " + resource);
+        // persist fingerprints in imported resources.
+        persistFingerprintsForCssImports(resource, reader);
+      }
+    } catch (final IOException e) {
+      getLog().debug("could not check fingerprint of resource: " + resource);
+    }
+  }
+
+  /**
+   * Invokes the provided function for each detected css import.
+   *
+   * @param func
+   *          a function (closure) invoked for each found import. It will be provided as argument the uri of imported
+   *          css.
+   */
+  private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
+      throws IOException {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
-        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
-        getLog().debug("\tisImportChanged: " + isImportChanged);
-        if (isImportChanged) {
-          changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
+        try {
+          func.apply(importedUri);
+        } catch (final Exception e) {
+          getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
         }
-      };
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
+      }
 
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
@@ -298,10 +322,6 @@ public abstract class AbstractWro4jMojo
         return CssImportPreProcessor.class.getSimpleName();
       }
     };
-    /**
-     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
-     * change.
-     */
     final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
       @Override
       protected boolean isIgnoreFailingProcessor() {
@@ -309,7 +329,36 @@ public abstract class AbstractWro4jMojo
       }
     };
     InjectorBuilder.create(getManagerFactory()).build().inject(processor);
-    return processor;
+    processor.process(resource, reader, new StringWriter());
+  }
+
+  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader)
+      throws IOException {
+    forEachCssImportApply(new Function<String, Void>() {
+      public Void apply(final String importedUri)
+          throws Exception {
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
+        return null;
+      }
+    }, resource, reader);
+  }
+
+  private void detectChangeForCssImports(final Resource resource, final Reader reader,
+      final AtomicBoolean changeDetected)
+      throws IOException {
+    forEachCssImportApply(new Function<String, Void>() {
+      public Void apply(final String importedUri)
+          throws Exception {
+        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
+        getLog().debug("\tisImportChanged: " + isImportChanged);
+        if (isImportChanged) {
+          changeDetected.set(true);
+          // no need to continue
+          throw new WroRuntimeException("Change detected. No need to continue processing");
+        }
+        return null;
+      }
+    }, resource, reader);
   }
 
   /**
@@ -319,6 +368,10 @@ public abstract class AbstractWro4jMojo
       throws Exception {
     final List<String> changedGroupNames = new ArrayList<String>();
     for (final Group group : getModel().getGroups()) {
+      if (!isTargetGroup(group)) {
+        //skip this group processing
+        continue;
+      }
       for (final Resource resource : group.getResources()) {
         getLog().debug("checking delta for resource: " + resource);
         if (isResourceChanged(resource)) {
@@ -330,6 +383,16 @@ public abstract class AbstractWro4jMojo
       }
     }
     return changedGroupNames;
+  }
+
+  /**
+   * Check if the provided group is a target group.
+   */
+  private boolean isTargetGroup(final Group group) {
+    notNull(group);
+    final String targetGroups = getTargetGroups();
+    //null, means all groups are target groups
+    return targetGroups == null || targetGroups.contains(group.getName());
   }
 
   private boolean isResourceChanged(final Resource resource) {
@@ -350,7 +413,7 @@ public abstract class AbstractWro4jMojo
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
         getLog().debug("Check @import directive from " + resource);
         // detect changes in imported resources.
-        createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
+        detectChangeForCssImports(resource, reader, changeDetected);
       }
       return changeDetected.get();
     } catch (final IOException e) {
@@ -359,6 +422,9 @@ public abstract class AbstractWro4jMojo
     return false;
   }
 
+  /**
+   * @return true if the build was triggered by an incremental change.
+   */
   protected final boolean isIncrementalBuild() {
     return buildContext != null && buildContext.isIncremental();
   }

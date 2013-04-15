@@ -3,9 +3,9 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -22,12 +22,11 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -408,7 +407,7 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void testIncrementalChange()
+  public void shouldDetectIncrementalChange()
       throws Exception {
     mojo = new Wro4jMojo() {
       @Override
@@ -439,8 +438,18 @@ public class TestWro4jMojo {
   @Test
   public void shouldDetectIncrementalChangeOfImportedCss()
       throws Exception {
-    final String parentResource = "parent.css";
     final String importResource = "imported.css";
+
+    configureMojoForModelWithImportedCssResource(importResource);
+    // incremental build detects no change
+    assertTrue(mojo.getTargetGroupsAsList().isEmpty());
+
+    when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
+    assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+  }
+
+  private void configureMojoForModelWithImportedCssResource(final String importResource) throws Exception {
+    final String parentResource = "parent.css";
 
     final WroModel model = new WroModel();
     model.addGroup(new Group("g1").addResource(Resource.create(parentResource)));
@@ -471,12 +480,20 @@ public class TestWro4jMojo {
         hashStrategy.getHash(new ByteArrayInputStream(importedInitialContent.getBytes())));
     mojo.setIgnoreMissingResources(true);
     mojo.setBuildContext(mockBuildContext);
+  }
+
+  @Test
+  public void shouldIgnoreChangesOfGroupsWhichAreNotPartOfTargetGroups() throws Exception {
+    final String importResource = "imported.css";
+
+    configureMojoForModelWithImportedCssResource(importResource);
+    mojo.setTargetGroups("g2");
 
     // incremental build detects no change
     assertTrue(mojo.getTargetGroupsAsList().isEmpty());
 
     when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
-    assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+    assertTrue(mojo.getTargetGroupsAsList().isEmpty());
   }
 
   @Test
