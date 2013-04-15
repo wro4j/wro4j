@@ -15,10 +15,9 @@
 */
 package wro4j.grails.plugin
 
-import groovy.util.ConfigObject
 import grails.util.Environment
-import org.codehaus.groovy.grails.commons.GrailsApplication 
 
+import org.codehaus.groovy.grails.commons.GrailsApplication
 
 /**
  * Helper to load DefaultWroConfig.groovy and merge it with merge Config.groovy
@@ -26,7 +25,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
  * @author Filirom1
  */
 class WroConfigHandler {
-  static GrailsApplication application;
+  static GrailsApplication application
   private static ConfigObject config
   private static final String CONFIG_PREFIX = "wro"
 
@@ -34,19 +33,19 @@ class WroConfigHandler {
    * Parse and load the configuration.
    * @return the configuration
    */
-  public static synchronized ConfigObject getConfig() {
+  static synchronized ConfigObject getConfig() {
     if (config == null) {
-      reloadConfig();
+      reloadConfig()
     }
-    return config;
+    return config
   }
 
   /**
    * Force a reload of the security configuration.
    */
-  public static void reloadConfig() {
+  static void reloadConfig() {
     def grailsConfig = application.getConfig()
-    mergeConfig((ConfigObject) grailsConfig.getProperty(CONFIG_PREFIX), "DefaultWroConfig");
+    mergeConfig((ConfigObject) grailsConfig.getProperty(CONFIG_PREFIX), "DefaultWroConfig")
   }
 
   /**
@@ -55,17 +54,17 @@ class WroConfigHandler {
    * @param className the name of the config class to load
    */
   private static void mergeConfig(final ConfigObject currentConfig, final String className) {
-    GroovyClassLoader classLoader = new GroovyClassLoader(WroConfigHandler.class.getClassLoader());
-    ConfigSlurper slurper = new ConfigSlurper(Environment.getCurrent().getName());
-    ConfigObject secondaryConfig;
+    GroovyClassLoader classLoader = new GroovyClassLoader(WroConfigHandler.getClassLoader())
+    ConfigSlurper slurper = new ConfigSlurper(Environment.getCurrent().getName())
+    ConfigObject secondaryConfig
     try {
-      secondaryConfig = slurper.parse(classLoader.loadClass(className));
+      secondaryConfig = slurper.parse(classLoader.loadClass(className))
     }
     catch (ClassNotFoundException e) {
-      throw new RuntimeException("unlable to merge config " + currentConfig + ", " + className, e);
+      throw new RuntimeException("unlable to merge config " + currentConfig + ", " + className, e)
     }
 
-    config = mergeConfig(currentConfig, (ConfigObject) secondaryConfig.getProperty(CONFIG_PREFIX));
+    config = mergeConfig(currentConfig, (ConfigObject) secondaryConfig.getProperty(CONFIG_PREFIX))
   }
 
   /**
@@ -79,13 +78,13 @@ class WroConfigHandler {
    */
   @SuppressWarnings("unchecked")
   private static ConfigObject mergeConfig(final ConfigObject currentConfig, final ConfigObject secondary) {
-    ConfigObject config = new ConfigObject();
+    ConfigObject config = new ConfigObject()
     if (secondary == null) {
-      config.putAll(currentConfig);
+      config.putAll(currentConfig)
     }
     else {
-      config.putAll(secondary.merge(currentConfig));
+      config.putAll(secondary.merge(currentConfig))
     }
-    return config;
+    return config
   }
 }

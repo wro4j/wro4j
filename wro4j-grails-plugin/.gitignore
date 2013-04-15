@@ -1,3 +1,4 @@
 target-eclipse
 grails-wro4j-*.zip*
 plugin.xml
+web-app/WEB-INF
