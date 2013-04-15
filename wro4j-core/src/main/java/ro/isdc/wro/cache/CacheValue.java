@@ -99,10 +99,7 @@ public final class CacheValue
    * @return the gzippedContent
    */
   public byte[] getGzippedContent() {
-    if (gzippedContent == null) {
-      return computeGzippedContent(rawContent);
-    }
-    return this.gzippedContent;
+    return this.gzippedContent == null ? computeGzippedContent(rawContent) : gzippedContent;
   }
 
   /**
