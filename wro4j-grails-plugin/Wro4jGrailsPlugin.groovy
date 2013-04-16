@@ -1,5 +1,8 @@
 import org.springframework.context.ApplicationContext
 import org.springframework.web.filter.DelegatingFilterProxy
+
+import ro.isdc.wro.http.WroContextFilter;
+import wro4j.grails.plugin.GrailsWroServletContextListenerInitializer;
 import wro4j.grails.plugin.ReloadableWroFilter
 import wro4j.grails.plugin.GrailsWroManagerFactory
 import wro4j.grails.plugin.WroConfigHandler
@@ -40,6 +43,12 @@ Web Resource Optimizer for Grails
     def contextParam = xml.'context-param'
     contextParam[contextParam.size() - 1] + {
       'filter' {
+        'filter-name'('wroContextFilter')
+        'filter-class'(WroContextFilter.name)
+      }
+    }
+    contextParam[contextParam.size() - 1] + {
+      'filter' {
         'filter-name'('wroFilter')
         'filter-class'(DelegatingFilterProxy.name)
         'init-param' {
@@ -51,6 +60,12 @@ Web Resource Optimizer for Grails
     def filter = xml.'filter'
     filter[filter.size() - 1] + {
       'filter-mapping' {
+        'filter-name'('wroContextFilter')
+        'url-pattern'('/*')
+      }
+    }
+    filter[filter.size() - 1] + {
+      'filter-mapping' {
         'filter-name'('wroFilter')
         'url-pattern'('/wro/*')
       }
@@ -58,12 +73,17 @@ Web Resource Optimizer for Grails
   }
 
   def doWithSpring = {
+	wroManagerFactory(GrailsWroManagerFactory)
     WroConfigHandler.application = application
     def config = WroConfigHandler.getConfig()
     wroFilter(ReloadableWroFilter) {
       properties = config.toProperties()
-      wroManagerFactory = new GrailsWroManagerFactory()
+      wroManagerFactory = wroManagerFactory
     }
+	wroServletContextListenerInitializer(GrailsWroServletContextListenerInitializer){
+      properties = config.toProperties()
+      wroManagerFactory = wroManagerFactory
+	}
   }
 
   def doWithDynamicMethods = { ctx ->
