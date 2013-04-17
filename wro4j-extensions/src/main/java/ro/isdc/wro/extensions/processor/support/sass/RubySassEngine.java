@@ -20,7 +20,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * A Sass processor using ruby gems.
- * 
+ *
  * @author Dmitry Erman
  * @created 12 Feb 2012
  * @since 1.4.4
@@ -30,19 +30,19 @@ public class RubySassEngine {
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
-  
+
   private final Set<String> requires;
-  
+
   public RubySassEngine() {
     requires = new LinkedHashSet<String>();
     requires.add(RUBY_GEM_REQUIRE);
     requires.add(SASS_PLUGIN_REQUIRE);
     requires.add(SASS_ENGINE_REQUIRE);
   }
-  
+
   /**
    * Adds a ruby require to the ruby script to be run by this RubySassEngine. It's safe to add the same require twice.
-   * 
+   *
    * @param require
    *          The name of the require, e.g. bourbon
    */
@@ -51,14 +51,15 @@ public class RubySassEngine {
       requires.add(require.trim());
     }
   }
-  
+
   /**
-   * Transforms a sass content into css using Sass ruby engine.
-   * 
+   * Transforms a sass content into css using Sass ruby engine. This method is synchronized because the engine itself is
+   * not thread-safe.
+   *
    * @param content
    *          the Sass content to process.
    */
-  public String process(final String content) {
+  public synchronized String process(final String content) {
     if (StringUtils.isEmpty(content)) {
       return StringUtils.EMPTY;
     }
@@ -74,15 +75,15 @@ public class RubySassEngine {
       LOG.debug(stopWatch.prettyPrint());
     }
   }
-  
+
   private String buildUpdateScript(final String content) {
     Validate.notNull(content);
     final StringWriter raw = new StringWriter();
     final PrintWriter script = new PrintWriter(raw);
     final StringBuilder sb = new StringBuilder();
     sb.append(":syntax => :scss");
-    
-    for (String require : requires) {
+
+    for (final String require : requires) {
       script.println("  require '" + require + "'                                   ");
     }
     // if (LOG.isDebugEnabled()) {
@@ -96,7 +97,7 @@ public class RubySassEngine {
     script.flush();
     return raw.toString();
   }
-//  
+//
 //  private void debugRubyEnvironment(final PrintWriter script) {
 //    script.println("  dir_contents = Dir.entries(Dir.pwd)    ");
 //    script.println("  puts dir_contents   ");
