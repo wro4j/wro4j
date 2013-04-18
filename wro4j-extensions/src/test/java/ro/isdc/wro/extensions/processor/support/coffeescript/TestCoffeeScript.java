@@ -17,11 +17,11 @@ public class TestCoffeeScript {
 
   @Test
   public void shouldCompileNullScript() {
-    assertEquals("(function() {\n\n\n\n}).call(this);\n", victim.compile(null));
+    assertEquals("(function() {\n\n\n}).call(this);\n", victim.compile(null));
   }
 
   @Test
   public void shouldCompileSimpleAlert() {
-    assertEquals("(function() {\n\n  alert('I knew it!');\n\n}).call(this);\n", victim.compile("alert 'I knew it!'"));
+    assertEquals("(function() {\n  alert('I knew it!');\n\n}).call(this);\n", victim.compile("alert 'I knew it!'"));
   }
 }
