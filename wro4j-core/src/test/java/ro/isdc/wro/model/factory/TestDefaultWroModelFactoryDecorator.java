@@ -3,8 +3,7 @@ package ro.isdc.wro.model.factory;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.model.WroModel;
@@ -17,12 +16,12 @@ import ro.isdc.wro.util.Transformer;
 public class TestDefaultWroModelFactoryDecorator {
   private final List<Transformer<WroModel>> emptyTransformers = Collections.emptyList();
   private WroModelFactory victim;
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullModel() {
     DefaultWroModelFactoryDecorator.decorate(null, emptyTransformers);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotDecorateModelFactoryWithNullTransformers() {
     DefaultWroModelFactoryDecorator.decorate(new XmlModelFactory(), null);
@@ -30,18 +29,18 @@ public class TestDefaultWroModelFactoryDecorator {
 
   @Test
   public void shouldDecorateCacheStrategy() {
-    WroModelFactory original = new XmlModelFactory();
+    final WroModelFactory original = new XmlModelFactory();
     victim = DefaultWroModelFactoryDecorator.decorate(original, emptyTransformers);
     Assert.assertTrue(victim instanceof DefaultWroModelFactoryDecorator);
     Assert.assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
   }
-  
+
   @Test
   public void shouldNotRedundantlyDecorateCacheStrategy() {
-    WroModelFactory original = DefaultWroModelFactoryDecorator.decorate(
+    final WroModelFactory original = DefaultWroModelFactoryDecorator.decorate(
         new XmlModelFactory(), emptyTransformers);
     victim = DefaultWroModelFactoryDecorator.decorate(original, emptyTransformers);
     Assert.assertTrue(victim instanceof DefaultWroModelFactoryDecorator);
     Assert.assertSame(original, victim);
-  }  
+  }
 }

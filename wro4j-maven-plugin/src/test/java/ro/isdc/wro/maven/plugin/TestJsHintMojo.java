@@ -3,12 +3,11 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -34,7 +33,7 @@ public class TestJsHintMojo
     return new JsHintMojo() {
       @Override
       void onException(final Exception e) {
-        Assert.fail("Shouldn't fail. Exception message: " + e.getMessage());
+        fail("Shouldn't fail. Exception message: " + e.getMessage());
       }
     };
   }

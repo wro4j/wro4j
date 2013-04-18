@@ -3,14 +3,14 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -110,7 +110,7 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(victim);
 
     victim.process(null, new StringReader("function test( ) {}"), sw);
-    Assert.assertEquals("", sw.toString());
+    assertEquals("", sw.toString());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -129,7 +129,7 @@ public class TestGoogleClosureCompressorProcessor {
     final StringWriter sw = new StringWriter();
     victim.process(null, new StringReader("alert(1);"), sw);
     // will leave result unchanged, because the processing is not successful.
-    Assert.assertEquals("alert(1);", sw.toString());
+    assertEquals("alert(1);", sw.toString());
   }
 
   @Test
@@ -161,6 +161,6 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(victim);
     final StringWriter sw = new StringWriter();
     victim.process(null, new StringReader("alert(1);"), sw);
-    Assert.assertEquals("alert(1);", sw.toString());
+    assertEquals("alert(1);", sw.toString());
   }
 }

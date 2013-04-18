@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.Reader;

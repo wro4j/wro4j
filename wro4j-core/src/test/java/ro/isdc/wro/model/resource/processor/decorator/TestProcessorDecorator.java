@@ -1,9 +1,9 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -224,6 +224,7 @@ public class TestProcessorDecorator {
   }
 
   private static class ImportAwareProcessor extends CssImportPreProcessor implements ImportAware {
+    @Override
     public boolean isImportAware() {
       return true;
     }

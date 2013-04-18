@@ -7,8 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class TestDefaultWroModelFactory {
   private ResourceAuthorizationManager authManager;
   @Inject
   private Injector injector;
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
@@ -46,13 +45,13 @@ public class TestDefaultWroModelFactory {
     injector.inject(this);
     Context.set(Context.standaloneContext());
   }
-  
+
   @Test
   public void decoratedModelshouldBeThreadSafe()
       throws Exception {
     final List<Transformer<WroModel>> modelTransformers = new ArrayList<Transformer<WroModel>>();
     modelTransformers.add(new WildcardExpanderModelTransformer());
-    
+
     victim = DefaultWroModelFactoryDecorator.decorate(new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream()
@@ -70,7 +69,7 @@ public class TestDefaultWroModelFactory {
       }
     }));
   }
-  
+
   @Test
   public void shouldAuthorizeResourcesFromModelWhenInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
@@ -78,11 +77,11 @@ public class TestDefaultWroModelFactory {
     Context.set(Context.standaloneContext(), config);
     final String authorizedResourceUri = "/authorized.js";
     createSampleModel(authorizedResourceUri);
-    
+
     Assert.assertTrue(authManager.isAuthorized(authorizedResourceUri));
     Assert.assertFalse(authManager.isAuthorized("/notAuthorized.js"));
   }
-  
+
   @Test
   public void shouldNotAuthorizeResourcesFromModelWhenNotInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
@@ -90,11 +89,11 @@ public class TestDefaultWroModelFactory {
     Context.set(Context.standaloneContext(), config);
     final String authorizedResourceUri = "/authorized.js";
     createSampleModel(authorizedResourceUri);
-    
+
     Assert.assertFalse(authManager.isAuthorized(authorizedResourceUri));
     Assert.assertFalse(authManager.isAuthorized("/notAuthorized.js"));
   }
-  
+
   /**
    * Instructs the victim to create the model with a single resource
    */
@@ -104,7 +103,7 @@ public class TestDefaultWroModelFactory {
       public WroModel create() {
         return model;
       }
-      
+
       public void destroy() {
       }
     };
