@@ -7,8 +7,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

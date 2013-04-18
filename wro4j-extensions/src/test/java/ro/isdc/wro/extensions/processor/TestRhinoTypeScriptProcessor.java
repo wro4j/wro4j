@@ -10,9 +10,8 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

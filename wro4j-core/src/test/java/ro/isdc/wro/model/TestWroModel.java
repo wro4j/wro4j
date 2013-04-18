@@ -3,10 +3,9 @@
  */
 package ro.isdc.wro.model;
 
-import static junit.framework.Assert.assertEquals;
-import junit.framework.Assert;
-
+import static org.junit.Assert.assertEquals;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +27,7 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 public class TestWroModel {
   private WroModel victim;
   private WroModelFactory factory;
+
   @Before
   public void setUp() {
     final Context context = Context.standaloneContext();
@@ -47,14 +47,14 @@ public class TestWroModel {
     // create a copy of original list
     Assert.assertEquals(1, group.getResources().size());
   }
-  
-  
+
+
   @Test(expected = InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
     Assert.assertFalse(victim.getGroups().isEmpty());
     victim.getGroupByName("INVALID_GROUP");
   }
-  
+
   /**
    * @return a valid {@link WroModel} pre populated with some valid resources.
    */
@@ -69,13 +69,13 @@ public class TestWroModel {
     final WroModel model = factory.create();
     return model;
   }
-  
+
   @Test
   public void shouldNotReturnDuplicatedResources() {
     final WroModel model = new WroModel();
-    
+
     assertEquals(0, new WroModelInspector(model).getAllUniqueResources().size());
-    
+
     model.addGroup(new Group("one").addResource(Resource.create("/one.js"))).addGroup(
         new Group("two").addResource(Resource.create("/one.js")));
     assertEquals(1, new WroModelInspector(model).getAllUniqueResources().size());

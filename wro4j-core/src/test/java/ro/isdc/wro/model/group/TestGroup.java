@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;
@@ -21,7 +20,7 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test class for {@link Group}.
- * 
+ *
  * @author Alex Objelean
  */
 public class TestGroup {
@@ -29,7 +28,7 @@ public class TestGroup {
   public void cannotCreateGroupWithNullName() {
     new Group(null);
   }
-  
+
   @Test
   public void shouldReturnSameGroupWhenGroupHasNoResources() {
     final Group group = new Group("group");
@@ -60,14 +59,14 @@ public class TestGroup {
     final Group group = new Group("group");
     group.hasResourcesOfType(null);
   }
-  
+
   @Test
   public void testNoResorucesOfTypeFound() {
     final Group group = new Group("group");
     Assert.assertEquals(false, group.hasResourcesOfType(ResourceType.CSS));
     Assert.assertEquals(false, group.hasResourcesOfType(ResourceType.JS));
   }
-  
+
   @Test
   public void testResoruceOfTypeFound() {
     final Group group = new Group("group");
@@ -77,13 +76,13 @@ public class TestGroup {
     Assert.assertEquals(true, group.hasResourcesOfType(ResourceType.CSS));
     Assert.assertEquals(false, group.hasResourcesOfType(ResourceType.JS));
   }
-  
+
   @Test(expected = IllegalArgumentException.class)
   public void cannotReplaceMissingResource() {
     final Group group = new Group("group");
     group.replace(Resource.create("/path", ResourceType.JS), Arrays.asList(Resource.create("", ResourceType.JS)));
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public void testReplaceWithEmptyCollection() {
@@ -93,7 +92,7 @@ public class TestGroup {
     group.replace(resource, Collections.EMPTY_LIST);
     Assert.assertTrue(group.getResources().isEmpty());
   }
-  
+
   @Test
   public void testReplaceWithFewResources() {
     final Group group = new Group("group");
@@ -107,31 +106,31 @@ public class TestGroup {
     Assert.assertEquals(2, group.getResources().size());
     Assert.assertEquals(resource.isMinimize(), group.getResources().get(0).isMinimize());
   }
-  
+
   @Test
   public void shouldReplaceAResourceWithSameResource() {
     final Group group = new Group("group");
     final Resource resource = Resource.create("/path.js");
     group.addResource(resource);
-    
+
     final List<Resource> resourceList = new ArrayList<Resource>();
     resourceList.add(resource);
-    
+
     group.replace(resource, resourceList);
     Assert.assertFalse(group.getResources().isEmpty());
   }
-  
+
   @Test
   public void shouldReplaceOnlyOneAndPreserveOtherResources() {
     final Group group = new Group("group");
     final Resource resource = Resource.create("/static/*", ResourceType.JS);
-    
+
     final Resource r0 = Resource.create("/asset/1.js", ResourceType.JS);
     group.addResource(r0);
-    
+
     final Resource r1 = Resource.create("/asset/2.js", ResourceType.JS);
     group.addResource(r1);
-    
+
     group.addResource(resource);
     group.replace(
         resource,
@@ -141,13 +140,13 @@ public class TestGroup {
     Assert.assertEquals(r0, group.getResources().get(0));
     Assert.assertEquals(r1, group.getResources().get(1));
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotCollectResourcesWithNullType() {
     final Group group = new Group("group");
     group.collectResourcesOfType(null);
   }
-  
+
   @Test
   public void shouldCollectCorrectNumberOfResourcesByType() {
     final Group group = new Group("group");
@@ -158,11 +157,11 @@ public class TestGroup {
     group.addResource(Resource.create("5.js"));
     group.addResource(Resource.create("6.js"));
     group.addResource(Resource.create("1.css"));
-    
+
     Assert.assertEquals(6, group.collectResourcesOfType(ResourceType.JS).getResources().size());
     Assert.assertEquals(1, group.collectResourcesOfType(ResourceType.CSS).getResources().size());
   }
-  
+
   @Test
   public void shouldBeThreadSafeWhenMutated()
       throws Exception {
@@ -170,7 +169,7 @@ public class TestGroup {
     final List<Resource> resources = new ArrayList<Resource>();
     final Resource r1 = Resource.create("/some.css", ResourceType.CSS);
     resources.add(r1);
-    
+
     WroTestUtils.runConcurrently(new Callable<Void>() {
       public Void call()
           throws Exception {

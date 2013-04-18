@@ -1,12 +1,15 @@
 package ro.isdc.wro.util.provider;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -24,19 +27,19 @@ public class TestProviderFinder {
   @Test
   public void shouldFindProcessorsProvider() {
     victim = ProviderFinder.of(ProcessorProvider.class);
-    Assert.assertFalse(victim.find().isEmpty());
+    assertFalse(victim.find().isEmpty());
   }
 
   @Test
   public void shouldFindNamingStrategyProviders() {
     victim = ProviderFinder.of(NamingStrategyProvider.class);
-    Assert.assertFalse(victim.find().isEmpty());
+    assertFalse(victim.find().isEmpty());
   }
 
   @Test
   public void shouldFindHashBuilderProviders() {
     victim = ProviderFinder.of(HashStrategyProvider.class);
-    Assert.assertFalse(victim.find().isEmpty());
+    assertFalse(victim.find().isEmpty());
   }
 
   @Test
@@ -47,7 +50,7 @@ public class TestProviderFinder {
         return new ArrayList<F>().iterator();
       }
     };
-    Assert.assertTrue(victim.find().isEmpty());
+    assertTrue(victim.find().isEmpty());
   }
 
   @Test(expected=WroRuntimeException.class)
@@ -82,7 +85,7 @@ public class TestProviderFinder {
         return Collections.<P>emptyList().iterator();
       }
     };
-    Assert.assertEquals(Arrays.asList(lowest, defaultPriority, highest), victim.find());
+    assertEquals(Arrays.asList(lowest, defaultPriority, highest), victim.find());
   }
 
   private static class OrderedProvider implements Ordered {

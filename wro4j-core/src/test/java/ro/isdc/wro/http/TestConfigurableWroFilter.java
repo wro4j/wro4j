@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.http;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.util.Properties;
@@ -16,9 +16,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -95,7 +94,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseDefaultEncodingWhenNoEncodingIsSet()
       throws Exception {
@@ -109,7 +108,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseConfiguredEncodingWhenSet()
       throws Exception {
@@ -124,7 +123,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseConfiguredMBeanNameWhenSet()
       throws Exception {
@@ -139,7 +138,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseNullMBeanWhenNotSet()
       throws Exception {
@@ -202,7 +201,7 @@ public class TestConfigurableWroFilter {
       throw processorsCreationException.get();
     }
   }
-  
+
   private static class SampleConfigurableWroFilter extends ConfigurableWroFilter {
     @Override
     protected WroManagerFactory newWroManagerFactory() {
@@ -210,7 +209,7 @@ public class TestConfigurableWroFilter {
       factory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("some"))));
       return factory;
     }
-    
+
     @Override
     protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
       throw e;

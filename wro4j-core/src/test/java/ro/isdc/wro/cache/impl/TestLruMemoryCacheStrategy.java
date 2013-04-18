@@ -3,9 +3,8 @@ package ro.isdc.wro.cache.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,14 +32,14 @@ public class TestLruMemoryCacheStrategy {
 
   @Test
   public void testLruCache() throws IOException {
-    HashStrategy builder = new CRC32HashStrategy();
-    CacheKey key1 = new CacheKey("testGroup01", ResourceType.JS, false);
-    CacheKey key2 = new CacheKey("testGroup02", ResourceType.CSS, false);
-    CacheKey key3 = new CacheKey("testGroup03", ResourceType.JS, false);
-    CacheKey key4 = new CacheKey("testGroup04", ResourceType.CSS, false);
+    final HashStrategy builder = new CRC32HashStrategy();
+    final CacheKey key1 = new CacheKey("testGroup01", ResourceType.JS, false);
+    final CacheKey key2 = new CacheKey("testGroup02", ResourceType.CSS, false);
+    final CacheKey key3 = new CacheKey("testGroup03", ResourceType.JS, false);
+    final CacheKey key4 = new CacheKey("testGroup04", ResourceType.CSS, false);
 
-    String content = "var foo = 'Hello World';";
-    String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
+    final String content = "var foo = 'Hello World';";
+    final String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
 
     cache.put(key1, CacheValue.valueOf(content, hash));
     cache.put(key2, CacheValue.valueOf(content, hash));
@@ -51,7 +50,7 @@ public class TestLruMemoryCacheStrategy {
     cache.put(key4, CacheValue.valueOf(content, hash));
     Assert.assertNull(cache.get(key2));
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();

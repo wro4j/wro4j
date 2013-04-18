@@ -11,10 +11,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

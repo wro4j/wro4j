@@ -1,6 +1,6 @@
 package ro.isdc.wro.extensions.processor;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +40,9 @@ public class TestDustJsProcessor {
 
   @Test
   public void testSimpleString() throws Exception {
-    StringWriter writer = new StringWriter();
+    final StringWriter writer = new StringWriter();
     processor.process(null, new StringReader("Hello {name}!"), writer);
-    String result = writer.toString();
+    final String result = writer.toString();
     assertTrue(result.matches("\\(function\\(\\)\\{.*\\}\\)\\(\\);"));
   }
 

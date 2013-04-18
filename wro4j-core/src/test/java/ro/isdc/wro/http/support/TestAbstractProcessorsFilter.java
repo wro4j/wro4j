@@ -12,8 +12,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -64,7 +63,7 @@ public class TestAbstractProcessorsFilter {
     final String processedMessage = "DONE";
     final List<ResourceProcessor> processors = new ArrayList<ResourceProcessor>();
     processors.add(new ResourceProcessor() {
-      public void process(Resource resource, Reader reader, Writer writer)
+      public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         writer.write(processedMessage);
       }
@@ -78,7 +77,7 @@ public class TestAbstractProcessorsFilter {
       throws Exception {
     final List<ResourceProcessor> processors = new ArrayList<ResourceProcessor>();
     processors.add(new ResourceProcessor() {
-      public void process(Resource resource, Reader reader, Writer writer)
+      public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
         throw new WroRuntimeException("processor fails");
       }
@@ -94,7 +93,7 @@ public class TestAbstractProcessorsFilter {
         return processors;
       }
       @Override
-      protected void onRuntimeException(RuntimeException e, HttpServletResponse response, FilterChain chain) {
+      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
         throw e;
       }
     };

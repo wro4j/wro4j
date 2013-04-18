@@ -6,9 +6,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -43,14 +42,14 @@ public class TestMinimizeAwareProcessorDecorator {
     public void process(final Reader reader, final Writer writer)
         throws IOException {
     }
-    public void process(Resource resource, Reader reader, Writer writer)
+    public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
     }
     public boolean isMinimize() {
       return true;
     }
   }
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
@@ -58,61 +57,61 @@ public class TestMinimizeAwareProcessorDecorator {
     mockReader = new StringReader("");
     mockWriter = new StringWriter();
   }
-  
+
   private void initVictim() {
     InjectorBuilder.create(new BaseWroManagerFactory()).build().inject(victim);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullProcessor() {
     victim = new MinimizeAwareProcessorDecorator(null, true);
   }
-  
+
   @Test
   public void shouldInvokeMinimizePreProcessorWhenMinimizeIsRequired()
       throws Exception {
-    ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
+    final ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
     victim = new MinimizeAwareProcessorDecorator(processor, true);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(processor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldNotInvokeMinimizePreProcessorWhenMinimizeIsNotRequired()
       throws Exception {
-    ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
+    final ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
     victim = new MinimizeAwareProcessorDecorator(processor, false);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(processor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldInvokeMinimizePostProcessorWhenMinimizeIsRequired()
       throws Exception {
-    
-    MinimizeAwareProcessor processor = Mockito.spy(new MinimizeAwareProcessor());
+
+    final MinimizeAwareProcessor processor = Mockito.spy(new MinimizeAwareProcessor());
     victim = new MinimizeAwareProcessorDecorator(processor, true);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(processor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldNotInvokeMinimizePostProcessorWhenMinimizeIsNotRequired()
       throws Exception {
-    ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
+    final ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
     victim = new MinimizeAwareProcessorDecorator(processor, false);
     initVictim();
     victim.process(mockReader, mockWriter);
     Mockito.verify(processor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldInvokePreProcessorWhenMinimizeIsRequired()
       throws Exception {
@@ -122,7 +121,7 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class),
         Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldInvokePreProcessorWhenMinimizeIsNotRequired()
       throws Exception {
@@ -132,7 +131,7 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class),
         Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldInvokePostProcessorWhenMinimizeIsRequired()
       throws Exception {
@@ -142,7 +141,7 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPostProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldInvokePostProcessorWhenMinimizeIsNotRequired()
       throws Exception {
@@ -152,11 +151,11 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPostProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldLeaveContentUnchangedWhenProcessorIsSkipped()
       throws Exception {
-    ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
+    final ResourceProcessor processor = Mockito.spy(new JSMinProcessor());
     victim = new MinimizeAwareProcessorDecorator(processor, false);
     initVictim();
     final String resourceContent = "var i      =     1;";
@@ -166,7 +165,7 @@ public class TestMinimizeAwareProcessorDecorator {
         Mockito.any(Writer.class));
     Assert.assertEquals(resourceContent, writer.toString());
   }
-  
+
   @Test
   public void shouldInvokePreProcessor()
       throws Exception {
@@ -176,7 +175,7 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
 
   @Test
   public void shouldInvokePreProcessorWithResourceWantingMinimize()
@@ -201,7 +200,7 @@ public class TestMinimizeAwareProcessorDecorator {
     Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldInvokeMinimizeAwarePreProcessorWithResourceWantingMinimize()
       throws Exception {

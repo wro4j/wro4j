@@ -9,9 +9,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.Resource;

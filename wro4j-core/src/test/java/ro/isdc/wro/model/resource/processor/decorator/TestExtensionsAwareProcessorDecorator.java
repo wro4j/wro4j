@@ -6,8 +6,7 @@ package ro.isdc.wro.model.resource.processor.decorator;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

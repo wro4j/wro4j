@@ -1,6 +1,8 @@
 package ro.isdc.wro.maven.plugin.factory;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS;
 import static ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS;
 
@@ -13,8 +15,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import junit.framework.Assert;
 
 import org.apache.commons.lang3.Validate;
 import org.junit.After;
@@ -34,6 +34,7 @@ import ro.isdc.wro.model.factory.ConfigurableModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExtensionsAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
@@ -41,6 +42,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.AbstractDecorator;
+
 
 /**
  * @author Alex Objelean
@@ -100,11 +102,11 @@ public class TestConfigurableWroManagerFactory {
 
     final Collection<ResourceProcessor> list = processorsFactory.getPreProcessors();
 
-    Assert.assertFalse(list.isEmpty());
+    assertFalse(list.isEmpty());
     final Iterator<ResourceProcessor> iterator = list.iterator();
-    Assert.assertEquals(JSMinProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(CssImportPreProcessor.class, iterator.next().getClass());
-    Assert.assertEquals(CssVariablesProcessor.class, iterator.next().getClass());
+    assertEquals(JSMinProcessor.class, getProcessor(iterator.next()).getClass());
+    assertEquals(CssImportPreProcessor.class, getProcessor(iterator.next()).getClass());
+    assertEquals(CssVariablesProcessor.class, getProcessor(iterator.next()).getClass());
   }
 
   private Properties createProperties(final String key, final String value) {
@@ -117,7 +119,7 @@ public class TestConfigurableWroManagerFactory {
   public void testWithEmptyPreProcessors() {
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn("");
     initFactory(mockFilterConfig);
-    Assert.assertTrue(processorsFactory.getPreProcessors().isEmpty());
+    assertTrue(processorsFactory.getPreProcessors().isEmpty());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -129,14 +131,14 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testWhenValidPreProcessorsSet() {
     initFactory(mockFilterConfig, createProperties(PARAM_PRE_PROCESSORS, "cssUrlRewriting"));
-    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
+    assertEquals(1, processorsFactory.getPreProcessors().size());
   }
 
   @Test
   public void testWithEmptyPostProcessors() {
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn("");
     initFactory(mockFilterConfig);
-    Assert.assertTrue(processorsFactory.getPostProcessors().isEmpty());
+    assertTrue(processorsFactory.getPostProcessors().isEmpty());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -148,7 +150,7 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void testWhenValidPostProcessorsSet() {
     initFactory(mockFilterConfig, createProperties(PARAM_POST_PROCESSORS, "cssMinJawr, jsMin, cssVariables"));
-    Assert.assertEquals(3, processorsFactory.getPostProcessors().size());
+    assertEquals(3, processorsFactory.getPostProcessors().size());
   }
 
   @Test
@@ -156,9 +158,8 @@ public class TestConfigurableWroManagerFactory {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "cssMin");
     initFactory(mockFilterConfig, configProperties);
-    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
-    Assert.assertEquals(CssMinProcessor.class,
-        processorsFactory.getPreProcessors().iterator().next().getClass());
+    assertEquals(1, processorsFactory.getPreProcessors().size());
+    assertEquals(CssMinProcessor.class, processorsFactory.getPreProcessors().iterator().next().getClass());
   }
 
   @Test
@@ -166,8 +167,9 @@ public class TestConfigurableWroManagerFactory {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin");
     initFactory(mockFilterConfig, configProperties);
-    Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
-    Assert.assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
+    assertEquals(1, processorsFactory.getPostProcessors().size());
+    assertEquals(JSMinProcessor.class,
+        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
   }
 
   @Test
@@ -175,8 +177,16 @@ public class TestConfigurableWroManagerFactory {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin, cssMin");
     initFactory(mockFilterConfig, configProperties);
-    Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
-    Assert.assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
+    assertEquals(2, processorsFactory.getPostProcessors().size());
+    assertEquals(JSMinProcessor.class, getProcessor(processorsFactory.getPostProcessors().iterator().next()).getClass());
+  }
+
+  /**
+   * @return the processor instance which is not a decorator based on provided processor.
+   */
+  private Object getProcessor(final Object processor) {
+    return processor instanceof ProcessorDecorator ? ((ProcessorDecorator) processor).getOriginalDecoratedObject()
+        : processor;
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -191,8 +201,8 @@ public class TestConfigurableWroManagerFactory {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "jsMin.js");
     initFactory(mockFilterConfig, configProperties);
-    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
-    Assert.assertTrue(processorsFactory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
+    assertEquals(1, processorsFactory.getPreProcessors().size());
+    assertTrue(processorsFactory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
   }
 
   @Test(expected = WroRuntimeException.class)

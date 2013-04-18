@@ -1,7 +1,7 @@
 package ro.isdc.wro.config.support;
 
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.concurrent.Callable;

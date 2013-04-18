@@ -3,7 +3,8 @@
  */
 package ro.isdc.wro.runner;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,8 +12,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.Properties;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -65,9 +64,9 @@ public class TestWro4jCommandLineRunner {
         "-wrongArgument"
       };
       invokeRunner(args);
-      Assert.fail("Should have failed!");
+      fail("Should have failed!");
     } catch (final Exception e) {
-      Assert.assertEquals(CmdLineException.class, e.getCause().getClass());
+      assertEquals(CmdLineException.class, e.getCause().getClass());
     }
   }
 
@@ -77,7 +76,7 @@ public class TestWro4jCommandLineRunner {
     try {
       invokeRunner("".split(" "));
     } catch (final Exception e) {
-      Assert.assertEquals(CmdLineException.class, e.getCause().getClass());
+      assertEquals(CmdLineException.class, e.getCause().getClass());
     }
   }
 
