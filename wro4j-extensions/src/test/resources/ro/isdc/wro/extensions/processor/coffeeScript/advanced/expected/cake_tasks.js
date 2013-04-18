@@ -7,6 +7,7 @@
 
   task('build:parser', 'rebuild the Jison parser', function(options) {
     var code, dir;
+
     require('jison');
     code = require('./lib/grammar').parser.generate();
     dir = options.output || 'lib';

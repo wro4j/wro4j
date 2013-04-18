@@ -9,6 +9,7 @@
 
   ages = (function() {
     var _results;
+
     _results = [];
     for (child in yearsOld) {
       age = yearsOld[child];
