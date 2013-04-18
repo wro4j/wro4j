@@ -1,6 +1,9 @@
 package ro.isdc.wro.util.provider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.imageio.spi.ServiceRegistry;
 
@@ -96,12 +99,9 @@ public class ProviderFinder<T> {
   @SuppressWarnings("unchecked")
   <P> Iterator<P> lookupProviders(final Class<P> providerClass) {
     LOG.debug("searching for providers of type : {}", providerClass);
-
-    ClassLoader orig = Thread.currentThread().getContextClassLoader();
-
+    final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     try {
-
-      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 
       final Class<?> serviceLoader = getClass().getClassLoader().loadClass("java.util.ServiceLoader");
       LOG.debug("using {} to lookupProviders", serviceLoader.getName());
@@ -109,8 +109,8 @@ public class ProviderFinder<T> {
     } catch (final Exception e) {
       LOG.debug("ServiceLoader is not available. Falling back to ServiceRegistry.", e);
     } finally {
-
-      Thread.currentThread().setContextClassLoader(orig);
+      //preserve original classLoader to make it osgi friendly
+      Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
     LOG.debug("using {} to lookupProviders", ServiceRegistry.class.getName());
     return ServiceRegistry.lookupProviders(providerClass);
