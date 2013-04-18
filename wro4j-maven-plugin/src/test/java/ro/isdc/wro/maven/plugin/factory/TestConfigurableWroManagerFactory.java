@@ -168,8 +168,7 @@ public class TestConfigurableWroManagerFactory {
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, "jsMin");
     initFactory(mockFilterConfig, configProperties);
     assertEquals(1, processorsFactory.getPostProcessors().size());
-    assertEquals(JSMinProcessor.class,
-        ((ProcessorDecorator) processorsFactory.getPostProcessors().iterator().next()).getDecoratedObject().getClass());
+    assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
   }
 
   @Test
