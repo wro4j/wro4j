@@ -12,13 +12,13 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
+*
 * This was inspired by TestFingerprintCreatorNamingStrategy.
 */
 
 package ro.isdc.wro.model.resource.support.naming;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 
@@ -49,7 +49,7 @@ public class TestHashEncoderNamingStrategy {
   public void cannotAcceptNullResourceName() throws Exception {
     namingStrategy.rename(null, WroUtil.EMPTY_STREAM);
   }
-  
+
   @Test(expected=NullPointerException.class)
   public void cannotAcceptNullStream() throws Exception {
     namingStrategy.rename("fileName.js", null);
@@ -60,13 +60,13 @@ public class TestHashEncoderNamingStrategy {
     final String result = namingStrategy.rename("fileName", WroUtil.EMPTY_STREAM);
     assertEquals("fileName-0", result);
   }
-  
+
   @Test
   public void shouldRenameResourceWithSomeContent() throws Exception {
     final String result = namingStrategy.rename("anotherFile.js", new ByteArrayInputStream("someContent".getBytes()));
     assertEquals("anotherFile-b598c484.js", result);
   }
-  
+
   @Test
   public void shouldRenameResourceContainedInAFolder() throws Exception {
     final String result = namingStrategy.rename("folder1/folder2/resource.css", new ByteArrayInputStream("someContent".getBytes()));

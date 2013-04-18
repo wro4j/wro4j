@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.extensions.processor;
 
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,22 +24,22 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test ruby sass css processor.
- * 
+ *
  * @author Simon van der Sluis
  * @created Created on Apr 21, 2010
  */
 public class TestRubySassCssProcessor {
   /** Location (base) of ruby sass css test resources. */
   private final URL url = getClass().getResource("rubysasscss");
-  
+
   /** A RubySassEngine to test */
   private RubySassCssProcessor processor;
-  
+
   @Before
   public void setUp() {
     processor = new RubySassCssProcessor();
   }
-  
+
   @Test
   public void shouldTestFromFolder()
       throws Exception {
@@ -50,12 +50,12 @@ public class TestRubySassCssProcessor {
 
   @Test
   public void executeMultipleTimesDoesntThrowOutOfMemoryException() {
-    RubySassEngine engine = new RubySassEngine();
+    final RubySassEngine engine = new RubySassEngine();
     for (int i = 0; i < 100; i++) {
       engine.process("#navbar {width: 80%;}");
     }
   }
-  
+
   @Test
   public void shouldBeThreadSafe()
       throws Exception {
@@ -73,7 +73,7 @@ public class TestRubySassCssProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
   /**
    * Test that processing invalid sass css produces exceptions.
    */
@@ -95,7 +95,7 @@ public class TestRubySassCssProcessor {
       }
     });
   }
-  
+
   /**
    * This test proves that Sass Engine behave strangely after the first failure.
    */
@@ -105,11 +105,11 @@ public class TestRubySassCssProcessor {
     try {
       processor.process(null, new StringReader("$base= #f938ab;"), new StringWriter());
       fail("Should have failed");
-    } catch (Exception e) {
-      
+    } catch (final Exception e) {
+
     }
     final String sass = ".valid {color: red}  @mixin rounded($side, $radius: 10px) { border-#{$side}-radius: $radius; -moz-border-radius-#{$side}: $radius; -webkit-border-#{$side}-radius: $radius;}#navbar li { @include rounded(top); }";
     processor.process(null, new StringReader(sass), new StringWriter());
   }
-  
+
 }

@@ -4,8 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,9 +21,9 @@ public class TestConfigurableHashStrategy {
 
   @Mock
   private HashStrategy mockHashStrategy;
-  
+
   private ConfigurableHashStrategy victim;
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -32,23 +31,23 @@ public class TestConfigurableHashStrategy {
     Context.set(Context.standaloneContext());
     WroTestUtils.createInjector().inject(victim);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotSetNullProperties() {
     victim.setProperties(null);
   }
-  
+
   @Test
   public void shouldUseNoOpNamingStrategyByDefault() {
     Assert.assertSame(SHA1HashStrategy.class, victim.getConfiguredStrategy().getClass());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void cannotConfigureInvalidAlias() {
     victim.setProperties(buildPropsForAlias("invalidStrategy"));
     victim.getConfiguredStrategy();
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void cannotConfigureInvalidAliases() {
     victim.setProperties(buildPropsForAlias(CRC32HashStrategy.ALIAS + ", invalidOne"));
@@ -59,7 +58,7 @@ public class TestConfigurableHashStrategy {
   public void shouldUseCRC32StrategyForValidAlias() {
     shouldUseCorrectStrategyForValidAlias(CRC32HashStrategy.class, CRC32HashStrategy.ALIAS);
   }
-  
+
   @Test
   public void shouldUseTimestampNamingStrategyForValidAlias() {
     shouldUseCorrectStrategyForValidAlias(MD5HashStrategy.class, MD5HashStrategy.ALIAS);
@@ -69,19 +68,19 @@ public class TestConfigurableHashStrategy {
   public void shouldUseHashEncoderStrategyForValidAlias() {
     shouldUseCorrectStrategyForValidAlias(SHA1HashStrategy.class, SHA1HashStrategy.ALIAS);
   }
-  
+
   private void shouldUseCorrectStrategyForValidAlias(final Class<?> strategyClass, final String alias) {
     victim.setProperties(buildPropsForAlias(alias));
     final HashStrategy actual = victim.getConfiguredStrategy();
     Assert.assertSame(strategyClass, actual.getClass());
   }
-  
+
   private Properties buildPropsForAlias(final String alias) {
     final Properties props = new Properties();
     props.setProperty(ConfigurableHashStrategy.KEY, alias);
     return props;
   }
-  
+
   @Test
   public void shouldUseOverridenStrategyMap() {
     final String mockAlias = "mock";
@@ -95,7 +94,7 @@ public class TestConfigurableHashStrategy {
     final HashStrategy actual = victim.getConfiguredStrategy();
     Assert.assertSame(mockHashStrategy, actual);
   }
-  
+
   @Test
   public void shouldHashWithConfiguredStrategy()
       throws Exception {

@@ -5,15 +5,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
-import ro.isdc.wro.cache.support.AbstractSynchronizedCacheStrategyDecorator;
 
 /**
  * @author Alex Objelean
@@ -22,20 +20,20 @@ public class TestSynchronizedCacheStrategyDecorator {
   private CacheStrategy<String, String> decorated;
   private AbstractSynchronizedCacheStrategyDecorator<String, String> victim;
   private ExecutorService executor;
-  
+
   @Before
   public void setUp() {
     decorated = new MemoryCacheStrategy<String, String>();
     executor = Executors.newCachedThreadPool();
   }
-  
+
   @After
   public void tearDown() throws Exception {
     awaitTermination();
     executor.shutdown();
   }
-  
-  
+
+
   @Test
   public void shouldInvokeLoadOnlyOnceForTheSameKey() throws Exception {
     final AtomicInteger count = createSlowCountingDecorator();
@@ -48,7 +46,7 @@ public class TestSynchronizedCacheStrategyDecorator {
     awaitTermination();
     Assert.assertEquals(1, count.get());
   }
-  
+
   @Test
   public void shouldInvokeLoadTwoTimesForDifferentKeys() throws Exception {
     final AtomicInteger count = createSlowCountingDecorator();
@@ -74,7 +72,7 @@ public class TestSynchronizedCacheStrategyDecorator {
         try {
           Thread.sleep(300);
           count.incrementAndGet();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
           throw new RuntimeException(e);
         }
         return "value-" + key;
@@ -82,14 +80,14 @@ public class TestSynchronizedCacheStrategyDecorator {
     };
     return count;
   }
-  
+
   /**
    * Await for executor termination
    */
   private void awaitTermination() {
     try {
       executor.awaitTermination(400, TimeUnit.MILLISECONDS);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }

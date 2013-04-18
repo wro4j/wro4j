@@ -3,9 +3,9 @@
  */
 package ro.isdc.wro.model.resource.support.hash;
 
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.Assert;
+import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class TestHashStrategy {
     final String input = "testString";
     fingerprintCreator = new MD5HashStrategy();
     final String hash = fingerprintCreator.getHash(new ByteArrayInputStream(input.getBytes()));
-    Assert.assertEquals("536788f4dbdffeecfbb8f350a941eea3", hash);
+    assertEquals("536788f4dbdffeecfbb8f350a941eea3", hash);
   }
 
   @Test
@@ -31,7 +31,7 @@ public class TestHashStrategy {
     final String input = "testString";
     fingerprintCreator = new SHA1HashStrategy();
     final String hash = fingerprintCreator.getHash(new ByteArrayInputStream(input.getBytes()));
-    Assert.assertEquals("956265657d0b637ef65b9b59f9f858eecf55ed6a", hash);
+    assertEquals("956265657d0b637ef65b9b59f9f858eecf55ed6a", hash);
   }
 
   @Test
@@ -39,6 +39,6 @@ public class TestHashStrategy {
     final String input = "testString";
     fingerprintCreator = new CRC32HashStrategy();
     final String hash = fingerprintCreator.getHash(new ByteArrayInputStream(input.getBytes()));
-    Assert.assertEquals("18f4fd08", hash);
+    assertEquals("18f4fd08", hash);
   }
 }

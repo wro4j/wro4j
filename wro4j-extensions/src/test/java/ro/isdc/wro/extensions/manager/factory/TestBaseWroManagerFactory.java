@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.extensions.manager.factory;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class TestBaseWroManagerFactory {
       @Override
       protected WroModelFactory newModelFactory() {
         final WroModelFactory modelFactory = super.newModelFactory();
-        Assert.assertEquals(SmartWroModelFactory.class, modelFactory.getClass());
+        assertEquals(SmartWroModelFactory.class, modelFactory.getClass());
         return modelFactory;
       }
     };
