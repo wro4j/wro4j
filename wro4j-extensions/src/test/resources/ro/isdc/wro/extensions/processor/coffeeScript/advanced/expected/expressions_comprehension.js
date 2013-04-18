@@ -3,6 +3,7 @@
 
   globals = ((function() {
     var _results;
+
     _results = [];
     for (name in window) {
       _results.push(name);

@@ -6,6 +6,7 @@
 
   awardMedals = function() {
     var first, others, second;
+
     first = arguments[0], second = arguments[1], others = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
     gold = first;
     silver = second;

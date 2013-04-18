@@ -1,5 +1,4 @@
 (function() {
-
   $('.account').attr({
     "class": 'active'
   });
