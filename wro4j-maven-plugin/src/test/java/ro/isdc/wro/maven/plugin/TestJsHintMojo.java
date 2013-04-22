@@ -29,7 +29,7 @@ public class TestJsHintMojo
    * {@inheritDoc}
    */
   @Override
-  protected AbstractSingleProcessorMojo newLinterMojo() {
+  protected AbstractLinterMojo newLinterMojo() {
     return new JsHintMojo() {
       @Override
       void onException(final Exception e) {
