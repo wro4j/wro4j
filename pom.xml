@@ -203,13 +203,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.0.2</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.beust</groupId>
-                        <artifactId>jcommander</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
