@@ -113,10 +113,10 @@ public abstract class AbstractLinterMojo<T>
 
 
   private void logSummary() {
-    final String message = totalFoundErrors == 0 ? "JSHINT found no errors." : String.format(
+    final String message = totalFoundErrors == 0 ? "No lint errors found." : String.format(
         "Found %s errors in %s files.", totalFoundErrors, totalResourcesWithErrors);
     getLog().info("----------------------------------------");
-    getLog().info(String.format("Total number of processed resources: %s", totalResources));
+    getLog().info(String.format("Total resources: %s", totalResources));
     getLog().info(message);
     getLog().info("----------------------------------------\n");
   }
