@@ -1,0 +1,7 @@
+$main-color: #ce4dd6
+$style: solid
+
+a
+  color: $main-color
+  &:hover
+    border-bottom: $style 1px
