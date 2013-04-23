@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -13,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 
+import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
@@ -127,20 +129,49 @@ public class TestJsHintMojo
   @Test
   public void shouldNotFailWhenThresholdIsGreaterThanNumberOfErrors()
       throws Exception {
-    ((JsHintMojo) getMojo()).setFailThreshold(3);
+    final JsHintMojo jsHintMojo = (JsHintMojo) getMojo();
+    jsHintMojo.setFailThreshold(6);
     executeResourcesWithErrors();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void shouldFailWhenThresholdEqualsWithNumberOfErrors()
       throws Exception {
-    ((JsHintMojo) getMojo()).setFailThreshold(2);
+    final JsHintMojo jsHintMojo = (JsHintMojo) getMojo();
+    jsHintMojo.setFailThreshold(5);
     executeResourcesWithErrors();
+  }
+
+  @Test(expected = MojoExecutionException.class)
+  public void shouldReportOnlyFirstErrorWhenFailFastIsTrue()
+      throws Exception {
+    final JsHintMojo jsHintMojo = (JsHintMojo) getMojo();
+    jsHintMojo.setFailFast(true);
+    try {
+      executeResourcesWithErrors();
+    } finally {
+      final LintReport<?> lintReport = jsHintMojo.getLintReport();
+      assertEquals(1, lintReport.getReports().size());
+    }
+  }
+
+  @Test(expected = MojoExecutionException.class)
+  public void shouldReportAllErrorsWhenFailFastIsFalse()
+      throws Exception {
+    final JsHintMojo jsHintMojo = (JsHintMojo) getMojo();
+    jsHintMojo.setFailFast(false);
+    try {
+      executeResourcesWithErrors();
+    } finally {
+      final LintReport<?> lintReport = jsHintMojo.getLintReport();
+      assertEquals(2, lintReport.getReports().size());
+    }
   }
 
   private void executeResourcesWithErrors()
       throws MojoExecutionException {
     getMojo().setTargetGroups("invalidResources");
+    getMojo().setOptions("undef, browser");
     getMojo().execute();
   }
 

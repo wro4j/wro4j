@@ -134,12 +134,16 @@ public abstract class AbstractWro4jMojo
       onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
-      final String message = "Exception occured while processing: " + e.toString() + ", class: " + e.getClass().getName()
-          + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
+      final String message = "Exception occured while processing: " + e.toString() + ", class: "
+          + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
       getLog().error(message, e);
       throw new MojoExecutionException(message, e);
     } finally {
-      onAfterExecute();
+      try {
+        onAfterExecute();
+      } catch (final Exception e) {
+        throw new MojoExecutionException("Exception in onAfterExecute", e);
+      }
     }
   }
 
@@ -369,7 +373,7 @@ public abstract class AbstractWro4jMojo
     final List<String> changedGroupNames = new ArrayList<String>();
     for (final Group group : getModel().getGroups()) {
       if (!isTargetGroup(group)) {
-        //skip this group processing
+        // skip this group processing
         continue;
       }
       for (final Resource resource : group.getResources()) {
@@ -391,7 +395,7 @@ public abstract class AbstractWro4jMojo
   private boolean isTargetGroup(final Group group) {
     notNull(group);
     final String targetGroups = getTargetGroups();
-    //null, means all groups are target groups
+    // null, means all groups are target groups
     return targetGroups == null || targetGroups.contains(group.getName());
   }
 

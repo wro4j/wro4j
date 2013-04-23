@@ -86,14 +86,6 @@ public class JsHintMojo
    * {@inheritDoc}
    */
   @Override
-  protected void onBeforeExecute() {
-    super.onBeforeExecute();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   protected ReportXmlFormatter createXmlFormatter(final LintReport<LinterError> lintReport, final FormatterType type) {
     return ReportXmlFormatter.createForLinterError(lintReport, type);
   }

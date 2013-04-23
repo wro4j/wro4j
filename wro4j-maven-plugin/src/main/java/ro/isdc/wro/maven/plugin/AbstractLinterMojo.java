@@ -243,6 +243,13 @@ public abstract class AbstractLinterMojo<T>
   }
 
   /**
+   * @VisibleForTesting
+   */
+  LintReport<T> getLintReport() {
+    return lintReport;
+  }
+
+  /**
    * @param failFast flag to set.
    */
   public void setFailFast(final boolean failFast) {
