@@ -34,6 +34,7 @@ public class SassCssProcessor
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
   public static final String ALIAS = "sassCss";
   
+  
   private ObjectPoolHelper<SassCss> enginePool;
   
   /**
@@ -48,10 +49,10 @@ public class SassCssProcessor
     });
   }
   
-  
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
@@ -59,11 +60,11 @@ public class SassCssProcessor
     try {
       writer.write(newEngine().process(content));
     } catch (final WroRuntimeException e) {
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.error("Exception while applying " + SassCss.class.getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
       onException(e);
       writer.write(content);
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + SassCss.class.getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
@@ -91,5 +92,5 @@ public class SassCssProcessor
    */
   protected SassCss newEngine() {
     return new SassCss();
-  }
+  }   
 }
