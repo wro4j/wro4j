@@ -28,7 +28,7 @@ public class TestJsLintMojo
    * {@inheritDoc}
    */
   @Override
-  protected AbstractSingleProcessorMojo newLinterMojo() {
+  protected AbstractLinterMojo newLinterMojo() {
     return new JsLintMojo() {
       @Override
       void onException(final Exception e) {

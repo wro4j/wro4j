@@ -46,25 +46,6 @@ public class JsHintMojo
    * @optional
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();
-  /**
-   * Counts maximum acceptable number of jshint errors, useful for progressive code quality enhancement strategy.
-   *
-   * @parameter expression="${failThreshold}"
-   * @optional
-   */
-  private int failThreshold = 0;
-  /**
-   * Counts total number of processed resources.
-   */
-  private int totalResources = 0;
-  /**
-   * Counts total number of resources with errors.
-   */
-  private int totalResourcesWithErrors = 0;
-  /**
-   * Counts total number of jshint errors.
-   */
-  private int totalFoundErrors = 0;
 
   /**
    * {@inheritDoc}
@@ -75,8 +56,7 @@ public class JsHintMojo
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        totalResources++;
-        getLog().info("processing resource: " + resource);
+        onProcessingResource(resource);
         // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
         super.process(resource, reader, new StringWriter());
       }
@@ -90,48 +70,16 @@ public class JsHintMojo
       protected void onLinterException(final LinterException e, final Resource resource) {
         final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s", e
             .getErrors().size(), resource, e.getErrors());
-        totalResourcesWithErrors++;
-        totalFoundErrors += e.getErrors().size();
+        addFoundErrors(e.getErrors().size());
         getLog().error(errorMessage);
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
-        if (!isFailNever()) {
-          if (totalFoundErrors >= failThreshold) {
-            throw new WroRuntimeException("Errors found when validating resource: " + resource);
-          }
+        if (isFailAllowed()) {
+          throw new WroRuntimeException("Errors found when validating resource: " + resource);
         }
       };
     }.setOptionsAsString(getOptions());
     return processor;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void onBeforeExecute() {
-    totalFoundErrors = 0;
-    totalResources = 0;
-    totalResourcesWithErrors = 0;
-    super.onBeforeExecute();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void onAfterExecute() {
-    logSummary();
-    super.onAfterExecute();
-  }
-
-  private void logSummary() {
-    final String message = totalFoundErrors == 0 ? "JSHINT found no errors." : String.format(
-        "JSHINT found %s errors in %s files.", totalFoundErrors, totalResourcesWithErrors);
-    getLog().info("----------------------------------------");
-    getLog().info(String.format("Total number of processed resources: %s", totalResources));
-    getLog().info(message);
-    getLog().info("----------------------------------------\n");
   }
 
   /**
@@ -172,13 +120,6 @@ public class JsHintMojo
    */
   void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;
-  }
-
-  /**
-   * @VisibleForTesting
-   */
-  void setFailThreshold(final int failThreshold) {
-    this.failThreshold = failThreshold;
   }
 
   /**

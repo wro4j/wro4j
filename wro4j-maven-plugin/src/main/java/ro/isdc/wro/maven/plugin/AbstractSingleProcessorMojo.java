@@ -107,6 +107,9 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     return factory;
   }
 
+  /**
+   * Factory method responsible for creating the processor which will be applied for this build.
+   */
   protected abstract ResourceProcessor createResourceProcessor();
 
   /**
