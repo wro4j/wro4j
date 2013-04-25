@@ -51,7 +51,7 @@ public class TestJsHintMojo
   @Test
   public void shouldUseMixedOptions()
       throws Exception {
-    getMojo().setOptions("devel,noarg,globalstrict,sub,browser,predef=[\"angular\",\"skf\"]");
+    getMojo().setOptions("devel,noarg,sub,browser,predef=[\"document\",\"jQuery\"]");
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
