@@ -13,6 +13,7 @@ import ro.isdc.wro.extensions.processor.support.DefaultProcessorProvider;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
+
 /**
  * @author Alex Objelean
  */
@@ -25,19 +26,22 @@ public class TestDefaultProcessorProvider {
   }
 
   @Test
-  public void shouldLoadNonEmptyPostProcessors() throws Exception {
+  public void shouldLoadNonEmptyPostProcessors()
+      throws Exception {
     final Map<String, ResourcePostProcessor> map = victim.providePostProcessors();
     assertFalse(map.isEmpty());
   }
 
   @Test
-  public void shouldLoadNonEmptyPreProcessors() throws Exception {
+  public void shouldLoadNonEmptyPreProcessors()
+      throws Exception {
     final Map<String, ResourcePreProcessor> map = victim.providePreProcessors();
     assertFalse(map.isEmpty());
   }
 
   @Test
-  public void shouldProvideGoogleClosureWhitespace() throws Exception {
+  public void shouldProvideGoogleClosureWhitespace()
+      throws Exception {
     assertTrue(victim.providePreProcessors().keySet().contains(GoogleClosureCompressorProcessor.ALIAS_WHITESPACE_ONLY));
   }
 }
