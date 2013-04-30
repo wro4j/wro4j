@@ -32,7 +32,7 @@
             </resource>
         </resources>
         <plugins>
-        <!-- 
+        <!-- -->
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>
@@ -48,7 +48,7 @@
                     <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
                 </configuration>
             </plugin>
-             -->
+             
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>

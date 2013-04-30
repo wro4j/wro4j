@@ -1,0 +1,5 @@
+@import-once "css/import2.css";
+
+.test-class {
+    .mixin(#fff);
+}

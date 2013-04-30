@@ -24,19 +24,22 @@ public class TestDefaultProcessorProvider {
   }
 
   @Test
-  public void shouldLoadNonEmptyPostProcessors() throws Exception {
+  public void shouldLoadNonEmptyPostProcessors()
+      throws Exception {
     final Map<String, ResourceProcessor> map = victim.providePostProcessors();
     assertFalse(map.isEmpty());
   }
 
   @Test
-  public void shouldLoadNonEmptyPreProcessors() throws Exception {
+  public void shouldLoadNonEmptyPreProcessors()
+      throws Exception {
     final Map<String, ResourceProcessor> map = victim.providePreProcessors();
     assertFalse(map.isEmpty());
   }
 
   @Test
-  public void shouldProvideGoogleClosureWhitespace() throws Exception {
+  public void shouldProvideGoogleClosureWhitespace()
+      throws Exception {
     assertTrue(victim.providePreProcessors().keySet().contains(GoogleClosureCompressorProcessor.ALIAS_WHITESPACE_ONLY));
   }
 }
