@@ -1,0 +1,22 @@
+<div ng-controller="homeCtrl" class="wrapper">
+
+    <div class="row">
+        <div class="span10 well">This is a demo of how wro4j can be used along with webjars and
+            spring inside an osgi environment. Each of the links below are served via wro4j,
+            click one to load it into the text area</div>
+    </div>
+    <div class="row">
+        <div class="span4" id="side">
+            <ul class="nav nav-tabs nav-stacked">
+                <li class="{{file.class}}" ng-repeat="file in files"><a ng-click="loadFile(file)">{{file.name}}</a></li>
+            </ul>
+        </div>
+        <div class="span6" id="main">
+            <div><a id="fileAnchor" href="{{currFile.path}}">{{currFile.path}}</a></div>
+            <form>
+                <textarea id="fileTextarea" rows="25" style="width: 100%;" ng-model="fileTextArea"></textarea>
+            </form>
+        </div>
+    </div>
+
+</div>
