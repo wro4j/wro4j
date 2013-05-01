@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ro.isdc.wro4j</groupId>
+    <artifactId>wro4j-examples</artifactId>
+    <version>1.6.4-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>wro4j-osgi-example</artifactId>
+  <packaging>war</packaging>
+  <name>wro4j-osgi-example</name>
+
+  <properties>
+    <context.path>wro4j-osgi</context.path>
+    <webapp.path>${project.basedir}/src/main/webapp</webapp.path>
+
+    <karaf.version>2.3.1</karaf.version>
+    <jetty.version>8.1.8.v20121106</jetty.version>
+    <antlr.version>3.4_1</antlr.version>
+    <less4j.version>1.0.2</less4j.version>
+    <commons-io.version>2.4</commons-io.version>
+    <commons-lang.version>3.1</commons-lang.version>
+    <project_charset>UTF-8</project_charset>
+    <osgi.enable.start>&lt;!--</osgi.enable.start>
+    <osgi.enable.end>--&gt;</osgi.enable.end>
+    <wro4j.path.prefix></wro4j.path.prefix>
+
+    <!-- webjar versions -->
+    <angular.version>1.1.4</angular.version>
+    <bootstrap.version>2.3.1</bootstrap.version>
+    <jasmine.version>1.3.1</jasmine.version>
+    <jquery.version>1.9.1</jquery.version>
+    <json2.version>20110223</json2.version>
+
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>osgi</id>
+      <properties>
+        <osgi.enable.start></osgi.enable.start>
+        <osgi.enable.end></osgi.enable.end>
+        <wro4j.path.prefix>file:${project.basedir}/src/main/webapp</wro4j.path.prefix>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.springframework.osgi</groupId>
+          <artifactId>spring-osgi-web</artifactId>
+          <version>1.2.1</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+              <warSourceDirectory>${project.basedir}/src/main/webapp</warSourceDirectory>
+              <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+              <webResources>
+                <resource>
+                  <directory>src/main/webapp/WEB-INF</directory>
+                  <includes>
+                    <include>**/web.xml</include>
+                    <include>**/wro.xml</include>
+                    <include>**/module-context.xml</include>
+                  </includes>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                </resource>
+              </webResources>
+              <archive>
+                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+              </archive>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>bundle-manifest</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>manifest</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <supportedProjectTypes>
+                <supportedProjectType>war</supportedProjectType>
+              </supportedProjectTypes>
+              <instructions>
+                <Import-Package>
+                  javax.servlet; version="[2.5.0, 4.0.0)",
+                  javax.servlet.http; version="[2.5.0, 4.0.0)",
+                  javax.servlet.resources; version="[2.5.0, 4.0.0)",
+                  org.slf4j,
+                  org.springframework.beans,
+                  org.springframework.beans.factory.config,
+                  org.springframework.core,
+                  org.springframework.osgi.web.context.support; version="[1.2.0, 2.0.0)",
+                  org.springframework.web.bind.annotation,
+                  org.springframework.web.context,
+                  org.springframework.web.context.support; version="[3.1.0, 4.0.0)",
+                  org.springframework.web.filter; version="[3.1.0, 4.0.0)",
+                  org.springframework.web.servlet; version="[3.1.0, 4.0.0)",
+                  org.springframework.osgi.service.importer,
+                  ro.isdc.wro.cache,
+                  ro.isdc.wro.config,
+                  ro.isdc.wro.config.jmx,
+                  ro.isdc.wro.config.factory,
+                  ro.isdc.wro.config.metadata,
+                  ro.isdc.wro.config.support,
+                  ro.isdc.wro.http,
+                  ro.isdc.wro.manager,
+                  ro.isdc.wro.model,
+                  ro.isdc.wro.util,
+                  *
+                </Import-Package>
+                <Bundle-ClassPath>
+                  .,
+                  WEB-INF/classes
+                </Bundle-ClassPath>
+                <Web-ContextPath>${context.path}</Web-ContextPath>
+              </instructions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/wro4j-resources</directory>
+        <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF</targetPath>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp/WEB-INF</directory>
+              <includes>
+                <include>**/web.xml</include>
+                <include>**/wro.xml</include>
+                <include>**/module-context.xml</include>
+              </includes>
+              <targetPath>WEB-INF</targetPath>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jetty.version}</version>
+        <configuration>
+          <scanIntervalSeconds>0</scanIntervalSeconds>
+          <webAppConfig>
+            <descriptor>${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/web.xml</descriptor>
+            <contextPath>/${context.path}</contextPath>
+          </webAppConfig>
+        </configuration>
+      </plugin>
+      <!-- The dependency plugin copies js and css resources out of webjars and puts them inside
+                     war file. This way, the resources are available on the classpath so that wro4j can find
+                     them -->
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-sources</phase>
+            <goals><goal>unpack</goal></goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>angularjs</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>bootstrap</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>jquery</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>json2</artifactId>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <!-- Project Dependencies -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>wro4j-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+
+    <!-- www.webjars.org -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>angularjs</artifactId>
+      <version>${angular.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap</artifactId>
+      <version>${bootstrap.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>jquery</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>json2</artifactId>
+      <version>${json2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+      <version>${jquery.version}</version>
+    </dependency>
+  </dependencies>
+</project>
