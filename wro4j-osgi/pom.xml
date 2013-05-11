@@ -17,6 +17,12 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>wro4j-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -31,6 +37,7 @@
         <configuration>
           <instructions>
             <Import-Package>
+              org.junit; resolution:=optional,
               junit.framework; resolution:=optional,
               org.slf4j.impl; resolution:=optional,
               com.github.lltyk.rhino17r1; resolution:=optional,
