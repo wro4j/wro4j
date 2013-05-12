@@ -30,6 +30,7 @@ public final class RhinoScriptBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
   private static final String SCRIPT_ENV = "env.rhino.min.js";
   private static final String SCRIPT_JSON = "json2.min.js";
+  private static final String SCRIPT_CYCLE = "cycle.js";
   private final ScriptableObject scope;
 
   private RhinoScriptBuilder() {
@@ -46,7 +47,7 @@ public final class RhinoScriptBuilder {
     initContext();
     return Context.getCurrentContext();
   }
-  
+
   /**
    * @return the context
    */
@@ -59,22 +60,22 @@ public final class RhinoScriptBuilder {
    * Initialize the context.
    */
   private ScriptableObject createContext(final ScriptableObject initialScope) {
-    Context context = getContext();
+    final Context context = getContext();
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
     context.setLanguageVersion(Context.VERSION_1_8);
     InputStream script = null;
-    final ScriptableObject scope = (ScriptableObject) context.initStandardObjects(initialScope);
+    final ScriptableObject scriptCommon = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
       script = getClass().getResourceAsStream("commons.js");
-      context.evaluateReader(scope, new InputStreamReader(script), "commons.js", 1, null);
+      context.evaluateReader(scriptCommon, new InputStreamReader(script), "commons.js", 1, null);
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
     } finally {
       IOUtils.closeQuietly(script);
     }
-    return scope;
+    return scriptCommon;
   }
 
   /**
@@ -85,8 +86,8 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
-      final InputStream script = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluateChain(script, SCRIPT_ENV);
+      final InputStream scriptEnv = getClass().getResourceAsStream(SCRIPT_ENV);
+      evaluateChain(scriptEnv, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize env.rhino script", e);
@@ -94,10 +95,18 @@ public final class RhinoScriptBuilder {
   }
 
 
+  /**
+   * This method will load JSON utility and aslo a Douglas Crockford's <a
+   * href="https://github.com/douglascrockford/JSON-js/blob/master/cycle.js">utility</a> required for decycling objects
+   * which would fail otherwise when using JSON.stringify.
+   */
   public RhinoScriptBuilder addJSON() {
     try {
       final InputStream script = getClass().getResourceAsStream(SCRIPT_JSON);
+      final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
+
       evaluateChain(script, SCRIPT_JSON);
+      evaluateChain(scriptCycle, SCRIPT_CYCLE);
       return this;
     } catch (final IOException e) {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);

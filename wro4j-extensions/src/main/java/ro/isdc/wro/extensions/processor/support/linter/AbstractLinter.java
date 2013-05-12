@@ -73,7 +73,7 @@ public abstract class AbstractLinter {
     final String packIt = buildLinterScript(WroUtil.toJSMultiLineString(data), getOptions());
     final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
     if (!valid) {
-      final String json = builder.addJSON().evaluate(String.format("JSON.stringify(%s.errors)", getLinterName()),
+      final String json = builder.addJSON().evaluate(String.format("JSON.stringify(JSON.decycle(%s.errors))", getLinterName()),
           "stringify errors").toString();
       LOG.debug("json {}", json);
       final Type type = new TypeToken<List<LinterError>>() {}.getType();
