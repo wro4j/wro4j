@@ -92,7 +92,6 @@ public class ResourceWatcher {
     for (final Resource resource : resources) {
       if (isChanged = isChanged(resource, group.getName())) {
         onResourceChanged(resource);
-        break;
       }
     }
     return isChanged;
