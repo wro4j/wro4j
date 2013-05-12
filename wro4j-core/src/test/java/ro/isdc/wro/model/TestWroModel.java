@@ -6,6 +6,7 @@ package ro.isdc.wro.model;
 import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -50,7 +51,6 @@ public class TestWroModel {
     Assert.assertEquals(1, group.getResources().size());
   }
 
-
   @Test(expected = InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
     Assert.assertFalse(victim.getGroups().isEmpty());
@@ -83,4 +83,20 @@ public class TestWroModel {
     assertEquals(1, new WroModelInspector(model).getAllUniqueResources().size());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void cannotMergeNullModel() {
+    victim.merge(null);
+  }
+
+  @Test
+  public void shouldMergeEmptyModel() {
+    victim.merge(new WroModel());
+    assertEquals(buildValidModel(), victim);
+  }
+
+  @Test
+  public void shouldMergeNotEmptyModel() {
+    victim.merge(new WroModel().addGroup(new Group("anEmptyGroup")));
+    assertEquals(Arrays.asList("anEmptyGroup", "g1", "g2", "g3"), new WroModelInspector(victim).getGroupNames());
+  }
 }

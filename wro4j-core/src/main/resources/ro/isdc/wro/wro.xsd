@@ -6,7 +6,7 @@
 	<xsd:element name="groups" type="Groups" />
 
 	<xsd:complexType name="Groups">
-		<xsd:choice minOccurs="1" maxOccurs="unbounded">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
 			<xsd:element name="import" type="xsd:string"/>
 			<xsd:element name="group" type="Group" minOccurs="1"
 				maxOccurs="unbounded" />
