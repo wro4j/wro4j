@@ -201,6 +201,12 @@ public class TestXmlModelFactory {
     assertEquals(2, model.getGroups().size());
   }
 
+  @Test
+  public void shouldLoadEmptyModel() {
+    final WroModel model = loadModelFromLocation("emptyModel.xml");
+    assertEquals(0, model.getGroups().size());
+  }
+
 
   private WroModel loadModelFromLocation(final String location) {
     final WroModelFactory factory = new XmlModelFactory() {
