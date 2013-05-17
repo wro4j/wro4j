@@ -207,6 +207,11 @@ public class TestXmlModelFactory {
     assertEquals(0, model.getGroups().size());
   }
 
+  @Test(expected = WroRuntimeException.class)
+  public void cannotCreateFromXmlWithInvalidNamespace() {
+    loadModelFromLocation("invalidNamespace.xml");
+  }
+
 
   private WroModel loadModelFromLocation(final String location) {
     final WroModelFactory factory = new XmlModelFactory() {
