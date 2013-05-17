@@ -112,7 +112,6 @@ public class XmlModelFactory
    * pre processing.
    */
   private static final String ATTR_MINIMIZE = "minimize";
-
   /**
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
    * any element.
@@ -205,7 +204,7 @@ public class XmlModelFactory
       }
       return document;
     } catch (final Exception e) {
-      throw new WroRuntimeException("Cannot build model from XML", e);
+      throw new WroRuntimeException("Cannot build model from XML: " + e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -272,7 +271,7 @@ public class XmlModelFactory
         return locatorFactory.getLocator(modelLocation);
       }
     };
-    //inject manually created modelFactory
+    // inject manually created modelFactory
     injector.inject(importedModelFactory);
     try {
       return importedModelFactory.create();
@@ -289,7 +288,7 @@ public class XmlModelFactory
    *          to parse.
    */
   private void parseGroups() {
-    //use groups created by imports (if any)
+    // use groups created by imports (if any)
     for (final Element element : allGroupElements.values()) {
       parseGroup(element);
     }
