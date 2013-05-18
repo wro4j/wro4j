@@ -23,6 +23,11 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>2.0.0</version>
+    </dependency>
     </dependencies>
     <build>
         <resources>
@@ -52,7 +57,7 @@
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>
-                <version>1.6.2</version>
+                <version>1.6.4-SNAPSHOT</version>
                 <executions>
                 <!----> 
                     <execution>

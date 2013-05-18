@@ -65,4 +65,8 @@ public class TestWebjarUriLocator {
     stream.close();
   }
 
+  @Test
+  public void test() throws Exception {
+    System.out.println(IOUtils.toString(victim.locate("webjar:jquery.js")));
+  }
 }
