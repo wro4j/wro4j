@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import ro.isdc.wro.util.ObjectDecorator;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final Map<Class<?>, Object> map;
+  private final Map<Object, Boolean> injectedObjects = new WeakHashMap<Object, Boolean>();
 
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
@@ -44,10 +46,15 @@ public final class Injector {
    *
    * @param object
    *          {@link Object} which will be scanned for @Inject annotation presence.
+   * @return the injected object instance. Useful for fluent interface.
    */
-  public void inject(final Object object) {
+  public <T> T inject(final T object) {
     Validate.notNull(object);
-    processInjectAnnotation(object);
+    if (!injectedObjects.containsKey(object)) {
+      processInjectAnnotation(object);
+      injectedObjects.put(System.identityHashCode(object), true);
+    }
+    return object;
   }
 
   /**

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+	<group name="application">
+		<css>/folder with spaces/application.css</css>
+	</group>
+    <group name="g1">
+        <js>/folder with spaces/g1.js</js>
+    </group>
+</groups>

@@ -15,7 +15,7 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
 /**
  * Default implementation of {@link NamingStrategyProvider} providing all {@link NamingStrategy} implementations from
  * core module.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
@@ -25,8 +25,8 @@ public class DefaultCacheStrategyProvider
   /**
    * {@inheritDoc}
    */
-  public Map<String, CacheStrategy> provideCacheStrategies() {
-    final Map<String, CacheStrategy> map = new HashMap<String, CacheStrategy>();
+  public Map<String, CacheStrategy<CacheKey, CacheValue>> provideCacheStrategies() {
+    final Map<String, CacheStrategy<CacheKey, CacheValue>> map = new HashMap<String, CacheStrategy<CacheKey, CacheValue>>();
     map.put(MemoryCacheStrategy.ALIAS, new MemoryCacheStrategy<CacheKey, CacheValue>());
     map.put(LruMemoryCacheStrategy.ALIAS, new LruMemoryCacheStrategy<CacheKey, CacheValue>());
     return map;

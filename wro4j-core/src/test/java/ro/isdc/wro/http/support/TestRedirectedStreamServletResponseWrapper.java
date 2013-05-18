@@ -7,8 +7,7 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,17 +30,17 @@ public class TestRedirectedStreamServletResponseWrapper {
     MockitoAnnotations.initMocks(this);
     victim = new RedirectedStreamServletResponseWrapper(redirectedStream, mockResponse);
   }
-  
+
   @Test(expected = IllegalArgumentException.class)
   public void cannotAcceptNullResponse() {
     new RedirectedStreamServletResponseWrapper(new ByteArrayOutputStream(), null);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullStream() {
     new RedirectedStreamServletResponseWrapper(null, mockResponse);
   }
-  
+
   @Test
   public void shouldRedirectWriter() throws Exception {
     final String message = "Hello world!";
@@ -49,7 +48,7 @@ public class TestRedirectedStreamServletResponseWrapper {
     victim.getWriter().flush();
     Assert.assertEquals(message, new String(redirectedStream.toByteArray()));
   }
-  
+
   @Test
   public void shouldRedirectStream() throws Exception {
     final String message = "Hello world!";

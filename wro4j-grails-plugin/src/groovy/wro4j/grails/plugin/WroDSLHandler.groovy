@@ -28,7 +28,7 @@ class WroDSLHandler {
 
   static Script dsl
 
-  public static synchronized Script getDsl() {
+  static synchronized Script getDsl() {
     if (dsl == null) {
       dsl = loadDefaultDSL()
     }
@@ -37,11 +37,10 @@ class WroDSLHandler {
 
   /** Load the DSL from the default class loader      */
   private static loadDefaultDSL() {
-    Class c = WroDSLHandler.class.getClassLoader().loadClass("Wro")
-    (Script) c.newInstance();
+    WroDSLHandler.getClassLoader().loadClass("Wro").newInstance()
   }
 
-  public static synchronized void setDsl(Script dsl) {
+  static synchronized void setDsl(Script dsl) {
     this.dsl = dsl
   }
 }

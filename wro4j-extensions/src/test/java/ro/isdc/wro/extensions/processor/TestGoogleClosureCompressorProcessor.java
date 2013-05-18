@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -10,12 +12,11 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.Resource;
@@ -28,6 +29,7 @@ import ro.isdc.wro.util.WroTestUtils;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSSourceFile;
+import com.google.javascript.jscomp.SourceFile;
 
 
 /**
@@ -108,17 +110,17 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(victim);
 
     victim.process(null, new StringReader("function test( ) {}"), sw);
-    Assert.assertEquals("", sw.toString());
+    assertEquals("", sw.toString());
   }
 
-  @Test
-  public void invalidExtern()
+  @Test(expected=WroRuntimeException.class)
+  public void shouldFailWhenInvalidExternProvided()
       throws IOException {
     victim = new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS) {
       @Override
-      protected JSSourceFile[] getExterns(final Resource resource) {
-        return new JSSourceFile[] {
-          JSSourceFile.fromFile(new File("INVALID"))
+      protected SourceFile[] getExterns(final Resource resource) {
+        return new SourceFile[] {
+          SourceFile.fromFile(new File("INVALID"))
         };
       }
     };
@@ -127,7 +129,7 @@ public class TestGoogleClosureCompressorProcessor {
     final StringWriter sw = new StringWriter();
     victim.process(null, new StringReader("alert(1);"), sw);
     // will leave result unchanged, because the processing is not successful.
-    Assert.assertEquals("alert(1);", sw.toString());
+    assertEquals("alert(1);", sw.toString());
   }
 
   @Test
@@ -159,6 +161,6 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(victim);
     final StringWriter sw = new StringWriter();
     victim.process(null, new StringReader("alert(1);"), sw);
-    Assert.assertEquals("alert(1);", sw.toString());
+    assertEquals("alert(1);", sw.toString());
   }
 }

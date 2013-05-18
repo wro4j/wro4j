@@ -1,6 +1,6 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Reader;
 import java.io.Writer;

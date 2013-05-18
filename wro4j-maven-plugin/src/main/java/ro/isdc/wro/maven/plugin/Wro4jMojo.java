@@ -4,6 +4,7 @@
 package ro.isdc.wro.maven.plugin;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * @parameter expression="${groupNameMappingFile}"
    * @optional
    */
-  private String groupNameMappingFile;
+  private File groupNameMappingFile;
   /**
    * Holds a mapping between original group name file & renamed one.
    */
@@ -96,6 +97,21 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void onBeforeExecute() {
+    groupNames.clear();
+    if (groupNameMappingFile != null && isIncrementalBuild()) {
+      try {
+        //reuse stored properties for incremental build
+        groupNames.load(new FileInputStream(groupNameMappingFile));
+      } catch(final IOException e) {
+        getLog().debug("Cannot load " + groupNameMappingFile.getPath());
+      }
+    }
+  }
 
   /**
    * {@inheritDoc}
@@ -286,24 +302,27 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
   /**
    * @param destinationFolder the destinationFolder to set
+   * @VisibleForTesting
    */
-  public void setDestinationFolder(final File destinationFolder) {
+  void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
 
 
   /**
    * @param cssDestinationFolder the cssDestinationFolder to set
+   * @VisibleForTesting
    */
-  public void setCssDestinationFolder(final File cssDestinationFolder) {
+  void setCssDestinationFolder(final File cssDestinationFolder) {
     this.cssDestinationFolder = cssDestinationFolder;
   }
 
 
   /**
    * @param jsDestinationFolder the jsDestinationFolder to set
+   * @VisibleForTesting
    */
-  public void setJsDestinationFolder(final File jsDestinationFolder) {
+  void setJsDestinationFolder(final File jsDestinationFolder) {
     this.jsDestinationFolder = jsDestinationFolder;
   }
 
@@ -311,23 +330,17 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    * The folder where the project is built.
    *
    * @param buildDirectory the buildDirectory to set
+   * @VisibleForTesting
    */
-  public void setBuildDirectory(final File buildDirectory) {
+  void setBuildDirectory(final File buildDirectory) {
     this.buildDirectory = buildDirectory;
   }
 
   /**
-   * @param buildFinalName the buildFinalName to set
-   */
-  public void setBuildFinalName(final File buildFinalName) {
-    this.buildFinalName = buildFinalName;
-  }
-
-
-  /**
    * @param groupNameMappingFile the groupNameMappingFile to set
+   * @VisibleForTesting
    */
-  public void setGroupNameMappingFile(final String groupNameMappingFile) {
+  void setGroupNameMappingFile(final File groupNameMappingFile) {
     this.groupNameMappingFile = groupNameMappingFile;
   }
 }

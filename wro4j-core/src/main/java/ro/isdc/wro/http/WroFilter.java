@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -85,6 +86,7 @@ public class WroFilter
    */
   private boolean enable = true;
   private Injector injector;
+  private MBeanServer mbeanServer = null;
 
   /**
    * {@inheritDoc}
@@ -97,8 +99,10 @@ public class WroFilter
     this.wroManagerFactory = createWroManagerFactory();
     headersConfigurer = newResponseHeadersConfigurer();
     registerChangeListeners();
-    initJMX();
+    registerMBean();
     doInit(config);
+    LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
+    LOG.info("wro4j configuration: {}", wroConfiguration);
   }
 
   /**
@@ -130,22 +134,35 @@ public class WroFilter
   }
 
   /**
-   * Expose MBean to tell JMX infrastructure about our MBean.
+   * Expose MBean to tell JMX infrastructure about our MBean (only if jmxEnabled is true).
    */
-  private void initJMX() {
-    try {
-      if (wroConfiguration.isJmxEnabled()) {
-        final MBeanServer mbeanServer = getMBeanServer();
-        final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
+  private void registerMBean() {
+    if (wroConfiguration.isJmxEnabled()) {
+      try {
+        mbeanServer = getMBeanServer();
+        final ObjectName name = getMBeanObjectName();
         if (!mbeanServer.isRegistered(name)) {
           mbeanServer.registerMBean(wroConfiguration, name);
         }
+      } catch (final JMException e) {
+        LOG.error("Exception occured while registering MBean", e);
       }
-      LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
-      LOG.info("wro4j configuration: {}", wroConfiguration);
+    }
+  }
+
+  private void unregisterMBean() {
+    try {
+      if (mbeanServer != null && mbeanServer.isRegistered(getMBeanObjectName())) {
+        mbeanServer.unregisterMBean(getMBeanObjectName());
+      }
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
+  }
+
+  private ObjectName getMBeanObjectName()
+      throws MalformedObjectNameException {
+    return new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
   }
 
   /**
@@ -370,7 +387,7 @@ public class WroFilter
       LOG.debug("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);
     } catch (final Exception ex) {
-      // should never happen (use debug level to suppres unuseful logs)
+      // should never happen (use debug level to suppress unuseful logs)
       LOG.debug("Error while chaining the request", e);
     }
   }
@@ -479,6 +496,8 @@ public class WroFilter
    * {@inheritDoc}
    */
   public void destroy() {
+    //Avoid memory leak by unregistering mBean on destroy
+    unregisterMBean();
     if (wroManagerFactory != null) {
       wroManagerFactory.destroy();
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+    <group name="csslint">
+        <js>/libraries/csslint/**</js>
+    </group>
+    <group name="jslint">
+        <js>/libraries/jslint/**</js>
+    </group>
+    <group name="uglifyJs">
+        <js>/libraries/uglifyJs/**</js>
+    </group>
+    <group name="styles">
+        <css>/assets/oocss/**.css</css>
+        <js>/assets/uglify/**.js</js>
+     </group>   
+</groups>

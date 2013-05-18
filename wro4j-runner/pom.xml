@@ -5,7 +5,7 @@
     <parent>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-parent</artifactId>
-        <version>1.6.3-SNAPSHOT</version>
+        <version>1.6.4-SNAPSHOT</version>
     </parent>
     <artifactId>wro4j-runner</artifactId>
     <packaging>jar</packaging>
@@ -17,16 +17,37 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wro4j-extensions</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.ant</groupId>
-                    <artifactId>ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest-core</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+		<!-- Specify provided scope explicitly to exclude these transitive large dependencies -->
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-complete</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.n4u.sass</groupId>
+            <artifactId>sass-gems</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>nz.co.edmi</groupId>
+            <artifactId>bourbon-gem-jar</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.gmaven.runtime</groupId>
+            <artifactId>gmaven-runtime-1.7</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -37,6 +58,16 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
             <scope>compile</scope>
         </dependency>
 		<!-- Explicitly add slf4j with compile scope -->

@@ -1,0 +1,13 @@
+Below are the test-cases to be tested for cssImport 
+
+@import( "url" )
+@import ("url")
+@import('url')
+@import "url";
+@import url("test")
+@import  url("http://www.westciv.com/styles/style1");
+@import  url('http://www.westciv.com/styles/style1');
+@import  url(http://www.westciv.com/styles/style1);
+@import  url(  http://www.westciv.com/styles/style1  );
+@import  "http://www.westciv.com/styles/style1";
+@import  "   http://www.westciv.com/styles/style1   ";

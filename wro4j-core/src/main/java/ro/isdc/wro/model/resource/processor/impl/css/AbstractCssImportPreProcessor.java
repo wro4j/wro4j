@@ -9,15 +9,19 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
@@ -26,8 +30,8 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.CssImportInspector;
 import ro.isdc.wro.util.StringUtils;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -49,19 +53,38 @@ public abstract class AbstractCssImportPreProcessor
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
-
   /**
-   * List of processed resources, useful for detecting deep recursion. A {@link ThreadLocal} is used to ensure that the
-   * processor is thread-safe and doesn't erroneously detect recursion when running in concurrent environment.
+   * A map useful for detecting deep recursion. The key (correlationId) - identifies a processing unit, while the value
+   * contains a pair between the list o processed resources and a stack holding recursive calls (value contained on this
+   * stack is not important). This map is used to ensure that the processor is thread-safe and doesn't erroneously
+   * detect recursion when running in concurrent environment (when processor is invoked from within the processor for
+   * child resources).
    */
-  private final ThreadLocal<List<String>> processedImports = new ThreadLocal<List<String>>() {
+  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new ConcurrentHashMap<String, Pair<List<String>, Stack<String>>>() {
+    /**
+     * Make sure that the get call will always return a not null object. To avoid growth of this map, it is important to
+     * call remove for each invoked get.
+     */
     @Override
-    protected List<String> initialValue() {
-      return new ArrayList<String>();
+    public Pair<List<String>, Stack<String>> get(final Object key) {
+      Pair<List<String>, Stack<String>> result = super.get(key);
+      if (result == null) {
+        final List<String> list = new ArrayList<String>();
+        result = ImmutablePair.of(list, new Stack<String>());
+        put(key.toString(), result);
+      }
+      return result;
     };
   };
-  protected static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssImport"));
-  private static final String REGEX_IMPORT_FROM_COMMENTS = WroUtil.loadRegexpWithKey("cssImportFromComments");
+
+
+  /**
+   * Useful to check that there is no memory leak after processing completion.
+   * @VisibleForTesting
+   */
+  protected final Map<String, Pair<List<String>, Stack<String>>> getContextMap() {
+    return contextMap;
+  }
 
   /**
    * {@inheritDoc}
@@ -73,15 +96,12 @@ public abstract class AbstractCssImportPreProcessor
     try {
       final String result = parseCss(resource, IOUtils.toString(reader));
       writer.write(result);
-      getProcessedList().clear();
     } finally {
+      //imkportant to avoid memory leak
+      clearProcessedImports();
       reader.close();
       writer.close();
     }
-  }
-
-  private List<String> getProcessedList() {
-    return processedImports.get();
   }
 
   /**
@@ -98,15 +118,40 @@ public abstract class AbstractCssImportPreProcessor
    */
   private String parseCss(final Resource resource, final String cssContent)
     throws IOException {
-    if (getProcessedList().contains(resource.getUri())) {
+    if (isImportProcessed(resource.getUri())) {
       LOG.debug("[WARN] Recursive import detected: {}", resource);
       onRecursiveImportDetected();
       return "";
     }
     final String importedUri = resource.getUri().replace(File.separatorChar,'/');
-    getProcessedList().add(importedUri);
+    addProcessedImport(importedUri);
     final List<Resource> importedResources = findImportedResources(resource.getUri(), cssContent);
     return doTransform(cssContent, importedResources);
+  }
+
+  private boolean isImportProcessed(final String uri) {
+    return getProcessedImports().contains(uri);
+  }
+
+  private void addProcessedImport(final String importedUri) {
+    final String correlationId = Context.getCorrelationId();
+    contextMap.get(correlationId).getValue().push(importedUri);
+    getProcessedImports().add(importedUri);
+  }
+
+  private List<String> getProcessedImports() {
+    return contextMap.get(Context.getCorrelationId()).getKey();
+  }
+
+  private void clearProcessedImports() {
+    final String correlationId = Context.getCorrelationId();
+    final Stack<String> stack = contextMap.get(correlationId).getValue();
+    if (!stack.isEmpty()) {
+      stack.pop();
+    }
+    if (stack.isEmpty()) {
+      contextMap.remove(correlationId);
+    }
   }
 
   /**
@@ -116,12 +161,10 @@ public abstract class AbstractCssImportPreProcessor
     throws IOException {
     // it should be sorted
     final List<Resource> imports = new ArrayList<Resource>();
-    String css = cssContent;
-    //remove imports from comments before parse the file
-    css = css.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
-    final Matcher m = PATTERN.matcher(css);
-    while (m.find()) {
-      final Resource importedResource = createImportedResource(resourceUri, m.group(1));
+    final String css = cssContent;
+    final List<String> foundImports = findImports(css);
+    for (final String importUrl : foundImports) {
+      final Resource importedResource = createImportedResource(resourceUri, importUrl);
       // check if already exist
       if (imports.contains(importedResource)) {
         LOG.debug("[WARN] Duplicate imported resource: {}", importedResource);
@@ -131,6 +174,15 @@ public abstract class AbstractCssImportPreProcessor
       }
     }
     return imports;
+  }
+
+  /**
+   * Extracts a list of imports from css content.
+   *
+   * @return a list of found imports.
+   */
+  protected List<String> findImports(final String css) {
+    return new CssImportInspector(css).findImports();
   }
 
   /**

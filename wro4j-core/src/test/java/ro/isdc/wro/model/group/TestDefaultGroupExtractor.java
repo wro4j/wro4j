@@ -3,9 +3,9 @@
  */
 package ro.isdc.wro.model.group;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,7 +35,7 @@ public class TestDefaultGroupExtractor {
     groupExtractor = new DefaultGroupExtractor();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotExtractGroupNameWithNullUri() {
     groupExtractor.getGroupName(null);
   }
@@ -45,7 +45,7 @@ public class TestDefaultGroupExtractor {
     groupExtractor.getResourceType(null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void cannotExtractMinimizedWithNullRequest() {
     groupExtractor.isMinimized(null);
   }

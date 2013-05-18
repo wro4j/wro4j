@@ -19,7 +19,7 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.GroupExtractorDecorator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 /**
@@ -28,7 +28,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * @author Alex Objelean
  */
 public class DefaultStandaloneContextAwareManagerFactory
-  extends StandaloneWroManagerFactory implements StandaloneContextAwareManagerFactory {
+  extends StandaloneWroManagerFactory implements StandaloneContextAware {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultStandaloneContextAwareManagerFactory.class);
   /**
    * Context used by stand-alone process.
@@ -71,7 +71,7 @@ public class DefaultStandaloneContextAwareManagerFactory
 
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
-    return new DefaultProcesorsFactory();
+    return new DefaultProcessorsFactory();
   }
 
   @Override

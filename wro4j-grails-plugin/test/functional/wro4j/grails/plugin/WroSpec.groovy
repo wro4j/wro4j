@@ -3,8 +3,6 @@ package wro4j.grails.plugin
 import geb.spock.GebReportingSpec
 
 class WroSpec extends GebReportingSpec {
-  def setupSpec() {
-  }
 
   def testWroPluginWorks() {
     when:

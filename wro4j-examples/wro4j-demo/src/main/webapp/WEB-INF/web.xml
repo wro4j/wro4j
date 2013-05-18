@@ -35,8 +35,12 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
-
   
+   <filter-mapping>
+    <filter-name>WebResourceOptimizer</filter-name>
+    <url-pattern>/v/*</url-pattern>
+  </filter-mapping>
+
   <filter>
     <filter-name>Wro4j Assets</filter-name>
     <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
@@ -48,6 +52,17 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
+  
+  <filter>
+    <filter-name>GzipFilter</filter-name>
+    <filter-class>ro.isdc.wro.http.GzipFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>GzipFilter</filter-name>
+    <url-pattern>/static/*</url-pattern>
+  </filter-mapping>
+  
+  
   
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>

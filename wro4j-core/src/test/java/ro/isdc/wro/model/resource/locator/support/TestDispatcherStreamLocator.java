@@ -3,9 +3,9 @@
  */
 package ro.isdc.wro.model.resource.locator.support;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -55,7 +55,7 @@ public class TestDispatcherStreamLocator {
     WroTestUtils.createInjector().inject(victim);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IOException.class)
   public void shouldNotAcceptNullRequestOrResponse()
       throws Exception {
     victim.getInputStream(null, null, null);

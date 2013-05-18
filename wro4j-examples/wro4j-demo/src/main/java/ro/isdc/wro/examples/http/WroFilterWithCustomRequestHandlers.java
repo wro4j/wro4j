@@ -9,13 +9,14 @@ import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 
 /**
  * A filter which uses custom {@link RequestHandler} implementations.
- * 
+ *
  * @author Alex Objelean
  */
 public class WroFilterWithCustomRequestHandlers
     extends WroFilter {
   public WroFilterWithCustomRequestHandlers() {
-    RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory().addHandler(new ModelAsJsonRequestHandler());
+    final RequestHandlerFactory requestHandlerFactory = new DefaultRequestHandlerFactory()
+        .addHandler(new ModelAsJsonRequestHandler());
     setRequestHandlerFactory(requestHandlerFactory);
   }
 }

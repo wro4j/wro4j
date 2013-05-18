@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.http;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -27,9 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -95,6 +96,8 @@ public class TestWroFilter {
   @Mock
   private UriLocatorFactory mockUriLocatorFactory;
   @Mock
+  private MBeanServer mockMBeanServer;
+  @Mock
   private UriLocator mockUriLocator;
 
   @Before
@@ -117,9 +120,13 @@ public class TestWroFilter {
       protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
         throw WroRuntimeException.wrap(e);
       }
+
+      @Override
+      protected MBeanServer getMBeanServer() {
+        return mockMBeanServer;
+      }
     };
     victim.setWroManagerFactory(mockManagerFactory);
-    // victim.init(mockFilterConfig);
   }
 
   private WroManagerFactory createValidManagerFactory() {
@@ -784,6 +791,14 @@ public class TestWroFilter {
 
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verifyChainIsNotCalled(mockFilterChain);
+  }
+
+  @Test
+  public void shouldUnregisterMBeanOnDestroy() throws Exception {
+    when(mockMBeanServer.isRegistered(Mockito.any(ObjectName.class))).thenReturn(true);
+    victim.init(mockFilterConfig);
+    victim.destroy();
+    verify(mockMBeanServer).unregisterMBean(Mockito.any(ObjectName.class));
   }
 
   @After

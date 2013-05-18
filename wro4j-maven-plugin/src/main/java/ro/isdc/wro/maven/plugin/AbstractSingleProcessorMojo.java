@@ -15,7 +15,9 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -35,13 +37,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    * @optional
    */
   private String options;
-  /**
-   * When true, all the plugin won't stop its execution and will log all found errors.
-   *
-   * @parameter default-value="false" expression="${failNever}"
-   * @optional
-   */
-  private boolean failNever;
+
 
   /**
    * {@inheritDoc}
@@ -50,7 +46,6 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   public final void doExecute()
     throws Exception {
     getLog().info("options: " + options);
-    getLog().info("failNever: " + failNever);
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
@@ -87,10 +82,13 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    * {@inheritDoc}
    */
   @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory() {
-    final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
-    factory.setProcessorsFactory(createSingleProcessorsFactory());
-    return factory;
+  protected WroManagerFactory getManagerFactory() {
+    return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+      @Override
+      protected void onBeforeBuild(final Builder builder) {
+        builder.setProcessorsFactory(createSingleProcessorsFactory());
+      }
+    };
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {
@@ -100,12 +98,16 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     return factory;
   }
 
+  /**
+   * Factory method responsible for creating the processor which will be applied for this build.
+   */
   protected abstract ResourcePreProcessor createResourceProcessor();
+
 
   /**
    * @return raw representation of the option value.
    */
-  public String getOptions() {
+  protected String getOptions() {
     return options;
   }
 
@@ -115,19 +117,5 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    */
   void setOptions(final String options) {
     this.options = options;
-  }
-
-  /**
-   * @param failNever the failFast to set
-   */
-  public void setFailNever(final boolean failNever) {
-    this.failNever = failNever;
-  }
-
-  /**
-   * @return the failNever
-   */
-  public boolean isFailNever() {
-    return failNever;
   }
 }

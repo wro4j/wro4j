@@ -12,13 +12,13 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
+*
 * This was inspired by TestFingerprintCreatorNamingStrategy.
 */
 
 package ro.isdc.wro.model.resource.support.naming;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class TestTimestampNamingStrategy {
   private NamingStrategy namingStrategy;
 
   private static long TIMESTAMP = 123456789;
-  
+
   @Before
   public void setUp() {
     namingStrategy = new TimestampNamingStrategy() {

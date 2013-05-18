@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,7 +30,7 @@ import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFact
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
@@ -42,6 +44,7 @@ import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessor
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
+import ro.isdc.wro.util.Function;
 
 
 /**
@@ -49,7 +52,8 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  *
  * @author Alex Objelean
  */
-public abstract class AbstractWro4jMojo extends AbstractMojo {
+public abstract class AbstractWro4jMojo
+    extends AbstractMojo {
   /**
    * File containing the groups definitions.
    *
@@ -60,7 +64,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * The folder where web application context resides useful for locating resources relative to servletContext .
    *
-   * @parameter default-value="${basedir}/src/main/webapp/"  expression="${contextFolder}"
+   * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
    */
   private File contextFolder;
   /**
@@ -91,9 +95,9 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    */
   private String wroManagerFactory;
   /**
-   * An instance of {@link StandaloneContextAwareManagerFactory}.
+   * An instance of {@link StandaloneContextAware}.
    */
-  private StandaloneContextAwareManagerFactory managerFactory;
+  private WroManagerFactory managerFactory;
   /**
    * The path to configuration file.
    *
@@ -114,9 +118,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * {@inheritDoc}
    */
   public final void execute()
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     validate();
-
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
@@ -131,9 +134,16 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
-      throw new MojoExecutionException("Exception occured while processing: " + e.getMessage(), e);
+      final String message = "Exception occured while processing: " + e.toString() + ", class: "
+          + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
+      getLog().error(message, e);
+      throw new MojoExecutionException(message, e);
     } finally {
-      onAfterExecute();
+      try {
+        onAfterExecute();
+      } catch (final Exception e) {
+        throw new MojoExecutionException("Exception in onAfterExecute", e);
+      }
     }
   }
 
@@ -144,7 +154,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
   /**
-   * Invoked right after execution complete, no matter if it failed or not.
+   * Invoked right after execution completion. This method is invoked also if the execution failed with an exception.
    */
   protected void onAfterExecute() {
   }
@@ -165,16 +175,16 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * Perform actual plugin processing.
    */
   protected abstract void doExecute()
-    throws Exception;
+      throws Exception;
 
   /**
-   * This method will ensure that you have a right and initialized instance of
-   * {@link StandaloneContextAwareManagerFactory}. When overriding this method, ensure that creating managerFactory
-   * performs injection during manager creation, otherwise the manager won't be initialized porperly.
+   * This method will ensure that you have a right and initialized instance of {@link StandaloneContextAware}. When
+   * overriding this method, ensure that creating managerFactory performs injection during manager creation, otherwise
+   * the manager won't be initialized porperly.
    *
    * @return {@link WroManagerFactory} implementation.
    */
-  protected StandaloneContextAwareManagerFactory getManagerFactory() {
+  protected WroManagerFactory getManagerFactory() {
     if (managerFactory == null) {
       try {
         managerFactory = newWroManagerFactory();
@@ -182,7 +192,9 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
         throw WroRuntimeException.wrap(e);
       }
       // initialize before process.
-      managerFactory.initialize(createStandaloneContext());
+      if (managerFactory instanceof StandaloneContextAware) {
+        ((StandaloneContextAware) managerFactory).initialize(createStandaloneContext());
+      }
     }
     return managerFactory;
   }
@@ -190,9 +202,9 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * {@inheritDoc}
    */
-  protected StandaloneContextAwareManagerFactory newWroManagerFactory()
-    throws MojoExecutionException {
-    StandaloneContextAwareManagerFactory factory = null;
+  protected WroManagerFactory newWroManagerFactory()
+      throws MojoExecutionException {
+    WroManagerFactory factory = null;
     if (wroManagerFactory != null) {
       factory = createCustomManagerFactory();
     } else {
@@ -205,7 +217,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
         throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
       }
       getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
-      ((ExtraConfigFileAware)factory).setExtraConfigFile(extraConfigFile);
+      ((ExtraConfigFileAware) factory).setExtraConfigFile(extraConfigFile);
     }
     return factory;
   }
@@ -213,13 +225,13 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   /**
    * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
    */
-  private StandaloneContextAwareManagerFactory createCustomManagerFactory()
-    throws MojoExecutionException {
-    StandaloneContextAwareManagerFactory managerFactory;
+  private WroManagerFactory createCustomManagerFactory()
+      throws MojoExecutionException {
+    WroManagerFactory managerFactory;
     try {
       final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-        wroManagerFactory.trim());
-      managerFactory = (StandaloneContextAwareManagerFactory)wroManagerFactoryClass.newInstance();
+          wroManagerFactory.trim());
+      managerFactory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
       getLog().error("Cannot instantiate wroManagerFactoryClass", e);
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
@@ -227,12 +239,11 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return managerFactory;
   }
 
-
   /**
    * @return a list of groups which will be processed.
    */
   protected final List<String> getTargetGroupsAsList()
-    throws Exception {
+      throws Exception {
     List<String> result = null;
     if (isIncrementalBuild()) {
       result = getIncrementalGroupNames();
@@ -252,38 +263,56 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   private void persistResourceFingerprints(final List<String> groupNames) {
     if (buildContext != null) {
       final WroModelInspector modelInspector = new WroModelInspector(getModel());
-      final WroManager manager = getWroManager();
-      final HashStrategy hashStrategy = manager.getHashStrategy();
-      final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
       for (final String groupName : groupNames) {
         final Group group = modelInspector.getGroupByName(groupName);
         if (group != null) {
           for (final Resource resource : group.getResources()) {
-            try {
-              final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-              buildContext.setValue(resource.getUri(), fingerprint);
-            } catch (final IOException e) {
-              getLog().debug("could not check fingerprint of resource: " + resource);
-            }
+            persistResourceFingerprints(resource);
           }
         }
       }
     }
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Resource resource, final AtomicBoolean changeDetected) {
+  private void persistResourceFingerprints(final Resource resource) {
+    final WroManager manager = getWroManager();
+    final HashStrategy hashStrategy = manager.getHashStrategy();
+    final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
+    try {
+      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+      buildContext.setValue(resource.getUri(), fingerprint);
+      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
+      if (resource.getType() == ResourceType.CSS) {
+        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+        getLog().debug("Check @import directive from " + resource);
+        // persist fingerprints in imported resources.
+        persistFingerprintsForCssImports(resource, reader);
+      }
+    } catch (final IOException e) {
+      getLog().debug("could not check fingerprint of resource: " + resource);
+    }
+  }
+
+  /**
+   * Invokes the provided function for each detected css import.
+   *
+   * @param func
+   *          a function (closure) invoked for each found import. It will be provided as argument the uri of imported
+   *          css.
+   */
+  private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
+      throws IOException {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
-        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
-        getLog().debug("\tisImportChanged: " + isImportChanged);
-        if (isImportChanged) {
-          changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
+        try {
+          func.apply(importedUri);
+        } catch (final Exception e) {
+          getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
         }
-      };
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
+      }
 
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
@@ -297,10 +326,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
         return CssImportPreProcessor.class.getSimpleName();
       }
     };
-    /**
-     * Ignore processor failure, since we are interesting in detecting change only. A failure is treated as lack of
-     * change.
-     */
     final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
       @Override
       protected boolean isIgnoreFailingProcessor() {
@@ -308,26 +333,70 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
       }
     };
     InjectorBuilder.create(getManagerFactory()).build().inject(processor);
-    return processor;
+    processor.process(resource, reader, new StringWriter());
+  }
+
+  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader)
+      throws IOException {
+    forEachCssImportApply(new Function<String, Void>() {
+      public Void apply(final String importedUri)
+          throws Exception {
+        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
+        return null;
+      }
+    }, resource, reader);
+  }
+
+  private void detectChangeForCssImports(final Resource resource, final Reader reader,
+      final AtomicBoolean changeDetected)
+      throws IOException {
+    forEachCssImportApply(new Function<String, Void>() {
+      public Void apply(final String importedUri)
+          throws Exception {
+        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
+        getLog().debug("\tisImportChanged: " + isImportChanged);
+        if (isImportChanged) {
+          changeDetected.set(true);
+          // no need to continue
+          throw new WroRuntimeException("Change detected. No need to continue processing");
+        }
+        return null;
+      }
+    }, resource, reader);
   }
 
   /**
    * @return a list of groups changed by incremental builds.
    */
-  private List<String> getIncrementalGroupNames() throws Exception {
+  private List<String> getIncrementalGroupNames()
+      throws Exception {
     final List<String> changedGroupNames = new ArrayList<String>();
     for (final Group group : getModel().getGroups()) {
+      if (!isTargetGroup(group)) {
+        // skip this group processing
+        continue;
+      }
       for (final Resource resource : group.getResources()) {
         getLog().debug("checking delta for resource: " + resource);
         if (isResourceChanged(resource)) {
           getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
           changedGroupNames.add(group.getName());
-          //no need to check rest of resources from this group
+          // no need to check rest of resources from this group
           break;
         }
       }
     }
     return changedGroupNames;
+  }
+
+  /**
+   * Check if the provided group is a target group.
+   */
+  private boolean isTargetGroup(final Group group) {
+    notNull(group);
+    final String targetGroups = getTargetGroups();
+    // null, means all groups are target groups
+    return targetGroups == null || targetGroups.contains(group.getName());
   }
 
   private boolean isResourceChanged(final Resource resource) {
@@ -338,7 +407,8 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     final AtomicBoolean changeDetected = new AtomicBoolean(false);
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resource.getUri())) : null;
+      final String previousFingerprint = buildContext != null ? String
+          .valueOf(buildContext.getValue(resource.getUri())) : null;
       getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
 
       changeDetected.set(fingerprint != null && !fingerprint.equals(previousFingerprint));
@@ -347,7 +417,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
         getLog().debug("Check @import directive from " + resource);
         // detect changes in imported resources.
-        createCssImportProcessor(resource, changeDetected).process(resource, reader, new StringWriter());
+        detectChangeForCssImports(resource, reader, changeDetected);
       }
       return changeDetected.get();
     } catch (final IOException e) {
@@ -356,7 +426,10 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return false;
   }
 
-  private boolean isIncrementalBuild() {
+  /**
+   * @return true if the build was triggered by an incremental change.
+   */
+  protected final boolean isIncrementalBuild() {
     return buildContext != null && buildContext.isIncremental();
   }
 
@@ -365,7 +438,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
   }
 
   private WroModel getModel() {
-      return getWroManager().getModelFactory().create();
+    return getWroManager().getModelFactory().create();
   }
 
   private WroManager getWroManager() {
@@ -376,12 +449,11 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     }
   }
 
-
   /**
    * Checks if all required fields are configured.
    */
   protected void validate()
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     if (wroFile == null) {
       throw new MojoExecutionException("contextFolder was not set!");
     }
@@ -394,7 +466,7 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
    * Update the classpath.
    */
   protected final void extendPluginClasspath()
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     // this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
     final List<String> classpathElements = new ArrayList<String>();
     try {
@@ -405,7 +477,6 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     final ClassLoader classLoader = createClassLoader(classpathElements);
     Thread.currentThread().setContextClassLoader(classLoader);
   }
-
 
   /**
    * @return {@link ClassRealm} based on project dependencies.
@@ -426,74 +497,79 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
     return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
   }
 
-
   /**
-   * @param contextFolder the servletContextFolder to set
+   * @param contextFolder
+   *          the servletContextFolder to set
+   * @VisibleForTesting
    */
-  public void setContextFolder(final File contextFolder) {
+  void setContextFolder(final File contextFolder) {
     this.contextFolder = contextFolder;
   }
 
-
   /**
-   * @param wroFile the wroFile to set
+   * @param wroFile
+   *          the wroFile to set
+   * @VisibleForTesting
    */
-  public void setWroFile(final File wroFile) {
+  void setWroFile(final File wroFile) {
     this.wroFile = wroFile;
   }
 
-
   /**
    * @return the wroFile
+   * @VisibleForTesting
    */
-  public File getWroFile() {
+  File getWroFile() {
     return this.wroFile;
   }
 
-
   /**
    * @return the contextFolder
+   * @VisibleForTesting
    */
-  public File getContextFolder() {
+  File getContextFolder() {
     return this.contextFolder;
   }
 
-
   /**
-   * @param minimize flag for minimization.
+   * @param minimize
+   *          flag for minimization.
+   * @VisibleForTesting
    */
-  public void setMinimize(final boolean minimize) {
+  void setMinimize(final boolean minimize) {
     this.minimize = minimize;
   }
 
-
   /**
-   * @param ignoreMissingResources the ignoreMissingResources to set
+   * @param ignoreMissingResources
+   *          the ignoreMissingResources to set
+   * @VisibleForTesting
    */
-  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
+  void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
   }
 
-
   /**
    * @return the minimize
+   * @VisibleForTesting
    */
-  public boolean isMinimize() {
+  boolean isMinimize() {
     return this.minimize;
   }
 
-
   /**
    * @return the ignoreMissingResources
+   * @VisibleForTesting
    */
-  public boolean isIgnoreMissingResources() {
+  boolean isIgnoreMissingResources() {
     return this.ignoreMissingResources;
   }
 
   /**
    * Used for testing.
    *
-   * @param mavenProject the mavenProject to set
+   * @param mavenProject
+   *          the mavenProject to set
    */
   void setMavenProject(final MavenProject mavenProject) {
     this.mavenProject = mavenProject;
@@ -501,29 +577,36 @@ public abstract class AbstractWro4jMojo extends AbstractMojo {
 
   /**
    * @return the targetGroups
+   * @VisibleForTesting
    */
-  public String getTargetGroups() {
+  String getTargetGroups() {
     return this.targetGroups;
   }
 
   /**
-   * @param versionEncoder(targetGroups) comma separated group names.
+   * @param versionEncoder
+   *          (targetGroups) comma separated group names.
+   * @VisibleForTesting
    */
-  public void setTargetGroups(final String targetGroups) {
+  void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
   }
 
   /**
-   * @param wroManagerFactory fully qualified name of the {@link WroManagerFactory} class.
+   * @param wroManagerFactory
+   *          fully qualified name of the {@link WroManagerFactory} class.
+   * @VisibleForTesting
    */
-  public void setWroManagerFactory(final String wroManagerFactory) {
+  void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
   }
 
   /**
-   * @param extraConfigFile the extraConfigFile to set
+   * @param extraConfigFile
+   *          the extraConfigFile to set
+   * @VisibleForTesting
    */
-  public void setExtraConfigFile(final File extraConfigFile) {
+  void setExtraConfigFile(final File extraConfigFile) {
     this.extraConfigFile = extraConfigFile;
   }
 

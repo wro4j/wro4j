@@ -1,11 +1,17 @@
 Wro4j Grails Plugin
 ====================
 
-This version is a working SNAPSHOT. You will have to install the plugin using the ZIP archive full path:
+Install the plugin by using:
 
-    wget http://xxx/grails-wro4j-1.4.0-SNAPSHOT.zip
-    grails install-plugin grails-wro4j-1.4.0-SNAPSHOT.zip
+    grails install-plugin wro4j
 
+Or, install the plugin by adding the following to BuildConfig.groovy:
+
+    grails.project.dependency.resolution {
+       plugins {
+          compile ':wro4j:latest.release'
+       }
+    }
 
 Web Resource Optimizer for Grails
 ----------------------------------
@@ -14,10 +20,7 @@ Web Resource Optimizer for Grails
 In order to get started with wro4j, you have to follow only 3 simple steps.
 
 
-Step 1: Install plugin wro4j
-
-    grails install-plugin wro4j
-
+Step 1: Install the wro4j plugin
 
 
 Step 2: Create grails-app/conf/Wro.groovy
@@ -261,4 +264,9 @@ Yes, of course !!!
 
 run 'grails package-plugin'
 
-It will create a plugin archive.
+It will create a plugin archive. Note that the selenium tests require that firefox.exe be on the PATH, so be sure to add it before running anything with runs the tests.
+
+**Releasing a new version of this plugin to grails.org/plugins**
+
+run 'grails publish-plugin --no-scm'
+

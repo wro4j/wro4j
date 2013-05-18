@@ -1,0 +1,93 @@
+
+/* This layout came from http://csseasy.com with very few changes applied. */
+
+body {
+	width:950px;
+	margin:0 auto;
+	margin-top:30px;
+}
+
+/* ----- HEADER ----- */
+
+#header {
+	width:950px;
+	height:129px;
+	background:url(header.png);
+}
+
+#app_title {
+	position: relative;
+	left: 580px;
+	top: 85px;
+	width: 270px;
+	font-family: sans-serif;
+	font-family: 'arial rounded MT bold';
+	font-size: 18pt;
+	color: #009900;
+}
+
+/* ----- NAVIGATION ----- */
+
+#navigation {
+	width:950px;
+	height:40px;
+	background-color:#ffffff;
+	margin-top:10px;
+	font-family:sans-serif;
+}
+
+/* ----- MAIN CONTENT ----- */
+
+#content { 
+	width:950px;
+	background-color:#ffffff;
+	margin-top:10px;
+	min-height:500px; /* for modern browsers */
+	height:auto !important; /* for modern browsers */
+	height:500px; /* for IE5.x and IE6 */
+	font-family:sans-serif;
+}
+
+/* ----- FOOTER ----- */
+/* NOT USED */
+
+#footer { 
+	width:950px;
+	height:30px;
+	background-color:#7ccaef;
+	margin-top:10px;
+	margin-bottom: 10px;
+}
+
+/* ------- TABLE ------ */
+
+table.itemlist {
+	border-width: 1px;
+	border-spacing: ;
+	border-style: none;
+	border-color: gray;
+	border-collapse: separate;
+	background-color: white;
+}
+
+table.itemlist th {
+	border-width: 1px;
+	padding: 1px;
+	border-style: none;
+	border-color: white;
+	background-color: black;
+	color: white;
+	-moz-border-radius: ;
+}
+table.itemlist td {
+	border-width: 1px;
+	padding: 1px;
+	border-style: none;
+	border-color: white;
+	background-color: white;
+	-moz-border-radius: ;
+}
+
+/* ---- MISC ---- */
+
+.nobr { white-space:nowrap }

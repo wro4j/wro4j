@@ -1,0 +1,23 @@
+/**
+@import url("/some/url1.css");
+@import  url("/some/url.css");
+@import   url("/some/url.css");
+@import "/some/url.css";
+@import  "/some/url.css";
+@import   "/some/url.css";
+@import '/some/url.css';
+@import  '/some/url.css';
+@import   '/some/url.css';
+*/
+@import url("/some/url1.css");
+@import  url("/some/url.css");
+@import   url("/some/url.css");
+@import "/some/url.css";
+@import  "/some/url.css";
+@import   "/some/url.css";
+@import '/some/url.css';
+@import  '/some/url.css';
+@import   '/some/url.css';
+.module {
+  color: red;
+}

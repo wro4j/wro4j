@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
 /**
  * Uses the {@link HashStrategy} implementation associated with an alias read from properties file.
- * 
+ *
  * @author Alex Objelean
  * @created 17 Jun 2012
  * @since 1.4.7
@@ -23,19 +21,15 @@ public class ConfigurableHashStrategy
    * Property name to specify alias.
    */
   public static final String KEY = "hashStrategy";
-  @Inject
-  private Injector injector;
-  
+
   /**
    * {@inheritDoc}
    */
   public String getHash(final InputStream inputStream)
       throws IOException {
-    final HashStrategy hashStrategy = getConfiguredStrategy();
-    injector.inject(hashStrategy);
-    return hashStrategy.getHash(inputStream);
+    return getConfiguredStrategy().getHash(inputStream);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -43,7 +37,7 @@ public class ConfigurableHashStrategy
   protected String getStrategyKey() {
     return KEY;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -51,7 +45,7 @@ public class ConfigurableHashStrategy
   protected HashStrategy getDefaultStrategy() {
     return new SHA1HashStrategy();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -59,7 +53,7 @@ public class ConfigurableHashStrategy
   protected Map<String, HashStrategy> getStrategies(final HashStrategyProvider provider) {
     return provider.provideHashStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */

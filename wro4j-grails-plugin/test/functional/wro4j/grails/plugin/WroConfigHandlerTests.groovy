@@ -1,18 +1,11 @@
 package wro4j.grails.plugin
 
+import static org.junit.Assert.assertEquals
 import grails.test.GrailsUnitTestCase
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
-import org.junit.Assert
 
 class WroConfigHandlerTests extends GrailsUnitTestCase {
-  protected void setUp() {
-    super.setUp()
-  }
-
-  protected void tearDown() {
-    super.tearDown()
-  }
 
   def testConfigIsLoaded() {
     //when:
@@ -30,8 +23,8 @@ class WroConfigHandlerTests extends GrailsUnitTestCase {
 
   void testConfigOverrideDefaultWroConfig() {
     //expect
-    Assert.assertEquals(60, WroConfigHandler.config.cacheUpdatePeriod) //Config.groovy
-    Assert.assertEquals(0, WroConfigHandler.config.modelUpdatePeriod) //DefaultWroConfig.groovy
-    Assert.assertEquals(GrailsWroManagerFactory.name, WroConfigHandler.config.managerFactoryClassName) //default WroManagerFactory
+    assertEquals(60, WroConfigHandler.config.cacheUpdatePeriod) //Config.groovy
+    assertEquals(0, WroConfigHandler.config.modelUpdatePeriod) //DefaultWroConfig.groovy
+    assertEquals(GrailsWroManagerFactory.name, WroConfigHandler.config.managerFactoryClassName) //default WroManagerFactory
   }
 }

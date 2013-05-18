@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-parent</artifactId>
-  <version>1.6.3-SNAPSHOT</version>
+    <version>1.6.4-SNAPSHOT</version>
   <packaging>pom</packaging>  
   
   <name>wro4j parent</name>
@@ -65,12 +66,13 @@
     <commons-io.version>2.4</commons-io.version>
     <commons-lang.version>3.1</commons-lang.version>
     <commons-pool.version>1.6</commons-pool.version>
-    <closure.version>r2388</closure.version>
+    <closure.version>v20130227</closure.version>
     <slf4j.version>1.7.2</slf4j.version>    
     <maven.version>3.0.4</maven.version>    
     <mockito.version>1.9.5</mockito.version>
-    <junit.version>4.10</junit.version>    
+        <junit.version>4.11</junit.version>
     <rhino.version>1.7R3</rhino.version>
+        <spring.version>3.1.1.RELEASE</spring.version>
      
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  
@@ -130,6 +132,12 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
         <version>${maven.version}</version>
@@ -189,11 +197,6 @@
         <version>${closure.version}</version>
       </dependency>	 
       <dependency>
-        <groupId>com.github.lltyk</groupId>
-        <artifactId>dojo-shrinksafe</artifactId>
-        <version>1.7.2</version>
-      </dependency>      
-      <dependency>
         <groupId>me.n4u.sass</groupId>
         <artifactId>sass-gems</artifactId>
         <version>3.2.1</version>
@@ -201,7 +204,48 @@
       <dependency>
         <groupId>com.github.sommeri</groupId>
         <artifactId>less4j</artifactId>
-        <version>0.0.11</version>
+                <version>1.0.3</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lltyk</groupId>
+                <artifactId>dojo-shrinksafe</artifactId>
+                <version>1.7.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jruby</groupId>
+                <artifactId>jruby-complete</artifactId>
+                <version>1.6.8</version>
+            </dependency>
+            <dependency>
+                <groupId>nz.co.edmi</groupId>
+                <artifactId>bourbon-gem-jar</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.gmaven.runtime</groupId>
+                <artifactId>gmaven-runtime-1.7</artifactId>
+                <version>1.3</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.sonatype.gossip</groupId>
+                        <artifactId>gossip</artifactId>
+                    </exclusion>
+                </exclusions>
       </dependency>
       <dependency>
 	<groupId>org.webjars</groupId>
@@ -221,6 +265,21 @@
         <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>                
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
     </dependencies>        
   </dependencyManagement>
   <dependencies>
@@ -268,6 +327,12 @@
           <artifactId>maven-release-plugin</artifactId>
           <version>2.2.1</version>
         </plugin>    
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.3.7</version>
+                    <extensions>true</extensions>
+                </plugin>
       </plugins>
     </pluginManagement>  
     <plugins>        
@@ -361,6 +426,7 @@
         <module>wro4j-extensions</module>
         <module>wro4j-maven-plugin</module>
         <module>wro4j-runner</module>           
+                <module>wro4j-osgi</module>
       </modules>
     </profile>  
     <profile>
@@ -374,6 +440,7 @@
         <module>wro4j-maven-plugin</module>
         <module>wro4j-runner</module>           
         <module>wro4j-examples</module>        
+                <module>wro4j-osgi</module>
       </modules>
     </profile>  
     <profile>
@@ -385,6 +452,7 @@
         <module>wro4j-core</module>          
         <module>wro4j-extensions</module>
         <module>wro4j-maven-plugin</module>
+                <module>wro4j-osgi</module>
       </modules>
     </profile>    
     <profile>
@@ -401,6 +469,7 @@
         <module>wro4j-core</module>    
         <module>wro4j-extensions</module>
         <module>wro4j-maven-plugin</module>
+                <module>wro4j-osgi</module>
       </modules>
 
       <build>      
@@ -440,6 +509,11 @@
               <updateReleaseInfo>true</updateReleaseInfo>
             </configuration>
           </plugin>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <version>2.3.7</version>
+                    </plugin>
         </plugins>
       </build>
       <distributionManagement>
@@ -456,12 +530,4 @@
       </distributionManagement>      
     </profile>
   </profiles>  
-  <!-- Repository for third party libraries 
-  <repositories>
-    <repository>
-      <id>Sonatype</id>
-      <url>http://oss.sonatype.org/content/groups/public</url>
-    </repository>
-  </repositories>
-  -->
 </project>
