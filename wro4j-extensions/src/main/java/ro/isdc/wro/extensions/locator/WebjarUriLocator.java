@@ -6,7 +6,7 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.webjars.AssetLocator;
+import org.webjars.WebJarAssetLocator;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -34,6 +34,8 @@ public class WebjarUriLocator
    */
   public static final String PREFIX = format("%s:", ALIAS);
   private final UriLocator classpathLocator = new ClasspathUriLocator();
+  private final WebJarAssetLocator webjarAssetLocator = new WebJarAssetLocator();
+
 
   /**
    * @return the uri which is acceptable by this locator.
@@ -49,7 +51,7 @@ public class WebjarUriLocator
   public InputStream locate(final String uri)
       throws IOException {
     try {
-      final String fullpath = AssetLocator.getFullPath(extractPath(uri));
+      final String fullpath = webjarAssetLocator.getFullPath(extractPath(uri));
       return classpathLocator.locate(ClasspathUriLocator.createUri(fullpath));
     } catch (final Exception e) {
       throw new IOException("No webjar with uri: " + uri + " available.", e);
