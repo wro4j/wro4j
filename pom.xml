@@ -2,28 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-parent</artifactId>
     <version>1.6.4-SNAPSHOT</version>
     <packaging>pom</packaging>
-
     <name>wro4j parent</name>
     <inceptionYear>2008</inceptionYear>
     <url>http://code.google.com/p/wro4j/</url>
-
     <description>
      The purpose of this project is to reduce the number of requests 
      needed to load a page and the amount of data to transfer to clients, 
      achieving drastic improvement of loading times. The resources can be benefit 
      also from minification and compression.
-    </description>
-
+  </description>
     <issueManagement>
         <system>googleCode</system>
         <url>http://code.google.com/p/wro4j/issues/list</url>
     </issueManagement>
-
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -31,13 +26,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
     <scm>
         <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>
         <url>http://github.com/alexo/wro4j.git</url>
     </scm>
-
     <mailingLists>
         <mailingList>
             <name>Discussion Group</name>
@@ -45,7 +38,6 @@
             <archive>http://groups.google.com/group/wro4j</archive>
         </mailingList>
     </mailingLists>
-
     <developers>
         <developer>
             <id>alex.objelean</id>
@@ -60,30 +52,26 @@
             <timezone>+2</timezone>
         </developer>
     </developers>
-
     <properties>
         <wro4j.version>1.5.1-SNAPSHOT</wro4j.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>3.1</commons-lang.version>
         <commons-pool.version>1.6</commons-pool.version>
-        <closure.version>v20130227</closure.version>
+        <closure.version>v20130411</closure.version>
         <slf4j.version>1.7.2</slf4j.version>
         <maven.version>3.0.4</maven.version>
         <mockito.version>1.9.5</mockito.version>
         <junit.version>4.11</junit.version>
         <rhino.version>1.7R3</rhino.version>
         <spring.version>3.1.1.RELEASE</spring.version>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compile.encoding>UTF-8</maven.compile.encoding>
         <maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
     </properties>
-
-
     <dependencyManagement>
         <dependencies>
-            <!-- Project Dependencies -->
+      <!-- Project Dependencies -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wro4j-core</artifactId>
@@ -103,8 +91,8 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <!-- Other Dependencies -->
+            </dependency>      
+      <!-- Other Dependencies -->
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
@@ -172,7 +160,7 @@
                 <version>1.1</version>
                 <scope>test</scope>
             </dependency>
-            <!-- Provided by container -->
+      <!-- Provided by container -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
@@ -185,7 +173,7 @@
                 <version>2.0</version>
                 <scope>provided</scope>
             </dependency>
-            <!-- Third Party Tools -->
+      <!-- Third Party Tools -->
             <dependency>
                 <groupId>org.mozilla</groupId>
                 <artifactId>rhino</artifactId>
@@ -247,7 +235,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- Unit tests -->
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>webjars-locator</artifactId>
+                <version>0.4</version>
+            </dependency>
+      <!-- Unit tests -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -286,7 +279,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        <!-- For test -->
+    <!-- For test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -296,7 +289,6 @@
             <artifactId>mockito-core</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -314,7 +306,6 @@
                 </excludes>
             </resource>
         </resources>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -459,14 +450,13 @@
                     <value>true</value>
                 </property>
             </activation>
-            <!-- These modules will go to maven central repo -->
+      <!-- These modules will go to maven central repo -->
             <modules>
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
                 <module>wro4j-osgi</module>
             </modules>
-
             <build>
                 <plugins>
                     <plugin>

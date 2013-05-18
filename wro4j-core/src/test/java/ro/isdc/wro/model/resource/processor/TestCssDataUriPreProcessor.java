@@ -30,7 +30,7 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test for {@link CssDataUriPreProcessor} class.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
@@ -40,11 +40,11 @@ public class TestCssDataUriPreProcessor {
 
   protected DataUriGenerator createMockDataUriGenerator() {
     try {
-      DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
+      final DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
       Mockito.when(uriGenerator.generateDataURI(Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(
           "data:image/png;base64,iVBORw0KG");
       return uriGenerator;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException("Cannot create DataUriGenerator mock", e);
     }
   }
@@ -69,24 +69,24 @@ public class TestCssDataUriPreProcessor {
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
-  
+
   /**
    * @return a locator factory which handles absolute url locations and failed servletContext relative url's by serving
    *         proxy resources from classpath. This is useful to make test pass without internet connection.
    */
   private UriLocatorFactory createLocatorFactory() {
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(
         new ServletContextUriLocator() {
           @Override
           public InputStream locate(final String uri)
               throws IOException {
             try {
               return super.locate(uri);
-            } catch (Exception e) {
+            } catch (final Exception e) {
               return new ClasspathUriLocator().locate(PROXY_RESOURCE_PATH + "test1.png");
             }
           }
-        }).addUriLocator(new UrlUriLocator() {
+        }).addLocator(new UrlUriLocator() {
       @Override
       public InputStream locate(final String uri)
           throws IOException {
@@ -109,7 +109,7 @@ public class TestCssDataUriPreProcessor {
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-  
+
   @Test
   public void shouldTransformLargeResources()
       throws Exception {
@@ -117,12 +117,12 @@ public class TestCssDataUriPreProcessor {
     initProcessor(processor);
 
     final URL url = getClass().getResource("dataUri");
-    
+
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedLarge");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-  
+
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);

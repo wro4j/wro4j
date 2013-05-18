@@ -308,7 +308,7 @@ public class TestPreProcessorExecutor {
         return new ByteArrayInputStream("".getBytes());
       }
     };
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(emptyStreamLocator);
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(emptyStreamLocator);
     //init executor
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory);
     InjectorBuilder.create(managerFactory).build().inject(victim);
