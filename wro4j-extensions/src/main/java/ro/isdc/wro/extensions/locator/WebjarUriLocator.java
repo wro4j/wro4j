@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 import org.webjars.WebJarAssetLocator;
 
@@ -34,7 +35,17 @@ public class WebjarUriLocator
    */
   public static final String PREFIX = format("%s:", ALIAS);
   private final UriLocator classpathLocator = new ClasspathUriLocator();
-  private final WebJarAssetLocator webjarAssetLocator = new WebJarAssetLocator();
+  private final WebJarAssetLocator webjarAssetLocator = newWebJarAssetLocator();
+
+
+  /**
+   * @return an instance of {@link WebJarAssetLocator} to be used for identifying the fully qualified name of resources
+   *         based on provided partial path.
+   */
+  private WebJarAssetLocator newWebJarAssetLocator() {
+    return new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(
+        Pattern.compile(".*"), Thread.currentThread().getContextClassLoader()));
+  }
 
 
   /**

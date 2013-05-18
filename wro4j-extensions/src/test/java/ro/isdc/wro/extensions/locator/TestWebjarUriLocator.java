@@ -49,8 +49,8 @@ public class TestWebjarUriLocator {
   public void shouldFindValidWebjar()
       throws Exception {
     assertNotEmpty(victim.locate("webjar:jquery.js"));
-    assertNotEmpty(victim.locate("webjar:jquery/1.8.3/jquery.js"));
-    assertNotEmpty(victim.locate("webjar:/jquery/1.8.3/jquery.js"));
+    assertNotEmpty(victim.locate("webjar:jquery/2.0.0/jquery.js"));
+    assertNotEmpty(victim.locate("webjar:/jquery/2.0.0/jquery.js"));
   }
 
   @Test(expected = IOException.class)
@@ -63,10 +63,5 @@ public class TestWebjarUriLocator {
       throws IOException {
     IOUtils.read(stream, new byte[] {});
     stream.close();
-  }
-
-  @Test
-  public void test() throws Exception {
-    System.out.println(IOUtils.toString(victim.locate("webjar:jquery.js")));
   }
 }

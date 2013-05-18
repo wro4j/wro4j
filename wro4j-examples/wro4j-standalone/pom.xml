@@ -50,6 +50,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <ignoreMissingResources>false</ignoreMissingResources>
                     <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
                 </configuration>
             </plugin>
