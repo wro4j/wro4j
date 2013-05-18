@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.resource.locator.factory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
    *
    * @param locators list of {@link UriLocator} arguments.
    */
-  public final SimpleUriLocatorFactory addUriLocator(final UriLocator... locators) {
+  public final SimpleUriLocatorFactory addLocator(final UriLocator... locators) {
     for (final UriLocator locator : locators) {
       uriLocators.add(locator);
     }
@@ -47,7 +48,24 @@ public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
   }
 
   /**
+   * Use {@link SimpleUriLocatorFactory#addLocator(UriLocator...)} instead.
+   */
+  @Deprecated
+  public final SimpleUriLocatorFactory addUriLocator(final UriLocator... locators) {
+    return addLocator(locators);
+  }
+
+  /**
+   * @param locators {@link Collection} of locators to add.
+   */
+  public final SimpleUriLocatorFactory addLocators(final Collection<UriLocator> locators) {
+    uriLocators.addAll(locators);
+    return this;
+  }
+
+  /**
    * @return the list of currently configured locators.
+   * @VisibleForTesting
    */
   public List<UriLocator> getUriLocators() {
     return Collections.unmodifiableList(this.uriLocators);

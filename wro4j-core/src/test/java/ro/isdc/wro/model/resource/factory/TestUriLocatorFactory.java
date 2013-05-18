@@ -35,14 +35,14 @@ public class TestUriLocatorFactory {
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenNoCapableLocatorAvailable()
       throws Exception {
-    factory.addUriLocator(new ClasspathUriLocator());
+    factory.addLocator(new ClasspathUriLocator());
     factory.locate("http://www.google.com");
   }
 
   @Test
   public void testValidUri()
       throws Exception {
-    factory.addUriLocator(new ClasspathUriLocator());
+    factory.addLocator(new ClasspathUriLocator());
     Assert.assertNotNull(factory.locate("classpath:" + WroUtil.toPackageAsFolder(TestUriLocatorFactory.class)));
   }
 }

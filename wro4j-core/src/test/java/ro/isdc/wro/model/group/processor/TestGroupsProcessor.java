@@ -99,7 +99,7 @@ public class TestGroupsProcessor {
     final Group group = new Group(groupName).addResource(Resource.create("1.js")).addResource(Resource.create("2.js"));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(group));
     // the locator which returns the name of the resource as its content
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addUriLocator(new UriLocator() {
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(new UriLocator() {
       public boolean accept(final String uri) {
         return true;
       }
