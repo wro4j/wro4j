@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 
 /**
  * A {@link ProcessorsFactory} implementation which is easy to configure using a {@link Properties} object.
- * 
+ *
  * @author Alex Objelean
  * @created 30 Jul 2011
  * @since 1.4.0
@@ -34,7 +34,7 @@ public class ConfigurableLocatorFactory
    * Name of init param used to specify uri locators.
    */
   public static final String PARAM_URI_LOCATORS = "uriLocators";
-  
+
   private final ResourceLocatorFactory locatorFactory = newLocatorFactory();
 
   /**
@@ -44,7 +44,7 @@ public class ConfigurableLocatorFactory
   protected String getStrategyKey() {
     return PARAM_URI_LOCATORS;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -52,14 +52,14 @@ public class ConfigurableLocatorFactory
   protected Map<String, ResourceLocatorFactory> getStrategies(final LocatorProvider provider) {
     return provider.provideLocators();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public ResourceLocator getLocator(final String uri) {
     return locatorFactory.getLocator(uri);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -67,18 +67,18 @@ public class ConfigurableLocatorFactory
       throws IOException {
     return new AutoCloseInputStream(locatorFactory.locate(uri));
   }
-  
+
   /**
    * {@inheritDoc}
    */
-  private UriLocatorFactory newLocatorFactory() {
-    final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
-    final List<UriLocator> locators = getConfiguredStrategies();
-    for (final UriLocator locator : locators) {
-      factory.addLocator(locator);
+  private ResourceLocatorFactory newLocatorFactory() {
+    final SimpleResourceLocatorFactory factory = new SimpleResourceLocatorFactory();
+    final List<ResourceLocatorFactory> locatorFactories = getConfiguredStrategies();
+    for (final ResourceLocatorFactory locatorFactory : locatorFactories) {
+      factory.addFactory(locatorFactory);
     }
     // use default when none provided
-    if (locators.isEmpty()) {
+    if (locatorFactories.isEmpty()) {
       LOG.debug("No locators configured. Using Default locator factory.");
       return new DefaultResourceLocatorFactory();
     }
@@ -91,7 +91,7 @@ public class ConfigurableLocatorFactory
   public ResourceLocator getInstance(final String uri) {
     return locatorFactory.getLocator(uri);
   }
-  
+
   /**
    * {@inheritDoc}
    */

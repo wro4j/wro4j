@@ -7,18 +7,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.extensions.locator.WebjarUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
 
 
 /**
  * @author Alex Objelean
  */
 public class TestDefaultUriLocatorFactory {
-  private DefaultUriLocatorFactory victim;
+  private DefaultResourceLocatorFactory victim;
 
   @Before
   public void setUp() {
-    victim = new DefaultUriLocatorFactory();
+    victim = new DefaultResourceLocatorFactory();
   }
 
   @Test
@@ -29,7 +29,7 @@ public class TestDefaultUriLocatorFactory {
   @Test
   public void shouldContainWebjarLocator() {
     boolean hasWebjarLocator = false;
-    for (final UriLocator locator : victim.getUriLocators()) {
+    for (final ResourceLocator locator : victim.getUriLocators()) {
       if (locator instanceof WebjarUriLocator) {
         hasWebjarLocator = true;
       }

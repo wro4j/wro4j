@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 
 import org.webjars.WebJarAssetLocator;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 
 /**
@@ -25,7 +25,7 @@ import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
  * @since 1.6.2
  */
 public class WebjarUriLocator
-    implements UriLocator {
+    implements ResourceLocator {
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
@@ -34,9 +34,7 @@ public class WebjarUriLocator
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
   public static final String PREFIX = format("%s:", ALIAS);
-  private final UriLocator classpathLocator = new ClasspathUriLocator();
   private final WebJarAssetLocator webjarAssetLocator = newWebJarAssetLocator();
-
 
   /**
    * @return an instance of {@link WebJarAssetLocator} to be used for identifying the fully qualified name of resources
@@ -55,6 +53,7 @@ public class WebjarUriLocator
     notNull(path);
     return PREFIX + path;
   }
+
   /**
    * {@inheritDoc}
    */
@@ -63,7 +62,7 @@ public class WebjarUriLocator
       throws IOException {
     try {
       final String fullpath = webjarAssetLocator.getFullPath(extractPath(uri));
-      return classpathLocator.locate(ClasspathUriLocator.createUri(fullpath));
+      return new ClasspathResourceLocator(ClasspathResourceLocator.createUri(fullpath)).getInputStream();
     } catch (final Exception e) {
       throw new IOException("No webjar with uri: " + uri + " available.", e);
     }

@@ -9,7 +9,7 @@ import ro.isdc.wro.extensions.processor.support.DefaultProcessorProvider;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.spi.RequestHandlerProvider;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
@@ -67,7 +67,7 @@ public class DefaultConfigurableProvider
    * {@inheritDoc}
    */
   @Override
-  public Map<String, UriLocator> provideLocators() {
+  public Map<String, ResourceLocatorFactory> provideLocators() {
     return locatorProvider.provideLocators();
   }
 

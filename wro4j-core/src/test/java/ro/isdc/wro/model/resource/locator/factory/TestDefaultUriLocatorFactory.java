@@ -5,20 +5,20 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator.LocatorStrategy;
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.LocatorStrategy;
 
 
 /**
  * @author Alex Objelean
  */
 public class TestDefaultUriLocatorFactory {
-  private DefaultUriLocatorFactory victim;
+  private DefaultResourceLocatorFactory victim;
 
   @Before
   public void setUp() {
-    victim = new DefaultUriLocatorFactory();
+    victim = new DefaultResourceLocatorFactory();
   }
 
   @Test
@@ -28,9 +28,9 @@ public class TestDefaultUriLocatorFactory {
 
   @Test
   public void shouldUseServletContextLocatorWithPreferredLocatorStrategy() {
-    for (final UriLocator locator : victim.getUriLocators()) {
-      if (locator instanceof ServletContextUriLocator) {
-        assertEquals(LocatorStrategy.DISPATCHER_FIRST, ((ServletContextUriLocator) locator).getLocatorStrategy());
+    for (final ResourceLocator locator : victim.getUriLocators()) {
+      if (locator instanceof ServletContextResourceLocator) {
+        assertEquals(LocatorStrategy.DISPATCHER_FIRST, ((ServletContextResourceLocator) locator).getLocatorStrategy());
         return;
       }
     }

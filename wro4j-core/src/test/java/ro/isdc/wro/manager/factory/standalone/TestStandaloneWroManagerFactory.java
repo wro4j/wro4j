@@ -6,9 +6,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.SimpleResourceLocatorFactory;
 
 /**
  * @author Alex Objelean
@@ -23,9 +23,9 @@ public class TestStandaloneWroManagerFactory {
 
   @Test
   public void shouldHaveMoreLocatorsThanDefaultFactoryHas() {
-    final UriLocatorFactory locatorFactory = victim.newUriLocatorFactory();
-    final List<?> availableLocators = ((SimpleUriLocatorFactory) locatorFactory).getUriLocators();
-    final List<?> defaultLocators = new DefaultUriLocatorFactory().getUriLocators();
+    final ResourceLocatorFactory locatorFactory = victim.newLocatorFactory();
+    final List<?> availableLocators = ((SimpleResourceLocatorFactory) locatorFactory).getUriLocators();
+    final List<?> defaultLocators = new DefaultResourceLocatorFactory().getUriLocators();
     Assert.assertTrue(availableLocators.size() > defaultLocators.size());
   }
 }
