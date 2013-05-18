@@ -71,11 +71,11 @@ public class ConfigurableLocatorFactory
   /**
    * {@inheritDoc}
    */
-  private ResourceLocatorFactory newLocatorFactory() {
-    final SimpleResourceLocatorFactory factory = new SimpleResourceLocatorFactory();
-    final List<ResourceLocatorFactory> locators = getConfiguredStrategies();
-    for (final ResourceLocatorFactory locatorFactory : locators) {
-      factory.addFactory(locatorFactory);
+  private UriLocatorFactory newLocatorFactory() {
+    final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
+    final List<UriLocator> locators = getConfiguredStrategies();
+    for (final UriLocator locator : locators) {
+      factory.addLocator(locator);
     }
     // use default when none provided
     if (locators.isEmpty()) {

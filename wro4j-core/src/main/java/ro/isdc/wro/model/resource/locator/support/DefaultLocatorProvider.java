@@ -1,7 +1,7 @@
 package ro.isdc.wro.model.resource.locator.support;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
@@ -26,7 +26,7 @@ public class DefaultLocatorProvider
    * {@inheritDoc}
    */
   public Map<String, ResourceLocatorFactory> provideLocators() {
-    final Map<String, ResourceLocatorFactory> map = new HashMap<String, ResourceLocatorFactory>();
+    final Map<String, ResourceLocatorFactory> map = new TreeMap<String, ResourceLocatorFactory>();
     map.put(ClasspathResourceLocator.ALIAS, new ClasspathResourceLocatorFactory());
     map.put(ServletContextResourceLocator.ALIAS, new ServletContextResourceLocatorFactory());
     map.put(ServletContextResourceLocator.ALIAS_DISPATCHER_FIRST, new ServletContextResourceLocatorFactory() {

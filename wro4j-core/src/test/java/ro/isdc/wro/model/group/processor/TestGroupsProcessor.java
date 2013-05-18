@@ -104,13 +104,13 @@ public class TestGroupsProcessor {
       public ResourceLocator getLocator(final String uri) {
         return new AbstractResourceLocator() {
           public InputStream getInputStream()
-              throws IOException {
-            return new ByteArrayInputStream(uri.getBytes());
-          }
+          throws IOException {
+        return new ByteArrayInputStream(uri.getBytes());
+      }
         };
       }
     };
-    
+
     final ResourceProcessor failingPreProcessor = new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -136,7 +136,7 @@ public class TestGroupsProcessor {
     final CssMinProcessor cssMinProcessor = Mockito.spy(new CssMinProcessor());
     final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory();
     managerFactory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(cssMinProcessor));
-    managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("g1").addResource(Resource.create("script.js")))));
+    managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("g1").addResource(Resource.create("/script.js")))));
     initVictim(new WroConfiguration(), managerFactory);
 
     victim.process(new CacheKey("g1", ResourceType.JS, true));
@@ -149,7 +149,7 @@ public class TestGroupsProcessor {
     final JSMinProcessor cssMinProcessor = Mockito.spy(new JSMinProcessor());
     final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory();
     managerFactory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(cssMinProcessor));
-    managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("g1").addResource(Resource.create("script.js")))));
+    managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("g1").addResource(Resource.create("/script.js")))));
     initVictim(new WroConfiguration(), managerFactory);
 
     victim.process(new CacheKey("g1", ResourceType.JS, true));

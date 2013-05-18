@@ -92,7 +92,7 @@ public class ServletContextResourceLocator
     String pathToUse = StringUtils.cleanPath(path);
     if (!pathToUse.startsWith(PREFIX)) {
       pathToUse = PREFIX + pathToUse;
-    }
+  }
     this.path = pathToUse;
   }
 
@@ -208,5 +208,13 @@ public class ServletContextResourceLocator
       LOG.debug("[FAIL] reading resource from {}", uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
+  }
+
+  /**
+   * @return the strategy used by this locator.
+   * @VisibleForTesting
+   */
+  public LocatorStrategy getLocatorStrategy() {
+    return locatorStrategy;
   }
 }

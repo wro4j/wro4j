@@ -3,6 +3,9 @@
  */
 package ro.isdc.wro.model.resource.locator.support;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +41,15 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link ResourceLocator} implementation.
    */
-  public static final String PREFIX = "classpath:";
+  public static final String PREFIX = format("%s:", ALIAS);
+
+  /**
+   * @return the uri which is acceptable by this locator.
+   */
+  public static String createUri(final String path) {
+    notNull(path);
+    return PREFIX + path;
+  }
   /**
    * Classpath location. This value is expected to be prefixed with "classpath:" value.
    */
@@ -70,7 +81,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
    * {@inheritDoc}
    */
   public InputStream getInputStream()
-    throws IOException {
+      throws IOException {
     LOG.debug("Reading uri: {}", path);
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
@@ -88,7 +99,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
    * @return an input stream for an uri containing a wildcard for a given location.
    */
   private InputStream locateWildcardStream(final String uri, final String location)
-    throws IOException {
+      throws IOException {
     LOG.debug("wildcard detected for location: {}", location);
     // prefix with '/' because we use class relative resource retrieval. Using ClassLoader.getSystemResource doesn't
     // work well.

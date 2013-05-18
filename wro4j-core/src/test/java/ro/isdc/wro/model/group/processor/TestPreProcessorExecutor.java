@@ -82,7 +82,7 @@ public class TestPreProcessorExecutor {
 
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
     Context.set(context);
-    // force parallel execution
+    //force parallel execution
     Context.get().getConfig().setParallelPreprocessing(true);
     Context.get().getConfig().setIgnoreFailingProcessor(true);
     initExecutor();
@@ -111,7 +111,7 @@ public class TestPreProcessorExecutor {
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullArguments()
-      throws Exception {
+    throws Exception {
     victim.processAndMerge(null, true);
   }
 
@@ -122,7 +122,7 @@ public class TestPreProcessorExecutor {
   private ResourceProcessor createSlowPreProcessor(final long time) {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
+        throws IOException {
         try {
           IOUtils.copy(reader, writer);
           Thread.sleep(time);
@@ -135,7 +135,7 @@ public class TestPreProcessorExecutor {
   private ResourceProcessor createProcessorUsingMissingResource() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
+        throws IOException {
         LOG.debug("executing processor which will throw IOException");
         throw new IOException("Invalid resource found!");
       }
@@ -145,7 +145,7 @@ public class TestPreProcessorExecutor {
   private ResourceProcessor createProcessorWhichFails() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
+        throws IOException {
         LOG.debug("executing failing processor...");
         throw new WroRuntimeException("Boom!");
       }
@@ -154,7 +154,7 @@ public class TestPreProcessorExecutor {
 
   @Test
   public void processEmptyList()
-      throws Exception {
+    throws Exception {
     final List<Resource> resources = new ArrayList<Resource>();
     final Group group = new Group("dummy");
     group.setResources(resources);
@@ -164,7 +164,7 @@ public class TestPreProcessorExecutor {
 
   @Test
   public void shouldNotFailWhenNoResourcesProcessed()
-      throws Exception {
+    throws Exception {
     initExecutor(createProcessorUsingMissingResource());
     victim.processAndMerge(createGroup(), true);
   }
@@ -181,7 +181,7 @@ public class TestPreProcessorExecutor {
 
   @Test(expected = IOException.class)
   public void shouldFailWhenProcessingInvalidResource()
-      throws Exception {
+    throws Exception {
     when(mockLocatorFactory.locate(Mockito.anyString())).thenThrow(IOException.class);
     Context.get().getConfig().setIgnoreMissingResources(false);
     shouldNotFailWhenProcessingInvalidResource();
@@ -189,7 +189,7 @@ public class TestPreProcessorExecutor {
 
   @Test
   public void shouldNotFailWhenProcessingInvalidResource()
-      throws IOException {
+    throws IOException {
     initExecutor(createProcessorUsingMissingResource());
     final Group group = createGroup(Resource.create("/uri", ResourceType.JS));
     final String result = victim.processAndMerge(group, true);
@@ -198,7 +198,7 @@ public class TestPreProcessorExecutor {
 
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenUsingFailingPreProcessor()
-      throws Exception {
+    throws Exception {
     Context.get().getConfig().setIgnoreFailingProcessor(false);
     useFailingPreProcessor();
   }
@@ -228,7 +228,7 @@ public class TestPreProcessorExecutor {
       throws Exception {
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     LOG.info("availableProcessors: {}", availableProcessors);
-    // test it only if number there are more than 1 CPU cores are available
+    //test it only if number there are more than 1 CPU cores are available
     if (availableProcessors > 1) {
       final StopWatch watch = new StopWatch();
       final WroConfiguration config = Context.get().getConfig();
@@ -269,7 +269,7 @@ public class TestPreProcessorExecutor {
 
   @Test
   public void shouldNotMinimizeDecoratedResourcesWithMinimizationDisabled()
-      throws Exception {
+    throws Exception {
     final Resource resource = Resource.create("classpath:1.js");
     resource.setMinimize(false);
     final ResourceProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
@@ -304,7 +304,7 @@ public class TestPreProcessorExecutor {
         return emptyStreamLocator;
       }
     };
-    // init executor
+    //init executor
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(locatorFactory);
     InjectorBuilder.create(managerFactory).build().inject(victim);
 

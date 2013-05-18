@@ -39,18 +39,18 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestCssDataUriPreProcessor {
   private final String PROXY_RESOURCE_PATH = "classpath:ro/isdc/wro/model/resource/processor/dataUri/proxyImage/";
   private ResourceProcessor processor;
-  
+
   protected DataUriGenerator createMockDataUriGenerator() {
     try {
-      DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
+      final DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
       Mockito.when(uriGenerator.generateDataURI(Mockito.any(InputStream.class), Mockito.anyString())).thenReturn(
           "data:image/png;base64,iVBORw0KG");
       return uriGenerator;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException("Cannot create DataUriGenerator mock", e);
     }
   }
-  
+
   @Before
   public void init()
       throws Exception {
@@ -63,7 +63,7 @@ public class TestCssDataUriPreProcessor {
     };
     initProcessor(processor);
   }
-  
+
   final void initProcessor(final ResourceProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setLocatorFactory(createLocatorFactory());
@@ -92,16 +92,16 @@ public class TestCssDataUriPreProcessor {
             }
           }
         };
-      }
+        }
     };
     return locatorFactory;
   }
-  
+
   @Test
   public void shouldTransformResourcesFromFolder()
       throws Exception {
     final URL url = getClass().getResource("dataUri");
-    
+
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
@@ -112,7 +112,7 @@ public class TestCssDataUriPreProcessor {
       throws Exception {
     processor = new CssDataUriPreProcessor();
     initProcessor(processor);
-    
+
     final URL url = getClass().getResource("dataUri");
     
     final File testFolder = new File(url.getFile(), "test");
