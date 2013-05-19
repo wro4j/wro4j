@@ -1,8 +1,8 @@
 package ro.isdc.wro.extensions.locator;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,38 +11,41 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.UriLocator;
+import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 
 
 /**
  * @author Alex Objelean
  */
-public class TestWebjarUriLocator {
-  private UriLocator victim;
+public class TestWebjarResourceLocator {
+  private ResourceLocatorFactory victim;
 
   @Before
   public void setUp() {
-    victim = new WebjarUriLocator();
+    victim = new WebjarResourceLocatorFactory();
   }
 
   @Test
   public void shouldCreateValidUri() {
-    assertEquals("webjar:/path/to/resource.js", WebjarUriLocator.createUri("/path/to/resource.js"));
+    assertEquals("webjar:/path/to/resource.js", WebjarResourceLocator.createUri("/path/to/resource.js"));
   }
 
   @Test(expected = NullPointerException.class)
   public void cannotCreateValidUriFromNullArgument() {
-    WebjarUriLocator.createUri(null);
+    WebjarResourceLocator.createUri(null);
   }
 
   @Test
   public void shouldAcceptKnownUri() {
-    assertTrue(victim.accept(WebjarUriLocator.createUri("/path/to/resource.js")));
+    final ResourceLocator locator = victim.getLocator(WebjarResourceLocator.createUri("/path/to/resource.js"));
+    assertNotNull(locator);
   }
 
   @Test
   public void shouldNotAcceptUnknown() {
-    assertFalse(victim.accept("http://www.server.com/path/to/resource.js"));
+    final ResourceLocator locator = victim.getLocator(WebjarResourceLocator.createUri("http://www.server.com/path/to/resource.js"));
+    assertNull(locator);
   }
 
   @Test

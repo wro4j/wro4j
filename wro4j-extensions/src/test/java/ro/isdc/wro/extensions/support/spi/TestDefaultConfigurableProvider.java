@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
 
 /**
  * @author Alex Objelean
@@ -34,6 +34,6 @@ public class TestDefaultConfigurableProvider {
 
   @Test
   public void shouldProvideWebjarLocator() {
-    assertTrue(victim.provideLocators().containsKey(WebjarUriLocator.ALIAS));
+    assertTrue(victim.provideLocators().containsKey(WebjarResourceLocator.ALIAS));
   }
 }

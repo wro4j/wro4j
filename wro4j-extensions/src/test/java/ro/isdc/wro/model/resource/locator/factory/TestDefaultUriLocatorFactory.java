@@ -6,8 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
-import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
 
 
 /**
@@ -23,14 +22,14 @@ public class TestDefaultUriLocatorFactory {
 
   @Test
   public void shouldHaveSeveralDefaultLocators() {
-    assertEquals(6, victim.getUriLocators().size());
+    assertEquals(6, victim.getLocatorFactories().size());
   }
 
   @Test
   public void shouldContainWebjarLocator() {
     boolean hasWebjarLocator = false;
-    for (final ResourceLocator locator : victim.getUriLocators()) {
-      if (locator instanceof WebjarUriLocator) {
+    for (final ResourceLocatorFactory locator : victim.getLocatorFactories()) {
+      if (locator instanceof WebjarResourceLocator) {
         hasWebjarLocator = true;
       }
     }

@@ -24,8 +24,8 @@ public class TestStandaloneWroManagerFactory {
   @Test
   public void shouldHaveMoreLocatorsThanDefaultFactoryHas() {
     final ResourceLocatorFactory locatorFactory = victim.newLocatorFactory();
-    final List<?> availableLocators = ((SimpleResourceLocatorFactory) locatorFactory).getUriLocators();
-    final List<?> defaultLocators = new DefaultResourceLocatorFactory().getUriLocators();
+    final List<?> availableLocators = ((SimpleResourceLocatorFactory) locatorFactory).getLocatorFactories();
+    final List<?> defaultLocators = new DefaultResourceLocatorFactory().getLocatorFactories();
     Assert.assertTrue(availableLocators.size() > defaultLocators.size());
   }
 }

@@ -3,7 +3,8 @@ package ro.isdc.wro.extensions.locator.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocatorFactory;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.util.Ordered;
@@ -24,7 +25,7 @@ public class DefaultLocatorProvider
   @Override
   public Map<String, ResourceLocatorFactory> provideLocators() {
     final Map<String, ResourceLocatorFactory> map = new HashMap<String, ResourceLocatorFactory>();
-    map.put(WebjarUriLocator.ALIAS, new WebjarUriLocator());
+    map.put(WebjarResourceLocator.ALIAS, new WebjarResourceLocatorFactory());
     return map;
   }
 
