@@ -52,6 +52,7 @@ public class CoffeeScript {
     }
   }
 
+
   /**
    * Override this method to use a different version of CoffeeScript. This method is useful for upgrading coffeeScript
    * processor independently of wro4j.
@@ -66,7 +67,7 @@ public class CoffeeScript {
   /**
    * @return {@link WebjarUriLocator} instance to retrieve webjars.
    */
-  protected final WebjarUriLocator getWebjarLocator() {
+  private WebjarUriLocator getWebjarLocator() {
     if (webjarLocator == null) {
       webjarLocator = new WebjarUriLocator();
     }

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -32,6 +33,7 @@ public class LessCss {
   public static final String DEFAULT_LESS_JS = "less-1.3.3.min.js";
   private static final String SCRIPT_RUN = "run.js";
   private static final String SCRIPT_INIT = "init.js";
+  private WebjarUriLocator webjarLocator;
   private ScriptableObject scope;
 
   /**
@@ -61,17 +63,26 @@ public class LessCss {
   /**
    * @return the stream of the script responsible for invoking the less transformation javascript code.
    */
-  protected InputStream getRunScriptAsStream() {
+  protected InputStream getRunScriptAsStream() throws IOException {
     return LessCss.class.getResourceAsStream(SCRIPT_RUN);
   }
 
   /**
    * @return stream of the less.js script.
    */
-  protected InputStream getScriptAsStream() {
-    return LessCss.class.getResourceAsStream(DEFAULT_LESS_JS);
+  protected InputStream getScriptAsStream() throws IOException {
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("less.min.js"));
   }
 
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  private WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
+  }
 
   /**
    * @param data css content to process.
