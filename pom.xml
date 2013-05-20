@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>   
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-parent</artifactId>
@@ -14,7 +19,7 @@
      needed to load a page and the amount of data to transfer to clients, 
      achieving drastic improvement of loading times. The resources can be benefit 
      also from minification and compression.
-  </description>
+    </description>
     <issueManagement>
         <system>googleCode</system>
         <url>http://code.google.com/p/wro4j/issues/list</url>
@@ -71,7 +76,7 @@
     </properties>
     <dependencyManagement>
         <dependencies>
-      <!-- Project Dependencies -->
+ 	    <!-- Project Dependencies -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wro4j-core</artifactId>
@@ -311,7 +316,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.2.1</version>
+                    <version>2.3.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
@@ -403,7 +408,7 @@
     </reporting>
     <profiles>
         <profile>
-            <id>no-examples</id>
+            <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -411,8 +416,6 @@
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
-                <module>wro4j-runner</module>
-                <module>wro4j-osgi</module>
             </modules>
         </profile>
         <profile>
@@ -428,91 +431,6 @@
                 <module>wro4j-examples</module>
                 <module>wro4j-osgi</module>
             </modules>
-        </profile>
-        <profile>
-            <id>install</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>wro4j-core</module>
-                <module>wro4j-extensions</module>
-                <module>wro4j-maven-plugin</module>
-                <module>wro4j-osgi</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>release</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>release</name>
-                    <value>true</value>
-                </property>
-            </activation>
-      <!-- These modules will go to maven central repo -->
-            <modules>
-                <module>wro4j-core</module>
-                <module>wro4j-extensions</module>
-                <module>wro4j-maven-plugin</module>
-                <module>wro4j-osgi</module>
-            </modules>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.4</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <inherited>true</inherited>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <inherited>true</inherited>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <configuration>
-                            <updateReleaseInfo>true</updateReleaseInfo>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <version>2.3.7</version>
-                    </plugin>
-                </plugins>
-            </build>
-            <distributionManagement>
-                <repository>
-                    <id>sonatype-nexus-staging</id>
-                    <name>Nexus Release Repository</name>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-                <snapshotRepository>
-                    <id>sonatype-nexus-snapshots</id>
-                    <name>Sonatype Nexus Snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-            </distributionManagement>
         </profile>
     </profiles>
 </project>
