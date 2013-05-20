@@ -53,8 +53,9 @@ public abstract class AbstractLinter {
 
   /**
    * @return the stream of the linter script. Override this method to provide a different script version.
+   * @throws IOException if the stream is invalid or unavailable.
    */
-  protected abstract InputStream getScriptAsStream();
+  protected abstract InputStream getScriptAsStream() throws IOException;
 
   /**
    * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the

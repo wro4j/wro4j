@@ -3,7 +3,10 @@
  */
 package ro.isdc.wro.extensions.processor.support.linter;
 
+import java.io.IOException;
 import java.io.InputStream;
+
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 
 
 /**
@@ -15,18 +18,14 @@ import java.io.InputStream;
  * @since 1.4.2
  */
 public class JsLint extends AbstractLinter {
-  /**
-   * The name of the jshint script to be used by default.
-   */
-  private static final String DEFAULT_JSLINT_JS = "jslint.min.js";
-
+  private final WebjarUriLocator webjarLocator = new WebjarUriLocator();
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.
    */
   @Override
-  protected InputStream getScriptAsStream() {
+  protected InputStream getScriptAsStream() throws IOException {
     //this resource is packed with packerJs compressor
-    return JsLint.class.getResourceAsStream(DEFAULT_JSLINT_JS);
+    return webjarLocator.locate(WebjarUriLocator.createUri("jslint.js"));
   }
 
   /**

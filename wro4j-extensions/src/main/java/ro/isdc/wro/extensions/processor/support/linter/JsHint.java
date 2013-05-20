@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.extensions.processor.support.linter;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -26,7 +27,7 @@ public class JsHint extends AbstractLinter {
    * @return the stream of the jshint script. Override this method to provide a different script version.
    */
   @Override
-  protected InputStream getScriptAsStream() {
+  protected InputStream getScriptAsStream() throws IOException {
     //this resource is packed with packerJs compressor
     return JsHint.class.getResourceAsStream(DEFAULT_JSHINT_JS);
   }
