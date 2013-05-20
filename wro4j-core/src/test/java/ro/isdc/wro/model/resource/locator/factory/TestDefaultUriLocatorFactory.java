@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.LocatorStrategy;
 
 
@@ -28,7 +29,8 @@ public class TestDefaultUriLocatorFactory {
   public void shouldUseServletContextLocatorWithPreferredLocatorStrategy() {
     for (final ResourceLocatorFactory locator : victim.getLocatorFactories()) {
       if (locator instanceof ServletContextResourceLocatorFactory) {
-        assertEquals(LocatorStrategy.DISPATCHER_FIRST, ((ServletContextResourceLocatorFactory) locator).getLocatorStrategy());
+        final LocatorStrategy actual = ((ServletContextResourceLocator) locator.getLocator("/someUri")).getLocatorStrategy();
+        assertEquals(LocatorStrategy.DISPATCHER_FIRST, actual);
         return;
       }
     }
