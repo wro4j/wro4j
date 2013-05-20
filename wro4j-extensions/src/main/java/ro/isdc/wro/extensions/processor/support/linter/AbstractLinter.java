@@ -32,7 +32,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
-  private final WebjarUriLocator webjarLocator = new WebjarUriLocator();
+  private WebjarUriLocator webjarLocator;
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
@@ -57,6 +57,9 @@ public abstract class AbstractLinter {
    * @return {@link WebjarUriLocator} instance to retrieve webjars.
    */
   protected final WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
     return webjarLocator;
   }
 
