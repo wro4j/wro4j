@@ -11,6 +11,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.WroUtil;
@@ -28,9 +29,10 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.6.2.min.js";
   private String[] options;
   private ScriptableObject scope;
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.6.2.min.js";
+  private WebjarUriLocator webjarLocator;
 
   /**
    * Initialize script builder for evaluation.
@@ -56,8 +58,19 @@ public class CoffeeScript {
    *
    * @return The stream of the CoffeeScript.
    */
-  protected InputStream getCoffeeScriptAsStream() {
+  protected InputStream getCoffeeScriptAsStream() throws IOException {
+    //return getWebjarLocator().locate(WebjarUriLocator.createUri("coffee-script.min.js"));
     return CoffeeScript.class.getResourceAsStream(DEFAULT_COFFE_SCRIPT);
+  }
+
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  protected final WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
   }
 
   /**
