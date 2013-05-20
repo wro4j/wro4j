@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLint;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -31,6 +32,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
+  private final WebjarUriLocator webjarLocator = new WebjarUriLocator();
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
@@ -49,6 +51,13 @@ public abstract class AbstractLinter {
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
     }
+  }
+
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  protected final WebjarUriLocator getWebjarLocator() {
+    return webjarLocator;
   }
 
   /**

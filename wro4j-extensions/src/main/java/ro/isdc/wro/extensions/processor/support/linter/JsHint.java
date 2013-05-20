@@ -30,6 +30,7 @@ public class JsHint extends AbstractLinter {
   protected InputStream getScriptAsStream() throws IOException {
     //this resource is packed with packerJs compressor
     return JsHint.class.getResourceAsStream(DEFAULT_JSHINT_JS);
+    //return getWebjarLocator().locate(WebjarUriLocator.createUri("jshint.js"));
   }
 
   /**
