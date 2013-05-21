@@ -60,8 +60,7 @@ public class CoffeeScript {
    * @return The stream of the CoffeeScript.
    */
   protected InputStream getCoffeeScriptAsStream() throws IOException {
-    //return getWebjarLocator().locate(WebjarUriLocator.createUri("coffee-script.min.js"));
-    return CoffeeScript.class.getResourceAsStream(DEFAULT_COFFE_SCRIPT);
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("coffee-script.min.js"));
   }
 
   /**
