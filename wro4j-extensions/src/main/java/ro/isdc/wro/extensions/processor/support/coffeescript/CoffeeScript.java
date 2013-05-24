@@ -11,6 +11,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.WroUtil;
@@ -21,16 +22,17 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The coffee-script version is used <code>1.6.2</code>: {@link https://github.com/jashkenas/coffee-script}.
+ * This processor loads coffee-script library from the webjar.
  *
  * @author Alex Objelean
  * @since 1.3.6
  */
 public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.6.2.min.js";
   private String[] options;
   private ScriptableObject scope;
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.6.2.min.js";
+  private WebjarUriLocator webjarLocator;
 
   /**
    * Initialize script builder for evaluation.
@@ -50,14 +52,25 @@ public class CoffeeScript {
     }
   }
 
+
   /**
    * Override this method to use a different version of CoffeeScript. This method is useful for upgrading coffeeScript
    * processor independently of wro4j.
    *
    * @return The stream of the CoffeeScript.
    */
-  protected InputStream getCoffeeScriptAsStream() {
-    return CoffeeScript.class.getResourceAsStream(DEFAULT_COFFE_SCRIPT);
+  protected InputStream getCoffeeScriptAsStream() throws IOException {
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("coffee-script.min.js"));
+  }
+
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  private WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
   }
 
   /**

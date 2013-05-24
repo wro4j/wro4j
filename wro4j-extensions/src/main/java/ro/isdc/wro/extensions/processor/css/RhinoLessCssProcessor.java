@@ -104,9 +104,7 @@ import ro.isdc.wro.util.ObjectFactory;
 public class RhinoLessCssProcessor
   implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoLessCssProcessor.class);
-
   public static final String ALIAS = "rhinoLessCss";
-
   private ObjectPoolHelper<LessCss> enginePool;
 
   public RhinoLessCssProcessor() {
