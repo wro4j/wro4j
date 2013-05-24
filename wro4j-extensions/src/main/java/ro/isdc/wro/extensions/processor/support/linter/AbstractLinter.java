@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLint;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
@@ -31,6 +32,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
+  private WebjarUriLocator webjarLocator;
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
@@ -52,9 +54,20 @@ public abstract class AbstractLinter {
   }
 
   /**
-   * @return the stream of the linter script. Override this method to provide a different script version.
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
    */
-  protected abstract InputStream getScriptAsStream();
+  protected final WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
+  }
+
+  /**
+   * @return the stream of the linter script. Override this method to provide a different script version.
+   * @throws IOException if the stream is invalid or unavailable.
+   */
+  protected abstract InputStream getScriptAsStream() throws IOException;
 
   /**
    * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the

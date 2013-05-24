@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webjars.WebJarAssetLocator;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -26,6 +28,7 @@ import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
  */
 public class WebjarUriLocator
     implements UriLocator {
+  private static final Logger LOG = LoggerFactory.getLogger(WebjarUriLocator.class);
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
@@ -47,7 +50,6 @@ public class WebjarUriLocator
         Pattern.compile(".*"), Thread.currentThread().getContextClassLoader()));
   }
 
-
   /**
    * @return the uri which is acceptable by this locator.
    */
@@ -61,6 +63,7 @@ public class WebjarUriLocator
   @Override
   public InputStream locate(final String uri)
       throws IOException {
+    LOG.debug("locating webjar: {}", uri);
     try {
       final String fullpath = webjarAssetLocator.getFullPath(extractPath(uri));
       return classpathLocator.locate(ClasspathUriLocator.createUri(fullpath));

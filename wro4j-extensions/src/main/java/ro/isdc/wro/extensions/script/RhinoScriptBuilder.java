@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 
 
 /**
@@ -102,7 +103,7 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addJSON() {
     try {
-      final InputStream script = getClass().getResourceAsStream(SCRIPT_JSON);
+      final InputStream script = new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js"));
       final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
 
       evaluateChain(script, SCRIPT_JSON);
@@ -112,7 +113,6 @@ public final class RhinoScriptBuilder {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);
     }
   }
-
 
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
