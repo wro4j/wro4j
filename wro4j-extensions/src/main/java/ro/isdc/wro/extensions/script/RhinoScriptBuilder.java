@@ -57,7 +57,6 @@ public final class RhinoScriptBuilder {
     return this.scope;
   }
 
-
   /**
    * Initialize the context.
    */
