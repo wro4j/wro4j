@@ -22,6 +22,7 @@ public class EmberJs
    * There is no 'exports' object in Rhino, so this file creates it, as well as an helper function
    */
   private static final String DEFAULT_HEADLESS_RHINO_JS = "headless-rhino.js";
+  private WebjarUriLocator webjarLocator;
 
   /**
    * visible for testing, the init of a HandlebarsJs template
@@ -32,22 +33,36 @@ public class EmberJs
     return String.format("(function() {Ember.TEMPLATES[%s] = Ember.Handlebars.template(%s)})();", name, precompiledFunction);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected String getCompileCommand() {
     // Function present in headless-ember
     return "precompile";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected InputStream getCompilerAsStream() throws IOException {
     final Vector<InputStream> inputStreams = new Vector<InputStream>();
-    inputStreams.add(new WebjarUriLocator().locate(WebjarUriLocator.createUri("jquery.js")));
-    inputStreams.add(new WebjarUriLocator().locate(WebjarUriLocator.createUri("handlebars.js")));
-    inputStreams.add(new WebjarUriLocator().locate(WebjarUriLocator.createUri("ember.js")));
+    inputStreams.add(getWebjarLocator().locate(WebjarUriLocator.createUri("jquery.js")));
+    inputStreams.add(getWebjarLocator().locate(WebjarUriLocator.createUri("handlebars.js")));
+    inputStreams.add(getWebjarLocator().locate(WebjarUriLocator.createUri("ember.js")));
     inputStreams.add(EmberJs.class.getResourceAsStream(DEFAULT_HEADLESS_RHINO_JS));
-    //inputStreams.add(EmberJs.class.getResourceAsStream(DEFAULT_EMBER_TEMPLATE_COMPILER_JS));
-    //inputStreams.add(fis3);
 
     return new SequenceInputStream(inputStreams.elements());
+  }
+
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  private WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
   }
 }
