@@ -10,7 +10,8 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
 
 
 /**
- * EmberJS is a framework which provide a templating engine built on top of Handlebars.
+ * EmberJS is a framework which provide a templating engine built on top of Handlebars. The emberJs library and all its
+ * dependencies are loaded from the webjar.
  *
  * @author blemoine
  */

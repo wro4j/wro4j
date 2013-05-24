@@ -103,7 +103,7 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addJSON() {
     try {
-      final InputStream script = new WebjarUriLocator().locate(WebjarUriLocator.createUri("json2.js"));
+      final InputStream script = new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js"));
       final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
 
       evaluateChain(script, SCRIPT_JSON);
@@ -113,7 +113,6 @@ public final class RhinoScriptBuilder {
       throw new RuntimeException("Couldn't initialize json2.min.js script", e);
     }
   }
-
 
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
