@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +57,9 @@ public class Less4jProcessor
       logWarnings(result);
       writer.write(result.getCss());
     } catch (final Less4jException e) {
-      LOG.error("Failed to compile less. Errors are: ");
+      LOG.error("Failed to compile less resource: {}.", resource.getUri());
       for (final Problem problem : e.getErrors()) {
-        LOG.error(ToStringBuilder.reflectionToString(problem));
+        LOG.error(problemAsString(problem));
       }
       throw WroRuntimeException.wrap(e);
     }
@@ -70,8 +69,12 @@ public class Less4jProcessor
     if (!result.getWarnings().isEmpty()) {
       LOG.warn("Less warnings are:");
       for (final Problem problem : result.getWarnings()) {
-        LOG.warn(ToStringBuilder.reflectionToString(problem));
+        LOG.warn(problemAsString(problem));
       }
     }
+  }
+
+  private String problemAsString(final Problem problem) {
+    return String.format("(Line: %s, Char: %s). Message: %s.", problem.getLine(), problem.getCharacter(), problem.getMessage());
   }
 }

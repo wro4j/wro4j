@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.css.Less4jProcessor;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.LessCssImportPreProcessor;
@@ -85,7 +86,8 @@ public class TestLess4jProcessor {
       public Void apply(final File input)
           throws Exception {
         try {
-          processor.process(null, new FileReader(input), new StringWriter());
+          processor.process(Resource.create(input.getPath(), ResourceType.CSS), new FileReader(input),
+              new StringWriter());
           Assert.fail("Expected to fail, but didn't");
         } catch (final Exception e) {
           //expected to throw exception, continue
