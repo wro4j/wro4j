@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,7 @@ import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
  */
 public class WebjarResourceLocator
     implements ResourceLocator {
-  private static final Logger LOG = LoggerFactory.getLogger(WebjarUriLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(WebjarResourceLocator.class);
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
@@ -37,8 +36,7 @@ public class WebjarResourceLocator
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
   public static final String PREFIX = format("%s:", ALIAS);
-  private final UriLocator classpathLocator = new ClasspathUriLocator();
-  private final WebJarAssetLocator webjarAssetLocator = newWebJarAssetLocator();
+  private final WebJarAssetLocator webjarAssetLocator;
 
   /**
    * @return the uri which is acceptable by this locator.
@@ -58,15 +56,6 @@ public class WebjarResourceLocator
     this.path = path;
     this.webjarAssetLocator = webjarAssetLocator;
   }
-
-  /**
-   * @return an instance of {@link WebJarAssetLocator} to be used for identifying the fully qualified name of resources
-   *         based on provided partial path.
-   */
-  private WebJarAssetLocator newWebJarAssetLocator() {
-    return new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(
-        Pattern.compile(".*"), Thread.currentThread().getContextClassLoader()));
-  }
   /**
    * {@inheritDoc}
    */
@@ -74,10 +63,6 @@ public class WebjarResourceLocator
   public ResourceLocator createRelative(final String relativePath)
       throws IOException {
     throw new UnsupportedOperationException();
-//    final String folder = FilenameUtils.getFullPath(location);
-//    // remove '../' & normalize the path.
-//    final String pathToUse = StringUtils.cleanPath(folder + relativePath);
-//    return new ClasspathResourceLocator(PREFIX + pathToUse);
   }
 
   /**
@@ -94,7 +79,7 @@ public class WebjarResourceLocator
   @Override
   public InputStream getInputStream()
       throws IOException {
-    LOG.debug("locating webjar: {}", uri);
+    LOG.debug("locating webjar: {}", path);
     try {
       final String fullpath = webjarAssetLocator.getFullPath(extractPath(path));
       return new ClasspathResourceLocator(ClasspathResourceLocator.createUri(fullpath)).getInputStream();

@@ -3,8 +3,10 @@ package ro.isdc.wro.extensions.processor.support.handlebarsjs;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocatorFactory;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 
 
 /**
@@ -17,7 +19,7 @@ public class HandlebarsJs extends AbstractJsTemplateCompiler {
   private static final String HANDLEBARS_JS_TEMPLATES_INIT = "(function() { var template = Handlebars.template, "
       + "templates = Handlebars.templates = Handlebars.templates || {};";
 
-  private WebjarUriLocator webjarLocator;
+  private ResourceLocatorFactory webjarLocatorFactory;
 
   /**
    * {@inheritDoc}
@@ -29,13 +31,13 @@ public class HandlebarsJs extends AbstractJsTemplateCompiler {
   }
 
   /**
-   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   * @return {@link ResourceLocatorFactory} instance to retrieve webjars.
    */
-  private WebjarUriLocator getWebjarLocator() {
-    if (webjarLocator == null) {
-      webjarLocator = new WebjarUriLocator();
+  private ResourceLocatorFactory getWebjarLocatorFactory() {
+    if (webjarLocatorFactory == null) {
+      webjarLocatorFactory = new WebjarResourceLocatorFactory();
     }
-    return webjarLocator;
+    return webjarLocatorFactory;
   }
 
   /**
@@ -51,6 +53,6 @@ public class HandlebarsJs extends AbstractJsTemplateCompiler {
    */
   @Override
   protected InputStream getCompilerAsStream() throws IOException {
-    return getWebjarLocator().locate(WebjarUriLocator.createUri("handlebars.js"));
+    return getWebjarLocatorFactory().locate(WebjarResourceLocator.createUri("handlebars.js"));
   }
 }

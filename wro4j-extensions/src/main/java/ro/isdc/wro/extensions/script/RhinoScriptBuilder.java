@@ -18,7 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocatorFactory;
 
 
 /**
@@ -103,7 +104,7 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addJSON() {
     try {
-      final InputStream script = new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js"));
+      final InputStream script = new WebjarResourceLocatorFactory().locate(WebjarResourceLocator.createUri("20110223/json2.js"));
       final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
 
       evaluateChain(script, SCRIPT_JSON);

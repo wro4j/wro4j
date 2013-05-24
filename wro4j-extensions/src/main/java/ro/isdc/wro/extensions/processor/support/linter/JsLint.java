@@ -6,7 +6,7 @@ package ro.isdc.wro.extensions.processor.support.linter;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
 
 
 /**
@@ -21,7 +21,7 @@ public class JsLint extends AbstractLinter {
    */
   @Override
   protected InputStream getScriptAsStream() throws IOException {
-    return getWebjarLocator().locate(WebjarUriLocator.createUri("jslint.js"));
+    return getWebjarLocatorFactory().locate(WebjarResourceLocator.createUri("jslint.js"));
   }
 
   /**

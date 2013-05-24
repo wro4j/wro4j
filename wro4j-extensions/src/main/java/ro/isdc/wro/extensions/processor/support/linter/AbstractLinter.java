@@ -13,9 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocatorFactory;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLint;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
@@ -32,7 +33,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
-  private WebjarUriLocator webjarLocator;
+  private ResourceLocatorFactory webjarLocatorFactory;
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
@@ -54,13 +55,13 @@ public abstract class AbstractLinter {
   }
 
   /**
-   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   * @return {@link ResourceLocatorFactory} instance to retrieve webjars.
    */
-  protected final WebjarUriLocator getWebjarLocator() {
-    if (webjarLocator == null) {
-      webjarLocator = new WebjarUriLocator();
+  protected final ResourceLocatorFactory getWebjarLocatorFactory() {
+    if (webjarLocatorFactory == null) {
+      webjarLocatorFactory = new WebjarResourceLocatorFactory();
     }
-    return webjarLocator;
+    return webjarLocatorFactory;
   }
 
   /**

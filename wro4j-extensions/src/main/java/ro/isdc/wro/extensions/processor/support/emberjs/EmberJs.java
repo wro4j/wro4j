@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.Vector;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocator;
+import ro.isdc.wro.extensions.locator.WebjarResourceLocatorFactory;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
+import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 
 
 /**
@@ -22,7 +24,7 @@ public class EmberJs
    * There is no 'exports' object in Rhino, so this file creates it, as well as an helper function
    */
   private static final String DEFAULT_HEADLESS_RHINO_JS = "headless-rhino.js";
-
+  private ResourceLocatorFactory webjarLocatorFactory;
   /**
    * visible for testing, the init of a HandlebarsJs template
    */
@@ -41,13 +43,21 @@ public class EmberJs
   @Override
   protected InputStream getCompilerAsStream() throws IOException {
     final Vector<InputStream> inputStreams = new Vector<InputStream>();
-    inputStreams.add(new WebjarUriLocator().locate(WebjarUriLocator.createUri("jquery.js")));
-    inputStreams.add(new WebjarUriLocator().locate(WebjarUriLocator.createUri("handlebars.js")));
-    inputStreams.add(new WebjarUriLocator().locate(WebjarUriLocator.createUri("ember.js")));
+    inputStreams.add(getWebjarLocatorFactory().locate(WebjarResourceLocator.createUri("jquery.js")));
+    inputStreams.add(getWebjarLocatorFactory().locate(WebjarResourceLocator.createUri("handlebars.js")));
+    inputStreams.add(getWebjarLocatorFactory().locate(WebjarResourceLocator.createUri("ember.js")));
     inputStreams.add(EmberJs.class.getResourceAsStream(DEFAULT_HEADLESS_RHINO_JS));
-    //inputStreams.add(EmberJs.class.getResourceAsStream(DEFAULT_EMBER_TEMPLATE_COMPILER_JS));
-    //inputStreams.add(fis3);
 
     return new SequenceInputStream(inputStreams.elements());
+  }
+
+  /**
+   * @return {@link ResourceLocatorFactory} instance to retrieve webjars.
+   */
+  private ResourceLocatorFactory getWebjarLocatorFactory() {
+    if (webjarLocatorFactory == null) {
+      webjarLocatorFactory = new WebjarResourceLocatorFactory();
+    }
+    return webjarLocatorFactory;
   }
 }
