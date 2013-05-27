@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 
 import javax.servlet.FilterConfig;
@@ -22,6 +21,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -67,7 +67,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     Mockito.when(request.getRequestURI()).thenReturn(group);
     //mock response
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
 
     //init context
     final WroConfiguration config = Context.get().getConfig();

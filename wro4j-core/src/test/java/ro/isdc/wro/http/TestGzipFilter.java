@@ -28,6 +28,7 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.http.support.DelegatingServletInputStream;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 /**
  * @author Alex Objelean
@@ -49,7 +50,7 @@ public class TestGzipFilter {
     MockitoAnnotations.initMocks(this);
     when(mockRequest.getInputStream()).thenReturn(
         new DelegatingServletInputStream(new ByteArrayInputStream("".getBytes())));
-    when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
+    when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
     // mock chaining
     Mockito.doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)

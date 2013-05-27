@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -69,6 +68,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -113,7 +113,7 @@ public class TestWroFilter {
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);
     when(mockManagerFactory.create()).thenReturn(new BaseWroManagerFactory().create());
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
+    when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
 
     victim = new WroFilter() {
       @Override
