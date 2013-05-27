@@ -6,8 +6,9 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.Writer;
+
+import org.apache.commons.io.output.NullWriter;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -57,11 +58,9 @@ public class CssLintMojo
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        if (resource != null) {
-          getLog().info("processing resource: " + resource.getUri());
-        }
+        getProgressIndicator().onProcessingResource(resource);
         // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
-        super.process(resource, reader, new StringWriter());
+        super.process(resource, reader, new NullWriter());
       }
 
       @Override
@@ -71,6 +70,7 @@ public class CssLintMojo
 
       @Override
       protected void onCssLintException(final CssLintException e, final Resource resource) {
+        getProgressIndicator().addFoundErrors(e.getErrors().size());
         getLog().error(
             e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
                 + e.getErrors());
