@@ -6,6 +6,7 @@ import org.apache.maven.plugin.logging.Log;
 
 import ro.isdc.wro.model.resource.Resource;
 
+
 /**
  * Responsible for logging progress related details. Useful to find the best balance between "to much" vs "none"
  * details. This implementation will indicate the state of the progress after a given period of time (ex: each 5
@@ -72,11 +73,9 @@ public class ProgressIndicator {
    */
   public void onProcessingResource(final Resource resource) {
     totalResources++;
-    if (resource != null) {
-      log.debug("processing resource: " + resource.getUri());
-      if (isLogRequired()) {
-        log.info("Resources processed: " + getTotalResources() + ". Last processed: " + resource.getUri());
-      }
+    log.debug("processing resource: " + resource.getUri());
+    if (isLogRequired()) {
+      log.info("Resources processed: " + getTotalResources() + ". Last processed: " + resource.getUri());
     }
     updateLastInvocation();
   }
@@ -87,6 +86,7 @@ public class ProgressIndicator {
 
   /**
    * This method has a side effect of incrementing the number of resources containing errors.
+   *
    * @param errorsToAdd
    *          number of errors found during processing. This number will be added to the counter holding total number of
    *          found errors.

@@ -60,7 +60,7 @@ public abstract class AbstractLinterMojo<T>
    * Contains errors found during jslint processing which will be reported eventually.
    */
   private LintReport<T> lintReport;
-  private final ProgressIndicator progressIndicator = new ProgressIndicator(getLog());
+  private ProgressIndicator progressIndicator;
 
   /**
    * Add a single report to the registry of found errors.
@@ -77,6 +77,7 @@ public abstract class AbstractLinterMojo<T>
    */
   @Override
   protected void onBeforeExecute() {
+    progressIndicator = new ProgressIndicator(getLog());
     getLog().info("failNever: " + failNever);
     progressIndicator.reset();
 
