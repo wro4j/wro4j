@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.testing.SilentLog;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,7 @@ public abstract class AbstractTestLinterMojo {
   public void setUp()
       throws Exception {
     mojo = newLinterMojo();
+    mojo.setLog(new SilentLog());
     mojo.setIgnoreMissingResources(false);
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
