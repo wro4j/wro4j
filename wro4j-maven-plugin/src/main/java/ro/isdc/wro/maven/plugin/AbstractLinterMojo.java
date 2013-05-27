@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import static org.apache.commons.lang3.Validate.isTrue;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +14,7 @@ import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
+import ro.isdc.wro.maven.plugin.support.ProgressIndicator;
 import ro.isdc.wro.model.resource.Resource;
 
 
@@ -58,22 +57,10 @@ public abstract class AbstractLinterMojo<T>
    */
   private int failThreshold = 0;
   /**
-   * Counts total number of processed resources.
-   */
-  private int totalResources = 0;
-  /**
-   * Counts total number of resources with errors.
-   */
-  private int totalResourcesWithErrors = 0;
-  /**
-   * Counts total number of jshint errors.
-   */
-  private int totalFoundErrors = 0;
-
-  /**
    * Contains errors found during jslint processing which will be reported eventually.
    */
   private LintReport<T> lintReport;
+  private ProgressIndicator progressIndicator;
 
   /**
    * Add a single report to the registry of found errors.
@@ -90,10 +77,10 @@ public abstract class AbstractLinterMojo<T>
    */
   @Override
   protected void onBeforeExecute() {
+    progressIndicator = new ProgressIndicator(getLog());
     getLog().info("failNever: " + failNever);
-    totalFoundErrors = 0;
-    totalResources = 0;
-    totalResourcesWithErrors = 0;
+    progressIndicator.reset();
+
     // validate report format before actual plugin execution (fail fast).
     validateReportFormat();
     lintReport = new LintReport<T>();
@@ -106,19 +93,9 @@ public abstract class AbstractLinterMojo<T>
   @Override
   protected void onAfterExecute() {
     super.onAfterExecute();
-    logSummary();
+    progressIndicator.logSummary();
     generateReport();
     checkFailStatus();
-  }
-
-
-  private void logSummary() {
-    final String message = totalFoundErrors == 0 ? "No lint errors found." : String.format(
-        "Found %s errors in %s files.", totalFoundErrors, totalResourcesWithErrors);
-    getLog().info("----------------------------------------");
-    getLog().info(String.format("Total resources: %s", totalResources));
-    getLog().info(message);
-    getLog().info("----------------------------------------\n");
   }
 
   private void generateReport() {
@@ -151,36 +128,12 @@ public abstract class AbstractLinterMojo<T>
    */
   protected abstract ReportXmlFormatter createXmlFormatter(LintReport<T> lintReport, FormatterType type);
 
-  private void validateReportFormat() {
-    if (FormatterType.getByFormat(getReportFormat()) == null) {
-      throw new WroRuntimeException("Usupported report format: " + getReportFormat() + ". Valid formats are: "
-          + FormatterType.getSupportedFormatsAsCSV());
-    }
-  }
-
-  private boolean shouldGenerateReport() {
-    return getReportFile() != null;
-  }
-
   /**
    * A method which should be invoked on each new resource processing, having as a side effect an increment of the
    * counter holding the number of total processed resources.
    */
   protected final void onProcessingResource(final Resource resource) {
-    getLog().info("processing resource: " + resource);
-    totalResources++;
-  }
-
-  /**
-   * This method has a side effect of incrementing the number of resources containing errors.
-   * @param errorsToAdd
-   *          number of errors found during processing. This number will be added to the counter holding total number of
-   *          found errors.
-   */
-  protected final void addFoundErrors(final int errorsToAdd) {
-    isTrue(errorsToAdd > 0, "Cannot add negative number of errors");
-    totalResourcesWithErrors++;
-    totalFoundErrors += errorsToAdd;
+    progressIndicator.onProcessingResource(resource);
   }
 
   /**
@@ -188,13 +141,6 @@ public abstract class AbstractLinterMojo<T>
    */
   protected final boolean isFailAllowed() {
     return failFast && isStatusFailed();
-  }
-
-  /**
-   * @return true if the build status is failed.
-   */
-  private boolean isStatusFailed() {
-    return !failNever && (totalFoundErrors >= failThreshold);
   }
 
   /**
@@ -206,6 +152,28 @@ public abstract class AbstractLinterMojo<T>
    * @return the preferred format of the report.
    */
   protected abstract String getReportFormat();
+
+  protected final ProgressIndicator getProgressIndicator() {
+    return progressIndicator;
+  }
+
+  /**
+   * @return true if the build status is failed.
+   */
+  private boolean isStatusFailed() {
+    return !failNever && (progressIndicator.getTotalFoundErrors() >= failThreshold);
+  }
+
+  private void validateReportFormat() {
+    if (FormatterType.getByFormat(getReportFormat()) == null) {
+      throw new WroRuntimeException("Usupported report format: " + getReportFormat() + ". Valid formats are: "
+          + FormatterType.getSupportedFormatsAsCSV());
+    }
+  }
+
+  private boolean shouldGenerateReport() {
+    return getReportFile() != null;
+  }
 
   /**
    * Used by unit test to check if mojo doesn't fail.

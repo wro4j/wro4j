@@ -6,8 +6,9 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.Writer;
+
+import org.apache.commons.io.output.NullWriter;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
@@ -57,12 +58,12 @@ public class JsLintMojo
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        getLog().info("processing resource: " + resource);
+        getProgressIndicator().onProcessingResource(resource);
         if (resource != null) {
           getLog().info("processing resource: " + resource.getUri());
         }
         // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
-        super.process(resource, reader, new StringWriter());
+        super.process(resource, reader, new NullWriter());
       }
 
       @Override
@@ -74,6 +75,7 @@ public class JsLintMojo
       protected void onLinterException(final LinterException e, final Resource resource) {
         final String errorMessage = String.format("%s errors found while processing resource: %s. Errors are: %s", e
             .getErrors().size(), resource, e.getErrors());
+        getProgressIndicator().addFoundErrors(e.getErrors().size());
         getLog().error(errorMessage);
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
