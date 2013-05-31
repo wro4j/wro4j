@@ -7,11 +7,11 @@
 		<artifactId>wro4j-parent</artifactId>
 		<version>1.6.4-SNAPSHOT</version>
 	</parent>
-	<artifactId>wro4j-rhino</artifactId>
+	<artifactId>wro4j-rhino</artifactId>    
 	<packaging>jar</packaging>
-	<name>wro4j extensions</name>	
+	<name>wro4j rhino submodule</name>	
 	<properties>
-		<rhino.folder>../submodules/rhino</rhino.folder>
+		<rhino.folder>../submodule/rhino</rhino.folder>
 	</properties>
 	<build>
 		<sourceDirectory>${rhino.folder}</sourceDirectory>

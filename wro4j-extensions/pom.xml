@@ -16,10 +16,16 @@
             <artifactId>wro4j-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wro4j-rhino</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../wro4j-rhino/target/wro4j-rhino-${project.version}.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-		<!-- Other Dependencies -->
+        <!-- Other Dependencies -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -35,8 +41,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <!--<version>2.5.6</version>
-            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -45,10 +49,6 @@
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>rhino</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.lltyk</groupId>
@@ -84,101 +84,101 @@
             <artifactId>jshint</artifactId>
             <version>2.1.2-SNAPSHOT</version>
         </dependency>
-         -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>less</artifactId>
-            <version>1.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>emberjs</artifactId>
-            <version>1.0.0-rc.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>handlebars</artifactId>
-            <version>1.0.0-rc.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>coffee-script</artifactId>
-            <version>1.6.2-1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jslint</artifactId>
-            <version>1d8c1f8f74</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>json2</artifactId>
-            <version>20110223</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery</artifactId>
-            <version>2.0.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
+    -->
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>less</artifactId>
+        <version>1.3.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>emberjs</artifactId>
+        <version>1.0.0-rc.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>handlebars</artifactId>
+        <version>1.0.0-rc.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>coffee-script</artifactId>
+        <version>1.6.2-1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jslint</artifactId>
+        <version>1d8c1f8f74</version>
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>json2</artifactId>
+        <version>20110223</version>
+    </dependency>
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>2.0.0</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>gmaven-plugin</artifactId>
+            <version>1.3</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>generateStubs</goal>
+                        <goal>compile</goal>
+                        <goal>generateTestStubs</goal>
+                        <goal>testCompile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+    <pluginManagement>
         <plugins>
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>1.0.0</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>org.codehaus.gmaven</groupId>
+                                    <artifactId>gmaven-plugin</artifactId>
+                                    <versionRange>[1.3,)</versionRange>
+                                    <goals>
+                                        <goal>generateStubs</goal>
+                                        <goal>compile</goal>
+                                        <goal>generateTestStubs</goal>
+                                        <goal>testCompile</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generateStubs</goal>
-                            <goal>compile</goal>
-                            <goal>generateTestStubs</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.codehaus.gmaven</groupId>
-                                        <artifactId>gmaven-plugin</artifactId>
-                                        <versionRange>[1.3,)</versionRange>
-                                        <goals>
-                                            <goal>generateStubs</goal>
-                                            <goal>compile</goal>
-                                            <goal>generateTestStubs</goal>
-                                            <goal>testCompile</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore/>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+    </pluginManagement>
+</build>
 </project>
