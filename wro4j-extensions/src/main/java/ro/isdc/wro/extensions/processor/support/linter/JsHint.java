@@ -21,7 +21,7 @@ public class JsHint extends AbstractLinter {
   /**
    * The name of the jshint script to be used by default.
    */
-  private static final String DEFAULT_JSHINT_JS = "jshint.min.js";
+  private static final String DEFAULT_JSHINT_JS = "jshint-2.1.2.js";
 
   /**
    * @return the stream of the jshint script. Override this method to provide a different script version.
@@ -30,7 +30,7 @@ public class JsHint extends AbstractLinter {
   protected InputStream getScriptAsStream() throws IOException {
     //this resource is packed with packerJs compressor
     return JsHint.class.getResourceAsStream(DEFAULT_JSHINT_JS);
-    //return getWebjarLocator().locate(WebjarUriLocator.createUri("jshint.js"));
+    //return getWebjarLocator().locate(WebjarUriLocator.createUri("jshint-2.1.2.js"));
   }
 
   /**
