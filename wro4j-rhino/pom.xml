@@ -11,7 +11,7 @@
 	<packaging>jar</packaging>
 	<name>wro4j extensions</name>	
 	<properties>
-		<rhino.folder>../rhino</rhino.folder>
+		<rhino.folder>../submodules/rhino</rhino.folder>
 	</properties>
 	<build>
 		<sourceDirectory>${rhino.folder}</sourceDirectory>
