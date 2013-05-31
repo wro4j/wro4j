@@ -65,7 +65,7 @@ public abstract class AbstractJsTemplateCompiler {
     try {
       RhinoScriptBuilder builder;
       if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getCompilerAsStream(), "templateCompiler.js");
+        builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(getCompilerAsStream(), "templateCompiler.js");
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);

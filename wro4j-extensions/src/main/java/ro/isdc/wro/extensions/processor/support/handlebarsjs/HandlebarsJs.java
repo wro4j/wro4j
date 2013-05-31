@@ -1,7 +1,9 @@
 package ro.isdc.wro.extensions.processor.support.handlebarsjs;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
 
@@ -12,29 +14,43 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
  * @author heldeen
  */
 public class HandlebarsJs extends AbstractJsTemplateCompiler {
-
-  /**
-   * visible for testing, the init of a HandlebarsJs template
-   */
-  public static final String HANDLEBARS_JS_TEMPLATES_INIT = "(function() { var template = Handlebars.template, "
+  private static final String HANDLEBARS_JS_TEMPLATES_INIT = "(function() { var template = Handlebars.template, "
       + "templates = Handlebars.templates = Handlebars.templates || {};";
 
-  private static final String DEFAULT_HANDLEBARS_JS = "handlebars-1.0.rc.3.js";
+  private WebjarUriLocator webjarLocator;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String compile(final String content, final String name) {
-
     return HANDLEBARS_JS_TEMPLATES_INIT + "templates[" + name + "] = template("
         + super.compile(content, "") + " ); })();";
   }
 
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  private WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected String getCompileCommand() {
     return "Handlebars.precompile";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected InputStream getCompilerAsStream() {
-    return HandlebarsJs.class.getResourceAsStream(DEFAULT_HANDLEBARS_JS);
+  protected InputStream getCompilerAsStream() throws IOException {
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("handlebars.js"));
   }
 }

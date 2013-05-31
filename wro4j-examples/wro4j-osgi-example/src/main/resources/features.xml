@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="ro.itsc.wro4j-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+  <feature name='aopalliance' description='Aopalliance feature' version='1.0_6' resolver='(obr)'>
+    <bundle start-level="30">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/1.0_6</bundle>
+  </feature>
+
+  <feature name='spring' description='spring framework feature' version='${spring.version}' resolver='(obr)'>
+    <feature version="[1.0,2.0)">aopalliance</feature>
+    <bundle start-level="30">mvn:org.springframework/spring-core/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-beans/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-context/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-context-support/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-aop/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-expression/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-web/${spring.version}</bundle>
+    <bundle start-level="30">mvn:org.springframework/spring-webmvc/${spring.version}</bundle>
+  </feature>
+
+  <feature name='common' description='wro4j common feature' version='${project.version}' resolver='(obr)'>
+    <feature version="${spring.version}">spring</feature>
+    <feature version="[${karaf.version}, 3.0.0)">war</feature>
+    <feature version="[7.5.0, 8.0.0)">jetty</feature>
+    <feature version="[1.2.1, 2.0.0)">spring-dm-web</feature>
+    <feature version="[3.1.1,4.0.0)">spring-web</feature>
+    <feature>spring-dm-web</feature>
+  </feature>
+
+  <feature name="wro4j" version="${project.version}" resolver="(obr)">
+    <feature>common</feature>
+    <bundle start-level="30">mvn:commons-pool/commons-pool/${commons-pool.version}</bundle>
+    <bundle start-level="30">mvn:commons-io/commons-io/${commons-io.version}</bundle>
+    <bundle start-level="30">mvn:org.apache.commons/commons-lang3/${commons-lang.version}</bundle>
+    <bundle start-level="30">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr-runtime/${antlr.version}</bundle>
+    <bundle start-level="30">wrap:mvn:org.mozilla/rhino/${rhino.version}</bundle>
+    <bundle start-level="30">wrap:mvn:com.github.sommeri/less4j/${less4j.version}</bundle>
+    <bundle start-level="60">mvn:ro.isdc.wro4j/wro4j-osgi/${project.version}</bundle>
+    <bundle start-level="60">mvn:ro.isdc.wro4j/wro4j-osgi-example/${project.version}/war</bundle>
+  </feature>
+
+</features>

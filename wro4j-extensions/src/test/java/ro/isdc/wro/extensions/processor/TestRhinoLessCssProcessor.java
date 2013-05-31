@@ -5,6 +5,7 @@ package ro.isdc.wro.extensions.processor;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -120,8 +121,8 @@ public class TestRhinoLessCssProcessor {
   public void shouldBePossibleToExtendLessCssWithDifferentScriptStream() {
     new LessCss() {
       @Override
-      protected InputStream getScriptAsStream() {
-        return LessCss.class.getResourceAsStream(LessCss.DEFAULT_LESS_JS);
+      protected InputStream getScriptAsStream() throws IOException {
+        return TestRhinoCoffeeScriptProcessor.class.getResourceAsStream("less.js");
       }
     }.less("#id {}");
   }

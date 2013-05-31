@@ -65,7 +65,7 @@ public class DefaultProcessorProvider
   private void populateProcessorsMap(final Map<String, ResourcePreProcessor> map) {
     map.put(CssUrlRewritingProcessor.ALIAS, new CssUrlRewritingProcessor());
     map.put(CssImportPreProcessor.ALIAS, new CssImportPreProcessor());
-    map.put(LessCssImportPreProcessor.ALIAS, new CssImportPreProcessor());
+    map.put(LessCssImportPreProcessor.ALIAS, new LessCssImportPreProcessor());
     map.put(CssVariablesProcessor.ALIAS, new CssVariablesProcessor());
     map.put(CssCompressorProcessor.ALIAS, new CssCompressorProcessor());
     map.put(SemicolonAppenderPreProcessor.ALIAS, new SemicolonAppenderPreProcessor());

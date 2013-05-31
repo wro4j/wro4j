@@ -200,7 +200,7 @@ public class XmlModelFactory
       }
       return document;
     } catch (final Exception e) {
-      throw new WroRuntimeException("Cannot build model from XML", e);
+      throw new WroRuntimeException("Cannot build model from XML: " + e.getMessage(), e);
     }
   }
 
