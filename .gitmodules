@@ -1,3 +1,0 @@
-[submodule "submodule/rhino"]
-	path = submodule/rhino
-	url = https://github.com/mozilla/rhino.git
