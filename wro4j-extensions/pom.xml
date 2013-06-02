@@ -17,9 +17,8 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>wro4j-rhino</artifactId>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../wro4j-rhino/target/wro4j-rhino-${project.version}.jar</systemPath>
+            <artifactId>rhino</artifactId>
+            <version>1.7R5-20130223</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
