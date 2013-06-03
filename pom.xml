@@ -67,7 +67,6 @@
         <maven.version>3.0.4</maven.version>
         <mockito.version>1.9.5</mockito.version>
         <junit.version>4.11</junit.version>
-        <rhino.version>1.7R3</rhino.version>
         <spring.version>3.1.1.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -85,11 +84,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>wro4j-extensions</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>wro4j-rhino</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -183,12 +177,7 @@
                 <version>2.0</version>
                 <scope>provided</scope>
             </dependency>
-      <!-- Third Party Tools -->
-            <dependency>
-                <groupId>org.mozilla</groupId>
-                <artifactId>rhino</artifactId>
-                <version>${rhino.version}</version>
-            </dependency>
+	    <!-- Third Party Tools -->
             <dependency>
                 <groupId>com.google.javascript</groupId>
                 <artifactId>closure-compiler</artifactId>
@@ -425,7 +414,6 @@
             <modules>
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
-                <module>wro4j-rhino</module>
                 <module>wro4j-maven-plugin</module>
             </modules>
         </profile>
@@ -437,7 +425,6 @@
             <modules>
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
-                <module>wro4j-rhino</module>
                 <module>wro4j-maven-plugin</module>
                 <module>wro4j-runner</module>
             </modules>
@@ -450,7 +437,6 @@
             <modules>
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
-                <module>wro4j-rhino</module>
                 <module>wro4j-maven-plugin</module>
                 <module>wro4j-runner</module>
                 <module>wro4j-examples</module>
