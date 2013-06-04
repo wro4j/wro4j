@@ -47,7 +47,7 @@ public abstract class AbstractLinter {
       // reusing the scope doesn't work here. Get the following error: TypeError: Cannot find function create in object
       // function Object() { [native code for Object.Object, arity=1] }
       // TODO investigate why
-      return RhinoScriptBuilder.newChain().evaluateChain(getScriptAsStream(), "linter.js");
+      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(getScriptAsStream(), "linter.js");
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
     }
