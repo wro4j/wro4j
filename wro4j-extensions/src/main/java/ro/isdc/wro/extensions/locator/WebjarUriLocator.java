@@ -63,7 +63,7 @@ public class WebjarUriLocator
   @Override
   public InputStream locate(final String uri)
       throws IOException {
-    LOG.debug("locating webjar: {}", uri);
+    LOG.debug("locating: {}", uri);
     try {
       final String fullpath = webjarAssetLocator.getFullPath(extractPath(uri));
       return classpathLocator.locate(ClasspathUriLocator.createUri(fullpath));
