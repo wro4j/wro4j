@@ -63,7 +63,7 @@ public class TestNodeCoffeeScriptProcessor {
   @Test
   public void shouldCompileAllFromFolderUsingBareOption()
       throws Exception {
-    final ResourcePreProcessor processor = new NodeCoffeeScriptProcessor() {
+    final ResourceProcessor processor = new NodeCoffeeScriptProcessor() {
       @Override
       protected String[] buildOptionalArguments() {
         return new String[] {"--bare"};
