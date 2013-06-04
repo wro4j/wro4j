@@ -38,6 +38,7 @@ public class WebjarResourceLocator
   public static final String PREFIX = format("%s:", ALIAS);
   private final WebJarAssetLocator webjarAssetLocator;
 
+
   /**
    * @return the uri which is acceptable by this locator.
    */

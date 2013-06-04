@@ -13,11 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -32,11 +34,16 @@ public class RubySassCssProcessor
     implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(RubySassCssProcessor.class);
   public static final String ALIAS = "rubySassCss";
+  private ObjectPoolHelper<RubySassEngine> enginePool;
   
-  /**
-   * Engine.
-   */
-  private RubySassEngine engine;
+  public RubySassCssProcessor() {
+    enginePool = new ObjectPoolHelper<RubySassEngine>(new ObjectFactory<RubySassEngine>() {
+      @Override
+      public RubySassEngine create() {
+        return newEngine();
+      }
+    });
+  }
   
   /**
    * {@inheritDoc}
@@ -45,8 +52,9 @@ public class RubySassCssProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
+    final RubySassEngine engine = enginePool.getObject();
     try {
-      writer.write(getEngine().process(content));
+      writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
@@ -55,6 +63,7 @@ public class RubySassCssProcessor
     } finally {
       reader.close();
       writer.close();
+      enginePool.returnObject(engine);
     }
   }
   
@@ -67,11 +76,18 @@ public class RubySassCssProcessor
   
   /**
    * A getter used for lazy loading.
+   * @deprecated use {@link #newEngine()} instead.
    */
+  @Deprecated
   protected RubySassEngine getEngine() {
-    if (engine == null) {
-      engine = new RubySassEngine();
+      return newEngine();
     }
-    return engine;
+  /**
+   * @return a fresh instance of {@link RubySassEngine}
+   */
+  protected RubySassEngine newEngine() {
+    return new RubySassEngine();
   }
+  
+  
 }
