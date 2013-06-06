@@ -5,7 +5,7 @@
         <js>/static/jshint/*.js</js>
     </group>
     <group name="cssGroup">
-        <css>/static/csslint/**css</css>
+        <css>/static/csslint/**.css</css>
     </group>
     
     <group name="lessTestcase1">
