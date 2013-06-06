@@ -233,7 +233,7 @@
 
 var JSHINT = (function () {
     "use strict";
-
+ 
     var anonname,       // The guessed name for anonymous functions.
 
 // These are operators that should not be used with the ! operator.

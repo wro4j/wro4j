@@ -1,5 +1,5 @@
 function test() {
-'use strict';
+'use strict';  
 console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');
@@ -11,7 +11,7 @@ console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');
-console.log('Yey!!! thats the choice mate ...');
+console.log('Yey!!! thats the choice mate ...'); 
 console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');
 console.log('Yey!!! thats the choice mate ...');

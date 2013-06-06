@@ -245,7 +245,7 @@ public abstract class AbstractWro4jMojo
   protected final List<String> getTargetGroupsAsList()
       throws Exception {
     List<String> result = null;
-    if (isIncrementalBuild()) {
+    if (isIncrementalCheckRequired()) {
       result = getIncrementalGroupNames();
     } else if (getTargetGroups() == null) {
       result = getAllModelGroupNames();
@@ -255,6 +255,13 @@ public abstract class AbstractWro4jMojo
     persistResourceFingerprints(result);
     getLog().info("The following groups will be processed: " + result);
     return result;
+  }
+
+  /**
+   * @return true if the only incremental changed group should be used as target groups for next processing.
+   */
+  protected boolean isIncrementalCheckRequired() {
+    return isIncrementalBuild();
   }
 
   /**
@@ -373,17 +380,16 @@ public abstract class AbstractWro4jMojo
       throws Exception {
     final List<String> changedGroupNames = new ArrayList<String>();
     for (final Group group : getModel().getGroups()) {
-      if (!isTargetGroup(group)) {
-        // skip this group processing
-        continue;
-      }
-      for (final Resource resource : group.getResources()) {
-        getLog().debug("checking delta for resource: " + resource);
-        if (isResourceChanged(resource)) {
-          getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
-          changedGroupNames.add(group.getName());
-          // no need to check rest of resources from this group
-          break;
+      // skip processing non target groups
+      if (isTargetGroup(group)) {
+        for (final Resource resource : group.getResources()) {
+          getLog().debug("checking delta for resource: " + resource);
+          if (isResourceChanged(resource)) {
+            getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
+            changedGroupNames.add(group.getName());
+            // no need to check rest of resources from this group
+            break;
+          }
         }
       }
     }
