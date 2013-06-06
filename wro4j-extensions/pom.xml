@@ -18,7 +18,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>rhino</artifactId>
-            <version>1.7R5-20130223</version>
+            <version>1.7R5-20130223-1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
