@@ -31,7 +31,6 @@ public class WroManagerFactoryDecorator
 
   /**
    * Allows client code to change the builder before the {@link WroManager} is created.
-   * @param builder
    */
   protected void onBeforeBuild(final Builder builder) {
   }

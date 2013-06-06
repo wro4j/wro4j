@@ -1,11 +1,15 @@
 package ro.isdc.wro.manager.factory;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Properties;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
 
@@ -22,12 +26,13 @@ public class TestDefaultWroManagerFactory {
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullConfiguration() {
-    new DefaultWroManagerFactory(null);
+    final WroConfiguration config = null;
+    new DefaultWroManagerFactory(config);
   }
 
   @Test
   public void shouldCreateADefaultManagerFactory() {
-    Assert.assertEquals(BaseWroManagerFactory.class, victim.getFactory().getClass());
+    assertEquals(BaseWroManagerFactory.class, victim.getFactory().getClass());
   }
 
   @Test
@@ -38,7 +43,7 @@ public class TestDefaultWroManagerFactory {
         return new ConfigurableWroManagerFactory();
       }
     };
-    Assert.assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
+    assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
   }
 
 
@@ -47,7 +52,7 @@ public class TestDefaultWroManagerFactory {
     final WroConfiguration config = new WroConfiguration();
     config.setWroManagerClassName(NoProcessorsWroManagerFactory.class.getName());
     victim = new DefaultWroManagerFactory(config);
-    Assert.assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
+    assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -71,5 +76,38 @@ public class TestDefaultWroManagerFactory {
 
     victim.onModelPeriodChanged(0);
     Mockito.verify(mockManagerFactory).onModelPeriodChanged(0);
+  }
+
+
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullProperty() {
+    final Properties props = null;
+    new DefaultWroManagerFactory(props);
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void cannotAcceptInvalidManagerClassConfiguredInProperties() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.managerFactoryClassName.name(), "invalid");
+    new DefaultWroManagerFactory(props);
+  }
+
+  @Test
+  public void shouldLoadValidManagerClassConfiguredInProperties() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.managerFactoryClassName.name(), NoProcessorsWroManagerFactory.class.getName());
+    final DefaultWroManagerFactory victim = new DefaultWroManagerFactory(props);
+    assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
+  }
+
+  @Test
+  public void shouldCreateOverridenManagerFactoryWhenManagerClassPropertyIsMissing() {
+    victim = new DefaultWroManagerFactory(new Properties()) {
+      @Override
+      protected WroManagerFactory newManagerFactory() {
+        return new ConfigurableWroManagerFactory();
+      }
+    };
+    assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
   }
 }
