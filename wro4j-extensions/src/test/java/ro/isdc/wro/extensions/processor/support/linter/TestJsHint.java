@@ -5,6 +5,8 @@ package ro.isdc.wro.extensions.processor.support.linter;
 
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
+
 
 /**
  * @author Alex Objelean
@@ -93,6 +95,13 @@ public class TestJsHint {
   public void shouldNotFailWhenIndentationIsCorrect()
       throws Exception {
     jsHint.setOptions("indent=2", "white");
+    jsHint.validate("function test() {\n  alert(1);\n}");
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void testInvalidOptions()
+      throws Exception {
+    jsHint.setOptions("unused:vars");
     jsHint.validate("function test() {\n  alert(1);\n}");
   }
 }
