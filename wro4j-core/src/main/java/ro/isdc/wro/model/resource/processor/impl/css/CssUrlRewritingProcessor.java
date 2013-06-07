@@ -177,7 +177,9 @@ public class CssUrlRewritingProcessor
       return computeNewImageLocation(cssUri, imageUrl);
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
-      return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
+      final String proxyUrl = computeNewImageLocation(cssUri, imageUrl);
+      //leave imageUrl unchanged if it is a servlet context relative resource
+      return getUrlPrefix() + (ServletContextUriLocator.isValid(imageUrl) ? imageUrl : proxyUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
   }
