@@ -3,6 +3,7 @@ package ro.isdc.wro.http;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.Filter;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.CountingOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,15 +69,35 @@ public class GzipFilter
     LOG.debug("Applying gzip on resource: " + req.getRequestURI());
     response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final GZIPOutputStream gzout = new GZIPOutputStream(new BufferedOutputStream(baos));
+    final CountingOutputStream countingStream = new CountingOutputStream(new GZIPOutputStream(new BufferedOutputStream(baos)));
+    //final GZIPOutputStream gzout = new GZIPOutputStream(new BufferedOutputStream(baos));
     //Perform gzip operation in-memory before sending response
-    final HttpServletResponseWrapper wrappedResponse = new RedirectedStreamServletResponseWrapper(gzout, response);
+    final HttpServletResponseWrapper wrappedResponse = new RedirectedStreamServletResponseWrapper(countingStream, response);
     chain.doFilter(req, wrappedResponse);
     //close underlying stream
-    gzout.close();
-    response.setContentLength(baos.size());
-    IOUtils.write(baos.toByteArray(), response.getOutputStream());
+    countingStream.close();
+    response.setContentLength(countingStream.getCount());
+    //avoid NO CONTENT error thrown by jetty when gzipping empty response
+    if (countingStream.getCount() > 0) {
+      IOUtils.write(baos.toByteArray(), response.getOutputStream());
+    }
   }
+
+  /*
+   * Determines if a byte array is compressed. The java.util.zip GZip implementation does not expose the GZip header so
+   * it is difficult to determine if a string is compressed.
+   * @param bytes an array of bytes
+   * @return true if the array is compressed or false otherwise
+   * @throws java.io.IOException if the byte array couldn't be read
+   */
+  public boolean isCompressed(final byte[] bytes)
+      throws IOException {
+    if ((bytes == null) || (bytes.length < 2)) {
+      return false;
+    } else {
+      return ((bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8)));
+    }
+   }
 
   /**
    * Checks if the request supports gzip and is not a include request (these cannot be gzipped)

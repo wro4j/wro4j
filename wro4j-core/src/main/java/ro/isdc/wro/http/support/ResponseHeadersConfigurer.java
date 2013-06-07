@@ -20,7 +20,7 @@ import ro.isdc.wro.util.WroUtil;
 /**
  * Responsible for configuring response headers. The configured headers contains the default headers overridden by those
  * set through "headers" property.
- * 
+ *
  * @author Alex Objelean
  * @since 1.4.9
  * @created 27 Aug 2012
@@ -35,7 +35,8 @@ public class ResponseHeadersConfigurer {
    * String representation of headers to set. Each header is separated by a | character.
    */
   private final String headersAsString;
-  
+  private final Long lastModifiedTimestamp = new Date().getTime();
+
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
    * put, in order to avoid duplicate keys. This is done, because according to RFC 2616 Message Headers field names are
@@ -53,7 +54,7 @@ public class ResponseHeadersConfigurer {
       return super.get(((String) key).toLowerCase());
     }
   };
-  
+
   /**
    * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers used to disable cache.
    */
@@ -65,14 +66,14 @@ public class ResponseHeadersConfigurer {
       }
     };
   }
-  
+
   /**
    * Factory method which creates a {@link ResponseHeadersConfigurer} containing no headers set.
    */
   public static ResponseHeadersConfigurer emptyHeaders() {
     return new ResponseHeadersConfigurer();
   }
-  
+
   /**
    * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers used to disable cache in debug
    * mode.
@@ -81,11 +82,14 @@ public class ResponseHeadersConfigurer {
     return new ResponseHeadersConfigurer(config.getHeader()) {
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
+        // TODO probably this is not a good idea to set this field which will have a different value when there will be
+        // more than one instance of wro4j.
+        map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(getLastModifiedTimestamp()));
         useDefaultsFromConfig(config, map);
       };
     };
   }
-  
+
   /**
    * Factory method which creates a {@link ResponseHeadersConfigurer} containing headers provided as string (separated
    * by | character).
@@ -97,7 +101,7 @@ public class ResponseHeadersConfigurer {
   public ResponseHeadersConfigurer() {
     this(null);
   }
-  
+
   /**
    * @param headersAsString
    *          string representation of the headers to add separated by | character.
@@ -139,7 +143,7 @@ public class ResponseHeadersConfigurer {
 
   /**
    * Parse header value & puts the found values in headersMap field.
-   * 
+   *
    * @param header
    *          value to parse.
    */
@@ -154,7 +158,7 @@ public class ResponseHeadersConfigurer {
 
   /**
    * Allow configuration of default headers. This is useful when you need to set custom expires headers.
-   * 
+   *
    * @param map
    *          the {@link Map} where key represents the header name, and value - header value.
    */
@@ -172,8 +176,8 @@ public class ResponseHeadersConfigurer {
 
   /**
    * Encapsulates the default headers set based on {@link WroConfiguration}. This exist for backward compatibility and
-   * exist for internal usage only (do not call this method explicitly).
-   * 
+   * for internal usage only (do not call this method explicitly).
+   *
    * @deprecated will be removed when other deprecated methods requiring this method will be removed.
    */
   @Deprecated
@@ -183,13 +187,9 @@ public class ResponseHeadersConfigurer {
       // prevent caching when in development mode
       addNoCacheHeaders(map);
     } else {
-      final Long timestamp = new Date().getTime();
       final Calendar cal = Calendar.getInstance();
       cal.roll(Calendar.YEAR, 1);
       map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-      // TODO probably this is not a good idea to set this field which will have a different value when there will be
-      // more than one instance of wro4j.
-      map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(timestamp));
       map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
     }
   }
@@ -197,7 +197,7 @@ public class ResponseHeadersConfigurer {
   /**
    * Method called for each request and responsible for setting response headers, used mostly for cache control.
    * Override this method if you want to change the way headers are set.<br>
-   * 
+   *
    * @param response
    *          {@link HttpServletResponse} object.
    */
@@ -207,11 +207,15 @@ public class ResponseHeadersConfigurer {
       response.setHeader(entry.getKey(), entry.getValue());
     }
   }
-  
+
   /**
    * @VisibleForTesting
    */
   final Map<String, String> getHeadersMap() {
     return Collections.unmodifiableMap(headersMap);
+  }
+
+  Long getLastModifiedTimestamp() {
+    return lastModifiedTimestamp;
   }
 }

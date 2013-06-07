@@ -20,11 +20,12 @@ public class TestImageUrlRewriter {
   private static final String PROTECTED_CSS_URI = "/WEB-INF/path/to/style.css";
   private static final String DEFAULT_IMAGE_URL = "/img/image.png";
   private static final String RELATIVE_IMAGE_URL = "img/image.png";
+  private RewriterContext context;
   private ImageUrlRewriter victim;
 
   @Before
   public void setUp() {
-    final RewriterContext context = new RewriterContext();
+    context = new RewriterContext();
     context.setProxyPrefix(DEFAULT_PREFIX);
     context.setContextPath(DEFAULT_CONTEXT_PATH);
     victim = new ImageUrlRewriter(context);
@@ -55,6 +56,15 @@ public class TestImageUrlRewriter {
 
   @Test
   public void checkRelativeImageUrlInClasspathCssResource() {
+    final String actual = victim.rewrite(ClasspathUriLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
+    final String expected = DEFAULT_PREFIX + "classpath:/path/to/" + RELATIVE_IMAGE_URL;
+    assertEquals(expected, actual);
+  }
+
+
+  @Test
+  public void checkRelativeImageUrlInClasspathCssResourceWhenContextPathIsNotDefault() {
+    context.setContextPath("/1/2/3");
     final String actual = victim.rewrite(ClasspathUriLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
     final String expected = DEFAULT_PREFIX + "classpath:/path/to/" + RELATIVE_IMAGE_URL;
     assertEquals(expected, actual);

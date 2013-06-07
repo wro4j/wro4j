@@ -234,7 +234,6 @@ public class WroFilter
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
         useDefaultsFromConfig(wroConfiguration, map);
-        WroFilter.this.configureDefaultHeaders(map);
       }
     };
   }
@@ -249,18 +248,6 @@ public class WroFilter
   private long valueAsLong(final Object value) {
     Validate.notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
-  }
-
-  /**
-   * Allow configuration of default headers. This is useful when you need to set custom expires headers.
-   *
-   * @param map
-   *          the {@link Map} where key represents the header name, and value - header value.
-   * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and
-   *             {@link ResponseHeadersConfigurer#configureDefaultHeaders(Map)}
-   */
-  @Deprecated
-  protected void configureDefaultHeaders(final Map<String, String> map) {
   }
 
   /**

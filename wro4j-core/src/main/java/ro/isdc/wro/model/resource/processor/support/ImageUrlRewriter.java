@@ -25,8 +25,9 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  * @since 1.6.4
  */
 public class ImageUrlRewriter {
-  private static final String ROOT_CONTEXT_PATH = "/";
   private static final Logger LOG = LoggerFactory.getLogger(ImageUrlRewriter.class);
+  private static final String ROOT_CONTEXT_PATH = ServletContextUriLocator.PREFIX;
+  private static final String FOLDER_PREFIX = "/..";
   private final RewriterContext context;
 
   /**
@@ -100,7 +101,10 @@ public class ImageUrlRewriter {
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       final String proxyUrl = context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);
-      final String contextRelativeUrl = computeNewImageLocation(context.contextPath, imageUrl);
+      //avoid double slash
+      final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
+          : context.contextPath + imageUrl;
+      //final String contextRelativeUrl = context.contextPath + imageUrl;
       // leave imageUrl unchanged if it is a servlet context relative resource
       return (ServletContextUriLocator.isValid(imageUrl) ? contextRelativeUrl : proxyUrl);
     }
@@ -115,13 +119,13 @@ public class ImageUrlRewriter {
     LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
     String computedPrefix = StringUtils.EMPTY;
     if (aggregatedFolderPath != null) {
-      final String folderPrefix = "/..";
       final StringBuffer result = new StringBuffer("");
       final String[] depthFolders = aggregatedFolderPath.split(ROOT_CONTEXT_PATH);
       LOG.debug("subfolders {}", Arrays.toString(depthFolders));
+
       for (final String folder : depthFolders) {
         if (!StringUtils.isEmpty(folder)) {
-          result.append(folderPrefix);
+          result.append(FOLDER_PREFIX);
         }
       }
       computedPrefix = result.toString().replaceFirst(ROOT_CONTEXT_PATH, "");
