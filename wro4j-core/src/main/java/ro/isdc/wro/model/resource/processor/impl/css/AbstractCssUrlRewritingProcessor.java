@@ -5,6 +5,7 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
+import static ro.isdc.wro.util.WroUtil.cleanImageUrl;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -64,7 +65,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       final String cssUri = resource.getUri();
       LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
-      final String result = parseCss(css, cssUri);
+      final String result = newCssUrlInspector().findAndReplace(css, createUrlItemHandler(cssUri));
       writer.write(result);
       onProcessCompleted();
     } finally {
@@ -73,8 +74,8 @@ public abstract class AbstractCssUrlRewritingProcessor
     }
   }
 
-  private String parseCss(final String cssContent, final String cssUri) {
-    return newCssUrlInspector().findAndReplace(cssContent, new ItemHandler() {
+  private ItemHandler createUrlItemHandler(final String cssUri) {
+    return new ItemHandler() {
       public String replace(final String originalDeclaration, final String originalUrl) {
         Validate.notNull(originalUrl);
         String replacement = originalDeclaration;
@@ -93,7 +94,7 @@ public abstract class AbstractCssUrlRewritingProcessor
         }
         return replacement;
       }
-    });
+    };
   }
 
   protected CssUrlInspector newCssUrlInspector() {
@@ -146,17 +147,6 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @return replaced url.
    */
   protected abstract String replaceImageUrl(final String cssUri, final String imageUrl);
-
-  /**
-   * Cleans the image url by triming result and removing \' or \" characters if such exists.
-   *
-   * @param imageUrl
-   *          to clean.
-   * @return cleaned image URL.
-   */
-  protected final String cleanImageUrl(final String imageUrl) {
-    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
-  }
 
   /**
    * Check if url must be replaced or not. The replacement is not needed if the url of the image is absolute (can be

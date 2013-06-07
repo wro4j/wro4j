@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -388,5 +390,18 @@ public final class WroUtil {
     } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
+  }
+
+
+  /**
+   * Cleans the image url by trimming result and removing \' or \" characters if such exists.
+   *
+   * @param imageUrl
+   *          to clean.
+   * @return cleaned image URL.
+   */
+  public static final String cleanImageUrl(final String imageUrl) {
+    notNull(imageUrl);
+    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
   }
 }
