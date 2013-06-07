@@ -1,12 +1,12 @@
 .imageWithSrcAttribute {
     filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=classpath:../images/tabs/tabContent.png', sizingMethod='scale' );
-    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',   sizingMethod='scale' )
-    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',   sizingMethod='scale' );
-    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',  
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[WRO-PREFIX]?id=/images/tabs/tabContent.png',   sizingMethod='scale' )
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=/images/tabs/tabContent.png',   sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=/images/tabs/tabContent.png',  
        sizingMethod='scale' );
-    filter : progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',  sizingMethod='scale' );
+    filter : progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=/images/tabs/tabContent.png',  sizingMethod='scale' );
     filter : 
-        progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=classpath:images/tabs/tabContent.png',   sizingMethod='scale' );
+        progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '[WRO-PREFIX]?id=/images/tabs/tabContent.png',   sizingMethod='scale' );
     color:red;
     background: url([WRO-PREFIX]?id=classpath:img.gif)
 }
@@ -40,28 +40,28 @@
 .inline {background:#ffffff url('[WRO-PREFIX]?id=classpath:img_tree.png') no-repeat right top;}
 .inlineMinimized {background:#ffffff url('[WRO-PREFIX]?id=classpath:img_tree.png') no-repeat right top;color:red;font-size:large;}.anotherClass{color:blue;background:#ffffff url('[WRO-PREFIX]?id=classpath:img_tree.png') no-repeat right top;}
 .noQuotes {
-    background-IMAGE: URL([WRO-PREFIX]?id=classpath:img.gif);
-    background: url([WRO-PREFIX]?id=classpath:img.gif) red;
-    background: url([WRO-PREFIX]?id=classpath:folder/img.gif) no-repeat right;
+    background-IMAGE: URL([WRO-PREFIX]?id=/img.gif);
+    background: url([WRO-PREFIX]?id=/img.gif) red;
+    background: url([WRO-PREFIX]?id=/folder/img.gif) no-repeat right;
     background: url(http://www.google.com/);
 }
 
 .differentTypeOfQuotes {
-    background: #B3B3B3 url("[WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png") repeat-x 
+    background: #B3B3B3 url("[WRO-PREFIX]?id=/images/buttons/button_gry_bg.png") repeat-x 
         scroll 0 -1px;
-    background: #B3B3B3 url('[WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png') repeat-x
+    background: #B3B3B3 url('[WRO-PREFIX]?id=/images/buttons/button_gry_bg.png') repeat-x
         scroll 0 -1px;
-    background: #B3B3B3 url([WRO-PREFIX]?id=classpath:images/buttons/button_gry_bg.png) repeat-x
+    background: #B3B3B3 url([WRO-PREFIX]?id=/images/buttons/button_gry_bg.png) repeat-x
         scroll 0 -1px
 }
 
 .contextPathWithWhitespaces {
-    background-image: url( "[WRO-PREFIX]?id=classpath:absolute/path/to/image1.png" );
-    background-image: url( '[WRO-PREFIX]?id=classpath:absolute/path/to/image2.png' );
-    background-image: url( [WRO-PREFIX]?id=classpath:absolute/path/to/image3.png );
-    background-image: url( "[WRO-PREFIX]?id=classpath:absolute/path/to/image4.png");
-    background-image: url( '[WRO-PREFIX]?id=classpath:absolute/path/to/image5.png');
-    background-image: url( [WRO-PREFIX]?id=classpath:absolute/path/to/image6.png);
+    background-image: url( "[WRO-PREFIX]?id=/absolute/path/to/image1.png" );
+    background-image: url( '[WRO-PREFIX]?id=/absolute/path/to/image2.png' );
+    background-image: url( [WRO-PREFIX]?id=/absolute/path/to/image3.png );
+    background-image: url( "[WRO-PREFIX]?id=/absolute/path/to/image4.png");
+    background-image: url( '[WRO-PREFIX]?id=/absolute/path/to/image5.png');
+    background-image: url( [WRO-PREFIX]?id=/absolute/path/to/image6.png);
     background-image: url( "[WRO-PREFIX]?id=classpath:absolute/path/to/image7.png" );
     background-image: url( '[WRO-PREFIX]?id=classpath:absolute/path/to/image8.png' );
     background-image: url( [WRO-PREFIX]?id=classpath:absolute/path/to/image9.png );

@@ -104,7 +104,7 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * <p/>
  * The algorithm requires two types of {@link UriLocator} objects, one for resolving url resources & one for classpath
  * resources. Both need to be injected using IoC when creating the instance of {@link CssUrlRewritingProcessor} class.
- * 
+ *
  * @author Alex Objelean
  * @created Nov 19, 2008
  */
@@ -120,7 +120,7 @@ public class CssUrlRewritingProcessor
   private ResourceAuthorizationManager authorizationManager;
   @Inject
   private ReadOnlyContext context;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -130,7 +130,7 @@ public class CssUrlRewritingProcessor
       LOG.debug("allowed urls: {}", ((DefaultResourceAuthorizationManager) authorizationManager).list());
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -140,13 +140,13 @@ public class CssUrlRewritingProcessor
     LOG.debug("adding allowed url: {}", allowedUrl);
     //add only if add is supported
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
-      ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);      
+      ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);
     }
   }
-  
+
   /**
    * Replace provided url with the new url if needed.
-   * 
+   *
    * @param cssUri
    *          Uri of the parsed css.
    * @param imageUrl
@@ -177,10 +177,12 @@ public class CssUrlRewritingProcessor
         final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
         return computeNewImageLocation(externalServerCssUri, imageUrl);
       }
-      return computeNewImageLocation(cssUri, imageUrl);      
+      return computeNewImageLocation(cssUri, imageUrl);
     }
     if (classpathUriValid(cssUri)) {
-      return getUrlPrefix() + computeNewImageLocation(cssUri, imageUrl);
+      final String proxyUrl = computeNewImageLocation(cssUri, imageUrl);
+      //leave imageUrl unchanged if it is a servlet context relative resource
+      return getUrlPrefix() + (isContextRelativeUri(imageUrl) ? imageUrl : proxyUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
   }
@@ -202,7 +204,6 @@ public class CssUrlRewritingProcessor
     }
     return exernalServerCssUri;
   }
-
 
   /**
    * @return the path to be prefixed after css aggregation. This depends on the aggregated css destination folder. This
@@ -226,10 +227,10 @@ public class CssUrlRewritingProcessor
     LOG.debug("computedPrefix: {}", computedPrefix);
     return computedPrefix;
   }
-  
+
   /**
    * Concatenates cssUri and imageUrl after few changes are applied to both input parameters.
-   * 
+   *
    * @param cssUri
    *          the URI of css resource.
    * @param imageUrl
@@ -258,7 +259,7 @@ public class CssUrlRewritingProcessor
     // remove '/' from imageUrl if it starts with one.
     final String processedImageUrl = cleanImageUrl.startsWith(ServletContextResourceLocator.PREFIX)
       ? cleanImageUrl.substring(1)
-      : cleanImageUrl;
+        : cleanImageUrl;
     // remove redundant part of the path
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
@@ -284,11 +285,11 @@ public class CssUrlRewritingProcessor
   public final boolean isUriAllowed(final String uri) {
     return authorizationManager.isAuthorized(uri);
   }
-  
+
   /**
    * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
    * folder).
-   * 
+   *
    * @param uri
    *          the uri to check.
    * @return true if the uri is a protected resource.
@@ -296,10 +297,10 @@ public class CssUrlRewritingProcessor
   public boolean isProtectedResource(final String uri) {
     return StringUtils.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
   }
-  
+
   /**
    * Check if a uri is a context relative resource (if starts with /).
-   * 
+   *
    * @param uri
    *          to check.
    * @return true if the uri is a servletContext resource.
