@@ -26,9 +26,9 @@ public class TestNamingStrategy {
 
   @Before
   public void setUp() {
-    namingStrategy = new HashEncoderNamingStrategy() {
+    namingStrategy = new DefaultHashEncoderNamingStrategy() {
       @Override
-      protected HashStrategy newHashStrategy() {
+      protected HashStrategy getHashStrategy() {
         return new HashStrategy() {
           public String getHash(final InputStream inputStream)
               throws IOException {

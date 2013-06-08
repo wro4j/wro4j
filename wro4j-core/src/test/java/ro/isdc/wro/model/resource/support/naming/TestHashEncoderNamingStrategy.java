@@ -41,7 +41,7 @@ public class TestHashEncoderNamingStrategy {
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    namingStrategy = new HashEncoderNamingStrategy();
+    namingStrategy = new DefaultHashEncoderNamingStrategy();
     WroTestUtils.createInjector().inject(namingStrategy);
   }
 
