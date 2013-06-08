@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 import ro.isdc.wro.model.resource.processor.support.ImageUrlRewriter.RewriterContext;
 
 
@@ -50,29 +50,28 @@ public class TestImageUrlRewriter {
 
   @Test
   public void checkContextRelativeUrlInClasspathCssResource() {
-    final String actual = victim.rewrite(ClasspathUriLocator.createUri(DEFAULT_CSS_URI), DEFAULT_IMAGE_URL);
+    final String actual = victim.rewrite(ClasspathResourceLocator.createUri(DEFAULT_CSS_URI), DEFAULT_IMAGE_URL);
     assertEquals(DEFAULT_IMAGE_URL, actual);
   }
 
   @Test
   public void checkRelativeImageUrlInClasspathCssResource() {
-    final String actual = victim.rewrite(ClasspathUriLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
+    final String actual = victim.rewrite(ClasspathResourceLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
     final String expected = DEFAULT_PREFIX + "classpath:/path/to/" + RELATIVE_IMAGE_URL;
     assertEquals(expected, actual);
   }
 
-
   @Test
   public void checkRelativeImageUrlInClasspathCssResourceWhenContextPathIsNotDefault() {
     context.setContextPath("/1/2/3");
-    final String actual = victim.rewrite(ClasspathUriLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
+    final String actual = victim.rewrite(ClasspathResourceLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
     final String expected = DEFAULT_PREFIX + "classpath:/path/to/" + RELATIVE_IMAGE_URL;
     assertEquals(expected, actual);
   }
 
   @Test
   public void checkRelativeWithDotsImageUrlInClasspathCssResource() {
-    final String actual = victim.rewrite(ClasspathUriLocator.createUri(DEFAULT_CSS_URI), "../" + RELATIVE_IMAGE_URL);
+    final String actual = victim.rewrite(ClasspathResourceLocator.createUri(DEFAULT_CSS_URI), "../" + RELATIVE_IMAGE_URL);
     final String expected = DEFAULT_PREFIX + "classpath:/path/" + RELATIVE_IMAGE_URL;
     assertEquals(expected, actual);
   }

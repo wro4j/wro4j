@@ -3,23 +3,14 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import static ro.isdc.wro.util.StringUtils.cleanPath;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
-import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
-import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.processor.support.ImageUrlRewriter;
+import ro.isdc.wro.model.resource.processor.support.ImageUrlRewriter.RewriterContext;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
@@ -164,28 +155,5 @@ public class CssUrlRewritingProcessor
    */
   @Override
   protected void onProcessCompleted() {
-  }
-
-  /**
-   * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
-   * folder).
-   *
-   * @param uri
-   *          the uri to check.
-   * @return true if the uri is a protected resource.
-   */
-  public boolean isProtectedResource(final String uri) {
-    return StringUtils.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
-  }
-
-  /**
-   * Check if a uri is a context relative resource (if starts with /).
-   *
-   * @param uri
-   *          to check.
-   * @return true if the uri is a servletContext resource.
-   */
-  private boolean isContextRelativeUri(final String uri) {
-    return uri.trim().startsWith(ServletContextResourceLocator.PREFIX);
   }
 }

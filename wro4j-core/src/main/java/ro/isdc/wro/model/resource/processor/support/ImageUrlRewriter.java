@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
+import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 
 /**
@@ -26,8 +26,12 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  */
 public class ImageUrlRewriter {
   private static final Logger LOG = LoggerFactory.getLogger(ImageUrlRewriter.class);
-  private static final String ROOT_CONTEXT_PATH = ServletContextUriLocator.PREFIX;
+  private static final String ROOT_CONTEXT_PATH = ServletContextResourceLocator.PREFIX;
   private static final String FOLDER_PREFIX = "/..";
+  /**
+   * Constant for WEB-INF folder.
+   */
+  private static final String PROTECTED_PREFIX = "/WEB-INF/";
   private final RewriterContext context;
 
   /**
@@ -75,12 +79,12 @@ public class ImageUrlRewriter {
   public String rewrite(final String cssUri, final String imageUrl) {
     notNull(cssUri);
     notNull(imageUrl);
-    if (ServletContextUriLocator.isValid(cssUri)) {
-      if (ServletContextUriLocator.isValid(imageUrl)) {
+    if (isContextRelativeUri(cssUri)) {
+      if (isContextRelativeUri(imageUrl)) {
         return imageUrl;
       }
       // Treat WEB-INF special case
-      if (ServletContextUriLocator.isProtectedResource(cssUri)) {
+      if (isProtectedResource(cssUri)) {
         return context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);
       }
       // Compute the folder where the final css is located. This is important for computing image location after url
@@ -91,22 +95,22 @@ public class ImageUrlRewriter {
       LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
       return computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
     }
-    if (UrlUriLocator.isValid(cssUri)) {
-      if (ServletContextUriLocator.isValid(imageUrl)) {
+    if (UrlResourceLocator.isValid(cssUri)) {
+      if (isContextRelativeUri(imageUrl)) {
         // when imageUrl starts with /, assume the cssUri is the external server host
         final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
         return computeNewImageLocation(externalServerCssUri, imageUrl);
       }
       return computeNewImageLocation(cssUri, imageUrl);
     }
-    if (ClasspathUriLocator.isValid(cssUri)) {
+    if (classpathUriValid(cssUri)) {
       final String proxyUrl = context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);
       //avoid double slash
       final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
           : context.contextPath + imageUrl;
       //final String contextRelativeUrl = context.contextPath + imageUrl;
       // leave imageUrl unchanged if it is a servlet context relative resource
-      return (ServletContextUriLocator.isValid(imageUrl) ? contextRelativeUrl : proxyUrl);
+      return (isContextRelativeUri(imageUrl) ? contextRelativeUrl : proxyUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
   }
@@ -144,7 +148,7 @@ public class ImageUrlRewriter {
       // compute the host of the external server (with protocol & port).
       final String serverHost = cssUri.replace(new URL(cssUri).getPath(), "");
       // the uri should end mandatory with /
-      exernalServerCssUri = serverHost + ServletContextUriLocator.PREFIX;
+      exernalServerCssUri = serverHost + ServletContextResourceLocator.PREFIX;
       LOG.debug("using {} host as cssUri", exernalServerCssUri);
     } catch (final MalformedURLException e) {
       // should never happen
@@ -166,13 +170,13 @@ public class ImageUrlRewriter {
     final String cleanImageUrl = cleanImageUrl(imageUrl);
     // TODO move to ServletContextUriLocator as a helper method?
     // for the following input: /a/b/c/1.css => /a/b/c/
-    int idxLastSeparator = cssUri.lastIndexOf(ServletContextUriLocator.PREFIX);
+    int idxLastSeparator = cssUri.lastIndexOf(ServletContextResourceLocator.PREFIX);
     if (idxLastSeparator == -1) {
-      if (ClasspathUriLocator.isValid(cssUri)) {
-        idxLastSeparator = cssUri.lastIndexOf(ClasspathUriLocator.PREFIX);
+      if (classpathUriValid(cssUri)) {
+        idxLastSeparator = cssUri.lastIndexOf(ClasspathResourceLocator.PREFIX);
         // find the index of ':' character used by classpath prefix
         if (idxLastSeparator >= 0) {
-          idxLastSeparator += ClasspathUriLocator.PREFIX.length() - 1;
+          idxLastSeparator += ClasspathResourceLocator.PREFIX.length() - 1;
         }
       }
       if (idxLastSeparator < 0) {
@@ -181,7 +185,7 @@ public class ImageUrlRewriter {
     }
     final String cssUriFolder = cssUri.substring(0, idxLastSeparator + 1);
     // remove '/' from imageUrl if it starts with one.
-    final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX) ? cleanImageUrl.substring(1)
+    final String processedImageUrl = cleanImageUrl.startsWith(ServletContextResourceLocator.PREFIX) ? cleanImageUrl.substring(1)
         : cleanImageUrl;
     // remove redundant part of the path, but skip protected resources (ex: located inside /WEB-INF/ folder). -> Not
     // sure if this is a problem yet.
@@ -190,5 +194,40 @@ public class ImageUrlRewriter {
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
     return computedImageLocation;
+  }
+
+
+  /**
+   * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
+   * folder).
+   *
+   * @param uri
+   *          the uri to check.
+   * @return true if the uri is a protected resource.
+   */
+  private boolean isProtectedResource(final String uri) {
+    return StringUtils.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
+  }
+
+  /**
+   * Check if a uri is a classpath resource.
+   *
+   * @param uri
+   *          to check.
+   * @return true if the uri is a classpath resource.
+   */
+  private boolean classpathUriValid(final String uri) {
+    return uri.trim().startsWith(ClasspathResourceLocator.PREFIX);
+  }
+
+  /**
+   * Check if a uri is a context relative resource (if starts with /).
+   *
+   * @param uri
+   *          to check.
+   * @return true if the uri is a servletContext resource.
+   */
+  private boolean isContextRelativeUri(final String uri) {
+    return uri.trim().startsWith(ServletContextResourceLocator.PREFIX);
   }
 }

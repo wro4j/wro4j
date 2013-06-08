@@ -42,7 +42,6 @@ public class TestCssUrlRewritingProcessor {
 
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
 
-
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
