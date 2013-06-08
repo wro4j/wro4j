@@ -232,7 +232,7 @@ class TestGroovyModelParser {
     WroModel wroModel = GroovyModelParser.parse(dsl)
 
     //then:
-    assert ["g1", "g2"] == wroModel.groupNames
+    assert ["g1", "g2"] == new WroModelInspector(wroModel).groupNames
   }
 
     @Test
