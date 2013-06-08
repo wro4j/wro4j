@@ -19,7 +19,7 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * A processor which uses a list of processors to compute the result.
  *
  * @author Alex Objelean
- * @since 1.6.4
+ * @since 1.7.0
  * @created 17 Apr 2013
  */
 public class ChainedProcessor

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.CountingOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @created 11 Apr 2013
- * @since 1.6.4
+ * @since 1.7.0
  */
 public class GzipFilter
     implements Filter {
@@ -67,14 +68,20 @@ public class GzipFilter
     LOG.debug("Applying gzip on resource: " + req.getRequestURI());
     response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final GZIPOutputStream gzout = new GZIPOutputStream(new BufferedOutputStream(baos));
-    //Perform gzip operation in-memory before sending response
-    final HttpServletResponseWrapper wrappedResponse = new RedirectedStreamServletResponseWrapper(gzout, response);
+    final CountingOutputStream countingStream = new CountingOutputStream(new GZIPOutputStream(new BufferedOutputStream(
+        baos)));
+    // final GZIPOutputStream gzout = new GZIPOutputStream(new BufferedOutputStream(baos));
+    // Perform gzip operation in-memory before sending response
+    final HttpServletResponseWrapper wrappedResponse = new RedirectedStreamServletResponseWrapper(countingStream,
+        response);
     chain.doFilter(req, wrappedResponse);
-    //close underlying stream
-    gzout.close();
-    response.setContentLength(baos.size());
-    IOUtils.write(baos.toByteArray(), response.getOutputStream());
+    // close underlying stream
+    countingStream.close();
+    response.setContentLength(countingStream.getCount());
+    // avoid NO CONTENT error thrown by jetty when gzipping empty response
+    if (countingStream.getCount() > 0) {
+      IOUtils.write(baos.toByteArray(), response.getOutputStream());
+    }
   }
 
   /**

@@ -32,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
@@ -45,8 +48,7 @@ public final class WroUtil {
   /**
    * Empty line pattern.
    */
-  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile(loadRegexpWithKey("emptyLine"),
-      Pattern.MULTILINE);
+  public static final Pattern EMTPY_LINE_PATTERN = Pattern.compile(loadRegexpWithKey("emptyLine"), Pattern.MULTILINE);
   /**
    * Thread safe date format used to transform milliseconds into date as string to put in response header. The localy is
    * set explicitly to US to conform to specification.
@@ -331,9 +333,12 @@ public final class WroUtil {
   /**
    * Copy and close the reader and writer streams.
    *
-   * @param reader The source stream.
-   * @param writer The destination stream.
-   * @throws IOException If content cannot be copy.
+   * @param reader
+   *          The source stream.
+   * @param writer
+   *          The destination stream.
+   * @throws IOException
+   *           If content cannot be copy.
    */
   public static void safeCopy(final Reader reader, final Writer writer)
       throws IOException {
@@ -365,5 +370,17 @@ public final class WroUtil {
     } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
+  }
+
+  /**
+   * Cleans the image url by trimming result and removing \' or \" characters if such exists.
+   *
+   * @param imageUrl
+   *          to clean.
+   * @return cleaned image URL.
+   */
+  public static final String cleanImageUrl(final String imageUrl) {
+    notNull(imageUrl);
+    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
   }
 }

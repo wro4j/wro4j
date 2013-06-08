@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
+import static ro.isdc.wro.util.WroUtil.cleanImageUrl;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -120,17 +122,9 @@ public class CssDataUriPreProcessor
       final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
       LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length / 1024, exceedLimit);
       return !exceedLimit;
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       throw new WroRuntimeException("Should never happen", e);
     }
-  }
-  
-  /**
-   * @deprecated use {@link CssDataUriPreProcessor#isReplaceAccepted(String)} instead.
-   */
-  @Deprecated
-  protected boolean replaceWithDataUri(final String dataUri) {
-    return isReplaceAccepted(dataUri);
   }
   
   /**

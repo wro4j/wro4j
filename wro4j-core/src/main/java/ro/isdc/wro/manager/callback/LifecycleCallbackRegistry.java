@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +33,6 @@ public class LifecycleCallbackRegistry
    */
   private final List<ObjectFactory<LifecycleCallback>> callbackFactoryList = new ArrayList<ObjectFactory<LifecycleCallback>>();
   private final Map<String, List<LifecycleCallback>> map = new ConcurrentHashMap<String, List<LifecycleCallback>>();
-
-  /**
-   * @deprecated use {@link #registerCallback(ObjectFactory)} instead to ensure thread-safety.
-   * @param callback to register.
-   */
-  @Deprecated
-  public void registerCallback(final LifecycleCallback callback) {
-    Validate.notNull(callback);
-    registerCallback(new ObjectFactory<LifecycleCallback>() {
-      public LifecycleCallback create() {
-        return callback;
-      }
-    });
-  }
 
   /**
    * Register a callback using a factory responsible for callback instantiation.

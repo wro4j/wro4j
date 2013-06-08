@@ -5,6 +5,7 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
+import static ro.isdc.wro.util.WroUtil.cleanImageUrl;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -31,7 +32,7 @@ import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 
 /**
  * A processor responsible for rewriting url's from inside the css resources.
- * 
+ *
  * @author Alex Objelean
  * @created Created on 9 May, 2010
  */
@@ -54,7 +55,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       final String cssUri = resource.getUri();
       LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
-      final String result = parseCss(css, cssUri);
+      final String result = newCssUrlInspector().findAndReplace(css, createUrlItemHandler(cssUri));
       writer.write(result);
       onProcessCompleted();
     } finally {
@@ -63,8 +64,8 @@ public abstract class AbstractCssUrlRewritingProcessor
     }
   }
 
-  private String parseCss(final String cssContent, final String cssUri) {
-    return newCssUrlInspector().findAndReplace(cssContent, new ItemHandler() {
+  private ItemHandler createUrlItemHandler(final String cssUri) {
+    return new ItemHandler() {
       public String replace(final String originalDeclaration, final String originalUrl) {
         Validate.notNull(originalUrl);
         String replacement = originalDeclaration;
@@ -83,7 +84,7 @@ public abstract class AbstractCssUrlRewritingProcessor
         }
         return replacement;
       }
-    });
+    };
   }
 
   protected CssUrlInspector newCssUrlInspector() {
@@ -95,10 +96,10 @@ public abstract class AbstractCssUrlRewritingProcessor
    */
   protected void onProcessCompleted() {
   }
-  
+
   /**
    * Invoked to replace the entire css declaration.
-   * <p/> 
+   * <p/>
    * An example of css declaration:
    *
    * <pre>
@@ -106,7 +107,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    * </pre>
    *
    * Useful when the css declaration should be changed. The use-case is: {@link FallbackCssDataUriProcessor}.
-   * 
+   *
    * @param originalDeclaration
    *          the original, unchanged declaration.
    * @param modifiedDeclaration
@@ -116,19 +117,19 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected String replaceDeclaration(final String originalDeclaration, final String modifiedDeclaration) {
     return modifiedDeclaration;
   }
-  
+
   /**
    * Invoked when an url is replaced. Useful if you need to do something with newly replaced url.
-   * 
+   *
    * @param replacedUrl
    *          the newly computed url created as a result of url rewriting.
    */
   protected void onUrlReplaced(final String replacedUrl) {
   }
-  
+
   /**
    * Replace provided url with the new url if needed.
-   * 
+   *
    * @param cssUri
    *          Uri of the parsed css.
    * @param imageUrl
@@ -136,22 +137,11 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @return replaced url.
    */
   protected abstract String replaceImageUrl(final String cssUri, final String imageUrl);
-  
-  /**
-   * Cleans the image url by triming result and removing \' or \" characters if such exists.
-   * 
-   * @param imageUrl
-   *          to clean.
-   * @return cleaned image URL.
-   */
-  protected final String cleanImageUrl(final String imageUrl) {
-    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
-  }
-  
+
   /**
    * Check if url must be replaced or not. The replacement is not needed if the url of the image is absolute (can be
    * resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
-   * 
+   *
    * @param url
    *          to check.
    * @return true if url needs to be replaced or remain unchanged.
@@ -159,10 +149,10 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected boolean isReplaceNeeded(final String url) {
     return !(DataUriGenerator.isDataUri(url.trim()) || UrlResourceLocator.isValid(url));
   }
-  
+
   /**
    * This method has protected modifier in order to be accessed by unit test class.
-   * 
+   *
    * @return urlPrefix value.
    * @VisibleForTesting
    */
@@ -170,14 +160,14 @@ public abstract class AbstractCssUrlRewritingProcessor
     final String requestURI = context.getRequest().getRequestURI();
     return FilenameUtils.getFullPath(requestURI) + getProxyResourcePath();
   }
-  
+
   /**
    * @return the part of the url used to identify a proxy resource.
    */
   private String getProxyResourcePath() {
     return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
-  
+
   /**
    * @param url
    *          of the resource to check.

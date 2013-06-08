@@ -394,9 +394,9 @@ public class TestWroFilter {
   private void initVictimWithMockAuthManager() {
     victim = new WroFilter() {
       @Override
-      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
+      protected void onException(final Exception e, final HttpServletResponse response,
           final FilterChain chain) {
-        throw e;
+        throw WroRuntimeException.wrap(e);
       }
 
       @Override

@@ -21,7 +21,6 @@ public class BourbonCssProcessor extends RubySassCssProcessor implements Resourc
    * The processor alias.
    */
   public static final String ALIAS = "bourbonCss";
-
   private static final String BOURBON_GEM_REQUIRE = "bourbon";
 
   /**
@@ -29,8 +28,8 @@ public class BourbonCssProcessor extends RubySassCssProcessor implements Resourc
    * bourbon gem is imported (required).
    */
   @Override
-  protected RubySassEngine getEngine() {
-    final RubySassEngine engine = super.getEngine();
+  protected RubySassEngine newEngine() {
+    final RubySassEngine engine = super.newEngine();
     engine.addRequire(BOURBON_GEM_REQUIRE);
     return engine;
   }
