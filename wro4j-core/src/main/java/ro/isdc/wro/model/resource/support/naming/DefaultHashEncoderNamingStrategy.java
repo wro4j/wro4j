@@ -27,7 +27,7 @@ public class DefaultHashEncoderNamingStrategy
   @Inject
   private HashStrategy hashStrategy;
 
-  
+
   /**
    * @return the {@link HashStrategy} to use for renaming. By default the used strategy is the same as the one
    *         configured by wro4j. Override this method to provide a custom {@link HashStrategy}.
@@ -45,8 +45,7 @@ public class DefaultHashEncoderNamingStrategy
     Validate.notNull(originalName);
     Validate.notNull(inputStream);
     final String baseName = FilenameUtils.getBaseName(originalName);
-    int baseNameIndex = originalName.indexOf(baseName);
-    final String path = originalName.substring(0, baseNameIndex);
+    final String path = FilenameUtils.getPath(originalName);
     final String extension = FilenameUtils.getExtension(originalName);
     final String hash = getHashStrategy().getHash(inputStream);
     final StringBuilder sb = new StringBuilder(path).append(baseName).append("-").append(hash);

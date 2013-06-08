@@ -224,12 +224,7 @@ public class TestWroManager {
   @Test(expected = NullPointerException.class)
   public void cannotRegisterNullCallback() {
     final WroManager manager = new BaseWroManagerFactory().create();
-    final LifecycleCallback callback = null;
-    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
-      public LifecycleCallback create() {
-        return callback;
-      }
-    });
+    manager.registerCallback(null);
   }
 
   /**

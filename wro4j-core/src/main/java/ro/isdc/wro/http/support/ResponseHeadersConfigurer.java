@@ -82,9 +82,6 @@ public class ResponseHeadersConfigurer {
     return new ResponseHeadersConfigurer(config.getHeader()) {
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
-        // TODO probably this is not a good idea to set this field which will have a different value when there will be
-        // more than one instance of wro4j.
-        map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(getLastModifiedTimestamp()));
         if (config.isDebug()) {
           // prevent caching when in development mode
           addNoCacheHeaders(map);
@@ -93,6 +90,9 @@ public class ResponseHeadersConfigurer {
           cal.roll(Calendar.YEAR, 1);
           map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
           map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+          // TODO probably this is not a good idea to set this field which will have a different value when there will be
+          // more than one instance of wro4j.
+          map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(getLastModifiedTimestamp()));
         }
       };
     };
