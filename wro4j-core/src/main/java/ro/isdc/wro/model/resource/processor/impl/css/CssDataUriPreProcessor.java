@@ -131,14 +131,6 @@ public class CssDataUriPreProcessor
   }
 
   /**
-   * @deprecated use {@link CssDataUriPreProcessor#isReplaceAccepted(String)} instead.
-   */
-  @Deprecated
-  protected boolean replaceWithDataUri(final String dataUri) {
-    return isReplaceAccepted(dataUri);
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override

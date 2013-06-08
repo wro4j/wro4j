@@ -64,6 +64,7 @@ import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
+import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -115,7 +116,11 @@ public class TestWroManager {
       return new BaseWroManagerFactory() {
         @Override
         protected void onAfterInitializeManager(final WroManager manager) {
-          manager.registerCallback(new PerformanceLoggerCallback());
+          manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+            public LifecycleCallback create() {
+              return new PerformanceLoggerCallback();
+            }
+          });
         };
 
         @Override
@@ -220,7 +225,11 @@ public class TestWroManager {
   public void cannotRegisterNullCallback() {
     final WroManager manager = new BaseWroManagerFactory().create();
     final LifecycleCallback callback = null;
-    manager.registerCallback(callback);
+    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return callback;
+      }
+    });
   }
 
   /**
@@ -517,7 +526,11 @@ public class TestWroManager {
   public void shouldRegisterCallback() {
     final WroManager manager = new BaseWroManagerFactory().create();
     final LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
-    manager.registerCallback(mockCallback);
+    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return mockCallback;
+      }
+    });
     manager.getCallbackRegistry().onProcessingComplete();
     Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
   }

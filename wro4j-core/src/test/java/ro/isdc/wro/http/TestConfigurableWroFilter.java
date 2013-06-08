@@ -190,8 +190,8 @@ public class TestConfigurableWroFilter {
           return original;
         }
         @Override
-        protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
-          throw e;
+        protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
+          throw WroRuntimeException.wrap(e);
         }
       };
       final Properties properties = new Properties();
@@ -221,8 +221,8 @@ public class TestConfigurableWroFilter {
     }
 
     @Override
-    protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
-      throw e;
+    protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
+      throw WroRuntimeException.wrap(e);
     }
   };
 

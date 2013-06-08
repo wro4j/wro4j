@@ -8,7 +8,6 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -227,15 +225,7 @@ public class WroFilter
    * @return the {@link ResponseHeadersConfigurer}.
    */
   protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
-    /**
-     * TODO: when the WroFilter#configureDefaultsHeaders is deprecated, replace this constructor with factory method.
-     */
-    return new ResponseHeadersConfigurer(wroConfiguration.getHeader()) {
-      @Override
-      public void configureDefaultHeaders(final Map<String, String> map) {
-        useDefaultsFromConfig(wroConfiguration, map);
-      }
-    };
+    return ResponseHeadersConfigurer.fromConfig(wroConfiguration);
   }
 
   /**
@@ -346,29 +336,13 @@ public class WroFilter
   }
 
   /**
-   * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation redirects
-   * to 404 {@link WroRuntimeException} is thrown when in DEPLOYMENT mode.
+   * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation proceeds
+   * with filter chaining when exception is thrown.
    *
    * @param e
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
-    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(e
-        .getMessage(), e);
-    onRuntimeException(re, response, chain);
-  }
-
-  /**
-   * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
-   * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
-   *
-   * @param e
-   *          {@link RuntimeException} thrown during request processing.
-   * @deprecated use {@link WroFilter#onException(Exception, HttpServletResponse, FilterChain)}
-   */
-  @Deprecated
-  protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-      final FilterChain chain) {
     LOG.debug("Exception occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");

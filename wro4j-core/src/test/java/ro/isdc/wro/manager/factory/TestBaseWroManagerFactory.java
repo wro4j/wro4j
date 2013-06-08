@@ -33,6 +33,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
+import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
@@ -93,7 +94,11 @@ public class TestBaseWroManagerFactory {
     final WroManager manager = victim.create();
     InjectorBuilder.create(victim).build().inject(manager);
 
-    manager.registerCallback(callback);
+    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return callback;
+      }
+    });
     manager.getModelFactory().create();
 
     Mockito.verify(callback).onBeforeModelCreated();

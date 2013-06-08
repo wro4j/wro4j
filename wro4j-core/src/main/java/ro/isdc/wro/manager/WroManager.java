@@ -272,22 +272,6 @@ public class WroManager
   /**
    * Registers a callback.
    *
-   * @param callback
-   *          {@link LifecycleCallback} to register.
-   */
-  @Deprecated
-  public final void registerCallback(final LifecycleCallback callback) {
-    notNull(callback);
-    getCallbackRegistry().registerCallback(new ObjectFactory<LifecycleCallback>() {
-      public LifecycleCallback create() {
-        return callback;
-      }
-    });
-  }
-
-  /**
-   * Registers a callback.
-   *
    * @param callbackFactory
    *          {@link ObjectFactory} responsible for creating {@link LifecycleCallback} instance.
    */

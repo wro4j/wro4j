@@ -48,14 +48,6 @@ public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
   }
 
   /**
-   * Use {@link SimpleUriLocatorFactory#addLocator(UriLocator...)} instead.
-   */
-  @Deprecated
-  public final SimpleUriLocatorFactory addUriLocator(final UriLocator... locators) {
-    return addLocator(locators);
-  }
-
-  /**
    * @param locators {@link Collection} of locators to add.
    */
   public final SimpleUriLocatorFactory addLocators(final Collection<UriLocator> locators) {

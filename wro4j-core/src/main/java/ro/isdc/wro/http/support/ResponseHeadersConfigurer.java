@@ -85,7 +85,15 @@ public class ResponseHeadersConfigurer {
         // TODO probably this is not a good idea to set this field which will have a different value when there will be
         // more than one instance of wro4j.
         map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(getLastModifiedTimestamp()));
-        useDefaultsFromConfig(config, map);
+        if (config.isDebug()) {
+          // prevent caching when in development mode
+          addNoCacheHeaders(map);
+        } else {
+          final Calendar cal = Calendar.getInstance();
+          cal.roll(Calendar.YEAR, 1);
+          map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
+          map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+        }
       };
     };
   }
@@ -172,26 +180,6 @@ public class ResponseHeadersConfigurer {
     map.put(HttpHeader.PRAGMA.toString(), "no-cache");
     map.put(HttpHeader.CACHE_CONTROL.toString(), "no-cache");
     map.put(HttpHeader.EXPIRES.toString(), "0");
-  }
-
-  /**
-   * Encapsulates the default headers set based on {@link WroConfiguration}. This exist for backward compatibility and
-   * for internal usage only (do not call this method explicitly).
-   *
-   * @deprecated will be removed when other deprecated methods requiring this method will be removed.
-   */
-  @Deprecated
-  protected static void useDefaultsFromConfig(final WroConfiguration config, final Map<String, String> map) {
-    // put defaults
-    if (config.isDebug()) {
-      // prevent caching when in development mode
-      addNoCacheHeaders(map);
-    } else {
-      final Calendar cal = Calendar.getInstance();
-      cal.roll(Calendar.YEAR, 1);
-      map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-      map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
-    }
   }
 
   /**
