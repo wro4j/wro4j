@@ -32,7 +32,7 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @created 11 Apr 2013
- * @since 1.6.4
+ * @since 1.7.0
  */
 public class GzipFilter
     implements Filter {

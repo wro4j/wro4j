@@ -22,7 +22,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  * Responsible for computing the url of the images from css based on the location of the css where they are located.
  *
  * @author Alex Objelean
- * @since 1.6.4
+ * @since 1.7.0
  */
 public class ImageUrlRewriter {
   private static final Logger LOG = LoggerFactory.getLogger(ImageUrlRewriter.class);
