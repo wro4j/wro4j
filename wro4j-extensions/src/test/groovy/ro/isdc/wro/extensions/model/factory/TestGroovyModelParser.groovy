@@ -17,6 +17,7 @@ package ro.isdc.wro.extensions.model.factory
 
 import org.junit.Test
 import ro.isdc.wro.model.WroModel
+import ro.isdc.wro.model.WroModelInspector
 import ro.isdc.wro.model.resource.ResourceType
 import ro.isdc.wro.WroRuntimeException
 
