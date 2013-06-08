@@ -13,7 +13,7 @@ import ro.isdc.wro.model.resource.Resource;
  * seconds).
  *
  * @author Alex Objelean
- * @since 1.6.4
+ * @since 1.7.0
  * @created 27 May 2013
  */
 public class ProgressIndicator {

@@ -49,16 +49,10 @@ public class TestLifecycleCallbackRegistry {
     Context.unset();
   }
 
-  @Test(expected=NullPointerException.class)
-  public void shouldNotAcceptNullCallback() {
-    final LifecycleCallback callback = null;
-    registry.registerCallback(callback);
-  }
-
   @Test
   public void shouldInvokeRegisteredCallbacks() {
     final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
-    registry.registerCallback(callback);
+    registry.registerCallback(factoryFor(callback));
 
     registry.onBeforeModelCreated();
     Mockito.verify(callback).onBeforeModelCreated();
@@ -88,6 +82,14 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(callback).onProcessingComplete();
   }
 
+  private ObjectFactory<LifecycleCallback> factoryFor(final LifecycleCallback callback) {
+    return new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return callback;
+      }
+    };
+  }
+
   @Test
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
@@ -103,8 +105,8 @@ public class TestLifecycleCallbackRegistry {
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterMerge();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onProcessingComplete();
 
-    registry.registerCallback(failingCallback);
-    registry.registerCallback(simpleCallback);
+    registry.registerCallback(factoryFor(failingCallback));
+    registry.registerCallback(factoryFor(simpleCallback));
 
     registry.onBeforeModelCreated();
     registry.onAfterModelCreated();
@@ -157,7 +159,11 @@ public class TestLifecycleCallbackRegistry {
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setGroupExtractor(groupExtractor)
         .setModelFactory(modelFactory);
     final WroManager manager = managerFactory.create();
-    manager.registerCallback(callback);
+    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return callback;
+      }
+    });
     manager.process();
 
     Mockito.verify(callback).onBeforeModelCreated();

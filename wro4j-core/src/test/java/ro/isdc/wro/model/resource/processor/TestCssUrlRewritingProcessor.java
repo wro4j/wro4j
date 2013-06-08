@@ -17,11 +17,16 @@ import java.util.concurrent.Callable;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
+import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -32,6 +37,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 3, 2008
  */
 public class TestCssUrlRewritingProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(TestCssUrlRewritingProcessor.class);
   private CssUrlRewritingProcessor processor;
 
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
@@ -41,6 +47,14 @@ public class TestCssUrlRewritingProcessor {
   public void setUp() {
     Context.set(Context.standaloneContext());
     processor = new CssUrlRewritingProcessor() {
+      @Inject
+      private ResourceAuthorizationManager authorizationManager;
+      @Override
+      protected void onProcessCompleted() {
+        if (authorizationManager instanceof DefaultResourceAuthorizationManager) {
+          LOG.debug("allowed urls: {}", ((DefaultResourceAuthorizationManager) authorizationManager).list());
+        }
+      }
       @Override
       protected String getUrlPrefix() {
         return "[WRO-PREFIX]?id=";

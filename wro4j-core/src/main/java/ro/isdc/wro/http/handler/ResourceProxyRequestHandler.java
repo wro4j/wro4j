@@ -77,19 +77,19 @@ public class ResourceProxyRequestHandler
 
     // set expiry headers
     getHeadersConfigurer().setHeaders(response);
-
-    response.setStatus(HttpServletResponse.SC_OK);
     InputStream is = null;
     try {
       is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
       final int length = IOUtils.copy(is, outputStream);
       // servlet engine may ignore this if content body is flushed to client
       response.setContentLength(length);
+      response.setStatus(HttpServletResponse.SC_OK);
     } finally {
       IOUtils.closeQuietly(is);
       IOUtils.closeQuietly(outputStream);
     }
   }
+
 
   private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
     if (!authManager.isAuthorized(resourceUri)) {

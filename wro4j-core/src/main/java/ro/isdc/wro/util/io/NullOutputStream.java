@@ -7,7 +7,7 @@ import java.io.OutputStream;
  * Implementation of {@link OutputStream} that simply discards written bytes.
  *
  * @author Alex Objelean
- * @since 1.6.4
+ * @since 1.7.0
  */
 public final class NullOutputStream
     extends OutputStream {

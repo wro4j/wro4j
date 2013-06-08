@@ -29,7 +29,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script-1.6.2.min.js";
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.js";
   private String[] options;
   private ScriptableObject scope;
   private WebjarUriLocator webjarLocator;

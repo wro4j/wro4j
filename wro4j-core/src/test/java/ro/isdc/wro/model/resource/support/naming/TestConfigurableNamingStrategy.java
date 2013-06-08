@@ -64,7 +64,7 @@ public class TestConfigurableNamingStrategy {
 
   @Test
   public void shouldUseHashEncoderStrategyForValidAlias() {
-    shouldUseCorrectStrategyForValidAlias(HashEncoderNamingStrategy.class, HashEncoderNamingStrategy.ALIAS);
+    shouldUseCorrectStrategyForValidAlias(DefaultHashEncoderNamingStrategy.class, DefaultHashEncoderNamingStrategy.ALIAS);
   }
 
   private void shouldUseCorrectStrategyForValidAlias(final Class<?> strategyClass, final String alias) {
