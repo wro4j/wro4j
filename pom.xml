@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -9,7 +8,7 @@
     <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.7.0</version>
     <packaging>pom</packaging>
     <name>wro4j parent</name>
     <inceptionYear>2008</inceptionYear>
@@ -35,7 +34,8 @@
         <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>
         <url>http://github.com/alexo/wro4j.git</url>
-    </scm>
+      <tag>wro4j-parent-1.7.0</tag>
+  </scm>
     <mailingLists>
         <mailingList>
             <name>Discussion Group</name>
