@@ -214,4 +214,12 @@ public class ServletContextUriLocator
       throw new IOException("Exception while reading resource from " + uri);
     }
   }
+
+  /**
+   * @return the strategy used by this locator.
+   * @VisibleForTesting
+   */
+  public LocatorStrategy getLocatorStrategy() {
+    return locatorStrategy;
+  }
 }

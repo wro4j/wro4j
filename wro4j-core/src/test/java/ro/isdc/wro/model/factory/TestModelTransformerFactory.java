@@ -5,9 +5,8 @@ package ro.isdc.wro.model.factory;
 
 import java.util.Arrays;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,32 +25,32 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestModelTransformerFactory {
   @Mock
   private WroModelFactory mockFactory;
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     Mockito.when(mockFactory.create()).thenReturn(new WroModel());
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
   }
-  
+
   private ModelTransformerFactory factory;
-  
+
   @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullDecoratedModel() {
     factory = new ModelTransformerFactory(null);
   }
-  
+
   @Test
   public void shouldNotChangeTheModelWhenNoTransformersProvided() {
     factory = new ModelTransformerFactory(mockFactory);
     Assert.assertEquals(new WroModel().getGroups(), factory.create().getGroups());
   }
-  
+
   @Test
   public void shouldChangeTheModelWhenTransformersProvided() {
     final Transformer<WroModel> transformer = new Transformer<WroModel>() {

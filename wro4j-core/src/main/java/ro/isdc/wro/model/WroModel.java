@@ -44,15 +44,6 @@ public final class WroModel {
   }
 
   /**
-   * @return a set of group names.
-   * @deprecated use {@link WroModelInspector#getGroupNames()}
-   */
-  @Deprecated
-  public final List<String> getGroupNames() {
-    return new WroModelInspector(this).getGroupNames();
-  }
-
-  /**
    * @param groups
    *          the groups to set
    */

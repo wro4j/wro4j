@@ -29,7 +29,7 @@ public class TestResourceChangeDetector {
     Context.set(Context.standaloneContext());
     victim = new ResourceChangeDetector();
     final WroManagerFactory managerFactory = new BaseWroManagerFactory()
-        .setUriLocatorFactory(new SimpleUriLocatorFactory().addUriLocator(WroTestUtils.createResourceMockingLocator()));
+        .setUriLocatorFactory(new SimpleUriLocatorFactory().addLocator(WroTestUtils.createResourceMockingLocator()));
     final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
   }

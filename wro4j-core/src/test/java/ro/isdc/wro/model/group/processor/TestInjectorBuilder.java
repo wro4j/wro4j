@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.model.group.processor;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertSame;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

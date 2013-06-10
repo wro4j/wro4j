@@ -1,0 +1,6 @@
+.foo {
+  background-image: url(http://example.com/foo.png);
+}
+.foo:after {
+  content: "Go to http://example.com/";
+}

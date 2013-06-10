@@ -136,6 +136,14 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     writeGroupNameMap();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean isIncrementalCheckRequired() {
+    return super.isIncrementalCheckRequired() && destinationFolder.exists();
+  }
+
   private void writeGroupNameMap()
       throws Exception {
     if (groupNameMappingFile != null) {

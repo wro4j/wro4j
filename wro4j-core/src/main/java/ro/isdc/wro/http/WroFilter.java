@@ -8,10 +8,10 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,7 +28,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -42,6 +41,7 @@ import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -85,6 +85,7 @@ public class WroFilter
    */
   private boolean enable = true;
   private Injector injector;
+  private MBeanServer mbeanServer = null;
 
   /**
    * {@inheritDoc}
@@ -97,8 +98,10 @@ public class WroFilter
     this.wroManagerFactory = createWroManagerFactory();
     headersConfigurer = newResponseHeadersConfigurer();
     registerChangeListeners();
-    initJMX();
+    registerMBean();
     doInit(config);
+    LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
+    LOG.info("wro4j configuration: {}", wroConfiguration);
   }
 
   /**
@@ -130,22 +133,35 @@ public class WroFilter
   }
 
   /**
-   * Expose MBean to tell JMX infrastructure about our MBean.
+   * Expose MBean to tell JMX infrastructure about our MBean (only if jmxEnabled is true).
    */
-  private void initJMX() {
-    try {
-      if (wroConfiguration.isJmxEnabled()) {
-        final MBeanServer mbeanServer = getMBeanServer();
-        final ObjectName name = new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
+  private void registerMBean() {
+    if (wroConfiguration.isJmxEnabled()) {
+      try {
+        mbeanServer = getMBeanServer();
+        final ObjectName name = getMBeanObjectName();
         if (!mbeanServer.isRegistered(name)) {
           mbeanServer.registerMBean(wroConfiguration, name);
         }
+      } catch (final JMException e) {
+        LOG.error("Exception occured while registering MBean", e);
       }
-      LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
-      LOG.info("wro4j configuration: {}", wroConfiguration);
+    }
+  }
+
+  private void unregisterMBean() {
+    try {
+      if (mbeanServer != null && mbeanServer.isRegistered(getMBeanObjectName())) {
+        mbeanServer.unregisterMBean(getMBeanObjectName());
+      }
     } catch (final JMException e) {
       LOG.error("Exception occured while registering MBean", e);
     }
+  }
+
+  private ObjectName getMBeanObjectName()
+      throws MalformedObjectNameException {
+    return new ObjectName(newMBeanName(), "type", WroConfiguration.class.getSimpleName());
   }
 
   /**
@@ -174,7 +190,7 @@ public class WroFilter
       LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
           + contextPath + " contextPath.");
     }
-    return contextPath.replaceFirst("/", "");
+    return contextPath.replaceFirst(ServletContextUriLocator.PREFIX, "");
   }
 
   /**
@@ -210,16 +226,7 @@ public class WroFilter
    * @return the {@link ResponseHeadersConfigurer}.
    */
   protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
-    /**
-     * TODO: when the WroFilter#configureDefaultsHeaders is deprecated, replace this constructor with factory method.
-     */
-    return new ResponseHeadersConfigurer(wroConfiguration.getHeader()) {
-      @Override
-      public void configureDefaultHeaders(final Map<String, String> map) {
-        useDefaultsFromConfig(wroConfiguration, map);
-        WroFilter.this.configureDefaultHeaders(map);
-      }
-    };
+    return ResponseHeadersConfigurer.fromConfig(wroConfiguration);
   }
 
   /**
@@ -232,18 +239,6 @@ public class WroFilter
   private long valueAsLong(final Object value) {
     Validate.notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
-  }
-
-  /**
-   * Allow configuration of default headers. This is useful when you need to set custom expires headers.
-   *
-   * @param map
-   *          the {@link Map} where key represents the header name, and value - header value.
-   * @deprecated use {@link WroFilter#newResponseHeaderConfigurer()} and
-   *             {@link ResponseHeadersConfigurer#configureDefaultHeaders(Map)}
-   */
-  @Deprecated
-  protected void configureDefaultHeaders(final Map<String, String> map) {
   }
 
   /**
@@ -342,29 +337,13 @@ public class WroFilter
   }
 
   /**
-   * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation redirects
-   * to 404 {@link WroRuntimeException} is thrown when in DEPLOYMENT mode.
+   * Invoked when a {@link Exception} is thrown. Allows custom exception handling. The default implementation proceeds
+   * with filter chaining when exception is thrown.
    *
    * @param e
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
-    final RuntimeException re = e instanceof RuntimeException ? (RuntimeException) e : new WroRuntimeException(e
-        .getMessage(), e);
-    onRuntimeException(re, response, chain);
-  }
-
-  /**
-   * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
-   * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
-   *
-   * @param e
-   *          {@link RuntimeException} thrown during request processing.
-   * @deprecated use {@link WroFilter#onException(Exception, HttpServletResponse, FilterChain)}
-   */
-  @Deprecated
-  protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-      final FilterChain chain) {
     LOG.debug("Exception occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
@@ -479,6 +458,8 @@ public class WroFilter
    * {@inheritDoc}
    */
   public void destroy() {
+    //Avoid memory leak by unregistering mBean on destroy
+    unregisterMBean();
     if (wroManagerFactory != null) {
       wroManagerFactory.destroy();
     }

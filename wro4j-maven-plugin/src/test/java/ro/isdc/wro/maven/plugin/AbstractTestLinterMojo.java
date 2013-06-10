@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.testing.SilentLog;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,26 +28,27 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * @author Alex Objelean
  */
 public abstract class AbstractTestLinterMojo {
-  private AbstractSingleProcessorMojo mojo;
+  private AbstractLinterMojo mojo;
 
   @Before
   public void setUp()
       throws Exception {
     mojo = newLinterMojo();
+    mojo.setLog(new SilentLog());
     mojo.setIgnoreMissingResources(false);
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
   }
 
-  protected final AbstractSingleProcessorMojo getMojo() {
+  protected final AbstractLinterMojo getMojo() {
     return mojo;
   }
 
   /**
    * @return Mojo to test.
    */
-  protected abstract AbstractSingleProcessorMojo newLinterMojo();
+  protected abstract AbstractLinterMojo newLinterMojo();
 
   private void setWroFile(final String classpathResourceName)
       throws URISyntaxException {

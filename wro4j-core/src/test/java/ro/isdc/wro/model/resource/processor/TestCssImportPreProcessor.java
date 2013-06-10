@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -13,10 +13,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -143,7 +145,11 @@ public class TestCssImportPreProcessor {
    */
   @Test
   public void shouldNotComplainAboutRecursiveImportWhenRunningConcurrently() throws Exception {
+    final AtomicReference<Map<?, ?>> contextMapRef = new AtomicReference<Map<?,?>>();
     victim = new CssImportPreProcessor() {
+      {{
+        contextMapRef.set(getContextMap());
+      }}
       @Override
       protected void onRecursiveImportDetected() {
         throw new WroRuntimeException("Recursion detected");
@@ -153,6 +159,7 @@ public class TestCssImportPreProcessor {
     WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
+        Context.set(Context.standaloneContext());
         final Reader reader = new StringReader("@import('/path/to/imported');");
         final Resource resource1 = Resource.create("resource1.css");
         final Resource resource2 = Resource.create("resource2.css");
@@ -161,8 +168,10 @@ public class TestCssImportPreProcessor {
         } else {
           victim.process(resource2, reader, new StringWriter());
         }
+        Context.unset();
         return null;
       }
     }));
+    assertTrue(contextMapRef.get().isEmpty());
   }
 }

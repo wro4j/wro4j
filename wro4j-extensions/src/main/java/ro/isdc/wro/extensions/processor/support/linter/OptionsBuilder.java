@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
+
 
 /**
  * Responsible for building json representations of the options consumed by linter code.
@@ -68,6 +70,12 @@ public class OptionsBuilder {
   private String processSingleOption(final String option) {
     String optionName = option;
     String optionValue = Boolean.TRUE.toString();
+    if (option.contains(":")) {
+      final String message = String.format("Invalid option: '%s'. Expected format: key=value or key=['v1','v2']",
+          option);
+      LOG.error(message);
+      throw new WroRuntimeException(message);
+    }
     if (option.contains("=")) {
       final String[] optionEntry = option.split("=");
       if (optionEntry.length != 2) {

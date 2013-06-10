@@ -6,8 +6,7 @@ package ro.isdc.wro.config.factory;
 
 import javax.servlet.FilterConfig;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

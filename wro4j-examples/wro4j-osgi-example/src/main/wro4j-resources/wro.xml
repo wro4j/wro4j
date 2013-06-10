@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+
+  <group name="angular">
+    <js>classpath:META-INF/resources/webjars/angularjs/${angular.version}/angular.js</js>
+    <js>classpath:META-INF/resources/webjars/angularjs/${angular.version}/angular-resource.js</js>
+  </group>
+
+  <group name="bootstrap">
+    <js>classpath:META-INF/resources/webjars/bootstrap/${bootstrap.version}/js/bootstrap.js</js>
+    <css>classpath:META-INF/resources/webjars/bootstrap/${bootstrap.version}/css/bootstrap.css</css>
+  </group>
+
+  <group name="bootstrap-responsive">
+    <js>classpath:META-INF/resources/webjars/bootstrap/${bootstrap.version}/js/bootstrap.js</js>
+    <css>classpath:META-INF/resources/webjars/bootstrap/${bootstrap.version}/css/bootstrap-responsive.css</css>
+  </group>
+
+  <group name="jasmine">
+    <js>classpath:META-INF/resources/webjars/jasmine/${jasmine.version}/jasmine.js</js>
+    <js>classpath:META-INF/resources/webjars/jasmine/${jasmine.version}/jasmine-html.js</js>
+    <css>classpath:META-INF/resources/webjars/jasmine/${jasmine.version}/jasmine.css</css>
+  </group>
+
+  <group name="json2">
+    <js>classpath:META-INF/resources/webjars/json2/${json2.version}/json2.js</js>
+  </group>
+
+  <group name="jquery">
+    <js>classpath:META-INF/resources/webjars/jquery/${jquery.version}/jquery.js</js>
+  </group>
+
+  <group name="thirdparty">
+    <group-ref>jquery</group-ref>
+    <group-ref>json2</group-ref>
+    <group-ref>jasmine</group-ref>
+    <group-ref>bootstrap</group-ref>
+    <group-ref>angular</group-ref>
+  </group>
+
+  <group name="controllers">
+    <js>${wro4j.path.prefix}/js/controllers.js</js>
+  </group>
+
+  <group name="directives">
+    <js>${wro4j.path.prefix}/js/directives.js</js>
+  </group>
+
+  <group name="filters">
+    <js>${wro4j.path.prefix}/js/filters.js</js>
+  </group>
+
+  <group name="services">
+    <js>${wro4j.path.prefix}/js/services.js</js>
+  </group>
+
+  <group name="app">
+    <js>${wro4j.path.prefix}/js/app.js</js>
+    <css>${wro4j.path.prefix}/css/app.css</css>
+  </group>
+
+  <group name="application">
+    <group-ref>controllers</group-ref>
+    <group-ref>directives</group-ref>
+    <group-ref>filters</group-ref>
+    <group-ref>services</group-ref>
+    <group-ref>app</group-ref>
+  </group>
+
+</groups>

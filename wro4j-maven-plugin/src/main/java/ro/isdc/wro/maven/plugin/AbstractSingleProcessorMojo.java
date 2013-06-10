@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 
 import javax.servlet.FilterConfig;
@@ -22,6 +21,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -37,13 +37,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    * @optional
    */
   private String options;
-  /**
-   * When true, all the plugin won't stop its execution and will log all found errors.
-   *
-   * @parameter default-value="false" expression="${failNever}"
-   * @optional
-   */
-  private boolean failNever;
+
 
   /**
    * {@inheritDoc}
@@ -52,7 +46,6 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
   public final void doExecute()
     throws Exception {
     getLog().info("options: " + options);
-    getLog().info("failNever: " + failNever);
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
@@ -74,7 +67,7 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     Mockito.when(request.getRequestURI()).thenReturn(group);
     //mock response
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
 
     //init context
     final WroConfiguration config = Context.get().getConfig();
@@ -105,7 +98,11 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
     return factory;
   }
 
+  /**
+   * Factory method responsible for creating the processor which will be applied for this build.
+   */
   protected abstract ResourcePreProcessor createResourceProcessor();
+
 
   /**
    * @return raw representation of the option value.
@@ -120,21 +117,5 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    */
   void setOptions(final String options) {
     this.options = options;
-  }
-
-  /**
-   * @param failNever the failFast to set
-   * @VisibleForTesting
-   */
-  void setFailNever(final boolean failNever) {
-    this.failNever = failNever;
-  }
-
-  /**
-   * @return the failNever
-   * @VisibleForTesting
-   */
-  boolean isFailNever() {
-    return failNever;
   }
 }

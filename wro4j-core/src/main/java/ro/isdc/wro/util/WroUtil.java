@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -309,22 +311,6 @@ public final class WroUtil {
   }
 
   /**
-   * Wraps original exception into {@link WroRuntimeException} and throw it.
-   *
-   * @param e
-   *          the exception to wrap.
-   * @deprecated use {@link WroRuntimeException#wrap(Exception)}
-   */
-  @Deprecated
-  public static void wrapWithWroRuntimeException(final Exception e) {
-    LOG.error("Exception occured: " + e.getClass(), e.getCause());
-    if (e instanceof WroRuntimeException) {
-      throw (WroRuntimeException) e;
-    }
-    throw new WroRuntimeException(e.getMessage(), e);
-  }
-
-  /**
    * Load the regular expression stored in in regexp.properties resource file.
    *
    * @param key
@@ -388,5 +374,17 @@ public final class WroUtil {
     } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
+  }
+
+  /**
+   * Cleans the image url by trimming result and removing \' or \" characters if such exists.
+   *
+   * @param imageUrl
+   *          to clean.
+   * @return cleaned image URL.
+   */
+  public static final String cleanImageUrl(final String imageUrl) {
+    notNull(imageUrl);
+    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
   }
 }

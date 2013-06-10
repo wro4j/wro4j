@@ -15,8 +15,9 @@
 */
 package wro4j.grails.plugin
 
-import ro.isdc.wro.http.ConfigurableWroFilter
 import javax.servlet.FilterConfig
+
+import ro.isdc.wro.http.ConfigurableWroFilter
 
 /**
  * A WroFilter that can be reloaded with the #reload() method
@@ -25,16 +26,16 @@ import javax.servlet.FilterConfig
  */
 class ReloadableWroFilter extends ConfigurableWroFilter {
 
-  private FilterConfig filterConfig;
+  private FilterConfig filterConfig
 
   /** Reload the wroFilter  */
   void reload() {
-    this.destroy()
-    this.init(filterConfig)
+    destroy()
+    init(filterConfig)
   }
 
   /** Store the filterConfig     */
   void doInit(FilterConfig filterConfig) {
-    this.filterConfig = filterConfig;
+    this.filterConfig = filterConfig
   }
 }

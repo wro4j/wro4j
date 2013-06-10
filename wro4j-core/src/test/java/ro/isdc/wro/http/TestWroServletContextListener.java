@@ -1,6 +1,6 @@
 package ro.isdc.wro.http;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -10,8 +10,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -28,7 +27,7 @@ import ro.isdc.wro.util.AbstractDecorator;
 
 /**
  * Test {@link WroServletContextListener} class.
- * 
+ *
  * @author Alex Objelean
  */
 public class TestWroServletContextListener {
@@ -38,17 +37,17 @@ public class TestWroServletContextListener {
   @Mock
   private ServletContext mockServletContext;
   private WroServletContextListener victim;
-  
+
   @Before
   public void setUp() {
     initMocks(this);
     map.clear();
-    
+
     when(mockServletContextEvent.getServletContext()).thenReturn(mockServletContext);
     when(mockServletContext.getAttribute(Mockito.anyString())).then(new Answer<Object>() {
       public Object answer(final InvocationOnMock invocation)
           throws Throwable {
-        return map.get((String) invocation.getArguments()[0]);
+        return map.get(invocation.getArguments()[0]);
       }
     });
     Mockito.doAnswer(new Answer<Object>() {
@@ -74,51 +73,51 @@ public class TestWroServletContextListener {
     victim.contextInitialized(mockServletContextEvent);
     assertNotNull(victim.getConfiguration());
   }
-  
+
   @Test(expected = IllegalStateException.class)
   public void shouldFailWhenMultipleListenersWithSameNameDefined() {
     victim.contextInitialized(mockServletContextEvent);
     victim.contextInitialized(mockServletContextEvent);
   }
-  
+
   @Test
   public void shouldNotFailWhenContextInitializedAndDestroyed() {
     victim.contextInitialized(mockServletContextEvent);
     victim.contextDestroyed(mockServletContextEvent);
     victim.contextInitialized(mockServletContextEvent);
   }
-  
+
   @Test
   public void shouldCreateBaseWroManagerFactoryByDefault() {
     victim.contextInitialized(mockServletContextEvent);
     Assert.assertEquals(DefaultWroManagerFactory.class, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()).getClass());
   }
-  
+
   @Test
   public void shouldCreateWroManagerFactorySpecifiedByWroConfiguration() {
     victim.contextInitialized(mockServletContextEvent);
     Assert.assertEquals(DefaultWroManagerFactory.class, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()).getClass());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotSetNullWroConfiguration() {
     victim.setConfiguration(null);
   }
-  
+
 
   @Test(expected = NullPointerException.class)
   public void cannotSetNullWroManager() {
     victim.setManagerFactory(null);
   }
-  
+
   @Test
   public void shouldUseTheConfigurationSet() {
-    WroConfiguration configuration = new WroConfiguration();
+    final WroConfiguration configuration = new WroConfiguration();
     victim.setConfiguration(configuration);
     victim.contextInitialized(mockServletContextEvent);
     Assert.assertSame(configuration, victim.getConfiguration());
   }
-  
+
 
   @Test
   public void shouldUseOverridenConfiguration() {
@@ -132,7 +131,7 @@ public class TestWroServletContextListener {
     victim.contextInitialized(mockServletContextEvent);
     Assert.assertSame(configuration, victim.getConfiguration());
   }
-  
+
 
   @Test
   public void shouldUseTheWroManagerSet() {
@@ -141,7 +140,7 @@ public class TestWroServletContextListener {
     victim.contextInitialized(mockServletContextEvent);
     Assert.assertSame(managerFactory, AbstractDecorator.getOriginalDecoratedObject(victim.getManagerFactory()));
   }
-  
+
 
   @Test
   public void shouldUseOverridenManagerFactory() {

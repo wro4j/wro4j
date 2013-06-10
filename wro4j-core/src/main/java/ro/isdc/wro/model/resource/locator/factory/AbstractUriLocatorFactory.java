@@ -10,6 +10,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
@@ -33,7 +34,7 @@ public abstract class AbstractUriLocatorFactory implements UriLocatorFactory {
     throws IOException {
     final UriLocator uriLocator = getInstance(uri);
     if (uriLocator == null) {
-      throw new IOException("No locator is capable of handling uri: " + uri);
+      throw new WroRuntimeException("No locator is capable of handling uri: " + uri);
     }
     LOG.debug("[OK] locating {} using locator: {}", uri, uriLocator.getClass().getSimpleName());
     return new AutoCloseInputStream(uriLocator.locate(uri));

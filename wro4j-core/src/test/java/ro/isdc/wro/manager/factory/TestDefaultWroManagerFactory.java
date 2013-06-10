@@ -1,12 +1,15 @@
 package ro.isdc.wro.manager.factory;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 
 
@@ -15,22 +18,23 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
  */
 public class TestDefaultWroManagerFactory {
   private DefaultWroManagerFactory victim;
-  
+
   @Before
   public void setUp() {
     victim = new DefaultWroManagerFactory(new WroConfiguration());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullConfiguration() {
-    new DefaultWroManagerFactory(null);
+    final WroConfiguration config = null;
+    new DefaultWroManagerFactory(config);
   }
-  
+
   @Test
   public void shouldCreateADefaultManagerFactory() {
-    Assert.assertEquals(BaseWroManagerFactory.class, victim.getFactory().getClass());
+    assertEquals(BaseWroManagerFactory.class, victim.getFactory().getClass());
   }
-  
+
   @Test
   public void shouldCreateOverridenManagerFactory() {
     victim = new DefaultWroManagerFactory(new WroConfiguration()) {
@@ -39,25 +43,25 @@ public class TestDefaultWroManagerFactory {
         return new ConfigurableWroManagerFactory();
       }
     };
-    Assert.assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
+    assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
   }
-  
+
 
   @Test
   public void shouldCreateManagerFactory() {
-    WroConfiguration config = new WroConfiguration();
+    final WroConfiguration config = new WroConfiguration();
     config.setWroManagerClassName(NoProcessorsWroManagerFactory.class.getName());
     victim = new DefaultWroManagerFactory(config);
-    Assert.assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
+    assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void cannotCreateInvalidConfiguredManagerFactory() {
-    WroConfiguration config = new WroConfiguration();
+    final WroConfiguration config = new WroConfiguration();
     config.setWroManagerClassName("invalid.class.name.ManagerFactory");
     victim = new DefaultWroManagerFactory(config);
   }
-  
+
   @Test
   public void shouldInvokeListenerMethods() {
     final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
@@ -69,8 +73,41 @@ public class TestDefaultWroManagerFactory {
     };
     victim.onCachePeriodChanged(0);
     Mockito.verify(mockManagerFactory).onCachePeriodChanged(0);
-    
+
     victim.onModelPeriodChanged(0);
     Mockito.verify(mockManagerFactory).onModelPeriodChanged(0);
+  }
+
+
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullProperty() {
+    final Properties props = null;
+    new DefaultWroManagerFactory(props);
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void cannotAcceptInvalidManagerClassConfiguredInProperties() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.managerFactoryClassName.name(), "invalid");
+    new DefaultWroManagerFactory(props);
+  }
+
+  @Test
+  public void shouldLoadValidManagerClassConfiguredInProperties() {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.managerFactoryClassName.name(), NoProcessorsWroManagerFactory.class.getName());
+    final DefaultWroManagerFactory victim = new DefaultWroManagerFactory(props);
+    assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
+  }
+
+  @Test
+  public void shouldCreateOverridenManagerFactoryWhenManagerClassPropertyIsMissing() {
+    victim = new DefaultWroManagerFactory(new Properties()) {
+      @Override
+      protected WroManagerFactory newManagerFactory() {
+        return new ConfigurableWroManagerFactory();
+      }
+    };
+    assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
   }
 }

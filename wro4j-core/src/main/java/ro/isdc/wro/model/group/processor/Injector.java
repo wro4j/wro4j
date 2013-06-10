@@ -3,10 +3,13 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -31,13 +34,12 @@ import ro.isdc.wro.util.ObjectDecorator;
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
   private final Map<Class<?>, Object> map;
-  private final Map<Object, Boolean> injectedObjects = new WeakHashMap<Object, Boolean>();
-
+  private final Map<Object, Boolean> injectedObjects = Collections.synchronizedMap(new WeakHashMap<Object, Boolean>());
   /**
    * Mapping of classes to be annotated and the corresponding injected object.
    */
   Injector(final Map<Class<?>, Object> map) {
-    Validate.notNull(map);
+    notNull(map);
     this.map = map;
   }
 

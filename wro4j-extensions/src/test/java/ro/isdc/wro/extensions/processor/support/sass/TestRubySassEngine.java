@@ -2,9 +2,8 @@ package ro.isdc.wro.extensions.processor.support.sass;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

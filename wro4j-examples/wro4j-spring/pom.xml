@@ -5,11 +5,11 @@
     <parent>
         <artifactId>wro4j-examples</artifactId>
         <groupId>ro.isdc.wro4j</groupId>
-        <version>1.6.3-SNAPSHOT</version>
+        <version>1.7.0</version>
     </parent>
     <groupId>ro.isdc.wro</groupId>
     <version>1.0-SNAPSHOT</version>
-    <name>wro4j-examples</name>
+    <name>wro4j spring</name>
     <artifactId>wro4j-spring</artifactId>
     <packaging>war</packaging>
     <properties>

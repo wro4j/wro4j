@@ -10,7 +10,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +65,8 @@ public class GroupsProcessor {
   public String process(final CacheKey cacheKey) {
     Validate.notNull(cacheKey);
     try {
-      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
-          cacheKey.getGroupName(), cacheKey.getType());
+      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(), cacheKey
+          .getGroupName(), cacheKey.getType());
       // find processed result for a group
       final WroModel model = modelFactory.create();
       final Group group = new WroModelInspector(model).getGroupByName(cacheKey.getGroupName());
@@ -112,15 +111,7 @@ public class GroupsProcessor {
     for (final ResourcePostProcessor processor : processors) {
       final ResourcePreProcessor decoratedProcessor = decorateProcessor(processor, cacheKey.isMinimize());
       writer = new StringWriter();
-      try {
-        callbackRegistry.onBeforePostProcess();
-        //the processor is invoked as a pre processor. This is important for correct computation of eligibility.
-        decoratedProcessor.process(resource, reader, writer);
-      } finally {
-        callbackRegistry.onAfterPostProcess();
-        IOUtils.closeQuietly(reader);
-        IOUtils.closeQuietly(writer);
-      }
+      decoratedProcessor.process(resource, reader, writer);
       reader = new StringReader(writer.toString());
     }
     return writer.toString();
@@ -130,7 +121,18 @@ public class GroupsProcessor {
    * @return a decorated processor.
    */
   private ProcessorDecorator decorateProcessor(final ResourcePostProcessor processor, final boolean minimize) {
-    final ProcessorDecorator decorated = new DefaultProcessorDecorator(processor, minimize);
+    final ProcessorDecorator decorated = new DefaultProcessorDecorator(processor, minimize) {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        try {
+          callbackRegistry.onBeforePostProcess();
+          super.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPostProcess();
+        }
+      }
+    };
     injector.inject(decorated);
     return decorated;
   }

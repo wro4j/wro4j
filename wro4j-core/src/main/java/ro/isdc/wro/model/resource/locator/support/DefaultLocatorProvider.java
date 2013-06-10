@@ -1,7 +1,7 @@
 package ro.isdc.wro.model.resource.locator.support;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -13,7 +13,7 @@ import ro.isdc.wro.util.Ordered;
 
 /**
  * Default implementation of {@link LocatorProvider} providing all {@link UriLocator} implementations from core module.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
@@ -24,7 +24,7 @@ public class DefaultLocatorProvider
    * {@inheritDoc}
    */
   public Map<String, UriLocator> provideLocators() {
-    final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
+    final Map<String, UriLocator> map = new TreeMap<String, UriLocator>();
     map.put(ClasspathUriLocator.ALIAS, new ClasspathUriLocator());
     map.put(ServletContextUriLocator.ALIAS, new ServletContextUriLocator());
     map.put(ServletContextUriLocator.ALIAS_DISPATCHER_FIRST,

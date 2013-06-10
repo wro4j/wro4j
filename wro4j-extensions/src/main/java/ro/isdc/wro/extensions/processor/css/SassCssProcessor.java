@@ -25,7 +25,7 @@ import ro.isdc.wro.util.ObjectFactory;
 
 /**
  * A processor using sass engine:
- * 
+ *
  * @author Alex Objelean
  * @created 27 Oct 2010
  */
@@ -35,10 +35,10 @@ public class SassCssProcessor
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
   public static final String ALIAS = "sassCss";
   public static final String ALIAS_RUBY = "rubySassCss";
-  
-  
+
+
   private ObjectPoolHelper<SassCss> enginePool;
-  
+
   /**
    * default constructor that sets the engine used to RHINO for backwards compatibility.
    */
@@ -50,10 +50,11 @@ public class SassCssProcessor
       }
     });
   }
-  
+
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
@@ -61,11 +62,11 @@ public class SassCssProcessor
     try {
       writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
+      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+      LOG.error("Exception while applying " + SassCss.class.getClass().getSimpleName() + " processor on the " + resourceUri
+          + " resource, no processing applied...", e);
       onException(e);
       writer.write(content);
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + SassCss.class.getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
     } finally {
       reader.close();
       writer.close();
@@ -77,30 +78,31 @@ public class SassCssProcessor
       }
     }
   }
-  
+
   /**
    * Invoked when a processing exception occurs. By default the exception is thrown further.
    */
   protected void onException(final WroRuntimeException e) {
     throw e;
   }
-  
+
   /**
    * Method for processing with Rhino based engine
-   * 
+   *
    * @param content
    * @return
    */
   protected SassCss newEngine() {
     return new SassCss();
   }
-  
+
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
   }
-  
+
 }

@@ -3,9 +3,10 @@
  */
 package ro.isdc.wro.model.resource.locator.factory;
 
-import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
-import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import java.util.List;
+
+import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
+import ro.isdc.wro.util.provider.ProviderFinder;
 
 
 /**
@@ -17,7 +18,9 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  */
 public final class DefaultUriLocatorFactory extends SimpleUriLocatorFactory {
   public DefaultUriLocatorFactory() {
-    addUriLocator(new ServletContextUriLocator()).addUriLocator(new ClasspathUriLocator()).addUriLocator(
-      new UrlUriLocator());
+    final List<LocatorProvider> providers = ProviderFinder.of(LocatorProvider.class).find();
+    for (final LocatorProvider provider : providers) {
+      addLocators(provider.provideLocators().values());
+    }
   }
 }

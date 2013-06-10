@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -38,7 +39,11 @@ public class TestLifecycleCallbackDecorator {
     decorator = new LifecycleCallbackDecorator(callback);
 
     final LifecycleCallbackRegistry registry = new LifecycleCallbackRegistry();
-    registry.registerCallback(decorator);
+    registry.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return decorator;
+      }
+    });
 
     registry.onBeforeModelCreated();
     registry.onAfterModelCreated();

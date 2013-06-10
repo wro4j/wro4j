@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -18,8 +19,7 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * This class is not thread-safe.<br/>
- * The underlying implementation use patched less.js from version <code>1.3.3</code> project: {@link https
- * ://github.com/cloudhead/less.js}.
+ * The underlying implementation uses the webjar containing less.js library.
  *
  * @author Alex Objelean
  * @since 1.3.0
@@ -30,8 +30,8 @@ public class LessCss {
    * The name of the sass script to be used by default.
    */
   public static final String DEFAULT_LESS_JS = "less-1.3.3.min.js";
-  private static final String SCRIPT_RUN = "run.js";
   private static final String SCRIPT_INIT = "init.js";
+  private WebjarUriLocator webjarLocator;
   private ScriptableObject scope;
 
   /**
@@ -42,9 +42,8 @@ public class LessCss {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
         final InputStream initStream = LessCss.class.getResourceAsStream(SCRIPT_INIT);
-        final InputStream runStream = getRunScriptAsStream();
         builder = RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(initStream, SCRIPT_INIT).evaluateChain(
-          getScriptAsStream(), DEFAULT_LESS_JS).evaluateChain(runStream, SCRIPT_RUN);
+            getScriptAsStream(), DEFAULT_LESS_JS);
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);
@@ -59,19 +58,21 @@ public class LessCss {
   }
 
   /**
-   * @return the stream of the script responsible for invoking the less transformation javascript code.
+   * @return stream of the less.js script.
    */
-  protected InputStream getRunScriptAsStream() {
-    return LessCss.class.getResourceAsStream(SCRIPT_RUN);
+  protected InputStream getScriptAsStream() throws IOException {
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("less.min.js"));
   }
 
   /**
-   * @return stream of the less.js script.
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
    */
-  protected InputStream getScriptAsStream() {
-    return LessCss.class.getResourceAsStream(DEFAULT_LESS_JS);
+  private WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
   }
-
 
   /**
    * @param data css content to process.

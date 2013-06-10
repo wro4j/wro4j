@@ -7,5 +7,4 @@ Released under the MIT License
 (function() {
 
 
-
 }).call(this);

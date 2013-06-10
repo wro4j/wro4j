@@ -5,7 +5,15 @@
         <js>/static/jshint/*.js</js>
     </group>
     <group name="cssGroup">
-        <css>/static/csslint/**css</css>
+        <css>/static/csslint/**.css</css>
+    </group>
+    
+    <group name="lessTestcase1">
+        <css>/assets/less/testcase1/testcase.less</css>
+    </group>
+    
+    <group name="webjar">
+        <js>webjar:jquery.js</js>
     </group>
     
 </groups>

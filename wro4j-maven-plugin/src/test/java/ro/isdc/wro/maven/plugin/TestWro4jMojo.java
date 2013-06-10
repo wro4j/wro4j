@@ -3,9 +3,9 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -22,12 +22,11 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -82,7 +81,7 @@ public class TestWro4jMojo {
   private File jsDestinationFolder;
   private File destinationFolder;
   private File extraConfigFile;
-  private Wro4jMojo mojo;
+  private Wro4jMojo victim;
 
   @Before
   public void setUp()
@@ -99,8 +98,8 @@ public class TestWro4jMojo {
       }
     };
     Context.set(Context.standaloneContext());
-    mojo = new Wro4jMojo();
-    setUpMojo(mojo);
+    victim = new Wro4jMojo();
+    setUpMojo(victim);
   }
 
   /**
@@ -123,14 +122,15 @@ public class TestWro4jMojo {
     mojo.setExtraConfigFile(extraConfigFile);
     mojo.setDestinationFolder(destinationFolder);
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
+    mojo.setBuildContext(mockBuildContext);
   }
 
   private void setWroFile(final String classpathResourceName)
       throws URISyntaxException {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
-    mojo.setWroFile(wroFile);
-    mojo.setContextFolder(wroFile.getParentFile().getParentFile());
+    victim.setWroFile(wroFile);
+    victim.setContextFolder(wroFile.getParentFile().getParentFile());
   }
 
   private void setWroWithValidResources()
@@ -146,124 +146,124 @@ public class TestWro4jMojo {
   @Test
   public void testMojoWithPropertiesSetAndOneTargetGroup()
       throws Exception {
-    mojo.setTargetGroups("g1");
-    mojo.setIgnoreMissingResources(true);
-    mojo.execute();
+    victim.setTargetGroups("g1");
+    victim.setIgnoreMissingResources(true);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void shouldFailWhenInvalidResourcesAreUsed()
       throws Exception {
-    mojo.setIgnoreMissingResources(false);
-    mojo.execute();
+    victim.setIgnoreMissingResources(false);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testNoDestinationFolderSet()
       throws Exception {
-    mojo.setDestinationFolder(null);
-    mojo.execute();
+    victim.setDestinationFolder(null);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testOnlyCssDestinationFolderSet()
       throws Exception {
-    mojo.setCssDestinationFolder(cssDestinationFolder);
-    mojo.setDestinationFolder(null);
-    mojo.execute();
+    victim.setCssDestinationFolder(cssDestinationFolder);
+    victim.setDestinationFolder(null);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testOnlyJsDestinationFolderSet()
       throws Exception {
-    mojo.setJsDestinationFolder(jsDestinationFolder);
-    mojo.setDestinationFolder(null);
-    mojo.execute();
+    victim.setJsDestinationFolder(jsDestinationFolder);
+    victim.setDestinationFolder(null);
+    victim.execute();
   }
 
   @Test
   public void testJsAndCssDestinationFolderSet()
       throws Exception {
-    mojo.setIgnoreMissingResources(true);
-    mojo.setJsDestinationFolder(jsDestinationFolder);
-    mojo.setCssDestinationFolder(cssDestinationFolder);
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.setJsDestinationFolder(jsDestinationFolder);
+    victim.setCssDestinationFolder(cssDestinationFolder);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void cannotExecuteWhenInvalidResourcesPresentAndDoNotIgnoreMissingResources()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(false);
-    mojo.execute();
+    victim.setIgnoreMissingResources(false);
+    victim.execute();
   }
 
   @Test
   public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(true);
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testMojoWithWroManagerFactorySet()
       throws Exception {
-    mojo.setWroManagerFactory(ExceptionThrowingWroManagerFactory.class.getName());
-    mojo.execute();
+    victim.setWroManagerFactory(ExceptionThrowingWroManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testInvalidMojoWithWroManagerFactorySet()
       throws Exception {
-    mojo.setWroManagerFactory("INVALID_CLASS_NAME");
-    mojo.execute();
+    victim.setWroManagerFactory("INVALID_CLASS_NAME");
+    victim.execute();
   }
 
   @Test
   public void executeWithNullTargetGroupsProperty()
       throws Exception {
-    mojo.setIgnoreMissingResources(true);
-    mojo.setTargetGroups(null);
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.setTargetGroups(null);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testMojoWithCustomManagerFactoryWithInvalidResourceAndNotIgnoreMissingResources()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(false);
-    mojo.setWroManagerFactory(CustomManagerFactory.class.getName());
-    mojo.execute();
+    victim.setIgnoreMissingResources(false);
+    victim.setWroManagerFactory(CustomManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test
   public void testMojoWithCustomManagerFactoryWithInvalidResourceAndIgnoreMissingResources()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(true);
-    mojo.setWroManagerFactory(CustomManagerFactory.class.getName());
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.setWroManagerFactory(CustomManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
   public void testMojoWithConfigurableWroManagerFactory()
       throws Exception {
     setWroWithValidResources();
-    mojo.setIgnoreMissingResources(true);
+    victim.setIgnoreMissingResources(true);
     // by default a valid file is used, set null explicitly
-    mojo.setExtraConfigFile(null);
-    mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
-    mojo.execute();
+    victim.setExtraConfigFile(null);
+    victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test
   public void testMojoWithConfigurableWroManagerFactoryWithValidAndEmptyConfigFileSet()
       throws Exception {
     setWroWithValidResources();
-    mojo.setIgnoreMissingResources(true);
-    mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test
@@ -273,21 +273,21 @@ public class TestWro4jMojo {
     final String preProcessors = ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS + "=cssMin";
     FileUtils.write(extraConfigFile, preProcessors);
 
-    mojo.setIgnoreMissingResources(true);
-    mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test
   public void testComputedAggregatedFolder()
       throws Exception {
     setWroWithValidResources();
-    mojo.setWroManagerFactory(CssUrlRewriterWroManagerFactory.class.getName());
-    mojo.setIgnoreMissingResources(true);
+    victim.setWroManagerFactory(CssUrlRewriterWroManagerFactory.class.getName());
+    victim.setIgnoreMissingResources(true);
     final File cssDestinationFolder = new File(this.destinationFolder, "subfolder");
     cssDestinationFolder.mkdir();
-    mojo.setCssDestinationFolder(cssDestinationFolder);
-    mojo.execute();
+    victim.setCssDestinationFolder(cssDestinationFolder);
+    victim.execute();
   }
 
   @Test(expected = MojoExecutionException.class)
@@ -297,9 +297,9 @@ public class TestWro4jMojo {
     final String preProcessors = ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS + "=INVALID";
     FileUtils.write(extraConfigFile, preProcessors);
 
-    mojo.setIgnoreMissingResources(true);
-    mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
-    mojo.execute();
+    victim.setIgnoreMissingResources(true);
+    victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
+    victim.execute();
   }
 
   @Test
@@ -309,9 +309,9 @@ public class TestWro4jMojo {
 
     final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
 
-    mojo.setGroupNameMappingFile(groupNameMappingFile);
-    mojo.setIgnoreMissingResources(true);
-    mojo.execute();
+    victim.setGroupNameMappingFile(groupNameMappingFile);
+    victim.setIgnoreMissingResources(true);
+    victim.execute();
 
     // verify
     final Properties groupNames = new Properties();
@@ -329,10 +329,10 @@ public class TestWro4jMojo {
 
     final File groupNameMappingFile = new File(FileUtils.getTempDirectory(), "groupMapping-" + new Date().getTime());
 
-    mojo.setWroManagerFactory(CustomNamingStrategyWroManagerFactory.class.getName());
-    mojo.setGroupNameMappingFile(groupNameMappingFile);
-    mojo.setIgnoreMissingResources(true);
-    mojo.execute();
+    victim.setWroManagerFactory(CustomNamingStrategyWroManagerFactory.class.getName());
+    victim.setGroupNameMappingFile(groupNameMappingFile);
+    victim.setIgnoreMissingResources(true);
+    victim.execute();
 
     // verify
     final Properties groupNames = new Properties();
@@ -355,10 +355,10 @@ public class TestWro4jMojo {
     props.setProperty(ConfigurableNamingStrategy.KEY, FolderHashEncoderNamingStrategy.ALIAS);
     props.list(new PrintStream(extraConfigFile));
 
-    mojo.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
-    mojo.setExtraConfigFile(extraConfigFile);
-    mojo.setIgnoreMissingResources(true);
-    mojo.execute();
+    victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
+    victim.setExtraConfigFile(extraConfigFile);
+    victim.setIgnoreMissingResources(true);
+    victim.execute();
 
     FileUtils.deleteQuietly(extraConfigFile);
   }
@@ -408,9 +408,9 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void testIncrementalChange()
+  public void shouldDetectIncrementalChange()
       throws Exception {
-    mojo = new Wro4jMojo() {
+    victim = new Wro4jMojo() {
       @Override
       protected WroManagerFactory getManagerFactory() {
         return new WroManagerFactoryDecorator(super.getManagerFactory()) {
@@ -421,26 +421,35 @@ public class TestWro4jMojo {
         };
       }
     };
-    setUpMojo(mojo);
+    setUpMojo(victim);
     final String hashValue = "SomeHashValue";
     when(mockHashStrategy.getHash(Mockito.any(InputStream.class))).thenReturn(hashValue);
     when(mockBuildContext.isIncremental()).thenReturn(true);
     when(mockBuildContext.getValue(Mockito.anyString())).thenReturn(hashValue);
-    mojo.setIgnoreMissingResources(true);
-    mojo.setBuildContext(mockBuildContext);
+    victim.setIgnoreMissingResources(true);
     // incremental build detects no change
-    assertTrue(mojo.getTargetGroupsAsList().isEmpty());
+    assertTrue(victim.getTargetGroupsAsList().isEmpty());
 
     // incremental change detects change for all resources
     when(mockHashStrategy.getHash(Mockito.any(InputStream.class))).thenReturn("TotallyDifferentValue");
-    assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+    assertFalse(victim.getTargetGroupsAsList().isEmpty());
   }
 
   @Test
   public void shouldDetectIncrementalChangeOfImportedCss()
       throws Exception {
-    final String parentResource = "parent.css";
     final String importResource = "imported.css";
+
+    configureMojoForModelWithImportedCssResource(importResource);
+    // incremental build detects no change
+    assertTrue(victim.getTargetGroupsAsList().isEmpty());
+
+    when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
+    assertFalse(victim.getTargetGroupsAsList().isEmpty());
+  }
+
+  private void configureMojoForModelWithImportedCssResource(final String importResource) throws Exception {
+    final String parentResource = "parent.css";
 
     final WroModel model = new WroModel();
     model.addGroup(new Group("g1").addResource(Resource.create(parentResource)));
@@ -448,7 +457,7 @@ public class TestWro4jMojo {
     final String parentContent = String.format("@import url(%s)", importResource);
     when(mockLocator.locate(Mockito.eq(parentResource))).thenAnswer(answerWithContent(parentContent));
 
-    mojo = new Wro4jMojo() {
+    victim = new Wro4jMojo() {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
@@ -458,8 +467,8 @@ public class TestWro4jMojo {
         return managerFactory;
       }
     };
-    final HashStrategy hashStrategy = mojo.getManagerFactory().create().getHashStrategy();
-    setUpMojo(mojo);
+    final HashStrategy hashStrategy = victim.getManagerFactory().create().getHashStrategy();
+    setUpMojo(victim);
 
     final String importedInitialContent = "initial";
 
@@ -469,14 +478,21 @@ public class TestWro4jMojo {
         hashStrategy.getHash(new ByteArrayInputStream(parentContent.getBytes())));
     when(mockBuildContext.getValue(Mockito.eq(importResource))).thenReturn(
         hashStrategy.getHash(new ByteArrayInputStream(importedInitialContent.getBytes())));
-    mojo.setIgnoreMissingResources(true);
-    mojo.setBuildContext(mockBuildContext);
+    victim.setIgnoreMissingResources(true);
+  }
+
+  @Test
+  public void shouldIgnoreChangesOfGroupsWhichAreNotPartOfTargetGroups() throws Exception {
+    final String importResource = "imported.css";
+
+    configureMojoForModelWithImportedCssResource(importResource);
+    victim.setTargetGroups("g2");
 
     // incremental build detects no change
-    assertTrue(mojo.getTargetGroupsAsList().isEmpty());
+    assertTrue(victim.getTargetGroupsAsList().isEmpty());
 
     when(mockLocator.locate(Mockito.eq(importResource))).thenAnswer(answerWithContent("Changed"));
-    assertFalse(mojo.getTargetGroupsAsList().isEmpty());
+    assertTrue(victim.getTargetGroupsAsList().isEmpty());
   }
 
   @Test
@@ -489,7 +505,7 @@ public class TestWro4jMojo {
       final WroModel model = new WroModel();
       model.addGroup(new Group("g1").addResource(g1Resource));
       model.addGroup(new Group("g2").addResource(Resource.create("2.js")));
-      mojo = new Wro4jMojo() {
+      victim = new Wro4jMojo() {
         @Override
         protected WroManagerFactory newWroManagerFactory()
             throws MojoExecutionException {
@@ -500,14 +516,13 @@ public class TestWro4jMojo {
           return managerFactory;
         }
       };
-      setUpMojo(mojo);
-      mojo.setBuildContext(mockBuildContext);
+      setUpMojo(victim);
 
-      mojo.setGroupNameMappingFile(groupNameMappingFile);
+      victim.setGroupNameMappingFile(groupNameMappingFile);
       when(mockBuildContext.isIncremental()).thenReturn(true);
 
-      assertEquals(2, mojo.getTargetGroupsAsList().size());
-      mojo.execute();
+      assertEquals(2, victim.getTargetGroupsAsList().size());
+      victim.execute();
       final Properties groupNames = new Properties();
       groupNames.load(new FileInputStream(groupNameMappingFile));
       assertEquals(4, groupNames.entrySet().size());
@@ -518,13 +533,13 @@ public class TestWro4jMojo {
         public Object answer(final InvocationOnMock invocation)
             throws Throwable {
           final String key = (String) invocation.getArguments()[0];
-          return mojo.getManagerFactory().create().getHashStrategy().getHash(new ByteArrayInputStream(key.getBytes()));
+          return victim.getManagerFactory().create().getHashStrategy().getHash(new ByteArrayInputStream(key.getBytes()));
         }
       });
 
 
-      assertEquals(1, mojo.getTargetGroupsAsList().size());
-      mojo.execute();
+      assertEquals(1, victim.getTargetGroupsAsList().size());
+      victim.execute();
 
       groupNames.load(new FileInputStream(groupNameMappingFile));
       // The number of persisted groupNames should still be unchanged, even though only a single group has been changed
@@ -533,6 +548,46 @@ public class TestWro4jMojo {
     } finally {
       FileUtils.deleteQuietly(groupNameMappingFile);
     }
+  }
+
+  /**
+   * Test for the following scenario: when incremental build is performed, only changed resources are processed. Given
+   * that there are two target groups, and a resource from only one group is changed incremental build should process
+   * only that one group. However, if the targetFolder does not exist, all target groups must be processed.
+   */
+  @Test
+  public void shouldProcessTargetGroupsWhenDestinationFolderDoesNotExist() throws Exception {
+    victim = new Wro4jMojo() {
+      @Override
+      protected WroManagerFactory getManagerFactory() {
+        return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+          @Override
+          protected void onBeforeBuild(final Builder builder) {
+            builder.setHashStrategy(mockHashStrategy);
+          }
+        };
+      }
+    };
+    final String constantHash = "hash";
+    when(mockHashStrategy.getHash(Mockito.any(InputStream.class))).thenReturn(constantHash);
+    setUpMojo(victim);
+    victim.setIgnoreMissingResources(true);
+
+    final int totalGroups = 9;
+
+    assertEquals(totalGroups, victim.getTargetGroupsAsList().size());
+
+    when(mockBuildContext.isIncremental()).thenReturn(true);
+    when(mockBuildContext.getValue(Mockito.anyString())).thenReturn(constantHash);
+
+    assertEquals(0, victim.getTargetGroupsAsList().size());
+
+    //delete target folder
+    destinationFolder.delete();
+
+    assertEquals(9, victim.getTargetGroupsAsList().size());
+
+    victim.doExecute();
   }
 
   private Answer<InputStream> answerWithContent(final String content) {

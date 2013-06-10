@@ -39,7 +39,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Inject
   private GroupsProcessor groupsProcessor;
   @Inject
-  private HashStrategy hashBuilder;
+  private HashStrategy hashStrategy;
   @Inject
   private ResourceAuthorizationManager authorizationManager;
   @Inject
@@ -116,7 +116,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
         if (LOG.isDebugEnabled()) {
           LOG.debug("Content to fingerprint: [{}]", StringUtils.abbreviate(content, 30));
         }
-        hash = hashBuilder.getHash(new ByteArrayInputStream(content.getBytes()));
+        hash = hashStrategy.getHash(new ByteArrayInputStream(content.getBytes()));
       }
       final CacheValue entry = CacheValue.valueOf(content, hash);
       LOG.debug("computed entry: {}", entry);
