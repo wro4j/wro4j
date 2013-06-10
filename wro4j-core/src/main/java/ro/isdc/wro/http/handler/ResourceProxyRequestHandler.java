@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.http.support.ContentTypeResolver;
+import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.model.group.Inject;
@@ -56,9 +57,8 @@ public class ResourceProxyRequestHandler
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-    final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
-    verifyAccess(resourceUri, response);
-    serveProxyResourceUri(resourceUri, response);
+    verifyAccess(request, response);
+    serveProxyResourceUri(request, response);
   }
 
   /**
@@ -69,34 +69,63 @@ public class ResourceProxyRequestHandler
     return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
   }
 
-  private void serveProxyResourceUri(final String resourceUri, final HttpServletResponse response)
+  private void serveProxyResourceUri(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
+    final String resourceUri = getResourceUri(request);
     LOG.debug("[OK] serving proxy resource: {}", resourceUri);
     final OutputStream outputStream = response.getOutputStream();
     response.setContentType(ContentTypeResolver.get(resourceUri, context.getConfig().getEncoding()));
 
-    // set expiry headers
-    getHeadersConfigurer().setHeaders(response);
-    InputStream is = null;
-    try {
-      is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
-      final int length = IOUtils.copy(is, outputStream);
-      // servlet engine may ignore this if content body is flushed to client
-      response.setContentLength(length);
-      response.setStatus(HttpServletResponse.SC_OK);
-    } finally {
-      IOUtils.closeQuietly(is);
-      IOUtils.closeQuietly(outputStream);
+    if (isResourceChanged(request)) {
+      // set expiry headers
+      getHeadersConfigurer().setHeaders(response);
+      InputStream is = null;
+      try {
+        is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
+        final int length = IOUtils.copy(is, outputStream);
+        // servlet engine may ignore this if content body is flushed to client
+        response.setContentLength(length);
+        response.setStatus(HttpServletResponse.SC_OK);
+      } finally {
+        IOUtils.closeQuietly(is);
+        IOUtils.closeQuietly(outputStream);
+      }
+    } else {
+      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
     }
   }
 
+  /**
+   * Used to identify whether the {@link HttpServletResponse#SC_NOT_MODIFIED} or {@link HttpServletResponse#SC_OK}
+   * should be returned. Currently a single timestamp is used to detect the change for all resources. This might be no
+   * accurate, but at least it allows sending NOT_MODIFIED header much often resulting in less load on the server.
+   * <p/>
+   * Override this method if a different way detecting change is required.
+   *
+   * @return true if the requested resource is changed on the server and the latest version should be returned.
+   */
+  protected boolean isResourceChanged(final HttpServletRequest request) {
+    try {
+      final long ifModifiedSince = request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString());
+      return ifModifiedSince < getHeadersConfigurer().getLastModifiedTimestamp();
+    } catch (final Exception e) {
+      LOG.warn("Could not extract IF_MODIFIED_SINCE header for request: " + request.getRequestURI() + ". Assuming content is changed. ", e);
+      return true;
+    }
+  }
 
-  private void verifyAccess(final String resourceUri, final HttpServletResponse response) {
+  private void verifyAccess(final HttpServletRequest request, final HttpServletResponse response) {
+    final String resourceUri = getResourceUri(request);
     if (!authManager.isAuthorized(resourceUri)) {
       LOG.debug("[FAIL] Unauthorized proxy resource: {}", resourceUri);
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       throw new UnauthorizedRequestException("Unauthorized resource request detected: " + resourceUri);
     }
+  }
+
+  private String getResourceUri(final HttpServletRequest request) {
+    final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
+    return resourceUri;
   }
 
   private final ResponseHeadersConfigurer getHeadersConfigurer() {

@@ -14,7 +14,7 @@
         <project_charset>UTF-8</project_charset>
     </properties>
     <dependencies>
-    <!-- Project Dependencies -->
+        <!-- Project Dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wro4j-extensions</artifactId>
@@ -23,11 +23,11 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-    <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>jquery</artifactId>
-        <version>2.0.0</version>
-    </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>2.0.0</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -37,7 +37,7 @@
             </resource>
         </resources>
         <plugins>
-        <!-- -->
+            <!-- -->
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>
@@ -54,13 +54,13 @@
                     <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
                 </configuration>
             </plugin>
-             
+
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
                 <artifactId>wro4j-maven-plugin</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
                 <executions>
-                <!----> 
+                <!---->
                     <execution>
                         <id>csslint</id>
                         <phase>test</phase>
@@ -72,7 +72,7 @@
                             <targetGroups>cssGroup</targetGroups>
                         </configuration>
                     </execution>
-                     
+
                     <execution>
                         <id>jshint</id>
                         <phase>test</phase>
@@ -85,11 +85,7 @@
                         </configuration>
                     </execution>
                 </executions>
-                <!--  
-                <configuration>
-                    <options>undef</options>
-                </configuration>
-                -->
+                <!-- <configuration> <options>undef</options> </configuration> -->
             </plugin>
         </plugins>
     </build>

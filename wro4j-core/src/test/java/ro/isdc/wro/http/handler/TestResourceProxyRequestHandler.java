@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -30,6 +31,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -217,6 +219,36 @@ public class TestResourceProxyRequestHandler {
     victim.handle(request, response);
 
     verify(response, times(1)).setContentType("image/png");
+  }
+
+  @Test
+  public void shouldSetCorrectResopnsCodeBasedOnResourceChangeState()
+      throws IOException {
+    final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+
+    final long timeInFuture = new Date().getTime() + 10000;
+    when(request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString())).thenReturn(timeInFuture);
+    victim.handle(request, response);
+    verify(response).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+
+
+    final long longTimeAgo = 123L;
+    when(request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString())).thenReturn(longTimeAgo);
+    victim.handle(request, response);
+    verify(response).setStatus(Mockito.eq(HttpServletResponse.SC_OK));
+  }
+
+  @Test
+  public void shouldAssumeResourceChangedWhenModifiedSinceHeaderExtractionFails() throws Exception {
+    final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+
+    when(request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString())).thenThrow(new IllegalArgumentException("BOOM!"));
+    victim.handle(request, response);
+    verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
   private InputStream getInputStream(final String filename)
