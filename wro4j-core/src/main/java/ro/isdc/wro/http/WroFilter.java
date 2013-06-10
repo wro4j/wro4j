@@ -41,6 +41,7 @@ import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
@@ -189,7 +190,7 @@ public class WroFilter
       LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
           + contextPath + " contextPath.");
     }
-    return contextPath.replaceFirst("/", "");
+    return contextPath.replaceFirst(ServletContextUriLocator.PREFIX, "");
   }
 
   /**

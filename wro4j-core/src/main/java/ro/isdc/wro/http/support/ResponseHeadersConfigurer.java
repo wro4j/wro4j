@@ -35,7 +35,7 @@ public class ResponseHeadersConfigurer {
    * String representation of headers to set. Each header is separated by a | character.
    */
   private final String headersAsString;
-  private final Long lastModifiedTimestamp = new Date().getTime();
+  private final Long lastModifiedTimestamp = initTimestamp();
 
   /**
    * Map containing header values used to control caching. The keys from this values are trimmed and lower-cased when
@@ -203,7 +203,20 @@ public class ResponseHeadersConfigurer {
     return Collections.unmodifiableMap(headersMap);
   }
 
-  Long getLastModifiedTimestamp() {
+  /**
+   * @return the timestamp of the last modification.
+   */
+  public Long getLastModifiedTimestamp() {
     return lastModifiedTimestamp;
+  }
+
+  /**
+   * @return the timestamp value milliseconds stripped. Strip operation is important, because when timestamp is
+   *         extracted from response header, it ends with 000 (milliseconds are not applied).
+   */
+  private long initTimestamp() {
+    long timestamp = new Date().getTime();
+    timestamp = timestamp - (timestamp % 1000);
+    return timestamp;
   }
 }

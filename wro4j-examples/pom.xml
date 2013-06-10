@@ -17,6 +17,8 @@
     <module>wro4j-demo</module>
     <module>wro4j-standalone</module>
     <module>wro4j-spring</module>
+<!--
     <module>wro4j-osgi-example</module>
+-->
   </modules>
 </project>
