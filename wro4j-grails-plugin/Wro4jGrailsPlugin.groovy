@@ -10,7 +10,7 @@ import wro4j.grails.plugin.WroDSLHandler
 
 class Wro4jGrailsPlugin {
   // the plugin version == wro4j version
-  def version = "1.6.3"
+  def version = "1.7.0"
   def grailsVersion = "1.3.7 > *"
   def pluginExcludes = [
       "grails-app/views/index.gsp",
