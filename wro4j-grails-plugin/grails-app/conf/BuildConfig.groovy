@@ -16,7 +16,7 @@ grails.project.dependency.resolution = {
   def seleniumVersion = "2.31.0"
 
   dependencies {
-    runtime("ro.isdc.wro4j:wro4j-extensions:1.6.3") {
+    runtime("ro.isdc.wro4j:wro4j-extensions:1.7.0") {
       excludes('slf4j-log4j12', 'slf4j-api', 'spring-web', 'gmaven-runtime-1.6', 'servlet-api', 'ant', 'groovy-all')
     }
 
