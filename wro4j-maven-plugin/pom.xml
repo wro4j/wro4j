@@ -4,7 +4,7 @@
     <parent>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-parent</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1-SNAPSHOT</version>
     </parent>
     <artifactId>wro4j-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>

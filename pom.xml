@@ -8,7 +8,7 @@
     <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
-    <version>1.7.0</version>
+    <version>1.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>wro4j parent</name>
     <inceptionYear>2008</inceptionYear>
