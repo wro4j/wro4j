@@ -1,15 +1,11 @@
 Wro4j Grails Plugin
 ====================
 
-Install the plugin by using:
-
-    grails install-plugin wro4j
-
-Or, install the plugin by adding the following to BuildConfig.groovy:
+Install the plugin by adding the following to BuildConfig.groovy:
 
     grails.project.dependency.resolution {
        plugins {
-          compile ':wro4j:latest.release'
+          compile 'ro.isdc.wro4j:grails-wro4j:latest.release'
        }
     }
 
@@ -262,11 +258,11 @@ Yes, of course !!!
 
 **How to build this plugin**
 
-run 'grails package-plugin'
+run 'mvn package'
 
 It will create a plugin archive. Note that the selenium tests require that firefox.exe be on the PATH, so be sure to add it before running anything with runs the tests.
 
-**Releasing a new version of this plugin to grails.org/plugins**
+**Releasing a new version of this plugin**
 
-run 'grails publish-plugin --no-scm'
+See https://code.google.com/p/wro4j/wiki/ReleaseSteps
 

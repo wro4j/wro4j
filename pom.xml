@@ -415,6 +415,7 @@
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
+                <module>wro4j-grails-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -427,6 +428,7 @@
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
                 <module>wro4j-runner</module>
+                <module>wro4j-grails-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -441,6 +443,7 @@
                 <module>wro4j-runner</module>
                 <module>wro4j-examples</module>
                 <module>wro4j-osgi</module>
+                <module>wro4j-grails-plugin</module>
             </modules>
         </profile>
     </profiles>
