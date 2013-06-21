@@ -23,7 +23,7 @@ import ro.isdc.wro.manager.WroManager;
 public class DefaultWroManagerFactory
     implements WroManagerFactory {
   private final WroManagerFactory factory;
-
+  private Properties properties;
   /**
    *
    * @param configuration
@@ -43,6 +43,7 @@ public class DefaultWroManagerFactory
    */
   public DefaultWroManagerFactory(final Properties properties) {
     notNull(properties);
+    this.properties = properties;
     factory = initFactory(properties.getProperty(ConfigConstants.managerFactoryClassName.name()));
   }
 
@@ -59,7 +60,12 @@ public class DefaultWroManagerFactory
       try {
         factoryClass = Thread.currentThread().getContextClassLoader().loadClass(wroManagerClassName);
         // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
+        final WroManagerFactory factory = (WroManagerFactory)factoryClass.newInstance();
+        // inject properties if required
+        if (factory instanceof ConfigurableWroManagerFactory && properties != null) {
+          ((ConfigurableWroManagerFactory) factory).setConfigProperties(properties);
+        }
+        return factory;
       } catch (final Exception e) {
         throw new WroRuntimeException("Exception while loading WroManagerFactory class:" + wroManagerClassName, e);
       }
