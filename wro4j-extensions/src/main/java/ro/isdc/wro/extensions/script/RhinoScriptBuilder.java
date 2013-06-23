@@ -200,7 +200,7 @@ public final class RhinoScriptBuilder {
     } catch (final RhinoException e) {
       final String message = RhinoUtils.createExceptionMessage(e);
       LOG.error("JavaScriptException occured: {}", message);
-      throw new WroRuntimeException(message);
+      throw WroRuntimeException.wrap(e, message);
     } finally {
       // Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
       if (Context.getCurrentContext() != null) {

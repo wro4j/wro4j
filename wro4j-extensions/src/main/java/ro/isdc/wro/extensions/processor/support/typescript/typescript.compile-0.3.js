@@ -31,23 +31,26 @@ var compilerWrapper = {
 				Close: function() {}
 		};
 		var compiler = new TypeScript.TypeScriptCompiler(outfile);
-		TypeScript.codeGenTarget = codeGenTarget;
+		TypeScript.LanguageVersion = codeGenTarget;
 
 		if(src.length == 0) {
 			return '';
 		}
+		/*
 		compiler.parser.errorRecovery = true;
 		compiler.setErrorCallback(function(start, len, message, block) {
 			var error = 'Compilation error: ' + message + '\n Code block: ' + block + ' Start position: ' + start + ' Length: '+ len;
 			console.log(error);
 			compilationResult.errors.push(message);
 		});
+	
 		compiler.addUnit(libfile, 'lib.d.ts');
 		compiler.addUnit(src,'');
 		compiler.typeCheck();
 		compiler.emit(false, function createFile(fileName) {
 			return outfile;
 		});
+		  */
 		compilationResult.source = outfile.source;
 		return compilationResult;
 	}

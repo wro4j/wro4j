@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
@@ -27,9 +28,9 @@ public class TypeScriptCompiler {
   private static final String PARAM_ERRORS = "errors";
   private static final String PARAM_SOURCE = "source";
   private static final Logger LOG = LoggerFactory.getLogger(TypeScriptCompiler.class);
-  private static final String TYPESCRIPT_JS = "typescript-0.8.js";
+  private static final String TYPESCRIPT_JS = "typescript.js";
   private static final String TYPESCRIPT_COMPILE_JS = "typescript.compile-0.3.js";
-  private final String ecmaScriptVersion = "TypeScript.CodeGenTarget.ES5";
+  private final String ecmaScriptVersion = "TypeScript.LanguageVersion.ES5";
   private ScriptableObject scope;
 
   public String compile(final String typeScript) {
@@ -94,8 +95,8 @@ public class TypeScriptCompiler {
   /**
    * @return the stream for the script for TypeScript compiler.
    */
-  protected InputStream getCompilerStream() {
-    return TypeScriptCompiler.class.getResourceAsStream(TYPESCRIPT_JS);
+  protected InputStream getCompilerStream() throws IOException {
+    return new WebjarUriLocator().locate(WebjarUriLocator.createUri(TYPESCRIPT_JS));
   }
 
   private RhinoScriptBuilder initScriptBuilder() {
