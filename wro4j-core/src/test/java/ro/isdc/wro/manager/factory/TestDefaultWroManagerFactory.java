@@ -1,6 +1,7 @@
 package ro.isdc.wro.manager.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.InputStream;
@@ -45,8 +46,10 @@ public class TestDefaultWroManagerFactory {
       throws Exception {
     initMocks(this);
     victim = DefaultWroManagerFactory.create(new WroConfiguration());
-    Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
-    Mockito.when(servletContext.getResourceAsStream(Mockito.anyString())).then(createValidModelStreamAnswer());
+    when(request.getRequestURL()).thenReturn(new StringBuffer());
+    when(request.getServletPath()).thenReturn("");
+    when(filterConfig.getServletContext()).thenReturn(servletContext);
+    when(servletContext.getResourceAsStream(Mockito.anyString())).then(createValidModelStreamAnswer());
     Context.set(Context.webContext(request, response, filterConfig));
   }
 
