@@ -408,7 +408,7 @@ public class WroFilter
    * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory newWroManagerFactory() {
-    return new DefaultWroManagerFactory(wroConfiguration);
+    return DefaultWroManagerFactory.create(wroConfiguration);
   }
 
   /**

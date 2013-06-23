@@ -85,7 +85,7 @@ public class WroServletContextListener
    * @return default implementation of {@link WroManagerFactory}.
    */
   protected WroManagerFactory newManagerFactory() {
-    return new DefaultWroManagerFactory(this.configuration);
+    return DefaultWroManagerFactory.create(this.configuration);
   }
 
   /**
