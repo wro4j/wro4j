@@ -23,14 +23,21 @@ import ro.isdc.wro.manager.WroManager;
 public class DefaultWroManagerFactory
     implements WroManagerFactory {
   private final WroManagerFactory factory;
-  private Properties properties;
+
   /**
+   * A factory method which uses {@link WroConfiguration} to get the configured wroManager className.
    *
    * @param configuration
+   *          {@link WroConfiguration} to get the {@link ConfigConstants#managerFactoryClassName} from.
    */
-  public DefaultWroManagerFactory(final WroConfiguration configuration) {
+  public static DefaultWroManagerFactory create(final WroConfiguration configuration) {
     notNull(configuration);
-    factory = initFactory(configuration.getWroManagerClassName());
+    final Properties properties = new Properties();
+    final String wroManagerClassName = configuration.getWroManagerClassName();
+    if (wroManagerClassName != null) {
+      properties.setProperty(ConfigConstants.managerFactoryClassName.name(), wroManagerClassName);
+    }
+    return new DefaultWroManagerFactory(properties);
   }
 
   /**
@@ -43,14 +50,14 @@ public class DefaultWroManagerFactory
    */
   public DefaultWroManagerFactory(final Properties properties) {
     notNull(properties);
-    this.properties = properties;
-    factory = initFactory(properties.getProperty(ConfigConstants.managerFactoryClassName.name()));
+    factory = initFactory(properties);
   }
 
   /**
    * Initialized inner factory based on provided configuration.
    */
-  private WroManagerFactory initFactory(final String wroManagerClassName) {
+  private WroManagerFactory initFactory(final Properties properties) {
+    final String wroManagerClassName = properties.getProperty(ConfigConstants.managerFactoryClassName.name());
     if (StringUtils.isEmpty(wroManagerClassName)) {
       // If no context param was specified we return the default factory
       return newManagerFactory();
@@ -62,7 +69,7 @@ public class DefaultWroManagerFactory
         // Instantiate the factory
         final WroManagerFactory factory = (WroManagerFactory)factoryClass.newInstance();
         // inject properties if required
-        if (factory instanceof ConfigurableWroManagerFactory && properties != null) {
+        if (factory instanceof ConfigurableWroManagerFactory) {
           ((ConfigurableWroManagerFactory) factory).setConfigProperties(properties);
         }
         return factory;

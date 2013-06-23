@@ -44,7 +44,7 @@ public class TestDefaultWroManagerFactory {
   public void setUp()
       throws Exception {
     initMocks(this);
-    victim = new DefaultWroManagerFactory(new WroConfiguration());
+    victim = DefaultWroManagerFactory.create(new WroConfiguration());
     Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
     Mockito.when(servletContext.getResourceAsStream(Mockito.anyString())).then(createValidModelStreamAnswer());
     Context.set(Context.webContext(request, response, filterConfig));
@@ -63,7 +63,7 @@ public class TestDefaultWroManagerFactory {
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullConfiguration() {
     final WroConfiguration config = null;
-    new DefaultWroManagerFactory(config);
+    DefaultWroManagerFactory.create(config);
   }
 
   @Test
@@ -73,7 +73,7 @@ public class TestDefaultWroManagerFactory {
 
   @Test
   public void shouldCreateOverridenManagerFactory() {
-    victim = new DefaultWroManagerFactory(new WroConfiguration()) {
+    victim = new DefaultWroManagerFactory(new Properties()) {
       @Override
       protected WroManagerFactory newManagerFactory() {
         return new ConfigurableWroManagerFactory();
@@ -86,7 +86,7 @@ public class TestDefaultWroManagerFactory {
   public void shouldCreateManagerFactory() {
     final WroConfiguration config = new WroConfiguration();
     config.setWroManagerClassName(NoProcessorsWroManagerFactory.class.getName());
-    victim = new DefaultWroManagerFactory(config);
+    victim = DefaultWroManagerFactory.create(config);
     assertEquals(NoProcessorsWroManagerFactory.class, victim.getFactory().getClass());
   }
 
@@ -94,13 +94,13 @@ public class TestDefaultWroManagerFactory {
   public void cannotCreateInvalidConfiguredManagerFactory() {
     final WroConfiguration config = new WroConfiguration();
     config.setWroManagerClassName("invalid.class.name.ManagerFactory");
-    victim = new DefaultWroManagerFactory(config);
+    victim = DefaultWroManagerFactory.create(config);
   }
 
   @Test
   public void shouldInvokeListenerMethods() {
     final WroManagerFactory mockManagerFactory = Mockito.mock(WroManagerFactory.class);
-    victim = new DefaultWroManagerFactory(new WroConfiguration()) {
+    victim = new DefaultWroManagerFactory(new Properties()) {
       @Override
       protected WroManagerFactory newManagerFactory() {
         return mockManagerFactory;
