@@ -23,6 +23,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.factory.ConfigurableModelFactory;
+import ro.isdc.wro.model.factory.XmlModelFactory;
 
 
 /**
@@ -149,12 +150,24 @@ public class TestDefaultWroManagerFactory {
   }
 
   /**
-   * Fix for issue751.
+   * Exceptional flow for issue751.
    */
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenInvalidModelIsProvidedWhenUsingConfigurableWroManagerFactory() {
+    useModelFactoryWithAlias("invalidModel");
+  }
+
+  /**
+   * Happy flow for issue751.
+   */
+  @Test
+  public void shouldUseValidModelIsProvidedWhenUsingConfigurableWroManagerFactory() {
+    useModelFactoryWithAlias(XmlModelFactory.ALIAS);
+  }
+
+  private void useModelFactoryWithAlias(final String modelFactoryAlias) {
     final Properties properties = propsForWroManagerClassName(ConfigurableWroManagerFactory.class.getName());
-    properties.setProperty(ConfigurableModelFactory.KEY, "invalidModel");
+    properties.setProperty(ConfigurableModelFactory.KEY, modelFactoryAlias);
     victim = new DefaultWroManagerFactory(properties);
     victim.create().getModelFactory().create();
   }
