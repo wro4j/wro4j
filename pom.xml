@@ -5,7 +5,6 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>   
-    <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-parent</artifactId>
