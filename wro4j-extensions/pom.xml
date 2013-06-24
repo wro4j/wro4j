@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
+            <artifactId>jruby-core</artifactId>
         </dependency>
         <dependency>
             <groupId>me.n4u.sass</groupId>
