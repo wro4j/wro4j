@@ -20,13 +20,11 @@ public class TestJsLint {
     jsLint.validate("");
   }
 
-
   @Test
   public void shouldValidateWithNoOptions()
     throws Exception {
     jsLint.validate("");
   }
-
 
   @Test
   public void shouldValidateWithMultipleOptions()
