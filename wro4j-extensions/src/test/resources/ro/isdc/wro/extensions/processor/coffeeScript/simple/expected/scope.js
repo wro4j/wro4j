@@ -5,7 +5,6 @@
 
   changeNumbers = function() {
     var inner;
-
     inner = -1;
     return outer = 10;
   };
