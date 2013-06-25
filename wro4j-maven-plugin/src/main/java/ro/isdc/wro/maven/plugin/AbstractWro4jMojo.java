@@ -500,7 +500,16 @@ public abstract class AbstractWro4jMojo
       getLog().error("Error retreiving URL for artifact", e);
       throw new RuntimeException(e);
     }
-    return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
+
+    return new URLClassLoader(urls.toArray(new URL[] {}), getParentClassLoader());
+  }
+
+  /**
+   * @return the parent {@link ClassLoader}. The current {@link ClassLoader} cannot be used as parent, since it will
+   *         lead to polluting the entire classpath also with transitive dependencies which were excluded by maven.
+   */
+  private ClassLoader getParentClassLoader() {
+    return Thread.currentThread().getContextClassLoader().getParent();
   }
 
   /**
