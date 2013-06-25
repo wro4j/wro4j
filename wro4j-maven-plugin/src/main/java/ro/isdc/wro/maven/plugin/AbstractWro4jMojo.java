@@ -509,7 +509,7 @@ public abstract class AbstractWro4jMojo
    *         lead to polluting the entire classpath also with transitive dependencies which were excluded by maven.
    */
   private ClassLoader getParentClassLoader() {
-    return Thread.currentThread().getContextClassLoader().getParent();
+    return Thread.currentThread().getContextClassLoader();
   }
 
   /**
