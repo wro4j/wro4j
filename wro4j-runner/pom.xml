@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
+            <artifactId>jruby-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
